@@ -57,7 +57,7 @@ namespace ADB_Explorer.Services
                 return theme;
             }
 
-            return AppTheme.Default;
+            return AppTheme.Light;
         }
     }
 }

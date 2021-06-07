@@ -41,7 +41,7 @@ namespace ADB_Explorer.Views
         // TODO WTS: Change the icons and titles for all HamburgerMenuItems here.
         public ObservableCollection<HamburgerMenuItem> MenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()
         {
-            new HamburgerMenuGlyphItem() { Label = Properties.Resources.ShellExplorerPage, Glyph = "\uE8A5", TargetPageType = typeof(ExplorerPage) },
+            new HamburgerMenuGlyphItem() { Label = Properties.Resources.ShellExplorerPage, Glyph = "\uF12B", TargetPageType = typeof(ExplorerPage) },
         };
 
         public ObservableCollection<HamburgerMenuItem> OptionMenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()
