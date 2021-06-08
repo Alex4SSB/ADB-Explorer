@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <ApplicationIcon>adb_explorer_icon_v1.ico</ApplicationIcon>
+    <ApplicationIcon>adb_explorer_icon_v2_icons8.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <PlatformTarget>AnyCPU</PlatformTarget>
