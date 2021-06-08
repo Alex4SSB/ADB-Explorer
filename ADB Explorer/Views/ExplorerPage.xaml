@@ -22,10 +22,22 @@
             Grid.Row="1"
             Margin="{StaticResource MediumLeftRightMargin}"
             Background="{DynamicResource MahApps.Brushes.Gray10}">
-            <!--
-                The Mahapps Gray10 color represents where you should place your content.
-                Place your content here.
-            -->
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ListView
+                x:Name="WindowsExplorerView"
+                Grid.Column="2"
+                Margin="10" ItemsSource="{Binding Path=WindowsFileList }">
+
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn />
+                    </GridView>
+                </ListView.View>
+            </ListView>
         </Grid>
     </Grid>
 </Page>
