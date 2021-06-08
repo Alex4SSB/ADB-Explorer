@@ -20,13 +20,14 @@ namespace ADB_Explorer.Views
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public IEnumerable<string> WindowsFileList { get; set; }
+        public List<string> WindowsFileList { get; set; }
 
         public void OnNavigatedTo(object parameter)
         {
-            var files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-
-            WindowsFileList = files.Select(f => Path.GetFileName(f));
+            //var files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            var files = DriveInfo.GetDrives();
+            WindowsFileList = files.Select(f => f.Name).ToList();
+            //WindowsFileList = files.Select(f => Path.GetFileName(f));
 
             //WindowsExplorerView.items
         }
@@ -47,5 +48,31 @@ namespace ADB_Explorer.Views
         }
 
         private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private void WindowsExplorerView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var itemName = WindowsExplorerView.SelectedItem.ToString();
+            if (itemName == "..")
+            {
+                itemName = Directory.GetParent(WindowsFileList[1]).FullName;
+                var parent = Directory.GetParent(itemName);
+                if (parent is null)
+                {
+                    WindowsFileList.Clear();
+                    WindowsFileList.AddRange(DriveInfo.GetDrives().Select(f => f.Name).ToList());
+                    WindowsExplorerView.Items.Refresh();
+                    return;
+                }
+                itemName = parent.FullName;
+            }
+            else if (!Directory.Exists(itemName)) return;
+            WindowsFileList.Clear();
+            WindowsFileList.Add("..");
+            WindowsFileList.AddRange(Directory.GetDirectories(itemName));
+            WindowsFileList.AddRange(Directory.GetFiles(itemName));
+            WindowsExplorerView.Items.Refresh();
+            //WindowsExplorerView.Items.Clear();
+            //WindowsFileList.ForEach(i => WindowsExplorerView.Items.Add(i));
+        }
     }
 }
