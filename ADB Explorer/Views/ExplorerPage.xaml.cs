@@ -51,7 +51,7 @@ namespace ADB_Explorer.Views
 
         private void WindowsExplorerView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var itemName = WindowsExplorerView.SelectedItem.ToString();
+            var itemName = WindowsExplorerView.SelectedItem?.ToString();
             if (itemName == "..")
             {
                 itemName = Directory.GetParent(WindowsFileList[1]).FullName;

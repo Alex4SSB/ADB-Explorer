@@ -9,6 +9,55 @@
     d:DesignWidth="800"
     Style="{DynamicResource MahApps.Styles.Page}"
     mc:Ignorable="d">
+    <Page.Resources>
+        <Style TargetType="ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <Border
+                            x:Name="_Border"
+                            Padding="2"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Margin="2,2,5,2"
+                                    FontFamily="Segoe MDL2 Assets"
+                                    Text="&#xE8B7;" />
+                                <TextBlock Grid.Column="1" Text="{Binding .}" />
+                            </Grid>
+
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="_Border" Property="Background" Value="LightGray" />
+                                <Setter Property="Foreground" Value="DeepSkyBlue" />
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="_Border" Property="Background" Value="AliceBlue" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <!--<Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="UseLayoutRounding" Value="False" />
+                    <Setter Property="Background" Value="Green" />
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Red" />
+            </Style.Resources>-->
+        </Style>
+    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
@@ -33,18 +82,30 @@
                 Margin="10"
                 ItemsSource="{Binding Path=WindowsFileList}"
                 MouseDoubleClick="WindowsExplorerView_MouseDoubleClick">
-                <ListView.ItemContainerStyle>
+                <!--<ListView.Style>
+                    <Style TargetType="ListView">
+
+                        <Style.Resources>
+                            <SolidColorBrush x:Key="{ x:Static SystemColors.HighlightBrushKey}" Color="AliceBlue" />
+                        </Style.Resources>
+                    </Style>
+                </ListView.Style>-->
+                <!--<ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     </Style>
-                </ListView.ItemContainerStyle>
+                </ListView.ItemContainerStyle>-->
                 <ListView.View>
 
                     <GridView>
                         <GridViewColumn Width="{Binding ElementName=WindowsExplorerView, Path=ActualWidth}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding .}" />
+                                    <!--<StackPanel>
+                                        <TextBlock Text="i"/>
+                                        <TextBlock Text="{Binding .}" />
+                                    </StackPanel>-->
+
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
