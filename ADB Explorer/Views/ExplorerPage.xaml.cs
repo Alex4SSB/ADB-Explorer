@@ -29,7 +29,7 @@ namespace ADB_Explorer.Views
             WindowsFileList = files.Select(f => f.Name).ToList();
             //WindowsFileList = files.Select(f => Path.GetFileName(f));
 
-            //WindowsExplorerView.items
+            //WindowsExplorerGrid.items
         }
 
         public void OnNavigatedFrom()
@@ -51,7 +51,7 @@ namespace ADB_Explorer.Views
 
         private void WindowsExplorerView_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var itemName = WindowsExplorerView.SelectedItem?.ToString();
+            var itemName = WindowsExplorerGrid.SelectedItem?.ToString();
             if (itemName == "..")
             {
                 itemName = Directory.GetParent(WindowsFileList[1]).FullName;
@@ -60,7 +60,7 @@ namespace ADB_Explorer.Views
                 {
                     WindowsFileList.Clear();
                     WindowsFileList.AddRange(DriveInfo.GetDrives().Select(f => f.Name).ToList());
-                    WindowsExplorerView.Items.Refresh();
+                    WindowsExplorerGrid.Items.Refresh();
                     return;
                 }
                 itemName = parent.FullName;
@@ -70,9 +70,9 @@ namespace ADB_Explorer.Views
             WindowsFileList.Add("..");
             WindowsFileList.AddRange(Directory.GetDirectories(itemName));
             WindowsFileList.AddRange(Directory.GetFiles(itemName));
-            WindowsExplorerView.Items.Refresh();
-            //WindowsExplorerView.Items.Clear();
-            //WindowsFileList.ForEach(i => WindowsExplorerView.Items.Add(i));
+            WindowsExplorerGrid.Items.Refresh();
+            //WindowsExplorerGrid.Items.Clear();
+            //WindowsFileList.ForEach(i => WindowsExplorerGrid.Items.Add(i));
         }
     }
 }
