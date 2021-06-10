@@ -28,19 +28,11 @@
         <TextBlock
             Margin="{StaticResource MediumLeftMargin}"
             Style="{StaticResource PageTitleStyle}"
-            Text="{x:Static properties:Resources.ExplorerPageTitle}" />
-        <Grid
-            Grid.Row="1"
-            Margin="{StaticResource MediumLeftRightMargin}"
-            Background="{DynamicResource MahApps.Brushes.Gray10}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="12" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <DataGrid
+            Text="{x:Static properties:Resources.ExplorerPageTitle}"
+            Grid.Row="0" />
+        <DataGrid
                 x:Name="WindowsExplorerGrid"
-                Grid.Column="2"
+                Grid.Row="1"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
                 ColumnHeaderStyle="{StaticResource ColHeaderStyle}"
@@ -50,37 +42,36 @@
                 KeyboardNavigation.TabNavigation="Once"
                 SelectionMode="Extended"
                 SelectionUnit="FullRow">
-                <DataGrid.RowStyle>
-                    <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="DataGridRow">
-                        <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
-                    </Style>
-                </DataGrid.RowStyle>
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn x:Name="Icon">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn
+            <DataGrid.RowStyle>
+                <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="DataGridRow">
+                    <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn x:Name="Icon">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn
                         x:Name="Name"
                         Binding="{Binding Name}"
                         Header="Name" />
-                    <DataGridTextColumn
+                <DataGridTextColumn
                         x:Name="Date"
                         Binding="{Binding Date}"
                         Header="Date modified" />
-                    <DataGridTextColumn
+                <DataGridTextColumn
                         x:Name="Type"
                         Binding="{Binding Type}"
                         Header="Type" />
-                    <DataGridTextColumn
+                <DataGridTextColumn
                         x:Name="Size"
                         Binding="{Binding Size}"
                         Header="Size" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </Page>
