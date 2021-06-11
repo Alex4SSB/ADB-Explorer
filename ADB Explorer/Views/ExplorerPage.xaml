@@ -17,7 +17,7 @@
             TargetType="DataGridColumnHeader">
             <Setter Property="controls:ControlsHelper.ContentCharacterCasing" Value="Normal" />
             <Setter Property="FontWeight" Value="Regular" />
-            
+
         </Style>
     </Page.Resources>
     <Grid>
@@ -72,10 +72,21 @@
                     x:Name="Type"
                     Binding="{Binding Type}"
                     Header="Type" />
-                <DataGridTextColumn
-                    x:Name="Size"
-                    Binding="{Binding Size}"
-                    Header="Size" />
+                <DataGridTextColumn x:Name="Size" Header="Size">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Text" Value="{Binding Size}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="Parent">
+                                    <Setter Property="Text" Value="" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                    <Setter Property="Text" Value="" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
