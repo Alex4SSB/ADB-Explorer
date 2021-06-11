@@ -26,22 +26,22 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock
+            Grid.Row="0"
             Margin="{StaticResource MediumLeftMargin}"
             Style="{StaticResource PageTitleStyle}"
-            Text="{x:Static properties:Resources.ExplorerPageTitle}"
-            Grid.Row="0" />
+            Text="{x:Static properties:Resources.ExplorerPageTitle}" />
         <DataGrid
-                x:Name="ExplorerGrid"
-                Grid.Row="1"
-                AutoGenerateColumns="False"
-                CanUserAddRows="False"
-                ColumnHeaderStyle="{StaticResource ColHeaderStyle}"
-                GridLinesVisibility="Horizontal"
-                IsReadOnly="True"
-                ItemsSource="{Binding}"
-                KeyboardNavigation.TabNavigation="Once"
-                SelectionMode="Extended"
-                SelectionUnit="FullRow">
+            x:Name="ExplorerGrid"
+            Grid.Row="1"
+            AutoGenerateColumns="False"
+            CanUserAddRows="False"
+            ColumnHeaderStyle="{StaticResource ColHeaderStyle}"
+            GridLinesVisibility="Horizontal"
+            IsReadOnly="True"
+            ItemsSource="{Binding}"
+            KeyboardNavigation.TabNavigation="Once"
+            SelectionMode="Extended"
+            SelectionUnit="FullRow">
             <DataGrid.RowStyle>
                 <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="DataGridRow">
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
@@ -56,21 +56,21 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn
-                        x:Name="Name"
-                        Binding="{Binding Name}"
-                        Header="Name" />
+                    x:Name="Name"
+                    Binding="{Binding Name}"
+                    Header="Name" />
                 <DataGridTextColumn
-                        x:Name="Date"
-                        Binding="{Binding ModifiedTime}"
-                        Header="Date modified" />
+                    x:Name="Date"
+                    Binding="{Binding Date}"
+                    Header="Date modified" />
                 <DataGridTextColumn
-                        x:Name="Type"
-                        Binding="{Binding Type}"
-                        Header="Type" />
+                    x:Name="Type"
+                    Binding="{Binding Type}"
+                    Header="Type" />
                 <DataGridTextColumn
-                        x:Name="Size"
-                        Binding="{Binding Size}"
-                        Header="Size" />
+                    x:Name="Size"
+                    Binding="{Binding Size}"
+                    Header="Size" />
             </DataGrid.Columns>
         </DataGrid>
     </Grid>

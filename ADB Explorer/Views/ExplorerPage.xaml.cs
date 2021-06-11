@@ -1,16 +1,14 @@
 ﻿using ADB_Explorer.Contracts.Views;
-using System;
+using ADB_Explorer.Core.Models;
+using ADB_Explorer.Core.Services;
+using ADB_Explorer.Models;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
-using ADB_Explorer.Models;
 using System.Windows.Input;
-using ADB_Explorer.Core.Models;
-using ADB_Explorer.Core.Services;
 
 namespace ADB_Explorer.Views
 {
