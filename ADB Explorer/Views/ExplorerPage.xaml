@@ -31,7 +31,7 @@
             Text="{x:Static properties:Resources.ExplorerPageTitle}"
             Grid.Row="0" />
         <DataGrid
-                x:Name="WindowsExplorerGrid"
+                x:Name="ExplorerGrid"
                 Grid.Row="1"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
@@ -61,7 +61,7 @@
                         Header="Name" />
                 <DataGridTextColumn
                         x:Name="Date"
-                        Binding="{Binding Date}"
+                        Binding="{Binding ModifiedTime}"
                         Header="Date modified" />
                 <DataGridTextColumn
                         x:Name="Type"

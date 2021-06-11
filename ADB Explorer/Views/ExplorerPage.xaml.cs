@@ -9,6 +9,8 @@ using System.Runtime.CompilerServices;
 using System.Windows.Controls;
 using ADB_Explorer.Models;
 using System.Windows.Input;
+using ADB_Explorer.Core.Models;
+using ADB_Explorer.Core.Services;
 
 namespace ADB_Explorer.Views
 {
@@ -22,13 +24,18 @@ namespace ADB_Explorer.Views
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public List<FileClass> WindowsFileList { get; set; }
+        public List<PhysicalFileClass> WindowsFileList { get; set; }
+        public List<FileClass> AndroidFileList { get; set; }
 
         public void OnNavigatedTo(object parameter)
         {
-            var files = DriveInfo.GetDrives();
-            WindowsFileList = files.Select(f => new FileClass(f.Name, FileType.Drive)).ToList();
-            WindowsExplorerGrid.ItemsSource = WindowsFileList;
+            // Windows
+            WindowsFileList = DriveInfo.GetDrives().Select(f => new PhysicalFileClass(f.Name, FileStat.FileType.Drive)).ToList();
+
+            // Android
+            AndroidFileList = ADBService.ReadDirectory("sdcard").Select(f => new FileClass(f)).ToList();
+
+            ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
 
         public void OnNavigatedFrom()
@@ -76,13 +83,16 @@ namespace ADB_Explorer.Views
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.Source is DataGridRow row && row.Item is FileClass file)
+            if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
-                WindowsFileList.Clear();
-                WindowsFileList.Add(new(Directory.GetParent(file.FilePath)?.FullName, FileType.Parent));
-                WindowsFileList.AddRange(Directory.GetDirectories(file.FilePath).Select(d => new FileClass(d, FileType.Folder)));
-                WindowsFileList.AddRange(Directory.GetFiles(file.FilePath).Select(f => new FileClass(f, FileType.File)));
-                WindowsExplorerGrid.Items.Refresh();
+                // WindowsFileList.Clear();
+                // WindowsFileList.Add(new(Directory.GetParent(file.Path)?.FullName, FileStat.FileType.Parent));
+                // WindowsFileList.AddRange(Directory.GetDirectories(file.Path).Select(d => new PhysicalFileClass(d, FileStat.FileType.Folder)));
+                // WindowsFileList.AddRange(Directory.GetFiles(file.Path).Select(f => new PhysicalFileClass(f, FileStat.FileType.File)));
+
+                AndroidFileList.Clear();
+                AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => new FileClass(f)));
+                ExplorerGrid.Items.Refresh();
             }
         }
     }
