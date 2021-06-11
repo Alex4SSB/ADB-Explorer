@@ -17,12 +17,13 @@
             TargetType="DataGridColumnHeader">
             <Setter Property="controls:ControlsHelper.ContentCharacterCasing" Value="Normal" />
             <Setter Property="FontWeight" Value="Regular" />
-            <Setter Property="FontFamily" Value="Calibri" />
+            
         </Style>
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock
@@ -30,9 +31,13 @@
             Margin="{StaticResource MediumLeftMargin}"
             Style="{StaticResource PageTitleStyle}"
             Text="{x:Static properties:Resources.ExplorerPageTitle}" />
+        <TextBox
+            x:Name="PathBox"
+            Grid.Row="1"
+            Margin="10" />
         <DataGrid
             x:Name="ExplorerGrid"
-            Grid.Row="1"
+            Grid.Row="2"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             ColumnHeaderStyle="{StaticResource ColHeaderStyle}"

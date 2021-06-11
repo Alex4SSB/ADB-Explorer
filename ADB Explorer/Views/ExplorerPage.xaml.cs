@@ -30,6 +30,7 @@ namespace ADB_Explorer.Views
             // Windows
             WindowsFileList = DriveInfo.GetDrives().Select(f => new PhysicalFileClass(f.Name, FileStat.FileType.Drive)).ToList();
 
+            PathBox.Text = "sdcard";
             // Android
             AndroidFileList = ADBService.ReadDirectory("sdcard").Select(f => new FileClass(f)).ToList();
 
@@ -87,6 +88,8 @@ namespace ADB_Explorer.Views
                 // WindowsFileList.Add(new(Directory.GetParent(file.Path)?.FullName, FileStat.FileType.Parent));
                 // WindowsFileList.AddRange(Directory.GetDirectories(file.Path).Select(d => new PhysicalFileClass(d, FileStat.FileType.Folder)));
                 // WindowsFileList.AddRange(Directory.GetFiles(file.Path).Select(f => new PhysicalFileClass(f, FileStat.FileType.File)));
+
+                PathBox.Text = file.Path;
 
                 AndroidFileList.Clear();
                 AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => new FileClass(f)));
