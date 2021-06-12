@@ -49,7 +49,6 @@ namespace ADB_Explorer.Core.Services
                 c switch
                 {
                     var ch when new[] { '(', ')', '<', '>', '|' ,';', '&', '*', '\\', '~', '"', '\'', ' ' }.Contains(ch) => "\\" + ch,
-                    // ' ' => "%s",
                     _ => new string(c, 1)
                 }));
         }
@@ -74,8 +73,15 @@ namespace ADB_Explorer.Core.Services
 
             // Execute find and stat to get file details in a safe to parse format
             string stdout, stderr;
-            int exitCode = ExecuteShellCommand("find", out stdout, out stderr, 
-                $"\"{EscapeShellString(path)}/\"", "-maxdepth", "1", "-exec", "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
+            int exitCode = ExecuteShellCommand(
+                "find",
+                out stdout,
+                out stderr,
+                $"\"{EscapeShellString(path)}/\"",
+                "-maxdepth",
+                "1",
+                "-exec",
+                "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
 
             if (exitCode != 0)
             {
@@ -83,7 +89,6 @@ namespace ADB_Explorer.Core.Services
             }
 
             // Split result by lines
-            
             var fileEntries = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Skip(1);
             foreach (var fileEntry in fileEntries)
             {
