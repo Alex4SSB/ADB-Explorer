@@ -14,7 +14,7 @@ namespace ADB_Explorer.Views
 {
     public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
     {
-        private const string INTERNAL_STORAGE = "storage/";
+        private const string INTERNAL_STORAGE = "sdcard";
 
         public ExplorerPage()
         {
