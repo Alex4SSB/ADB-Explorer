@@ -14,6 +14,8 @@ namespace ADB_Explorer.Views
 {
     public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
     {
+        private const string INTERNAL_STORAGE = "storage/";
+
         public ExplorerPage()
         {
             InitializeComponent();
@@ -30,9 +32,9 @@ namespace ADB_Explorer.Views
             // Windows
             WindowsFileList = DriveInfo.GetDrives().Select(f => new PhysicalFileClass(f.Name, FileStat.FileType.Drive)).ToList();
 
-            PathBox.Text = "/storage/emulated";
+            PathBox.Text = INTERNAL_STORAGE;
             // Android
-            AndroidFileList = ADBService.ReadDirectory(PathBox.Text).Select(f => new FileClass(f)).ToList();
+            AndroidFileList = ADBService.ReadDirectory(INTERNAL_STORAGE).Select(f => new FileClass(f)).ToList();
 
             ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
@@ -94,6 +96,8 @@ namespace ADB_Explorer.Views
                 AndroidFileList.Clear();
                 AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => new FileClass(f)));
                 ExplorerGrid.Items.Refresh();
+
+                ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
             }
         }
     }
