@@ -75,7 +75,7 @@
                 <DataGridTextColumn x:Name="Size" Header="Size">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Text" Value="{Binding Size}" />
+                            <Setter Property="Text" Value="{Binding SizeString}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Type}" Value="Parent">
                                     <Setter Property="Text" Value="" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using ADB_Explorer.Converters;
 using ADB_Explorer.Core.Models;
 
 namespace ADB_Explorer.Models
@@ -20,8 +21,8 @@ namespace ADB_Explorer.Models
 
         public object Icon { get; }
         public string TypeName { get; set; }
-
         public string Date => ModifiedTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+        public string SizeString => Size.ToSize();
     }
 
     public class PhysicalFileClass : FileClass

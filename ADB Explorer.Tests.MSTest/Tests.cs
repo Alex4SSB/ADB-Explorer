@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using ADB_Explorer.Converters;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 
 namespace ADB_Explorer.Tests.MSTest
 {
@@ -7,8 +9,24 @@ namespace ADB_Explorer.Tests.MSTest
     public class Tests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void ToSizeTest()
         {
+            var testVals = new Dictionary<ulong, string>()
+            {
+                { 0, "0B" },
+                { 300, "300B" },
+                { 33000, "33KB" },
+                { 500690, "501KB" },
+                { 1200100, "1MB" },
+                { 3400200100, "3GB" },
+                { 1200300400500, "1200GB" }
+            };
+
+            foreach (var item in testVals)
+            {
+                Assert.IsTrue(item.Key.ToSize() == item.Value);
+            }
+
         }
     }
 }
