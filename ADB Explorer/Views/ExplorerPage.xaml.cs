@@ -30,9 +30,9 @@ namespace ADB_Explorer.Views
             // Windows
             WindowsFileList = DriveInfo.GetDrives().Select(f => new PhysicalFileClass(f.Name, FileStat.FileType.Drive)).ToList();
 
-            PathBox.Text = "sdcard";
+            PathBox.Text = "/storage/emulated";
             // Android
-            AndroidFileList = ADBService.ReadDirectory("sdcard").Select(f => new FileClass(f)).ToList();
+            AndroidFileList = ADBService.ReadDirectory(PathBox.Text).Select(f => new FileClass(f)).ToList();
 
             ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
