@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ADB_Explorer.Core.Services
@@ -13,20 +11,26 @@ namespace ADB_Explorer.Core.Services
     {
         private const string ADB_PATH = "adb";
         private const string SHELL_CMD = "shell";
+        private static readonly char[] SEPARATORS = { '\n', '\r' };
 
-        public static int ExecuteShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
+        private static void InitProcess(Process cmdProcess)
         {
-            Process cmdProcess = new Process();
             cmdProcess.StartInfo.UseShellExecute = false;
             cmdProcess.StartInfo.RedirectStandardOutput = true;
             cmdProcess.StartInfo.RedirectStandardError = true;
             cmdProcess.StartInfo.CreateNoWindow = true;
+        }
+
+        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, string prefix = "", params string[] args)
+        {
+            using var cmdProcess = new Process();
+            InitProcess(cmdProcess);
             cmdProcess.StartInfo.FileName = ADB_PATH;
-            cmdProcess.StartInfo.Arguments = SHELL_CMD + " " + cmd + " " + string.Join(" ", args);
+            cmdProcess.StartInfo.Arguments = $"{prefix}{(prefix == "" ? "" : " ")}{cmd}{(args.Length < 1 ? "" : " ")}{string.Join(" ", args)}";
             cmdProcess.Start();
 
-            var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
-            var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
+            using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
+            using var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
             Task.WaitAll(stdoutTask, stderrTask);
             cmdProcess.WaitForExit();
 
@@ -35,37 +39,39 @@ namespace ADB_Explorer.Core.Services
             return cmdProcess.ExitCode;
         }
 
+        public static int ExecuteShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
+            => ExecuteAdbCommand(cmd, out stdout, out stderr, SHELL_CMD, args);
+
         public static List<FileStat> ReadDirectory(string path)
         {
             List<FileStat> result = new List<FileStat>();
 
             // Remove trailing '/' from given path to avoid possible issues
-            if (path.EndsWith('/'))
-            {
-                path = path.Remove(path.Length - 1);
-            }
+            path = path.TrimEnd('/');
 
             // Add parent directory when needed
-            if (path.LastIndexOf('/') > 0)
+            if (path.LastIndexOf('/') is int index && index > 0)
             {
                 result.Add(new FileStat
                 {
                     Name = "..",
-                    Path = path.Remove(path.LastIndexOf('/')),
+                    Path = path.Remove(index),
                     Type = FileStat.FileType.Parent
                 });
             }
 
             // Execute find and stat to get file details in a safe to parse format
             string stdout, stderr;
-            int exitCode = ExecuteShellCommand("find", out stdout, out stderr, $"\"{path}/\"", "-maxdepth", "1", "-exec", "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
+            int exitCode = ExecuteShellCommand("find", out stdout, out stderr, 
+                $"\"{path}/\"", "-maxdepth", "1", "-exec", "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
             if ((exitCode != 0) || (stderr.Length > 0))
             {
                 throw new Exception($"{stderr} (Error Code: {exitCode})");
             }
 
             // Split result by lines
-            var fileEntries = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Skip(1).ToList();
+            
+            var fileEntries = stdout.Split(SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Skip(1);
             foreach (var fileEntry in fileEntries)
             {
                 // Split each line to its parameters
