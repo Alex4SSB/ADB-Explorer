@@ -10,8 +10,7 @@ namespace ADB_Explorer.Core.Services
     public class ADBService
     {
         private const string ADB_PATH = "adb";
-        private const string SHELL_CMD = "shell";
-        private static readonly char[] SEPARATORS = { '\n', '\r' };
+        private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
 
         private static void InitProcess(Process cmdProcess)
         {
@@ -21,12 +20,12 @@ namespace ADB_Explorer.Core.Services
             cmdProcess.StartInfo.CreateNoWindow = true;
         }
 
-        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, string prefix = "", params string[] args)
+        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args)
         {
             using var cmdProcess = new Process();
             InitProcess(cmdProcess);
             cmdProcess.StartInfo.FileName = ADB_PATH;
-            cmdProcess.StartInfo.Arguments = $"{prefix}{(prefix == "" ? "" : " ")}{cmd}{(args.Length < 1 ? "" : " ")}{string.Join(" ", args)}";
+            cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
             cmdProcess.Start();
 
             using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
@@ -40,7 +39,20 @@ namespace ADB_Explorer.Core.Services
         }
 
         public static int ExecuteShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
-            => ExecuteAdbCommand(cmd, out stdout, out stderr, SHELL_CMD, args);
+        {
+            return ExecuteAdbCommand("shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
+        }
+
+        public static string EscapeShellString(string str)
+        {
+            return string.Concat(str.Select(c =>
+                c switch
+                {
+                    var ch when new[] { '(', ')', '<', '>', '|' ,';', '&', '*', '\\', '~', '"', '\'', ' ' }.Contains(ch) => "\\" + ch,
+                    // ' ' => "%s",
+                    _ => new string(c, 1)
+                }));
+        }
 
         public static List<FileStat> ReadDirectory(string path)
         {
@@ -50,7 +62,7 @@ namespace ADB_Explorer.Core.Services
             path = path.TrimEnd('/');
 
             // Add parent directory when needed
-            if (path.LastIndexOf('/') is int index && index > 0)
+            if (path.LastIndexOf('/') is var index && index > 0)
             {
                 result.Add(new FileStat
                 {
@@ -63,15 +75,16 @@ namespace ADB_Explorer.Core.Services
             // Execute find and stat to get file details in a safe to parse format
             string stdout, stderr;
             int exitCode = ExecuteShellCommand("find", out stdout, out stderr, 
-                $"\"{path}/\"", "-maxdepth", "1", "-exec", "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
-            if ((exitCode != 0) || (stderr.Length > 0))
+                $"\"{EscapeShellString(path)}/\"", "-maxdepth", "1", "-exec", "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
+
+            if (exitCode != 0)
             {
                 throw new Exception($"{stderr} (Error Code: {exitCode})");
             }
 
             // Split result by lines
             
-            var fileEntries = stdout.Split(SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Skip(1);
+            var fileEntries = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Skip(1);
             foreach (var fileEntry in fileEntries)
             {
                 // Split each line to its parameters
