@@ -14,11 +14,6 @@ namespace ADB_Explorer.Models
     {
         public FileClass() { }
 
-        private static BitmapSource IconToBitmapSource(System.Drawing.Icon icon)
-        {
-            return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-        }
-
         public static FileClass GenerateAndroidFile(FileStat fileStat)
         {
             return new FileClass
@@ -28,12 +23,12 @@ namespace ADB_Explorer.Models
                 Type = fileStat.Type,
                 Size = fileStat.Size,
                 ModifiedTime = fileStat.ModifiedTime,
-                Icon = fileStat.Type switch 
+                Icon = fileStat.Type switch
                 {
-                   FileType.File => IconToBitmapSource(ShellIcon.GetExtensionIcon(System.IO.Path.GetExtension(fileStat.Path), ShellIcon.IconSize.Small)),
-                   _ => IconToBitmapSource(ShellIcon.GetFileIcon(System.IO.Path.GetTempPath(), ShellIcon.IconSize.Small))
+                    FileType.File => IconToBitmapSource(ShellIconManager.GetExtensionIcon(System.IO.Path.GetExtension(fileStat.Path), ShellIconManager.IconSize.Large)),
+                    _ => folderIconBitmapSource
                 }
-        };
+            };
         }
 
         public static FileClass GenerateWindowsFile(string path, FileType type)
@@ -56,7 +51,14 @@ namespace ADB_Explorer.Models
 
         public object Icon { get; set; }
         public string TypeName { get; set; }
-        public string Date => ModifiedTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+        public string ModifiedTimeString => ModifiedTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
         public string SizeString => Size.ToSize();
+
+        private static BitmapSource IconToBitmapSource(System.Drawing.Icon icon)
+        {
+            return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        }
+
+        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), ShellIconManager.IconSize.Large));
     }
 }
