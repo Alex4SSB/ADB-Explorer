@@ -56,11 +56,10 @@
                 <DataGridTemplateColumn x:Name="Icon">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Image 
-                                Source="{Binding Icon}" 
-                                Height="24" 
-                                Width="24" 
-                                RenderOptions.BitmapScalingMode="HighQuality"/>
+                            <Image
+                                Height="32"
+                                RenderOptions.BitmapScalingMode="HighQuality"
+                                Source="{Binding Icon}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -70,22 +69,44 @@
                     Header="Name" />
                 <DataGridTextColumn
                     x:Name="Date"
-                    Binding="{Binding ModifiedTimeString}"
-                    Header="Date modified" />
-                <DataGridTextColumn
-                    x:Name="Type"
-                    Binding="{Binding Type}"
-                    Header="Type" />
-                <DataGridTextColumn x:Name="Size" Header="Size">
+                    Header="Date modified"
+                    SortMemberPath="ModifiedTime">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Text" Value="{Binding SizeString}" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Type}" Value="Parent">
-                                    <Setter Property="Text" Value="" />
+                                <DataTrigger Binding="{Binding Type}" Value="File">
+                                    <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                    <Setter Property="Text" Value="" />
+                                    <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn x:Name="Type" Header="Type">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="File">
+                                    <Setter Property="Text" Value="{Binding Type}" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                    <Setter Property="Text" Value="{Binding Type}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
+                <DataGridTextColumn
+                    x:Name="Size"
+                    Header="Size"
+                    SortMemberPath="Size">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="File">
+                                    <Setter Property="Text" Value="{Binding SizeString}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
