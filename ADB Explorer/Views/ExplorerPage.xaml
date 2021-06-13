@@ -53,11 +53,11 @@
                 </Style>
             </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTemplateColumn x:Name="Icon">
+                <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Image
-                                Height="32"
+                                Width="16"
                                 RenderOptions.BitmapScalingMode="HighQuality"
                                 Source="{Binding Icon}" />
                         </DataTemplate>
@@ -73,6 +73,7 @@
                     SortMemberPath="ModifiedTime">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
+                            <Setter Property="Margin" Value="4,0,8,0" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Type}" Value="File">
                                     <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
@@ -87,6 +88,7 @@
                 <DataGridTextColumn x:Name="Type" Header="Type">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
+                            <Setter Property="Margin" Value="4,0,0,0" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Type}" Value="File">
                                     <Setter Property="Text" Value="{Binding Type}" />
@@ -104,6 +106,7 @@
                     SortMemberPath="Size">
                     <DataGridTextColumn.ElementStyle>
                         <Style TargetType="TextBlock">
+                            <Setter Property="Margin" Value="4,0,0,0" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Type}" Value="File">
                                     <Setter Property="Text" Value="{Binding SizeString}" />

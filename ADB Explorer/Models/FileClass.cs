@@ -14,6 +14,8 @@ namespace ADB_Explorer.Models
     {
         public FileClass() { }
 
+        private const ShellIconManager.IconSize iconSize = ShellIconManager.IconSize.Small;
+
         public static FileClass GenerateAndroidFile(FileStat fileStat)
         {
             return new FileClass
@@ -25,7 +27,7 @@ namespace ADB_Explorer.Models
                 ModifiedTime = fileStat.ModifiedTime,
                 Icon = fileStat.Type switch
                 {
-                    FileType.File => IconToBitmapSource(ShellIconManager.GetExtensionIcon(System.IO.Path.GetExtension(fileStat.Path), ShellIconManager.IconSize.Large)),
+                    FileType.File => IconToBitmapSource(ShellIconManager.GetExtensionIcon(System.IO.Path.GetExtension(fileStat.Path), iconSize)),
                     _ => folderIconBitmapSource
                 }
             };
@@ -59,6 +61,6 @@ namespace ADB_Explorer.Models
             return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }
 
-        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), ShellIconManager.IconSize.Large));
+        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize));
     }
 }
