@@ -24,17 +24,17 @@ namespace ADB_Explorer.Views
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public List<PhysicalFileClass> WindowsFileList { get; set; }
+        public List<FileClass> WindowsFileList { get; set; }
         public List<FileClass> AndroidFileList { get; set; }
 
         public void OnNavigatedTo(object parameter)
         {
             // Windows
-            WindowsFileList = DriveInfo.GetDrives().Select(f => new PhysicalFileClass(f.Name, FileStat.FileType.Drive)).ToList();
+            WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
 
             PathBox.Text = INTERNAL_STORAGE;
             // Android
-            AndroidFileList = ADBService.ReadDirectory(INTERNAL_STORAGE).Select(f => new FileClass(f)).ToList();
+            AndroidFileList = ADBService.ReadDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
 
             ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
@@ -94,7 +94,7 @@ namespace ADB_Explorer.Views
                 PathBox.Text = file.Path;
 
                 AndroidFileList.Clear();
-                AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => new FileClass(f)));
+                AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => FileClass.GenerateAndroidFile(f)));
                 ExplorerGrid.Items.Refresh();
 
                 ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
