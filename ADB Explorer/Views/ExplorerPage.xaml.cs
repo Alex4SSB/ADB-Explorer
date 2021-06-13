@@ -94,7 +94,11 @@ namespace ADB_Explorer.Views
                 PathBox.Text = file.Path;
 
                 AndroidFileList.Clear();
+                ExplorerGrid.ItemsSource = null;
+
                 AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => FileClass.GenerateAndroidFile(f)));
+
+                ExplorerGrid.ItemsSource = AndroidFileList;
                 ExplorerGrid.Items.Refresh();
 
                 ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
