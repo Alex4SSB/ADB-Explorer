@@ -57,14 +57,14 @@ namespace ADB_Explorer.Helpers
             return icon;
         }
 
-        public static Icon GetExtensionIcon(string extension, IconSize iconWidth)
+        public static Icon GetExtensionIcon(string extension, IconSize iconSize)
         {
-            return GetIcon(extension, SHGFI_USEFILEATTRIBUTES | (uint)iconWidth);
+            return GetIcon(extension, SHGFI_USEFILEATTRIBUTES | (uint)iconSize);
         }
 
-        public static Icon GetFileIcon(string filePath, IconSize iconWidth)
+        public static Icon GetFileIcon(string filePath, IconSize iconSize)
         {
-            return GetIcon(filePath, (uint)iconWidth);
+            return GetIcon(filePath, (uint)iconSize);
         }
     }
 }
