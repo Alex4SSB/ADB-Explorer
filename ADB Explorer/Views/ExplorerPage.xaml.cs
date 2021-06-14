@@ -34,10 +34,15 @@ namespace ADB_Explorer.Views
             // Windows
             //WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
 
-            PathBox.Text = INTERNAL_STORAGE;
+
             // Android
             if (AndroidFileList is null)
+            {
+                PathBox.Text = INTERNAL_STORAGE;
                 AndroidFileList = ADBService.ReadDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
+            }
+            else
+                PathBox.Text = CurrentPath;
 
             ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
@@ -63,6 +68,7 @@ namespace ADB_Explorer.Views
         {
             if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
+                CurrentPath =
                 PathBox.Text = file.Path;
 
                 AndroidFileList.Clear();
