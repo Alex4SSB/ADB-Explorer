@@ -27,6 +27,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <TextBlock
+            x:Name="TitleBlock"
             Grid.Row="0"
             Margin="{StaticResource MediumLeftMargin}"
             Style="{StaticResource PageTitleStyle}"

@@ -10,6 +10,10 @@ namespace ADB_Explorer.Core.Services
     public class ADBService
     {
         private const string ADB_PATH = "adb";
+        private const string PRODUCT_MODEL = "ro.product.model";
+        private const string HOST_NAME = "net.hostname";
+        private const string VENDOR = "ro.vendor.config.CID";
+        private const string GET_PROP = "getprop";
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
 
         private static void InitProcess(Process cmdProcess)
@@ -114,6 +118,37 @@ namespace ADB_Explorer.Core.Services
             }
 
             return result;
+        }
+
+        public static string GetDeviceName()
+        {
+            var stdout = GetProps();
+            var hostName = GetPropsValue(stdout, HOST_NAME);
+
+            if (string.IsNullOrEmpty(hostName))
+            {
+                stdout = GetPropsValue(stdout, PRODUCT_MODEL).Replace('_', ' ');
+            }
+            else
+            {
+                var vendor = GetPropsValue(stdout, VENDOR);
+                stdout = string.IsNullOrEmpty(stdout)
+                    ? GetPropsValue(stdout, PRODUCT_MODEL)
+                    : $"{vendor} {hostName}";
+            }
+
+            return stdout;
+        }
+
+        private static string GetProps()
+        {
+            ExecuteShellCommand(GET_PROP, out string stdout, out string stderr);
+            return stdout;
+        }
+
+        private static string GetPropsValue(string props, string key)
+        {
+            return props.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).First(s => s.Contains(key)).Split('[', ']')[3];
         }
     }
 }

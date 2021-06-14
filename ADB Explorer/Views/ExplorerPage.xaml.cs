@@ -4,6 +4,7 @@ using ADB_Explorer.Core.Services;
 using ADB_Explorer.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -29,6 +30,9 @@ namespace ADB_Explorer.Views
 
         public void OnNavigatedTo(object parameter)
         {
+            // Get device name
+            TitleBlock.Text = ADBService.GetDeviceName();
+
             // Windows
             WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
 
@@ -38,6 +42,8 @@ namespace ADB_Explorer.Views
 
             ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
+
+        
 
         public void OnNavigatedFrom()
         {
