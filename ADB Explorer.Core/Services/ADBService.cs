@@ -148,7 +148,8 @@ namespace ADB_Explorer.Core.Services
 
         private static string GetPropsValue(string props, string key)
         {
-            return props.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).First(s => s.Contains(key)).Split('[', ']')[3];
+            var value = props.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(s => s.Contains(key));
+            return value.Any() ? value.First().Split('[', ']')[3] : "";
         }
     }
 }
