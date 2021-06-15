@@ -1,13 +1,12 @@
-﻿using System;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Core.Models;
+using ADB_Explorer.Helpers;
+using System;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
-using ADB_Explorer.Converters;
-using ADB_Explorer.Core.Models;
-using ADB_Explorer.Helpers;
 using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Models

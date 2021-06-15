@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ADB_Explorer.Core.Services
@@ -14,6 +15,7 @@ namespace ADB_Explorer.Core.Services
         private const string HOST_NAME = "net.hostname";
         private const string VENDOR = "ro.vendor.config.CID";
         private const string GET_PROP = "getprop";
+        private const string GET_DEVICES = "devices";
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
 
         private static void InitProcess(Process cmdProcess)
@@ -120,24 +122,15 @@ namespace ADB_Explorer.Core.Services
             return result;
         }
 
-        public static string GetDeviceName()
+        public static string GetDeviceName(int index = 0)
         {
-            var stdout = GetProps();
-            var hostName = GetPropsValue(stdout, HOST_NAME);
+            ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
+            var deviceNameRE = new Regex(@"(?<=device:)\w+");
+            var collection = deviceNameRE.Matches(stdout);
 
-            if (string.IsNullOrEmpty(hostName))
-            {
-                stdout = GetPropsValue(stdout, PRODUCT_MODEL).Replace('_', ' ');
-            }
-            else
-            {
-                var vendor = GetPropsValue(stdout, VENDOR);
-                stdout = string.IsNullOrEmpty(stdout)
-                    ? GetPropsValue(stdout, PRODUCT_MODEL)
-                    : $"{vendor} {hostName}";
-            }
-
-            return stdout;
+            return collection.Count > index
+                ? collection[index].Value.Replace('_', ' ')
+                : "";
         }
 
         private static string GetProps()
