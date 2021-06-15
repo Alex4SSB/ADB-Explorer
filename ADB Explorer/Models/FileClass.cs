@@ -67,6 +67,12 @@ namespace ADB_Explorer.Models
 
         private static Icon ExtIcon(string extension, ShellIconManager.IconSize iconSize)
         {
+            // No extension -> "*" which means unknown file 
+            if (extension == string.Empty)
+            {
+                extension = "*";
+            }
+
             Icon icon;
             if (!FileIcons.ContainsKey(extension))
             {

@@ -39,7 +39,7 @@ namespace ADB_Explorer.Views
             if (AndroidFileList is null)
             {
                 PathBox.Text = INTERNAL_STORAGE;
-                AndroidFileList = ADBService.ReadDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
+                AndroidFileList = ADBService.ListDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
             }
             else
                 PathBox.Text = CurrentPath;
@@ -74,7 +74,7 @@ namespace ADB_Explorer.Views
                 AndroidFileList.Clear();
                 ExplorerGrid.ItemsSource = null;
 
-                AndroidFileList.AddRange(ADBService.ReadDirectory(file.Path).Select(f => FileClass.GenerateAndroidFile(f)));
+                AndroidFileList.AddRange(ADBService.ListDirectory(file.Path).Select(f => FileClass.GenerateAndroidFile(f)));
 
                 ExplorerGrid.ItemsSource = AndroidFileList;
                 ExplorerGrid.Items.Refresh();

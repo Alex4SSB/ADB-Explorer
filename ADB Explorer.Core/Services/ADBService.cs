@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ADB_Explorer.Core.Services
@@ -15,6 +16,19 @@ namespace ADB_Explorer.Core.Services
         private const string VENDOR = "ro.vendor.config.CID";
         private const string GET_PROP = "getprop";
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
+        private const string LS_FILE_ENTRY_PATTERN = @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)$";
+
+        enum UnixFileMode : UInt32
+        {
+            S_IFMT =   0b1111 << 12, // bit mask for the file type bit fields
+            S_IFSOCK = 0b1100 << 12, // socket
+            S_IFLNK =  0b1010 << 12, // symbolic link
+            S_IFREG =  0b1000 << 12, // regular file
+            S_IFBLK =  0b0110 << 12, // block device
+            S_IFDIR =  0b0100 << 12, // directory
+            S_IFCHR =  0b0010 << 12, // character device
+            S_IFIFO =  0b0001 << 12  // FIFO
+        }
 
         private static void InitProcess(Process cmdProcess)
         {
@@ -30,6 +44,8 @@ namespace ADB_Explorer.Core.Services
             InitProcess(cmdProcess);
             cmdProcess.StartInfo.FileName = ADB_PATH;
             cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
+            cmdProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
+            cmdProcess.StartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
             cmdProcess.Start();
 
             using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
@@ -57,67 +73,59 @@ namespace ADB_Explorer.Core.Services
                 }));
         }
 
-        public static List<FileStat> ReadDirectory(string path)
+        public static List<FileStat> ListDirectory(string path)
         {
-            List<FileStat> result = new List<FileStat>();
-
             // Remove trailing '/' from given path to avoid possible issues
             path = path.TrimEnd('/');
 
-            // Add parent directory when needed
-            if (path.LastIndexOf('/') is var index && index > 0)
-            {
-                result.Add(new FileStat
-                {
-                    Name = "..",
-                    Path = path.Remove(index),
-                    Type = FileStat.FileType.Parent
-                });
-            }
-
-            // Execute find and stat to get file details in a safe to parse format
+            // Execute adb ls to get file list
             string stdout, stderr;
-            int exitCode = ExecuteShellCommand(
-                "find",
-                out stdout,
-                out stderr,
-                $"\"{EscapeShellString(path)}/\"",
-                "-maxdepth",
-                "1",
-                "-exec",
-                "\"stat -L -c %F/%s/%Y/%n {} \\;\"");
-
+            int exitCode = ExecuteAdbCommand("ls", out stdout, out stderr, $"\"{EscapeShellString(path)}/\"");
             if (exitCode != 0)
             {
                 throw new Exception($"{stderr} (Error Code: {exitCode})");
             }
 
-            // Split result by lines
-            var fileEntries = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Skip(1);
-            foreach (var fileEntry in fileEntries)
+            // Parse stdout into natural values
+            var fileEntries = Regex.Matches(stdout, LS_FILE_ENTRY_PATTERN, RegexOptions.IgnoreCase | RegexOptions.Multiline).Select(match => new
             {
-                // Split each line to its parameters
-                var fileDetails = fileEntry.Split('/', 4, StringSplitOptions.RemoveEmptyEntries);
+                Name = match.Groups["Name"].Value.TrimEnd('\r'),
+                Size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber),
+                Time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber),
+                Mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber)
+            });
 
-                FileStat fileStat = new FileStat
+            // Convert parse results to FileStats
+            var fileStats = fileEntries.Select(entry => new FileStat
+            {
+                Name = entry.Name,
+                Path = path + '/' + entry.Name,
+                Type = (entry.Mode & (UInt32)UnixFileMode.S_IFMT) switch
                 {
-                    Name = System.IO.Path.GetFileName(fileDetails[3]),
-                    Path = fileDetails[3],
-                    Type = fileDetails[0] switch
-                    {
-                        "directory" => FileStat.FileType.Folder,
-                        "regular file" => FileStat.FileType.File,
-                        "regular empty file" => FileStat.FileType.File,
-                        _ => throw new Exception("Cannot handle file type: " + fileDetails[0])
-                    },
-                    Size = UInt64.Parse(fileDetails[1]),
-                    ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(long.Parse(fileDetails[2])).DateTime
-                };
+                    (UInt32)UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
+                    (UInt32)UnixFileMode.S_IFREG => FileStat.FileType.File,
+                    (UInt32)UnixFileMode.S_IFLNK => FileStat.FileType.Folder,
+                    _ => throw new Exception($"Cannot handle file: {entry.Name}, mode: {entry.Mode}")
+                },
+                Size = entry.Size,
+                ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(entry.Time).DateTime
+            });
 
-                result.Add(fileStat);
+            // Add parent directory when needed
+            if (path.LastIndexOf('/') is var index && index > 0)
+            {
+                fileStats = new[]
+                {
+                    new FileStat
+                    {
+                        Name = "..",
+                        Path = path.Remove(index),
+                        Type = FileStat.FileType.Parent
+                    }
+                }.Concat(fileStats);
             }
 
-            return result;
+            return fileStats.ToList();
         }
 
         public static string GetDeviceName()
