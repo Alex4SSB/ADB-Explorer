@@ -124,12 +124,12 @@ namespace ADB_Explorer.Core.Services
             {
                 Name = entry.Name,
                 Path = path + '/' + entry.Name,
-                Type = (entry.Mode & (UInt32)UnixFileMode.S_IFMT) switch
+                Type = (UnixFileMode)(entry.Mode & (UInt32)UnixFileMode.S_IFMT) switch
                 {
-                    (UInt32)UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
-                    (UInt32)UnixFileMode.S_IFREG => FileStat.FileType.File,
-                    (UInt32)UnixFileMode.S_IFLNK => FileStat.FileType.Folder,
-                    _ => throw new Exception($"Cannot handle file: {entry.Name}, mode: {entry.Mode}")
+                    UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
+                    UnixFileMode.S_IFREG => FileStat.FileType.File,
+                    UnixFileMode.S_IFLNK => FileStat.FileType.Folder,
+                    _ => throw new Exception($"Cannot handle file: \"{entry.Name}\" with mode: {entry.Mode}")
                 },
                 Size = entry.Size,
                 ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(entry.Time).DateTime.ToLocalTime()
