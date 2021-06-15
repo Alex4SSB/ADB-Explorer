@@ -16,10 +16,17 @@ namespace ADB_Explorer.Core.Services
         private const string VENDOR = "ro.vendor.config.CID";
         private const string GET_PROP = "getprop";
         private const string GET_DEVICES = "devices";
-        private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
-        private const string LS_FILE_ENTRY_PATTERN = @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)$";
 
-        enum UnixFileMode : UInt32
+        private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
+        private static readonly string[] SPECIAL_DIRS = { ".", ".." };
+
+        private static readonly Regex LS_FILE_ENTRY_RE = new Regex(
+            @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
+            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+
+        private static readonly Regex DEVICE_NAME_RE = new Regex(@"(?<=device:)\w+");
+
+        private enum UnixFileMode : UInt32
         {
             S_IFMT =   0b1111 << 12, // bit mask for the file type bit fields
             S_IFSOCK = 0b1100 << 12, // socket
@@ -102,16 +109,15 @@ namespace ADB_Explorer.Core.Services
             }
 
             // Parse stdout into natural values
-            var fileEntries = 
-                Regex.Matches(stdout, LS_FILE_ENTRY_PATTERN, RegexOptions.IgnoreCase | RegexOptions.Multiline)
-                    .Where(match => (match.Groups["Name"].Value != ".") && (match.Groups["Name"].Value != ".."))
-                    .Select(match => new
-                    {
-                        Name = match.Groups["Name"].Value.TrimEnd('\r'),
-                        Size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber),
-                        Time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber),
-                        Mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber)
-                    });
+            var fileEntries = LS_FILE_ENTRY_RE.Matches(stdout)
+                .Where(match => !SPECIAL_DIRS.Contains(match.Groups["Name"].Value))
+                .Select(match => new
+                {
+                    Name = match.Groups["Name"].Value,
+                    Size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber),
+                    Time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber),
+                    Mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber)
+                });
 
             // Convert parse results to FileStats
             var fileStats = fileEntries.Select(entry => new FileStat
@@ -149,8 +155,7 @@ namespace ADB_Explorer.Core.Services
         public static string GetDeviceName(int index = 0)
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
-            var deviceNameRE = new Regex(@"(?<=device:)\w+");
-            var collection = deviceNameRE.Matches(stdout);
+            var collection = DEVICE_NAME_RE.Matches(stdout);
 
             return collection.Count > index
                 ? collection[index].Value.Replace('_', ' ')
