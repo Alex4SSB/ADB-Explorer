@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Core.Services;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace ADB_Explorer.Models
 {
@@ -20,6 +21,8 @@ namespace ADB_Explorer.Models
         public static List<FileClass> AndroidFileList { get; set; }
 
         public static string CurrentPath { get; set; }
+
+        public static Dictionary<string, Icon> FileIcons = new();
 
     }
 }

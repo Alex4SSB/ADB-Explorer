@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Windows;
@@ -7,6 +8,7 @@ using System.Windows.Media.Imaging;
 using ADB_Explorer.Converters;
 using ADB_Explorer.Core.Models;
 using ADB_Explorer.Helpers;
+using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Models
 {
@@ -27,7 +29,7 @@ namespace ADB_Explorer.Models
                 ModifiedTime = fileStat.ModifiedTime,
                 Icon = fileStat.Type switch
                 {
-                    FileType.File => IconToBitmapSource(ShellIconManager.GetExtensionIcon(System.IO.Path.GetExtension(fileStat.Path), iconSize)),
+                    FileType.File => IconToBitmapSource(ExtIcon(System.IO.Path.GetExtension(fileStat.Path), iconSize)),
                     _ => folderIconBitmapSource
                 }
             };
@@ -62,5 +64,19 @@ namespace ADB_Explorer.Models
         }
 
         private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize));
+
+        private static Icon ExtIcon(string extension, ShellIconManager.IconSize iconSize)
+        {
+            Icon icon;
+            if (!FileIcons.ContainsKey(extension))
+            {
+                icon = ShellIconManager.GetExtensionIcon(extension, iconSize);
+                FileIcons.Add(extension, icon);
+            }
+            else
+                icon = FileIcons[extension];
+
+            return icon;
+        }
     }
 }

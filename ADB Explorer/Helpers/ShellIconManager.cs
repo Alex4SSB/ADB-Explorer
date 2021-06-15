@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Windows.Interop;
-using System.Windows.Media.Imaging;
 
 namespace ADB_Explorer.Helpers
 {
@@ -48,7 +46,7 @@ namespace ADB_Explorer.Helpers
                 (uint)Marshal.SizeOf(shinfo),
                 SHGFI_ICON | flags);
 
-            Icon icon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
+            Icon icon = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
             DestroyIcon(shinfo.hIcon);
             return icon;
         }
