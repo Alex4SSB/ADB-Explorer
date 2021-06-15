@@ -25,6 +25,7 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TextBlock
             x:Name="TitleBlock"
@@ -118,5 +119,30 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <StackPanel
+            Grid.Row="3"
+            Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"
+            Orientation="Horizontal">
+            <TextBlock Margin="8,4,0,4" Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+            <TextBlock Margin="0,4,4,4" Text=" items" />
+            <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock
+                    x:Name="SelectedItemsBlock"
+                    Margin="8,4,0,4"
+                    Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+                <TextBlock Margin="0,4,4,4" Text=" items selected" />
+            </StackPanel>
+
+        </StackPanel>
     </Grid>
 </Page>
