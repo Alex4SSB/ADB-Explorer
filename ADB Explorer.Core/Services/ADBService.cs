@@ -15,6 +15,7 @@ namespace ADB_Explorer.Core.Services
         private const string HOST_NAME = "net.hostname";
         private const string VENDOR = "ro.vendor.config.CID";
         private const string GET_PROP = "getprop";
+        private const string GET_DEVICES = "devices";
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
         private const string LS_FILE_ENTRY_PATTERN = @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)$";
 
@@ -128,24 +129,15 @@ namespace ADB_Explorer.Core.Services
             return fileStats.ToList();
         }
 
-        public static string GetDeviceName()
+        public static string GetDeviceName(int index = 0)
         {
-            var stdout = GetProps();
-            var hostName = GetPropsValue(stdout, HOST_NAME);
+            ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
+            var deviceNameRE = new Regex(@"(?<=device:)\w+");
+            var collection = deviceNameRE.Matches(stdout);
 
-            if (string.IsNullOrEmpty(hostName))
-            {
-                stdout = GetPropsValue(stdout, PRODUCT_MODEL).Replace('_', ' ');
-            }
-            else
-            {
-                var vendor = GetPropsValue(stdout, VENDOR);
-                stdout = string.IsNullOrEmpty(stdout)
-                    ? GetPropsValue(stdout, PRODUCT_MODEL)
-                    : $"{vendor} {hostName}";
-            }
-
-            return stdout;
+            return collection.Count > index
+                ? collection[index].Value.Replace('_', ' ')
+                : "";
         }
 
         private static string GetProps()

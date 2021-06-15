@@ -29,7 +29,13 @@ namespace ADB_Explorer.Views
         public void OnNavigatedTo(object parameter)
         {
             // Get device name
-            TitleBlock.Text = DeviceName;
+            if (DeviceName is string name && string.IsNullOrEmpty(name))
+            {
+                TitleBlock.Text = "NO CONNECTED DEVICES";
+                return;
+            }
+            else
+                TitleBlock.Text = DeviceName;
 
             // Windows
             //WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
