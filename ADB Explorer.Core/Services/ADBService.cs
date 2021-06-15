@@ -64,14 +64,28 @@ namespace ADB_Explorer.Core.Services
             return ExecuteAdbCommand("shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
         }
 
-        public static string EscapeShellString(string str)
+        public static string EscapeAdbShellString(string str)
         {
-            return string.Concat(str.Select(c =>
+            var result = string.Concat(str.Select(c =>
                 c switch
                 {
-                    var ch when new[] { '(', ')', '<', '>', '|' ,';', '&', '*', '\\', '~', '"', '\'', ' ' }.Contains(ch) => "\\" + ch,
+                    var ch when new[] { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ' }.Contains(ch) => "\\" + ch,
                     _ => new string(c, 1)
                 }));
+
+            return $"\"{result}\"";
+        }
+
+        public static string EscapeAdbString(string str)
+        {
+            var result = string.Concat(str.Select(c =>
+                c switch
+                {
+                    var ch when new[] { '$', '`', '"', '\\' }.Contains(ch) => "\\" + ch,
+                    _ => new string(c, 1)
+                }));
+
+            return $"\"{result}\"";
         }
 
         public static List<FileStat> ListDirectory(string path)
@@ -81,20 +95,23 @@ namespace ADB_Explorer.Core.Services
 
             // Execute adb ls to get file list
             string stdout, stderr;
-            int exitCode = ExecuteAdbCommand("ls", out stdout, out stderr, $"\"{EscapeShellString(path)}/\"");
+            int exitCode = ExecuteAdbCommand("ls", out stdout, out stderr, EscapeAdbString(path));
             if (exitCode != 0)
             {
                 throw new Exception($"{stderr} (Error Code: {exitCode})");
             }
 
             // Parse stdout into natural values
-            var fileEntries = Regex.Matches(stdout, LS_FILE_ENTRY_PATTERN, RegexOptions.IgnoreCase | RegexOptions.Multiline).Select(match => new
-            {
-                Name = match.Groups["Name"].Value.TrimEnd('\r'),
-                Size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber),
-                Time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber),
-                Mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber)
-            });
+            var fileEntries = 
+                Regex.Matches(stdout, LS_FILE_ENTRY_PATTERN, RegexOptions.IgnoreCase | RegexOptions.Multiline)
+                    .Where(match => (match.Groups["Name"].Value != ".") && (match.Groups["Name"].Value != ".."))
+                    .Select(match => new
+                    {
+                        Name = match.Groups["Name"].Value.TrimEnd('\r'),
+                        Size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber),
+                        Time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber),
+                        Mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber)
+                    });
 
             // Convert parse results to FileStats
             var fileStats = fileEntries.Select(entry => new FileStat
@@ -109,7 +126,7 @@ namespace ADB_Explorer.Core.Services
                     _ => throw new Exception($"Cannot handle file: {entry.Name}, mode: {entry.Mode}")
                 },
                 Size = entry.Size,
-                ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(entry.Time).DateTime
+                ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(entry.Time).DateTime.ToLocalTime()
             });
 
             // Add parent directory when needed
