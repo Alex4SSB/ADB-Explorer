@@ -18,7 +18,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public static List<FileClass> AndroidFileList { get; set; }
+        public static List<FileClass> AndroidFileList = new();
 
         public static string CurrentPath { get; set; }
 

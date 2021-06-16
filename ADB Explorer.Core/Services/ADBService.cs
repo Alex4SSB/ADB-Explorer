@@ -1,9 +1,11 @@
 ﻿using ADB_Explorer.Core.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ADB_Explorer.Core.Services
@@ -22,7 +24,7 @@ namespace ADB_Explorer.Core.Services
 
         private static readonly Regex LS_FILE_ENTRY_RE = new Regex(
             @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
-            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+            RegexOptions.IgnoreCase);
 
         private static readonly Regex DEVICE_NAME_RE = new Regex(@"(?<=device:)\w+");
 
@@ -46,15 +48,21 @@ namespace ADB_Explorer.Core.Services
             cmdProcess.StartInfo.CreateNoWindow = true;
         }
 
-        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args)
+        public static Process StartCommandProcess(string cmd, params string[] args)
         {
-            using var cmdProcess = new Process();
+            var cmdProcess = new Process();
             InitProcess(cmdProcess);
             cmdProcess.StartInfo.FileName = ADB_PATH;
             cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
             cmdProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
             cmdProcess.StartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
             cmdProcess.Start();
+            return cmdProcess;
+        }
+
+        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args)
+        {
+            using var cmdProcess = StartCommandProcess(cmd, args);
 
             using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
             using var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
@@ -64,6 +72,52 @@ namespace ADB_Explorer.Core.Services
             stdout = stdoutTask.Result;
             stderr = stderrTask.Result;
             return cmdProcess.ExitCode;
+        }
+
+        public class ProcessFailedException : Exception
+        {
+            public ProcessFailedException() {}
+
+            public ProcessFailedException(int exitCode, string standardError) : base(standardError)
+            {
+                ExitCode = exitCode;
+                StandardError = standardError;
+            }
+
+            public ProcessFailedException(int exitCode, string standardError, Exception inner) : base(standardError, inner)
+            {
+                ExitCode = exitCode;
+                StandardError = standardError;
+            }
+
+            public int ExitCode { get; set; }
+            public string StandardError { get; set; }
+        };
+
+        public static IEnumerable<string> ExecuteAdbCommandAsync(CancellationToken cancellationToken, string cmd, params string[] args)
+        {
+            using var cmdProcess = StartCommandProcess(cmd, args);
+
+            var stdoutLine = cmdProcess.StandardOutput.ReadLine();
+            while (stdoutLine != null)
+            {
+                yield return stdoutLine;
+                stdoutLine = cmdProcess.StandardOutput.ReadLine();
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    cmdProcess.Kill();
+                    yield break;
+                }
+            }
+
+            string stderr = cmdProcess.StandardError.ReadToEnd();
+            cmdProcess.WaitForExit();
+
+            if (cmdProcess.ExitCode != 0)
+            {
+                throw new ProcessFailedException(cmdProcess.ExitCode, stderr);
+            }
         }
 
         public static int ExecuteShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
@@ -95,61 +149,57 @@ namespace ADB_Explorer.Core.Services
             return $"\"{result}\"";
         }
 
-        public static List<FileStat> ListDirectory(string path)
+        public static void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
         {
             // Remove trailing '/' from given path to avoid possible issues
             path = path.TrimEnd('/');
 
-            // Execute adb ls to get file list
-            string stdout, stderr;
-            int exitCode = ExecuteAdbCommand("ls", out stdout, out stderr, EscapeAdbString(path));
-            if (exitCode != 0)
-            {
-                throw new Exception($"{stderr} (Error Code: {exitCode})");
-            }
-
-            // Parse stdout into natural values
-            var fileEntries = LS_FILE_ENTRY_RE.Matches(stdout)
-                .Where(match => !SPECIAL_DIRS.Contains(match.Groups["Name"].Value))
-                .Select(match => new
-                {
-                    Name = match.Groups["Name"].Value,
-                    Size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber),
-                    Time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber),
-                    Mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber)
-                });
-
-            // Convert parse results to FileStats
-            var fileStats = fileEntries.Select(entry => new FileStat
-            {
-                Name = entry.Name,
-                Path = path + '/' + entry.Name,
-                Type = (UnixFileMode)(entry.Mode & (UInt32)UnixFileMode.S_IFMT) switch
-                {
-                    UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
-                    UnixFileMode.S_IFREG => FileStat.FileType.File,
-                    UnixFileMode.S_IFLNK => FileStat.FileType.Folder,
-                    _ => throw new Exception($"Cannot handle file: \"{entry.Name}\" with mode: {entry.Mode}")
-                },
-                Size = entry.Size,
-                ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(entry.Time).DateTime.ToLocalTime()
-            });
-
             // Add parent directory when needed
             if (path.LastIndexOf('/') is var index && index > 0)
             {
-                fileStats = new[]
-                {
-                    new FileStat
+                output.Enqueue(new FileStat
                     {
                         Name = "..",
                         Path = path.Remove(index),
                         Type = FileStat.FileType.Parent
-                    }
-                }.Concat(fileStats);
+                    });
             }
 
-            return fileStats.ToList();
+            // Execute adb ls to get file list
+            var stdout = ExecuteAdbCommandAsync(cancellationToken, "ls", EscapeAdbString(path));
+            foreach (string stdoutLine in stdout)
+            {
+                var match = LS_FILE_ENTRY_RE.Match(stdoutLine);
+                if (!match.Success)
+                {
+                    throw new Exception($"Invalid output for adb ls command: {stdoutLine}");
+                }
+
+                var name = match.Groups["Name"].Value;
+                var size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber);
+                var time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber);
+                var mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber);
+
+                if (SPECIAL_DIRS.Contains(name))
+                {
+                    continue;
+                }
+
+                output.Enqueue(new FileStat
+                {
+                    Name = name,
+                    Path = path + '/' + name,
+                    Type = (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
+                    {
+                        UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
+                        UnixFileMode.S_IFREG => FileStat.FileType.File,
+                        UnixFileMode.S_IFLNK => FileStat.FileType.Folder,
+                        _ => throw new Exception($"Cannot handle file: \"{name}\" with mode: {mode}")
+                    },
+                    Size = size,
+                    ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime()
+                });
+            }
         }
 
         public static string GetDeviceName(int index = 0)
