@@ -68,11 +68,12 @@ namespace ADB_Explorer.Views
             // Android
             if (AndroidFileList is null || !AndroidFileList.Any())
             {
-                PathBox.Text = INTERNAL_STORAGE;
+                //PathBox.Text = INTERNAL_STORAGE;
                 AndroidFileList = ADBService.ListDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
+                AddPathButton(INTERNAL_STORAGE, "Internal Storage");
             }
-            else
-                PathBox.Text = CurrentPath;
+            //else
+            //    PathBox.Text = CurrentPath;
 
             ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
         }
@@ -99,19 +100,43 @@ namespace ADB_Explorer.Views
         {
             if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
-                CurrentPath =
-                PathBox.Text = file.Path;
+                //CurrentPath =
+                //PathBox.Text = file.Path;
+                AddPathButton(file.Path, file.Name);
 
-                AndroidFileList.Clear();
-                ExplorerGrid.ItemsSource = null;
-
-                AndroidFileList.AddRange(ADBService.ListDirectory(file.Path).Select(f => FileClass.GenerateAndroidFile(f)));
-
-                ExplorerGrid.ItemsSource = AndroidFileList;
-                ExplorerGrid.Items.Refresh();
-
-                ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                EnterFolder(file.Path);
             }
+        }
+
+        private void AddPathButton(string path, string name)
+        {
+            Button button = new() { Content = name, Tag = path };
+            button.Click += PathButton_Click;
+
+            if (PathStackPanel.Children.Count > 0)
+            {
+                TextBlock tb = new() { Text = " > ", VerticalAlignment = System.Windows.VerticalAlignment.Center };
+                PathStackPanel.Children.Add(tb);
+            }
+            PathStackPanel.Children.Add(button);
+        }
+
+        private void EnterFolder(string path)
+        {
+            AndroidFileList.Clear();
+            ExplorerGrid.ItemsSource = null;
+
+            AndroidFileList.AddRange(ADBService.ListDirectory(path).Select(f => FileClass.GenerateAndroidFile(f)));
+
+            ExplorerGrid.ItemsSource = AndroidFileList;
+            ExplorerGrid.Items.Refresh();
+
+            ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+        }
+
+        private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            EnterFolder((sender as Button).Tag.ToString());
         }
     }
 }
