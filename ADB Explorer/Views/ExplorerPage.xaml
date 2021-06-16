@@ -121,7 +121,7 @@
         </DataGrid>
         <StackPanel
             Grid.Row="3"
-            Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"
+            Background="{DynamicResource MahApps.Brushes.Accent2}"
             Orientation="Horizontal">
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>

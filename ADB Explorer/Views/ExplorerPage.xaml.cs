@@ -56,7 +56,7 @@ namespace ADB_Explorer.Views
             else
             {
                 TitleBlock.Text = "NO CONNECTED DEVICES";
-                AndroidFileList.Clear();
+                AndroidFileList?.Clear();
                 ConnectTimer.Start();
                 return;
             }
