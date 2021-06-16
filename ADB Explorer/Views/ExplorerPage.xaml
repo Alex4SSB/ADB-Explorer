@@ -138,9 +138,21 @@
                 </StackPanel.Style>
                 <TextBlock
                     x:Name="SelectedItemsBlock"
-                    Margin="8,4,0,4"
+                    Margin="4,4,0,4"
                     Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
-                <TextBlock Margin="0,4,4,4" Text=" items selected" />
+                <TextBlock Margin="0,4,0,4" Text=" item" />
+                <TextBlock Margin="0,4,0,4" Text="s">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Margin="0,4,4,4" Text=" selected" />
             </StackPanel>
 
         </StackPanel>
