@@ -123,9 +123,23 @@
             Grid.Row="3"
             Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"
             Orientation="Horizontal">
-            <TextBlock Margin="8,4,0,4" Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
-            <TextBlock Margin="0,4,4,4" Text=" items" />
-            <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock
+                    x:Name="ItemsCountBlock"
+                    Margin="8,4,0,4"
+                    Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+                <TextBlock Margin="0,4,4,4" Text=" items" />
+                <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
