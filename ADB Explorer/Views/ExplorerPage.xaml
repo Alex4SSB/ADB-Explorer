@@ -171,8 +171,8 @@
                     x:Name="SelectedItemsBlock"
                     Margin="4,4,0,4"
                     Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
-                <TextBlock Margin="0,4,0,4" Text=" item" />
-                <TextBlock Margin="0,4,0,4" Text="s">
+                <TextBlock Margin="0,4" Text=" item" />
+                <TextBlock Margin="0,4" Text="s">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
@@ -184,6 +184,7 @@
                     </TextBlock.Style>
                 </TextBlock>
                 <TextBlock Margin="0,4,4,4" Text=" selected" />
+                <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
             </StackPanel>
 
         </StackPanel>
