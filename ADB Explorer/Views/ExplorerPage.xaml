@@ -9,7 +9,7 @@
     d:DesignHeight="450"
     d:DesignWidth="800"
     Style="{DynamicResource MahApps.Styles.Page}"
-    mc:Ignorable="d">
+    mc:Ignorable="d" MouseDown="Page_MouseDown">
     <Page.Resources>
         <Style
             x:Key="ColHeaderStyle"
@@ -38,7 +38,9 @@
             Grid.Row="1"
             Margin="10"
             VerticalContentAlignment="Center"
-            IsReadOnly="True" />
+            GotFocus="PathBox_GotFocus"
+            IsReadOnly="True"
+            LostFocus="PathBox_LostFocus" />
         <StackPanel
             x:Name="PathStackPanel"
             Grid.Row="1"

@@ -161,5 +161,24 @@ namespace ADB_Explorer.Views
             PopulateButtons(path);
             EnterFolder(path);
         }
+
+        private void PathBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Collapsed;
+            PathBox.Text = PathBox.Tag.ToString();
+            PathBox.IsReadOnly = false;
+        }
+
+        private void PathBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Visible;
+            PathBox.Text = "";
+            PathBox.IsReadOnly = true;
+        }
+
+        private void Page_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ExplorerGrid.Focus();
+        }
     }
 }
