@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Core.Services;
 using System.Collections.Generic;
 using System.Drawing;
+using ADB_Explorer.Helpers;
 
 namespace ADB_Explorer.Models
 {
@@ -18,7 +19,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public static List<FileClass> AndroidFileList = new();
+        public static RangeSupportedObservableCollection<FileClass> AndroidFileList = new();
 
         public static string CurrentPath { get; set; }
 

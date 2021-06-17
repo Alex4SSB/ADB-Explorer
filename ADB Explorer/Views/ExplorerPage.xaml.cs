@@ -22,9 +22,8 @@ namespace ADB_Explorer.Views
     public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
     {
         private const string INTERNAL_STORAGE = "sdcard";
-        private const int DIR_LIST_UPDATE_INTERVAL_MS = 1000;
-
-        public List<FileClass> WindowsFileList { get; set; }
+        private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,23 +37,21 @@ namespace ADB_Explorer.Views
             StopDirectoryList();
 
             AndroidFileList.Clear();
-            ExplorerGrid.ItemsSource = null;
-            ExplorerGrid.Items.Refresh();
 
             cancellationTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
 
             listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, cancellationTokenSource.Token));
 
-            if (listDirTask.Wait(DIR_LIST_UPDATE_INTERVAL_MS))
+            if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
             {
                 StopDirectoryList();
             }
             else
             {
                 UpdateDirectoryList();
-                listDirTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => StopDirectoryList()));
                 dirListUpdateTimer.Start();
+                listDirTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => StopDirectoryList()));
             }
         }
 
@@ -65,11 +62,9 @@ namespace ADB_Explorer.Views
                 bool wasEmpty = (AndroidFileList.Count == 0);
 
                 AndroidFileList.AddRange(waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)));
-                ExplorerGrid.Items.Refresh();
 
                 if (wasEmpty && (AndroidFileList.Count > 0))
                 {
-                    ExplorerGrid.ItemsSource = AndroidFileList;
                     ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
                 }
             }
@@ -95,8 +90,19 @@ namespace ADB_Explorer.Views
             cancellationTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
             dirListUpdateTimer = new DispatcherTimer();
-            dirListUpdateTimer.Interval = TimeSpan.FromMilliseconds(DIR_LIST_UPDATE_INTERVAL_MS);
+            dirListUpdateTimer.Interval = DIR_LIST_UPDATE_INTERVAL;
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
+
+            // Get device name
+            if (DeviceName is string name && string.IsNullOrEmpty(name))
+            {
+                TitleBlock.Text = "NO CONNECTED DEVICES";
+                return;
+            }
+            else
+            {
+                TitleBlock.Text = DeviceName;
+            }
 
             ExplorerGrid.ItemsSource = AndroidFileList;
 
@@ -118,15 +124,6 @@ namespace ADB_Explorer.Views
 
         public void OnNavigatedTo(object parameter)
         {
-            // Get device name
-            if (DeviceName is string name && string.IsNullOrEmpty(name))
-            {
-                TitleBlock.Text = "NO CONNECTED DEVICES";
-                return;
-            }
-            else
-                TitleBlock.Text = DeviceName;
-
             // Windows
             //WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
         }
