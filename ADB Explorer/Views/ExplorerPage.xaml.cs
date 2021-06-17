@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -115,7 +116,7 @@ namespace ADB_Explorer.Views
 
             for (int i = 0; i < dirs.Length; i++)
             {
-                var dirPath = string.Join('/', dirs[..(i+1)]);
+                var dirPath = string.Join('/', dirs[..(i + 1)]);
                 var dirName = dirs[i] == INTERNAL_STORAGE ? "Internal Storage" : dirs[i];
                 AddPathButton(dirPath, dirName);
             }
@@ -123,14 +124,21 @@ namespace ADB_Explorer.Views
 
         private void AddPathButton(string path, string name)
         {
-            Button button = new() { Content = name, Tag = path };
-            button.Click += PathButton_Click;
-
             if (PathStackPanel.Children.Count > 0)
             {
-                TextBlock tb = new() { Text = " > ", VerticalAlignment = System.Windows.VerticalAlignment.Center };
+                TextBlock tb = new()
+                {
+                    Text = " \uE970 ",
+                    FontFamily = new("Segoe MDL2 Assets"),
+                    FontSize = 7,
+                    Margin = new(0, 1, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
                 PathStackPanel.Children.Add(tb);
             }
+
+            Button button = new() { Content = name, Tag = path };
+            button.Click += PathButton_Click;
             PathStackPanel.Children.Add(button);
         }
 

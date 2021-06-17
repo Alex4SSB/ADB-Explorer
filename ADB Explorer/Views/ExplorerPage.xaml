@@ -36,20 +36,21 @@
         <TextBox
             x:Name="PathBox"
             Grid.Row="1"
+            Margin="10"
             VerticalContentAlignment="Center"
-            IsReadOnly="True"
-            Margin="10" />
+            IsReadOnly="True" />
         <StackPanel
             x:Name="PathStackPanel"
             Grid.Row="1"
             Margin="10"
             Orientation="Horizontal">
             <StackPanel.Resources>
-                <Style BasedOn="{StaticResource MahApps.Styles.Button.MetroSquare}" TargetType="Button">
-                    <Setter Property="Margin" Value="4" />
+                <Style BasedOn="{StaticResource MahApps.Styles.Button.Split.Arrow}" TargetType="Button">
+                    <Setter Property="Margin" Value="1,1" />
+                    <Setter Property="Padding" Value="4,0" />
                 </Style>
             </StackPanel.Resources>
-            
+
         </StackPanel>
         <DataGrid
             x:Name="ExplorerGrid"
