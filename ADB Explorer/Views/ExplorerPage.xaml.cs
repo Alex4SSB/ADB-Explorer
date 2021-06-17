@@ -21,7 +21,15 @@ namespace ADB_Explorer.Views
 {
     public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
     {
-        private const string INTERNAL_STORAGE = "sdcard";
+        private const string INTERNAL_STORAGE = "/sdcard";
+        private static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new Dictionary<string, string>
+        {
+            {"/sdcard", "Internal Storage"},
+            {"/storage/emulated/0", "Internal Storage"},
+            {"/storage/self/primary", "Internal Storage"},
+            {"/", "Root"}
+        };
+
         private readonly DispatcherTimer ConnectTimer = new();
         private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
         private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
@@ -137,10 +145,13 @@ namespace ADB_Explorer.Views
             }
             else
             {
-                PathBox.Tag = INTERNAL_STORAGE;
+                PathBox.Tag =
+                CurrentPath = INTERNAL_STORAGE;
                 StartDirectoryList(INTERNAL_STORAGE);
             }
-            PopulateButtons(PathBox.Tag.ToString());
+
+            if (PathBox.Tag is string path)
+                PopulateButtons(path);
         }
 
         public void OnNavigatedFrom()
@@ -182,12 +193,21 @@ namespace ADB_Explorer.Views
         private void PopulateButtons(string path)
         {
             PathStackPanel.Children.Clear();
-            var dirs = path.Split('/');
+
+            // On special cases
+            var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.Where((kv) => path.StartsWith(kv.Key)).FirstOrDefault();
+            if (specialPair.Key != null)
+            {
+                AddPathButton(specialPair.Key, specialPair.Value);
+                path = path.Substring(specialPair.Key.Length).TrimStart('/');
+            }
+
+            var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
             for (int i = 0; i < dirs.Length; i++)
             {
                 var dirPath = string.Join('/', dirs[..(i + 1)]);
-                var dirName = dirs[i] == INTERNAL_STORAGE ? "Internal Storage" : dirs[i];
+                var dirName = dirs[i];
                 AddPathButton(dirPath, dirName);
             }
         }
@@ -201,8 +221,6 @@ namespace ADB_Explorer.Views
                     Text = " \uE970 ",
                     FontFamily = new("Segoe MDL2 Assets"),
                     FontSize = 7,
-                    Margin = new(0, 1, 0, 0),
-                    VerticalAlignment = VerticalAlignment.Center
                 };
                 PathStackPanel.Children.Add(tb);
             }

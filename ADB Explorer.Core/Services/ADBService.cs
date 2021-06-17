@@ -40,6 +40,26 @@ namespace ADB_Explorer.Core.Services
             S_IFIFO =  0b0001 << 12  // FIFO
         }
 
+        public class ProcessFailedException : Exception
+        {
+            public ProcessFailedException() { }
+
+            public ProcessFailedException(int exitCode, string standardError) : base(standardError)
+            {
+                ExitCode = exitCode;
+                StandardError = standardError;
+            }
+
+            public ProcessFailedException(int exitCode, string standardError, Exception inner) : base(standardError, inner)
+            {
+                ExitCode = exitCode;
+                StandardError = standardError;
+            }
+
+            public int ExitCode { get; set; }
+            public string StandardError { get; set; }
+        };
+
         private static void InitProcess(Process cmdProcess)
         {
             cmdProcess.StartInfo.UseShellExecute = false;
@@ -73,26 +93,6 @@ namespace ADB_Explorer.Core.Services
             stderr = stderrTask.Result;
             return cmdProcess.ExitCode;
         }
-
-        public class ProcessFailedException : Exception
-        {
-            public ProcessFailedException() {}
-
-            public ProcessFailedException(int exitCode, string standardError) : base(standardError)
-            {
-                ExitCode = exitCode;
-                StandardError = standardError;
-            }
-
-            public ProcessFailedException(int exitCode, string standardError, Exception inner) : base(standardError, inner)
-            {
-                ExitCode = exitCode;
-                StandardError = standardError;
-            }
-
-            public int ExitCode { get; set; }
-            public string StandardError { get; set; }
-        };
 
         public static IEnumerable<string> ExecuteAdbCommandAsync(CancellationToken cancellationToken, string cmd, params string[] args)
         {
@@ -149,20 +149,25 @@ namespace ADB_Explorer.Core.Services
             return $"\"{result}\"";
         }
 
+        private static string ConcatPaths(string path1, string path2)
+        {
+            return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
+        }
+
         public static void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
         {
-            // Remove trailing '/' from given path to avoid possible issues
-            path = path.TrimEnd('/');
+            // Get real path
+            path = TranslateDevicePath(path);
 
             // Add parent directory when needed
-            if (path.LastIndexOf('/') is var index && index > 0)
+            if (path != "/")
             {
                 output.Enqueue(new FileStat
-                    {
-                        FileName = "..",
-                        Path = path.Remove(index),
-                        Type = FileStat.FileType.Parent
-                    });
+                {
+                    FileName = "..",
+                    Path = TranslateDevicePath(ConcatPaths(path, "..")),
+                    Type = FileStat.FileType.Parent
+                });
             }
 
             // Execute adb ls to get file list
@@ -188,18 +193,29 @@ namespace ADB_Explorer.Core.Services
                 output.Enqueue(new FileStat
                 {
                     FileName = name,
-                    Path = path + '/' + name,
+                    Path = ConcatPaths(path, name),
                     Type = (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
                     {
                         UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
                         UnixFileMode.S_IFREG => FileStat.FileType.File,
-                        UnixFileMode.S_IFLNK => FileStat.FileType.Folder,
-                        _ => throw new Exception($"Cannot handle file: \"{name}\" with mode: {mode}")
+                        UnixFileMode.S_IFLNK => FileStat.FileType.Folder, // Links are assumed to be folders
+                        _ => FileStat.FileType.File // Other types are assumed to be files
                     },
                     Size = size,
                     ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime()
                 });
             }
+        }
+
+        public static string TranslateDevicePath(string path)
+        {
+            string stdout, stderr;
+            int exitCode = ExecuteShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path), "&&", "pwd");
+            if (exitCode != 0)
+            {
+                throw new Exception(stderr);
+            }
+            return stdout.TrimEnd(LINE_SEPARATORS);
         }
 
         public static string GetDeviceName(int index = 0)
