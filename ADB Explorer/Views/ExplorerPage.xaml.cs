@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
@@ -62,19 +63,20 @@ namespace ADB_Explorer.Views
             }
 
             // Windows
-            //WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
-
+            // WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
 
             // Android
             if (AndroidFileList is null || !AndroidFileList.Any())
             {
-                PathBox.Text = INTERNAL_STORAGE;
+                PathBox.Tag =
+                CurrentPath = INTERNAL_STORAGE;
                 AndroidFileList = ADBService.ListDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
             }
             else
-                PathBox.Text = CurrentPath;
+                PathBox.Tag = CurrentPath;
 
-            ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
+            PopulateButtons(PathBox.Tag.ToString());
+            ExplorerGrid.ItemsSource = AndroidFileList; // WindowsFileList;
         }
 
         public void OnNavigatedFrom()
@@ -99,19 +101,84 @@ namespace ADB_Explorer.Views
         {
             if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
-                CurrentPath =
-                PathBox.Text = file.Path;
+                PathBox.Tag =
+                CurrentPath = file.Path;
+                PopulateButtons(file.Path);
 
-                AndroidFileList.Clear();
-                ExplorerGrid.ItemsSource = null;
-
-                AndroidFileList.AddRange(ADBService.ListDirectory(file.Path).Select(f => FileClass.GenerateAndroidFile(f)));
-
-                ExplorerGrid.ItemsSource = AndroidFileList;
-                ExplorerGrid.Items.Refresh();
-
-                ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                EnterFolder(file.Path);
             }
+        }
+
+        private void PopulateButtons(string path)
+        {
+            PathStackPanel.Children.Clear();
+            var dirs = path.Split('/');
+
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                var dirPath = string.Join('/', dirs[..(i + 1)]);
+                var dirName = dirs[i] == INTERNAL_STORAGE ? "Internal Storage" : dirs[i];
+                AddPathButton(dirPath, dirName);
+            }
+        }
+
+        private void AddPathButton(string path, string name)
+        {
+            if (PathStackPanel.Children.Count > 0)
+            {
+                TextBlock tb = new()
+                {
+                    Text = " \uE970 ",
+                    FontFamily = new("Segoe MDL2 Assets"),
+                    FontSize = 7,
+                    Margin = new(0, 1, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                PathStackPanel.Children.Add(tb);
+            }
+
+            Button button = new() { Content = name, Tag = path };
+            button.Click += PathButton_Click;
+            PathStackPanel.Children.Add(button);
+        }
+
+        private void EnterFolder(string path)
+        {
+            AndroidFileList.Clear();
+            ExplorerGrid.ItemsSource = null;
+
+            AndroidFileList.AddRange(ADBService.ListDirectory(path).Select(f => FileClass.GenerateAndroidFile(f)));
+
+            ExplorerGrid.ItemsSource = AndroidFileList;
+            ExplorerGrid.Items.Refresh();
+
+            ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+        }
+
+        private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            string path = (sender as Button).Tag.ToString();
+            PopulateButtons(path);
+            EnterFolder(path);
+        }
+
+        private void PathBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Collapsed;
+            PathBox.Text = PathBox.Tag.ToString();
+            PathBox.IsReadOnly = false;
+        }
+
+        private void PathBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Visible;
+            PathBox.Text = "";
+            PathBox.IsReadOnly = true;
+        }
+
+        private void Page_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ExplorerGrid.Focus();
         }
     }
 }
