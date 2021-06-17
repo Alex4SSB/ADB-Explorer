@@ -62,20 +62,20 @@ namespace ADB_Explorer.Views
             }
 
             // Windows
-            //WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
-
+            // WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
 
             // Android
             if (AndroidFileList is null || !AndroidFileList.Any())
             {
-                //PathBox.Text = INTERNAL_STORAGE;
+                PathBox.Tag =
+                CurrentPath = INTERNAL_STORAGE;
                 AndroidFileList = ADBService.ListDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
-                AddPathButton(INTERNAL_STORAGE, "Internal Storage");
             }
-            //else
-            //    PathBox.Text = CurrentPath;
+            else
+                PathBox.Tag = CurrentPath;
 
-            ExplorerGrid.ItemsSource = AndroidFileList;// WindowsFileList;
+            PopulateButtons(PathBox.Tag.ToString());
+            ExplorerGrid.ItemsSource = AndroidFileList; // WindowsFileList;
         }
 
         public void OnNavigatedFrom()
@@ -100,11 +100,24 @@ namespace ADB_Explorer.Views
         {
             if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
-                //CurrentPath =
-                //PathBox.Text = file.Path;
-                AddPathButton(file.Path, file.Name);
+                PathBox.Tag =
+                CurrentPath = file.Path;
+                PopulateButtons(file.Path);
 
                 EnterFolder(file.Path);
+            }
+        }
+
+        private void PopulateButtons(string path)
+        {
+            PathStackPanel.Children.Clear();
+            var dirs = path.Split('/');
+
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                var dirPath = string.Join('/', dirs[..(i+1)]);
+                var dirName = dirs[i] == INTERNAL_STORAGE ? "Internal Storage" : dirs[i];
+                AddPathButton(dirPath, dirName);
             }
         }
 
@@ -136,7 +149,9 @@ namespace ADB_Explorer.Views
 
         private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            EnterFolder((sender as Button).Tag.ToString());
+            string path = (sender as Button).Tag.ToString();
+            PopulateButtons(path);
+            EnterFolder(path);
         }
     }
 }
