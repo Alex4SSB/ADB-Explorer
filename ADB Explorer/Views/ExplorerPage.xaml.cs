@@ -143,6 +143,7 @@ namespace ADB_Explorer.Views
             if (AndroidFileList.Any())
             {
                 PathBox.Tag = CurrentPath;
+                PopulateButtons(CurrentPath);
             }
             else
             {
@@ -245,9 +246,7 @@ namespace ADB_Explorer.Views
 
         private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            string path = (sender as Button).Tag.ToString();
-            PopulateButtons(path);
-            StartDirectoryList(path);
+            NavigateToPath((sender as Button).Tag.ToString());
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
