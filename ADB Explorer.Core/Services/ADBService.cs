@@ -159,7 +159,7 @@ namespace ADB_Explorer.Core.Services
             {
                 output.Enqueue(new FileStat
                     {
-                        Name = "..",
+                        FileName = "..",
                         Path = path.Remove(index),
                         Type = FileStat.FileType.Parent
                     });
@@ -187,7 +187,7 @@ namespace ADB_Explorer.Core.Services
 
                 output.Enqueue(new FileStat
                 {
-                    Name = name,
+                    FileName = name,
                     Path = path + '/' + name,
                     Type = (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
                     {

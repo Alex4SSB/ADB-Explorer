@@ -1,27 +1,28 @@
-﻿using ADB_Explorer.Core.Helpers;
-using ADB_Explorer.Contracts.Views;
+﻿using ADB_Explorer.Contracts.Views;
+using ADB_Explorer.Core.Helpers;
 using ADB_Explorer.Core.Models;
 using ADB_Explorer.Core.Services;
 using ADB_Explorer.Models;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using static ADB_Explorer.Models.Data;
 using System.Windows.Threading;
-using System.Threading;
-using System;
-using System.Windows;
+using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Views
 {
     public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
     {
         private const string INTERNAL_STORAGE = "sdcard";
+        private readonly DispatcherTimer ConnectTimer = new();
         private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
         private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
 
@@ -87,49 +88,65 @@ namespace ADB_Explorer.Views
             InitializeComponent();
             DataContext = this;
 
+            ConnectTimer.Interval = TimeSpan.FromSeconds(2);
+            ConnectTimer.Tick += ConnectTimer_Tick;
+        }
+
+        private void ConnectTimer_Tick(object sender, EventArgs e)
+        {
+            if (ADBService.GetDeviceName() != "")
+            {
+                ConnectTimer.Stop();
+                LaunchSequence();
+            }
+        }
+
+        public List<FileClass> WindowsFileList { get; set; }
+
+        public void OnNavigatedTo(object parameter)
+        {
+            LaunchSequence();
+        }
+
+        private void LaunchSequence()
+        {
+            // Get device name
+            if (ADBService.GetDeviceName() is string name && !string.IsNullOrEmpty(name))
+            {
+                TitleBlock.Text = name;
+            }
+            else
+            {
+                TitleBlock.Text = "NO CONNECTED DEVICES";
+                AndroidFileList?.Clear();
+                ConnectTimer.Start();
+                return;
+            }
+
             cancellationTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
             dirListUpdateTimer = new DispatcherTimer();
             dirListUpdateTimer.Interval = DIR_LIST_UPDATE_INTERVAL;
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
 
-            // Get device name
-            if (DeviceName is string name && string.IsNullOrEmpty(name))
-            {
-                TitleBlock.Text = "NO CONNECTED DEVICES";
-                return;
-            }
-            else
-            {
-                TitleBlock.Text = DeviceName;
-            }
-
             ExplorerGrid.ItemsSource = AndroidFileList;
 
             if (AndroidFileList.Any())
             {
-                PathBox.Text = CurrentPath;
+                PathBox.Tag = CurrentPath;
             }
             else
             {
-                PathBox.Text = INTERNAL_STORAGE;
+                PathBox.Tag = INTERNAL_STORAGE;
                 StartDirectoryList(INTERNAL_STORAGE);
             }
-        }
-
-        ~ExplorerPage()
-        {
-            StopDirectoryList();
-        }
-
-        public void OnNavigatedTo(object parameter)
-        {
-            // Windows
-            //WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
+            PopulateButtons(PathBox.Tag.ToString());
         }
 
         public void OnNavigatedFrom()
         {
+            StopDirectoryList();
+            ConnectTimer.Stop();
         }
 
         private void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -149,8 +166,9 @@ namespace ADB_Explorer.Views
         {
             if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
-                CurrentPath =
-                PathBox.Text = file.Path;
+                PathBox.Tag =
+                CurrentPath = file.Path;
+                PopulateButtons(file.Path);
 
                 StartDirectoryList(file.Path);
             }
@@ -159,6 +177,65 @@ namespace ADB_Explorer.Views
         private void DirListUpdateTimer_Tick(object sender, EventArgs e)
         {
             UpdateDirectoryList();
+        }
+
+        private void PopulateButtons(string path)
+        {
+            PathStackPanel.Children.Clear();
+            var dirs = path.Split('/');
+
+            for (int i = 0; i < dirs.Length; i++)
+            {
+                var dirPath = string.Join('/', dirs[..(i + 1)]);
+                var dirName = dirs[i] == INTERNAL_STORAGE ? "Internal Storage" : dirs[i];
+                AddPathButton(dirPath, dirName);
+            }
+        }
+
+        private void AddPathButton(string path, string name)
+        {
+            if (PathStackPanel.Children.Count > 0)
+            {
+                TextBlock tb = new()
+                {
+                    Text = " \uE970 ",
+                    FontFamily = new("Segoe MDL2 Assets"),
+                    FontSize = 7,
+                    Margin = new(0, 1, 0, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                PathStackPanel.Children.Add(tb);
+            }
+
+            Button button = new() { Content = name, Tag = path };
+            button.Click += PathButton_Click;
+            PathStackPanel.Children.Add(button);
+        }
+
+        private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            string path = (sender as Button).Tag.ToString();
+            PopulateButtons(path);
+            StartDirectoryList(path);
+        }
+
+        private void PathBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Collapsed;
+            PathBox.Text = PathBox.Tag.ToString();
+            PathBox.IsReadOnly = false;
+        }
+
+        private void PathBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Visible;
+            PathBox.Text = "";
+            PathBox.IsReadOnly = true;
+        }
+
+        private void Page_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ExplorerGrid.Focus();
         }
     }
 }

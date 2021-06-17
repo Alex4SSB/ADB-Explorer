@@ -8,6 +8,7 @@
     xmlns:properties="clr-namespace:ADB_Explorer.Properties"
     d:DesignHeight="450"
     d:DesignWidth="800"
+    MouseDown="Page_MouseDown"
     Style="{DynamicResource MahApps.Styles.Page}"
     mc:Ignorable="d">
     <Page.Resources>
@@ -36,14 +37,30 @@
         <TextBox
             x:Name="PathBox"
             Grid.Row="1"
-            Margin="10" />
+            Margin="10"
+            VerticalContentAlignment="Center"
+            GotFocus="PathBox_GotFocus"
+            IsReadOnly="True"
+            LostFocus="PathBox_LostFocus" />
+        <StackPanel
+            x:Name="PathStackPanel"
+            Grid.Row="1"
+            Margin="10"
+            Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style BasedOn="{StaticResource MahApps.Styles.Button.Split.Arrow}" TargetType="Button">
+                    <Setter Property="Margin" Value="1,1" />
+                    <Setter Property="Padding" Value="4,0" />
+                </Style>
+            </StackPanel.Resources>
+
+        </StackPanel>
         <DataGrid
             x:Name="ExplorerGrid"
             Grid.Row="2"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
             ColumnHeaderStyle="{StaticResource ColHeaderStyle}"
-            GridLinesVisibility="Horizontal"
             IsReadOnly="True"
             ItemsSource="{Binding}"
             KeyboardNavigation.TabNavigation="Once"
@@ -67,7 +84,7 @@
                 </DataGridTemplateColumn>
                 <DataGridTextColumn
                     x:Name="Name"
-                    Binding="{Binding Name}"
+                    Binding="{Binding FileName}"
                     Header="Name" />
                 <DataGridTextColumn
                     x:Name="Date"
@@ -121,11 +138,25 @@
         </DataGrid>
         <StackPanel
             Grid.Row="3"
-            Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}"
+            Background="{DynamicResource MahApps.Brushes.Accent2}"
             Orientation="Horizontal">
-            <TextBlock Margin="8,4,0,4" Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
-            <TextBlock Margin="0,4,4,4" Text=" items" />
-            <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock
+                    x:Name="ItemsCountBlock"
+                    Margin="8,4,0,4"
+                    Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+                <TextBlock Margin="0,4,4,4" Text=" items" />
+                <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+            </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
@@ -138,9 +169,21 @@
                 </StackPanel.Style>
                 <TextBlock
                     x:Name="SelectedItemsBlock"
-                    Margin="8,4,0,4"
+                    Margin="4,4,0,4"
                     Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
-                <TextBlock Margin="0,4,4,4" Text=" items selected" />
+                <TextBlock Margin="0,4,0,4" Text=" item" />
+                <TextBlock Margin="0,4,0,4" Text="s">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Margin="0,4,4,4" Text=" selected" />
             </StackPanel>
 
         </StackPanel>
