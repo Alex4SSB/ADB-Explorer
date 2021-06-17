@@ -41,7 +41,7 @@
             VerticalContentAlignment="Center"
             GotFocus="PathBox_GotFocus"
             IsReadOnly="True"
-            LostFocus="PathBox_LostFocus" />
+            LostFocus="PathBox_LostFocus" KeyDown="PathBox_KeyDown" />
         <StackPanel
             x:Name="PathStackPanel"
             Grid.Row="1"

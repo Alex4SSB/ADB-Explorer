@@ -29,6 +29,7 @@ namespace ADB_Explorer.Views
             {"/storage/self/primary", "Internal Storage"},
             {"/", "Root"}
         };
+        private static readonly Key[] KEYS_TO_NAVIGATE = { Key.Enter, Key.Return };
 
         private readonly DispatcherTimer ConnectTimer = new();
         private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
@@ -145,19 +146,33 @@ namespace ADB_Explorer.Views
             }
             else
             {
-                PathBox.Tag =
-                CurrentPath = INTERNAL_STORAGE;
-                StartDirectoryList(INTERNAL_STORAGE);
+                NavigateToPath(INTERNAL_STORAGE);
             }
-
-            if (PathBox.Tag is string path)
-                PopulateButtons(path);
         }
 
         public void OnNavigatedFrom()
         {
             StopDirectoryList();
             ConnectTimer.Stop();
+        }
+        public bool NavigateToPath(string path)
+        {
+            string realPath = path;
+            try
+            {
+                realPath = ADBService.TranslateDevicePath(path);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            PathBox.Tag =
+            CurrentPath = realPath;
+            PopulateButtons(realPath);
+            StartDirectoryList(realPath);
+            return true;
         }
 
         private void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -177,11 +192,7 @@ namespace ADB_Explorer.Views
         {
             if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
             {
-                PathBox.Tag =
-                CurrentPath = file.Path;
-                PopulateButtons(file.Path);
-
-                StartDirectoryList(file.Path);
+                NavigateToPath(file.Path);
             }
         }
 
@@ -193,21 +204,23 @@ namespace ADB_Explorer.Views
         private void PopulateButtons(string path)
         {
             PathStackPanel.Children.Clear();
+            var pathItems = new List<string>();
 
-            // On special cases
+            // On special cases, cut prefix of the path and replace with a pretty button
             var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.Where((kv) => path.StartsWith(kv.Key)).FirstOrDefault();
             if (specialPair.Key != null)
             {
                 AddPathButton(specialPair.Key, specialPair.Value);
+                pathItems.Add(specialPair.Key);
                 path = path.Substring(specialPair.Key.Length).TrimStart('/');
             }
 
             var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-            for (int i = 0; i < dirs.Length; i++)
+            foreach (var dir in dirs)
             {
-                var dirPath = string.Join('/', dirs[..(i + 1)]);
-                var dirName = dirs[i];
+                pathItems.Add(dir);
+                var dirPath = string.Join('/', pathItems);
+                var dirName = pathItems.Last();
                 AddPathButton(dirPath, dirName);
             }
         }
@@ -254,6 +267,14 @@ namespace ADB_Explorer.Views
         private void Page_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ExplorerGrid.Focus();
+        }
+
+        private void PathBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (KEYS_TO_NAVIGATE.Contains(e.Key) && NavigateToPath(PathBox.Text))
+            {
+                ExplorerGrid.Focus();
+            }
         }
     }
 }
