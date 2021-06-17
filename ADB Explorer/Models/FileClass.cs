@@ -21,7 +21,7 @@ namespace ADB_Explorer.Models
         {
             return new FileClass
             {
-                Name = fileStat.Name,
+                FileName = fileStat.FileName,
                 Path = fileStat.Path,
                 Type = fileStat.Type,
                 Size = fileStat.Size,
@@ -41,7 +41,7 @@ namespace ADB_Explorer.Models
                 Path = path,
                 Type = type,
                 TypeName = type.ToString(),
-                Name = type switch
+                FileName = type switch
                 {
                     FileType.Drive => path,
                     FileType.Folder => System.IO.Path.GetFileName(path),

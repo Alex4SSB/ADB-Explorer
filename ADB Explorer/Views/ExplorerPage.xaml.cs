@@ -1,12 +1,16 @@
 ﻿using ADB_Explorer.Contracts.Views;
+using ADB_Explorer.Core.Helpers;
 using ADB_Explorer.Core.Models;
 using ADB_Explorer.Core.Services;
 using ADB_Explorer.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -19,6 +23,65 @@ namespace ADB_Explorer.Views
     {
         private const string INTERNAL_STORAGE = "sdcard";
         private readonly DispatcherTimer ConnectTimer = new();
+        private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
+        private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private Task listDirTask;
+        private DispatcherTimer dirListUpdateTimer;
+        private CancellationTokenSource cancellationTokenSource;
+        private ConcurrentQueue<FileStat> waitingFileStats;
+
+        private void StartDirectoryList(string path)
+        {
+            StopDirectoryList();
+
+            AndroidFileList.Clear();
+
+            cancellationTokenSource = new CancellationTokenSource();
+            waitingFileStats = new ConcurrentQueue<FileStat>();
+
+            listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, cancellationTokenSource.Token));
+
+            if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
+            {
+                StopDirectoryList();
+            }
+            else
+            {
+                UpdateDirectoryList();
+                dirListUpdateTimer.Start();
+                listDirTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => StopDirectoryList()));
+            }
+        }
+
+        private void UpdateDirectoryList()
+        {
+            if (listDirTask != null)
+            {
+                bool wasEmpty = (AndroidFileList.Count == 0);
+
+                AndroidFileList.AddRange(waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)));
+
+                if (wasEmpty && (AndroidFileList.Count > 0))
+                {
+                    ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                }
+            }
+        }
+
+        private void StopDirectoryList()
+        {
+            if (listDirTask != null)
+            {
+                dirListUpdateTimer.Stop();
+                cancellationTokenSource.Cancel();
+                listDirTask.Wait();
+                UpdateDirectoryList();
+                listDirTask = null;
+            }
+        }
 
         public ExplorerPage()
         {
@@ -37,8 +100,6 @@ namespace ADB_Explorer.Views
                 LaunchSequence();
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public List<FileClass> WindowsFileList { get; set; }
 
@@ -62,25 +123,29 @@ namespace ADB_Explorer.Views
                 return;
             }
 
-            // Windows
-            // WindowsFileList = DriveInfo.GetDrives().Select(f => FileClass.GenerateWindowsFile(f.Name, FileStat.FileType.Drive)).ToList();
+            cancellationTokenSource = new CancellationTokenSource();
+            waitingFileStats = new ConcurrentQueue<FileStat>();
+            dirListUpdateTimer = new DispatcherTimer();
+            dirListUpdateTimer.Interval = DIR_LIST_UPDATE_INTERVAL;
+            dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
 
-            // Android
-            if (AndroidFileList is null || !AndroidFileList.Any())
+            ExplorerGrid.ItemsSource = AndroidFileList;
+
+            if (AndroidFileList.Any())
             {
-                PathBox.Tag =
-                CurrentPath = INTERNAL_STORAGE;
-                AndroidFileList = ADBService.ListDirectory(INTERNAL_STORAGE).Select(f => FileClass.GenerateAndroidFile(f)).ToList();
+                PathBox.Tag = CurrentPath;
             }
             else
-                PathBox.Tag = CurrentPath;
-
+            {
+                PathBox.Tag = INTERNAL_STORAGE;
+                StartDirectoryList(INTERNAL_STORAGE);
+            }
             PopulateButtons(PathBox.Tag.ToString());
-            ExplorerGrid.ItemsSource = AndroidFileList; // WindowsFileList;
         }
 
         public void OnNavigatedFrom()
         {
+            StopDirectoryList();
             ConnectTimer.Stop();
         }
 
@@ -105,8 +170,13 @@ namespace ADB_Explorer.Views
                 CurrentPath = file.Path;
                 PopulateButtons(file.Path);
 
-                EnterFolder(file.Path);
+                StartDirectoryList(file.Path);
             }
+        }
+
+        private void DirListUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            UpdateDirectoryList();
         }
 
         private void PopulateButtons(string path)
@@ -142,24 +212,11 @@ namespace ADB_Explorer.Views
             PathStackPanel.Children.Add(button);
         }
 
-        private void EnterFolder(string path)
-        {
-            AndroidFileList.Clear();
-            ExplorerGrid.ItemsSource = null;
-
-            AndroidFileList.AddRange(ADBService.ListDirectory(path).Select(f => FileClass.GenerateAndroidFile(f)));
-
-            ExplorerGrid.ItemsSource = AndroidFileList;
-            ExplorerGrid.Items.Refresh();
-
-            ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
-        }
-
         private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             string path = (sender as Button).Tag.ToString();
             PopulateButtons(path);
-            EnterFolder(path);
+            StartDirectoryList(path);
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
