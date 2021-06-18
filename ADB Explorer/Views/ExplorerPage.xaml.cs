@@ -21,13 +21,13 @@ namespace ADB_Explorer.Views
 {
     public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
     {
-        private const string INTERNAL_STORAGE = "/sdcard";
-        private static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new Dictionary<string, string>
+        private static readonly string DEFAULT_PATH = "/sdcard";
+        private static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
         {
-            {"/sdcard", "Internal Storage"},
-            {"/storage/emulated/0", "Internal Storage"},
-            {"/storage/self/primary", "Internal Storage"},
-            {"/", "Root"}
+            { "/sdcard", "Internal Storage" },
+            { "/storage/emulated/0", "Internal Storage" },
+            { "/storage/self/primary", "Internal Storage" },
+            { "/", "Root" }
         };
         private static readonly Key[] KEYS_TO_NAVIGATE = { Key.Enter, Key.Return };
 
@@ -134,8 +134,10 @@ namespace ADB_Explorer.Views
 
             cancellationTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
-            dirListUpdateTimer = new DispatcherTimer();
-            dirListUpdateTimer.Interval = DIR_LIST_UPDATE_INTERVAL;
+            dirListUpdateTimer = new DispatcherTimer
+            {
+                Interval = DIR_LIST_UPDATE_INTERVAL
+            };
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
@@ -147,7 +149,7 @@ namespace ADB_Explorer.Views
             }
             else
             {
-                NavigateToPath(INTERNAL_STORAGE);
+                NavigateToPath(DEFAULT_PATH);
             }
         }
 
@@ -158,7 +160,7 @@ namespace ADB_Explorer.Views
         }
         public bool NavigateToPath(string path)
         {
-            string realPath = path;
+            string realPath;
             try
             {
                 realPath = ADBService.TranslateDevicePath(path);
@@ -208,12 +210,12 @@ namespace ADB_Explorer.Views
             var pathItems = new List<string>();
 
             // On special cases, cut prefix of the path and replace with a pretty button
-            var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.Where((kv) => path.StartsWith(kv.Key)).FirstOrDefault();
+            var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.FirstOrDefault((kv) => path.StartsWith(kv.Key));
             if (specialPair.Key != null)
             {
                 AddPathButton(specialPair.Key, specialPair.Value);
                 pathItems.Add(specialPair.Key);
-                path = path.Substring(specialPair.Key.Length).TrimStart('/');
+                path = path[specialPair.Key.Length..].TrimStart('/');
             }
 
             var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
