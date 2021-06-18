@@ -155,8 +155,24 @@
                     x:Name="ItemsCountBlock"
                     Margin="8,4,0,4"
                     Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
-                <TextBlock Margin="0,4,4,4" Text=" items" />
-                <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+                <TextBlock Margin="0,4" Text=" item" />
+                <TextBlock Margin="0,4" Text="s">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock
+                    x:Name="UnfinishedBlock"
+                    Margin="0,4"
+                    Text=" *"
+                    Visibility="Collapsed" />
+                <Separator Margin="8,4,4,4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>

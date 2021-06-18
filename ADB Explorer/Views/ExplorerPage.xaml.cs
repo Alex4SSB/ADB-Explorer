@@ -19,7 +19,7 @@ using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Views
 {
-    public partial class ExplorerPage : Page, INotifyPropertyChanged, INavigationAware
+    public partial class ExplorerPage : Page, INavigationAware
     {
         private static readonly string DEFAULT_PATH = "/sdcard";
         private static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
@@ -35,62 +35,10 @@ namespace ADB_Explorer.Views
         private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
         private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private Task listDirTask;
         private DispatcherTimer dirListUpdateTimer;
         private CancellationTokenSource cancellationTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
-
-        private void StartDirectoryList(string path)
-        {
-            StopDirectoryList();
-
-            AndroidFileList.Clear();
-
-            cancellationTokenSource = new CancellationTokenSource();
-            waitingFileStats = new ConcurrentQueue<FileStat>();
-
-            listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, cancellationTokenSource.Token));
-
-            if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
-            {
-                StopDirectoryList();
-            }
-            else
-            {
-                UpdateDirectoryList();
-                dirListUpdateTimer.Start();
-                listDirTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => StopDirectoryList()));
-            }
-        }
-
-        private void UpdateDirectoryList()
-        {
-            if (listDirTask != null)
-            {
-                bool wasEmpty = (AndroidFileList.Count == 0);
-
-                AndroidFileList.AddRange(waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)));
-
-                if (wasEmpty && (AndroidFileList.Count > 0))
-                {
-                    ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
-                }
-            }
-        }
-
-        private void StopDirectoryList()
-        {
-            if (listDirTask != null)
-            {
-                dirListUpdateTimer.Stop();
-                cancellationTokenSource.Cancel();
-                listDirTask.Wait();
-                UpdateDirectoryList();
-                listDirTask = null;
-            }
-        }
 
         public ExplorerPage()
         {
@@ -101,20 +49,20 @@ namespace ADB_Explorer.Views
             ConnectTimer.Tick += ConnectTimer_Tick;
         }
 
-        private void ConnectTimer_Tick(object sender, EventArgs e)
-        {
-            if (ADBService.GetDeviceName() != "")
-            {
-                ConnectTimer.Stop();
-                LaunchSequence();
-            }
-        }
-
-        public List<FileClass> WindowsFileList { get; set; }
-
         public void OnNavigatedTo(object parameter)
         {
             LaunchSequence();
+        }
+
+        public void OnNavigatedFrom()
+        {
+            if (listDirTask is not null)
+            {
+                StopDirectoryList();
+                AndroidFileList.Clear();
+            }
+            
+            ConnectTimer.Stop();
         }
 
         private void LaunchSequence()
@@ -142,22 +90,81 @@ namespace ADB_Explorer.Views
 
             ExplorerGrid.ItemsSource = AndroidFileList;
 
-            if (AndroidFileList.Any())
+            if (string.IsNullOrEmpty(CurrentPath))
+            {
+                NavigateToPath(DEFAULT_PATH);
+            }
+            else if (AndroidFileList.Any())
             {
                 PathBox.Tag = CurrentPath;
                 PopulateButtons(CurrentPath);
             }
             else
+                NavigateToPath(CurrentPath);
+        }
+
+        private void ConnectTimer_Tick(object sender, EventArgs e)
+        {
+            if (ADBService.GetDeviceName() == "") return;
+
+            ConnectTimer.Stop();
+            LaunchSequence();
+        }
+
+        private void StartDirectoryList(string path)
+        {
+            StopDirectoryList();
+
+            AndroidFileList.Clear();
+
+            cancellationTokenSource = new CancellationTokenSource();
+            waitingFileStats = new ConcurrentQueue<FileStat>();
+
+            listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, cancellationTokenSource.Token));
+
+            if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
             {
-                NavigateToPath(DEFAULT_PATH);
+                StopDirectoryList();
+            }
+            else
+            {
+                Cursor = Cursors.AppStarting;
+                UnfinishedBlock.Visibility = Visibility.Visible;
+
+                UpdateDirectoryList();
+                dirListUpdateTimer.Start();
+                listDirTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => StopDirectoryList()));
             }
         }
 
-        public void OnNavigatedFrom()
+        private void UpdateDirectoryList()
         {
-            StopDirectoryList();
-            ConnectTimer.Stop();
+            if (listDirTask is null) return;
+
+            bool wasEmpty = (AndroidFileList.Count == 0);
+
+            AndroidFileList.AddRange(waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)));
+
+            if (wasEmpty && (AndroidFileList.Count > 0))
+            {
+                ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+            }
         }
+
+        private void StopDirectoryList()
+        {
+            if (listDirTask is null) return;
+
+            Cursor = null;
+            UnfinishedBlock.Visibility = Visibility.Collapsed;
+
+            dirListUpdateTimer.Stop();
+            cancellationTokenSource.Cancel();
+            listDirTask.Wait();
+            UpdateDirectoryList();
+            listDirTask = null;
+        }
+
         public bool NavigateToPath(string path)
         {
             string realPath;
@@ -177,19 +184,6 @@ namespace ADB_Explorer.Views
             StartDirectoryList(realPath);
             return true;
         }
-
-        private void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (Equals(storage, value))
-            {
-                return;
-            }
-
-            storage = value;
-            OnPropertyChanged(propertyName);
-        }
-
-        private void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
