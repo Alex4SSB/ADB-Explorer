@@ -65,6 +65,7 @@
             IsReadOnly="True"
             ItemsSource="{Binding}"
             KeyboardNavigation.TabNavigation="Once"
+            SelectionChanged="ExplorerGrid_SelectionChanged"
             SelectionMode="Extended"
             SelectionUnit="FullRow">
             <DataGrid.RowStyle>
@@ -141,6 +142,11 @@
             Grid.Row="3"
             Background="{DynamicResource MahApps.Brushes.Accent2}"
             Orientation="Horizontal">
+            <StackPanel.Resources>
+                <Style BasedOn="{StaticResource MahApps.Styles.Separator.StatusBar}" TargetType="Separator">
+                    <Setter Property="Margin" Value="8,6,4,6" />
+                </Style>
+            </StackPanel.Resources>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">
@@ -172,7 +178,7 @@
                     Margin="0,4"
                     Text=" *"
                     Visibility="Collapsed" />
-                <Separator Margin="8,4,4,4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+                <Separator />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>
@@ -200,10 +206,20 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
-                <TextBlock Margin="0,4,4,4" Text=" selected" />
-                <Separator Margin="4" Style="{StaticResource MahApps.Styles.Separator.StatusBar}" />
+                <TextBlock Margin="0,4" Text=" selected" />
+                <TextBlock x:Name="TotalSizeBlock" Margin="6,4,0,4">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <Separator />
             </StackPanel>
-
         </StackPanel>
     </Grid>
 </Page>

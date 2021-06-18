@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Contracts.Views;
+using ADB_Explorer.Converters;
 using ADB_Explorer.Core.Helpers;
 using ADB_Explorer.Core.Models;
 using ADB_Explorer.Core.Services;
@@ -39,6 +40,20 @@ namespace ADB_Explorer.Views
         private DispatcherTimer dirListUpdateTimer;
         private CancellationTokenSource cancellationTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
+
+        private string SelectedFilesTotalSize
+        {
+            get
+            {
+                var files = ExplorerGrid.SelectedItems.OfType<FileClass>().ToList();
+                if (files.Any(i => i.Type != FileStat.FileType.File)) return "0";
+
+                ulong totalSize = 0;
+                files.ForEach(f => totalSize += f.Size);
+
+                return totalSize.ToSize();
+            }
+        }
 
         public ExplorerPage()
         {
@@ -270,6 +285,11 @@ namespace ADB_Explorer.Views
             {
                 ExplorerGrid.Focus();
             }
+        }
+
+        private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TotalSizeBlock.Text = SelectedFilesTotalSize;
         }
     }
 }
