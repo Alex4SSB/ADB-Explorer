@@ -163,11 +163,13 @@ namespace ADB_Explorer.Core.Services
             if (path != "/")
             {
                 output.Enqueue(new FileStat
-                {
-                    FileName = "..",
-                    Path = TranslateDevicePath(ConcatPaths(path, "..")),
-                    Type = FileStat.FileType.Parent
-                });
+                (
+                    fileName: "..",
+                    path: TranslateDevicePath(ConcatPaths(path, "..")),
+                    type: FileStat.FileType.Parent,
+                    size: 0,
+                    modifiedTime: DateTimeOffset.FromUnixTimeSeconds(0).DateTime
+                ));
             }
 
             // Execute adb ls to get file list
@@ -191,19 +193,19 @@ namespace ADB_Explorer.Core.Services
                 }
 
                 output.Enqueue(new FileStat
-                {
-                    FileName = name,
-                    Path = ConcatPaths(path, name),
-                    Type = (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
+                (
+                    fileName: name,
+                    path: ConcatPaths(path, name),
+                    type: (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
                     {
                         UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
                         UnixFileMode.S_IFREG => FileStat.FileType.File,
                         UnixFileMode.S_IFLNK => FileStat.FileType.Folder, // Links are assumed to be folders
                         _ => FileStat.FileType.File // Other types are assumed to be files
                     },
-                    Size = size,
-                    ModifiedTime = DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime()
-                });
+                    size: size,
+                    modifiedTime: DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime()
+                ));
             }
         }
 

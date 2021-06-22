@@ -19,7 +19,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public static RangeSupportedObservableCollection<FileClass> AndroidFileList = new();
+        public static MyObservableCollection<FileClass> AndroidFileList = new();
 
         public static string CurrentPath { get; set; }
 
