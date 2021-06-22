@@ -16,8 +16,8 @@ namespace ADB_Explorer.Models
     {
         private const ShellIconManager.IconSize iconSize = ShellIconManager.IconSize.Small;
 
-        public FileClass(string fileName, string path, FileType type, UInt64 size, DateTime modifiedTime) :
-            base(fileName, path, type, size, modifiedTime)
+        public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null) :
+            base(fileName, path, type, isLink, size, modifiedTime)
         {
             icon = GetIcon();
         }
@@ -30,7 +30,8 @@ namespace ADB_Explorer.Models
                 path: fileStat.Path,
                 type: fileStat.Type,
                 size: fileStat.Size,
-                modifiedTime: fileStat.ModifiedTime
+                modifiedTime: fileStat.ModifiedTime,
+                isLink: fileStat.IsLink
             );
         }
 
@@ -53,8 +54,8 @@ namespace ADB_Explorer.Models
         //}
 
         public string TypeName => Type.ToString();
-        public string ModifiedTimeString => ModifiedTime.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
-        public string SizeString => Size.ToSize();
+        public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+        public string SizeString => Size?.ToSize();
 
         private object icon;
 
@@ -68,7 +69,8 @@ namespace ADB_Explorer.Models
             }
         }
 
-        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize));
+        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
+        private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
 
         private static BitmapSource IconToBitmapSource(System.Drawing.Icon icon)
         {
@@ -79,12 +81,13 @@ namespace ADB_Explorer.Models
         {
             return Type switch
             {
-                FileType.File => IconToBitmapSource(ExtIcon(System.IO.Path.GetExtension(FileName), iconSize)),
-                _ => folderIconBitmapSource
+                FileType.File => IconToBitmapSource(ExtIcon(System.IO.Path.GetExtension(FileName), iconSize, IsLink)),
+                FileType.Folder or FileType.Parent => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
+                _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
             };
         }
 
-        private static Icon ExtIcon(string extension, ShellIconManager.IconSize iconSize)
+        private static Icon ExtIcon(string extension, ShellIconManager.IconSize iconSize, bool isLink)
         {
             // No extension -> "*" which means unknown file 
             if (extension == string.Empty)
@@ -93,14 +96,15 @@ namespace ADB_Explorer.Models
             }
 
             Icon icon;
-            if (!FileIcons.ContainsKey(extension))
+            var iconId = new Tuple<string, bool>(extension, isLink);
+            if (!FileIcons.ContainsKey(iconId))
             {
-                icon = ShellIconManager.GetExtensionIcon(extension, iconSize);
-                FileIcons.Add(extension, icon);
+                icon = ShellIconManager.GetExtensionIcon(extension, iconSize, isLink);
+                FileIcons.Add(iconId, icon);
             }
             else
             {
-                icon = FileIcons[extension];
+                icon = FileIcons[iconId];
             }
 
             return icon;
@@ -108,7 +112,7 @@ namespace ADB_Explorer.Models
 
         protected override void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            if (propertyName == "FileName" || propertyName == "Type")
+            if (propertyName == "FileName" || propertyName == "Type" || propertyName == "IsLink")
             {
                 Icon = GetIcon();
             }

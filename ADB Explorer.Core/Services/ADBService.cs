@@ -166,9 +166,7 @@ namespace ADB_Explorer.Core.Services
                 (
                     fileName: "..",
                     path: TranslateDevicePath(ConcatPaths(path, "..")),
-                    type: FileStat.FileType.Parent,
-                    size: 0,
-                    modifiedTime: DateTimeOffset.FromUnixTimeSeconds(0).DateTime
+                    type: FileStat.FileType.Parent
                 ));
             }
 
@@ -198,15 +196,28 @@ namespace ADB_Explorer.Core.Services
                     path: ConcatPaths(path, name),
                     type: (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
                     {
-                        UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
+                        UnixFileMode.S_IFSOCK => FileStat.FileType.Socket,
+                        UnixFileMode.S_IFLNK => FileStat.FileType.Unknown,
                         UnixFileMode.S_IFREG => FileStat.FileType.File,
-                        UnixFileMode.S_IFLNK => FileStat.FileType.Folder, // Links are assumed to be folders
-                        _ => FileStat.FileType.File // Other types are assumed to be files
+                        UnixFileMode.S_IFBLK => FileStat.FileType.BlockDevice,
+                        UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
+                        UnixFileMode.S_IFCHR => FileStat.FileType.CharDevice,
+                        UnixFileMode.S_IFIFO => FileStat.FileType.FIFO,
+                        (UnixFileMode)0 => FileStat.FileType.Unknown,
+                        _ => throw new Exception($"Unexpected file type for \"{name}\" with mode: {mode}")
                     },
-                    size: size,
-                    modifiedTime: DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime()
+                    size: (mode != 0) ? size : new UInt64?(),
+                    modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : new DateTime?(),
+                    isLink: (mode & (UInt32)UnixFileMode.S_IFMT) == (UInt32)UnixFileMode.S_IFLNK
                 ));
             }
+        }
+
+        public static bool IsDirectory(string path)
+        {
+            string stdout, stderr;
+            int exitCode = ExecuteShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path));
+            return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
         }
 
         public static string TranslateDevicePath(string path)

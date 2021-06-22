@@ -48,6 +48,20 @@ namespace ADB_Explorer.Helpers
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
+        public void RemoveAll()
+        {
+            suppressOnCollectionChanged = true;
+
+            while (base.Count > 0)
+            {
+                RemoveAt(0);
+            }
+
+            suppressOnCollectionChanged = false;
+
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
         private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (!suppressOnCollectionChanged)

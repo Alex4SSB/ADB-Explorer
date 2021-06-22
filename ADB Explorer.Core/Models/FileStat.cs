@@ -8,19 +8,25 @@ namespace ADB_Explorer.Core.Models
     {
         public enum FileType
         {
-            Drive,
-            Folder,
+            Socket,
             File,
-            Parent
+            BlockDevice,
+            Folder,
+            CharDevice,
+            FIFO,
+            Drive,
+            Parent,
+            Unknown
         }
 
-        public FileStat(string fileName, string path, FileType type, UInt64 size, DateTime modifiedTime)
+        public FileStat(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null)
         {
             this.fileName = fileName;
             this.path = path;
             this.type = type;
             this.size = size;
             this.modifiedTime = modifiedTime;
+            this.isLink = isLink;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -75,8 +81,8 @@ namespace ADB_Explorer.Core.Models
             }
         }
 
-        private UInt64 size;
-        public UInt64 Size
+        private UInt64? size;
+        public UInt64? Size
         {
             get
             {
@@ -92,8 +98,8 @@ namespace ADB_Explorer.Core.Models
             }
         }
 
-        private DateTime modifiedTime;
-        public DateTime ModifiedTime
+        private DateTime? modifiedTime;
+        public DateTime? ModifiedTime
         {
             get
             {
@@ -108,6 +114,22 @@ namespace ADB_Explorer.Core.Models
                 }
             }
         }
+
+        private bool isLink;
+
+        public bool IsLink
+        {
+            get
+            { 
+                return isLink;
+            }
+            set
+            { 
+                isLink = value;
+                NotifyPropertyChanged();
+            }
+        }
+
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {

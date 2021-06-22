@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using ADB_Explorer.Helpers;
+using System;
 
 namespace ADB_Explorer.Models
 {
@@ -23,7 +24,7 @@ namespace ADB_Explorer.Models
 
         public static string CurrentPath { get; set; }
 
-        public static Dictionary<string, Icon> FileIcons = new();
+        public static Dictionary<Tuple<string, bool>, Icon> FileIcons = new();
 
     }
 }

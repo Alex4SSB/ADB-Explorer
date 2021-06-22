@@ -37,8 +37,10 @@ namespace ADB_Explorer.Views
         private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
 
         private Task listDirTask;
+        private Task unknownFoldersTask;
         private DispatcherTimer dirListUpdateTimer;
-        private CancellationTokenSource cancellationTokenSource;
+        private CancellationTokenSource dirListCancelTokenSource;
+        private CancellationTokenSource determineFoldersCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
 
         private string SelectedFilesTotalSize
@@ -49,7 +51,7 @@ namespace ADB_Explorer.Views
                 if (files.Any(i => i.Type != FileStat.FileType.File)) return "0";
 
                 ulong totalSize = 0;
-                files.ForEach(f => totalSize += f.Size);
+                files.ForEach(f => totalSize += f.Size.GetValueOrDefault(0));
 
                 return totalSize.ToSize();
             }
@@ -74,7 +76,8 @@ namespace ADB_Explorer.Views
             if (listDirTask is not null)
             {
                 StopDirectoryList();
-                AndroidFileList.Clear();
+                StopDetermineFolders();
+                AndroidFileList.RemoveAll();
             }
             
             ConnectTimer.Stop();
@@ -95,7 +98,9 @@ namespace ADB_Explorer.Views
                 return;
             }
 
-            cancellationTokenSource = new CancellationTokenSource();
+            unknownFoldersTask = Task.Run(() => { });
+            dirListCancelTokenSource = new CancellationTokenSource();
+            determineFoldersCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
             dirListUpdateTimer = new DispatcherTimer
             {
@@ -129,13 +134,15 @@ namespace ADB_Explorer.Views
         private void StartDirectoryList(string path)
         {
             StopDirectoryList();
+            StopDetermineFolders();
 
-            AndroidFileList.Clear();
+            AndroidFileList.RemoveAll();
 
-            cancellationTokenSource = new CancellationTokenSource();
+            determineFoldersCancelTokenSource = new CancellationTokenSource();
+            dirListCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
 
-            listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, cancellationTokenSource.Token));
+            listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, dirListCancelTokenSource.Token));
 
             if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
             {
@@ -158,7 +165,10 @@ namespace ADB_Explorer.Views
 
             bool wasEmpty = (AndroidFileList.Count == 0);
 
-            AndroidFileList.AddRange(waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)));
+            var newFiles = waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)).ToArray();
+            AndroidFileList.AddRange(newFiles);
+            var unknownFiles = newFiles.Where(f => f.Type == FileStat.FileType.Unknown);
+            StartDetermineFolders(unknownFiles);
 
             if (wasEmpty && (AndroidFileList.Count > 0))
             {
@@ -174,10 +184,38 @@ namespace ADB_Explorer.Views
             UnfinishedBlock.Visibility = Visibility.Collapsed;
 
             dirListUpdateTimer.Stop();
-            cancellationTokenSource.Cancel();
+            dirListCancelTokenSource.Cancel();
             listDirTask.Wait();
             UpdateDirectoryList();
             listDirTask = null;
+            dirListCancelTokenSource = null;
+        }
+
+        private void StartDetermineFolders(IEnumerable<FileClass> files)
+        {
+            unknownFoldersTask.ContinueWith((t) => DetermineFolders(files, determineFoldersCancelTokenSource.Token));
+        }
+
+        private void DetermineFolders(IEnumerable<FileClass> files, CancellationToken cancellationToken)
+        {
+            foreach (var file in files)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+                else if (ADBService.IsDirectory(file.Path))
+                {
+                    Application.Current.Dispatcher.BeginInvoke(() => { file.Type = FileStat.FileType.Folder; });
+                }
+            }
+        }
+
+        private void StopDetermineFolders()
+        {
+            determineFoldersCancelTokenSource.Cancel();
+            unknownFoldersTask.Wait();
+            determineFoldersCancelTokenSource = null;
         }
 
         public bool NavigateToPath(string path)
@@ -202,7 +240,9 @@ namespace ADB_Explorer.Views
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.Source is DataGridRow row && row.Item is FileClass file && file.Type != FileStat.FileType.File)
+            if ((e.Source is DataGridRow row) &&
+                (row.Item is FileClass file) &&
+                (file.Type == FileStat.FileType.Folder || file.Type == FileStat.FileType.Parent))
             {
                 NavigateToPath(file.Path);
             }

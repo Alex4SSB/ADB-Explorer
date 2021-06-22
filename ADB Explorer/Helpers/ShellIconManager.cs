@@ -10,6 +10,7 @@ namespace ADB_Explorer.Helpers
         private const uint SHGFI_LARGEICON = 0x0;
         private const uint SHGFI_SMALLICON = 0x1;
         private const uint SHGFI_USEFILEATTRIBUTES = 0x10;
+        private const uint SHGFI_LINKOVERLAY = 0x8000;
         private const uint FILE_ATTRIBUTE_NORMAL = 0x80;
 
         [StructLayout(LayoutKind.Sequential)]
@@ -51,14 +52,14 @@ namespace ADB_Explorer.Helpers
             return icon;
         }
 
-        public static Icon GetExtensionIcon(string extension, IconSize iconSize)
+        public static Icon GetExtensionIcon(string extension, IconSize iconSize, bool isLink)
         {
-            return GetIcon(extension, SHGFI_USEFILEATTRIBUTES | (uint)iconSize);
+            return GetIcon(extension, SHGFI_USEFILEATTRIBUTES | (uint)iconSize | (isLink ? SHGFI_LINKOVERLAY : 0));
         }
 
-        public static Icon GetFileIcon(string filePath, IconSize iconSize)
+        public static Icon GetFileIcon(string filePath, IconSize iconSize, bool isLink)
         {
-            return GetIcon(filePath, (uint)iconSize);
+            return GetIcon(filePath, (uint)iconSize | (isLink ? SHGFI_LINKOVERLAY : 0));
         }
     }
 }
