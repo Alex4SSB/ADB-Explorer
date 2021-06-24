@@ -71,6 +71,8 @@ namespace ADB_Explorer.Models
 
         private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
         private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
+        private static readonly BitmapSource parentIconBitmapSource = IconToBitmapSource(ShellIconManager.ExtractIconByIndex("Shell32.dll", 45, iconSize));
+        private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellIconManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
 
         private static BitmapSource IconToBitmapSource(System.Drawing.Icon icon)
         {
@@ -82,7 +84,9 @@ namespace ADB_Explorer.Models
             return Type switch
             {
                 FileType.File => IconToBitmapSource(ExtIcon(System.IO.Path.GetExtension(FileName), iconSize, IsLink)),
-                FileType.Folder or FileType.Parent => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
+                FileType.Folder => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
+                FileType.Parent => parentIconBitmapSource,
+                FileType.Unknown => unknownFileIconBitmapSource,
                 _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
             };
         }

@@ -61,5 +61,28 @@ namespace ADB_Explorer.Helpers
         {
             return GetIcon(filePath, (uint)iconSize | (isLink ? SHGFI_LINKOVERLAY : 0));
         }
+
+        public static Icon ExtractIconByIndex(string filePath, int index, IconSize iconSize)
+        {
+            IntPtr hIcon;
+            if (iconSize == IconSize.Large)
+            {
+                ExtractIconEx(filePath, index, out hIcon, IntPtr.Zero, 1);
+            }
+            else
+            {
+                ExtractIconEx(filePath, index, IntPtr.Zero, out hIcon, 1);
+            }
+
+            Icon icon = (Icon)Icon.FromHandle(hIcon).Clone();
+            DestroyIcon(hIcon);
+            return icon;
+        }
+
+        [DllImport("shell32", CharSet = CharSet.Unicode)]
+        private static extern int ExtractIconEx(string lpszFile, int nIconIndex, out IntPtr phiconLarge, IntPtr phiconSmall, int nIcons);
+
+        [DllImport("shell32", CharSet = CharSet.Unicode)]
+        private static extern int ExtractIconEx(string lpszFile, int nIconIndex, IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons);
     }
 }
