@@ -348,14 +348,16 @@ namespace ADB_Explorer
                 PathStackPanel.Children.Add(tb);
             }
 
-            Button button = new() { Content = name, Tag = path };
+            MenuItem button = new() { Header = name, Tag = path, Height = 24 };
+            Menu menu = new() { Height = 24 };
+            menu.Items.Add(button);
             button.Click += PathButton_Click;
-            PathStackPanel.Children.Add(button);
+            PathStackPanel.Children.Add(menu);
         }
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPath((sender as Button).Tag.ToString());
+            NavigateToPath((sender as MenuItem).Tag.ToString());
         }
     }
 }

@@ -124,7 +124,7 @@
                 <TextBox
                     x:Name="PathBox"
                     Grid.Column="1"
-                    Margin="8,6"
+                    Margin="6"
                     VerticalContentAlignment="Center"
                     GotFocus="PathBox_GotFocus"
                     IsReadOnly="True"
@@ -136,9 +136,6 @@
                     Margin="10"
                     Orientation="Horizontal">
                     <StackPanel.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="Padding" Value="4,0" />
-                        </Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="VerticalAlignment" Value="Center" />
                         </Style>
