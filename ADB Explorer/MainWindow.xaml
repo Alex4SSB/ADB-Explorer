@@ -1,67 +1,156 @@
-﻿<Page
-    x:Class="ADB_Explorer.Views.ExplorerPage"
+﻿<Window
+    x:Class="ADB_Explorer.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:properties="clr-namespace:ADB_Explorer.Properties"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
-    MouseDown="Page_MouseDown"
-    Style="{DynamicResource MahApps.Styles.Page}"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="ADB Explorer"
+    Width="800"
+    Height="450"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    MouseDown="Window_MouseDown"
     mc:Ignorable="d">
-    <Page.Resources>
-        <Style
-            x:Key="ColHeaderStyle"
-            BasedOn="{StaticResource MahApps.Styles.DataGridColumnHeader}"
-            TargetType="DataGridColumnHeader">
-            <Setter Property="controls:ControlsHelper.ContentCharacterCasing" Value="Normal" />
-            <Setter Property="FontWeight" Value="Regular" />
-        </Style>
-    </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="48" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="54" />
+            <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock
-            x:Name="TitleBlock"
-            Grid.Row="0"
-            Margin="{StaticResource MediumLeftMargin}"
-            Style="{StaticResource PageTitleStyle}"
-            Text="{x:Static properties:Resources.ExplorerPageTitle}" />
-        <TextBox
-            x:Name="PathBox"
-            Grid.Row="1"
-            Margin="10"
-            VerticalContentAlignment="Center"
-            GotFocus="PathBox_GotFocus"
-            IsReadOnly="True"
-            KeyDown="PathBox_KeyDown"
-            LostFocus="PathBox_LostFocus" />
-        <StackPanel
-            x:Name="PathStackPanel"
-            Grid.Row="1"
-            Margin="12"
-            Orientation="Horizontal">
-            <StackPanel.Resources>
-                <Style BasedOn="{StaticResource MahApps.Styles.Button.Split.Arrow}" TargetType="Button">
-                    <Setter Property="Padding" Value="4,0" />
+        <Menu Margin="7,0" VerticalAlignment="Center">
+            <Menu.Resources>
+                <Style TargetType="ui:FontIcon">
+                    <Setter Property="FontSize" Value="18" />
                 </Style>
-                <Style TargetType="TextBlock">
-                    <Setter Property="VerticalAlignment" Value="Center" />
-                </Style>
-            </StackPanel.Resources>
+            </Menu.Resources>
+            <MenuItem Margin="2,0">
+                <MenuItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:FontIcon
+                            Margin="0,0,8,0"
+                            FontSize="20"
+                            Glyph="&#xECC8;" />
+                        <TextBlock VerticalAlignment="Center" Text="New" />
+                    </StackPanel>
+                </MenuItem.Header>
+                <MenuItem>
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                Margin="0,0,8,0"
+                                FontSize="16"
+                                Glyph="&#xECC8;" />
+                            <TextBlock Text="New Item" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem>
+                    <MenuItem.Header>
+                        New Folder
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem ToolTip="Cut">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE8C6;" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem ToolTip="Copy">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE8C8;" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem ToolTip="Paste">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE77F;" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem ToolTip="Rename">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE8AC;" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem ToolTip="Share">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE72D;" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem ToolTip="Recycle">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE74D;" />
+                </MenuItem.Header>
+            </MenuItem>
+        </Menu>
+        <Menu Margin="0,0,7,0" HorizontalAlignment="Right">
+            <MenuItem
+                x:Name="ToggleThemeButton"
+                Click="ToggleThemeButton_Click"
+                ToolTip="Toggle Theme">
+                <MenuItem.Header>
+                    <ui:FontIcon FontSize="18" Glyph="&#xE771;" />
+                </MenuItem.Header>
+            </MenuItem>
+        </Menu>
+        <StackPanel Grid.Row="1">
+            <Separator />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Menu Margin="7,0,0,0">
+                    <Menu.Resources>
+                        <Style TargetType="ui:FontIcon">
+                            <Setter Property="FontSize" Value="14" />
+                        </Style>
+                    </Menu.Resources>
+                    <MenuItem ToolTip="Back">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE72B;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem ToolTip="Forward">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE72A;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem ToolTip="Up">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE197;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+                <TextBox
+                    x:Name="PathBox"
+                    Grid.Column="1"
+                    Margin="8,6"
+                    VerticalContentAlignment="Center"
+                    GotFocus="PathBox_GotFocus"
+                    IsReadOnly="True"
+                    KeyDown="PathBox_KeyDown"
+                    LostFocus="PathBox_LostFocus" />
+                <StackPanel
+                    x:Name="PathStackPanel"
+                    Grid.Column="1"
+                    Margin="10"
+                    Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button">
+                            <Setter Property="Padding" Value="4,0" />
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </StackPanel.Resources>
+                </StackPanel>
+            </Grid>
         </StackPanel>
         <DataGrid
             x:Name="ExplorerGrid"
             Grid.Row="2"
             AutoGenerateColumns="False"
             CanUserAddRows="False"
-            ColumnHeaderStyle="{StaticResource ColHeaderStyle}"
             IsReadOnly="True"
             ItemsSource="{Binding}"
             KeyboardNavigation.TabNavigation="Once"
@@ -69,7 +158,7 @@
             SelectionMode="Extended"
             SelectionUnit="FullRow">
             <DataGrid.RowStyle>
-                <Style BasedOn="{StaticResource MahApps.Styles.DataGridRow}" TargetType="DataGridRow">
+                <Style TargetType="DataGridRow">
                     <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
                 </Style>
             </DataGrid.RowStyle>
@@ -138,13 +227,12 @@
                 </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel
-            Grid.Row="3"
-            Background="{DynamicResource MahApps.Brushes.Accent2}"
-            Orientation="Horizontal">
+        <StackPanel Grid.Row="3" Orientation="Horizontal">
             <StackPanel.Resources>
-                <Style BasedOn="{StaticResource MahApps.Styles.Separator.StatusBar}" TargetType="Separator">
+                <Style TargetType="Border">
                     <Setter Property="Margin" Value="8,6,4,6" />
+                    <Setter Property="BorderBrush" Value="Gray" />
+                    <Setter Property="BorderThickness" Value="1" />
                 </Style>
             </StackPanel.Resources>
             <StackPanel Orientation="Horizontal">
@@ -178,7 +266,7 @@
                     Margin="0,4"
                     Text=" *"
                     Visibility="Collapsed" />
-                <Separator />
+                <Border />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <StackPanel.Style>
@@ -218,8 +306,8 @@
                         </Style>
                     </TextBlock.Style>
                 </TextBlock>
-                <Separator />
+                <Border />
             </StackPanel>
         </StackPanel>
     </Grid>
-</Page>
+</Window>

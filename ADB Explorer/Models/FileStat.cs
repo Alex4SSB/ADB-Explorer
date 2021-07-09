@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ADB_Explorer.Core.Models
+namespace ADB_Explorer.Models
 {
     public class FileStat : INotifyPropertyChanged
     {
@@ -19,7 +19,7 @@ namespace ADB_Explorer.Core.Models
             Unknown
         }
 
-        public FileStat(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null)
+        public FileStat(string fileName, string path, FileType type, bool isLink = false, ulong? size = null, DateTime? modifiedTime = null)
         {
             this.fileName = fileName;
             this.path = path;
@@ -32,7 +32,8 @@ namespace ADB_Explorer.Core.Models
         public event PropertyChangedEventHandler PropertyChanged;
 
         private string fileName;
-        public string FileName {
+        public string FileName
+        {
             get
             {
                 return fileName;
@@ -81,8 +82,8 @@ namespace ADB_Explorer.Core.Models
             }
         }
 
-        private UInt64? size;
-        public UInt64? Size
+        private ulong? size;
+        public ulong? Size
         {
             get
             {
@@ -120,18 +121,18 @@ namespace ADB_Explorer.Core.Models
         public bool IsLink
         {
             get
-            { 
+            {
                 return isLink;
             }
             set
-            { 
+            {
                 isLink = value;
                 NotifyPropertyChanged();
             }
         }
 
 
-        protected virtual void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             if (PropertyChanged != null)
             {

@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Core.Models;
 using ADB_Explorer.Helpers;
 using System;
 using System.Drawing;
@@ -120,7 +119,7 @@ namespace ADB_Explorer.Models
             {
                 Icon = GetIcon();
             }
-            
+
             base.NotifyPropertyChanged(propertyName);
         }
     }

@@ -1,10 +1,9 @@
-﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Converters;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace ADB_Explorer.Tests.MSTest
+namespace ADB_Test
 {
-    // TODO WTS: Add appropriate unit tests.
     [TestClass]
     public class Tests
     {

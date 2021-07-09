@@ -22,7 +22,7 @@ namespace ADB_Explorer.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources {
+    internal class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace ADB_Explorer.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager {
+        internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ADB_Explorer.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace ADB_Explorer.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture {
+        internal static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,135 +63,9 @@ namespace ADB_Explorer.Properties {
         /// <summary>
         ///   Looks up a localized string similar to ADB Explorer.
         /// </summary>
-        public static string AppDisplayName {
+        internal static string AppDisplayName {
             get {
                 return ResourceManager.GetString("AppDisplayName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Explorer.
-        /// </summary>
-        public static string ExplorerPageTitle {
-            get {
-                return ResourceManager.GetString("ExplorerPageTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings page placeholder text.  Your app description goes here..
-        /// </summary>
-        public static string SettingsPageAboutText {
-            get {
-                return ResourceManager.GetString("SettingsPageAboutText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to About this application.
-        /// </summary>
-        public static string SettingsPageAboutTitle {
-            get {
-                return ResourceManager.GetString("SettingsPageAboutTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Choose Theme.
-        /// </summary>
-        public static string SettingsPageChooseThemeText {
-            get {
-                return ResourceManager.GetString("SettingsPageChooseThemeText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Personalization.
-        /// </summary>
-        public static string SettingsPagePersonalizationTitle {
-            get {
-                return ResourceManager.GetString("SettingsPagePersonalizationTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Privacy Statement.
-        /// </summary>
-        public static string SettingsPagePrivacyStatementText {
-            get {
-                return ResourceManager.GetString("SettingsPagePrivacyStatementText", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Dark.
-        /// </summary>
-        public static string SettingsPageRadioButtonDarkTheme {
-            get {
-                return ResourceManager.GetString("SettingsPageRadioButtonDarkTheme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Light.
-        /// </summary>
-        public static string SettingsPageRadioButtonLightTheme {
-            get {
-                return ResourceManager.GetString("SettingsPageRadioButtonLightTheme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Default.
-        /// </summary>
-        public static string SettingsPageRadioButtonWindowsDefaultTheme {
-            get {
-                return ResourceManager.GetString("SettingsPageRadioButtonWindowsDefaultTheme", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings.
-        /// </summary>
-        public static string SettingsPageTitle {
-            get {
-                return ResourceManager.GetString("SettingsPageTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Explorer.
-        /// </summary>
-        public static string ShellExplorerPage {
-            get {
-                return ResourceManager.GetString("ShellExplorerPage", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Go back.
-        /// </summary>
-        public static string ShellGoBackButton {
-            get {
-                return ResourceManager.GetString("ShellGoBackButton", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Open or close navigation.
-        /// </summary>
-        public static string ShellHamburgerButtonName {
-            get {
-                return ResourceManager.GetString("ShellHamburgerButtonName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Settings.
-        /// </summary>
-        public static string ShellSettingsPage {
-            get {
-                return ResourceManager.GetString("ShellSettingsPage", resourceCulture);
             }
         }
     }

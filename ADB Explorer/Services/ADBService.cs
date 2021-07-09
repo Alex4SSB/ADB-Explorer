@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Core.Models;
+﻿using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ADB_Explorer.Core.Services
+namespace ADB_Explorer.Services
 {
     public class ADBService
     {
@@ -30,14 +30,14 @@ namespace ADB_Explorer.Core.Services
 
         private enum UnixFileMode : UInt32
         {
-            S_IFMT =   0b1111 << 12, // bit mask for the file type bit fields
+            S_IFMT = 0b1111 << 12, // bit mask for the file type bit fields
             S_IFSOCK = 0b1100 << 12, // socket
-            S_IFLNK =  0b1010 << 12, // symbolic link
-            S_IFREG =  0b1000 << 12, // regular file
-            S_IFBLK =  0b0110 << 12, // block device
-            S_IFDIR =  0b0100 << 12, // directory
-            S_IFCHR =  0b0010 << 12, // character device
-            S_IFIFO =  0b0001 << 12  // FIFO
+            S_IFLNK = 0b1010 << 12, // symbolic link
+            S_IFREG = 0b1000 << 12, // regular file
+            S_IFBLK = 0b0110 << 12, // block device
+            S_IFDIR = 0b0100 << 12, // directory
+            S_IFCHR = 0b0010 << 12, // character device
+            S_IFIFO = 0b0001 << 12  // FIFO
         }
 
         public class ProcessFailedException : Exception

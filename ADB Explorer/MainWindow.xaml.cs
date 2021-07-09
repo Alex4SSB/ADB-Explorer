@@ -1,27 +1,31 @@
-﻿using ADB_Explorer.Contracts.Views;
-using ADB_Explorer.Converters;
-using ADB_Explorer.Core.Helpers;
-using ADB_Explorer.Core.Models;
-using ADB_Explorer.Core.Services;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services;
+using ModernWpf;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using static ADB_Explorer.Models.Data;
 
-namespace ADB_Explorer.Views
+namespace ADB_Explorer
 {
-    public partial class ExplorerPage : Page, INavigationAware
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
     {
+        private readonly SolidColorBrush DarkBG = new(Color.FromRgb(32, 32, 32));
+        private readonly SolidColorBrush LightBG = new(Color.FromRgb(243, 243, 243));
+
         private static readonly string DEFAULT_PATH = "/sdcard";
         private static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
         {
@@ -57,21 +61,19 @@ namespace ADB_Explorer.Views
             }
         }
 
-        public ExplorerPage()
+        public MainWindow()
         {
             InitializeComponent();
-            DataContext = this;
+
+            SetTheme(RetrieveValue<ApplicationTheme>("theme"));
+
+            LaunchSequence();
 
             ConnectTimer.Interval = TimeSpan.FromSeconds(2);
             ConnectTimer.Tick += ConnectTimer_Tick;
         }
 
-        public void OnNavigatedTo(object parameter)
-        {
-            LaunchSequence();
-        }
-
-        public void OnNavigatedFrom()
+        ~MainWindow()
         {
             if (listDirTask is not null)
             {
@@ -79,20 +81,86 @@ namespace ADB_Explorer.Views
                 StopDetermineFolders();
                 AndroidFileList.RemoveAll();
             }
-            
+
             ConnectTimer.Stop();
+        }
+
+        private void ToggleThemeButton_Click(object sender, RoutedEventArgs e)
+        {
+            SetTheme(ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light
+                ? ApplicationTheme.Dark
+                : ApplicationTheme.Light
+                );
+        }
+
+        private void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
+
+        private void SetTheme(ApplicationTheme theme)
+        {
+            ThemeManager.Current.ApplicationTheme = theme;
+
+            Background = theme == ApplicationTheme.Light ? LightBG : DarkBG;
+            Application.Current.Properties["theme"] = ThemeManager.Current.ApplicationTheme;
+        }
+
+        private static T RetrieveValue<T>(string key)
+        {
+            return Application.Current.Properties[key] is string value ? (T)Enum.Parse(typeof(T), value) : default;
+        }
+
+        private void PathBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Collapsed;
+            PathBox.Text = PathBox.Tag?.ToString();
+            PathBox.IsReadOnly = false;
+        }
+
+        private void PathBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (KEYS_TO_NAVIGATE.Contains(e.Key) && NavigateToPath(PathBox.Text))
+            {
+                ExplorerGrid.Focus();
+            }
+        }
+
+        private void PathBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            PathStackPanel.Visibility = Visibility.Visible;
+            PathBox.Text = "";
+            PathBox.IsReadOnly = true;
+        }
+
+        private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if ((e.Source is DataGridRow row) &&
+                (row.Item is FileClass file) &&
+                (file.Type == FileStat.FileType.Folder || file.Type == FileStat.FileType.Parent))
+            {
+                NavigateToPath(file.Path);
+            }
+        }
+
+        private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TotalSizeBlock.Text = SelectedFilesTotalSize;
+        }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ExplorerGrid.Focus();
         }
 
         private void LaunchSequence()
         {
+            Title = Properties.Resources.AppDisplayName;
             // Get device name
             if (ADBService.GetDeviceName() is string name && !string.IsNullOrEmpty(name))
             {
-                TitleBlock.Text = name;
+                Title = $"{Title} - {name}";
             }
             else
             {
-                TitleBlock.Text = "NO CONNECTED DEVICES";
+                Title = $"{Title} - NO CONNECTED DEVICES";
                 AndroidFileList?.Clear();
                 ConnectTimer.Start();
                 return;
@@ -238,16 +306,6 @@ namespace ADB_Explorer.Views
             return true;
         }
 
-        private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            if ((e.Source is DataGridRow row) &&
-                (row.Item is FileClass file) &&
-                (file.Type == FileStat.FileType.Folder || file.Type == FileStat.FileType.Parent))
-            {
-                NavigateToPath(file.Path);
-            }
-        }
-
         private void DirListUpdateTimer_Tick(object sender, EventArgs e)
         {
             UpdateDirectoryList();
@@ -295,41 +353,9 @@ namespace ADB_Explorer.Views
             PathStackPanel.Children.Add(button);
         }
 
-        private void PathButton_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void PathButton_Click(object sender, RoutedEventArgs e)
         {
             NavigateToPath((sender as Button).Tag.ToString());
-        }
-
-        private void PathBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            PathStackPanel.Visibility = Visibility.Collapsed;
-            PathBox.Text = PathBox.Tag.ToString();
-            PathBox.IsReadOnly = false;
-        }
-
-        private void PathBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            PathStackPanel.Visibility = Visibility.Visible;
-            PathBox.Text = "";
-            PathBox.IsReadOnly = true;
-        }
-
-        private void Page_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            ExplorerGrid.Focus();
-        }
-
-        private void PathBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (KEYS_TO_NAVIGATE.Contains(e.Key) && NavigateToPath(PathBox.Text))
-            {
-                ExplorerGrid.Focus();
-            }
-        }
-
-        private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            TotalSizeBlock.Text = SelectedFilesTotalSize;
         }
     }
 }

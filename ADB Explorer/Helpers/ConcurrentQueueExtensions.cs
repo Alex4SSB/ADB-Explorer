@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Text;
 
-namespace ADB_Explorer.Core.Helpers
+namespace ADB_Explorer.Helpers
 {
     public static class ConcurrentQueueExtensions
     {
