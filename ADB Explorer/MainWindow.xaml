@@ -8,303 +8,333 @@
     Title="ADB Explorer"
     Width="800"
     Height="450"
+    ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     MouseDown="Window_MouseDown"
     mc:Ignorable="d">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="54" />
-            <RowDefinition />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Menu Margin="7,0" VerticalAlignment="Center">
-            <Menu.Resources>
-                <Style TargetType="ui:FontIcon">
-                    <Setter Property="FontSize" Value="18" />
-                </Style>
-            </Menu.Resources>
-            <MenuItem Margin="2,0">
-                <MenuItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:FontIcon
-                            Margin="0,0,8,0"
-                            FontSize="20"
-                            Glyph="&#xECC8;" />
-                        <TextBlock VerticalAlignment="Center" Text="New" />
-                    </StackPanel>
-                </MenuItem.Header>
-                <MenuItem>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="54" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Menu Margin="7,0" VerticalAlignment="Center">
+                <Menu.Resources>
+                    <Style TargetType="ui:FontIcon">
+                        <Setter Property="FontSize" Value="18" />
+                    </Style>
+                </Menu.Resources>
+                <MenuItem Margin="2,0">
                     <MenuItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <ui:FontIcon
                                 Margin="0,0,8,0"
-                                FontSize="16"
+                                FontSize="20"
                                 Glyph="&#xECC8;" />
-                            <TextBlock Text="New Item" />
+                            <TextBlock VerticalAlignment="Center" Text="New" />
                         </StackPanel>
                     </MenuItem.Header>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <ui:FontIcon
+                                    Margin="0,0,8,0"
+                                    FontSize="16"
+                                    Glyph="&#xECC8;" />
+                                <TextBlock Text="New Item" />
+                            </StackPanel>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            New Folder
+                        </MenuItem.Header>
+                    </MenuItem>
                 </MenuItem>
-                <MenuItem>
+                <MenuItem ToolTip="Cut">
                     <MenuItem.Header>
-                        New Folder
+                        <ui:FontIcon Glyph="&#xE8C6;" />
                     </MenuItem.Header>
                 </MenuItem>
-            </MenuItem>
-            <MenuItem ToolTip="Cut">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE8C6;" />
-                </MenuItem.Header>
-            </MenuItem>
-            <MenuItem ToolTip="Copy">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE8C8;" />
-                </MenuItem.Header>
-            </MenuItem>
-            <MenuItem ToolTip="Paste">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE77F;" />
-                </MenuItem.Header>
-            </MenuItem>
-            <MenuItem ToolTip="Rename">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE8AC;" />
-                </MenuItem.Header>
-            </MenuItem>
-            <MenuItem ToolTip="Share">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE72D;" />
-                </MenuItem.Header>
-            </MenuItem>
-            <MenuItem ToolTip="Recycle">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE74D;" />
-                </MenuItem.Header>
-            </MenuItem>
-        </Menu>
-        <Menu Margin="0,0,7,0" HorizontalAlignment="Right">
-            <MenuItem
-                x:Name="ToggleThemeButton"
-                Click="ToggleThemeButton_Click"
-                ToolTip="Toggle Theme">
-                <MenuItem.Header>
-                    <ui:FontIcon FontSize="18" Glyph="&#xE771;" />
-                </MenuItem.Header>
-            </MenuItem>
-        </Menu>
-        <StackPanel Grid.Row="1">
-            <Separator />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <Menu Margin="7,0,0,0">
-                    <Menu.Resources>
-                        <Style TargetType="ui:FontIcon">
-                            <Setter Property="FontSize" Value="14" />
+                <MenuItem ToolTip="Copy">
+                    <MenuItem.Header>
+                        <ui:FontIcon Glyph="&#xE8C8;" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem ToolTip="Paste">
+                    <MenuItem.Header>
+                        <ui:FontIcon Glyph="&#xE77F;" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem ToolTip="Rename">
+                    <MenuItem.Header>
+                        <ui:FontIcon Glyph="&#xE8AC;" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem ToolTip="Share">
+                    <MenuItem.Header>
+                        <ui:FontIcon Glyph="&#xE72D;" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem ToolTip="Recycle">
+                    <MenuItem.Header>
+                        <ui:FontIcon Glyph="&#xE74D;" />
+                    </MenuItem.Header>
+                </MenuItem>
+            </Menu>
+            <Menu Margin="0,0,7,0" HorizontalAlignment="Right">
+                <MenuItem
+                    x:Name="SettingsButton"
+                    Click="SettingsButton_Click"
+                    ToolTip="Open Settings">
+                    <MenuItem.Header>
+                        <ui:FontIcon FontSize="18" Glyph="&#xE713;" />
+                    </MenuItem.Header>
+                </MenuItem>
+            </Menu>
+            <StackPanel Grid.Row="1">
+                <Separator />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Menu Margin="7,0,0,0">
+                        <Menu.Resources>
+                            <Style TargetType="ui:FontIcon">
+                                <Setter Property="FontSize" Value="14" />
+                            </Style>
+                        </Menu.Resources>
+                        <MenuItem ToolTip="Back">
+                            <MenuItem.Header>
+                                <ui:FontIcon Glyph="&#xE72B;" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem ToolTip="Forward">
+                            <MenuItem.Header>
+                                <ui:FontIcon Glyph="&#xE72A;" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem ToolTip="Up">
+                            <MenuItem.Header>
+                                <ui:FontIcon Glyph="&#xE197;" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                    <TextBox
+                        x:Name="PathBox"
+                        Grid.Column="1"
+                        Margin="6"
+                        VerticalContentAlignment="Center"
+                        GotFocus="PathBox_GotFocus"
+                        IsReadOnly="True"
+                        KeyDown="PathBox_KeyDown"
+                        LostFocus="PathBox_LostFocus" />
+                    <StackPanel
+                        x:Name="PathStackPanel"
+                        Grid.Column="1"
+                        Margin="10"
+                        Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </StackPanel.Resources>
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+            <DataGrid
+                x:Name="ExplorerGrid"
+                Grid.Row="2"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                IsReadOnly="True"
+                ItemsSource="{Binding}"
+                KeyboardNavigation.TabNavigation="Once"
+                SelectionChanged="ExplorerGrid_SelectionChanged"
+                SelectionMode="Extended"
+                SelectionUnit="FullRow">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
+                    </Style>
+                </DataGrid.RowStyle>
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image
+                                    Width="16"
+                                    RenderOptions.BitmapScalingMode="HighQuality"
+                                    Source="{Binding Icon}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn
+                        x:Name="Name"
+                        Binding="{Binding FileName}"
+                        Header="Name" />
+                    <DataGridTextColumn
+                        x:Name="Date"
+                        Header="Date modified"
+                        SortMemberPath="ModifiedTime">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Margin" Value="4,0,8,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="File">
+                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn x:Name="Type" Header="Type">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Margin" Value="4,0,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="File">
+                                        <Setter Property="Text" Value="{Binding Type}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                        <Setter Property="Text" Value="{Binding Type}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn
+                        x:Name="Size"
+                        Header="Size"
+                        SortMemberPath="Size">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Margin" Value="4,0,0,0" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="File">
+                                        <Setter Property="Text" Value="{Binding SizeString}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <StackPanel Grid.Row="3" Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
+                        <Setter Property="Margin" Value="8,6,4,6" />
+                    </Style>
+                </StackPanel.Resources>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
-                    </Menu.Resources>
-                    <MenuItem ToolTip="Back">
-                        <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE72B;" />
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem ToolTip="Forward">
-                        <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE72A;" />
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem ToolTip="Up">
-                        <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE197;" />
-                        </MenuItem.Header>
-                    </MenuItem>
-                </Menu>
-                <TextBox
-                    x:Name="PathBox"
-                    Grid.Column="1"
-                    Margin="6"
-                    VerticalContentAlignment="Center"
-                    GotFocus="PathBox_GotFocus"
-                    IsReadOnly="True"
-                    KeyDown="PathBox_KeyDown"
-                    LostFocus="PathBox_LostFocus" />
-                <StackPanel
-                    x:Name="PathStackPanel"
-                    Grid.Column="1"
-                    Margin="10"
-                    Orientation="Horizontal">
-                    <StackPanel.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                        </Style>
-                    </StackPanel.Resources>
+                    </StackPanel.Style>
+                    <TextBlock
+                        x:Name="ItemsCountBlock"
+                        Margin="8,4,0,4"
+                        Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+                    <TextBlock Margin="0,4" Text=" item" />
+                    <TextBlock Margin="0,4" Text="s">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock
+                        x:Name="UnfinishedBlock"
+                        Margin="0,4"
+                        Text=" *"
+                        Visibility="Collapsed" />
+                    <StackPanel Orientation="Horizontal">
+                        <Separator />
+                    </StackPanel>
                 </StackPanel>
-            </Grid>
-        </StackPanel>
-        <DataGrid
-            x:Name="ExplorerGrid"
-            Grid.Row="2"
-            AutoGenerateColumns="False"
-            CanUserAddRows="False"
-            IsReadOnly="True"
-            ItemsSource="{Binding}"
-            KeyboardNavigation.TabNavigation="Once"
-            SelectionChanged="ExplorerGrid_SelectionChanged"
-            SelectionMode="Extended"
-            SelectionUnit="FullRow">
-            <DataGrid.RowStyle>
-                <Style TargetType="DataGridRow">
-                    <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
-                </Style>
-            </DataGrid.RowStyle>
-            <DataGrid.Columns>
-                <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image
-                                Width="16"
-                                RenderOptions.BitmapScalingMode="HighQuality"
-                                Source="{Binding Icon}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn
-                    x:Name="Name"
-                    Binding="{Binding FileName}"
-                    Header="Name" />
-                <DataGridTextColumn
-                    x:Name="Date"
-                    Header="Date modified"
-                    SortMemberPath="ModifiedTime">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="4,0,8,0" />
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Type}" Value="File">
-                                    <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                    <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
+                                    <Setter Property="Visibility" Value="Hidden" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn x:Name="Type" Header="Type">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="4,0,0,0" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Type}" Value="File">
-                                    <Setter Property="Text" Value="{Binding Type}" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                    <Setter Property="Text" Value="{Binding Type}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-                <DataGridTextColumn
-                    x:Name="Size"
-                    Header="Size"
-                    SortMemberPath="Size">
-                    <DataGridTextColumn.ElementStyle>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="4,0,0,0" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Type}" Value="File">
-                                    <Setter Property="Text" Value="{Binding SizeString}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGridTextColumn.ElementStyle>
-                </DataGridTextColumn>
-            </DataGrid.Columns>
-        </DataGrid>
-        <StackPanel Grid.Row="3" Orientation="Horizontal">
-            <StackPanel.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="Margin" Value="8,6,4,6" />
-                    <Setter Property="BorderBrush" Value="Gray" />
-                    <Setter Property="BorderThickness" Value="1" />
-                </Style>
-            </StackPanel.Resources>
-            <StackPanel Orientation="Horizontal">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <TextBlock
-                    x:Name="ItemsCountBlock"
-                    Margin="8,4,0,4"
-                    Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
-                <TextBlock Margin="0,4" Text=" item" />
-                <TextBlock Margin="0,4" Text="s">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <TextBlock
-                    x:Name="UnfinishedBlock"
-                    Margin="0,4"
-                    Text=" *"
-                    Visibility="Collapsed" />
-                <Border />
+                    </StackPanel.Style>
+                    <TextBlock
+                        x:Name="SelectedItemsBlock"
+                        Margin="4,4,0,4"
+                        Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+                    <TextBlock Margin="0,4" Text=" item" />
+                    <TextBlock Margin="0,4" Text="s">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <TextBlock Margin="0,4" Text=" selected" />
+                    <TextBlock x:Name="TotalSizeBlock" Margin="6,4,0,4">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal">
+                        <Separator />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <StackPanel.Style>
-                    <Style TargetType="StackPanel">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </StackPanel.Style>
-                <TextBlock
-                    x:Name="SelectedItemsBlock"
-                    Margin="4,4,0,4"
-                    Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
-                <TextBlock Margin="0,4" Text=" item" />
-                <TextBlock Margin="0,4" Text="s">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <TextBlock Margin="0,4" Text=" selected" />
-                <TextBlock x:Name="TotalSizeBlock" Margin="6,4,0,4">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <Border />
-            </StackPanel>
-        </StackPanel>
+        </Grid>
+        <ui:SplitView x:Name="SettingsSplitView" HorizontalAlignment="Right" FlowDirection="RightToLeft">
+            <ui:SplitView.Pane>
+                <Grid>
+                    <!--<StackPanel Orientation="Horizontal">
+                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    </StackPanel>-->
+                    <Menu Margin="4" VerticalAlignment="Top">
+                        <MenuItem
+                            x:Name="ToggleThemeButton"
+                            Click="ToggleThemeButton_Click"
+                            ToolTip="Toggle Theme">
+                            <MenuItem.Header>
+                                <ui:FontIcon FontSize="18" Glyph="&#xE771;" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock FontSize="20" Text="Settings" />
+
+                    </StackPanel>
+                </Grid>
+            </ui:SplitView.Pane>
+        </ui:SplitView>
+
     </Grid>
 </Window>

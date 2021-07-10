@@ -359,5 +359,10 @@ namespace ADB_Explorer
         {
             NavigateToPath((sender as MenuItem).Tag.ToString());
         }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsSplitView.IsPaneOpen = true;
+        }
     }
 }
