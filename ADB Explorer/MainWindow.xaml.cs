@@ -366,7 +366,7 @@ namespace ADB_Explorer
             SettingsSplitView.IsPaneOpen = true;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void ParentButton_Click(object sender, RoutedEventArgs e)
         {
             NavigateToPath(ParentPath);
         }

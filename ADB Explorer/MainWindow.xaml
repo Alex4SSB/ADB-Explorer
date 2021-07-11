@@ -118,7 +118,10 @@
                                 <ui:FontIcon Glyph="&#xE72A;" />
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem ToolTip="Up" Click="MenuItem_Click">
+                        <MenuItem
+                            x:Name="ParentButton"
+                            Click="ParentButton_Click"
+                            ToolTip="Up">
                             <MenuItem.Header>
                                 <ui:FontIcon Glyph="&#xE197;" />
                             </MenuItem.Header>
@@ -312,7 +315,10 @@
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <ui:SplitView x:Name="SettingsSplitView" HorizontalAlignment="Right" FlowDirection="RightToLeft">
+        <ui:SplitView
+            x:Name="SettingsSplitView"
+            HorizontalAlignment="Right"
+            FlowDirection="RightToLeft">
             <ui:SplitView.Pane>
                 <Grid>
                     <!--<StackPanel Orientation="Horizontal">
