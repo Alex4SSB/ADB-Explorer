@@ -23,6 +23,7 @@ namespace ADB_Explorer.Models
         public static MyObservableCollection<FileClass> AndroidFileList = new();
 
         public static string CurrentPath { get; set; }
+        public static string ParentPath { get; set; }
 
         public static Dictionary<Tuple<string, bool>, Icon> FileIcons = new();
 

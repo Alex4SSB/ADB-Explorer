@@ -118,7 +118,7 @@
                                 <ui:FontIcon Glyph="&#xE72A;" />
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem ToolTip="Up">
+                        <MenuItem ToolTip="Up" Click="MenuItem_Click">
                             <MenuItem.Header>
                                 <ui:FontIcon Glyph="&#xE197;" />
                             </MenuItem.Header>

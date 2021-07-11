@@ -15,7 +15,6 @@ namespace ADB_Explorer.Models
             CharDevice,
             FIFO,
             Drive,
-            Parent,
             Unknown
         }
 

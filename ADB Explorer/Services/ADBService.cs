@@ -19,8 +19,10 @@ namespace ADB_Explorer.Services
         private const string GET_PROP = "getprop";
         private const string GET_DEVICES = "devices";
 
+        private const string CURRENT_DIR = ".";
+        private const string PARENT_DIR = "..";
+        private static readonly string[] SPECIAL_DIRS = { CURRENT_DIR, PARENT_DIR };
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
-        private static readonly string[] SPECIAL_DIRS = { ".", ".." };
 
         private static readonly Regex LS_FILE_ENTRY_RE = new Regex(
             @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
@@ -159,17 +161,6 @@ namespace ADB_Explorer.Services
             // Get real path
             path = TranslateDevicePath(path);
 
-            // Add parent directory when needed
-            if (path != "/")
-            {
-                output.Enqueue(new FileStat
-                (
-                    fileName: "..",
-                    path: TranslateDevicePath(ConcatPaths(path, "..")),
-                    type: FileStat.FileType.Parent
-                ));
-            }
-
             // Execute adb ls to get file list
             var stdout = ExecuteAdbCommandAsync(cancellationToken, "ls", EscapeAdbString(path));
             foreach (string stdoutLine in stdout)
@@ -218,6 +209,11 @@ namespace ADB_Explorer.Services
             string stdout, stderr;
             int exitCode = ExecuteShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path));
             return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
+        }
+
+        public static string TranslateDeviceParentPath(string path)
+        {
+            return TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
         }
 
         public static string TranslateDevicePath(string path)

@@ -134,7 +134,7 @@ namespace ADB_Explorer
         {
             if ((e.Source is DataGridRow row) &&
                 (row.Item is FileClass file) &&
-                (file.Type == FileStat.FileType.Folder || file.Type == FileStat.FileType.Parent))
+                (file.Type == FileStat.FileType.Folder))
             {
                 NavigateToPath(file.Path);
             }
@@ -302,6 +302,7 @@ namespace ADB_Explorer
             PathBox.Tag =
             CurrentPath = realPath;
             PopulateButtons(realPath);
+            ParentPath = ADBService.TranslateDeviceParentPath(CurrentPath);
             StartDirectoryList(realPath);
             return true;
         }
@@ -363,6 +364,11 @@ namespace ADB_Explorer
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             SettingsSplitView.IsPaneOpen = true;
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateToPath(ParentPath);
         }
     }
 }
