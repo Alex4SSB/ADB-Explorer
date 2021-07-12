@@ -128,20 +128,28 @@
                                 </Style.Triggers>
                             </Style>
                         </Menu.Resources>
-                        <MenuItem ToolTip="Back" IsEnabled="False">
+                        <MenuItem
+                            x:Name="BackButton"
+                            Click="BackButton_Click"
+                            IsEnabled="False"
+                            ToolTip="Back">
                             <MenuItem.Header>
                                 <ui:FontIcon Glyph="&#xE72B;" />
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem ToolTip="Forward" IsEnabled="False">
+                        <MenuItem
+                            x:Name="ForwardButton"
+                            Click="ForwardButton_Click"
+                            IsEnabled="False"
+                            ToolTip="Forward">
                             <MenuItem.Header>
                                 <ui:FontIcon Glyph="&#xE72A;" />
                             </MenuItem.Header>
                         </MenuItem>
                         <MenuItem
                             x:Name="ParentButton"
-                            IsEnabled="False"
                             Click="ParentButton_Click"
+                            IsEnabled="False"
                             ToolTip="Up">
                             <MenuItem.Header>
                                 <ui:FontIcon Glyph="&#xE197;" />

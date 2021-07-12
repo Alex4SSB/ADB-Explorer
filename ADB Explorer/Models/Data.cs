@@ -25,6 +25,9 @@ namespace ADB_Explorer.Models
         public static string CurrentPath { get; set; }
         public static string ParentPath { get; set; }
 
+        public static List<string> PrevPath = new();
+        public static List<string> NextPath = new();
+
         public static Dictionary<Tuple<string, bool>, Icon> FileIcons = new();
 
     }

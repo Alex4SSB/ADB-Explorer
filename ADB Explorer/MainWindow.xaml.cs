@@ -286,7 +286,7 @@ namespace ADB_Explorer
             determineFoldersCancelTokenSource = null;
         }
 
-        public bool NavigateToPath(string path)
+        public bool NavigateToPath(string path, bool bfNavigated = false)
         {
             string realPath;
             try
@@ -297,6 +297,13 @@ namespace ADB_Explorer
             {
                 MessageBox.Show(e.Message, "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
+            }
+
+            if (!string.IsNullOrEmpty(CurrentPath))
+            {
+                if (!bfNavigated && (!PrevPath.Any() || PrevPath[^1] != CurrentPath))
+                    PrevPath.Add(CurrentPath);
+                BackButton.IsEnabled = PrevPath.Any();
             }
 
             PathBox.Tag =
@@ -372,6 +379,20 @@ namespace ADB_Explorer
         private void ParentButton_Click(object sender, RoutedEventArgs e)
         {
             NavigateToPath(ParentPath);
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var path = PrevPath[^1];
+            PrevPath.RemoveAt(PrevPath.Count - 1);
+            NextPath.Add(path);
+
+            NavigateToPath(path, true);
+        }
+
+        private void ForwardButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
