@@ -303,6 +303,9 @@ namespace ADB_Explorer
             CurrentPath = realPath;
             PopulateButtons(realPath);
             ParentPath = ADBService.TranslateDeviceParentPath(CurrentPath);
+
+            ParentButton.IsEnabled = CurrentPath != ParentPath;
+
             StartDirectoryList(realPath);
             return true;
         }
