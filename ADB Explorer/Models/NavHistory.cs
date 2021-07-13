@@ -1,0 +1,49 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ADB_Explorer.Models
+{
+    static class NavHistory
+    {
+        public static List<string> PathHistory = new();
+
+        private static int historyIndex = 0;
+
+        public static bool BackAvailable { get { return historyIndex > 0; } }
+        public static bool ForwardAvailable { get { return historyIndex < PathHistory.Count - 1; } }
+
+        public static string GoBack()
+        {
+            if (BackAvailable)
+                historyIndex--;
+
+            return PathHistory[historyIndex];
+        }
+
+        public static string GoForward()
+        {
+            if (ForwardAvailable)
+                historyIndex++;
+
+            return PathHistory[historyIndex];
+        }
+
+        /// <summary>
+        /// For any non back / forward navigation
+        /// </summary>
+        /// <param name="path"></param>
+        public static void Navigate(string path)
+        {
+            if (ForwardAvailable)
+            {
+                PathHistory.RemoveRange(historyIndex + 1, PathHistory.Count - historyIndex - 1);
+            }
+
+            PathHistory.Add(path);
+            historyIndex++;
+        }
+    }
+}
