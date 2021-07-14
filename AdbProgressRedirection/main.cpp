@@ -140,16 +140,20 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	std::unique_ptr<HANDLE, decltype(handle_closer)> child_handle_guard(&child_handle, handle_closer);
 
 	// While the child process is running
+	std::wstring prev_line_str;
 	while (WaitForSingleObject(child_handle, 0) == WAIT_TIMEOUT) {
 		// Read current line, where the cursor is
-		if (auto line_str = ReadConsoleLine(console_handle, 0); IsLinePrintable(line_str)) {
+		if (auto line_str = ReadConsoleLine(console_handle, 0);
+			(line_str != prev_line_str) && IsLinePrintable(line_str)) {
 			std::wcout << line_str << std::endl;
+			prev_line_str = line_str;
 			Sleep(CAPTURE_INTERVAL_MS);
 		}
 	}
 
 	// Read previous line to get the final message
-	if (auto line_str = ReadConsoleLine(console_handle, -1); IsLinePrintable(line_str)) {
+	if (auto line_str = ReadConsoleLine(console_handle, -1);
+		(line_str != prev_line_str) && IsLinePrintable(line_str)) {
 		std::wcout << line_str << std::endl;
 	}
 
