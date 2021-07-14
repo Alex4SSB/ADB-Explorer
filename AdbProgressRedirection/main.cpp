@@ -66,6 +66,10 @@ HANDLE CreateChildProcess(const std::wstring& cmd_line) {
 	return proc_info.hProcess;
 }
 
+bool IsLinePrintable(const std::wstring& line) {
+	return std::all_of(line.begin(), line.end(), [](const auto& wch) { return iswprint(wch); });
+}
+
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	// If no command to execute
 	if (argc <= 1) {
@@ -76,69 +80,84 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	// Set stdout to UTF-16
-	_setmode(_fileno(stdout), _O_U16TEXT);
+	fflush(stdout);
+	int previous_stdout_mode = _setmode(_fileno(stdout), _O_U16TEXT);
+	if (previous_stdout_mode == -1) {
+		return -2;
+	}
+
+	// RAII guard to restore stdout's previous mode
+#pragma warning(push)
+#pragma warning(disable: 6031)
+	auto stdout_mode_restore = [](int* m) { _setmode(_fileno(stdout), *m); };
+#pragma warning(pop)
+	std::unique_ptr<int, decltype(stdout_mode_restore)> stdout_mode_guard(&previous_stdout_mode, stdout_mode_restore);
 
 	// Create a new console screen buffer
 	HANDLE console_handle = CreateInheritableConsoleHandle();
 	if (console_handle == INVALID_HANDLE_VALUE) {
-		return -2;
-	}
-
-	// Replace stdout with the created console buffer so the child process will inherite it as its stdout
-	if (!SetStdHandle(STD_OUTPUT_HANDLE, console_handle)) {
-		CloseHandle(console_handle);
 		return -3;
 	}
 
-	// Set console to UTF-16
-	_setmode(_fileno(stdout), _O_U16TEXT);
+	// RAII guard that will close the console handle automatically
+	auto handle_closer = [](HANDLE* h) { CloseHandle(*h); };
+	std::unique_ptr<HANDLE, decltype(handle_closer)> stdout_handle_guard(&console_handle, handle_closer);
 
-	// Build child process command line for execution
-	std::wstring command_line =
-		std::accumulate(
-			argv + 1,
-			argv + argc,
-			std::wstring{},
-			[](const auto& cmd_line, const auto& curr_arg) {return cmd_line + L"\"" + curr_arg + L"\" "; });
+	// Create a child process with inherited console screen buffer as its stdout
+	HANDLE child_handle;
+	{
+		// Replace stdout with the created console buffer so the child process will inherite it as its stdout
+		if (!SetStdHandle(STD_OUTPUT_HANDLE, console_handle)) {
+			return -4;
+		}
 
-	// Start child process
-	HANDLE child_handle = CreateChildProcess(command_line);
-	if (child_handle == INVALID_HANDLE_VALUE) {
-		CloseHandle(console_handle);
-		return -4;
+		// RAII guard that will restore stdout to the original one
+		auto stdout_restore = [](HANDLE* h) { SetStdHandle(STD_OUTPUT_HANDLE, *h); };
+		std::unique_ptr<HANDLE, decltype(stdout_restore)> stdout_restore_guard(&stdout_handle, stdout_restore);
+
+		// Set our created console to UTF-16
+		fflush(stdout);
+		if (_setmode(_fileno(stdout), _O_U16TEXT) == -1) {
+			return -5;
+		}
+
+		// Build child process command line for execution
+		std::wstring command_line =
+			std::accumulate(
+				argv + 1,
+				argv + argc,
+				std::wstring{},
+				[](const auto& cmd_line, const auto& curr_arg) { return cmd_line + L"\"" + curr_arg + L"\" "; });
+
+		// Start child process
+		child_handle = CreateChildProcess(command_line);
+		if (child_handle == INVALID_HANDLE_VALUE) {
+			return -6;
+		}
 	}
 
-	// Replace stdout handle again to the original to pipe the output to it easily
-	if (!SetStdHandle(STD_OUTPUT_HANDLE, stdout_handle)) {
-		CloseHandle(child_handle);
-		CloseHandle(console_handle);
-		return -5;
-	}
+	// RAII guard that will close the child handle automatically
+	std::unique_ptr<HANDLE, decltype(handle_closer)> child_handle_guard(&child_handle, handle_closer);
 
 	// While the child process is running
 	while (WaitForSingleObject(child_handle, 0) == WAIT_TIMEOUT) {
 		// Read current line, where the cursor is
-		auto line_str = ReadConsoleLine(console_handle, 0);
-		if (std::none_of(line_str.begin(), line_str.end(), [](const auto& wch) { return !iswprint(wch); })) {
+		if (auto line_str = ReadConsoleLine(console_handle, 0); IsLinePrintable(line_str)) {
 			std::wcout << line_str << std::endl;
 			Sleep(CAPTURE_INTERVAL_MS);
 		}
 	}
 
 	// Read previous line to get the final message
-	auto line_str = ReadConsoleLine(console_handle, -1);
-	if (std::none_of(line_str.begin(), line_str.end(), [](const auto& wch) { return !iswprint(wch); })) {
+	if (auto line_str = ReadConsoleLine(console_handle, -1); IsLinePrintable(line_str)) {
 		std::wcout << line_str << std::endl;
 	}
 
-	// Fetch exit code from the child process and close it
+	// Fetch exit code from the child process to return it
 	DWORD exit_code;
 	if (!GetExitCodeProcess(child_handle, &exit_code)) {
-		exit_code = -6;
+		return -8;
 	}
 
-	// Close handles and return child exit code
-	CloseHandle(child_handle);
-	CloseHandle(console_handle);
 	return exit_code;
 }
