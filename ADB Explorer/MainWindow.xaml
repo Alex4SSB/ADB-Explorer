@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="ADB Explorer"
     Width="800"
@@ -11,7 +12,8 @@
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     MouseDown="Window_MouseDown"
-    mc:Ignorable="d">
+    MouseUp="Window_MouseUp"
+    mc:Ignorable="d" Closing="Window_Closing">
     <Grid>
 
         <Grid>

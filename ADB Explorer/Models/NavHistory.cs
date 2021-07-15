@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace ADB_Explorer.Models
 {
-    static class NavHistory
+    public static class NavHistory
     {
         public static List<string> PathHistory = new();
 
-        private static int historyIndex = 0;
+        private static int historyIndex = -1;
 
         public static bool BackAvailable { get { return historyIndex > 0; } }
         public static bool ForwardAvailable { get { return historyIndex < PathHistory.Count - 1; } }

@@ -73,7 +73,7 @@ namespace ADB_Explorer
             ConnectTimer.Tick += ConnectTimer_Tick;
         }
 
-        ~MainWindow()
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (listDirTask is not null)
             {
@@ -299,12 +299,9 @@ namespace ADB_Explorer
                 return false;
             }
 
-            if (!string.IsNullOrEmpty(CurrentPath))
-            {
-                if (!bfNavigated && (!PrevPath.Any() || PrevPath[^1] != CurrentPath))
-                    PrevPath.Add(CurrentPath);
-                BackButton.IsEnabled = PrevPath.Any();
-            }
+            if (!bfNavigated)
+                NavHistory.Navigate(realPath);
+            UpdateNavButtons();
 
             PathBox.Tag =
             CurrentPath = realPath;
@@ -315,6 +312,12 @@ namespace ADB_Explorer
 
             StartDirectoryList(realPath);
             return true;
+        }
+
+        private void UpdateNavButtons()
+        {
+            BackButton.IsEnabled = NavHistory.BackAvailable;
+            ForwardButton.IsEnabled = NavHistory.ForwardAvailable;
         }
 
         private void DirListUpdateTimer_Tick(object sender, EventArgs e)
@@ -383,16 +386,21 @@ namespace ADB_Explorer
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            var path = PrevPath[^1];
-            PrevPath.RemoveAt(PrevPath.Count - 1);
-            NextPath.Add(path);
-
-            NavigateToPath(path, true);
+            NavigateToPath(NavHistory.GoBack(), true);
         }
 
         private void ForwardButton_Click(object sender, RoutedEventArgs e)
         {
-
+            NavigateToPath(NavHistory.GoForward(), true);
         }
+
+        private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.XButton1)
+                NavigateToPath(NavHistory.GoBack(), true);
+            else if (e.ChangedButton == MouseButton.XButton2)
+                NavigateToPath(NavHistory.GoForward(), true);
+        }
+
     }
 }
