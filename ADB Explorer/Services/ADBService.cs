@@ -24,11 +24,19 @@ namespace ADB_Explorer.Services
         private static readonly string[] SPECIAL_DIRS = { CURRENT_DIR, PARENT_DIR };
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
 
-        private static readonly Regex LS_FILE_ENTRY_RE = new Regex(
-            @"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
-            RegexOptions.IgnoreCase);
+        private static readonly Regex LS_FILE_ENTRY_RE = 
+            new Regex(@"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
+                      RegexOptions.IgnoreCase);
 
         private static readonly Regex DEVICE_NAME_RE = new Regex(@"(?<=device:)\w+");
+
+        private static readonly Regex ADB_FILE_SYNC_PROGRESS_RE =
+            new Regex(@"^\[(?<total_prog>(?>\d+%|\?))\] (?<file>.+?)(?>: (?<curr_prog>\d+%)|(?<bytes>\d+)\/\?)? *$",
+                      RegexOptions.Multiline);
+
+        private static readonly Regex ADB_FILE_SYNC_STATS_RE =
+            new Regex(@"^(?<target>.+?): (?<pulled>\d+) files? pulled, (?<skipped>\d+) skipped\.(?> (?<rate>\d+(?>\.\d+)?) MB\/s \((?<bytes>\d+) bytes in (?<time>\d+(?>\.\d+)?)s\))? *$",
+                      RegexOptions.Multiline);
 
         private enum UnixFileMode : UInt32
         {
