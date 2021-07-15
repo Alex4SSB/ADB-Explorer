@@ -140,7 +140,7 @@ namespace ADB_Explorer.Services
             var result = string.Concat(str.Select(c =>
                 c switch
                 {
-                    var ch when new[] { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ' }.Contains(ch) => "\\" + ch,
+                    var ch when new[] { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`'}.Contains(ch) => "\\" + ch,
                     _ => new string(c, 1)
                 }));
 
