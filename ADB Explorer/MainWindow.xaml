@@ -12,7 +12,8 @@
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     MouseDown="Window_MouseDown"
-    mc:Ignorable="d">
+    MouseUp="Window_MouseUp"
+    mc:Ignorable="d" Closing="Window_Closing">
     <Grid>
 
         <Grid>

@@ -73,7 +73,7 @@ namespace ADB_Explorer
             ConnectTimer.Tick += ConnectTimer_Tick;
         }
 
-        ~MainWindow()
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (listDirTask is not null)
             {
@@ -393,5 +393,14 @@ namespace ADB_Explorer
         {
             NavigateToPath(NavHistory.GoForward(), true);
         }
+
+        private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.XButton1)
+                NavigateToPath(NavHistory.GoBack(), true);
+            else if (e.ChangedButton == MouseButton.XButton2)
+                NavigateToPath(NavHistory.GoForward(), true);
+        }
+
     }
 }
