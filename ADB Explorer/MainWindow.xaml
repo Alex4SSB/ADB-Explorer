@@ -11,9 +11,23 @@
     Height="450"
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
+    Closing="Window_Closing"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
-    mc:Ignorable="d" Closing="Window_Closing">
+    mc:Ignorable="d">
+    <Window.Resources>
+        <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type DataGridCell}">
+                        <Grid Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
 
         <Grid>
@@ -184,10 +198,13 @@
                 x:Name="ExplorerGrid"
                 Grid.Row="2"
                 AutoGenerateColumns="False"
-                CanUserAddRows="False"
+                CanUserResizeRows="False"
+                GridLinesVisibility="None"
+                HeadersVisibility="Column"
                 IsReadOnly="True"
                 ItemsSource="{Binding}"
                 KeyboardNavigation.TabNavigation="Once"
+                MinRowHeight="24"
                 SelectionChanged="ExplorerGrid_SelectionChanged"
                 SelectionMode="Extended"
                 SelectionUnit="FullRow">
@@ -196,6 +213,15 @@
                         <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
                     </Style>
                 </DataGrid.RowStyle>
+                <DataGrid.CellStyle>
+                    <Style BasedOn="{StaticResource CellVerticalStyle}" TargetType="DataGridCell">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="BorderThickness" Value="0" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.CellStyle>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>
