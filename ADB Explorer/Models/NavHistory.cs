@@ -33,6 +33,11 @@ namespace ADB_Explorer.Models
         /// <param name="path"></param>
         public static void Navigate(string path)
         {
+            if (PathHistory.Count > 0 && path == PathHistory[historyIndex])
+            {
+                return;
+            }
+
             if (ForwardAvailable)
             {
                 PathHistory.RemoveRange(historyIndex + 1, PathHistory.Count - historyIndex - 1);
