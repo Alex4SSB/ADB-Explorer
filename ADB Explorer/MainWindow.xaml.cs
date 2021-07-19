@@ -132,7 +132,12 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if ((e.Source is DataGridRow row) &&
+            EnterFolder(e.Source);
+        }
+
+        private void EnterFolder(object source)
+        {
+            if ((source is DataGridRow row) &&
                 (row.Item is FileClass file) &&
                 (file.Type == FileStat.FileType.Folder))
             {
@@ -402,5 +407,14 @@ namespace ADB_Explorer
                 NavigateToPath(NavHistory.GoForward(), true);
         }
 
+        private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter) return;
+
+            e.Handled = true;
+
+            if (ExplorerGrid.SelectedItems.Count == 1)
+                EnterFolder(sender);
+        }
     }
 }
