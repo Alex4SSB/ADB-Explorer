@@ -212,6 +212,15 @@
                     <Style TargetType="DataGridRow">
                         <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
                         <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
+                        <!--<Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.MenuHighlightColorKey}}" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </Style.Triggers>-->
                     </Style>
                 </DataGrid.RowStyle>
                 <DataGrid.CellStyle>
@@ -219,6 +228,11 @@
                         <Style.Triggers>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="BorderThickness" Value="0" />
+                                <Setter Property="Background" >
+                                    <Setter.Value>
+                                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.MenuHighlightColorKey}}"/>
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
