@@ -6,6 +6,7 @@
     <RootNamespace>ADB_Explorer</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>adb_explorer_icon_v4_icons8_combined.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
