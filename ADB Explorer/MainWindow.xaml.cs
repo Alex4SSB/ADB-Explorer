@@ -99,7 +99,10 @@ namespace ADB_Explorer
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
+            //ExplorerGrid.RowBackground =
+            //ExplorerGrid.Background =
             Background = theme == ApplicationTheme.Light ? LightBG : DarkBG;
+
             Application.Current.Properties["theme"] = ThemeManager.Current.ApplicationTheme;
         }
 

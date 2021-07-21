@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="ADB Explorer"
     Width="800"
@@ -16,6 +17,7 @@
     MouseUp="Window_MouseUp"
     mc:Ignorable="d">
     <Window.Resources>
+        <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -27,9 +29,9 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
     </Window.Resources>
     <Grid>
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="50" />
@@ -204,7 +206,7 @@
                 IsReadOnly="True"
                 ItemsSource="{Binding}"
                 KeyboardNavigation.TabNavigation="Once"
-                MinRowHeight="24"
+                MinRowHeight="21"
                 SelectionChanged="ExplorerGrid_SelectionChanged"
                 SelectionMode="Extended"
                 SelectionUnit="FullRow">
@@ -212,20 +214,21 @@
                     <Style TargetType="DataGridRow">
                         <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
                         <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
+                        <Setter Property="Background" Value="{DynamicResource SystemControlPageBackgroundAltHighBrush}" />
                     </Style>
                 </DataGrid.RowStyle>
                 <DataGrid.CellStyle>
                     <Style BasedOn="{StaticResource CellVerticalStyle}" TargetType="DataGridCell">
                         <Style.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
+                                <Setter Property="Background" Value="#FFE5F3FF" />
+                            </DataTrigger>
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter Property="BorderThickness" Value="0" />
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <SolidColorBrush Color="{StaticResource {x:Static SystemColors.MenuHighlightColorKey}}" />
-                                    </Setter.Value>
-                                </Setter>
+                                <Setter Property="Background" Value="#FFCCE8FF" />
                             </Trigger>
                         </Style.Triggers>
+                        <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.Columns>
@@ -242,9 +245,11 @@
                     <DataGridTextColumn
                         x:Name="Name"
                         Binding="{Binding FileName}"
+                        FontSize="{Binding Source={StaticResource FontSize}}"
                         Header="Name" />
                     <DataGridTextColumn
                         x:Name="Date"
+                        FontSize="{Binding Source={StaticResource FontSize}}"
                         Header="Date modified"
                         SortMemberPath="ModifiedTime">
                         <DataGridTextColumn.ElementStyle>
@@ -261,7 +266,10 @@
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
-                    <DataGridTextColumn x:Name="Type" Header="Type">
+                    <DataGridTextColumn
+                        x:Name="Type"
+                        FontSize="{Binding Source={StaticResource FontSize}}"
+                        Header="Type">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="Margin" Value="4,0,0,0" />
@@ -278,6 +286,7 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn
                         x:Name="Size"
+                        FontSize="{Binding Source={StaticResource FontSize}}"
                         Header="Size"
                         SortMemberPath="Size">
                         <DataGridTextColumn.ElementStyle>
