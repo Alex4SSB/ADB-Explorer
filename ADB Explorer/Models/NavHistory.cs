@@ -13,16 +13,18 @@ namespace ADB_Explorer.Models
 
         public static string GoBack()
         {
-            if (BackAvailable)
-                historyIndex--;
+            if (!BackAvailable) return null;
+
+            historyIndex--;
 
             return PathHistory[historyIndex];
         }
 
         public static string GoForward()
         {
-            if (ForwardAvailable)
-                historyIndex++;
+            if (!ForwardAvailable) return null;
+
+            historyIndex++;
 
             return PathHistory[historyIndex];
         }

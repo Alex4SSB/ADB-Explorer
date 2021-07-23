@@ -14,6 +14,7 @@
     ui:WindowHelper.UseModernWindowStyle="True"
     Background="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}"
     Closing="Window_Closing"
+    KeyDown="Window_KeyDown"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
     mc:Ignorable="d">
@@ -216,7 +217,7 @@
                     <Style TargetType="DataGridRow">
                         <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
                         <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
-                        <Setter Property="Background" Value="{DynamicResource SystemControlPageBackgroundAltHighBrush}" />
+                        <Setter Property="Background" Value="{Binding ElementName=DataGridBackgroundRectangle, Path=Background}" />
                     </Style>
                 </DataGrid.RowStyle>
                 <DataGrid.CellStyle>
@@ -399,7 +400,8 @@
         <ui:SplitView
             x:Name="SettingsSplitView"
             HorizontalAlignment="Right"
-            FlowDirection="RightToLeft">
+            FlowDirection="RightToLeft"
+            FocusVisualStyle="{x:Null}">
             <ui:SplitView.Pane>
                 <Grid>
                     <!--<StackPanel Orientation="Horizontal">

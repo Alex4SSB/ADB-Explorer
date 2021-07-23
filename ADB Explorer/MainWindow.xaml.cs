@@ -133,13 +133,12 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            EnterFolder(e.Source);
+            EnterFolder(ExplorerGrid.SelectedItem);
         }
 
         private void EnterFolder(object source)
         {
-            if ((source is DataGridRow row) &&
-                (row.Item is FileClass file) &&
+            if ((source is FileClass file) &&
                 (file.Type == FileStat.FileType.Folder))
             {
                 NavigateToPath(file.Path);
@@ -294,6 +293,8 @@ namespace ADB_Explorer
 
         public bool NavigateToPath(string path, bool bfNavigated = false)
         {
+            if (path is null) return false;
+
             string realPath;
             try
             {
@@ -410,12 +411,58 @@ namespace ADB_Explorer
 
         private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Enter) return;
+            var key = e.Key;
+            if (key == Key.Enter)
+            {
+                if (ExplorerGrid.SelectedItems.Count == 1)
+                    EnterFolder(ExplorerGrid.SelectedItem);
+            }
+            else if (key == Key.Back)
+            {
+                NavigateToPath(NavHistory.GoBack(), true);
+            }
+            else
+                return;
 
             e.Handled = true;
+        }
 
-            if (ExplorerGrid.SelectedItems.Count == 1)
-                EnterFolder(sender);
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (ExplorerGrid.Items.Count < 1) return;
+
+            var key = e.Key;
+            if (key == Key.Down)
+            {
+                if (ExplorerGrid.SelectedItems.Count == 0)
+                    ExplorerGrid.SelectedIndex = 0;
+                else
+                    ExplorerGrid.SelectedIndex++;
+
+                ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+            }
+            else if (key == Key.Up)
+            {
+                if (ExplorerGrid.SelectedItems.Count == 0)
+                    ExplorerGrid.SelectedItem = ExplorerGrid.Items[^1];
+                else if (ExplorerGrid.SelectedIndex > 0)
+                    ExplorerGrid.SelectedIndex--;
+
+                ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+            }
+            else if (key == Key.Enter)
+            {
+                if (ExplorerGrid.SelectedItems.Count == 1)
+                    EnterFolder(ExplorerGrid.SelectedItem);
+            }
+            else if (key == Key.Back)
+            {
+                NavigateToPath(NavHistory.GoBack(), true);
+            }
+            else
+                return;
+
+            e.Handled = true;
         }
     }
 }
