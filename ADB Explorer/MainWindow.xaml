@@ -12,6 +12,7 @@
     Height="450"
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
+    Background="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}"
     Closing="Window_Closing"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
@@ -29,7 +30,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Window.Resources>
     <Grid>
         <Grid>
@@ -227,6 +227,13 @@
                                 <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Background" Value="#FFCCE8FF" />
                             </Trigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
+                                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Background" Value="#FFD9D9D9" />
+                            </MultiDataTrigger>
                         </Style.Triggers>
                         <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
                     </Style>
