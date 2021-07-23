@@ -23,7 +23,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Background="{TemplateBinding Background}">
+                        <Grid Margin="0,1" Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" />
                         </Grid>
                     </ControlTemplate>
@@ -196,10 +196,12 @@
                     </StackPanel>
                 </Grid>
             </StackPanel>
+            <Rectangle x:Name="DataGridBackgroundRectangle" Grid.Row="2" />
             <DataGrid
                 x:Name="ExplorerGrid"
                 Grid.Row="2"
                 AutoGenerateColumns="False"
+                Background="Transparent"
                 CanUserResizeRows="False"
                 GridLinesVisibility="None"
                 HeadersVisibility="Column"
@@ -224,7 +226,6 @@
                                 <Setter Property="Background" Value="#FFE5F3FF" />
                             </DataTrigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="BorderThickness" Value="0" />
                                 <Setter Property="Background" Value="#FFCCE8FF" />
                             </Trigger>
                             <MultiDataTrigger>
@@ -236,6 +237,7 @@
                             </MultiDataTrigger>
                         </Style.Triggers>
                         <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
+                        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
                     </Style>
                 </DataGrid.CellStyle>
                 <DataGrid.Columns>
