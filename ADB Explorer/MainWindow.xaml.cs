@@ -99,7 +99,9 @@ namespace ADB_Explorer
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
-            DataGridBackgroundRectangle.Fill = theme == ApplicationTheme.Light ? new(Colors.White) : DarkBG;
+            GridBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
+            ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
+            ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
             Application.Current.Properties["theme"] = ThemeManager.Current.ApplicationTheme;
         }
