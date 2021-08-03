@@ -243,13 +243,13 @@
                         x:Name="PathBox"
                         Grid.Column="1"
                         Margin="6"
+                        Padding="36,0,0,0"
                         VerticalContentAlignment="Center"
                         GotFocus="PathBox_GotFocus"
                         IsReadOnly="True"
                         KeyDown="PathBox_KeyDown"
                         LostFocus="PathBox_LostFocus" />
                     <StackPanel
-                        x:Name="PathStackPanel"
                         Grid.Column="1"
                         Margin="10"
                         Orientation="Horizontal">
@@ -258,6 +258,23 @@
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
                         </StackPanel.Resources>
+                        <Border Background="DodgerBlue">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=PathStackPanel, Path=Visibility}" Value="Visible">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock
+                                x:Name="InputLangBlock"
+                                Margin="5,0"
+                                FontSize="15"
+                                FontWeight="DemiBold" />
+                        </Border>
+                        <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
                     </StackPanel>
                 </Grid>
             </StackPanel>
