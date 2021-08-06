@@ -266,7 +266,13 @@ namespace ADB_Explorer
 
         private void StartDetermineFolders(IEnumerable<FileClass> files)
         {
-            unknownFoldersTask.ContinueWith((t) => DetermineFolders(files, determineFoldersCancelTokenSource.Token));
+            unknownFoldersTask.ContinueWith((t) =>
+            {
+                if (determineFoldersCancelTokenSource != null)
+                {
+                    DetermineFolders(files, determineFoldersCancelTokenSource.Token);
+                }
+            });
         }
 
         private void DetermineFolders(IEnumerable<FileClass> files, CancellationToken cancellationToken)

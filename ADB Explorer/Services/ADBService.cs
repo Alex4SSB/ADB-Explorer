@@ -13,6 +13,7 @@ namespace ADB_Explorer.Services
     public class ADBService
     {
         private const string ADB_PATH = "adb";
+        private const string ADB_PROGRESS_HELPER_PATH = "AdbProgressRedirection.exe";
         private const string PRODUCT_MODEL = "ro.product.model";
         private const string HOST_NAME = "net.hostname";
         private const string VENDOR = "ro.vendor.config.CID";
@@ -30,13 +31,36 @@ namespace ADB_Explorer.Services
 
         private static readonly Regex DEVICE_NAME_RE = new Regex(@"(?<=device:)\w+");
 
-        private static readonly Regex ADB_FILE_SYNC_PROGRESS_RE =
-            new Regex(@"^\[(?<total_prog>(?>\d+%|\?))\] (?<file>.+?)(?>: (?<curr_prog>\d+%)|(?<bytes>\d+)\/\?)? *$",
+        private static readonly Regex PULL_PROGRESS_RE =
+            new Regex(@"^\[ *(?<TotalPrecentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPrecentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$",
                       RegexOptions.Multiline);
 
-        private static readonly Regex ADB_FILE_SYNC_STATS_RE =
-            new Regex(@"^(?<target>.+?): (?<pulled>\d+) files? pulled, (?<skipped>\d+) skipped\.(?> (?<rate>\d+(?>\.\d+)?) MB\/s \((?<bytes>\d+) bytes in (?<time>\d+(?>\.\d+)?)s\))? *$",
+        private static readonly Regex PULL_STATS_RE =
+            new Regex(@"^(?<TargetPath>.+?): (?<TotalPulled>\d+) files? pulled, (?<TotalSkipped>\d+) skipped\.(?> (?<AverageRate>\d+(?>\.\d+)?) MB\/s \((?<TotalBytes>\d+) bytes in (?<TotalTime>\d+(?>\.\d+)?)s\))? *$",
                       RegexOptions.Multiline);
+
+        public class AdbSyncProgressInfo
+        {
+            public string CurrentFile { get; set; }
+            public int? TotalPrecentage { get; set; }
+            public int? CurrentFilePrecentage { get; set; }
+            public UInt64? CurrentFileBytesTransferred { get; set; }
+
+            public override string ToString()
+            {
+                return TotalPrecentage.ToString() + ", " + CurrentFile + ", " + CurrentFilePrecentage?.ToString() + ", " + CurrentFileBytesTransferred?.ToString();
+            }
+        }
+
+        public class AdbSyncStatsInfo
+        {
+            public string TargetPath { get; set; }
+            public UInt64 FilesPulled { get; set; }
+            public UInt64 FilesSkipped { get; set; }
+            public decimal? AverageRate { get; set; }
+            public UInt64? TotalBytes { get; set; }
+            public decimal? TotalTime { get; set; }
+        }
 
         private enum UnixFileMode : UInt32
         {
@@ -78,21 +102,21 @@ namespace ADB_Explorer.Services
             cmdProcess.StartInfo.CreateNoWindow = true;
         }
 
-        public static Process StartCommandProcess(string cmd, params string[] args)
+        public static Process StartCommandProcess(string file, string cmd, System.Text.Encoding encoding, params string[] args)
         {
             var cmdProcess = new Process();
             InitProcess(cmdProcess);
-            cmdProcess.StartInfo.FileName = ADB_PATH;
+            cmdProcess.StartInfo.FileName = file;
             cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
-            cmdProcess.StartInfo.StandardOutputEncoding = System.Text.Encoding.UTF8;
-            cmdProcess.StartInfo.StandardErrorEncoding = System.Text.Encoding.UTF8;
+            cmdProcess.StartInfo.StandardOutputEncoding = encoding;
+            cmdProcess.StartInfo.StandardErrorEncoding = encoding;
             cmdProcess.Start();
             return cmdProcess;
         }
-
-        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args)
+        public static int ExecuteCommand(
+            string file, string cmd, out string stdout, out string stderr, System.Text.Encoding encoding, params string[] args)
         {
-            using var cmdProcess = StartCommandProcess(cmd, args);
+            using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
 
             using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
             using var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
@@ -104,9 +128,13 @@ namespace ADB_Explorer.Services
             return cmdProcess.ExitCode;
         }
 
-        public static IEnumerable<string> ExecuteAdbCommandAsync(CancellationToken cancellationToken, string cmd, params string[] args)
+        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args) =>
+            ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, System.Text.Encoding.UTF8, args);
+
+        public static IEnumerable<string> ExecuteCommandAsync(
+            string file, string cmd, CancellationToken cancellationToken, System.Text.Encoding encoding, params string[] args)
         {
-            using var cmdProcess = StartCommandProcess(cmd, args);
+            using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
 
             var stdoutLine = cmdProcess.StandardOutput.ReadLine();
             while (stdoutLine != null)
@@ -130,7 +158,10 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static int ExecuteShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
+        public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
+            ExecuteCommandAsync(ADB_PATH, cmd, cancellationToken, System.Text.Encoding.UTF8, args);
+
+        public static int ExecuteAdbShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
         {
             return ExecuteAdbCommand("shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
         }
@@ -170,7 +201,7 @@ namespace ADB_Explorer.Services
             path = TranslateDevicePath(path);
 
             // Execute adb ls to get file list
-            var stdout = ExecuteAdbCommandAsync(cancellationToken, "ls", EscapeAdbString(path));
+            var stdout = ExecuteAdbCommandAsync("ls", cancellationToken, EscapeAdbString(path));
             foreach (string stdoutLine in stdout)
             {
                 var match = LS_FILE_ENTRY_RE.Match(stdoutLine);
@@ -212,10 +243,92 @@ namespace ADB_Explorer.Services
             }
         }
 
+        public static AdbSyncStatsInfo Pull(
+            string targetPath,
+            string sourcePath,
+            ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+            CancellationToken cancellationToken)
+        {
+            // Execute adb pull
+            var stdout = ExecuteCommandAsync(
+                ADB_PROGRESS_HELPER_PATH,
+                ADB_PATH,
+                cancellationToken,
+                System.Text.Encoding.Unicode,
+                "pull",
+                "-a",
+                EscapeAdbString(sourcePath),
+                EscapeAdbString(targetPath));
+
+            // Each line should be a progress update (but sometimes the output can be weird)
+            string lastStdoutLine = null;
+            foreach (string stdoutLine in stdout)
+            {
+                lastStdoutLine = stdoutLine;
+                var progressMatch = PULL_PROGRESS_RE.Match(stdoutLine);
+                if (!progressMatch.Success)
+                {
+                    continue;
+                }
+
+                var currFile = progressMatch.Groups["CurrentFile"].Value;
+
+                string totalPrecentageRaw = progressMatch.Groups["TotalPrecentage"].Value;
+                int? totalPrecentage = totalPrecentageRaw.EndsWith("%") ? int.Parse(totalPrecentageRaw.TrimEnd('%')) : null;
+
+                int? currPrecentage = null;
+                if (progressMatch.Groups["CurrentPrecentage"].Success)
+                {
+                    string currPrecentageRaw = progressMatch.Groups["CurrentPrecentage"].Value;
+                    currPrecentage = currPrecentageRaw.EndsWith("%") ? int.Parse(currPrecentageRaw.TrimEnd('%')) : null;
+                }
+
+                UInt64? currBytes =
+                    progressMatch.Groups["CurrentBytes"].Success ?
+                    UInt64.Parse(progressMatch.Groups["CurrentBytes"].Value) : null;
+
+                progressUpdates.Enqueue(new AdbSyncProgressInfo
+                {
+                    TotalPrecentage = totalPrecentage,
+                    CurrentFile = currFile,
+                    CurrentFilePrecentage = currPrecentage,
+                    CurrentFileBytesTransferred = currBytes
+                });
+            }
+
+            if (lastStdoutLine == null)
+            {
+                return null;
+            }
+
+            var match = PULL_STATS_RE.Match(lastStdoutLine);
+            if (!match.Success)
+            {
+                return null;
+            }
+
+            var path = match.Groups["TargetPath"].Value;
+            UInt64 totalPulled = UInt64.Parse(match.Groups["TotalPulled"].Value);
+            UInt64 totalSkipped = UInt64.Parse(match.Groups["TotalSkipped"].Value);
+            decimal? avrageRate = match.Groups["AverageRate"].Success ? decimal.Parse(match.Groups["AverageRate"].Value) : null;
+            UInt64? totalBytes = match.Groups["TotalBytes"].Success ? UInt64.Parse(match.Groups["TotalBytes"].Value) : null;
+            decimal? totalTime = match.Groups["TotalTime"].Success ? decimal.Parse(match.Groups["TotalTime"].Value) : null;
+
+            return new AdbSyncStatsInfo
+            {
+                TargetPath = path,
+                FilesPulled = totalPulled,
+                FilesSkipped = totalSkipped,
+                AverageRate = avrageRate,
+                TotalBytes = totalBytes,
+                TotalTime = totalTime
+            };
+        }
+
         public static bool IsDirectory(string path)
         {
             string stdout, stderr;
-            int exitCode = ExecuteShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path));
+            int exitCode = ExecuteAdbShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path));
             return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
         }
 
@@ -227,7 +340,7 @@ namespace ADB_Explorer.Services
         public static string TranslateDevicePath(string path)
         {
             string stdout, stderr;
-            int exitCode = ExecuteShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path), "&&", "pwd");
+            int exitCode = ExecuteAdbShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path), "&&", "pwd");
             if (exitCode != 0)
             {
                 throw new Exception(stderr);
@@ -247,7 +360,7 @@ namespace ADB_Explorer.Services
 
         private static string GetProps()
         {
-            ExecuteShellCommand(GET_PROP, out string stdout, out string stderr);
+            ExecuteAdbShellCommand(GET_PROP, out string stdout, out string stderr);
             return stdout;
         }
 
