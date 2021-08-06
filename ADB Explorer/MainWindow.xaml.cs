@@ -71,6 +71,12 @@ namespace ADB_Explorer
 
             ConnectTimer.Interval = TimeSpan.FromSeconds(2);
             ConnectTimer.Tick += ConnectTimer_Tick;
+
+            InputLanguageManager.Current.InputLanguageChanged +=
+                new InputLanguageEventHandler((sender, e) =>
+                {
+                    UpdateInputLang();
+                });
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -99,7 +105,9 @@ namespace ADB_Explorer
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
-            DataGridBackgroundRectangle.Fill = theme == ApplicationTheme.Light ? new(Colors.White) : DarkBG;
+            GridBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
+            ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
+            ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
             Application.Current.Properties["theme"] = ThemeManager.Current.ApplicationTheme;
         }
@@ -114,6 +122,8 @@ namespace ADB_Explorer
             PathStackPanel.Visibility = Visibility.Collapsed;
             PathBox.Text = PathBox.Tag?.ToString();
             PathBox.IsReadOnly = false;
+
+            UpdateInputLang();
         }
 
         private void PathBox_KeyDown(object sender, KeyEventArgs e)
@@ -469,6 +479,11 @@ namespace ADB_Explorer
                 return;
 
             e.Handled = true;
+        }
+
+        private void UpdateInputLang()
+        {
+            InputLangBlock.Text = InputLanguageManager.Current.CurrentInputLanguage.TwoLetterISOLanguageName.ToUpper();
         }
     }
 }
