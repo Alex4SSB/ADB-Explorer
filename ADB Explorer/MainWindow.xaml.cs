@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using Microsoft.WindowsAPICodePack.Dialogs;
 using ModernWpf;
 using System;
 using System.Collections.Concurrent;
@@ -158,6 +159,8 @@ namespace ADB_Explorer
         private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             TotalSizeBlock.Text = SelectedFilesTotalSize;
+
+            CopyMenuButton.IsEnabled = ExplorerGrid.SelectedItems.Count == 1;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -484,6 +487,26 @@ namespace ADB_Explorer
         private void UpdateInputLang()
         {
             InputLangBlock.Text = InputLanguageManager.Current.CurrentInputLanguage.TwoLetterISOLanguageName.ToUpper();
+        }
+
+        private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Multiselect = false
+            };
+
+            ConcurrentQueue<ADBService.AdbSyncProgressInfo> progress = new();
+            CancellationToken token = new();
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                OverallProgressBar.Visibility = Visibility.Visible;
+                //Thread.Sleep(1);
+                var sync = ADBService.Pull(dialog.FileName, ((FileClass)ExplorerGrid.SelectedItem).Path, ref progress, token);
+                //OverallProgressBar.Visibility = Visibility.Collapsed;
+            }
         }
     }
 }
