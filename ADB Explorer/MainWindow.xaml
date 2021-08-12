@@ -474,29 +474,32 @@
         </Grid>
         <ui:SplitView
             x:Name="SettingsSplitView"
-            HorizontalAlignment="Right"
-            FlowDirection="RightToLeft"
-            FocusVisualStyle="{x:Null}">
+            FocusVisualStyle="{x:Null}"
+            OpenPaneLength="350"
+            PanePlacement="Right">
             <ui:SplitView.Pane>
-                <Grid>
-                    <!--<StackPanel Orientation="Horizontal">
-                        <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                    </StackPanel>-->
-                    <Menu Margin="4" VerticalAlignment="Top">
-                        <MenuItem
-                            x:Name="ToggleThemeButton"
-                            Click="ToggleThemeButton_Click"
-                            ToolTip="Toggle Theme">
-                            <MenuItem.Header>
-                                <ui:FontIcon FontSize="18" Glyph="&#xE771;" />
-                            </MenuItem.Header>
-                        </MenuItem>
-                    </Menu>
-                    <StackPanel HorizontalAlignment="Center">
-                        <TextBlock FontSize="20" Text="Settings" />
-
-                    </StackPanel>
-                </Grid>
+                <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                    <Grid Margin="24,8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="48" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock FontSize="24" Text="Settings" />
+                        <StackPanel Grid.Row="1" HorizontalAlignment="Left">
+                            <TextBlock Margin="0,0,0,6" Text="Theme" />
+                            <StackPanel>
+                                <RadioButton
+                                    x:Name="LightThemeRadioButton"
+                                    Checked="LightThemeRadioButton_Checked"
+                                    Content="Light" />
+                                <RadioButton
+                                    x:Name="DarkThemeRadioButton"
+                                    Checked="DarkThemeRadioButton_Checked"
+                                    Content="Dark" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Border>
             </ui:SplitView.Pane>
         </ui:SplitView>
 

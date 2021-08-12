@@ -69,9 +69,6 @@ namespace ADB_Explorer
         public MainWindow()
         {
             InitializeComponent();
-
-            SetTheme(RetrieveValue<ApplicationTheme>("theme"));
-
             LaunchSequence();
 
             ConnectTimer.Interval = TimeSpan.FromSeconds(2);
@@ -94,14 +91,6 @@ namespace ADB_Explorer
             }
 
             ConnectTimer.Stop();
-        }
-
-        private void ToggleThemeButton_Click(object sender, RoutedEventArgs e)
-        {
-            SetTheme(ThemeManager.Current.ApplicationTheme == ApplicationTheme.Light
-                ? ApplicationTheme.Dark
-                : ApplicationTheme.Light
-                );
         }
 
         private void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
@@ -174,6 +163,13 @@ namespace ADB_Explorer
 
         private void LaunchSequence()
         {
+            var theme = RetrieveValue<ApplicationTheme>("theme");
+            SetTheme(theme);
+            if (theme == ApplicationTheme.Light)
+                LightThemeRadioButton.IsChecked = true;
+            else
+                DarkThemeRadioButton.IsChecked = true;
+
             Title = Properties.Resources.AppDisplayName;
             // Get device name
             if (ADBService.GetDeviceName() is string name && !string.IsNullOrEmpty(name))
@@ -537,6 +533,16 @@ namespace ADB_Explorer
                 OverallProgressBar.IsIndeterminate = false;
                 OverallProgressBar.Value = precents.Value;
             }
+        }
+
+        private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SetTheme(ApplicationTheme.Light);
+        }
+
+        private void DarkThemeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            SetTheme(ApplicationTheme.Dark);
         }
     }
 }
