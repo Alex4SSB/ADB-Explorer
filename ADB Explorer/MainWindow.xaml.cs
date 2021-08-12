@@ -43,10 +43,14 @@ namespace ADB_Explorer
 
         private Task listDirTask;
         private Task unknownFoldersTask;
+        private Task<ADBService.AdbSyncStatsInfo> syncOprationTask;
         private DispatcherTimer dirListUpdateTimer;
+        private DispatcherTimer syncOprationProgressUpdateTimer;
         private CancellationTokenSource dirListCancelTokenSource;
         private CancellationTokenSource determineFoldersCancelTokenSource;
+        private CancellationTokenSource syncOperationCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
+        private ConcurrentQueue<ADBService.AdbSyncProgressInfo> waitingProgress;
 
         private string SelectedFilesTotalSize
         {
@@ -188,11 +192,17 @@ namespace ADB_Explorer
             dirListCancelTokenSource = new CancellationTokenSource();
             determineFoldersCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
+            waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
             dirListUpdateTimer = new DispatcherTimer
             {
                 Interval = DIR_LIST_UPDATE_INTERVAL
             };
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
+            syncOprationProgressUpdateTimer = new DispatcherTimer
+            {
+                Interval = DIR_LIST_UPDATE_INTERVAL
+            };
+            syncOprationProgressUpdateTimer.Tick += SyncOprationProgressUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
 
@@ -497,15 +507,35 @@ namespace ADB_Explorer
                 Multiselect = false
             };
 
-            ConcurrentQueue<ADBService.AdbSyncProgressInfo> progress = new();
-            CancellationToken token = new();
-
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
+                OverallProgressBar.IsIndeterminate = true;
                 OverallProgressBar.Visibility = Visibility.Visible;
-                //Thread.Sleep(1);
-                var sync = ADBService.Pull(dialog.FileName, ((FileClass)ExplorerGrid.SelectedItem).Path, ref progress, token);
-                //OverallProgressBar.Visibility = Visibility.Collapsed;
+
+                waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
+                syncOperationCancelTokenSource = new CancellationTokenSource();
+                var sourcePath = ((FileClass)ExplorerGrid.SelectedItem).Path;
+                var targetPath = dialog.FileName;
+                syncOprationTask = Task.Run(() => ADBService.Pull(targetPath, sourcePath, ref waitingProgress, syncOperationCancelTokenSource.Token));
+
+                syncOprationTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
+                syncOprationProgressUpdateTimer.Start();
+            }
+        }
+
+        private void AdbSyncCompleteHandler(ADBService.AdbSyncStatsInfo statsInfo)
+        {
+            syncOprationProgressUpdateTimer.Stop();
+            OverallProgressBar.Visibility = Visibility.Collapsed;
+        }
+
+        private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            if ((waitingProgress.DequeueAllExisting() is var progs) && progs.Any() &&
+                (progs.Last().TotalPrecentage is var precents) && precents.HasValue)
+            {
+                OverallProgressBar.IsIndeterminate = false;
+                OverallProgressBar.Value = precents.Value;
             }
         }
     }
