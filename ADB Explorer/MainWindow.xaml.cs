@@ -4,6 +4,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using ModernWpf;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -497,6 +498,11 @@ namespace ADB_Explorer
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
+            CopyFiles();
+        }
+
+        private void CopyFiles()
+        {
             var dialog = new CommonOpenFileDialog()
             {
                 IsFolderPicker = true,
@@ -543,6 +549,31 @@ namespace ADB_Explorer
         private void DarkThemeRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             SetTheme(ApplicationTheme.Dark);
+        }
+
+        private void DataGridCell_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Flyout.ShowAttachedFlyout((FrameworkElement)sender);
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            CopyFiles();
+        }
+
+        private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void DataGridCell_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            
         }
     }
 }

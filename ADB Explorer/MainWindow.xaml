@@ -20,7 +20,21 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
+        <ui:Flyout x:Key="RowContextMenu">
+            <Menu>
+                <MenuItem Click="MenuItem_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon Margin="0,0,6,0" Glyph="&#xE8C8;" />
+                            <TextBlock Text="Copy" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+            </Menu>
+        </ui:Flyout>
         <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
+            <EventSetter Event="MouseRightButtonUp" Handler="DataGridCell_MouseRightButtonUp" />
+            <EventSetter Event="MouseDown" Handler="DataGridCell_MouseDown" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -30,6 +44,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="ui:FlyoutBase.AttachedFlyout" Value="{StaticResource RowContextMenu}" />
             <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
@@ -299,6 +314,7 @@
                 ItemsSource="{Binding}"
                 KeyboardNavigation.TabNavigation="Once"
                 MinRowHeight="21"
+                MouseDown="ExplorerGrid_MouseDown"
                 RowStyle="{StaticResource RowLightStyle}"
                 SelectionChanged="ExplorerGrid_SelectionChanged"
                 SelectionMode="Extended"
