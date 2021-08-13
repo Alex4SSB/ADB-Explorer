@@ -138,7 +138,8 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            EnterFolder(ExplorerGrid.SelectedItem);
+            if (e.ChangedButton == MouseButton.Left)
+                EnterFolder(ExplorerGrid.SelectedItem);
         }
 
         private void EnterFolder(object source)
@@ -551,29 +552,19 @@ namespace ADB_Explorer
             SetTheme(ApplicationTheme.Dark);
         }
 
-        private void DataGridCell_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Flyout.ShowAttachedFlyout((FrameworkElement)sender);
-        }
-
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void ContextMenuCopyItem_Click(object sender, RoutedEventArgs e)
         {
             CopyFiles();
         }
 
         private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            var row = sender as DataGridRow;
 
-        }
+            if (row.IsSelected == false)
+                ExplorerGrid.SelectedItems.Clear();
 
-        private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void DataGridCell_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            
+            ((DataGridRow)sender).IsSelected = true;
         }
     }
 }

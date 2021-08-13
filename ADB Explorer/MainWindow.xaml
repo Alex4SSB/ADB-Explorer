@@ -20,21 +20,37 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
-        <ui:Flyout x:Key="RowContextMenu">
-            <Menu>
-                <MenuItem Click="MenuItem_Click">
+        <ContextMenu x:Key="RowContextMenu">
+            <ContextMenu.Items>
+                <MenuItem
+                    x:Name="ContextMenuCopyItem"
+                    Height="24"
+                    Padding="6,0"
+                    Click="ContextMenuCopyItem_Click">
                     <MenuItem.Header>
                         <StackPanel Orientation="Horizontal">
-                            <ui:FontIcon Margin="0,0,6,0" Glyph="&#xE8C8;" />
+                            <ui:FontIcon
+                                Margin="0,0,6,0"
+                                FontSize="16"
+                                Glyph="&#xE8C8;" />
                             <TextBlock Text="Copy" />
                         </StackPanel>
                     </MenuItem.Header>
                 </MenuItem>
-            </Menu>
-        </ui:Flyout>
+                <MenuItem Height="24" Padding="6,0">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                Margin="0,0,6,0"
+                                FontSize="16"
+                                Glyph="&#xE74D;" />
+                            <TextBlock Text="Delete" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+            </ContextMenu.Items>
+        </ContextMenu>
         <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
-            <EventSetter Event="MouseRightButtonUp" Handler="DataGridCell_MouseRightButtonUp" />
-            <EventSetter Event="MouseDown" Handler="DataGridCell_MouseDown" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -44,7 +60,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <Setter Property="ui:FlyoutBase.AttachedFlyout" Value="{StaticResource RowContextMenu}" />
             <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
@@ -66,6 +81,14 @@
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="#FFD9D9D9" />
                 </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFCCE8FF" />
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
         <Style
@@ -86,6 +109,14 @@
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="#FF333333" />
                 </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FF777777" />
+                </MultiDataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="TextBlockLightStyle" TargetType="TextBlock">
@@ -95,8 +126,10 @@
             <Setter Property="Background" Value="#FF202020" />
         </Style>
         <Style x:Key="RowStyle" TargetType="DataGridRow">
+            <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
         </Style>
         <Style
             x:Key="RowLightStyle"
@@ -196,7 +229,7 @@
                         <ui:FontIcon Glyph="&#xE72D;" />
                     </MenuItem.Header>
                 </MenuItem>
-                <MenuItem IsEnabled="False" ToolTip="Recycle">
+                <MenuItem IsEnabled="False" ToolTip="Delete">
                     <MenuItem.Header>
                         <ui:FontIcon Glyph="&#xE74D;" />
                     </MenuItem.Header>
@@ -308,14 +341,15 @@
                 Background="Transparent"
                 CanUserResizeRows="False"
                 CellStyle="{StaticResource CellLightStyle}"
+                ContextMenu="{StaticResource RowContextMenu}"
                 GridLinesVisibility="None"
                 HeadersVisibility="Column"
                 IsReadOnly="True"
                 ItemsSource="{Binding}"
                 KeyboardNavigation.TabNavigation="Once"
                 MinRowHeight="21"
-                MouseDown="ExplorerGrid_MouseDown"
                 RowStyle="{StaticResource RowLightStyle}"
+                SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                 SelectionChanged="ExplorerGrid_SelectionChanged"
                 SelectionMode="Extended"
                 SelectionUnit="FullRow">
