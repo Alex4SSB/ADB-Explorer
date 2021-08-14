@@ -53,6 +53,8 @@ namespace ADB_Explorer
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ConcurrentQueue<ADBService.AdbSyncProgressInfo> waitingProgress;
 
+        private DispatcherTimer PullTimer = new();
+
         private string SelectedFilesTotalSize
         {
             get
@@ -74,12 +76,38 @@ namespace ADB_Explorer
 
             ConnectTimer.Interval = TimeSpan.FromSeconds(2);
             ConnectTimer.Tick += ConnectTimer_Tick;
+            PullTimer.Interval = TimeSpan.FromMilliseconds(10);
+            PullTimer.Tick += PullTimer_Tick;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
                 {
                     UpdateInputLang();
                 });
+        }
+
+        private void PullTimer_Tick(object sender, EventArgs e)
+        {
+            if (!PullQ.Any()) return;
+
+            OverallProgressBar.IsIndeterminate = true;
+            ProgressGrid.Visibility = Visibility.Visible;
+
+            var item = PullQ.Dequeue();
+            if (ProgressCountTextBlock.Tag is int totalCount)
+            {
+                ProgressCountTextBlock.Text = $"{totalCount - PullQ.Count}/{totalCount}";
+            }
+
+            waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
+            syncOperationCancelTokenSource = new CancellationTokenSource();
+            syncOprationTask = Task.Run(() => ADBService.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
+
+            syncOprationTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
+            syncOprationProgressUpdateTimer.Start();
+
+            while (waitingProgress.DequeueAllExisting() is var progs && progs.Any())
+            { }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -155,7 +183,7 @@ namespace ADB_Explorer
         {
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
-            CopyMenuButton.IsEnabled = ExplorerGrid.SelectedItems.Count == 1;
+            CopyMenuButton.IsEnabled = ExplorerGrid.SelectedItems.Count > 0;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -215,6 +243,8 @@ namespace ADB_Explorer
             }
             else
                 NavigateToPath(CurrentPath);
+
+            PullTimer.Start();
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
@@ -512,24 +542,18 @@ namespace ADB_Explorer
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                OverallProgressBar.IsIndeterminate = true;
-                OverallProgressBar.Visibility = Visibility.Visible;
-
-                waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
-                syncOperationCancelTokenSource = new CancellationTokenSource();
-                var sourcePath = ((FileClass)ExplorerGrid.SelectedItem).Path;
-                var targetPath = dialog.FileName;
-                syncOprationTask = Task.Run(() => ADBService.Pull(targetPath, sourcePath, ref waitingProgress, syncOperationCancelTokenSource.Token));
-
-                syncOprationTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
-                syncOprationProgressUpdateTimer.Start();
+                ProgressCountTextBlock.Tag = ExplorerGrid.SelectedItems.Count;
+                foreach (FileClass item in ExplorerGrid.SelectedItems)
+                {
+                    PullQ.Enqueue(new(dialog.FileName, item.Path));
+                }
             }
         }
 
         private void AdbSyncCompleteHandler(ADBService.AdbSyncStatsInfo statsInfo)
         {
             syncOprationProgressUpdateTimer.Stop();
-            OverallProgressBar.Visibility = Visibility.Collapsed;
+            ProgressGrid.Visibility = Visibility.Collapsed;
         }
 
         private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)

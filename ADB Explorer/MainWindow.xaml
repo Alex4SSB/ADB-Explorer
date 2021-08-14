@@ -17,6 +17,7 @@
     KeyDown="Window_KeyDown"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
@@ -512,14 +513,20 @@
                 Grid.Row="3"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
-                <ui:ProgressBar
-                    x:Name="OverallProgressBar"
-                    Width="200"
-                    Margin="4"
-                    VerticalAlignment="Stretch"
-                    CornerRadius="0"
-                    Visibility="Collapsed"
-                    Value="50" />
+                <Grid x:Name="ProgressGrid" Visibility="Collapsed">
+                    <ui:ProgressBar
+                        x:Name="OverallProgressBar"
+                        Width="200"
+                        Margin="4"
+                        VerticalAlignment="Stretch"
+                        CornerRadius="0"
+                        Value="50" />
+                    <TextBlock
+                        x:Name="ProgressCountTextBlock"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="0/0" />
+                </Grid>
             </StackPanel>
         </Grid>
         <ui:SplitView

@@ -27,5 +27,9 @@ namespace ADB_Explorer.Models
 
         public static Dictionary<Tuple<string, bool>, Icon> FileIcons = new();
 
+        /// <summary>
+        /// Tuple of target path and source path
+        /// </summary>
+        public static Queue<Tuple<string, string>> PullQ = new();
     }
 }
