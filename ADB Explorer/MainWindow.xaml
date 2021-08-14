@@ -509,10 +509,11 @@
                     </StackPanel>
                 </StackPanel>
             </StackPanel>
-            <StackPanel
-                Grid.Row="3"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
+            <Grid Grid.Row="3" HorizontalAlignment="Right">
+                <TextBlock
+                    x:Name="OperationCompletedTextBlock"
+                    Margin="6,0"
+                    VerticalAlignment="Center" />
                 <Grid x:Name="ProgressGrid" Visibility="Collapsed">
                     <ui:ProgressBar
                         x:Name="OverallProgressBar"
@@ -527,7 +528,7 @@
                         VerticalAlignment="Center"
                         Text="0/0" />
                 </Grid>
-            </StackPanel>
+            </Grid>
         </Grid>
         <ui:SplitView
             x:Name="SettingsSplitView"
@@ -542,52 +543,53 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <TextBlock FontSize="24" Text="Settings" />
-                        <StackPanel Grid.Row="1" HorizontalAlignment="Left">
-                            <TextBlock Text="Theme" />
-                            <StackPanel Margin="0,6,0,15">
-                                <RadioButton
-                                    x:Name="LightThemeRadioButton"
-                                    Checked="LightThemeRadioButton_Checked"
-                                    Content="Light" />
-                                <RadioButton
-                                    x:Name="DarkThemeRadioButton"
-                                    Checked="DarkThemeRadioButton_Checked"
-                                    Content="Dark" />
+                        <ScrollViewer Grid.Row="1">
+                            <StackPanel HorizontalAlignment="Left">
+                                <TextBlock Text="Theme" />
+                                <StackPanel Margin="0,6,0,15">
+                                    <RadioButton
+                                        x:Name="LightThemeRadioButton"
+                                        Checked="LightThemeRadioButton_Checked"
+                                        Content="Light" />
+                                    <RadioButton
+                                        x:Name="DarkThemeRadioButton"
+                                        Checked="DarkThemeRadioButton_Checked"
+                                        Content="Dark" />
+                                </StackPanel>
+                                <Separator
+                                    Width="300"
+                                    Margin="0,0,0,6"
+                                    HorizontalAlignment="Center" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="120" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center" Text="Default Folder" />
+                                    <Button
+                                        x:Name="ChangeDefaultFolderButton"
+                                        Grid.Column="1"
+                                        Click="ChangeDefaultFolderButton_Click"
+                                        Content="Change" />
+                                </Grid>
+                                <TextBlock
+                                    x:Name="DefaultFolderBlock"
+                                    Margin="0,6,0,15"
+                                    FontFamily="Consolas"
+                                    Text="[not set]" />
+                                <Separator
+                                    Width="300"
+                                    Margin="0,0,0,6"
+                                    HorizontalAlignment="Center" />
+                                <TextBlock Text="File Double-Click Behavior" />
+                                <StackPanel Margin="0,6,0,15">
+                                    <CheckBox
+                                        x:Name="CopyOnDoubleClickCheckBox"
+                                        Checked="CopyOnDoubleClickCheckBox_Checked"
+                                        Content="Copy To Default Folder" />
+                                </StackPanel>
                             </StackPanel>
-                            <Separator
-                                Width="300"
-                                Margin="0,0,0,6"
-                                HorizontalAlignment="Center" />
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="120" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center" Text="Default Folder" />
-                                <Button
-                                    x:Name="ChangeDefaultFolderButton"
-                                    Grid.Column="1"
-                                    Click="ChangeDefaultFolderButton_Click"
-                                    Content="Change" />
-                            </Grid>
-                            <TextBlock
-                                x:Name="DefaultFolderBlock"
-                                Margin="0,6,0,15"
-                                FontFamily="Consolas"
-                                Text="[not set]" />
-                            <Separator
-                                Width="300"
-                                Margin="0,0,0,6"
-                                HorizontalAlignment="Center" />
-                            <TextBlock Text="File Double-Click Behavior" />
-                            <StackPanel Margin="0,6,0,15">
-                                <CheckBox
-                                    x:Name="CopyOnDoubleClickCheckBox"
-                                    Checked="CopyOnDoubleClickCheckBox_Checked"
-                                    Content="Copy To Default Folder" />
-
-                            </StackPanel>
-                        </StackPanel>
+                        </ScrollViewer>
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

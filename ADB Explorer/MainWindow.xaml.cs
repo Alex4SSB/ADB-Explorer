@@ -88,10 +88,20 @@ namespace ADB_Explorer
 
         private void PullTimer_Tick(object sender, EventArgs e)
         {
-            if (!PullQ.Any()) return;
+            if (!PullQ.Any())
+            {
+                if ((int)ProgressCountTextBlock.Tag > 0)
+                    OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
 
+                ProgressCountTextBlock.Tag = 0;
+                //ProgressGrid.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            OperationCompletedTextBlock.Text = "";
             OverallProgressBar.IsIndeterminate = true;
-            ProgressGrid.Visibility = Visibility.Visible;
+            if (ProgressGrid.Visibility == Visibility.Collapsed)
+                ProgressGrid.Visibility = Visibility.Visible;
 
             var item = PullQ.Dequeue();
             if (ProgressCountTextBlock.Tag is int totalCount)
@@ -103,7 +113,7 @@ namespace ADB_Explorer
             syncOperationCancelTokenSource = new CancellationTokenSource();
             syncOprationTask = Task.Run(() => ADBService.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
 
-            syncOprationTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
+            syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
             syncOprationProgressUpdateTimer.Start();
 
             while (waitingProgress.DequeueAllExisting() is var progs && progs.Any())
@@ -256,6 +266,7 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.copyOnDoubleClick) is bool copy)
                 CopyOnDoubleClickCheckBox.IsChecked = copy;
 
+            ProgressCountTextBlock.Tag = 0;
             PullTimer.Start();
         }
 
@@ -291,7 +302,7 @@ namespace ADB_Explorer
 
                 UpdateDirectoryList();
                 dirListUpdateTimer.Start();
-                listDirTask.ContinueWith((t) => Application.Current.Dispatcher.BeginInvoke(() => StopDirectoryList()));
+                listDirTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => StopDirectoryList()));
             }
         }
 
@@ -348,7 +359,7 @@ namespace ADB_Explorer
                 }
                 else if (ADBService.IsDirectory(file.Path))
                 {
-                    Application.Current.Dispatcher.BeginInvoke(() => { file.Type = FileStat.FileType.Folder; });
+                    Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileStat.FileType.Folder; });
                 }
             }
         }
@@ -566,7 +577,7 @@ namespace ADB_Explorer
                 path = dialog.FileName;
             }
 
-            ProgressCountTextBlock.Tag = ExplorerGrid.SelectedItems.Count;
+            ProgressCountTextBlock.Tag = (int)ProgressCountTextBlock.Tag + ExplorerGrid.SelectedItems.Count;
             foreach (FileClass item in ExplorerGrid.SelectedItems)
             {
                 PullQ.Enqueue(new(path, item.Path));
@@ -576,7 +587,13 @@ namespace ADB_Explorer
         private void AdbSyncCompleteHandler(ADBService.AdbSyncStatsInfo statsInfo)
         {
             syncOprationProgressUpdateTimer.Stop();
-            ProgressGrid.Visibility = Visibility.Collapsed;
+
+            if (!PullQ.Any())
+            {
+                ProgressGrid.Visibility = Visibility.Collapsed;
+                var fileCount = (int)OperationCompletedTextBlock.Tag;
+                OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileCount} file{(fileCount > 1 ? "s" : "")} done";
+            }
         }
 
         private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)
