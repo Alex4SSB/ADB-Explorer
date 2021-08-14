@@ -543,8 +543,8 @@
                         </Grid.RowDefinitions>
                         <TextBlock FontSize="24" Text="Settings" />
                         <StackPanel Grid.Row="1" HorizontalAlignment="Left">
-                            <TextBlock Margin="0,0,0,6" Text="Theme" />
-                            <StackPanel>
+                            <TextBlock Text="Theme" />
+                            <StackPanel Margin="0,6,0,15">
                                 <RadioButton
                                     x:Name="LightThemeRadioButton"
                                     Checked="LightThemeRadioButton_Checked"
@@ -554,6 +554,23 @@
                                     Checked="DarkThemeRadioButton_Checked"
                                     Content="Dark" />
                             </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center" Text="Default folder" />
+                                <Button
+                                    x:Name="ChangeDefaultFolderButton"
+                                    Grid.Column="1"
+                                    Click="ChangeDefaultFolderButton_Click"
+                                    Content="Change" />
+                            </Grid>
+                            <TextBlock
+                                x:Name="DefaultFolderBlock"
+                                Margin="0,6,0,15"
+                                FontFamily="Consolas"
+                                Text="[not set]" />
                         </StackPanel>
                     </Grid>
                 </Border>

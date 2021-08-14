@@ -132,12 +132,7 @@ namespace ADB_Explorer
             ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
             ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
-            Application.Current.Properties["theme"] = ThemeManager.Current.ApplicationTheme;
-        }
-
-        private static T RetrieveValue<T>(string key)
-        {
-            return Application.Current.Properties[key] is string value ? (T)Enum.Parse(typeof(T), value) : default;
+            Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
@@ -193,7 +188,7 @@ namespace ADB_Explorer
 
         private void LaunchSequence()
         {
-            var theme = RetrieveValue<ApplicationTheme>("theme");
+            var theme = Storage.RetrieveEnum<ApplicationTheme>();
             SetTheme(theme);
             if (theme == ApplicationTheme.Light)
                 LightThemeRadioButton.IsChecked = true;
@@ -243,6 +238,9 @@ namespace ADB_Explorer
             }
             else
                 NavigateToPath(CurrentPath);
+
+            if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
+                DefaultFolderBlock.Text = path;
 
             PullTimer.Start();
         }
@@ -537,7 +535,8 @@ namespace ADB_Explorer
             var dialog = new CommonOpenFileDialog()
             {
                 IsFolderPicker = true,
-                Multiselect = false
+                Multiselect = false,
+                DefaultDirectory = DefaultFolderBlock.Text
             };
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -589,6 +588,23 @@ namespace ADB_Explorer
                 ExplorerGrid.SelectedItems.Clear();
 
             ((DataGridRow)sender).IsSelected = true;
+        }
+
+        private void ChangeDefaultFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Multiselect = false
+            };
+            if (DefaultFolderBlock.Text != "[not set]")
+                dialog.DefaultDirectory = DefaultFolderBlock.Text;
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                DefaultFolderBlock.Text = dialog.FileName;
+                Storage.StoreValue(Settings.defaultFolder, dialog.FileName);
+            }
         }
     }
 }
