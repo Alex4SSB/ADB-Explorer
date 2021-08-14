@@ -162,15 +162,26 @@ namespace ADB_Explorer
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
-                EnterFolder(ExplorerGrid.SelectedItem);
+                DoubleClick(ExplorerGrid.SelectedItem);
         }
 
-        private void EnterFolder(object source)
+        private void DoubleClick(object source)
         {
-            if ((source is FileClass file) &&
-                (file.Type == FileStat.FileType.Folder))
+            if (source is FileClass file)
             {
-                NavigateToPath(file.Path);
+                switch (file.Type)
+                {
+                    case FileStat.FileType.File:
+                        if (CopyOnDoubleClickCheckBox.IsChecked == true)
+                            CopyFiles(true);
+
+                        break;
+                    case FileStat.FileType.Folder:
+                        NavigateToPath(file.Path);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -241,6 +252,9 @@ namespace ADB_Explorer
 
             if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
+
+            if (Storage.RetrieveBool(Settings.copyOnDoubleClick) is bool copy)
+                CopyOnDoubleClickCheckBox.IsChecked = copy;
 
             PullTimer.Start();
         }
@@ -470,7 +484,7 @@ namespace ADB_Explorer
             if (key == Key.Enter)
             {
                 if (ExplorerGrid.SelectedItems.Count == 1)
-                    EnterFolder(ExplorerGrid.SelectedItem);
+                    DoubleClick(ExplorerGrid.SelectedItem);
             }
             else if (key == Key.Back)
             {
@@ -508,7 +522,7 @@ namespace ADB_Explorer
             else if (key == Key.Enter)
             {
                 if (ExplorerGrid.SelectedItems.Count == 1)
-                    EnterFolder(ExplorerGrid.SelectedItem);
+                    DoubleClick(ExplorerGrid.SelectedItem);
             }
             else if (key == Key.Back)
             {
@@ -530,22 +544,32 @@ namespace ADB_Explorer
             CopyFiles();
         }
 
-        private void CopyFiles()
+        private void CopyFiles(bool quick = false)
         {
-            var dialog = new CommonOpenFileDialog()
+            string path;
+            if (quick)
             {
-                IsFolderPicker = true,
-                Multiselect = false,
-                DefaultDirectory = DefaultFolderBlock.Text
-            };
-
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                path = DefaultFolderBlock.Text;
+            }
+            else
             {
-                ProgressCountTextBlock.Tag = ExplorerGrid.SelectedItems.Count;
-                foreach (FileClass item in ExplorerGrid.SelectedItems)
+                var dialog = new CommonOpenFileDialog()
                 {
-                    PullQ.Enqueue(new(dialog.FileName, item.Path));
-                }
+                    IsFolderPicker = true,
+                    Multiselect = false,
+                    DefaultDirectory = DefaultFolderBlock.Text
+                };
+
+                if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                    return;
+
+                path = dialog.FileName;
+            }
+
+            ProgressCountTextBlock.Tag = ExplorerGrid.SelectedItems.Count;
+            foreach (FileClass item in ExplorerGrid.SelectedItems)
+            {
+                PullQ.Enqueue(new(path, item.Path));
             }
         }
 
@@ -605,6 +629,11 @@ namespace ADB_Explorer
                 DefaultFolderBlock.Text = dialog.FileName;
                 Storage.StoreValue(Settings.defaultFolder, dialog.FileName);
             }
+        }
+
+        private void CopyOnDoubleClickCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.copyOnDoubleClick, CopyOnDoubleClickCheckBox.IsChecked);
         }
     }
 }

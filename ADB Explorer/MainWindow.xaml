@@ -554,12 +554,16 @@
                                     Checked="DarkThemeRadioButton_Checked"
                                     Content="Dark" />
                             </StackPanel>
+                            <Separator
+                                Width="300"
+                                Margin="0,0,0,6"
+                                HorizontalAlignment="Center" />
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="120" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center" Text="Default folder" />
+                                <TextBlock VerticalAlignment="Center" Text="Default Folder" />
                                 <Button
                                     x:Name="ChangeDefaultFolderButton"
                                     Grid.Column="1"
@@ -571,6 +575,18 @@
                                 Margin="0,6,0,15"
                                 FontFamily="Consolas"
                                 Text="[not set]" />
+                            <Separator
+                                Width="300"
+                                Margin="0,0,0,6"
+                                HorizontalAlignment="Center" />
+                            <TextBlock Text="File Double-Click Behavior" />
+                            <StackPanel Margin="0,6,0,15">
+                                <CheckBox
+                                    x:Name="CopyOnDoubleClickCheckBox"
+                                    Checked="CopyOnDoubleClickCheckBox_Checked"
+                                    Content="Copy To Default Folder" />
+
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
                 </Border>

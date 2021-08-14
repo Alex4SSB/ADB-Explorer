@@ -3,6 +3,7 @@
     public enum Settings
     {
         theme,
-        defaultFolder
+        defaultFolder,
+        copyOnDoubleClick
     }
 }

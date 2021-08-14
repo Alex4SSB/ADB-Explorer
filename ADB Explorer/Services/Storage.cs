@@ -28,5 +28,17 @@ namespace ADB_Explorer.Services
         {
             Application.Current.Properties[value.GetType().ToString()] = value;
         }
+
+        public static bool? RetrieveBool(Enum value) => RetrieveBool(value.ToString());
+
+        public static bool? RetrieveBool(string key)
+        {
+            return Application.Current.Properties[key] switch
+            {
+                string value when !string.IsNullOrEmpty(value) => bool.Parse(value),
+                bool val => val,
+                _ => null
+            };
+        }
     }
 }
