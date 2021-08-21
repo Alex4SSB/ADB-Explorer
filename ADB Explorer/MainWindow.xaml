@@ -325,7 +325,7 @@
                                 x:Name="InputLangBlock"
                                 Margin="5,0"
                                 FontSize="15"
-                                FontWeight="DemiBold" />
+                                FontWeight="DemiBold" MouseDown="InputLangBlock_MouseDown" />
                         </Border>
                         <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
                     </StackPanel>

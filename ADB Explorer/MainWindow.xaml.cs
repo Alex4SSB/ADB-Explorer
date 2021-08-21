@@ -652,5 +652,10 @@ namespace ADB_Explorer
         {
             Storage.StoreValue(Settings.copyOnDoubleClick, CopyOnDoubleClickCheckBox.IsChecked);
         }
+
+        private void InputLangBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }
