@@ -356,5 +356,17 @@ namespace ADB_Explorer.Services
             var value = props.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(s => s.Contains(key));
             return value.Any() ? value.First().Split('[', ']')[3] : "";
         }
+
+        public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", host, port);
+        public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", host, port);
+        private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
+        {
+            string stderr;
+            int exitCode = ExecuteAdbCommand(cmd, out _, out stderr, $"{host}:{port}");
+            if (exitCode != 0)
+            {
+                throw new Exception(stderr);
+            }
+        }
     }
 }
