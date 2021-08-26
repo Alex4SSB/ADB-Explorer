@@ -41,19 +41,19 @@ namespace ADB_Explorer
         private readonly DispatcherTimer ConnectTimer = new();
         private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
         private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
+        private static readonly TimeSpan SYNC_PROG_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(100);
 
         private Task listDirTask;
         private Task unknownFoldersTask;
         private Task<ADBService.AdbSyncStatsInfo> syncOprationTask;
         private DispatcherTimer dirListUpdateTimer;
         private DispatcherTimer syncOprationProgressUpdateTimer;
+        private bool isPullInProgress = false;
         private CancellationTokenSource dirListCancelTokenSource;
         private CancellationTokenSource determineFoldersCancelTokenSource;
         private CancellationTokenSource syncOperationCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ConcurrentQueue<ADBService.AdbSyncProgressInfo> waitingProgress;
-
-        private DispatcherTimer PullTimer = new();
 
         private string SelectedFilesTotalSize
         {
@@ -76,48 +76,12 @@ namespace ADB_Explorer
 
             ConnectTimer.Interval = TimeSpan.FromSeconds(2);
             ConnectTimer.Tick += ConnectTimer_Tick;
-            PullTimer.Interval = TimeSpan.FromMilliseconds(10);
-            PullTimer.Tick += PullTimer_Tick;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
                 {
                     UpdateInputLang();
                 });
-        }
-
-        private void PullTimer_Tick(object sender, EventArgs e)
-        {
-            if (!PullQ.Any())
-            {
-                if ((int)ProgressCountTextBlock.Tag > 0)
-                    OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
-
-                ProgressCountTextBlock.Tag = 0;
-                //ProgressGrid.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            OperationCompletedTextBlock.Text = "";
-            OverallProgressBar.IsIndeterminate = true;
-            if (ProgressGrid.Visibility == Visibility.Collapsed)
-                ProgressGrid.Visibility = Visibility.Visible;
-
-            var item = PullQ.Dequeue();
-            if (ProgressCountTextBlock.Tag is int totalCount)
-            {
-                ProgressCountTextBlock.Text = $"{totalCount - PullQ.Count}/{totalCount}";
-            }
-
-            waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
-            syncOperationCancelTokenSource = new CancellationTokenSource();
-            syncOprationTask = Task.Run(() => ADBService.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
-
-            syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
-            syncOprationProgressUpdateTimer.Start();
-
-            while (waitingProgress.DequeueAllExisting() is var progs && progs.Any())
-            { }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -242,7 +206,7 @@ namespace ADB_Explorer
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
             syncOprationProgressUpdateTimer = new DispatcherTimer
             {
-                Interval = DIR_LIST_UPDATE_INTERVAL
+                Interval = SYNC_PROG_UPDATE_INTERVAL
             };
             syncOprationProgressUpdateTimer.Tick += SyncOprationProgressUpdateTimer_Tick;
 
@@ -267,7 +231,6 @@ namespace ADB_Explorer
                 CopyOnDoubleClickCheckBox.IsChecked = copy;
 
             ProgressCountTextBlock.Tag = 0;
-            PullTimer.Start();
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
@@ -577,10 +540,57 @@ namespace ADB_Explorer
                 path = dialog.FileName;
             }
 
-            ProgressCountTextBlock.Tag = (int)ProgressCountTextBlock.Tag + ExplorerGrid.SelectedItems.Count;
+            int totalCount = (int)ProgressCountTextBlock.Tag + ExplorerGrid.SelectedItems.Count;
+            ProgressCountTextBlock.Tag = totalCount;
+         
             foreach (FileClass item in ExplorerGrid.SelectedItems)
             {
                 PullQ.Enqueue(new(path, item.Path));
+            }
+
+            ProgressCountTextBlock.Text = $"{totalCount - PullQ.Count + 1}/{totalCount}";
+
+            // Initiate pull sequence if needed
+            if (!isPullInProgress)
+            {
+                isPullInProgress = true;
+                HandleNextPull();
+            }
+        }
+
+        private void HandleNextPull()
+        {
+            OperationCompletedTextBlock.Text = "";
+            OverallProgressBar.IsIndeterminate = true;
+            if (ProgressGrid.Visibility == Visibility.Collapsed)
+                ProgressGrid.Visibility = Visibility.Visible;
+
+            if (ProgressCountTextBlock.Tag is int totalCount)
+            {
+                ProgressCountTextBlock.Text = $"{totalCount - PullQ.Count + 1}/{totalCount}";
+            }
+
+            var item = PullQ.Dequeue();
+
+            waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
+            syncOperationCancelTokenSource = new CancellationTokenSource();
+            syncOprationTask = Task.Run(() => ADBService.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
+
+            syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
+            syncOprationProgressUpdateTimer.Start();
+        }
+
+        private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)
+        {
+            var currProgresses = waitingProgress.DequeueAllExisting();
+            if (currProgresses.Any() && (currProgresses.Last().TotalPrecentage is var precents) && precents.HasValue)
+            {
+                if (OverallProgressBar.IsIndeterminate)
+                {
+                    OverallProgressBar.IsIndeterminate = false;
+                }
+                OverallProgressBar.Value = precents.Value;
+                
             }
         }
 
@@ -588,21 +598,24 @@ namespace ADB_Explorer
         {
             syncOprationProgressUpdateTimer.Stop();
 
-            if (!PullQ.Any())
+            if (PullQ.Any())
             {
+                HandleNextPull();
+            }
+            else
+            {
+                isPullInProgress = false;
+
+                if ((int)ProgressCountTextBlock.Tag > 0)
+                {
+                    OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
+                }
+
+                ProgressCountTextBlock.Tag = 0;
+
                 ProgressGrid.Visibility = Visibility.Collapsed;
                 var fileCount = (int)OperationCompletedTextBlock.Tag;
                 OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileCount} file{(fileCount > 1 ? "s" : "")} done";
-            }
-        }
-
-        private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            if ((waitingProgress.DequeueAllExisting() is var progs) && progs.Any() &&
-                (progs.Last().TotalPrecentage is var precents) && precents.HasValue)
-            {
-                OverallProgressBar.IsIndeterminate = false;
-                OverallProgressBar.Value = precents.Value;
             }
         }
 
