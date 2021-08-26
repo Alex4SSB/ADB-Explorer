@@ -594,14 +594,13 @@ namespace ADB_Explorer
         private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)
         {
             var currProgresses = waitingProgress.DequeueAllExisting();
-            if (currProgresses.Any() && (currProgresses.Last().TotalPrecentage is var precents) && precents.HasValue)
+            if (currProgresses.Any() && (currProgresses.LastOrDefault()?.TotalPrecentage is var percents) && percents.HasValue)
             {
                 if (OverallProgressBar.IsIndeterminate)
                 {
                     OverallProgressBar.IsIndeterminate = false;
                 }
-                OverallProgressBar.Value = precents.Value;
-                
+                OverallProgressBar.Value = percents.Value;
             }
         }
 
