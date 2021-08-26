@@ -583,7 +583,9 @@
                         Margin="4"
                         VerticalAlignment="Stretch"
                         CornerRadius="0"
-                        Value="50" />
+                        Value="50"
+                        Minimum="0"
+                        Maximum="100" />
                     <TextBlock
                         x:Name="ProgressCountTextBlock"
                         HorizontalAlignment="Center"
