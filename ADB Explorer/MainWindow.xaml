@@ -144,6 +144,58 @@
             TargetType="DataGridRow">
             <Setter Property="Background" Value="#FF202020" />
         </Style>
+        <Style x:Key="DeviceRowLightStyle" TargetType="DataGridRow">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFE5F3FF" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FFCCE8FF" />
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFD9D9D9" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFCCE8FF" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+            <Setter Property="Background" Value="White" />
+        </Style>
+        <Style x:Key="DeviceRowDarkStyle" TargetType="DataGridRow">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF4D4D4D" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FF777777" />
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FF333333" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FF777777" />
+                </MultiDataTrigger>
+            </Style.Triggers>
+            <Setter Property="Background" Value="#FF202020" />
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid>
@@ -171,6 +223,15 @@
                         </Style.Triggers>
                     </Style>
                 </Menu.Resources>
+                <MenuItem
+                    x:Name="OpenDevicesButton"
+                    Click="OpenDevicesButton_Click"
+                    ToolTip="Show Devices">
+                    <MenuItem.Header>
+                        <ui:FontIcon Glyph="&#xE8CC;" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                 <MenuItem
                     x:Name="NewMenuButton"
                     Margin="2,0"
@@ -325,7 +386,8 @@
                                 x:Name="InputLangBlock"
                                 Margin="5,0"
                                 FontSize="15"
-                                FontWeight="DemiBold" MouseDown="InputLangBlock_MouseDown" />
+                                FontWeight="DemiBold"
+                                MouseDown="InputLangBlock_MouseDown" />
                         </Border>
                         <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
                     </StackPanel>
@@ -530,6 +592,73 @@
                 </Grid>
             </Grid>
         </Grid>
+        <ui:SplitView
+            x:Name="DevicesSplitView"
+            FocusVisualStyle="{x:Null}"
+            IsPaneOpen="True"
+            OpenPaneLength="200"
+            PanePlacement="Left">
+            <ui:SplitView.Pane>
+                <Border BorderBrush="Gray" BorderThickness="0,1,1,0">
+                    <Grid Margin="6,8">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="48" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="24"
+                            Text="Devices" />
+                        <TextBlock
+                            x:Name="DevicesBackgroundBlock"
+                            Grid.Row="1"
+                            Style="{StaticResource TextBlockLightStyle}" />
+                        <DataGrid
+                            x:Name="DevicesGrid"
+                            Grid.Row="1"
+                            AutoGenerateColumns="False"
+                            Background="Transparent"
+                            CanUserResizeRows="False"
+                            CellStyle="{StaticResource CellLightStyle}"
+                            GridLinesVisibility="None"
+                            HeadersVisibility="None"
+                            HorizontalScrollBarVisibility="Hidden"
+                            IsReadOnly="True"
+                            ItemsSource="{Binding}"
+                            KeyboardNavigation.TabNavigation="Once"
+                            MinRowHeight="24"
+                            RowStyle="{StaticResource DeviceRowLightStyle}"
+                            SelectionMode="Single"
+                            SelectionUnit="FullRow">
+                            <DataGrid.Resources>
+                                <Style TargetType="ScrollBar">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Width" Value="0" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                    <Setter Property="MinWidth" Value="0" />
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn x:Name="DeviceIcon" CanUserResize="False">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock
+                                                Margin="2,4"
+                                                FontFamily="Segoe MDL2 Assets"
+                                                FontSize="28"
+                                                Text="{Binding Icon}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn x:Name="DeviceName" Binding="{Binding Name}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </ui:SplitView.Pane>
+        </ui:SplitView>
         <ui:SplitView
             x:Name="SettingsSplitView"
             FocusVisualStyle="{x:Null}"

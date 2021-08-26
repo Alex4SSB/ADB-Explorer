@@ -142,6 +142,10 @@ namespace ADB_Explorer
             ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
             ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
+            DevicesBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
+            DevicesGrid.RowStyle = FindResource($"DeviceRow{theme}Style") as Style;
+            DevicesGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
+
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
         }
 
@@ -218,16 +222,23 @@ namespace ADB_Explorer
 
             Title = Properties.Resources.AppDisplayName;
             // Get device name
-            if (ADBService.GetDeviceName() is string name && !string.IsNullOrEmpty(name))
-            {
-                Title = $"{Title} - {name}";
-            }
-            else
+            Devices = ADBService.GetDevices();
+            if (Devices.Count == 0)
             {
                 Title = $"{Title} - NO CONNECTED DEVICES";
                 AndroidFileList?.Clear();
                 ConnectTimer.Start();
                 return;
+            }
+            else
+            {
+                Devices.Add(new("Add Device", "", DeviceClass.DeviceType.New));
+                DevicesGrid.ItemsSource = Devices;
+
+                if (Devices.Count > 2) // including the "add device"
+                    return;
+
+                Title = $"{Title} - {Devices[0].Name}";
             }
 
             unknownFoldersTask = Task.Run(() => { });
@@ -272,7 +283,7 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
-            if (ADBService.GetDeviceName() == "") return;
+            if (ADBService.GetDevices()?.Count < 1) return;
 
             ConnectTimer.Stop();
             LaunchSequence();
@@ -656,6 +667,11 @@ namespace ADB_Explorer
         private void InputLangBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
+        }
+
+        private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
+        {
+            DevicesSplitView.IsPaneOpen = true;
         }
     }
 }

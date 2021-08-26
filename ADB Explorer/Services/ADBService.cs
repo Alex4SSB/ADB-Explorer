@@ -4,9 +4,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using static ADB_Explorer.Models.AdbRegEx;
 
 namespace ADB_Explorer.Services
 {
@@ -24,20 +24,6 @@ namespace ADB_Explorer.Services
         private const string PARENT_DIR = "..";
         private static readonly string[] SPECIAL_DIRS = { CURRENT_DIR, PARENT_DIR };
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
-
-        private static readonly Regex LS_FILE_ENTRY_RE = 
-            new Regex(@"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
-                      RegexOptions.IgnoreCase);
-
-        private static readonly Regex DEVICE_NAME_RE = new Regex(@"(?<=device:)\w+");
-
-        private static readonly Regex PULL_PROGRESS_RE =
-            new Regex(@"^\[ *(?<TotalPrecentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPrecentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$",
-                      RegexOptions.Multiline);
-
-        private static readonly Regex PULL_STATS_RE =
-            new Regex(@"^(?<TargetPath>.+?): (?<TotalPulled>\d+) files? pulled, (?<TotalSkipped>\d+) skipped\.(?> (?<AverageRate>\d+(?>\.\d+)?) MB\/s \((?<TotalBytes>\d+) bytes in (?<TotalTime>\d+(?>\.\d+)?)s\))? *$",
-                      RegexOptions.Multiline);
 
         public class AdbSyncProgressInfo
         {
@@ -348,14 +334,15 @@ namespace ADB_Explorer.Services
             return stdout.TrimEnd(LINE_SEPARATORS);
         }
 
-        public static string GetDeviceName(int index = 0)
+        public static List<DeviceClass> GetDevices()
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
-            var collection = DEVICE_NAME_RE.Matches(stdout);
 
-            return collection.Count > index
-                ? collection[index].Value.Replace('_', ' ')
-                : "";
+            return DEVICE_NAME_RE.Matches(stdout).Select(
+                m => new DeviceClass(
+                    name: m.Groups["name"].Value.Replace('_', ' '),
+                    id: m.Groups["id"].Value)
+                ).ToList();
         }
 
         private static string GetProps()

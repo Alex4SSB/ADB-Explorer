@@ -8,17 +8,19 @@ namespace ADB_Explorer.Models
 {
     public static class Data
     {
-        private static string deviceName = "";
-        public static string DeviceName
-        {
-            get
-            {
-                if (deviceName == "")
-                    deviceName = ADBService.GetDeviceName();
+        //private static string deviceName = "";
+        //public static string DeviceName
+        //{
+        //    get
+        //    {
+        //        if (deviceName == "")
+        //            deviceName = ADBService.GetDeviceName();
 
-                return deviceName;
-            }
-        }
+        //        return deviceName;
+        //    }
+        //}
+
+        public static List<DeviceClass> Devices = new();
 
         public static MyObservableCollection<FileClass> AndroidFileList = new();
 
