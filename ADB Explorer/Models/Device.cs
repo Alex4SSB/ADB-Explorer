@@ -6,13 +6,12 @@
         {
             Local,
             Remote,
-            New
+            Offline
         }
 
         public string Name { get; set; }
         public string ID { get; set; }
         public string Icon { get; set; }
-        public object Space { get; set; }
 
         public DeviceClass(string name, string id, DeviceType type = DeviceType.Local)
         {
@@ -22,6 +21,7 @@
             {
                 DeviceType.Local => "\uE839",
                 DeviceType.Remote => "\uEE77",
+                DeviceType.Offline => "\uEB5E",
                 _ => throw new System.NotImplementedException(),
             };
         }

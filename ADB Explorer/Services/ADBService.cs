@@ -342,7 +342,7 @@ namespace ADB_Explorer.Services
                 m => new DeviceClass(
                     name: m.Groups["name"].Value.Replace('_', ' '),
                     id: m.Groups["id"].Value,
-                    type: m.Groups["id"].Value.Contains('.') ? DeviceClass.DeviceType.Remote : DeviceClass.DeviceType.Local)
+                    type: m.Groups["id"].Value.Contains('.') ? (m.Groups["status"].Value == "device" ? DeviceClass.DeviceType.Remote : DeviceClass.DeviceType.Offline) : DeviceClass.DeviceType.Local)
                 ).ToList();
         }
 
