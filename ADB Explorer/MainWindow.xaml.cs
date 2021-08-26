@@ -55,6 +55,8 @@ namespace ADB_Explorer
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ConcurrentQueue<ADBService.AdbSyncProgressInfo> waitingProgress;
 
+        public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
+
         private string SelectedFilesTotalSize
         {
             get
@@ -196,11 +198,13 @@ namespace ADB_Explorer
             }
             else
             {
-                Devices.Add(new("Add Device", "", DeviceClass.DeviceType.New));
                 DevicesGrid.ItemsSource = Devices;
 
-                if (Devices.Count > 2) // including the "add device"
+                if (Devices.Count > 1)
+                {
+                    ExplorerGrid.ItemsSource = null;
                     return;
+                }
 
                 Title = $"{Title} - {Devices[0].Name}";
             }
@@ -684,6 +688,38 @@ namespace ADB_Explorer
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
         {
             DevicesSplitView.IsPaneOpen = true;
+        }
+
+        private void ConnectNewDeviceButton_Click(object sender, RoutedEventArgs e)
+        {
+            ADBService.ConnectNetworkDevice(NewDeviceIpBox.Text, NewDevicePortBox.Text);
+
+            NewDeviceIpBox.Text = "";
+            NewDevicePortBox.Text = "";
+            NewDevicePanel.Visibility = Visibility.Collapsed;
+
+            LaunchSequence();
+        }
+
+        private void EnableConnectButton()
+        {
+            ConnectNewDeviceButton.IsEnabled = NewDeviceIpBox.Text is string ip
+                && !string.IsNullOrWhiteSpace(ip)
+                && ip.Count(c => c == '.') == 3
+                && ip.Split('.').Count(i => byte.TryParse(i, out _)) == 4
+                && NewDevicePortBox.Text is string port
+                && !string.IsNullOrWhiteSpace(port)
+                && ushort.TryParse(port, out _);
+        }
+
+        private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            EnableConnectButton();
+        }
+
+        private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
+        {
+            NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
         }
     }
 }

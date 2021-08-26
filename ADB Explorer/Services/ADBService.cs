@@ -341,7 +341,8 @@ namespace ADB_Explorer.Services
             return DEVICE_NAME_RE.Matches(stdout).Select(
                 m => new DeviceClass(
                     name: m.Groups["name"].Value.Replace('_', ' '),
-                    id: m.Groups["id"].Value)
+                    id: m.Groups["id"].Value,
+                    type: m.Groups["id"].Value.Contains('.') ? DeviceClass.DeviceType.Remote : DeviceClass.DeviceType.Local)
                 ).ToList();
         }
 
@@ -357,7 +358,9 @@ namespace ADB_Explorer.Services
             return value.Any() ? value.First().Split('[', ']')[3] : "";
         }
 
+        public static void ConnectNetworkDevice(string host, string port) => NetworkDeviceOperation("connect", host, UInt16.Parse(port));
         public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", host, port);
+        public static void DisconnectNetworkDevice(string host, string port) => NetworkDeviceOperation("disconnect", host, UInt16.Parse(port));
         public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", host, port);
         private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
         {

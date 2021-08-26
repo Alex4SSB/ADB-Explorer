@@ -583,9 +583,9 @@
                         Margin="4"
                         VerticalAlignment="Stretch"
                         CornerRadius="0"
-                        Value="50"
+                        Maximum="100"
                         Minimum="0"
-                        Maximum="100" />
+                        Value="50" />
                     <TextBlock
                         x:Name="ProgressCountTextBlock"
                         HorizontalAlignment="Center"
@@ -604,20 +604,60 @@
                 <Border BorderBrush="Gray" BorderThickness="0,1,1,0">
                     <Grid Margin="6,8">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="48" />
+                            <RowDefinition Height="50" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <TextBlock
+                            Margin="0,5"
                             HorizontalAlignment="Center"
                             FontSize="24"
                             Text="Devices" />
+                        <Menu HorizontalAlignment="Right">
+                            <MenuItem
+                                x:Name="OpenNewDeviceButton"
+                                Click="OpenNewDeviceButton_Click"
+                                ToolTip="Add a device">
+                                <MenuItem.Header>
+                                    <ui:FontIcon FontSize="22" Glyph="&#xECC8;" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </Menu>
+                        <StackPanel
+                            x:Name="NewDevicePanel"
+                            Grid.Row="1"
+                            Visibility="Collapsed">
+                            <StackPanel Margin="8">
+                                <TextBlock Text="IP:" />
+                                <TextBox
+                                    x:Name="NewDeviceIpBox"
+                                    Grid.Column="1"
+                                    TextChanged="NewDeviceIpBox_TextChanged" />
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Margin="0,6,0,0"
+                                    Text="Port:" />
+                                <TextBox
+                                    x:Name="NewDevicePortBox"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    TextChanged="NewDeviceIpBox_TextChanged" />
+                                <Button
+                                    x:Name="ConnectNewDeviceButton"
+                                    Margin="0,6,0,0"
+                                    HorizontalAlignment="Center"
+                                    Click="ConnectNewDeviceButton_Click"
+                                    Content="Connect"
+                                    IsEnabled="False" />
+                            </StackPanel>
+                        </StackPanel>
                         <TextBlock
                             x:Name="DevicesBackgroundBlock"
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Style="{StaticResource TextBlockLightStyle}" />
                         <DataGrid
                             x:Name="DevicesGrid"
-                            Grid.Row="1"
+                            Grid.Row="2"
                             AutoGenerateColumns="False"
                             Background="Transparent"
                             CanUserResizeRows="False"

@@ -22,7 +22,6 @@
             {
                 DeviceType.Local => "\uE839",
                 DeviceType.Remote => "\uEE77",
-                DeviceType.New => "\uE948",
                 _ => throw new System.NotImplementedException(),
             };
         }
