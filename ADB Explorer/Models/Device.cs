@@ -11,19 +11,30 @@
 
         public string Name { get; set; }
         public string ID { get; set; }
-        public string Icon { get; set; }
+        public DeviceType Type { get; set; }
+        public string Icon {
+            get
+            {
+                return Type switch
+                {
+                    DeviceType.Local => "\uE839",
+                    DeviceType.Remote => "\uEE77",
+                    DeviceType.Offline => "\uEB5E",
+                    _ => throw new System.NotImplementedException(),
+                };
+            }
+        }
+        public bool IsConnected { get; set; }
 
         public DeviceClass(string name, string id, DeviceType type = DeviceType.Local)
         {
             Name = name;
             ID = id;
-            Icon = type switch
-            {
-                DeviceType.Local => "\uE839",
-                DeviceType.Remote => "\uEE77",
-                DeviceType.Offline => "\uEB5E",
-                _ => throw new System.NotImplementedException(),
-            };
+            Type = type;
+        }
+
+        public DeviceClass()
+        {
         }
     }
 }

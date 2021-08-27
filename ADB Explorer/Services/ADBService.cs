@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static ADB_Explorer.Models.AdbRegEx;
@@ -88,7 +89,7 @@ namespace ADB_Explorer.Services
             cmdProcess.StartInfo.CreateNoWindow = true;
         }
 
-        public static Process StartCommandProcess(string file, string cmd, System.Text.Encoding encoding, params string[] args)
+        public static Process StartCommandProcess(string file, string cmd, Encoding encoding, params string[] args)
         {
             var cmdProcess = new Process();
             InitProcess(cmdProcess);
@@ -100,7 +101,7 @@ namespace ADB_Explorer.Services
             return cmdProcess;
         }
         public static int ExecuteCommand(
-            string file, string cmd, out string stdout, out string stderr, System.Text.Encoding encoding, params string[] args)
+            string file, string cmd, out string stdout, out string stderr, Encoding encoding, params string[] args)
         {
             using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
 
@@ -114,11 +115,16 @@ namespace ADB_Explorer.Services
             return cmdProcess.ExitCode;
         }
 
-        public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args) =>
-            ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, System.Text.Encoding.UTF8, args);
+        public static int ExecuteAdbCommand(string deviceId, string cmd, out string stdout, out string stderr, params string[] args)
+        {
+            return ExecuteCommand(ADB_PATH, $"{(string.IsNullOrEmpty(deviceId) ? "" : $"-s {deviceId} ")}{cmd}", out stdout, out stderr, Encoding.UTF8, args);
+        }
+
+        //public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args) =>
+        //    ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, System.Text.Encoding.UTF8, args);
 
         public static IEnumerable<string> ExecuteCommandAsync(
-            string file, string cmd, CancellationToken cancellationToken, System.Text.Encoding encoding, params string[] args)
+            string file, string cmd, CancellationToken cancellationToken, Encoding encoding, params string[] args)
         {
             using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
 
@@ -144,12 +150,12 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
-            ExecuteCommandAsync(ADB_PATH, cmd, cancellationToken, System.Text.Encoding.UTF8, args);
+        public static IEnumerable<string> ExecuteAdbCommandAsync(string deviceId, string cmd, CancellationToken cancellationToken, params string[] args) =>
+            ExecuteCommandAsync(ADB_PATH, $"{(string.IsNullOrEmpty(deviceId) ? "" : $"-s {deviceId} ")}{cmd}", cancellationToken, Encoding.UTF8, args);
 
-        public static int ExecuteAdbShellCommand(string cmd, out string stdout, out string stderr, params string[] args)
+        public static int ExecuteAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, params string[] args)
         {
-            return ExecuteAdbCommand("shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
+            return ExecuteAdbCommand(deviceId, "shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
         }
 
         public static string EscapeAdbShellString(string str)
@@ -181,13 +187,13 @@ namespace ADB_Explorer.Services
             return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
         }
 
-        public static void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
+        public static void ListDirectory(string deviceId, string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
         {
             // Get real path
-            path = TranslateDevicePath(path);
+            path = TranslateDevicePath(deviceId, path);
 
             // Execute adb ls to get file list
-            var stdout = ExecuteAdbCommandAsync("ls", cancellationToken, EscapeAdbString(path));
+            var stdout = ExecuteAdbCommandAsync(deviceId, "ls", cancellationToken, EscapeAdbString(path));
             foreach (string stdoutLine in stdout)
             {
                 var match = LS_FILE_ENTRY_RE.Match(stdoutLine);
@@ -230,6 +236,7 @@ namespace ADB_Explorer.Services
         }
 
         public static AdbSyncStatsInfo Pull(
+            string deviceId,
             string targetPath,
             string sourcePath,
             ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
@@ -240,8 +247,8 @@ namespace ADB_Explorer.Services
                 ADB_PROGRESS_HELPER_PATH,
                 ADB_PATH,
                 cancellationToken,
-                System.Text.Encoding.Unicode,
-                "pull",
+                Encoding.Unicode,
+                string.IsNullOrEmpty(deviceId) ? "pull" : $"-s {deviceId} pull",
                 "-a",
                 EscapeAdbString(sourcePath),
                 EscapeAdbString(targetPath));
@@ -311,22 +318,22 @@ namespace ADB_Explorer.Services
             };
         }
 
-        public static bool IsDirectory(string path)
+        public static bool IsDirectory(string deviceId, string path)
         {
             string stdout, stderr;
-            int exitCode = ExecuteAdbShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path));
+            int exitCode = ExecuteAdbShellCommand(deviceId, "cd", out stdout, out stderr, EscapeAdbShellString(path));
             return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
         }
 
-        public static string TranslateDeviceParentPath(string path)
+        public static string TranslateDeviceParentPath(string deviceId, string path)
         {
-            return TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
+            return TranslateDevicePath(deviceId, ConcatPaths(path, PARENT_DIR));
         }
 
-        public static string TranslateDevicePath(string path)
+        public static string TranslateDevicePath(string deviceId, string path)
         {
             string stdout, stderr;
-            int exitCode = ExecuteAdbShellCommand("cd", out stdout, out stderr, EscapeAdbShellString(path), "&&", "pwd");
+            int exitCode = ExecuteAdbShellCommand(deviceId, "cd", out stdout, out stderr, EscapeAdbShellString(path), "&&", "pwd");
             if (exitCode != 0)
             {
                 throw new Exception(stderr);
@@ -336,7 +343,7 @@ namespace ADB_Explorer.Services
 
         public static List<DeviceClass> GetDevices()
         {
-            ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
+            ExecuteAdbCommand("", GET_DEVICES, out string stdout, out string stderr, "-l");
 
             return DEVICE_NAME_RE.Matches(stdout).Select(
                 m => new DeviceClass(
@@ -346,11 +353,11 @@ namespace ADB_Explorer.Services
                 ).ToList();
         }
 
-        private static string GetProps()
-        {
-            ExecuteAdbShellCommand(GET_PROP, out string stdout, out string stderr);
-            return stdout;
-        }
+        //private static string GetProps()
+        //{
+        //    ExecuteAdbShellCommand(GET_PROP, out string stdout, out string stderr);
+        //    return stdout;
+        //}
 
         private static string GetPropsValue(string props, string key)
         {
@@ -365,7 +372,7 @@ namespace ADB_Explorer.Services
         private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
         {
             string stderr;
-            int exitCode = ExecuteAdbCommand(cmd, out _, out stderr, $"{host}:{port}");
+            int exitCode = ExecuteAdbCommand("", cmd, out _, out stderr, $"{host}:{port}");
             if (exitCode != 0)
             {
                 throw new Exception(stderr);

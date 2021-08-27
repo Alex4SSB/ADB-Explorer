@@ -110,7 +110,6 @@ namespace ADB_Explorer
 
             DevicesBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
             DevicesGrid.RowStyle = FindResource($"DeviceRow{theme}Style") as Style;
-            DevicesGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
         }
@@ -187,8 +186,10 @@ namespace ADB_Explorer
                 DarkThemeRadioButton.IsChecked = true;
 
             Title = Properties.Resources.AppDisplayName;
-            // Get device name
+
             Devices = ADBService.GetDevices();
+            DevicesGrid.ItemsSource = Devices;
+
             if (Devices.Count == 0)
             {
                 Title = $"{Title} - NO CONNECTED DEVICES";
@@ -196,18 +197,16 @@ namespace ADB_Explorer
                 ConnectTimer.Start();
                 return;
             }
-            else
+            else if (Devices.Count == 1)
             {
-                DevicesGrid.ItemsSource = Devices;
-
-                if (Devices.Count > 1)
-                {
-                    ExplorerGrid.ItemsSource = null;
-                    return;
-                }
-
-                Title = $"{Title} - {Devices[0].Name}";
+                Devices[0].IsConnected = true;
+                InitDevice();
             }
+        }
+
+        private void InitDevice()
+        {
+            Title = $"{Properties.Resources.AppDisplayName} - {(string.IsNullOrEmpty(CurrentDevice.ID) ? Devices[0].Name : CurrentDevice.Name)}";
 
             unknownFoldersTask = Task.Run(() => { });
             dirListCancelTokenSource = new CancellationTokenSource();
@@ -267,7 +266,7 @@ namespace ADB_Explorer
             dirListCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
 
-            listDirTask = Task.Run(() => ADBService.ListDirectory(path, ref waitingFileStats, dirListCancelTokenSource.Token));
+            listDirTask = Task.Run(() => ADBService.ListDirectory(CurrentDevice.ID, path, ref waitingFileStats, dirListCancelTokenSource.Token));
 
             if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
             {
@@ -335,7 +334,7 @@ namespace ADB_Explorer
                 {
                     break;
                 }
-                else if (ADBService.IsDirectory(file.Path))
+                else if (ADBService.IsDirectory(CurrentDevice.ID, file.Path))
                 {
                     Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileStat.FileType.Folder; });
                 }
@@ -356,7 +355,7 @@ namespace ADB_Explorer
             string realPath;
             try
             {
-                realPath = ADBService.TranslateDevicePath(path);
+                realPath = ADBService.TranslateDevicePath(CurrentDevice.ID, path);
             }
             catch (Exception e)
             {
@@ -371,7 +370,7 @@ namespace ADB_Explorer
             PathBox.Tag =
             CurrentPath = realPath;
             PopulateButtons(realPath);
-            ParentPath = ADBService.TranslateDeviceParentPath(CurrentPath);
+            ParentPath = ADBService.TranslateDeviceParentPath(CurrentDevice.ID, CurrentPath);
 
             ParentButton.IsEnabled = CurrentPath != ParentPath;
 
@@ -589,7 +588,7 @@ namespace ADB_Explorer
 
             waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
             syncOperationCancelTokenSource = new CancellationTokenSource();
-            syncOprationTask = Task.Run(() => ADBService.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
+            syncOprationTask = Task.Run(() => ADBService.Pull(CurrentDevice.ID, item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
 
             syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
             syncOprationProgressUpdateTimer.Start();
@@ -720,6 +719,21 @@ namespace ADB_Explorer
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
+        }
+
+        private void DeviceRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is DataGridRow row && row.Item is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
+            {
+                Devices.ForEach(d => d.IsConnected = false);
+                device.IsConnected = true;
+                CurrentDevice = device;
+
+                AndroidFileList.Clear();
+                ExplorerGrid.Items.Refresh();
+                DevicesGrid.Items.Refresh();
+                InitDevice();
+            }
         }
     }
 }

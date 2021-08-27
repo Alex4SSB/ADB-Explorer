@@ -61,6 +61,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
@@ -144,7 +145,13 @@
             TargetType="DataGridRow">
             <Setter Property="Background" Value="#FF202020" />
         </Style>
-        <Style x:Key="DeviceRowLightStyle" TargetType="DataGridRow">
+        <Style x:Key="DeviceRowStyle" TargetType="DataGridRow">
+            <EventSetter Event="MouseDoubleClick" Handler="DeviceRow_MouseDoubleClick" />
+        </Style>
+        <Style
+            x:Key="DeviceRowLightStyle"
+            BasedOn="{StaticResource DeviceRowStyle}"
+            TargetType="DataGridRow">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#FFE5F3FF" />
@@ -167,10 +174,16 @@
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="#FFCCE8FF" />
                 </MultiDataTrigger>
+                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                    <Setter Property="Background" Value="#FF7CB61A" />
+                </DataTrigger>
             </Style.Triggers>
             <Setter Property="Background" Value="White" />
         </Style>
-        <Style x:Key="DeviceRowDarkStyle" TargetType="DataGridRow">
+        <Style
+            x:Key="DeviceRowDarkStyle"
+            BasedOn="{StaticResource DeviceRowStyle}"
+            TargetType="DataGridRow">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#FF4D4D4D" />
@@ -193,6 +206,9 @@
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="#FF777777" />
                 </MultiDataTrigger>
+                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                    <Setter Property="Background" Value="#FF7CB61A" />
+                </DataTrigger>
             </Style.Triggers>
             <Setter Property="Background" Value="#FF202020" />
         </Style>
@@ -661,7 +677,7 @@
                             AutoGenerateColumns="False"
                             Background="Transparent"
                             CanUserResizeRows="False"
-                            CellStyle="{StaticResource CellLightStyle}"
+                            CellStyle="{StaticResource CellVerticalStyle}"
                             GridLinesVisibility="None"
                             HeadersVisibility="None"
                             HorizontalScrollBarVisibility="Hidden"
