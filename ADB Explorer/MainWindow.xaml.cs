@@ -534,7 +534,9 @@ namespace ADB_Explorer
 
         private void CopyFiles(bool quick = false)
         {
+            int itemsCount = ExplorerGrid.SelectedItems.Count;
             string path;
+
             if (quick)
             {
                 path = DefaultFolderBlock.Text;
@@ -545,7 +547,8 @@ namespace ADB_Explorer
                 {
                     IsFolderPicker = true,
                     Multiselect = false,
-                    DefaultDirectory = DefaultFolderBlock.Text
+                    DefaultDirectory = DefaultFolderBlock.Text,
+                    Title = "Select destination for " + (itemsCount > 1 ? "multiple items" : ExplorerGrid.SelectedItem)
                 };
 
                 if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -554,7 +557,7 @@ namespace ADB_Explorer
                 path = dialog.FileName;
             }
 
-            int totalCount = (int)ProgressCountTextBlock.Tag + ExplorerGrid.SelectedItems.Count;
+            int totalCount = (int)ProgressCountTextBlock.Tag + itemsCount;
             ProgressCountTextBlock.Tag = totalCount;
          
             foreach (FileClass item in ExplorerGrid.SelectedItems)
