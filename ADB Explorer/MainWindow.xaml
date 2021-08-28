@@ -648,6 +648,8 @@
                                 <TextBox
                                     x:Name="NewDeviceIpBox"
                                     Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    GotFocus="NewDeviceIpBox_GotFocus"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <TextBlock
                                     Grid.Row="1"
@@ -657,6 +659,8 @@
                                     x:Name="NewDevicePortBox"
                                     Grid.Row="1"
                                     Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    GotFocus="NewDevicePortBox_GotFocus"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <Button
                                     x:Name="ConnectNewDeviceButton"
@@ -722,6 +726,13 @@
             FocusVisualStyle="{x:Null}"
             OpenPaneLength="350"
             PanePlacement="Right">
+            <ui:SplitView.Resources>
+                <Style TargetType="Separator">
+                    <Setter Property="Width" Value="300" />
+                    <Setter Property="Margin" Value="0,0,0,6" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                </Style>
+            </ui:SplitView.Resources>
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
                     <Grid Margin="24,8">
@@ -743,10 +754,7 @@
                                         Checked="DarkThemeRadioButton_Checked"
                                         Content="Dark" />
                                 </StackPanel>
-                                <Separator
-                                    Width="300"
-                                    Margin="0,0,0,6"
-                                    HorizontalAlignment="Center" />
+                                <Separator />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="120" />
@@ -764,16 +772,21 @@
                                     Margin="0,6,0,15"
                                     FontFamily="Consolas"
                                     Text="[not set]" />
-                                <Separator
-                                    Width="300"
-                                    Margin="0,0,0,6"
-                                    HorizontalAlignment="Center" />
+                                <Separator />
                                 <TextBlock Text="File Double-Click Behavior" />
                                 <StackPanel Margin="0,6,0,15">
                                     <CheckBox
                                         x:Name="CopyOnDoubleClickCheckBox"
                                         Checked="CopyOnDoubleClickCheckBox_Checked"
                                         Content="Copy To Default Folder" />
+                                </StackPanel>
+                                <Separator />
+                                <TextBlock Text="Connection" />
+                                <StackPanel Margin="0,6,0,15">
+                                    <CheckBox
+                                        x:Name="RememberIpCheckBox"
+                                        Click="RememberIpCheckBox_Click"
+                                        Content="Remember Last IP" />
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>

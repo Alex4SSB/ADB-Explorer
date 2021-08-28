@@ -4,6 +4,8 @@
     {
         theme,
         defaultFolder,
-        copyOnDoubleClick
+        copyOnDoubleClick,
+        rememberIp,
+        lastIp
     }
 }

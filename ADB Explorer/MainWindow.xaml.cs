@@ -153,7 +153,6 @@ namespace ADB_Explorer
                     case FileStat.FileType.File:
                         if (CopyOnDoubleClickCheckBox.IsChecked == true)
                             CopyFiles(true);
-
                         break;
                     case FileStat.FileType.Folder:
                         NavigateToPath(file.Path);
@@ -186,7 +185,12 @@ namespace ADB_Explorer
                 DarkThemeRadioButton.IsChecked = true;
 
             Title = Properties.Resources.AppDisplayName;
+            LoadSettings();
+            DeviceListSetup();
+        }
 
+        private void DeviceListSetup(string selectedAddress = "")
+        {
             Devices = ADBService.GetDevices();
             DevicesGrid.ItemsSource = Devices;
 
@@ -197,16 +201,41 @@ namespace ADB_Explorer
                 ConnectTimer.Start();
                 return;
             }
-            else if (Devices.Count == 1)
+            else
             {
-                Devices[0].IsConnected = true;
+                if (Devices.Count == 1)
+                    CurrentDevice = Devices[0];
+                else
+                {
+                    var dev = Devices.Where(d => d.ID == selectedAddress);
+                    if (dev.Any())
+                        CurrentDevice = dev.First();
+                }
+
+                if (string.IsNullOrEmpty(CurrentDevice.ID))
+                    return;
+
+                Devices.ForEach(d => d.IsConnected = false);
+                CurrentDevice.IsConnected = true;
                 InitDevice();
             }
         }
 
+        private void LoadSettings()
+        {
+            if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
+                DefaultFolderBlock.Text = path;
+
+            if (Storage.RetrieveBool(Settings.copyOnDoubleClick) is bool copy)
+                CopyOnDoubleClickCheckBox.IsChecked = copy;
+
+            if (Storage.RetrieveBool(Settings.rememberIp) is bool remember)
+                RememberIpCheckBox.IsChecked = remember;
+        }
+
         private void InitDevice()
         {
-            Title = $"{Properties.Resources.AppDisplayName} - {(string.IsNullOrEmpty(CurrentDevice.ID) ? Devices[0].Name : CurrentDevice.Name)}";
+            Title = $"{Properties.Resources.AppDisplayName} - {CurrentDevice.Name}";
 
             unknownFoldersTask = Task.Run(() => { });
             dirListCancelTokenSource = new CancellationTokenSource();
@@ -237,12 +266,6 @@ namespace ADB_Explorer
             }
             else
                 NavigateToPath(CurrentPath);
-
-            if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
-                DefaultFolderBlock.Text = path;
-
-            if (Storage.RetrieveBool(Settings.copyOnDoubleClick) is bool copy)
-                CopyOnDoubleClickCheckBox.IsChecked = copy;
 
             ProgressCountTextBlock.Tag = 0;
         }
@@ -696,11 +719,16 @@ namespace ADB_Explorer
         {
             ADBService.ConnectNetworkDevice(NewDeviceIpBox.Text, NewDevicePortBox.Text);
 
+            if (RememberIpCheckBox.IsChecked == true)
+            {
+                Storage.StoreValue(Settings.lastIp, NewDeviceIpBox.Text);
+            }
+
             NewDeviceIpBox.Text = "";
             NewDevicePortBox.Text = "";
             NewDevicePanel.Visibility = Visibility.Collapsed;
 
-            LaunchSequence();
+            DeviceListSetup($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}");
         }
 
         private void EnableConnectButton()
@@ -722,6 +750,13 @@ namespace ADB_Explorer
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
+            if (RememberIpCheckBox.IsChecked == true
+                && string.IsNullOrEmpty(NewDeviceIpBox.Text)
+                && Storage.RetrieveValue(Settings.lastIp) is string lastIp
+                && !Devices.Any(d => d.ID.Split(':')[0] == lastIp))
+            {
+                NewDeviceIpBox.Text = lastIp;
+            }
         }
 
         private void DeviceRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -737,6 +772,21 @@ namespace ADB_Explorer
                 DevicesGrid.Items.Refresh();
                 InitDevice();
             }
+        }
+
+        private void RememberIpCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.rememberIp, RememberIpCheckBox.IsChecked);
+        }
+
+        private void NewDevicePortBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            NewDevicePortBox.SelectAll();
+        }
+
+        private void NewDeviceIpBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            NewDeviceIpBox.SelectAll();
         }
     }
 }
