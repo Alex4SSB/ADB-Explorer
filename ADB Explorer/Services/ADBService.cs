@@ -369,13 +369,21 @@ namespace ADB_Explorer.Services
         public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", host, port);
         public static void DisconnectNetworkDevice(string host, string port) => NetworkDeviceOperation("disconnect", host, UInt16.Parse(port));
         public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", host, port);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cmd">connect / disconnect</param>
+        /// <param name="host">IP address of remote device</param>
+        /// <param name="port">ADB port of remote device</param>
+        /// <exception cref="ConnectionRefusedException"></exception>
+        /// <exception cref="ConnectionTimeoutException"></exception>
         private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
         {
-            string stderr;
-            int exitCode = ExecuteAdbCommand("", cmd, out _, out stderr, $"{host}:{port}");
-            if (exitCode != 0)
+            ExecuteAdbCommand("", cmd, out string stdout, out _, $"{host}:{port}");
+            if (stdout.Contains("cannot connect"))
             {
-                throw new Exception(stderr);
+                throw new Exception(stdout);
             }
         }
     }

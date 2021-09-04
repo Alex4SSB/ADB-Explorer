@@ -196,7 +196,7 @@ namespace ADB_Explorer
 
             if (Devices.Count == 0)
             {
-                Title = $"{Title} - NO CONNECTED DEVICES";
+                Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 AndroidFileList?.Clear();
                 ConnectTimer.Start();
                 return;
@@ -717,7 +717,15 @@ namespace ADB_Explorer
 
         private void ConnectNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            ADBService.ConnectNetworkDevice(NewDeviceIpBox.Text, NewDevicePortBox.Text);
+            try
+            {
+                ADBService.ConnectNetworkDevice(NewDeviceIpBox.Text, NewDevicePortBox.Text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
 
             if (RememberIpCheckBox.IsChecked == true)
             {
