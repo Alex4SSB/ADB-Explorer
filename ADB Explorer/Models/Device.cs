@@ -24,7 +24,7 @@
                 };
             }
         }
-        public bool IsConnected { get; set; }
+        public bool IsOpen { get; set; }
 
         public DeviceClass(string name, string id, DeviceType type = DeviceType.Local)
         {

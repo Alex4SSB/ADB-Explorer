@@ -108,8 +108,8 @@ namespace ADB_Explorer
             ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
             ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
-            DevicesBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
-            DevicesGrid.RowStyle = FindResource($"DeviceRow{theme}Style") as Style;
+            //DevicesBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
+            //DevicesGrid.RowStyle = FindResource($"DeviceRow{theme}Style") as Style;
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
         }
@@ -192,7 +192,8 @@ namespace ADB_Explorer
         private void DeviceListSetup(string selectedAddress = "")
         {
             Devices = ADBService.GetDevices();
-            DevicesGrid.ItemsSource = Devices;
+            DevicesList.ItemsSource = Devices;
+            //DevicesGrid.ItemsSource = Devices;
 
             if (Devices.Count == 0)
             {
@@ -212,11 +213,11 @@ namespace ADB_Explorer
                         CurrentDevice = dev.First();
                 }
 
-                if (string.IsNullOrEmpty(CurrentDevice.ID))
+                if (CurrentDevice is null || string.IsNullOrEmpty(CurrentDevice.ID))
                     return;
 
-                Devices.ForEach(d => d.IsConnected = false);
-                CurrentDevice.IsConnected = true;
+                Devices.ForEach(d => d.IsOpen = false);
+                CurrentDevice.IsOpen = true;
                 InitDevice();
             }
         }
@@ -769,17 +770,17 @@ namespace ADB_Explorer
 
         private void DeviceRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is DataGridRow row && row.Item is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
-            {
-                Devices.ForEach(d => d.IsConnected = false);
-                device.IsConnected = true;
-                CurrentDevice = device;
+            //if (sender is DataGridRow row && row.Item is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
+            //{
+            //    Devices.ForEach(d => d.IsOpen = false);
+            //    device.IsOpen = true;
+            //    CurrentDevice = device;
 
-                AndroidFileList.Clear();
-                ExplorerGrid.Items.Refresh();
-                DevicesGrid.Items.Refresh();
-                InitDevice();
-            }
+            //    AndroidFileList.Clear();
+            //    ExplorerGrid.Items.Refresh();
+            //    DevicesGrid.Items.Refresh();
+            //    InitDevice();
+            //}
         }
 
         private void RememberIpCheckBox_Click(object sender, RoutedEventArgs e)
@@ -795,6 +796,46 @@ namespace ADB_Explorer
         private void NewDeviceIpBox_GotFocus(object sender, RoutedEventArgs e)
         {
             NewDeviceIpBox.SelectAll();
+        }
+
+        private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
+            {
+                Devices.ForEach(d => d.IsOpen = false);
+                device.IsOpen = true;
+                CurrentDevice = device;
+
+                AndroidFileList.Clear();
+                ExplorerGrid.Items.Refresh();
+                DevicesList.Items.Refresh();
+                InitDevice();
+            }
+        }
+
+        private void DisconnectDeviceButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && button.DataContext is DeviceClass device)
+            {
+                try
+                {
+                    ADBService.NetworkDeviceOperation("disconnect", device.ID);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
+
+                if (device.IsOpen)
+                {
+                    CurrentDevice = null;
+                    AndroidFileList.Clear();
+                    ExplorerGrid.Items.Refresh();
+                }
+                DeviceListSetup();
+                DevicesList.Items.Refresh();
+            }
         }
     }
 }

@@ -212,6 +212,105 @@
             </Style.Triggers>
             <Setter Property="Background" Value="#FF202020" />
         </Style>
+        <DataTemplate x:Key="DeviceListTemplate">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <ui:FontIcon
+                        Margin="2,4"
+                        FontSize="28"
+                        Glyph="{Binding Icon}" />
+                    <TextBlock
+                        Margin="4"
+                        VerticalAlignment="Center"
+                        Text="{Binding Name}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+                <ui:FontIcon
+                    HorizontalAlignment="Right"
+                    Foreground="Gray"
+                    Glyph="&#xE838;">
+                    <ui:FontIcon.Style>
+                        <Style TargetType="ui:FontIcon">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOpen}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
+                <StackPanel Grid.Row="1">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ui:ListViewItem, Mode=FindAncestor}, Path=IsSelected}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Separator />
+                    <Grid Margin="-6,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid HorizontalAlignment="Center">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="2">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Button
+                                x:Name="OpenDeviceButton"
+                                Click="OpenDeviceButton_Click"
+                                Content="&#xED25;"
+                                FontFamily="Segoe MDL2 Assets"
+                                FontSize="20"
+                                ToolTip="Open For Browsing" />
+                        </Grid>
+                        <Grid Grid.Column="1" HorizontalAlignment="Center">
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Type}" Value="0">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Button
+                                x:Name="DisconnectDeviceButton"
+                                Click="DisconnectDeviceButton_Click"
+                                Content="&#xECC9;"
+                                FontFamily="Segoe MDL2 Assets"
+                                FontSize="20"
+                                ToolTip="Disconnect" />
+                        </Grid>
+                    </Grid>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid>
@@ -671,11 +770,22 @@
                                     IsEnabled="False" />
                             </StackPanel>
                         </StackPanel>
-                        <TextBlock
+                        <!--<TextBlock
                             x:Name="DevicesBackgroundBlock"
                             Grid.Row="2"
-                            Style="{StaticResource TextBlockLightStyle}" />
-                        <DataGrid
+                            Style="{StaticResource TextBlockLightStyle}" />-->
+                        <ui:ListView
+                            x:Name="DevicesList"
+                            Grid.Row="2"
+                            ItemTemplate="{StaticResource DeviceListTemplate}"
+                            ItemsSource="{Binding}">
+                            <ui:ListView.ItemContainerStyle>
+                                <Style TargetType="ui:ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                </Style>
+                            </ui:ListView.ItemContainerStyle>
+                        </ui:ListView>
+                        <!--<DataGrid
                             x:Name="DevicesGrid"
                             Grid.Row="2"
                             AutoGenerateColumns="False"
@@ -691,7 +801,8 @@
                             MinRowHeight="24"
                             RowStyle="{StaticResource DeviceRowLightStyle}"
                             SelectionMode="Single"
-                            SelectionUnit="FullRow">
+                            SelectionUnit="FullRow"
+                            Visibility="Collapsed">
                             <DataGrid.Resources>
                                 <Style TargetType="ScrollBar">
                                     <Style.Triggers>
@@ -716,7 +827,7 @@
                                 </DataGridTemplateColumn>
                                 <DataGridTextColumn x:Name="DeviceName" Binding="{Binding Name}" />
                             </DataGrid.Columns>
-                        </DataGrid>
+                        </DataGrid>-->
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

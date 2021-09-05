@@ -381,7 +381,16 @@ namespace ADB_Explorer.Services
         private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
         {
             ExecuteAdbCommand("", cmd, out string stdout, out _, $"{host}:{port}");
-            if (stdout.Contains("cannot connect"))
+            if (stdout.Contains("cannot connect") || stdout.Contains("error"))
+            {
+                throw new Exception(stdout);
+            }
+        }
+
+        public static void NetworkDeviceOperation(string cmd, string fullAddress)
+        {
+            ExecuteAdbCommand("", cmd, out string stdout, out _, fullAddress);
+            if (stdout.Contains("cannot connect") || stdout.Contains("error"))
             {
                 throw new Exception(stdout);
             }
