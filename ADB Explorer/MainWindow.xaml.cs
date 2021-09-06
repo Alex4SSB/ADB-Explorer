@@ -255,6 +255,7 @@ namespace ADB_Explorer
             syncOprationProgressUpdateTimer.Tick += SyncOprationProgressUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
+            PathBox.IsEnabled = true;
 
             if (string.IsNullOrEmpty(CurrentPath))
             {
@@ -718,9 +719,15 @@ namespace ADB_Explorer
 
         private void ConnectNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
+            ConnectNewDevice();
+        }
+
+        private void ConnectNewDevice()
+        {
+            string deviceAddress = $"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}";
             try
             {
-                ADBService.ConnectNetworkDevice(NewDeviceIpBox.Text, NewDevicePortBox.Text);
+                ADBService.ConnectNetworkDevice(deviceAddress);
             }
             catch (Exception ex)
             {
@@ -737,7 +744,8 @@ namespace ADB_Explorer
             NewDevicePortBox.Text = "";
             NewDevicePanel.Visibility = Visibility.Collapsed;
 
-            DeviceListSetup($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}");
+            ClearExplorer();
+            DeviceListSetup(deviceAddress);
         }
 
         private void EnableConnectButton()
@@ -759,28 +767,19 @@ namespace ADB_Explorer
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
+        }
+
+        private void RetrieveIp()
+        {
+            NewDevicePortBox.Clear();
+
             if (RememberIpCheckBox.IsChecked == true
-                && string.IsNullOrEmpty(NewDeviceIpBox.Text)
-                && Storage.RetrieveValue(Settings.lastIp) is string lastIp
-                && !Devices.Any(d => d.ID.Split(':')[0] == lastIp))
+                            && string.IsNullOrEmpty(NewDeviceIpBox.Text)
+                            && Storage.RetrieveValue(Settings.lastIp) is string lastIp
+                            && !Devices.Any(d => d.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
             }
-        }
-
-        private void DeviceRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //if (sender is DataGridRow row && row.Item is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
-            //{
-            //    Devices.ForEach(d => d.IsOpen = false);
-            //    device.IsOpen = true;
-            //    CurrentDevice = device;
-
-            //    AndroidFileList.Clear();
-            //    ExplorerGrid.Items.Refresh();
-            //    DevicesGrid.Items.Refresh();
-            //    InitDevice();
-            //}
         }
 
         private void RememberIpCheckBox_Click(object sender, RoutedEventArgs e)
@@ -806,8 +805,7 @@ namespace ADB_Explorer
                 device.IsOpen = true;
                 CurrentDevice = device;
 
-                AndroidFileList.Clear();
-                ExplorerGrid.Items.Refresh();
+                ClearExplorer();
                 DevicesList.Items.Refresh();
                 InitDevice();
             }
@@ -819,23 +817,56 @@ namespace ADB_Explorer
             {
                 try
                 {
-                    ADBService.NetworkDeviceOperation("disconnect", device.ID);
+                    ADBService.DisconnectNetworkDevice(device.ID);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show(ex.Message, "Disconnection Error", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
 
                 if (device.IsOpen)
                 {
                     CurrentDevice = null;
-                    AndroidFileList.Clear();
-                    ExplorerGrid.Items.Refresh();
+                    ClearExplorer();
                 }
                 DeviceListSetup();
                 DevicesList.Items.Refresh();
             }
+        }
+
+        private void ClearExplorer()
+        {
+            AndroidFileList.Clear();
+            ExplorerGrid.Items.Refresh();
+            PathStackPanel.Children.Clear();
+            CurrentPath = null;
+            PathBox.Tag = null;
+            NavHistory.PathHistory.Clear();
+            PathBox.IsEnabled =
+            NewMenuButton.IsEnabled =
+            CopyMenuButton.IsEnabled =
+            BackButton.IsEnabled =
+            ForwardButton.IsEnabled =
+            ParentButton.IsEnabled = false;
+        }
+
+        private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
+        {
+            NewDevicePanel.Visibility = Visibility.Collapsed;
+            DevicesList.SelectedItem = null;
+        }
+
+        private void NewDevicePanel_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (NewDevicePanel.IsVisible)
+                RetrieveIp();
+        }
+
+        private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter && ConnectNewDeviceButton.IsEnabled)
+                ConnectNewDevice();
         }
     }
 }

@@ -365,10 +365,15 @@ namespace ADB_Explorer.Services
             return value.Any() ? value.First().Split('[', ']')[3] : "";
         }
 
-        public static void ConnectNetworkDevice(string host, string port) => NetworkDeviceOperation("connect", host, UInt16.Parse(port));
-        public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", host, port);
-        public static void DisconnectNetworkDevice(string host, string port) => NetworkDeviceOperation("disconnect", host, UInt16.Parse(port));
-        public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", host, port);
+        //public static void ConnectNetworkDevice(string host, string port) => NetworkDeviceOperation("connect", host, UInt16.Parse(port));
+        //public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", host, port);
+        //public static void DisconnectNetworkDevice(string host, string port) => NetworkDeviceOperation("disconnect", host, UInt16.Parse(port));
+        //public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", host, port);
+
+        public static void ConnectNetworkDevice(string host, string port) => NetworkDeviceOperation("connect", $"{host}:{port}");
+        public static void ConnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("connect", fullAddress);
+        public static void DisonnectNetworkDevice(string host, string port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");
+        public static void DisconnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("disconnect", fullAddress);
 
         /// <summary>
         /// 
@@ -378,16 +383,24 @@ namespace ADB_Explorer.Services
         /// <param name="port">ADB port of remote device</param>
         /// <exception cref="ConnectionRefusedException"></exception>
         /// <exception cref="ConnectionTimeoutException"></exception>
-        private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
-        {
-            ExecuteAdbCommand("", cmd, out string stdout, out _, $"{host}:{port}");
-            if (stdout.Contains("cannot connect") || stdout.Contains("error"))
-            {
-                throw new Exception(stdout);
-            }
-        }
+        //private static void NetworkDeviceOperation(string cmd, string host, UInt16 port)
+        //{
+        //    ExecuteAdbCommand("", cmd, out string stdout, out _, $"{host}:{port}");
+        //    if (stdout.Contains("cannot connect") || stdout.Contains("error"))
+        //    {
+        //        throw new Exception(stdout);
+        //    }
+        //}
 
-        public static void NetworkDeviceOperation(string cmd, string fullAddress)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cmd">connect / disconnect</param>
+        /// <param name="host">IP address of remote device</param>
+        /// <param name="port">ADB port of remote device</param>
+        /// <exception cref="ConnectionRefusedException"></exception>
+        /// <exception cref="ConnectionTimeoutException"></exception>
+        private static void NetworkDeviceOperation(string cmd, string fullAddress)
         {
             ExecuteAdbCommand("", cmd, out string stdout, out _, fullAddress);
             if (stdout.Contains("cannot connect") || stdout.Contains("error"))

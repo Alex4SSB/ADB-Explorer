@@ -145,73 +145,6 @@
             TargetType="DataGridRow">
             <Setter Property="Background" Value="#FF202020" />
         </Style>
-        <Style x:Key="DeviceRowStyle" TargetType="DataGridRow">
-            <EventSetter Event="MouseDoubleClick" Handler="DeviceRow_MouseDoubleClick" />
-        </Style>
-        <Style
-            x:Key="DeviceRowLightStyle"
-            BasedOn="{StaticResource DeviceRowStyle}"
-            TargetType="DataGridRow">
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFE5F3FF" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#FFCCE8FF" />
-                </Trigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FFD9D9D9" />
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FFCCE8FF" />
-                </MultiDataTrigger>
-                <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                    <Setter Property="Background" Value="#FF7CB61A" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter Property="Background" Value="White" />
-        </Style>
-        <Style
-            x:Key="DeviceRowDarkStyle"
-            BasedOn="{StaticResource DeviceRowStyle}"
-            TargetType="DataGridRow">
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF4D4D4D" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#FF777777" />
-                </Trigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FF333333" />
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FF777777" />
-                </MultiDataTrigger>
-                <DataTrigger Binding="{Binding IsConnected}" Value="True">
-                    <Setter Property="Background" Value="#FF7CB61A" />
-                </DataTrigger>
-            </Style.Triggers>
-            <Setter Property="Background" Value="#FF202020" />
-        </Style>
         <DataTemplate x:Key="DeviceListTemplate">
             <Grid>
                 <Grid.RowDefinitions>
@@ -475,6 +408,7 @@
                         Padding="36,0,0,0"
                         VerticalContentAlignment="Center"
                         GotFocus="PathBox_GotFocus"
+                        IsEnabled="False"
                         IsReadOnly="True"
                         KeyDown="PathBox_KeyDown"
                         LostFocus="PathBox_LostFocus" />
@@ -714,6 +648,7 @@
             FocusVisualStyle="{x:Null}"
             IsPaneOpen="True"
             OpenPaneLength="200"
+            PaneClosing="DevicesSplitView_PaneClosing"
             PanePlacement="Left">
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="0,1,1,0">
@@ -741,6 +676,7 @@
                         <StackPanel
                             x:Name="NewDevicePanel"
                             Grid.Row="1"
+                            IsVisibleChanged="NewDevicePanel_IsVisibleChanged"
                             Visibility="Collapsed">
                             <StackPanel Margin="8">
                                 <TextBlock Text="IP:" />
@@ -749,6 +685,7 @@
                                     Grid.Column="1"
                                     FontFamily="Consolas"
                                     GotFocus="NewDeviceIpBox_GotFocus"
+                                    KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <TextBlock
                                     Grid.Row="1"
@@ -760,6 +697,7 @@
                                     Grid.Column="1"
                                     FontFamily="Consolas"
                                     GotFocus="NewDevicePortBox_GotFocus"
+                                    KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <Button
                                     x:Name="ConnectNewDeviceButton"
@@ -770,10 +708,6 @@
                                     IsEnabled="False" />
                             </StackPanel>
                         </StackPanel>
-                        <!--<TextBlock
-                            x:Name="DevicesBackgroundBlock"
-                            Grid.Row="2"
-                            Style="{StaticResource TextBlockLightStyle}" />-->
                         <ui:ListView
                             x:Name="DevicesList"
                             Grid.Row="2"
@@ -785,49 +719,6 @@
                                 </Style>
                             </ui:ListView.ItemContainerStyle>
                         </ui:ListView>
-                        <!--<DataGrid
-                            x:Name="DevicesGrid"
-                            Grid.Row="2"
-                            AutoGenerateColumns="False"
-                            Background="Transparent"
-                            CanUserResizeRows="False"
-                            CellStyle="{StaticResource CellVerticalStyle}"
-                            GridLinesVisibility="None"
-                            HeadersVisibility="None"
-                            HorizontalScrollBarVisibility="Hidden"
-                            IsReadOnly="True"
-                            ItemsSource="{Binding}"
-                            KeyboardNavigation.TabNavigation="Once"
-                            MinRowHeight="24"
-                            RowStyle="{StaticResource DeviceRowLightStyle}"
-                            SelectionMode="Single"
-                            SelectionUnit="FullRow"
-                            Visibility="Collapsed">
-                            <DataGrid.Resources>
-                                <Style TargetType="ScrollBar">
-                                    <Style.Triggers>
-                                        <Trigger Property="IsEnabled" Value="False">
-                                            <Setter Property="Width" Value="0" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                    <Setter Property="MinWidth" Value="0" />
-                                </Style>
-                            </DataGrid.Resources>
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn x:Name="DeviceIcon" CanUserResize="False">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock
-                                                Margin="2,4"
-                                                FontFamily="Segoe MDL2 Assets"
-                                                FontSize="28"
-                                                Text="{Binding Icon}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn x:Name="DeviceName" Binding="{Binding Name}" />
-                            </DataGrid.Columns>
-                        </DataGrid>-->
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>
@@ -876,7 +767,9 @@
                                         x:Name="ChangeDefaultFolderButton"
                                         Grid.Column="1"
                                         Click="ChangeDefaultFolderButton_Click"
-                                        Content="Change" />
+                                        Content="&#xE70F;"
+                                        FontFamily="Segoe MDL2 Assets"
+                                        ToolTip="Change" />
                                 </Grid>
                                 <TextBlock
                                     x:Name="DefaultFolderBlock"
@@ -905,6 +798,5 @@
                 </Border>
             </ui:SplitView.Pane>
         </ui:SplitView>
-
     </Grid>
 </Window>
