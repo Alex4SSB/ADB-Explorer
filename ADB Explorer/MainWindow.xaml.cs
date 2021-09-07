@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Threading;
+using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer
@@ -25,24 +25,7 @@ namespace ADB_Explorer
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly SolidColorBrush DarkBG = new(Color.FromRgb(32, 32, 32));
-        private readonly SolidColorBrush LightBG = new(Color.FromRgb(243, 243, 243));
-
-        private static readonly string DEFAULT_PATH = "/sdcard";
-        private static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
-        {
-            { "/sdcard", "Internal Storage" },
-            { "/storage/emulated/0", "Internal Storage" },
-            { "/storage/self/primary", "Internal Storage" },
-            { "/", "Root" }
-        };
-        private static readonly Key[] KEYS_TO_NAVIGATE = { Key.Enter, Key.Return };
-
         private readonly DispatcherTimer ConnectTimer = new();
-        private static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
-        private static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
-        private static readonly TimeSpan SYNC_PROG_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(100);
-
         private Task listDirTask;
         private Task unknownFoldersTask;
         private Task<ADBService.AdbSyncStatsInfo> syncOprationTask;
@@ -108,9 +91,6 @@ namespace ADB_Explorer
             ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
             ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
 
-            //DevicesBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
-            //DevicesGrid.RowStyle = FindResource($"DeviceRow{theme}Style") as Style;
-
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
         }
 
@@ -126,7 +106,7 @@ namespace ADB_Explorer
 
         private void PathBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (KEYS_TO_NAVIGATE.Contains(e.Key) && NavigateToPath(PathBox.Text))
+            if (e.Key == Key.Enter && NavigateToPath(PathBox.Text))
             {
                 ExplorerGrid.Focus();
             }
@@ -168,7 +148,10 @@ namespace ADB_Explorer
         {
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
-            CopyMenuButton.IsEnabled = ExplorerGrid.SelectedItems.Count > 0;
+            var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
+            CopyMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
+                is FileStat.FileType.File
+                or FileStat.FileType.Folder);
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -194,7 +177,6 @@ namespace ADB_Explorer
         {
             Devices = ADBService.GetDevices();
             DevicesList.ItemsSource = Devices;
-            //DevicesGrid.ItemsSource = Devices;
 
             if (Devices.Count == 0)
             {
