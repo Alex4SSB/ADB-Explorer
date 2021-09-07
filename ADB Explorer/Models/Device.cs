@@ -36,5 +36,10 @@
         public DeviceClass()
         {
         }
+
+        public static implicit operator bool(DeviceClass obj)
+        {
+            return obj is object && !string.IsNullOrEmpty(obj.ID);
+        }
     }
 }

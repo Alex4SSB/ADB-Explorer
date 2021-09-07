@@ -72,7 +72,7 @@ namespace ADB_Explorer.Models
         private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
         private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellIconManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
 
-        private static BitmapSource IconToBitmapSource(System.Drawing.Icon icon)
+        private static BitmapSource IconToBitmapSource(Icon icon)
         {
             return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
         }

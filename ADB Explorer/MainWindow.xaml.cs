@@ -59,7 +59,7 @@ namespace ADB_Explorer
             InitializeComponent();
             LaunchSequence();
 
-            ConnectTimer.Interval = TimeSpan.FromSeconds(2);
+            ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             ConnectTimer.Tick += ConnectTimer_Tick;
 
             InputLanguageManager.Current.InputLanguageChanged +=
@@ -196,7 +196,7 @@ namespace ADB_Explorer
                         CurrentDevice = dev.First();
                 }
 
-                if (CurrentDevice is null || string.IsNullOrEmpty(CurrentDevice.ID))
+                if (!CurrentDevice)
                     return;
 
                 Devices.ForEach(d => d.IsOpen = false);
@@ -213,8 +213,16 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.copyOnDoubleClick) is bool copy)
                 CopyOnDoubleClickCheckBox.IsChecked = copy;
 
-            if (Storage.RetrieveBool(Settings.rememberIp) is bool remember)
-                RememberIpCheckBox.IsChecked = remember;
+            if (Storage.RetrieveBool(Settings.rememberIp) is bool remIp)
+                RememberIpCheckBox.IsChecked = remIp;
+
+            RememberPortCheckBox.IsEnabled = (bool)RememberIpCheckBox.IsChecked;
+
+            if (RememberPortCheckBox.IsEnabled
+                    && Storage.RetrieveBool(Settings.rememberPort) is bool remPort)
+            {
+                RememberPortCheckBox.IsChecked = remPort;
+            }
         }
 
         private void InitDevice()
@@ -719,9 +727,10 @@ namespace ADB_Explorer
             }
 
             if (RememberIpCheckBox.IsChecked == true)
-            {
                 Storage.StoreValue(Settings.lastIp, NewDeviceIpBox.Text);
-            }
+
+            if (RememberPortCheckBox.IsChecked == true)
+                Storage.StoreValue(Settings.lastPort, NewDevicePortBox.Text);
 
             NewDeviceIpBox.Text = "";
             NewDevicePortBox.Text = "";
@@ -754,19 +763,28 @@ namespace ADB_Explorer
 
         private void RetrieveIp()
         {
+            NewDeviceIpBox.Clear();
             NewDevicePortBox.Clear();
 
             if (RememberIpCheckBox.IsChecked == true
-                            && string.IsNullOrEmpty(NewDeviceIpBox.Text)
-                            && Storage.RetrieveValue(Settings.lastIp) is string lastIp
-                            && !Devices.Any(d => d.ID.Split(':')[0] == lastIp))
+                && Storage.RetrieveValue(Settings.lastIp) is string lastIp
+                && !Devices.Find(d => d.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
+                if (RememberPortCheckBox.IsChecked == true
+                    && Storage.RetrieveValue(Settings.lastPort) is string lastPort)
+                {
+                    NewDevicePortBox.Text = lastPort;
+                }
             }
         }
 
         private void RememberIpCheckBox_Click(object sender, RoutedEventArgs e)
         {
+            RememberPortCheckBox.IsEnabled = (bool)RememberIpCheckBox.IsChecked;
+            if (!RememberPortCheckBox.IsEnabled)
+                RememberPortCheckBox.IsChecked = false;
+
             Storage.StoreValue(Settings.rememberIp, RememberIpCheckBox.IsChecked);
         }
 
@@ -840,6 +858,11 @@ namespace ADB_Explorer
         {
             if (e.Key == Key.Enter && ConnectNewDeviceButton.IsEnabled)
                 ConnectNewDevice();
+        }
+
+        private void RememberPortCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.rememberPort, RememberPortCheckBox.IsChecked);
         }
     }
 }

@@ -6,6 +6,8 @@
         defaultFolder,
         copyOnDoubleClick,
         rememberIp,
-        lastIp
+        lastIp,
+        rememberPort,
+        lastPort
     }
 }

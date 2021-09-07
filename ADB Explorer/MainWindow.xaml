@@ -789,6 +789,10 @@
                                         x:Name="RememberIpCheckBox"
                                         Click="RememberIpCheckBox_Click"
                                         Content="Remember Last IP" />
+                                    <CheckBox
+                                        x:Name="RememberPortCheckBox"
+                                        Click="RememberPortCheckBox_Click"
+                                        Content="Remember Last Port" />
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
