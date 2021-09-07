@@ -684,7 +684,6 @@
                                     x:Name="NewDeviceIpBox"
                                     Grid.Column="1"
                                     FontFamily="Consolas"
-                                    GotFocus="NewDeviceIpBox_GotFocus"
                                     KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <TextBlock
@@ -696,7 +695,6 @@
                                     Grid.Row="1"
                                     Grid.Column="1"
                                     FontFamily="Consolas"
-                                    GotFocus="NewDevicePortBox_GotFocus"
                                     KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <Button

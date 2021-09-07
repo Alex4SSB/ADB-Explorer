@@ -119,6 +119,7 @@ namespace ADB_Explorer
             PathStackPanel.Visibility = Visibility.Collapsed;
             PathBox.Text = PathBox.Tag?.ToString();
             PathBox.IsReadOnly = false;
+            PathBox.SelectAll();
 
             UpdateInputLang();
         }
@@ -785,16 +786,6 @@ namespace ADB_Explorer
         private void RememberIpCheckBox_Click(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.rememberIp, RememberIpCheckBox.IsChecked);
-        }
-
-        private void NewDevicePortBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            NewDevicePortBox.SelectAll();
-        }
-
-        private void NewDeviceIpBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            NewDeviceIpBox.SelectAll();
         }
 
         private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
