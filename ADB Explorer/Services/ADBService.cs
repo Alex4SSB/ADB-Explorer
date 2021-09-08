@@ -111,12 +111,6 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static IEnumerable<string> ExecuteDeviceCommandAsync(
-            string deviceSerial, string file, string cmd, CancellationToken cancellationToken, Encoding encoding, params string[] args)
-        {
-            return ExecuteCommandAsync(file, "-s", cancellationToken, encoding, new[] { deviceSerial, cmd }.Concat(args).ToArray());
-        }
-
         public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
             ExecuteCommandAsync(ADB_PATH, cmd, cancellationToken, Encoding.UTF8, args);
 

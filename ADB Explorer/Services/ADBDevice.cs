@@ -122,12 +122,13 @@ namespace ADB_Explorer.Services
                 CancellationToken cancellationToken)
             {
                 // Execute adb pull
-                var stdout = ExecuteDeviceCommandAsync(
-                    deviceSerial,
+                var stdout = ExecuteCommandAsync(
                     ADB_PROGRESS_HELPER_PATH,
                     ADB_PATH,
                     cancellationToken,
                     Encoding.Unicode,
+                    "-s",
+                    deviceSerial,
                     "pull",
                     "-a",
                     EscapeAdbString(sourcePath),
