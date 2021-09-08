@@ -38,7 +38,10 @@
                         </StackPanel>
                     </MenuItem.Header>
                 </MenuItem>
-                <MenuItem Height="24" Padding="6,0">
+                <MenuItem
+                    x:Name="ContextMenuDeleteItem"
+                    Height="24"
+                    Padding="6,0">
                     <MenuItem.Header>
                         <StackPanel Orientation="Horizontal">
                             <ui:FontIcon
@@ -454,6 +457,7 @@
                 CanUserResizeRows="False"
                 CellStyle="{StaticResource CellLightStyle}"
                 ContextMenu="{StaticResource RowContextMenu}"
+                ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                 GridLinesVisibility="None"
                 HeadersVisibility="Column"
                 IsReadOnly="True"

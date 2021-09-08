@@ -6,7 +6,8 @@
         {
             Local,
             Remote,
-            Offline
+            Offline,
+            Unauthorized
         }
 
         public string Name { get; set; }
@@ -20,6 +21,7 @@
                     DeviceType.Local => "\uE839",
                     DeviceType.Remote => "\uEE77",
                     DeviceType.Offline => "\uEB5E",
+                    DeviceType.Unauthorized => "\uF476",
                     _ => throw new System.NotImplementedException(),
                 };
             }
@@ -31,6 +33,21 @@
             Name = name;
             ID = id;
             Type = type;
+        }
+
+        public DeviceClass(string name, string id, string status)
+        {
+            Name = name;
+            ID = id;
+
+            Type = status switch
+            {
+                "device" when id.Contains('.') => DeviceType.Remote,
+                "device" => DeviceType.Local,
+                "offline" => DeviceType.Offline,
+                "unauthorized" => DeviceType.Unauthorized,
+                _ => throw new System.NotImplementedException(),
+            };
         }
 
         public DeviceClass()

@@ -349,7 +349,7 @@ namespace ADB_Explorer.Services
                 m => new DeviceClass(
                     name: m.Groups["name"].Value.Replace('_', ' '),
                     id: m.Groups["id"].Value,
-                    type: m.Groups["id"].Value.Contains('.') ? (m.Groups["status"].Value == "device" ? DeviceClass.DeviceType.Remote : DeviceClass.DeviceType.Offline) : DeviceClass.DeviceType.Local)
+                    status: m.Groups["status"].Value)
                 ).ToList();
         }
 
@@ -403,7 +403,7 @@ namespace ADB_Explorer.Services
         private static void NetworkDeviceOperation(string cmd, string fullAddress)
         {
             ExecuteAdbCommand("", cmd, out string stdout, out _, fullAddress);
-            if (stdout.Contains("cannot connect") || stdout.Contains("error"))
+            if (stdout.Contains("cannot connect") || stdout.Contains("error") || stdout.Contains("failed"))
             {
                 throw new Exception(stdout);
             }

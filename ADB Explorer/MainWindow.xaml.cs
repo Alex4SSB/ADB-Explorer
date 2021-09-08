@@ -61,6 +61,7 @@ namespace ADB_Explorer
 
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             ConnectTimer.Tick += ConnectTimer_Tick;
+            ConnectTimer.Start();
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -177,22 +178,23 @@ namespace ADB_Explorer
         {
             Devices = ADBService.GetDevices();
             DevicesList.ItemsSource = Devices;
+            DevicesList.Items.Refresh();
 
             if (Devices.Count == 0)
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
-                AndroidFileList?.Clear();
-                ConnectTimer.Start();
+                ClearExplorer();
+                CurrentDevice = null;
                 return;
             }
             else
             {
-                if (Devices.Count == 1)
+                if (Devices.Count(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote) == 1)
                     CurrentDevice = Devices[0];
                 else
                 {
                     var dev = Devices.Where(d => d.ID == selectedAddress);
-                    if (dev.Any())
+                    if (dev.Any(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote))
                         CurrentDevice = dev.First();
                 }
 
@@ -265,10 +267,15 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
-            if (ADBService.GetDevices()?.Count < 1) return;
+            var devices = ADBService.GetDevices();
 
-            ConnectTimer.Stop();
-            LaunchSequence();
+            // do nothing if amount of devices and their types haven't changed
+            if (devices is null
+                || (devices.Count == Devices.Count
+                && devices.All(d => Devices.Find(dev => dev.ID == d.ID)?.Type == d.Type)))
+                return;
+
+            DeviceListSetup();
         }
 
         private void StartDirectoryList(string path)
@@ -671,7 +678,11 @@ namespace ADB_Explorer
             var row = sender as DataGridRow;
 
             if (row.IsSelected == false)
+            {
                 ExplorerGrid.SelectedItems.Clear();
+                if (e.OriginalSource is Border)
+                    return;
+            }
 
             ((DataGridRow)sender).IsSelected = true;
         }
@@ -863,6 +874,16 @@ namespace ADB_Explorer
         private void RememberPortCheckBox_Click(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.rememberPort, RememberPortCheckBox.IsChecked);
+        }
+
+        private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            if (ExplorerGrid.SelectedItems.Count < 1)
+            {
+                ((MenuItem)ExplorerGrid.ContextMenu.Items[0]).Visibility = Visibility.Collapsed;
+            }
+            else
+                ((MenuItem)ExplorerGrid.ContextMenu.Items[0]).Visibility = Visibility.Visible;
         }
     }
 }
