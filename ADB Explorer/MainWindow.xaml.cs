@@ -91,6 +91,7 @@ namespace ADB_Explorer
             GridBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
             ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
             ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
+            DevicesList.ItemContainerStyle = FindResource($"Device{theme}Style") as Style;
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
         }
@@ -176,36 +177,60 @@ namespace ADB_Explorer
 
         private void DeviceListSetup(string selectedAddress = "")
         {
-            Devices = ADBService.GetDevices();
-            DevicesList.ItemsSource = Devices;
-            DevicesList.Items.Refresh();
+            var init = true;
 
-            if (Devices.Count == 0)
+            Devices.RemoveAll(d => d.ID != CurrentDevice?.ID);
+            var devices = ADBService.GetDevices();
+
+            if (devices.Find(d => d.ID == CurrentDevice?.ID) is DeviceClass curr)
             {
-                Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
-                ClearExplorer();
-                CurrentDevice = null;
-                return;
+                if (CurrentDevice.Type == curr.Type)
+                    init = false;
+
+                CurrentDevice.Type = curr.Type;
             }
             else
             {
-                if (Devices.Count(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote) == 1)
-                    CurrentDevice = Devices[0];
+                CurrentDevice = null;
+                Devices.Clear();
+            }
+
+            Devices.AddRange(devices.Where(d => d.ID != CurrentDevice?.ID));
+            DevicesList.ItemsSource = Devices;
+            DevicesList.Items.Refresh();
+
+            if (Devices.Count(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote) == 0
+                || (CurrentDevice && CurrentDevice.Type is not DeviceClass.DeviceType.Local and not DeviceClass.DeviceType.Remote))
+            {
+                Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
+                ClearExplorer();
+                return;
+            }
+            else if (!CurrentDevice)
+            {
+                var connectedDevices = Devices.Where(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote);
+                if (connectedDevices.Count() == 1)
+                    CurrentDevice = connectedDevices.First();
                 else
                 {
-                    var dev = Devices.Where(d => d.ID == selectedAddress);
-                    if (dev.Any(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote))
-                        CurrentDevice = dev.First();
+                    var selectedDevice = connectedDevices?.Where(d => d.ID == selectedAddress);
+                    if (selectedDevice.Any())
+                        CurrentDevice = selectedDevice.First();
                 }
 
                 if (!CurrentDevice)
                     return;
-
-                Devices.ForEach(d => d.IsOpen = false);
-                CurrentDevice.IsOpen = true;
-                CurrentADBDevice = new(CurrentDevice.ID);
-                InitDevice();
             }
+
+            foreach (var item in Devices.Where(d => d.ID != CurrentDevice.ID))
+            {
+                item.IsOpen = item.IsSelected = false;
+            }
+
+            CurrentDevice.IsOpen = true;
+            CurrentADBDevice = new(CurrentDevice.ID);
+            if (init)
+                InitDevice();
         }
 
         private void LoadSettings()
@@ -772,6 +797,8 @@ namespace ADB_Explorer
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
+            Devices.ForEach(d => d.IsSelected = false);
+            DevicesList.Items.Refresh();
         }
 
         private void RetrieveIp()
@@ -860,7 +887,8 @@ namespace ADB_Explorer
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
             NewDevicePanel.Visibility = Visibility.Collapsed;
-            DevicesList.SelectedItem = null;
+            Devices.ForEach(d => d.IsSelected = false);
+            DevicesList.Items.Refresh();
         }
 
         private void NewDevicePanel_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -888,6 +916,16 @@ namespace ADB_Explorer
             }
             else
                 ((MenuItem)ExplorerGrid.ContextMenu.Items[0]).Visibility = Visibility.Visible;
+        }
+
+        private void ListViewItem_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is DeviceClass device && !device.IsSelected)
+            {
+                Devices.ForEach(d => d.IsSelected = false);
+                device.IsSelected = true;
+                DevicesList.Items.Refresh();
+            }
         }
     }
 }

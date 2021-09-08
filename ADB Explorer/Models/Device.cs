@@ -27,19 +27,20 @@
             }
         }
         public bool IsOpen { get; set; }
+        public bool IsSelected { get; set; }
 
         public DeviceClass(string name, string id, DeviceType type = DeviceType.Local)
         {
             Name = name;
             ID = id;
             Type = type;
+
+            if (string.IsNullOrEmpty(Name))
+                Name = "[Unauthorized]";
         }
 
-        public DeviceClass(string name, string id, string status)
+        public DeviceClass(string name, string id, string status) : this(name, id)
         {
-            Name = name;
-            ID = id;
-
             Type = status switch
             {
                 "device" when id.Contains('.') => DeviceType.Remote,
