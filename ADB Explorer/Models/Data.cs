@@ -10,6 +10,7 @@ namespace ADB_Explorer.Models
     {
         public static List<DeviceClass> Devices = new();
         public static DeviceClass CurrentDevice = new();
+        public static ADBService.Device CurrentADBDevice = null;
 
         public static MyObservableCollection<FileClass> AndroidFileList = new();
 
