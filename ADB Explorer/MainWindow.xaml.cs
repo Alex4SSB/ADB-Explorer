@@ -609,7 +609,7 @@ namespace ADB_Explorer
 
             waitingProgress = new ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo>();
             syncOperationCancelTokenSource = new CancellationTokenSource();
-            syncOprationTask = Task.Run(() => CurrentADBDevice.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
+            syncOprationTask = Task.Run(() => CurrentADBDevice.PullFile(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
 
             syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
             syncOprationProgressUpdateTimer.Start();

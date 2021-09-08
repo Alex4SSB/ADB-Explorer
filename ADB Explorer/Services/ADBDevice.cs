@@ -115,13 +115,29 @@ namespace ADB_Explorer.Services
                 }
             }
 
-            public AdbSyncStatsInfo Pull(
+            public AdbSyncStatsInfo PullFile(
+                string targetPath,
+                string sourcePath,
+                ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+                CancellationToken cancellationToken) =>
+                DoFileSync("pull", "-a", targetPath, sourcePath, ref progressUpdates, cancellationToken);
+
+            public AdbSyncStatsInfo PushFile(
+                string targetPath,
+                string sourcePath,
+                ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+                CancellationToken cancellationToken) =>
+                DoFileSync("push", "", targetPath, sourcePath, ref progressUpdates, cancellationToken);
+
+            private AdbSyncStatsInfo DoFileSync(
+                string opertation,
+                string operationArgs,
                 string targetPath,
                 string sourcePath,
                 ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
                 CancellationToken cancellationToken)
             {
-                // Execute adb pull
+                // Execute adb file sync operation
                 var stdout = ExecuteCommandAsync(
                     ADB_PROGRESS_HELPER_PATH,
                     ADB_PATH,
@@ -129,8 +145,8 @@ namespace ADB_Explorer.Services
                     Encoding.Unicode,
                     "-s",
                     deviceSerial,
-                    "pull",
-                    "-a",
+                    opertation,
+                    operationArgs,
                     EscapeAdbString(sourcePath),
                     EscapeAdbString(targetPath));
 
@@ -175,7 +191,7 @@ namespace ADB_Explorer.Services
                     return null;
                 }
 
-                var match = AdbRegEx.PULL_STATS_RE.Match(lastStdoutLine);
+                var match = AdbRegEx.FILE_SYNC_STATS_RE.Match(lastStdoutLine);
                 if (!match.Success)
                 {
                     return null;
