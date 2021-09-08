@@ -28,7 +28,7 @@ namespace ADB_Explorer
         private readonly DispatcherTimer ConnectTimer = new();
         private Task listDirTask;
         private Task unknownFoldersTask;
-        private Task<ADBService.AdbSyncStatsInfo> syncOprationTask;
+        private Task<ADBService.Device.AdbSyncStatsInfo> syncOprationTask;
         private DispatcherTimer dirListUpdateTimer;
         private DispatcherTimer syncOprationProgressUpdateTimer;
         private bool isPullInProgress = false;
@@ -36,7 +36,7 @@ namespace ADB_Explorer
         private CancellationTokenSource determineFoldersCancelTokenSource;
         private CancellationTokenSource syncOperationCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
-        private ConcurrentQueue<ADBService.AdbSyncProgressInfo> waitingProgress;
+        private ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo> waitingProgress;
 
         public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
 
@@ -201,6 +201,7 @@ namespace ADB_Explorer
 
                 Devices.ForEach(d => d.IsOpen = false);
                 CurrentDevice.IsOpen = true;
+                CurrentADBDevice = new(CurrentDevice.ID);
                 InitDevice();
             }
         }
@@ -233,7 +234,7 @@ namespace ADB_Explorer
             dirListCancelTokenSource = new CancellationTokenSource();
             determineFoldersCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
-            waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
+            waitingProgress = new ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo>();
             dirListUpdateTimer = new DispatcherTimer
             {
                 Interval = DIR_LIST_UPDATE_INTERVAL
@@ -273,6 +274,8 @@ namespace ADB_Explorer
 
         private void StartDirectoryList(string path)
         {
+            Cursor = Cursors.AppStarting;
+
             StopDirectoryList();
             StopDetermineFolders();
 
@@ -282,7 +285,7 @@ namespace ADB_Explorer
             dirListCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
 
-            listDirTask = Task.Run(() => ADBService.ListDirectory(CurrentDevice.ID, path, ref waitingFileStats, dirListCancelTokenSource.Token));
+            listDirTask = Task.Run(() => CurrentADBDevice.ListDirectory(path, ref waitingFileStats, dirListCancelTokenSource.Token));
 
             if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
             {
@@ -290,7 +293,6 @@ namespace ADB_Explorer
             }
             else
             {
-                Cursor = Cursors.AppStarting;
                 UnfinishedBlock.Visibility = Visibility.Visible;
 
                 UpdateDirectoryList();
@@ -350,7 +352,7 @@ namespace ADB_Explorer
                 {
                     break;
                 }
-                else if (ADBService.IsDirectory(CurrentDevice.ID, file.Path))
+                else if (CurrentADBDevice.IsDirectory(file.Path))
                 {
                     Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileStat.FileType.Folder; });
                 }
@@ -371,7 +373,7 @@ namespace ADB_Explorer
             string realPath;
             try
             {
-                realPath = ADBService.TranslateDevicePath(CurrentDevice.ID, path);
+                realPath = CurrentADBDevice.TranslateDevicePath(path);
             }
             catch (Exception e)
             {
@@ -386,7 +388,7 @@ namespace ADB_Explorer
             PathBox.Tag =
             CurrentPath = realPath;
             PopulateButtons(realPath);
-            ParentPath = ADBService.TranslateDeviceParentPath(CurrentDevice.ID, CurrentPath);
+            ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
 
             ParentButton.IsEnabled = CurrentPath != ParentPath;
 
@@ -605,9 +607,9 @@ namespace ADB_Explorer
 
             var item = PullQ.Dequeue();
 
-            waitingProgress = new ConcurrentQueue<ADBService.AdbSyncProgressInfo>();
+            waitingProgress = new ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo>();
             syncOperationCancelTokenSource = new CancellationTokenSource();
-            syncOprationTask = Task.Run(() => ADBService.Pull(CurrentDevice.ID, item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
+            syncOprationTask = Task.Run(() => CurrentADBDevice.Pull(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
 
             syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
             syncOprationProgressUpdateTimer.Start();
@@ -626,7 +628,7 @@ namespace ADB_Explorer
             }
         }
 
-        private void AdbSyncCompleteHandler(ADBService.AdbSyncStatsInfo statsInfo)
+        private void AdbSyncCompleteHandler(ADBService.Device.AdbSyncStatsInfo statsInfo)
         {
             syncOprationProgressUpdateTimer.Stop();
 
@@ -795,6 +797,7 @@ namespace ADB_Explorer
                 Devices.ForEach(d => d.IsOpen = false);
                 device.IsOpen = true;
                 CurrentDevice = device;
+                CurrentADBDevice = new(CurrentDevice.ID);
 
                 ClearExplorer();
                 DevicesList.Items.Refresh();
@@ -819,6 +822,7 @@ namespace ADB_Explorer
                 if (device.IsOpen)
                 {
                     CurrentDevice = null;
+                    CurrentADBDevice = null;
                     ClearExplorer();
                 }
                 DeviceListSetup();

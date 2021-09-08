@@ -11,7 +11,7 @@ namespace ADB_Explorer.Models
         public static readonly Regex DEVICE_NAME_RE = new(@"^(?<id>[\w.:]+?) +(?<status>\w+)* +.*device:(?<name>\w+)",
             RegexOptions.Multiline);
 
-        public static readonly Regex PULL_PROGRESS_RE =
+        public static readonly Regex FILE_SYNC_PROGRESS_RE =
             new(@"^\[ *(?<TotalPrecentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPrecentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$",
                       RegexOptions.Multiline);
 
