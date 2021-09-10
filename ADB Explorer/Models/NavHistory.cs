@@ -48,5 +48,11 @@ namespace ADB_Explorer.Models
             PathHistory.Add(path);
             historyIndex++;
         }
+
+        public static void Reset()
+        {
+            PathHistory.Clear();
+            historyIndex = -1;
+        }
     }
 }

@@ -58,7 +58,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
-                        <Grid Margin="0,1" Background="{TemplateBinding Background}">
+                        <Grid Margin="0" Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" />
                         </Grid>
                     </ControlTemplate>
@@ -764,7 +764,7 @@
             <ui:SplitView.Resources>
                 <Style TargetType="Separator">
                     <Setter Property="Width" Value="300" />
-                    <Setter Property="Margin" Value="0,0,0,6" />
+                    <Setter Property="Margin" Value="0,0,20,6" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
             </ui:SplitView.Resources>
@@ -828,6 +828,10 @@
                                         x:Name="RememberPortCheckBox"
                                         Click="RememberPortCheckBox_Click"
                                         Content="Remember Last Port" />
+                                    <CheckBox
+                                        x:Name="AutoOpenCheckBox"
+                                        Click="AutoOpenCheckBox_Click"
+                                        Content="Automatically Open for Browsing" />
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>

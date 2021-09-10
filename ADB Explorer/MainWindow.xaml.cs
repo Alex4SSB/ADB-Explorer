@@ -123,7 +123,7 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left)
+            if (e.ChangedButton == MouseButton.Left && ExplorerGrid.SelectedItems.Count == 1)
                 DoubleClick(ExplorerGrid.SelectedItem);
         }
 
@@ -178,48 +178,54 @@ namespace ADB_Explorer
         private void DeviceListSetup(string selectedAddress = "")
         {
             var init = true;
-            var selectedDevice = Devices.Find(d => d.IsSelected);
-
-            Devices.RemoveAll(d => d.ID != CurrentDevice?.ID && d.ID != selectedDevice?.ID);
             var devices = ADBService.GetDevices();
 
             if (devices.Find(d => d.ID == CurrentDevice?.ID) is DeviceClass curr)
             {
                 if (CurrentDevice.Type == curr.Type)
                     init = false;
-
-                CurrentDevice.Type = curr.Type;
-            }
-            else if (devices.Find(d => d.ID == selectedDevice?.ID) is DeviceClass selected)
-            {
-                selectedDevice.Type = selected.Type;
-                selectedDevice.Name = selected.Name;
             }
             else
             {
                 CurrentDevice = null;
-                Devices.Clear();
             }
 
+            Devices.RemoveAll(d => !devices.Any(dev => dev.ID == d.ID));
             foreach (var item in devices)
             {
-                if (Devices.Any(d => d.ID == item.ID))
-                    continue;
-
-                Devices.Add(item);
+                if (Devices?.Find(d => d.ID == item.ID) is DeviceClass device)
+                {
+                    device.Type = item.Type;
+                    device.Name = item.Name;
+                }
+                else
+                    Devices.Add(item);
             }
+
             DevicesList.ItemsSource = Devices;
             DevicesList.Items.Refresh();
 
-            if (Devices.Count(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote) == 0
-                || (CurrentDevice && CurrentDevice.Type is not DeviceClass.DeviceType.Local and not DeviceClass.DeviceType.Remote))
+            if (Devices.Count(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote) == 0)
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
                 return;
             }
-            else if (!CurrentDevice)
+            else
             {
+                if (CurrentDevice?.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote)
+                    return;
+
+                if (AutoOpenCheckBox.IsChecked != true)
+                {
+                    if (CurrentDevice)
+                        Devices.First(d => d.ID == CurrentDevice.ID).IsOpen = false;
+
+                    Title = Properties.Resources.AppDisplayName;
+                    ClearExplorer();
+                    return;
+                }
+
                 var connectedDevices = Devices.Where(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote);
                 if (connectedDevices.Count() == 1)
                     CurrentDevice = connectedDevices.First();
@@ -232,11 +238,9 @@ namespace ADB_Explorer
 
                 if (!CurrentDevice)
                     return;
-            }
 
-            foreach (var item in Devices.Where(d => d.ID != CurrentDevice.ID))
-            {
-                item.IsOpen = item.IsSelected = false;
+                if (!ConnectTimer.IsEnabled)
+                    DevicesSplitView.IsPaneOpen = false;
             }
 
             CurrentDevice.IsOpen = true;
@@ -263,6 +267,9 @@ namespace ADB_Explorer
             {
                 RememberPortCheckBox.IsChecked = remPort;
             }
+
+            if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
+                AutoOpenCheckBox.IsChecked = autoOpen;
         }
 
         private void InitDevice()
@@ -287,6 +294,7 @@ namespace ADB_Explorer
 
             ExplorerGrid.ItemsSource = AndroidFileList;
             PathBox.IsEnabled = true;
+            NavHistory.Reset();
 
             if (string.IsNullOrEmpty(CurrentPath))
             {
@@ -887,7 +895,7 @@ namespace ADB_Explorer
             PathStackPanel.Children.Clear();
             CurrentPath = null;
             PathBox.Tag = null;
-            NavHistory.PathHistory.Clear();
+            NavHistory.Reset();
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
             CopyMenuButton.IsEnabled =
@@ -938,6 +946,11 @@ namespace ADB_Explorer
                 device.IsSelected = true;
                 DevicesList.Items.Refresh();
             }
+        }
+
+        private void AutoOpenCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.autoOpen, AutoOpenCheckBox.IsChecked);
         }
     }
 }

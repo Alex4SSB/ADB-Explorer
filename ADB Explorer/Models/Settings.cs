@@ -8,6 +8,7 @@
         rememberIp,
         lastIp,
         rememberPort,
-        lastPort
+        lastPort,
+        autoOpen
     }
 }
