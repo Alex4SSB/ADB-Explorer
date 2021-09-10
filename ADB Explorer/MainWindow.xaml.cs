@@ -178,8 +178,9 @@ namespace ADB_Explorer
         private void DeviceListSetup(string selectedAddress = "")
         {
             var init = true;
+            var selectedDevice = Devices.Find(d => d.IsSelected);
 
-            Devices.RemoveAll(d => d.ID != CurrentDevice?.ID);
+            Devices.RemoveAll(d => d.ID != CurrentDevice?.ID && d.ID != selectedDevice?.ID);
             var devices = ADBService.GetDevices();
 
             if (devices.Find(d => d.ID == CurrentDevice?.ID) is DeviceClass curr)
@@ -189,13 +190,24 @@ namespace ADB_Explorer
 
                 CurrentDevice.Type = curr.Type;
             }
+            else if (devices.Find(d => d.ID == selectedDevice?.ID) is DeviceClass selected)
+            {
+                selectedDevice.Type = selected.Type;
+                selectedDevice.Name = selected.Name;
+            }
             else
             {
                 CurrentDevice = null;
                 Devices.Clear();
             }
 
-            Devices.AddRange(devices.Where(d => d.ID != CurrentDevice?.ID));
+            foreach (var item in devices)
+            {
+                if (Devices.Any(d => d.ID == item.ID))
+                    continue;
+
+                Devices.Add(item);
+            }
             DevicesList.ItemsSource = Devices;
             DevicesList.Items.Refresh();
 
@@ -213,9 +225,9 @@ namespace ADB_Explorer
                     CurrentDevice = connectedDevices.First();
                 else
                 {
-                    var selectedDevice = connectedDevices?.Where(d => d.ID == selectedAddress);
-                    if (selectedDevice.Any())
-                        CurrentDevice = selectedDevice.First();
+                    var paramDevice = connectedDevices?.Where(d => d.ID == selectedAddress);
+                    if (paramDevice.Any())
+                        CurrentDevice = paramDevice.First();
                 }
 
                 if (!CurrentDevice)
@@ -774,7 +786,7 @@ namespace ADB_Explorer
             NewDevicePortBox.Text = "";
             NewDevicePanel.Visibility = Visibility.Collapsed;
 
-            ClearExplorer();
+            //ClearExplorer();
             DeviceListSetup(deviceAddress);
         }
 

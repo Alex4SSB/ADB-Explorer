@@ -152,6 +152,110 @@
             <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_MouseDown" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="Margin" Value="0,1" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:ListViewItem">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="4"
+                                        FontSize="28"
+                                        Glyph="{Binding Icon}" />
+                                    <TextBlock
+                                        Margin="4"
+                                        VerticalAlignment="Center"
+                                        Text="{Binding Name}">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                                        <Setter Property="FontWeight" Value="Bold" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </StackPanel>
+                                <ui:FontIcon
+                                    Margin="4"
+                                    HorizontalAlignment="Right"
+                                    Foreground="Gray"
+                                    Glyph="&#xE838;">
+                                    <ui:FontIcon.Style>
+                                        <Style TargetType="ui:FontIcon">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsOpen}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:FontIcon.Style>
+                                </ui:FontIcon>
+                                <StackPanel Grid.Row="1">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <StackPanel
+                                        Margin="4"
+                                        HorizontalAlignment="Right"
+                                        Orientation="Horizontal">
+                                        <Grid Margin="8,0">
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="2">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="3">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Button
+                                                x:Name="OpenDeviceButton"
+                                                Click="OpenDeviceButton_Click"
+                                                Content="Browse" />
+                                        </Grid>
+                                        <Grid>
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Type}" Value="0">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="3">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Grid.Style>
+                                            <Button
+                                                x:Name="DisconnectDeviceButton"
+                                                Click="DisconnectDeviceButton_Click"
+                                                Content="Remove" />
+                                        </Grid>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style
             x:Key="DeviceLightStyle"
@@ -161,6 +265,9 @@
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter Property="Background" Value="#FFD9D9D9" />
                 </DataTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFC9C9C9" />
+                </Trigger>
             </Style.Triggers>
         </Style>
         <Style
@@ -171,105 +278,11 @@
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                     <Setter Property="Background" Value="#FF333333" />
                 </DataTrigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF4D4D4D" />
+                </Trigger>
             </Style.Triggers>
         </Style>
-        <DataTemplate x:Key="DeviceListTemplate">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
-                    <ui:FontIcon
-                        Margin="2,4"
-                        FontSize="28"
-                        Glyph="{Binding Icon}" />
-                    <TextBlock
-                        Margin="4"
-                        VerticalAlignment="Center"
-                        Text="{Binding Name}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                                        <Setter Property="FontWeight" Value="Bold" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </StackPanel>
-                <ui:FontIcon
-                    HorizontalAlignment="Right"
-                    Foreground="Gray"
-                    Glyph="&#xE838;">
-                    <ui:FontIcon.Style>
-                        <Style TargetType="ui:FontIcon">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsOpen}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:FontIcon.Style>
-                </ui:FontIcon>
-                <StackPanel Grid.Row="1">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <StackPanel
-                        Margin="-6,4"
-                        HorizontalAlignment="Right"
-                        Orientation="Horizontal">
-                        <Grid Margin="8,0">
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Type}" Value="2">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Type}" Value="3">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Button
-                                x:Name="OpenDeviceButton"
-                                Click="OpenDeviceButton_Click"
-                                Content="Browse" />
-                        </Grid>
-                        <Grid>
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Type}" Value="0">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Type}" Value="3">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Button
-                                x:Name="DisconnectDeviceButton"
-                                Click="DisconnectDeviceButton_Click"
-                                Content="Remove" />
-                        </Grid>
-                    </StackPanel>
-                </StackPanel>
-            </Grid>
-        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid>
@@ -738,7 +751,6 @@
                             Grid.Row="2"
                             IsSelectionEnabled="False"
                             ItemContainerStyle="{StaticResource DeviceLightStyle}"
-                            ItemTemplate="{StaticResource DeviceListTemplate}"
                             ItemsSource="{Binding}" />
                     </Grid>
                 </Border>
