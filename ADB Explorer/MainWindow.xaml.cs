@@ -177,35 +177,12 @@ namespace ADB_Explorer
 
         private void DeviceListSetup(string selectedAddress = "")
         {
-            var init = true;
-            var devices = ADBService.GetDevices();
+            var init = !Devices.Update(ADBService.GetDevices());
 
-            if (devices.Find(d => d.ID == CurrentDevice?.ID) is DeviceClass curr)
-            {
-                if (CurrentDevice.Type == curr.Type)
-                    init = false;
-            }
-            else
-            {
-                CurrentDevice = null;
-            }
-
-            Devices.RemoveAll(d => !devices.Any(dev => dev.ID == d.ID));
-            foreach (var item in devices)
-            {
-                if (Devices?.Find(d => d.ID == item.ID) is DeviceClass device)
-                {
-                    device.Type = item.Type;
-                    device.Name = item.Name;
-                }
-                else
-                    Devices.Add(item);
-            }
-
-            DevicesList.ItemsSource = Devices;
+            DevicesList.ItemsSource = Devices.List;
             DevicesList.Items.Refresh();
 
-            if (Devices.Count(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote) == 0)
+            if (!Devices.DevicesAvailable())
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
@@ -213,38 +190,27 @@ namespace ADB_Explorer
             }
             else
             {
-                if (CurrentDevice?.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote)
+                if (Devices.DevicesAvailable(true))
                     return;
 
                 if (AutoOpenCheckBox.IsChecked != true)
                 {
-                    if (CurrentDevice)
-                        Devices.First(d => d.ID == CurrentDevice.ID).IsOpen = false;
+                    Devices.Current?.SetOpen(false);
 
                     Title = Properties.Resources.AppDisplayName;
                     ClearExplorer();
                     return;
                 }
 
-                var connectedDevices = Devices.Where(d => d.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote);
-                if (connectedDevices.Count() == 1)
-                    CurrentDevice = connectedDevices.First();
-                else
-                {
-                    var paramDevice = connectedDevices?.Where(d => d.ID == selectedAddress);
-                    if (paramDevice.Any())
-                        CurrentDevice = paramDevice.First();
-                }
-
-                if (!CurrentDevice)
+                if (!Devices.SetCurrentDevice(selectedAddress))
                     return;
 
                 if (!ConnectTimer.IsEnabled)
                     DevicesSplitView.IsPaneOpen = false;
             }
 
-            CurrentDevice.IsOpen = true;
-            CurrentADBDevice = new(CurrentDevice.ID);
+            Devices.Current.SetOpen(true);
+            CurrentADBDevice = new(Devices.Current.ID);
             if (init)
                 InitDevice();
         }
@@ -274,7 +240,7 @@ namespace ADB_Explorer
 
         private void InitDevice()
         {
-            Title = $"{Properties.Resources.AppDisplayName} - {CurrentDevice.Name}";
+            Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
 
             unknownFoldersTask = Task.Run(() => { });
             dirListCancelTokenSource = new CancellationTokenSource();
@@ -313,15 +279,9 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
-            var devices = ADBService.GetDevices();
-
             // do nothing if amount of devices and their types haven't changed
-            if (devices is null
-                || (devices.Count == Devices.Count
-                && devices.All(d => Devices.Find(dev => dev.ID == d.ID)?.Type == d.Type)))
-                return;
-
-            DeviceListSetup();
+            if (Devices.DevicesChanged(ADBService.GetDevices()))
+                DeviceListSetup();
         }
 
         private void StartDirectoryList(string path)
@@ -817,7 +777,7 @@ namespace ADB_Explorer
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
-            Devices.ForEach(d => d.IsSelected = false);
+            Devices.UnselectAll();
             DevicesList.Items.Refresh();
         }
 
@@ -828,7 +788,7 @@ namespace ADB_Explorer
 
             if (RememberIpCheckBox.IsChecked == true
                 && Storage.RetrieveValue(Settings.lastIp) is string lastIp
-                && !Devices.Find(d => d.ID.Split(':')[0] == lastIp))
+                && !Devices.List.Find(d => d.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
                 if (RememberPortCheckBox.IsChecked == true
@@ -852,10 +812,8 @@ namespace ADB_Explorer
         {
             if (sender is Button button && button.DataContext is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
             {
-                Devices.ForEach(d => d.IsOpen = false);
-                device.IsOpen = true;
-                CurrentDevice = device;
-                CurrentADBDevice = new(CurrentDevice.ID);
+                device.SetOpen();
+                CurrentADBDevice = new(device.ID);
 
                 ClearExplorer();
                 DevicesList.Items.Refresh();
@@ -879,7 +837,7 @@ namespace ADB_Explorer
 
                 if (device.IsOpen)
                 {
-                    CurrentDevice = null;
+                    device.SetOpen(false);
                     CurrentADBDevice = null;
                     ClearExplorer();
                 }
@@ -907,7 +865,7 @@ namespace ADB_Explorer
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
             NewDevicePanel.Visibility = Visibility.Collapsed;
-            Devices.ForEach(d => d.IsSelected = false);
+            Devices.UnselectAll();
             DevicesList.Items.Refresh();
         }
 
@@ -942,8 +900,7 @@ namespace ADB_Explorer
         {
             if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is DeviceClass device && !device.IsSelected)
             {
-                Devices.ForEach(d => d.IsSelected = false);
-                device.IsSelected = true;
+                device.SetSelected();
                 DevicesList.Items.Refresh();
             }
         }

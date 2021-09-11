@@ -153,7 +153,7 @@ namespace ADB_Explorer.Services
             return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
         }
 
-        public static List<DeviceClass> GetDevices()
+        public static IEnumerable<DeviceClass> GetDevices()
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
 
@@ -162,7 +162,7 @@ namespace ADB_Explorer.Services
                     name: m.Groups["name"].Value.Replace('_', ' '),
                     id: m.Groups["id"].Value,
                     status: m.Groups["status"].Value)
-                ).ToList();
+                );
         }
 
         //private static string GetProps()
