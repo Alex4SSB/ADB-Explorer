@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
@@ -26,6 +27,7 @@ namespace ADB_Explorer
     public partial class MainWindow : Window
     {
         private readonly DispatcherTimer ConnectTimer = new();
+        private readonly DispatcherTimer PathButtonTimer = new();
         private Task listDirTask;
         private Task unknownFoldersTask;
         private Task<ADBService.Device.AdbSyncStatsInfo> syncOprationTask;
@@ -62,6 +64,9 @@ namespace ADB_Explorer
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
+
+            PathButtonTimer.Interval = PATH_TIMER_INTERVAL;
+            PathButtonTimer.Tick += PathButtonTimer_Tick;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -441,6 +446,18 @@ namespace ADB_Explorer
                 var dirName = pathItems.Last();
                 AddPathButton(dirPath, dirName);
             }
+
+            PathButtonTimer.Start();
+        }
+
+        private void PathButtonTimer_Tick(object sender, EventArgs e)
+        {
+            if (PathStackPanel.ActualWidth > PathBox.ActualWidth)
+            {
+                PathStackPanel.Children.RemoveRange(0, 2);
+            }
+
+            PathButtonTimer.Stop();
         }
 
         private void AddPathButton(string path, string name)
