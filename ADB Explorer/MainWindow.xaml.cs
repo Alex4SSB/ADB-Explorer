@@ -430,7 +430,7 @@ namespace ADB_Explorer
             var pathItems = new List<string>();
 
             // On special cases, cut prefix of the path and replace with a pretty button
-            var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.FirstOrDefault((kv) => path.StartsWith(kv.Key));
+            var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.FirstOrDefault(kv => path.StartsWith(kv.Key));
             if (specialPair.Key != null)
             {
                 AddPathButton(specialPair.Key, specialPair.Value);

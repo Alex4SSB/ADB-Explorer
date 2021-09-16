@@ -28,7 +28,8 @@ namespace ADB_Explorer.Services
         public string FilePath { get; }
 
         private OperationStatus status;
-        public OperationStatus Status {
+        public OperationStatus Status
+        {
             get
             {
                 return status;
@@ -43,7 +44,7 @@ namespace ADB_Explorer.Services
 
                 status = value;
                 NotifyPropertyChanged();
-            } 
+            }
         }
 
         private object statusInfo;
