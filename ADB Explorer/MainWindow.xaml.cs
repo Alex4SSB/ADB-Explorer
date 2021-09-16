@@ -27,7 +27,6 @@ namespace ADB_Explorer
     public partial class MainWindow : Window
     {
         private readonly DispatcherTimer ConnectTimer = new();
-        private readonly DispatcherTimer PathButtonTimer = new();
         private Task listDirTask;
         private Task unknownFoldersTask;
         private Task<ADBService.Device.AdbSyncStatsInfo> syncOprationTask;
@@ -64,9 +63,6 @@ namespace ADB_Explorer
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
-
-            PathButtonTimer.Interval = PATH_TIMER_INTERVAL;
-            PathButtonTimer.Tick += PathButtonTimer_Tick;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -426,6 +422,9 @@ namespace ADB_Explorer
 
         private void PopulateButtons(string path)
         {
+            var expectedLength = 0;
+            List<MenuItem> excessButtons = new();
+
             PathStackPanel.Children.Clear();
             var pathItems = new List<string>();
 
@@ -436,6 +435,7 @@ namespace ADB_Explorer
                 AddPathButton(specialPair.Key, specialPair.Value);
                 pathItems.Add(specialPair.Key);
                 path = path[specialPair.Key.Length..].TrimStart('/');
+                expectedLength = PathButtonLength.ButtonLength(specialPair.Value);
             }
 
             var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
@@ -445,19 +445,42 @@ namespace ADB_Explorer
                 var dirPath = string.Join('/', pathItems);
                 var dirName = pathItems.Last();
                 AddPathButton(dirPath, dirName);
+
+                if (PathStackPanel.Children.Count > 2)
+                    expectedLength += PATH_ARROW_WIDTH;
+
+                expectedLength += PathButtonLength.ButtonLength(dirName);
             }
 
-            PathButtonTimer.Start();
-        }
-
-        private void PathButtonTimer_Tick(object sender, EventArgs e)
-        {
-            if (PathStackPanel.ActualWidth > PathBox.ActualWidth)
+            while (expectedLength >= PathBox.ActualWidth && PathStackPanel.Children.Count > 2)
             {
+                var item = (MenuItem)((Menu)PathStackPanel.Children[0]).Items[0];
+                excessButtons.Add(item);
+                expectedLength -= PathButtonLength.ButtonLength((string)item.Header);
+                expectedLength -= PATH_ARROW_WIDTH;
                 PathStackPanel.Children.RemoveRange(0, 2);
             }
 
-            PathButtonTimer.Stop();
+            if (excessButtons.Any())
+            {
+                TextBlock tb = new()
+                {
+                    Text = " \uE970 ",
+                    FontFamily = new("Segoe MDL2 Assets"),
+                    FontSize = 7,
+                };
+                PathStackPanel.Children.Insert(0, tb);
+
+                Menu excessMenu = new() { Height = 24 };
+                excessMenu.Items.Add(new MenuItem()
+                {
+                    ItemsSource = excessButtons,
+                    Height = 24,
+                    Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
+                });
+                
+                PathStackPanel.Children.Insert(0, excessMenu);
+            }
         }
 
         private void AddPathButton(string path, string name)
