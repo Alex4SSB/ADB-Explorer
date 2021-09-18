@@ -12,6 +12,8 @@
     Title="ADB Explorer"
     Width="800"
     Height="450"
+    MinWidth="440"
+    MinHeight="400"
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     Background="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}"
@@ -24,38 +26,36 @@
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <ContextMenu x:Key="RowContextMenu">
-            <ContextMenu.Items>
-                <MenuItem
-                    x:Name="ContextMenuCopyItem"
-                    Height="24"
-                    Padding="6,0"
-                    Click="ContextMenuCopyItem_Click">
-                    <MenuItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <ui:FontIcon
-                                Margin="0,0,6,0"
-                                FontSize="16"
-                                Glyph="&#xE8C8;" />
-                            <TextBlock Text="Copy" />
-                        </StackPanel>
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem
-                    x:Name="ContextMenuDeleteItem"
-                    Height="24"
-                    Padding="6,0">
-                    <MenuItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <ui:FontIcon
-                                Margin="0,0,6,0"
-                                FontSize="16"
-                                Glyph="&#xE74D;" />
-                            <TextBlock Text="Delete" />
-                        </StackPanel>
-                    </MenuItem.Header>
-                </MenuItem>
-            </ContextMenu.Items>
+            <ContextMenu.Resources>
+                <Style TargetType="MenuItem">
+                    <Setter Property="Height" Value="24" />
+                    <Setter Property="Padding" Value="6,0" />
+                </Style>
+                <Style TargetType="ui:FontIcon">
+                    <Setter Property="Margin" Value="0,0,6,0" />
+                    <Setter Property="FontSize" Value="16" />
+                </Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal" />
+                </Style>
+            </ContextMenu.Resources>
         </ContextMenu>
+        <MenuItem x:Key="ContextMenuCopyItem" Click="ContextMenuCopyItem_Click">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE8C8;" />
+                    <TextBlock Text="Copy" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem x:Key="ContextMenuDeleteItem">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE74D;" />
+                    <TextBlock Text="Delete" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
         <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -522,6 +522,8 @@
                 ItemsSource="{Binding}"
                 KeyboardNavigation.TabNavigation="Once"
                 MinRowHeight="21"
+                MouseDown="ExplorerGrid_MouseDown"
+                PreviewMouseRightButtonDown="ExplorerGrid_PreviewMouseRightButtonDown"
                 RowStyle="{StaticResource RowLightStyle}"
                 SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                 SelectionChanged="ExplorerGrid_SelectionChanged"
