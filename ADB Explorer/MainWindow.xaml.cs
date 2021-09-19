@@ -29,15 +29,10 @@ namespace ADB_Explorer
         private readonly DispatcherTimer ConnectTimer = new();
         private Task listDirTask;
         private Task unknownFoldersTask;
-        private Task<ADBService.Device.AdbSyncStatsInfo> syncOprationTask;
         private DispatcherTimer dirListUpdateTimer;
-        private DispatcherTimer syncOprationProgressUpdateTimer;
-        private bool isPullInProgress = false;
         private CancellationTokenSource dirListCancelTokenSource;
         private CancellationTokenSource determineFoldersCancelTokenSource;
-        private CancellationTokenSource syncOperationCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
-        private ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo> waitingProgress;
 
         public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
 
@@ -63,6 +58,8 @@ namespace ADB_Explorer
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
+
+            fileOperationQueue.Operations.CollectionChanged += FileOperationProgressUpdateHandler;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -247,17 +244,11 @@ namespace ADB_Explorer
             dirListCancelTokenSource = new CancellationTokenSource();
             determineFoldersCancelTokenSource = new CancellationTokenSource();
             waitingFileStats = new ConcurrentQueue<FileStat>();
-            waitingProgress = new ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo>();
             dirListUpdateTimer = new DispatcherTimer
             {
                 Interval = DIR_LIST_UPDATE_INTERVAL
             };
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
-            syncOprationProgressUpdateTimer = new DispatcherTimer
-            {
-                Interval = SYNC_PROG_UPDATE_INTERVAL
-            };
-            syncOprationProgressUpdateTimer.Tick += SyncOprationProgressUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
             PathBox.IsEnabled = true;
@@ -626,72 +617,38 @@ namespace ADB_Explorer
 
                 path = dialog.FileName;
             }
-
-            int totalCount = (int)ProgressCountTextBlock.Tag + itemsCount;
-            ProgressCountTextBlock.Tag = totalCount;
          
             foreach (FileClass item in ExplorerGrid.SelectedItems)
             {
-                PullQ.Enqueue(new(path, item.Path));
+                fileOperationQueue.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item.Path, path));
             }
 
-            ProgressCountTextBlock.Text = $"{totalCount - PullQ.Count + 1}/{totalCount}";
-
-            // Initiate pull sequence if needed
-            if (!isPullInProgress)
-            {
-                isPullInProgress = true;
-                HandleNextPull();
-            }
+            
         }
 
-        private void HandleNextPull()
+        private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
         {
-            OperationCompletedTextBlock.Text = "";
-            OverallProgressBar.IsIndeterminate = true;
-            if (ProgressGrid.Visibility == Visibility.Collapsed)
-                ProgressGrid.Visibility = Visibility.Visible;
-
-            if (ProgressCountTextBlock.Tag is int totalCount)
+            if (fileOperationQueue.IsActive)
             {
-                ProgressCountTextBlock.Text = $"{totalCount - PullQ.Count + 1}/{totalCount}";
-            }
+                OperationCompletedTextBlock.Text = "";
+                
+                if (ProgressGrid.Visibility == Visibility.Collapsed)
+                    ProgressGrid.Visibility = Visibility.Visible;
 
-            var item = PullQ.Dequeue();
+                ProgressCountTextBlock.Text = $"{fileOperationQueue.CurrentOperationIndex + 1}/{fileOperationQueue.Operations.Count}";
 
-            waitingProgress = new ConcurrentQueue<ADBService.Device.AdbSyncProgressInfo>();
-            syncOperationCancelTokenSource = new CancellationTokenSource();
-            syncOprationTask = Task.Run(() => CurrentADBDevice.PullFile(item.Item1, item.Item2, ref waitingProgress, syncOperationCancelTokenSource.Token));
-
-            syncOprationTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => AdbSyncCompleteHandler(t.Result)));
-            syncOprationProgressUpdateTimer.Start();
-        }
-
-        private void SyncOprationProgressUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            var currProgresses = waitingProgress.DequeueAllExisting();
-            if (currProgresses.Any() && (currProgresses.LastOrDefault()?.TotalPrecentage is var percents) && percents.HasValue)
-            {
-                if (OverallProgressBar.IsIndeterminate)
+                if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPrecentage.HasValue)
                 {
                     OverallProgressBar.IsIndeterminate = false;
+                    OverallProgressBar.Value = progressInfo.TotalPrecentage.Value;
+                } 
+                else
+                {
+                    OverallProgressBar.IsIndeterminate = true;
                 }
-                OverallProgressBar.Value = percents.Value;
-            }
-        }
-
-        private void AdbSyncCompleteHandler(ADBService.Device.AdbSyncStatsInfo statsInfo)
-        {
-            syncOprationProgressUpdateTimer.Stop();
-
-            if (PullQ.Any())
-            {
-                HandleNextPull();
             }
             else
             {
-                isPullInProgress = false;
-
                 if ((int)ProgressCountTextBlock.Tag > 0)
                 {
                     OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
@@ -700,9 +657,9 @@ namespace ADB_Explorer
                 ProgressCountTextBlock.Tag = 0;
 
                 ProgressGrid.Visibility = Visibility.Collapsed;
-                var fileCount = (int)OperationCompletedTextBlock.Tag;
-                OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileCount} file{(fileCount > 1 ? "s" : "")} done";
+                OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.Operations.Count} file{(fileOperationQueue.Operations.Count > 1 ? "s" : "")} done";
             }
+            
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)

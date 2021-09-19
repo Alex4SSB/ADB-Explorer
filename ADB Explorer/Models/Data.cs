@@ -20,6 +20,6 @@ namespace ADB_Explorer.Models
         /// <summary>
         /// Tuple of target path and source path
         /// </summary>
-        public static Queue<Tuple<string, string>> PullQ = new();
+        public static FileOperationQueue fileOperationQueue = new();
     }
 }
