@@ -20,5 +20,6 @@ namespace ADB_Explorer.Models
         public static readonly TimeSpan CONNECT_TIMER_INTERVAL = TimeSpan.FromMilliseconds(2000);
 
         public static readonly int PATH_ARROW_WIDTH = 11;
+        public static readonly int PATH_EXCESS_BUTTON_WIDTH = 36;
     }
 }

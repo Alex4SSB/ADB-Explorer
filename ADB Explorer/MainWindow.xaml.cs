@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -33,6 +34,30 @@ namespace ADB_Explorer
         private CancellationTokenSource dirListCancelTokenSource;
         private CancellationTokenSource determineFoldersCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
+
+        private ItemsPresenter ExplorerContentPresenter;
+        private double ColumnHeaderHeight
+        {
+            get
+            {
+                GetExplorerContentPresenter();
+                return ExplorerContentPresenter is null ? 0 : ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight;
+            }
+        }
+        private double DataGridContentWidth
+        {
+            get
+            {
+                GetExplorerContentPresenter();
+                return ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
+            }
+        }
+
+        private void GetExplorerContentPresenter()
+        {
+            if (ExplorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
+                ExplorerContentPresenter = presenter;
+        }
 
         public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
 
@@ -68,6 +93,25 @@ namespace ADB_Explorer
                 });
         }
 
+        private void InitializeContextMenu(MenuType type)
+        {
+            ExplorerGrid.ContextMenu.Items.Clear();
+            switch (type)
+            {
+                case MenuType.ExplorerItem:
+                    ExplorerGrid.ContextMenu.Items.Add(FindResource("ContextMenuCopyItem"));
+                    ExplorerGrid.ContextMenu.Items.Add(FindResource("ContextMenuDeleteItem"));
+                    break;
+                case MenuType.EmptySpace:
+                    ExplorerGrid.ContextMenu.Items.Add(FindResource("ContextMenuDeleteItem"));
+                    break;
+                case MenuType.Header:
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             if (listDirTask is not null)
@@ -88,7 +132,6 @@ namespace ADB_Explorer
 
             GridBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
             ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
-            ExplorerGrid.CellStyle = FindResource($"Cell{theme}Style") as Style;
             DevicesList.ItemContainerStyle = FindResource($"Device{theme}Style") as Style;
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
@@ -445,6 +488,9 @@ namespace ADB_Explorer
 
             while (expectedLength >= PathBox.ActualWidth && PathStackPanel.Children.Count > 2)
             {
+                if (!excessButtons.Any())
+                    expectedLength += PATH_EXCESS_BUTTON_WIDTH;
+
                 var item = (MenuItem)((Menu)PathStackPanel.Children[0]).Items[0];
                 excessButtons.Add(item);
                 expectedLength -= PathButtonLength.ButtonLength((string)item.Header);
@@ -684,11 +730,17 @@ namespace ADB_Explorer
             if (row.IsSelected == false)
             {
                 ExplorerGrid.SelectedItems.Clear();
-                if (e.OriginalSource is Border)
-                    return;
             }
 
-            ((DataGridRow)sender).IsSelected = true;
+            if (e.ChangedButton == MouseButton.Right)
+            {
+                InitializeContextMenu(e.OriginalSource is Border ? MenuType.EmptySpace : MenuType.ExplorerItem);
+            }
+
+            if (e.OriginalSource is Border)
+                return;
+
+            row.IsSelected = true;
         }
 
         private void ChangeDefaultFolderButton_Click(object sender, RoutedEventArgs e)
@@ -885,12 +937,7 @@ namespace ADB_Explorer
 
         private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
-            if (ExplorerGrid.SelectedItems.Count < 1)
-            {
-                ((MenuItem)ExplorerGrid.ContextMenu.Items[0]).Visibility = Visibility.Collapsed;
-            }
-            else
-                ((MenuItem)ExplorerGrid.ContextMenu.Items[0]).Visibility = Visibility.Visible;
+            ExplorerGrid.ContextMenu.Visibility = Visible(ExplorerGrid.ContextMenu.HasItems);
         }
 
         private void ListViewItem_MouseDown(object sender, MouseButtonEventArgs e)
@@ -905,6 +952,50 @@ namespace ADB_Explorer
         private void AutoOpenCheckBox_Click(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.autoOpen, AutoOpenCheckBox.IsChecked);
+        }
+
+        private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var point = e.GetPosition(ExplorerGrid);
+            var actualRowWidth = 0.0;
+            foreach (var item in ExplorerGrid.Columns)
+            {
+                actualRowWidth += item.ActualWidth;
+            }
+
+            if (point.Y > ExplorerGrid.Items.Count * ExplorerGrid.MinRowHeight
+                || point.Y < ColumnHeaderHeight
+                || point.X > actualRowWidth
+                || point.X > DataGridContentWidth)
+            {
+                ExplorerGrid.SelectedItems.Clear();
+
+                if (point.Y < ColumnHeaderHeight || point.X > DataGridContentWidth)
+                    InitializeContextMenu(MenuType.Header);
+            }
+        }
+
+        private void ExplorerGrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject DepObject = (DependencyObject)e.OriginalSource;
+            ExplorerGrid.ContextMenu.IsOpen = false;
+            ExplorerGrid.ContextMenu.Visibility = Visibility.Collapsed;
+
+            while (DepObject is not null and not DataGridColumnHeader)
+            {
+                DepObject = VisualTreeHelper.GetParent(DepObject);
+            }
+
+            if (DepObject is DataGridColumnHeader)
+            {
+                InitializeContextMenu(MenuType.Header);
+            }
+            else if (e.OriginalSource is FrameworkElement element && element.DataContext is FileClass && ExplorerGrid.SelectedItems.Count > 0)
+            {
+                InitializeContextMenu(MenuType.ExplorerItem);
+            }
+            else
+                InitializeContextMenu(MenuType.EmptySpace);
         }
     }
 }
