@@ -70,62 +70,6 @@
             <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
-        <Style
-            x:Key="CellLightStyle"
-            BasedOn="{StaticResource CellVerticalStyle}"
-            TargetType="DataGridCell">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                    <Setter Property="Background" Value="#FFE5F3FF" />
-                </DataTrigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#FFCCE8FF" />
-                </Trigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FFD9D9D9" />
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FFCCE8FF" />
-                </MultiDataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style
-            x:Key="CellDarkStyle"
-            BasedOn="{StaticResource CellVerticalStyle}"
-            TargetType="DataGridCell">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                    <Setter Property="Background" Value="#FF4D4D4D" />
-                </DataTrigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#FF777777" />
-                </Trigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FF333333" />
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsMouseOver}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow, Mode=FindAncestor}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FF777777" />
-                </MultiDataTrigger>
-            </Style.Triggers>
-        </Style>
         <Style x:Key="TextBlockLightStyle" TargetType="TextBlock">
             <Setter Property="Background" Value="White" />
         </Style>
@@ -137,18 +81,79 @@
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridRow">
+                        <Border
+                            x:Name="RowBorder"
+                            HorizontalAlignment="Left"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            SnapsToDevicePixels="True">
+                            <DataGridCellsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style
             x:Key="RowLightStyle"
             BasedOn="{StaticResource RowStyle}"
             TargetType="DataGridRow">
             <Setter Property="Background" Value="White" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FFE5F3FF" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FFCCE8FF" />
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFD9D9D9" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FFCCE8FF" />
+                </MultiDataTrigger>
+            </Style.Triggers>
         </Style>
         <Style
             x:Key="RowDarkStyle"
             BasedOn="{StaticResource RowStyle}"
             TargetType="DataGridRow">
             <Setter Property="Background" Value="#FF202020" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF4D4D4D" />
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#FF777777" />
+                </Trigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FF333333" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Background" Value="#FF777777" />
+                </MultiDataTrigger>
+            </Style.Triggers>
         </Style>
         <Style x:Key="DeviceStyle" TargetType="ui:ListViewItem">
             <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_MouseDown" />
@@ -513,7 +518,7 @@
                 AutoGenerateColumns="False"
                 Background="Transparent"
                 CanUserResizeRows="False"
-                CellStyle="{StaticResource CellLightStyle}"
+                CellStyle="{StaticResource CellVerticalStyle}"
                 ContextMenu="{StaticResource RowContextMenu}"
                 ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                 GridLinesVisibility="None"
