@@ -724,7 +724,7 @@
                     <Grid Margin="6,8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="50" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="{Binding ElementName=NewDeviceRect, Path=ActualHeight}" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <TextBlock
@@ -742,9 +742,44 @@
                                 </MenuItem.Header>
                             </MenuItem>
                         </Menu>
+                        <Rectangle
+                            x:Name="NewDeviceRect"
+                            Grid.Row="1"
+                            Height="{Binding ElementName=NewDevicePanel, Path=ActualHeight}"
+                            Fill="Transparent">
+                            <Rectangle.Style>
+                                <Style TargetType="Rectangle">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Height"
+                                                            From="0"
+                                                            Duration="0:00:00.2" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Height"
+                                                            To="0"
+                                                            Duration="0:00:00.2" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Rectangle.Style>
+                        </Rectangle>
                         <StackPanel
                             x:Name="NewDevicePanel"
                             Grid.Row="1"
+                            VerticalAlignment="Bottom"
                             IsVisibleChanged="NewDevicePanel_IsVisibleChanged"
                             Visibility="Collapsed">
                             <StackPanel Margin="8">
@@ -780,7 +815,8 @@
                             Grid.Row="2"
                             IsSelectionEnabled="False"
                             ItemContainerStyle="{StaticResource DeviceLightStyle}"
-                            ItemsSource="{Binding}" />
+                            ItemsSource="{Binding}"
+                            MouseDown="DevicesList_MouseDown" />
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

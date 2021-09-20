@@ -844,7 +844,7 @@ namespace ADB_Explorer
 
             NewDeviceIpBox.Text = "";
             NewDevicePortBox.Text = "";
-            NewDevicePanel.Visibility = Visibility.Collapsed;
+            NewDevicePanelVisibility(false);
 
             //ClearExplorer();
             DeviceListSetup(deviceAddress);
@@ -868,9 +868,22 @@ namespace ADB_Explorer
 
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            NewDevicePanel.Visibility = Visible(!NewDevicePanel.IsVisible);
+            NewDevicePanelVisibility(!NewDevicePanelVisibility());
             Devices.UnselectAll();
             DevicesList.Items.Refresh();
+        }
+
+        private void NewDevicePanelVisibility(bool open)
+        {
+            if (NewDevicePanel.Visibility == Visibility.Collapsed)
+                NewDevicePanel.Visibility = Visibility.Visible;
+
+            NewDevicePanel.Tag = open ? "Open" : "Closed";
+        }
+
+        private bool NewDevicePanelVisibility()
+        {
+            return NewDevicePanel.Tag?.ToString() == "Open";
         }
 
         private void RetrieveIp()
@@ -956,14 +969,14 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
-            NewDevicePanel.Visibility = Visibility.Collapsed;
+            NewDevicePanelVisibility(false);
             Devices.UnselectAll();
             DevicesList.Items.Refresh();
         }
 
         private void NewDevicePanel_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (NewDevicePanel.IsVisible)
+            if (NewDevicePanelVisibility())
                 RetrieveIp();
         }
 
@@ -1039,6 +1052,12 @@ namespace ADB_Explorer
             }
             else
                 InitializeContextMenu(MenuType.EmptySpace);
+        }
+
+        private void DevicesList_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Devices.UnselectAll();
+            DevicesList.Items.Refresh();
         }
     }
 }
