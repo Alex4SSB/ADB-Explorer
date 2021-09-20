@@ -35,13 +35,13 @@ namespace ADB_Explorer.Services
             public class AdbSyncProgressInfo
             {
                 public string CurrentFile { get; set; }
-                public int? TotalPrecentage { get; set; }
-                public int? CurrentFilePrecentage { get; set; }
+                public int? TotalPercentage { get; set; }
+                public int? CurrentFilePercentage { get; set; }
                 public UInt64? CurrentFileBytesTransferred { get; set; }
 
                 public override string ToString()
                 {
-                    return TotalPrecentage.ToString() + ", " + CurrentFile + ", " + CurrentFilePrecentage?.ToString() + ", " + CurrentFileBytesTransferred?.ToString();
+                    return TotalPercentage.ToString() + ", " + CurrentFile + ", " + CurrentFilePercentage?.ToString() + ", " + CurrentFileBytesTransferred?.ToString();
                 }
             }
 
@@ -163,14 +163,14 @@ namespace ADB_Explorer.Services
 
                     var currFile = progressMatch.Groups["CurrentFile"].Value;
 
-                    string totalPrecentageRaw = progressMatch.Groups["TotalPrecentage"].Value;
-                    int? totalPrecentage = totalPrecentageRaw.EndsWith("%") ? int.Parse(totalPrecentageRaw.TrimEnd('%')) : null;
+                    string totalPercentageRaw = progressMatch.Groups["TotalPercentage"].Value;
+                    int? totalPercentage = totalPercentageRaw.EndsWith("%") ? int.Parse(totalPercentageRaw.TrimEnd('%')) : null;
 
-                    int? currPrecentage = null;
-                    if (progressMatch.Groups["CurrentPrecentage"].Success)
+                    int? currPercentage = null;
+                    if (progressMatch.Groups["CurrentPercentage"].Success)
                     {
-                        string currPrecentageRaw = progressMatch.Groups["CurrentPrecentage"].Value;
-                        currPrecentage = currPrecentageRaw.EndsWith("%") ? int.Parse(currPrecentageRaw.TrimEnd('%')) : null;
+                        string currPercentageRaw = progressMatch.Groups["CurrentPercentage"].Value;
+                        currPercentage = currPercentageRaw.EndsWith("%") ? int.Parse(currPercentageRaw.TrimEnd('%')) : null;
                     }
 
                     UInt64? currBytes =
@@ -179,9 +179,9 @@ namespace ADB_Explorer.Services
 
                     progressUpdates.Enqueue(new AdbSyncProgressInfo
                     {
-                        TotalPrecentage = totalPrecentage,
+                        TotalPercentage = totalPercentage,
                         CurrentFile = currFile,
-                        CurrentFilePrecentage = currPrecentage,
+                        CurrentFilePercentage = currPercentage,
                         CurrentFileBytesTransferred = currBytes
                     });
                 }

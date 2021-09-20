@@ -12,7 +12,7 @@ namespace ADB_Explorer.Models
             RegexOptions.Multiline);
 
         public static readonly Regex FILE_SYNC_PROGRESS_RE =
-            new(@"^\[ *(?<TotalPrecentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPrecentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$",
+            new(@"^\[ *(?<TotalPercentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPercentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$",
                       RegexOptions.Multiline);
 
         public static readonly Regex FILE_SYNC_STATS_RE =

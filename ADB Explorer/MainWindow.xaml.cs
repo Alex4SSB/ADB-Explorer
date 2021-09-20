@@ -277,6 +277,8 @@ namespace ADB_Explorer
 
             if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
                 AutoOpenCheckBox.IsChecked = autoOpen;
+
+            FileOperationsList.ItemsSource = fileOperationQueue.Operations;
         }
 
         private void InitDevice()
@@ -663,13 +665,11 @@ namespace ADB_Explorer
 
                 path = dialog.FileName;
             }
-         
+
             foreach (FileClass item in ExplorerGrid.SelectedItems)
             {
                 fileOperationQueue.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item.Path, path));
             }
-
-            
         }
 
         private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
@@ -677,17 +677,17 @@ namespace ADB_Explorer
             if (fileOperationQueue.IsActive)
             {
                 OperationCompletedTextBlock.Text = "";
-                
+
                 if (ProgressGrid.Visibility == Visibility.Collapsed)
                     ProgressGrid.Visibility = Visibility.Visible;
 
                 ProgressCountTextBlock.Text = $"{fileOperationQueue.CurrentOperationIndex + 1}/{fileOperationQueue.Operations.Count}";
 
-                if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPrecentage.HasValue)
+                if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
                 {
                     OverallProgressBar.IsIndeterminate = false;
-                    OverallProgressBar.Value = progressInfo.TotalPrecentage.Value;
-                } 
+                    OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
+                }
                 else
                 {
                     OverallProgressBar.IsIndeterminate = true;
@@ -1028,6 +1028,14 @@ namespace ADB_Explorer
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
         {
             NewDevicePanelVisibility(false);
+        }
+
+        private void CloseOperationButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is Button button && button.DataContext is FileOperation operation)
+            {
+                fileOperationQueue.Operations.Remove(operation);
+            }
         }
     }
 }

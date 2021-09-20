@@ -291,18 +291,70 @@
             </Style.Triggers>
         </Style>
         <DataTemplate x:Key="PullTemplate" DataType="services:FilePullOperation">
-            <ui:ListViewItem>
-                <Grid />
+            <ui:ListViewItem Margin="0,0,0,1">
+                <Border
+                    Background="#7D7D7D7D"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <Grid Width="240" Margin="2,0,0,0">
+                        <StackPanel HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Pull: " />
+                                <TextBlock Text="{Binding Status}" />
+                                <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.TotalPercentage}" />
+                            </StackPanel>
+                            <Grid MaxWidth="200">
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding FilePath}" />
+                            </Grid>
+                        </StackPanel>
+                        <Button
+                            Margin="6"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Click="CloseOperationButton_Click"
+                            Content="&#xE8BB;"
+                            FontFamily="Segoe MDL2 Assets"
+                            FontSize="10" />
+                    </Grid>
+                </Border>
             </ui:ListViewItem>
         </DataTemplate>
         <DataTemplate x:Key="PushTemplate" DataType="services:FilePushOperation">
-            <ui:ListViewItem>
-                <Grid />
+            <ui:ListViewItem Margin="0,0,0,1">
+                <Border
+                    Background="#7D7D7D7D"
+                    BorderBrush="Gray"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <Grid Width="240" Margin="2,0,0,0">
+                        <StackPanel HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Push: " />
+                                <TextBlock Text="{Binding Status}" />
+                                <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.TotalPercentage}" />
+                            </StackPanel>
+                            <Grid MaxWidth="200">
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding FilePath}" />
+                            </Grid>
+                        </StackPanel>
+                        <Button
+                            Margin="6"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Top"
+                            Click="CloseOperationButton_Click"
+                            Content="&#xE8BB;"
+                            FontFamily="Segoe MDL2 Assets"
+                            FontSize="10" />
+                    </Grid>
+                </Border>
             </ui:ListViewItem>
         </DataTemplate>
         <DataTemplate x:Key="SyncTemplate" DataType="services:FileSyncOperation">
             <ui:ListViewItem>
-                <Grid />
+                <Grid>
+                    <TextBlock Text="Sync" />
+                </Grid>
             </ui:ListViewItem>
         </DataTemplate>
         <helpers:FileOperationTemplateSelector
@@ -711,14 +763,23 @@
                         Text="0/0" />
                 </Grid>
             </Grid>
+            <ui:ListView
+                x:Name="FileOperationsList"
+                Grid.Row="2"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                ItemTemplateSelector="{StaticResource FileOperationTemplateSelector}"
+                ItemsSource="{Binding}" />
         </Grid>
+
         <ui:SplitView
             x:Name="DevicesSplitView"
             FocusVisualStyle="{x:Null}"
             IsPaneOpen="True"
             OpenPaneLength="200"
             PaneClosing="DevicesSplitView_PaneClosing"
-            PanePlacement="Left" PaneOpening="DevicesSplitView_PaneOpening">
+            PaneOpening="DevicesSplitView_PaneOpening"
+            PanePlacement="Left">
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="0,1,1,0">
                     <Grid Margin="6,8">
