@@ -832,15 +832,23 @@ namespace ADB_Explorer
 
         private void NewDevicePanelVisibility(bool open)
         {
-            if (NewDevicePanel.Visibility == Visibility.Collapsed)
-                NewDevicePanel.Visibility = Visibility.Visible;
+            if (NewDevicePanel is null)
+                return;
 
-            NewDevicePanel.Tag = open ? "Open" : "Closed";
+            if (open)
+            {
+                if (NewDevicePanel.Visibility == Visibility.Collapsed)
+                    NewDevicePanel.Visibility = Visibility.Visible;
+
+                NewDevicePanel.Tag = "Open";
+            }
+            else
+                NewDevicePanel.Tag = "Closed";
         }
 
         private bool NewDevicePanelVisibility()
         {
-            return NewDevicePanel.Tag?.ToString() == "Open";
+            return NewDevicePanel?.Tag?.ToString() == "Open";
         }
 
         private void RetrieveIp()
@@ -1015,6 +1023,11 @@ namespace ADB_Explorer
         {
             Devices.UnselectAll();
             DevicesList.Items.Refresh();
+        }
+
+        private void DevicesSplitView_PaneOpening(SplitView sender, object args)
+        {
+            NewDevicePanelVisibility(false);
         }
     }
 }

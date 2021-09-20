@@ -718,7 +718,7 @@
             IsPaneOpen="True"
             OpenPaneLength="200"
             PaneClosing="DevicesSplitView_PaneClosing"
-            PanePlacement="Left">
+            PanePlacement="Left" PaneOpening="DevicesSplitView_PaneOpening">
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="0,1,1,0">
                     <Grid Margin="6,8">
