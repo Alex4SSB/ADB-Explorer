@@ -28,7 +28,12 @@ namespace ADB_Explorer.Services
 
         public string TargetPath { get; }
 
-        public FileSyncOperation(Dispatcher dispatcher, FileSyncMethod adbMethod, ADBService.Device adbDevice, string sourcePath, string targetPath) : base(dispatcher, adbDevice, sourcePath)
+        public FileSyncOperation(
+            Dispatcher dispatcher, 
+            FileSyncMethod adbMethod, 
+            ADBService.Device adbDevice, 
+            string sourcePath, 
+            string targetPath) : base(dispatcher, adbDevice, sourcePath)
         {
             TargetPath = targetPath;
             this.adbMethod = adbMethod;
