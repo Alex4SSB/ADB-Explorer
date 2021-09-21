@@ -482,7 +482,7 @@ namespace ADB_Explorer
             foreach (var dir in dirs)
             {
                 pathItems.Add(dir);
-                var dirPath = string.Join('/', pathItems);
+                var dirPath = string.Join('/', pathItems).Replace("//", "/");
                 var dirName = pathItems.Last();
                 AddPathButton(dirPath, dirName);
 
