@@ -420,6 +420,7 @@ namespace ADB_Explorer
 
         public bool NavigateToPath(string path, bool bfNavigated = false)
         {
+            ExplorerGrid.Focus();
             if (path is null) return false;
 
             string realPath;
