@@ -57,11 +57,12 @@
             </MenuItem.Header>
         </MenuItem>
         <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
+            <EventSetter Event="MouseDown" Handler="ExplorerCanvas_MouseDown" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
                         <Grid Margin="0" Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center" />
+                            <ContentPresenter VerticalAlignment="Center" MouseDown="ExplorerCanvas_MouseDown" />
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -79,6 +80,7 @@
         <Style x:Key="RowStyle" TargetType="DataGridRow">
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
+            <EventSetter Event="MouseEnter" Handler="DataGridRow_MouseEnter" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <Setter Property="Template">
@@ -580,6 +582,8 @@
                 KeyboardNavigation.TabNavigation="Once"
                 MinRowHeight="21"
                 MouseDown="ExplorerGrid_MouseDown"
+                MouseMove="ExplorerGrid_MouseMove"
+                MouseUp="SelectionRect_MouseUp"
                 PreviewMouseRightButtonDown="ExplorerGrid_PreviewMouseRightButtonDown"
                 RowStyle="{StaticResource RowLightStyle}"
                 SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
@@ -657,6 +661,24 @@
                     </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
+            <Canvas
+                x:Name="ExplorerCanvas"
+                Grid.Row="2"
+                MouseDown="ExplorerCanvas_MouseDown">
+                <Border
+                    x:Name="SelectionRect"
+                    BorderBrush="#FF3399FF"
+                    BorderThickness="1"
+                    MouseMove="ExplorerGrid_MouseMove"
+                    MouseUp="SelectionRect_MouseUp"
+                    Visibility="Collapsed">
+                    <Rectangle MouseMove="ExplorerGrid_MouseMove" MouseUp="SelectionRect_MouseUp">
+                        <Rectangle.Fill>
+                            <SolidColorBrush Color="#7F3399FF" />
+                        </Rectangle.Fill>
+                    </Rectangle>
+                </Border>
+            </Canvas>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
                 <StackPanel.Resources>
                     <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
@@ -771,7 +793,6 @@
                 ItemTemplateSelector="{StaticResource FileOperationTemplateSelector}"
                 ItemsSource="{Binding}" />
         </Grid>
-
         <ui:SplitView
             x:Name="DevicesSplitView"
             FocusVisualStyle="{x:Null}"
