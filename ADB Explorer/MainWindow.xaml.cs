@@ -396,7 +396,7 @@ namespace ADB_Explorer
             });
         }
 
-        private void DetermineFolders(IEnumerable<FileClass> files, CancellationToken cancellationToken)
+        private static void DetermineFolders(IEnumerable<FileClass> files, CancellationToken cancellationToken)
         {
             foreach (var file in files)
             {
@@ -463,8 +463,6 @@ namespace ADB_Explorer
         private void PopulateButtons(string path)
         {
             var expectedLength = 0;
-            List<MenuItem> excessButtons = new();
-
             PathStackPanel.Children.Clear();
             var pathItems = new List<string>();
 
@@ -472,7 +470,7 @@ namespace ADB_Explorer
             var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.FirstOrDefault(kv => path.StartsWith(kv.Key));
             if (specialPair.Key != null)
             {
-                AddPathButton(specialPair.Key, specialPair.Value);
+                AddPathButton(specialPair);
                 pathItems.Add(specialPair.Key);
                 path = path[specialPair.Key.Length..].TrimStart('/');
                 expectedLength = PathButtonLength.ButtonLength(specialPair.Value);
@@ -492,51 +490,83 @@ namespace ADB_Explorer
                 expectedLength += PathButtonLength.ButtonLength(dirName);
             }
 
+            ConsolidateButtons(expectedLength);
+        }
+
+        private void ConsolidateButtons(double expectedLength)
+        {
+            List<MenuItem> excessButtons = new();
             while (expectedLength >= PathBox.ActualWidth && PathStackPanel.Children.Count > 2)
             {
+                var item = ((Menu)PathStackPanel.Children[0]).Items[0] as MenuItem;
+                if (item.Header is FontIcon)
+                {
+                    throw new NotImplementedException();
+                }
+
                 if (!excessButtons.Any())
                     expectedLength += PATH_EXCESS_BUTTON_WIDTH;
 
-                var item = (MenuItem)((Menu)PathStackPanel.Children[0]).Items[0];
                 excessButtons.Add(item);
                 expectedLength -= PathButtonLength.ButtonLength((string)item.Header);
                 expectedLength -= PATH_ARROW_WIDTH;
                 PathStackPanel.Children.RemoveRange(0, 2);
             }
 
-            if (excessButtons.Any())
-            {
-                TextBlock tb = new()
-                {
-                    Text = " \uE970 ",
-                    FontFamily = new("Segoe MDL2 Assets"),
-                    FontSize = 7,
-                };
-                PathStackPanel.Children.Insert(0, tb);
-
-                Menu excessMenu = new() { Height = 24 };
-                excessMenu.Items.Add(new MenuItem()
-                {
-                    ItemsSource = excessButtons,
-                    Height = 24,
-                    Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
-                });
-                
-                PathStackPanel.Children.Insert(0, excessMenu);
-            }
+            CreateExcessButton(excessButtons);
         }
 
-        private void AddPathButton(string path, string name)
+        private MenuItem CreateExcessButton(List<MenuItem> excessButtons = null)
         {
-            if (PathStackPanel.Children.Count > 0)
+            if (excessButtons is not null && !excessButtons.Any())
+                return null;
+
+            AddPathArrow(false);
+            Menu excessMenu = new() { Height = 24 };
+            MenuItem excessButton = new()
             {
-                TextBlock tb = new()
-                {
-                    Text = " \uE970 ",
-                    FontFamily = new("Segoe MDL2 Assets"),
-                    FontSize = 7,
-                };
-                PathStackPanel.Children.Add(tb);
+                ItemsSource = excessButtons,
+                Height = 24,
+                Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
+            };
+            excessMenu.Items.Add(excessButton);
+            PathStackPanel.Children.Insert(0, excessMenu);
+
+            return excessButton;
+        }
+
+        //private void ConsolidateButtons()
+        //{
+        //    if (PathStackPanel.ActualWidth / PathBox.ActualWidth > 0.98)
+        //    {
+        //        List<MenuItem> excessButtons = new();
+        //        var item = ((Menu)PathStackPanel.Children[0]).Items[0] as MenuItem;
+        //        if (item.Header is FontIcon)
+        //            excessButtons = (List<MenuItem>)item.ItemsSource;
+
+        //        var menu = PathStackPanel.Children[2] as Menu;
+        //        var excess = menu.Items[0] as MenuItem;
+        //        menu.Items.Clear();
+        //        PathStackPanel.Children.RemoveRange(2, 2);
+        //        excessButtons.Add(excess);
+
+        //        if (item.Header is not FontIcon)
+        //        {
+        //            item = CreateExcessButton(excessButtons);
+        //        }
+        //        else
+        //            item.ItemsSource = excessButtons;
+
+        //        item.Items.Refresh();
+        //    }
+        //}
+
+        private void AddPathButton(KeyValuePair<string, string> kv, bool addArrow = true) => AddPathButton(kv.Key, kv.Value, addArrow);
+        private void AddPathButton(string path, string name, bool addArrow = true)
+        {
+            if (PathStackPanel.Children.Count > 0 && addArrow)
+            {
+                AddPathArrow();
             }
 
             MenuItem button = new() { Header = name, Tag = path, Height = 24 };
@@ -544,6 +574,20 @@ namespace ADB_Explorer
             menu.Items.Add(button);
             button.Click += PathButton_Click;
             PathStackPanel.Children.Add(menu);
+        }
+
+        private void AddPathArrow(bool append = true)
+        {
+            FontIcon arrow = new()
+            {
+                Glyph = " \uE970 ",
+                FontSize = 7,
+            };
+
+            if (append)
+                PathStackPanel.Children.Add(arrow);
+            else
+                PathStackPanel.Children.Insert(0, arrow);
         }
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
@@ -709,7 +753,6 @@ namespace ADB_Explorer
                 ProgressGrid.Visibility = Visibility.Collapsed;
                 OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.Operations.Count} file{(fileOperationQueue.Operations.Count > 1 ? "s" : "")} done";
             }
-            
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -808,8 +851,6 @@ namespace ADB_Explorer
             NewDeviceIpBox.Text = "";
             NewDevicePortBox.Text = "";
             NewDevicePanelVisibility(false);
-
-            //ClearExplorer();
             DeviceListSetup(deviceAddress);
         }
 
@@ -1063,8 +1104,7 @@ namespace ADB_Explorer
                     if (i < 0)
                         return;
 
-                    var tempRow = ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
-                    if (tempRow is null)
+                    if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow tempRow)
                     {
                         ExplorerGrid.UnselectAll();
                         return;
@@ -1130,6 +1170,12 @@ namespace ADB_Explorer
         private void ExplorerCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             MouseDownPoint = e.GetPosition(ExplorerGrid);
+        }
+
+        private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (PathStackPanel.ActualWidth / PathBox.ActualWidth > 0.98)
+                ConsolidateButtons(PathStackPanel.ActualWidth);
         }
     }
 }
