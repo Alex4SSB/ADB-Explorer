@@ -54,6 +54,7 @@ namespace ADB_Explorer
         }
 
         private Point MouseDownPoint;
+        private List<MenuItem> PathButtons = new();
 
         private void GetExplorerContentPresenter()
         {
@@ -462,18 +463,22 @@ namespace ADB_Explorer
 
         private void PopulateButtons(string path)
         {
-            var expectedLength = 0;
-            PathStackPanel.Children.Clear();
-            var pathItems = new List<string>();
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            var expectedLength = 0.0;
+            List<MenuItem> tempButtons = new();
+            List<string> pathItems = new();
 
             // On special cases, cut prefix of the path and replace with a pretty button
             var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.FirstOrDefault(kv => path.StartsWith(kv.Key));
             if (specialPair.Key != null)
             {
-                AddPathButton(specialPair);
+                MenuItem button = CreatePathButton(specialPair);
+                tempButtons.Add(button);
                 pathItems.Add(specialPair.Key);
                 path = path[specialPair.Key.Length..].TrimStart('/');
-                expectedLength = PathButtonLength.ButtonLength(specialPair.Value);
+                expectedLength = PathButtonLength.ButtonLength(button);
             }
 
             var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
@@ -481,108 +486,107 @@ namespace ADB_Explorer
             {
                 pathItems.Add(dir);
                 var dirPath = string.Join('/', pathItems).Replace("//", "/");
-                var dirName = pathItems.Last();
-                AddPathButton(dirPath, dirName);
-
-                if (PathStackPanel.Children.Count > 2)
-                    expectedLength += PATH_ARROW_WIDTH;
-
-                expectedLength += PathButtonLength.ButtonLength(dirName);
+                MenuItem button = CreatePathButton(dirPath, dir);
+                tempButtons.Add(button);
+                expectedLength += PathButtonLength.ButtonLength(button);
             }
 
-            ConsolidateButtons(expectedLength);
+            expectedLength += (tempButtons.Count - 1) * PathButtonLength.ButtonLength(CreatePathArrow());
+
+            int i = 0;
+            for (; i < PathButtons.Count && i < tempButtons.Count; i++)
+            {
+                var oldB = PathButtons[i];
+                var newB = tempButtons[i];
+                if (oldB.Header.ToString() != newB.Header.ToString() ||
+                    oldB.Tag.ToString() != newB.Tag.ToString())
+                {
+                    break;
+                }
+            }
+            PathButtons.RemoveRange(i, PathButtons.Count - i);
+            PathButtons.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
+
+            // StackPanel's margin is 10, while TextBox's margins is 6, thus the offset is 4
+            ConsolidateButtons(expectedLength + 4);
         }
 
         private void ConsolidateButtons(double expectedLength)
         {
+            if (expectedLength > PathBox.ActualWidth)
+                expectedLength += PathButtonLength.ButtonLength(CreateExcessButton());
+
+            double excessLength = expectedLength - PathBox.ActualWidth;
             List<MenuItem> excessButtons = new();
-            while (expectedLength >= PathBox.ActualWidth && PathStackPanel.Children.Count > 2)
+            PathStackPanel.Children.Clear();
+
+            if (excessLength > 0)
             {
-                var item = ((Menu)PathStackPanel.Children[0]).Items[0] as MenuItem;
-                if (item.Header is FontIcon)
+                int i = 0;
+                while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
                 {
-                    throw new NotImplementedException();
+                    excessButtons.Add(PathButtons[i]);
+                    excessLength -= PathButtonLength.ButtonLength(PathButtons[i]);
+
+                    i++;
                 }
 
-                if (!excessButtons.Any())
-                    expectedLength += PATH_EXCESS_BUTTON_WIDTH;
-
-                excessButtons.Add(item);
-                expectedLength -= PathButtonLength.ButtonLength((string)item.Header);
-                expectedLength -= PATH_ARROW_WIDTH;
-                PathStackPanel.Children.RemoveRange(0, 2);
+                AddExcessButton(excessButtons);
             }
 
-            CreateExcessButton(excessButtons);
+            foreach (var item in PathButtons.Except(excessButtons))
+            {
+                if (PathStackPanel.Children.Count > 0)
+                    AddPathArrow();
+
+                AddPathButton(item);
+            }
         }
 
-        private MenuItem CreateExcessButton(List<MenuItem> excessButtons = null)
+        private MenuItem CreateExcessButton() => new MenuItem()
+        {
+            Height = 24,
+            Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
+        };
+
+        private void AddExcessButton(List<MenuItem> excessButtons = null)
         {
             if (excessButtons is not null && !excessButtons.Any())
-                return null;
+                return;
 
-            AddPathArrow(false);
+            var button = CreateExcessButton();
+            button.ItemsSource = excessButtons;
             Menu excessMenu = new() { Height = 24 };
-            MenuItem excessButton = new()
-            {
-                ItemsSource = excessButtons,
-                Height = 24,
-                Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
-            };
-            excessMenu.Items.Add(excessButton);
-            PathStackPanel.Children.Insert(0, excessMenu);
-
-            return excessButton;
+            excessMenu.Items.Add(button);
+            PathStackPanel.Children.Add(excessMenu);
         }
 
-        //private void ConsolidateButtons()
-        //{
-        //    if (PathStackPanel.ActualWidth / PathBox.ActualWidth > 0.98)
-        //    {
-        //        List<MenuItem> excessButtons = new();
-        //        var item = ((Menu)PathStackPanel.Children[0]).Items[0] as MenuItem;
-        //        if (item.Header is FontIcon)
-        //            excessButtons = (List<MenuItem>)item.ItemsSource;
-
-        //        var menu = PathStackPanel.Children[2] as Menu;
-        //        var excess = menu.Items[0] as MenuItem;
-        //        menu.Items.Clear();
-        //        PathStackPanel.Children.RemoveRange(2, 2);
-        //        excessButtons.Add(excess);
-
-        //        if (item.Header is not FontIcon)
-        //        {
-        //            item = CreateExcessButton(excessButtons);
-        //        }
-        //        else
-        //            item.ItemsSource = excessButtons;
-
-        //        item.Items.Refresh();
-        //    }
-        //}
-
-        private void AddPathButton(KeyValuePair<string, string> kv, bool addArrow = true) => AddPathButton(kv.Key, kv.Value, addArrow);
-        private void AddPathButton(string path, string name, bool addArrow = true)
+        private MenuItem CreatePathButton(KeyValuePair<string, string> kv) => CreatePathButton(kv.Key, kv.Value);
+        private MenuItem CreatePathButton(string path, string name)
         {
-            if (PathStackPanel.Children.Count > 0 && addArrow)
-            {
-                AddPathArrow();
-            }
-
             MenuItem button = new() { Header = name, Tag = path, Height = 24 };
-            Menu menu = new() { Height = 24 };
-            menu.Items.Add(button);
             button.Click += PathButton_Click;
+
+            return button;
+        }
+
+        private void AddPathButton(MenuItem button)
+        {
+            Menu menu = new() { Height = 24 };
+            ((Menu)button.Parent)?.Items.Clear();
+            menu.Items.Add(button);
             PathStackPanel.Children.Add(menu);
         }
 
+        private FontIcon CreatePathArrow() => new()
+        {
+            Glyph = " \uE970 ",
+            FontSize = 7,
+        };
+
         private void AddPathArrow(bool append = true)
         {
-            FontIcon arrow = new()
-            {
-                Glyph = " \uE970 ",
-                FontSize = 7,
-            };
+            var arrow = CreatePathArrow();
 
             if (append)
                 PathStackPanel.Children.Add(arrow);
@@ -1171,8 +1175,7 @@ namespace ADB_Explorer
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (PathStackPanel.ActualWidth / PathBox.ActualWidth > 0.98)
-                ConsolidateButtons(PathStackPanel.ActualWidth);
+            PopulateButtons((string)PathBox.Tag);
         }
     }
 }
