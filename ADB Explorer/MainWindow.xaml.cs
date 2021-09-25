@@ -875,6 +875,9 @@ namespace ADB_Explorer
             NewDevicePanelVisibility(!NewDevicePanelVisibility());
             Devices.UnselectAll();
             DevicesList.Items.Refresh();
+
+            if (NewDevicePanelVisibility())
+                RetrieveIp();
         }
 
         private void NewDevicePanelVisibility(bool open)
@@ -984,12 +987,6 @@ namespace ADB_Explorer
             NewDevicePanelVisibility(false);
             Devices.UnselectAll();
             DevicesList.Items.Refresh();
-        }
-
-        private void NewDevicePanel_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
-            if (NewDevicePanelVisibility())
-                RetrieveIp();
         }
 
         private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)

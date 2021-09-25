@@ -863,7 +863,6 @@
                             x:Name="NewDevicePanel"
                             Grid.Row="1"
                             VerticalAlignment="Bottom"
-                            IsVisibleChanged="NewDevicePanel_IsVisibleChanged"
                             Visibility="Collapsed">
                             <StackPanel Margin="8">
                                 <TextBlock Text="IP:" />
