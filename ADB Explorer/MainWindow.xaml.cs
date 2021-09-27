@@ -486,7 +486,7 @@ namespace ADB_Explorer
             {
                 pathItems.Add(dir);
                 var dirPath = string.Join('/', pathItems).Replace("//", "/");
-                MenuItem button = CreatePathButton(dirPath, dir);
+                MenuItem button = CreatePathButton(dirPath, dir.Replace("_", "__"));
                 tempButtons.Add(button);
                 expectedLength += PathButtonLength.ButtonLength(button);
             }
@@ -507,8 +507,8 @@ namespace ADB_Explorer
             PathButtons.RemoveRange(i, PathButtons.Count - i);
             PathButtons.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
 
-            // StackPanel's margin is 10, while TextBox's margins is 6, thus the offset is 4
-            ConsolidateButtons(expectedLength + 4);
+            // StackPanel's margin is 10, while TextBox's margins is 6, thus the offset is 4x2
+            ConsolidateButtons(expectedLength + 8);
         }
 
         private void ConsolidateButtons(double expectedLength)
