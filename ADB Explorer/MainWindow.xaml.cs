@@ -1090,56 +1090,57 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (MouseDownPoint.Y > 0 && e.LeftButton == MouseButtonState.Pressed && e.OriginalSource is DataGridRow row)
-            {
-                ExplorerGrid.UnselectAll();
+            // https://www.codeproject.com/Articles/148503/Simple-Drag-Selection-in-WPF
 
-                var currentY = e.GetPosition(ExplorerGrid).Y;
-                var above = currentY < MouseDownPoint.Y;
-                var verticalDistance = Math.Abs(MouseDownPoint.Y - currentY);
+            //if (MouseDownPoint.Y > 0 && e.LeftButton == MouseButtonState.Pressed && e.OriginalSource is DataGridRow row)
+            //{
+            //    ExplorerGrid.UnselectAll();
 
-                double currentRelativeDistance = 0;
-                var i = ExplorerGrid.ItemContainerGenerator.IndexFromContainer(row);
-                do
-                {
-                    if (i < 0)
-                        return;
+            //    var currentY = e.GetPosition(ExplorerGrid).Y;
+            //    var above = currentY < MouseDownPoint.Y;
+            //    var verticalDistance = Math.Abs(MouseDownPoint.Y - currentY);
 
-                    if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow tempRow)
-                    {
-                        ExplorerGrid.UnselectAll();
-                        return;
-                    }
+            //    double currentRelativeDistance = 0;
+            //    var i = ExplorerGrid.ItemContainerGenerator.IndexFromContainer(row);
+            //    do
+            //    {
+            //        if (i < 0)
+            //            return;
 
-                    currentRelativeDistance = Math.Abs(e.GetPosition(tempRow).Y);
-                    if (above)
-                    {
-                        if (currentRelativeDistance > verticalDistance && verticalDistance > tempRow.ActualHeight)
-                            break;
+            //        if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow tempRow)
+            //        {
+            //            ExplorerGrid.UnselectAll();
+            //            return;
+            //        }
 
-                        currentRelativeDistance = tempRow.ActualHeight - currentRelativeDistance;
-                    }
+            //        currentRelativeDistance = Math.Abs(e.GetPosition(tempRow).Y);
+            //        if (above)
+            //        {
+            //            if (currentRelativeDistance > verticalDistance && verticalDistance > tempRow.ActualHeight)
+            //                break;
 
-                    tempRow.IsSelected = true;
-                    i += above ? 1 : -1;
-                } while (currentRelativeDistance < verticalDistance && i < ExplorerGrid.Items.Count);
-            }
+            //            currentRelativeDistance = tempRow.ActualHeight - currentRelativeDistance;
+            //        }
+
+            //        tempRow.IsSelected = true;
+            //        i += above ? 1 : -1;
+            //    } while (currentRelativeDistance < verticalDistance && i < ExplorerGrid.Items.Count);
+            //}
         }
 
         private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
         {
             var point = e.GetPosition(ExplorerCanvas);
-            if (e.LeftButton == MouseButtonState.Released
-                || (e.LeftButton == MouseButtonState.Pressed
-                && (MouseDownPoint.Y < ColumnHeaderHeight || point.Y < ColumnHeaderHeight)))
+            if (e.LeftButton == MouseButtonState.Released) // || (e.LeftButton == MouseButtonState.Pressed && (MouseDownPoint.Y < ColumnHeaderHeight || point.Y < ColumnHeaderHeight))
             {
                 SelectionRect.Visibility = Visibility.Collapsed;
-                if (e.LeftButton == MouseButtonState.Pressed && point.Y < ColumnHeaderHeight)
-                    ExplorerGrid.UnselectAll();
+                //if (e.LeftButton == MouseButtonState.Pressed && point.Y < ColumnHeaderHeight)
+                //ExplorerGrid.UnselectAll();
 
                 return;
             }
 
+            //ExplorerGrid.CaptureMouse();
             SelectionRect.Visibility = Visibility.Visible;
             if (point.Y > MouseDownPoint.Y)
             {
@@ -1160,6 +1161,32 @@ namespace ADB_Explorer
 
             SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
             SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
+
+            SelectRows();
+        }
+
+        private void SelectRows()
+        {
+            ExplorerGrid.UnselectAll();
+            Rect selection = new(Canvas.GetLeft(SelectionRect),
+                                 Canvas.GetTop(SelectionRect),
+                                 SelectionRect.ActualWidth,
+                                 SelectionRect.ActualHeight);
+
+            for (int i = 0; i < ExplorerGrid.ItemContainerGenerator.Items.Count; i++)
+            {
+                var row = ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) as DataGridRow;
+                if (row is null)
+                {
+                    if (ExplorerGrid.SelectedItems.Count > 0)
+                        break;
+                    else
+                        continue;
+                }
+
+                Rect rowRect = new(row.TranslatePoint(new(), ExplorerGrid), row.DesiredSize);
+                row.IsSelected = rowRect.IntersectsWith(selection);
+            }
         }
 
         private void SelectionRect_MouseUp(object sender, MouseButtonEventArgs e)
@@ -1171,6 +1198,7 @@ namespace ADB_Explorer
         private void ExplorerCanvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
             MouseDownPoint = e.GetPosition(ExplorerGrid);
+            //ExplorerGrid.CaptureMouse();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
