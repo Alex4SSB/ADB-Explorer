@@ -53,7 +53,6 @@ namespace ADB_Explorer
             }
         }
 
-        private Point MouseDownPoint;
         private List<MenuItem> PathButtons = new();
 
         private void GetExplorerContentPresenter()
@@ -203,7 +202,6 @@ namespace ADB_Explorer
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             ExplorerGrid.Focus();
-            MouseDownPoint = e.GetPosition(ExplorerGrid);
         }
 
         private void LaunchSequence()
@@ -792,8 +790,6 @@ namespace ADB_Explorer
                 return;
 
             row.IsSelected = true;
-
-            MouseDownPoint = e.GetPosition(ExplorerGrid);
         }
 
         private void ChangeDefaultFolderButton_Click(object sender, RoutedEventArgs e)
@@ -1042,8 +1038,6 @@ namespace ADB_Explorer
                 if (point.Y < ColumnHeaderHeight || point.X > DataGridContentWidth)
                     InitializeContextMenu(MenuType.Header);
             }
-
-            MouseDownPoint = point;
         }
 
         private void ExplorerGrid_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -1086,91 +1080,6 @@ namespace ADB_Explorer
             {
                 fileOperationQueue.Operations.Remove(operation);
             }
-        }
-
-        private void DataGridRow_MouseEnter(object sender, MouseEventArgs e)
-        {
-            if (MouseDownPoint.Y > 0 && e.LeftButton == MouseButtonState.Pressed && e.OriginalSource is DataGridRow row)
-            {
-                ExplorerGrid.UnselectAll();
-
-                var currentY = e.GetPosition(ExplorerGrid).Y;
-                var above = currentY < MouseDownPoint.Y;
-                var verticalDistance = Math.Abs(MouseDownPoint.Y - currentY);
-
-                double currentRelativeDistance = 0;
-                var i = ExplorerGrid.ItemContainerGenerator.IndexFromContainer(row);
-                do
-                {
-                    if (i < 0)
-                        return;
-
-                    if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow tempRow)
-                    {
-                        ExplorerGrid.UnselectAll();
-                        return;
-                    }
-
-                    currentRelativeDistance = Math.Abs(e.GetPosition(tempRow).Y);
-                    if (above)
-                    {
-                        if (currentRelativeDistance > verticalDistance && verticalDistance > tempRow.ActualHeight)
-                            break;
-
-                        currentRelativeDistance = tempRow.ActualHeight - currentRelativeDistance;
-                    }
-
-                    tempRow.IsSelected = true;
-                    i += above ? 1 : -1;
-                } while (currentRelativeDistance < verticalDistance && i < ExplorerGrid.Items.Count);
-            }
-        }
-
-        private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
-        {
-            var point = e.GetPosition(ExplorerCanvas);
-            if (e.LeftButton == MouseButtonState.Released
-                || (e.LeftButton == MouseButtonState.Pressed
-                && (MouseDownPoint.Y < ColumnHeaderHeight || point.Y < ColumnHeaderHeight)))
-            {
-                SelectionRect.Visibility = Visibility.Collapsed;
-                if (e.LeftButton == MouseButtonState.Pressed && point.Y < ColumnHeaderHeight)
-                    ExplorerGrid.UnselectAll();
-
-                return;
-            }
-
-            SelectionRect.Visibility = Visibility.Visible;
-            if (point.Y > MouseDownPoint.Y)
-            {
-                Canvas.SetTop(SelectionRect, MouseDownPoint.Y);
-            }
-            else
-            {
-                Canvas.SetTop(SelectionRect, point.Y);
-            }
-            if (point.X > MouseDownPoint.X)
-            {
-                Canvas.SetLeft(SelectionRect, MouseDownPoint.X);
-            }
-            else
-            {
-                Canvas.SetLeft(SelectionRect, point.X);
-            }
-
-            SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
-            SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
-        }
-
-        private void SelectionRect_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            SelectionRect.Visibility = Visibility.Collapsed;
-            MouseDownPoint = new(0, 0);
-        }
-
-        private void ExplorerCanvas_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            MouseDownPoint = e.GetPosition(ExplorerGrid);
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
