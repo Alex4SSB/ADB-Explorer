@@ -599,6 +599,7 @@ namespace ADB_Explorer
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
+            ExplorerGrid.Focus();
             SettingsSplitView.IsPaneOpen = true;
         }
 
@@ -688,6 +689,7 @@ namespace ADB_Explorer
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
+            ExplorerGrid.Focus();
             CopyFiles();
         }
 
@@ -821,6 +823,7 @@ namespace ADB_Explorer
 
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
         {
+            ExplorerGrid.Focus();
             DevicesSplitView.IsPaneOpen = true;
         }
 

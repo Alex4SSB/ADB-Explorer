@@ -395,7 +395,14 @@
                     Click="OpenDevicesButton_Click"
                     ToolTip="Show Devices">
                     <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE8CC;" />
+                        <Grid>
+                            <ui:FontIcon Glyph="&#xE8CC;" />
+                            <TextBlock
+                                Margin="0,0,-10,-12"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Bottom"
+                                Text="{Binding ElementName=DevicesList, Path=Items.Count}" />
+                        </Grid>
                     </MenuItem.Header>
                 </MenuItem>
                 <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
