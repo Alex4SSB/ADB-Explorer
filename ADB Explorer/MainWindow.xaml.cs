@@ -1089,5 +1089,10 @@ namespace ADB_Explorer
         {
             PopulateButtons((string)PathBox.Tag);
         }
+
+        private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileOperationsSplitView.IsPaneOpen = true;
+        }
     }
 }
