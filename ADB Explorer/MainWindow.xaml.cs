@@ -326,30 +326,32 @@ namespace ADB_Explorer
         private void StartDirectoryList(string path)
         {
             Cursor = Cursors.AppStarting;
-
-            StopDirectoryList();
-            StopDetermineFolders();
-
-            AndroidFileList.RemoveAll();
-
-            determineFoldersCancelTokenSource = new CancellationTokenSource();
-            dirListCancelTokenSource = new CancellationTokenSource();
-            waitingFileStats = new ConcurrentQueue<FileStat>();
-
-            listDirTask = Task.Run(() => CurrentADBDevice.ListDirectory(path, ref waitingFileStats, dirListCancelTokenSource.Token));
-
-            if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
+            Dispatcher.BeginInvoke(() =>
             {
                 StopDirectoryList();
-            }
-            else
-            {
-                UnfinishedBlock.Visibility = Visibility.Visible;
+                StopDetermineFolders();
 
-                UpdateDirectoryList();
-                dirListUpdateTimer.Start();
-                listDirTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => StopDirectoryList()));
-            }
+                AndroidFileList.RemoveAll();
+
+                determineFoldersCancelTokenSource = new CancellationTokenSource();
+                dirListCancelTokenSource = new CancellationTokenSource();
+                waitingFileStats = new ConcurrentQueue<FileStat>();
+
+                listDirTask = Task.Run(() => CurrentADBDevice.ListDirectory(path, ref waitingFileStats, dirListCancelTokenSource.Token));
+
+                if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
+                {
+                    StopDirectoryList();
+                }
+                else
+                {
+                    UnfinishedBlock.Visibility = Visibility.Visible;
+
+                    UpdateDirectoryList();
+                    dirListUpdateTimer.Start();
+                    listDirTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => StopDirectoryList()));
+                }
+            });
         }
 
         private void UpdateDirectoryList()
