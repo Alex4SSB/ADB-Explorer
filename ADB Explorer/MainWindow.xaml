@@ -222,14 +222,15 @@
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsOpen}" Value="True" />
-                                                                <Condition Binding="{Binding Type}" Value="2" />
-                                                                <Condition Binding="{Binding Type}" Value="3" />
-                                                            </MultiDataTrigger.Conditions>
+                                                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
                                                             <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="2">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="3">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
@@ -242,13 +243,12 @@
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding Type}" Value="0" />
-                                                                <Condition Binding="{Binding Type}" Value="3" />
-                                                            </MultiDataTrigger.Conditions>
+                                                        <DataTrigger Binding="{Binding Type}" Value="0">
                                                             <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="3">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
