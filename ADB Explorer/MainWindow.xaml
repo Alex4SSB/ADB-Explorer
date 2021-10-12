@@ -214,6 +214,24 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
+                                    <StackPanel HorizontalAlignment="Stretch">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=DeviceSizeBlock, Path=Text}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                            <TextBlock Text="Storage: " />
+                                            <TextBlock x:Name="DeviceSizeBlock" Text="{Binding Used}" />
+                                            <TextBlock Text=" / " />
+                                            <TextBlock Text="{Binding Size}" />
+                                        </StackPanel>
+                                        <ui:ProgressBar Margin="8,4" Value="{Binding AvailableP}" />
+                                    </StackPanel>
                                     <StackPanel
                                         Margin="4"
                                         HorizontalAlignment="Right"

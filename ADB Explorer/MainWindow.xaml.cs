@@ -314,6 +314,8 @@ namespace ADB_Explorer
                 NavigateToPath(CurrentPath);
 
             ProgressCountTextBlock.Tag = 0;
+
+            Devices.Current.SetSize(CurrentADBDevice.GetStorageInfo());
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)

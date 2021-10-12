@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -99,6 +100,9 @@ namespace ADB_Explorer.Models
             _ => throw new System.NotImplementedException(),
         };
         public bool IsOpen { get; private set; }
+        public string Size { get; set; }
+        public string Used { get; set; }
+        public string AvailableP { get; set; }
 
         public void SetOpen(bool openState = true)
         {
@@ -165,6 +169,13 @@ namespace ADB_Explorer.Models
         {
             Type = other.Type;
             Name = other.Name;
+        }
+
+        internal void SetSize(Tuple<string, string, string> size)
+        {
+            Size = size.Item1;
+            Used = size.Item2;
+            AvailableP = size.Item3;
         }
     }
 

@@ -234,6 +234,17 @@ namespace ADB_Explorer.Services
             }
 
             public string TranslateDeviceParentPath(string path) => TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
+
+            public Tuple<string, string, string> GetStorageInfo()
+            {
+                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr, "-h");
+                if (exitCode != 0)
+                    return new("", "", "");
+
+                var match = AdbRegEx.EMULATED_STORAGE_SIZE.Match(stdout);
+
+                return new(match.Groups["size"].Value + "B", match.Groups["used"].Value + "B", match.Groups["availableP"].Value);
+            }
         }
     }
 }
