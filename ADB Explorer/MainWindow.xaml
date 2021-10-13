@@ -42,6 +42,24 @@
             </ContextMenu.Resources>
         </ContextMenu>
         <MenuItem x:Key="ContextMenuCopyItem" Click="ContextMenuCopyItem_Click">
+            <MenuItem.Resources>
+                <Style TargetType="ui:FontIcon">
+                    <Setter Property="FontSize" Value="16" />
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="Gray" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="Gray" />
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Margin" Value="6,0,0,0" />
+                </Style>
+            </MenuItem.Resources>
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE8C8;" />
@@ -315,7 +333,9 @@
                     <Setter Property="IsIndeterminate" Value="True" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Completed">
-                    <Setter Property="IsIndeterminate" Value="False" />
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Failed">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>

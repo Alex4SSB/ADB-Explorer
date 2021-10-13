@@ -95,17 +95,24 @@ namespace ADB_Explorer
                 });
         }
 
-        private void InitializeContextMenu(MenuType type)
+        private void InitializeContextMenu(MenuType type, object dataContext = null)
         {
+            MenuItem copyMenu = FindResource("ContextMenuCopyItem") as MenuItem;
+            MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
+
             switch (type)
             {
                 case MenuType.ExplorerItem:
-                    ExplorerGrid.ContextMenu.Items.Add(FindResource("ContextMenuCopyItem"));
-                    ExplorerGrid.ContextMenu.Items.Add(FindResource("ContextMenuDeleteItem"));
+                    copyMenu.IsEnabled = false;
+                    if (dataContext is FileClass file && file.Type is FileStat.FileType.File or FileStat.FileType.Folder)
+                        copyMenu.IsEnabled = true;
+
+                    ExplorerGrid.ContextMenu.Items.Add(copyMenu);
+                    ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                     break;
                 case MenuType.EmptySpace:
-                    ExplorerGrid.ContextMenu.Items.Add(FindResource("ContextMenuDeleteItem"));
+                    ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                     break;
                 case MenuType.Header:
                     break;
@@ -789,7 +796,7 @@ namespace ADB_Explorer
 
             if (e.ChangedButton == MouseButton.Right)
             {
-                InitializeContextMenu(e.OriginalSource is Border ? MenuType.EmptySpace : MenuType.ExplorerItem);
+                InitializeContextMenu(e.OriginalSource is Border ? MenuType.EmptySpace : MenuType.ExplorerItem, row.DataContext);
             }
 
             if (e.OriginalSource is Border)
@@ -1062,9 +1069,9 @@ namespace ADB_Explorer
             {
                 InitializeContextMenu(MenuType.Header);
             }
-            else if (e.OriginalSource is FrameworkElement element && element.DataContext is FileClass && ExplorerGrid.SelectedItems.Count > 0)
+            else if (e.OriginalSource is FrameworkElement element && element.DataContext is FileClass file && ExplorerGrid.SelectedItems.Count > 0)
             {
-                InitializeContextMenu(MenuType.ExplorerItem);
+                InitializeContextMenu(MenuType.ExplorerItem, file);
             }
             else
                 InitializeContextMenu(MenuType.EmptySpace);
