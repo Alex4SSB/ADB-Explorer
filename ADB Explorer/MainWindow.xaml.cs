@@ -322,7 +322,7 @@ namespace ADB_Explorer
 
             ProgressCountTextBlock.Tag = 0;
 
-            Devices.Current.SetSize(CurrentADBDevice.GetStorageInfo());
+            Devices.Current.SetDrives(CurrentADBDevice.GetStorageInfo());
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
@@ -952,6 +952,8 @@ namespace ADB_Explorer
                 ClearExplorer();
                 DevicesList.Items.Refresh();
                 InitDevice();
+
+                DevicesSplitView.IsPaneOpen = false;
             }
         }
 

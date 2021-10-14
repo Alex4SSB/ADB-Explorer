@@ -235,15 +235,16 @@ namespace ADB_Explorer.Services
 
             public string TranslateDeviceParentPath(string path) => TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
 
-            public Tuple<string, string, string> GetStorageInfo()
+            public List<Drive> GetStorageInfo()
             {
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr, "-h");
+                List<Drive> drives = new();
+                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr);
                 if (exitCode != 0)
-                    return new("", "", "");
+                    return drives;
 
-                var match = AdbRegEx.EMULATED_STORAGE_SIZE.Match(stdout);
+                var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
 
-                return new(match.Groups["size"].Value + "B", match.Groups["used"].Value + "B", match.Groups["availableP"].Value);
+                return match.Select(m => new Drive(m.Groups)).ToList();
             }
         }
     }

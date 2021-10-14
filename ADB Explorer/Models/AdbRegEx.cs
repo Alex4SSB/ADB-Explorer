@@ -20,6 +20,6 @@ namespace ADB_Explorer.Models
                       RegexOptions.Multiline);
 
         public static readonly Regex EMULATED_STORAGE_SIZE =
-            new(@"(?<size>[\d.]+\w*)\s+(?<used>[\d.]+\w*)\s+(?<available>[\d.]+\w*)\s+(?<availableP>[\d.]+)%\s+\/storage\/emulated");
+            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/storage\/[\w-]+)");
     }
 }

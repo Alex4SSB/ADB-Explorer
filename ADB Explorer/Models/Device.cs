@@ -97,12 +97,10 @@ namespace ADB_Explorer.Models
             DeviceType.Remote => "\uEE77",
             DeviceType.Offline => "\uEB5E",
             DeviceType.Unauthorized => "\uF476",
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
         public bool IsOpen { get; private set; }
-        public string Size { get; set; }
-        public string Used { get; set; }
-        public string AvailableP { get; set; }
+        public List<Drive> Drives { get; private set; } = new();
 
         public void SetOpen(bool openState = true)
         {
@@ -171,11 +169,9 @@ namespace ADB_Explorer.Models
             Name = other.Name;
         }
 
-        internal void SetSize(Tuple<string, string, string> size)
+        internal void SetDrives(List<Drive> drives)
         {
-            Size = size.Item1;
-            Used = size.Item2;
-            AvailableP = size.Item3;
+            Drives = drives;
         }
     }
 
