@@ -1,38 +1,50 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using System.ComponentModel;
 
 namespace ADB_Explorer.Models
 {
-    public class FileOperationQueue
+    public class FileOperationQueue : INotifyPropertyChanged
     {
-        public MyObservableCollection<FileOperation> Operations { get; private set; }
-
-        public int CurrentOperationIndex { get; private set; }
-        public FileOperation CurrentOperation { get; private set; }
-
-        public bool IsActive { get; private set; }
-        public bool ContinueOnFailure { get; set; }
-        public bool StartOnAddition { get; set; }
-
-        public FileOperationQueue()
+        private FileOperation currentOperation = null;
+        public FileOperation CurrentOperation
         {
-            CurrentOperationIndex = -1;
-            ContinueOnFailure = true;
-            StartOnAddition = true;
-            Operations = new();
-            Operations.CollectionChanged += Operations_CollectionChanged;
+            get
+            {
+                return currentOperation;
+            }
+            private set
+            {
+                if (currentOperation != value)
+                {
+                    currentOperation = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("CurrentOperation"));
+                }
+            }
         }
 
-        ~FileOperationQueue()
+        public MyObservableCollection<FileOperation> PendingOperations { get; private set; } = new();
+        public MyObservableCollection<FileOperation> CompletedOperations { get; private set; } = new();
+
+        public bool IsActive { get; private set; } = false;
+        public bool AutoStart { get; set; } = true;
+        public bool StopAfterFailure { get; set; } = false;
+
+        public int TotalCount
         {
-            Operations.CollectionChanged -= Operations_CollectionChanged;
+            get
+            {
+                return PendingOperations.Count + ((CurrentOperation != null) ? 1 : 0) + CompletedOperations.Count;
+            }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public void AddOperation(FileOperation fileOp)
         {
-            Operations.Add(fileOp);
+            PendingOperations.Add(fileOp);
             
-            if (StartOnAddition)
+            if (AutoStart)
             {
                 Start();
             }
@@ -40,44 +52,48 @@ namespace ADB_Explorer.Models
 
         public void Start()
         {
-            if (!IsActive)
+            if ((!IsActive) && (PendingOperations.Count > 0))
             {
                 IsActive = true;
-
-                if (CurrentOperationIndex == -1)
-                {
-                    CurrentOperationIndex = Operations.Count - 1;
-                    CurrentOperation = Operations[CurrentOperationIndex];
-                }
-
-                CurrentOperation.Start();
+                MoveToNextOperation();
             }
         }
 
-        private void Operations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void MoveToCompleted()
         {
-            // Item changed
-            if (IsActive && (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace))
+            if (CurrentOperation != null)
             {
-                if ((CurrentOperation.Status == FileOperation.OperationStatus.Failed) ||
-                    (CurrentOperation.Status == FileOperation.OperationStatus.Completed))
-                {
-                    if (CurrentOperationIndex + 1 < Operations.Count)
-                    {
-                        ++CurrentOperationIndex;
-                        CurrentOperation = Operations[CurrentOperationIndex];
+                CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
+                CompletedOperations.Add(CurrentOperation);
+                CurrentOperation = null;
+            }
+        }
 
-                        if (ContinueOnFailure || (CurrentOperation.Status != FileOperation.OperationStatus.Failed))
-                        {
-                            CurrentOperation.Start();
-                        }
-                    }
-                    else
-                    {
-                        CurrentOperationIndex = -1;
-                        CurrentOperation = null;
-                        IsActive = false;
-                    }
+        private void MoveToNextOperation()
+        {
+            MoveToCompleted();
+
+            CurrentOperation = PendingOperations[0];
+            PendingOperations.RemoveAt(0);
+
+            CurrentOperation.PropertyChanged += CurrentOperation_PropertyChanged;
+            CurrentOperation.Start();
+        }
+
+        private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if ((CurrentOperation.Status == FileOperation.OperationStatus.Failed) ||
+                (CurrentOperation.Status == FileOperation.OperationStatus.Completed))
+            {
+                if ((PendingOperations.Count == 0) ||
+                    (StopAfterFailure && (CurrentOperation.Status == FileOperation.OperationStatus.Failed)))
+                {
+                    MoveToCompleted();
+                    IsActive = false;
+                }
+                else
+                {
+                    MoveToNextOperation();
                 }
             }
         }

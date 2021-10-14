@@ -86,7 +86,8 @@ namespace ADB_Explorer
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
 
-            fileOperationQueue.Operations.CollectionChanged += FileOperationProgressUpdateHandler;
+            fileOperationQueue.PendingOperations.CollectionChanged += FileOperationProgressUpdateHandler;
+            fileOperationQueue.CompletedOperations.CollectionChanged += FileOperationProgressUpdateHandler;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -280,7 +281,7 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
                 AutoOpenCheckBox.IsChecked = autoOpen;
 
-            FileOperationsList.ItemsSource = fileOperationQueue.Operations;
+            FileOperationsList.ItemsSource = fileOperationQueue.PendingOperations; // FIXME: Show CompletedOperations and CurrentOperation too
         }
 
         private void InitDevice()
@@ -735,7 +736,7 @@ namespace ADB_Explorer
                 if (ProgressGrid.Visibility == Visibility.Collapsed)
                     ProgressGrid.Visibility = Visibility.Visible;
 
-                ProgressCountTextBlock.Text = $"{fileOperationQueue.CurrentOperationIndex + 1}/{fileOperationQueue.Operations.Count}";
+                ProgressCountTextBlock.Text = $"{fileOperationQueue.CompletedOperations.Count + 1}/{fileOperationQueue.TotalCount}";
 
                 if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
                 {
@@ -757,7 +758,7 @@ namespace ADB_Explorer
                 ProgressCountTextBlock.Tag = 0;
 
                 ProgressGrid.Visibility = Visibility.Collapsed;
-                OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.Operations.Count} file{(fileOperationQueue.Operations.Count > 1 ? "s" : "")} done";
+                OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.TotalCount} item{((fileOperationQueue.TotalCount > 1) ? "s" : "")} done";
             }
         }
 
@@ -1083,7 +1084,7 @@ namespace ADB_Explorer
         {
             if (e.OriginalSource is Button button && button.DataContext is FileOperation operation)
             {
-                fileOperationQueue.Operations.Remove(operation);
+                fileOperationQueue.CompletedOperations.Remove(operation); // FIXME: Cancelling current/pending tasks too (not implemented in fileOperationQueue yet...)
             }
         }
 
