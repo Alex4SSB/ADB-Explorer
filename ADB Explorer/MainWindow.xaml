@@ -42,6 +42,24 @@
             </ContextMenu.Resources>
         </ContextMenu>
         <MenuItem x:Key="ContextMenuCopyItem" Click="ContextMenuCopyItem_Click">
+            <MenuItem.Resources>
+                <Style TargetType="ui:FontIcon">
+                    <Setter Property="FontSize" Value="16" />
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="Gray" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="Gray" />
+                        </Trigger>
+                    </Style.Triggers>
+                    <Setter Property="Margin" Value="6,0,0,0" />
+                </Style>
+            </MenuItem.Resources>
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE8C8;" />
@@ -156,6 +174,24 @@
                 </MultiDataTrigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="DriveInfoTemplate" TargetType="ui:ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ui:ListViewItem">
+                        <StackPanel>
+                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                <TextBlock Text="{Binding PrettyName}" />
+                                <TextBlock Text=": " />
+                                <TextBlock x:Name="DeviceSizeBlock" Text="{Binding Used, Mode=OneWay}" />
+                                <TextBlock Text=" / " />
+                                <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                            </StackPanel>
+                            <ui:ProgressBar Margin="8,4" Value="{Binding UsageP, Mode=OneWay}" />
+                        </StackPanel>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="DeviceStyle" TargetType="ui:ListViewItem">
             <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_MouseDown" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -214,6 +250,18 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
+                                    <StackPanel HorizontalAlignment="Stretch">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=DeviceSizeBlock, Path=Text}" Value="">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <ui:ListView ItemContainerStyle="{StaticResource DriveInfoTemplate}" ItemsSource="{Binding Drives, Mode=OneWay}" />
+                                    </StackPanel>
                                     <StackPanel
                                         Margin="4"
                                         HorizontalAlignment="Right"
@@ -222,14 +270,15 @@
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding IsOpen}" Value="True" />
-                                                                <Condition Binding="{Binding Type}" Value="2" />
-                                                                <Condition Binding="{Binding Type}" Value="3" />
-                                                            </MultiDataTrigger.Conditions>
+                                                        <DataTrigger Binding="{Binding IsOpen}" Value="True">
                                                             <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="2">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="3">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
@@ -242,13 +291,12 @@
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding Type}" Value="0" />
-                                                                <Condition Binding="{Binding Type}" Value="3" />
-                                                            </MultiDataTrigger.Conditions>
+                                                        <DataTrigger Binding="{Binding Type}" Value="0">
                                                             <Setter Property="IsEnabled" Value="False" />
-                                                        </MultiDataTrigger>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="3">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
@@ -297,7 +345,9 @@
                     <Setter Property="IsIndeterminate" Value="True" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Status}" Value="Completed">
-                    <Setter Property="IsIndeterminate" Value="False" />
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="Failed">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
@@ -96,9 +97,10 @@ namespace ADB_Explorer.Models
             DeviceType.Remote => "\uEE77",
             DeviceType.Offline => "\uEB5E",
             DeviceType.Unauthorized => "\uF476",
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
         public bool IsOpen { get; private set; }
+        public List<Drive> Drives { get; private set; } = new();
 
         public void SetOpen(bool openState = true)
         {
@@ -165,6 +167,11 @@ namespace ADB_Explorer.Models
         {
             Type = other.Type;
             Name = other.Name;
+        }
+
+        internal void SetDrives(List<Drive> drives)
+        {
+            Drives = drives;
         }
     }
 

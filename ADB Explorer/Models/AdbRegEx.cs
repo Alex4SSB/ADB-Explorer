@@ -18,5 +18,8 @@ namespace ADB_Explorer.Models
         public static readonly Regex FILE_SYNC_STATS_RE =
             new(@"^(?<TargetPath>.+?): (?<TotalPulled>\d+) files? (?>pulled|pushed), (?<TotalSkipped>\d+) skipped\.(?> (?<AverageRate>\d+(?>\.\d+)?) MB\/s \((?<TotalBytes>\d+) bytes in (?<TotalTime>\d+(?>\.\d+)?)s\))? *$",
                       RegexOptions.Multiline);
+
+        public static readonly Regex EMULATED_STORAGE_SIZE =
+            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/storage\/[\w-]+)");
     }
 }

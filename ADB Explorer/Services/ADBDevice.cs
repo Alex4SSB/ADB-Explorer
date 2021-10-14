@@ -234,6 +234,18 @@ namespace ADB_Explorer.Services
             }
 
             public string TranslateDeviceParentPath(string path) => TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
+
+            public List<Drive> GetStorageInfo()
+            {
+                List<Drive> drives = new();
+                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr);
+                if (exitCode != 0)
+                    return drives;
+
+                var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
+
+                return match.Select(m => new Drive(m.Groups)).ToList();
+            }
         }
     }
 }
