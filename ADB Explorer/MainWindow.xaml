@@ -182,11 +182,11 @@
                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                 <TextBlock Text="{Binding PrettyName}" />
                                 <TextBlock Text=": " />
-                                <TextBlock x:Name="DeviceSizeBlock" Text="{Binding Used, Mode=OneWay}" />
+                                <TextBlock Text="{Binding Used, Mode=OneWay}" />
                                 <TextBlock Text=" / " />
                                 <TextBlock Text="{Binding Size, Mode=OneWay}" />
                             </StackPanel>
-                            <ui:ProgressBar Margin="8,4" Value="{Binding UsageP, Mode=OneWay}" />
+                            <ui:ProgressBar Margin="8,4,8,0" Value="{Binding UsageP, Mode=OneWay}" />
                         </StackPanel>
                     </ControlTemplate>
                 </Setter.Value>
@@ -250,20 +250,9 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <StackPanel HorizontalAlignment="Stretch">
-                                        <StackPanel.Style>
-                                            <Style TargetType="StackPanel">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=DeviceSizeBlock, Path=Text}" Value="">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </StackPanel.Style>
-                                        <ui:ListView ItemContainerStyle="{StaticResource DriveInfoTemplate}" ItemsSource="{Binding Drives, Mode=OneWay}" />
-                                    </StackPanel>
+                                    <ui:ListView ItemContainerStyle="{StaticResource DriveInfoTemplate}" ItemsSource="{Binding Drives, Mode=OneWay}" />
                                     <StackPanel
-                                        Margin="4"
+                                        Margin="4,0,4,4"
                                         HorizontalAlignment="Right"
                                         Orientation="Horizontal">
                                         <Grid Margin="8,0">
@@ -836,14 +825,37 @@
                             HorizontalAlignment="Center"
                             FontSize="24"
                             Text="File Operations" />
-                        <ScrollViewer Grid.Row="1" />
-                        <ui:ListView
-                            x:Name="FileOperationsList"
-                            Grid.Row="1"
-                            Margin="0,10"
-                            IsSelectionEnabled="False"
-                            ItemContainerStyle="{StaticResource FileOpItemStyle}"
-                            ItemsSource="{Binding}" />
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <ScrollViewer>
+                                <ui:ListView
+                                    x:Name="CurrentOperationList"
+                                    Margin="0,10"
+                                    IsSelectionEnabled="False"
+                                    ItemContainerStyle="{StaticResource FileOpItemStyle}"
+                                    ItemsSource="{Binding}" />
+                            </ScrollViewer>
+                            <ScrollViewer Grid.Row="1">
+                                <ui:ListView
+                                    x:Name="PendingOperationsList"
+                                    Margin="0,10"
+                                    IsSelectionEnabled="False"
+                                    ItemContainerStyle="{StaticResource FileOpItemStyle}"
+                                    ItemsSource="{Binding}" />
+                            </ScrollViewer>
+                            <ScrollViewer Grid.Row="2">
+                                <ui:ListView
+                                    x:Name="CompletedOperationsList"
+                                    Margin="0,10"
+                                    IsSelectionEnabled="False"
+                                    ItemContainerStyle="{StaticResource FileOpItemStyle}"
+                                    ItemsSource="{Binding}" />
+                            </ScrollViewer>
+                        </Grid>
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>
