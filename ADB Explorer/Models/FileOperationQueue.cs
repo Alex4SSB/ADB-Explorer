@@ -18,7 +18,7 @@ namespace ADB_Explorer.Models
                 if (currentOperation != value)
                 {
                     currentOperation = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs("CurrentOperation"));
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentOperation"));
                 }
             }
         }
