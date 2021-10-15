@@ -11,6 +11,7 @@ namespace ADB_Explorer.Models
             { "/sdcard", "Internal Storage" },
             { "/storage/emulated/0", "Internal Storage" },
             { "/storage/self/primary", "Internal Storage" },
+            { "/mnt/sdcard", "Internal Storage" },
             { "/", "Root" }
         };
 

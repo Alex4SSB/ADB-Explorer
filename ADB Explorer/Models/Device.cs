@@ -135,6 +135,8 @@ namespace ADB_Explorer.Models
 
             if (string.IsNullOrEmpty(Name))
                 Name = "[Unauthorized]";
+            else if (ID.Contains("emulator"))
+                Name = ID;
         }
 
         public DeviceClass(string name, string id, string status) : this(name, id)
