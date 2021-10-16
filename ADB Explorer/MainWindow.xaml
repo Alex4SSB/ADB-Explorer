@@ -934,21 +934,34 @@
                                 <TextBlock Text="IP:" />
                                 <TextBox
                                     x:Name="NewDeviceIpBox"
-                                    Grid.Column="1"
                                     FontFamily="Consolas"
                                     KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
-                                <TextBlock
-                                    Grid.Row="1"
-                                    Margin="0,6,0,0"
-                                    Text="Port:" />
+                                <TextBlock Margin="0,6,0,0" Text="Port:" />
                                 <TextBox
                                     x:Name="NewDevicePortBox"
-                                    Grid.Row="1"
-                                    Grid.Column="1"
                                     FontFamily="Consolas"
                                     KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
+                                <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        x:Name="PairingCodeBox"
+                                        FontFamily="Consolas"
+                                        TextChanged="PairingCodeBox_TextChanged" />
+                                    <Button
+                                        x:Name="PairNewDeviceButton"
+                                        Grid.Column="1"
+                                        Margin="4,0,0,0"
+                                        HorizontalAlignment="Right"
+                                        Click="PairNewDeviceButton_Click"
+                                        Content="Pair"
+                                        IsEnabled="False" />
+                                </Grid>
                                 <Button
                                     x:Name="ConnectNewDeviceButton"
                                     Margin="0,6,0,0"

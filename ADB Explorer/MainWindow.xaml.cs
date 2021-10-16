@@ -1112,5 +1112,15 @@ namespace ADB_Explorer
         {
             FileOperationsSplitView.IsPaneOpen = true;
         }
+
+        private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            PairNewDeviceButton.IsEnabled = PairingCodeBox.Text.Length == 6 && double.TryParse(PairingCodeBox.Text, out double _);
+        }
+
+        private void PairNewDeviceButton_Click(object sender, RoutedEventArgs e)
+        {
+            ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}", PairingCodeBox.Text);
+        }
     }
 }

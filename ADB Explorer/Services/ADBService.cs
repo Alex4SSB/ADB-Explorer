@@ -182,6 +182,8 @@ namespace ADB_Explorer.Services
         public static void DisonnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");
         public static void DisconnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("disconnect", fullAddress);
 
+        public static void PairNetworkDevice(string fullAddress, string pairingCode) => NetworkDeviceOperation("pair", fullAddress, pairingCode);
+
         /// <summary>
         /// 
         /// </summary>
@@ -190,9 +192,9 @@ namespace ADB_Explorer.Services
         /// <param name="port">ADB port of remote device</param>
         /// <exception cref="ConnectionRefusedException"></exception>
         /// <exception cref="ConnectionTimeoutException"></exception>
-        private static void NetworkDeviceOperation(string cmd, string fullAddress)
+        private static void NetworkDeviceOperation(string cmd, string fullAddress, string pairingCode = null)
         {
-            ExecuteAdbCommand(cmd, out string stdout, out _, fullAddress);
+            ExecuteAdbCommand(cmd, out string stdout, out _, fullAddress, pairingCode);
             if (stdout.Contains("cannot connect") || stdout.Contains("error") || stdout.Contains("failed"))
             {
                 throw new Exception(stdout);
