@@ -80,6 +80,8 @@ namespace ADB_Explorer
         public MainWindow()
         {
             InitializeComponent();
+
+            fileOperationQueue = new(this.Dispatcher);
             LaunchSequence();
 
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;

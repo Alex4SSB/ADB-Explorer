@@ -20,7 +20,7 @@ namespace ADB_Explorer.Services
             ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
             CancellationToken cancellationToken);
 
-        FileSyncMethod adbMethod;
+        private FileSyncMethod adbMethod;
         private Task<AdbSyncStatsInfo> operationTask;
         private CancellationTokenSource cancelTokenSource;
         private ConcurrentQueue<AdbSyncProgressInfo> waitingProgress;
