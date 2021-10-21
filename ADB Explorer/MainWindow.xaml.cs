@@ -298,6 +298,30 @@ namespace ADB_Explorer
         private void InitDevice()
         {
             Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
+            //InitDrive();
+
+            Devices.Current.SetDrives(CurrentADBDevice.GetStorageInfo());
+            DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
+        }
+
+        private static void CombinePrettyNames()
+        {
+            foreach (var drive in Devices.Current.Drives.Where(d => d.Type != DriveType.Root))
+            {
+                CurrentPrettyNames.Add(drive.Path, drive.Type == DriveType.External
+                    ? drive.ID : drive.PrettyName);
+            }
+            foreach (var item in SPECIAL_FOLDERS_PRETTY_NAMES)
+            {
+                CurrentPrettyNames.TryAdd(item.Key, item.Value);
+            }
+        }
+
+        private void InitDrive(string path = "")
+        {
+            DrivesItemRepeater.Visibility = Visibility.Collapsed;
+            ExplorerGrid.Visibility = Visibility.Visible;
+            CombinePrettyNames();
 
             unknownFoldersTask = Task.Run(() => { });
             dirListCancelTokenSource = new CancellationTokenSource();
@@ -311,23 +335,27 @@ namespace ADB_Explorer
 
             ExplorerGrid.ItemsSource = AndroidFileList;
             PathBox.IsEnabled = true;
+            HomeButton.IsEnabled = true;
             NavHistory.Reset();
 
-            if (string.IsNullOrEmpty(CurrentPath))
-            {
+            if (string.IsNullOrEmpty(path))
                 NavigateToPath(DEFAULT_PATH);
-            }
-            else if (AndroidFileList.Any())
-            {
-                PathBox.Tag = CurrentPath;
-                PopulateButtons(CurrentPath);
-            }
             else
-                NavigateToPath(CurrentPath);
+                NavigateToPath(path);
+
+            //if (string.IsNullOrEmpty(CurrentPath))
+            //{
+            //    NavigateToPath(DEFAULT_PATH);
+            //}
+            //else if (AndroidFileList.Any())
+            //{
+            //    PathBox.Tag = CurrentPath;
+            //    PopulateButtons(CurrentPath);
+            //}
+            //else
+            //    NavigateToPath(CurrentPath);
 
             ProgressCountTextBlock.Tag = 0;
-
-            Devices.Current.SetDrives(CurrentADBDevice.GetStorageInfo());
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
@@ -485,7 +513,7 @@ namespace ADB_Explorer
             List<string> pathItems = new();
 
             // On special cases, cut prefix of the path and replace with a pretty button
-            var specialPair = SPECIAL_FOLDERS_PRETTY_NAMES.FirstOrDefault(kv => path.StartsWith(kv.Key));
+            var specialPair = CurrentPrettyNames.FirstOrDefault(kv => path.StartsWith(kv.Key));
             if (specialPair.Key != null)
             {
                 MenuItem button = CreatePathButton(specialPair);
@@ -989,6 +1017,7 @@ namespace ADB_Explorer
 
         private void ClearExplorer()
         {
+            Data.CurrentPrettyNames.Clear();
             AndroidFileList.Clear();
             ExplorerGrid.Items.Refresh();
             PathStackPanel.Children.Clear();
@@ -1000,6 +1029,7 @@ namespace ADB_Explorer
             CopyMenuButton.IsEnabled =
             BackButton.IsEnabled =
             ForwardButton.IsEnabled =
+            HomeButton.IsEnabled =
             ParentButton.IsEnabled = false;
         }
 
@@ -1121,6 +1151,22 @@ namespace ADB_Explorer
         private void PairNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}", PairingCodeBox.Text);
+        }
+
+        private void DriveItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menu && menu.DataContext is Drive drive)
+            {
+                InitDrive(drive.Path);
+            }
+        }
+
+        private void HomeButton_Click(object sender, RoutedEventArgs e)
+        {
+            ExplorerGrid.Visibility = Visibility.Collapsed;
+            DrivesItemRepeater.Visibility = Visibility.Visible;
+
+            ClearExplorer();
         }
     }
 }

@@ -13,14 +13,8 @@ namespace ADB_Explorer.Services
 {
     public partial class ADBService
     {
-        
         private const string ADB_PATH = "adb";
         private const string GET_DEVICES = "devices";
-
-        //private const string PRODUCT_MODEL = "ro.product.model";
-        //private const string HOST_NAME = "net.hostname";
-        //private const string VENDOR = "ro.vendor.config.CID";
-        //private const string GET_PROP = "getprop";
 
         public class ProcessFailedException : Exception
         {
@@ -164,18 +158,6 @@ namespace ADB_Explorer.Services
                     status: m.Groups["status"].Value)
                 );
         }
-
-        //private static string GetProps()
-        //{
-        //    ExecuteAdbShellCommand(GET_PROP, out string stdout, out string stderr);
-        //    return stdout;
-        //}
-
-        //private static string GetPropsValue(string props, string key)
-        //{
-        //    var value = props.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(s => s.Contains(key));
-        //    return value.Any() ? value.First().Split('[', ']')[3] : "";
-        //}
 
         public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");
         public static void ConnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("connect", fullAddress);

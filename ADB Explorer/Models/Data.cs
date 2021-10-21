@@ -18,5 +18,7 @@ namespace ADB_Explorer.Models
         public static Dictionary<Tuple<string, bool>, Icon> FileIcons = new();
 
         public static FileOperationQueue fileOperationQueue;
+
+        public static Dictionary<string, string> CurrentPrettyNames = new();
     }
 }

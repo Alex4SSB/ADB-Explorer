@@ -15,6 +15,21 @@ namespace ADB_Explorer.Models
             { "/", "Root" }
         };
 
+        public static readonly Dictionary<string, DriveType> DRIVE_TYPES = new()
+        {
+            { "/storage/emulated", DriveType.Internal },
+            //{ "/storage/sdcard", DriveType.Internal },
+            { "/", DriveType.Root }
+        };
+        public static readonly Dictionary<DriveType, string> DRIVES_PRETTY_NAMES = new()
+        {
+            { DriveType.Root, "Root" },
+            { DriveType.Internal, "Internal Storage" },
+            { DriveType.Expansion, "µSD Card" },
+            { DriveType.External, "OTG Drive" },
+            { DriveType.Unknown, "" } // "Other Drive"
+        };
+
         public static readonly TimeSpan DIR_LIST_SYNC_TIMEOUT = TimeSpan.FromMilliseconds(500);
         public static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(1000);
         public static readonly TimeSpan SYNC_PROG_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(100);

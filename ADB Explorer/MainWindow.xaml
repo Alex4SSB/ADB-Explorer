@@ -250,9 +250,8 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <ui:ListView ItemContainerStyle="{StaticResource DriveInfoTemplate}" ItemsSource="{Binding Drives, Mode=OneWay}" />
                                     <StackPanel
-                                        Margin="4,0,4,4"
+                                        Margin="4"
                                         HorizontalAlignment="Right"
                                         Orientation="Horizontal">
                                         <Grid Margin="8,0">
@@ -537,6 +536,15 @@
                             </Style>
                         </Menu.Resources>
                         <MenuItem
+                            x:Name="HomeButton"
+                            Click="HomeButton_Click"
+                            IsEnabled="False"
+                            ToolTip="Device Drives">
+                            <MenuItem.Header>
+                                <ui:FontIcon FontSize="16" Glyph="&#xE80F;" />
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem
                             x:Name="BackButton"
                             Click="BackButton_Click"
                             IsEnabled="False"
@@ -609,6 +617,75 @@
                 x:Name="GridBackgroundBlock"
                 Grid.Row="2"
                 Style="{StaticResource TextBlockLightStyle}" />
+            <ui:ItemsRepeater
+                x:Name="DrivesItemRepeater"
+                Grid.Row="2"
+                Margin="10"
+                ItemsSource="{Binding}">
+                <ui:ItemsRepeater.Layout>
+                    <ui:UniformGridLayout
+                        MinColumnSpacing="10"
+                        MinItemHeight="60"
+                        MinItemWidth="280"
+                        MinRowSpacing="10" />
+                </ui:ItemsRepeater.Layout>
+                <ui:ItemsRepeater.ItemTemplate>
+                    <DataTemplate DataType="Drive">
+                        <Border Background="LightGray">
+                            <Menu Height="60">
+                                <MenuItem Height="60" Click="DriveItem_Click">
+                                    <MenuItem.Header>
+                                        <Grid MinWidth="256">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <ui:FontIcon
+                                                Margin="0,0,8,0"
+                                                FontSize="32"
+                                                Glyph="{Binding DriveIcon}" />
+                                            <StackPanel Grid.Column="1">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <StackPanel.Resources>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </Style>
+                                                    </StackPanel.Resources>
+                                                    <TextBlock Text="{Binding PrettyName}" />
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <StackPanel.Style>
+                                                            <Style TargetType="StackPanel">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding Type}" Value="External">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </StackPanel.Style>
+                                                        <TextBlock Text=" (" />
+                                                        <TextBlock
+                                                            VerticalAlignment="Center"
+                                                            FontFamily="Consolas"
+                                                            Text="{Binding ID}" />
+                                                        <TextBlock Text=")" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                                <ui:ProgressBar Margin="0,6" Value="{Binding UsageP, Mode=OneWay}" />
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Available, Mode=OneWay}" />
+                                                    <TextBlock Text=" free of " />
+                                                    <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </MenuItem.Header>
+                                </MenuItem>
+                            </Menu>
+                        </Border>
+                    </DataTemplate>
+                </ui:ItemsRepeater.ItemTemplate>
+            </ui:ItemsRepeater>
             <DataGrid
                 x:Name="ExplorerGrid"
                 Grid.Row="2"
@@ -630,7 +707,8 @@
                 SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                 SelectionChanged="ExplorerGrid_SelectionChanged"
                 SelectionMode="Extended"
-                SelectionUnit="FullRow">
+                SelectionUnit="FullRow"
+                Visibility="Collapsed">
                 <DataGrid.Columns>
                     <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
                         <DataGridTemplateColumn.CellTemplate>

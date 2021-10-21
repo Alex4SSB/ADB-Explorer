@@ -4,13 +4,20 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ADB_Explorer.Services
 {
     public partial class ADBService
     {
+        //private const string GET_PROP = "getprop";
+        //private const string PRODUCT_MODEL = "ro.product.model";
+        //private const string HOST_NAME = "net.hostname";
+        //private const string VENDOR = "ro.vendor.config.CID";
+
+        private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" }; // first partition
+
         public class Device
         {
             private string deviceSerial;
@@ -237,15 +244,54 @@ namespace ADB_Explorer.Services
 
             public List<Drive> GetStorageInfo()
             {
-                List<Drive> drives = new();
                 int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr);
                 if (exitCode != 0)
-                    return drives;
+                    return new();
 
                 var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
+                var mmcId = GetMmcId();
 
-                return match.Select(m => new Drive(m.Groups)).ToList();
+                return match.Select(m => new Drive(m.Groups, m.Groups["path"].Value.Contains(mmcId))).ToList();
             }
+
+            public string GetMmcId()
+            {
+                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "file", out string stdout, out _, MMC_BLOCK_DEVICES);
+                if (exitCode != 0)
+                    return "";
+
+                var match = AdbRegEx.MMC_BLOCK_DEVICE_NODE.Match(stdout);
+                if (!match.Success)
+                    return "";
+
+                exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "sm", out stdout, out _, "list-volumes");
+                if (exitCode != 0)
+                    return "";
+
+                var node = $"{match.Groups["major"].Value},{match.Groups["minor"].Value}";
+                var mmcVolumeId = Regex.Match(stdout, @$"{node}\smounted\s(?<id>[\w-]+)");
+
+                return mmcVolumeId.Success ? mmcVolumeId.Groups["id"].Value : "";
+            }
+
+            //private Dictionary<string, string> props { get; set; }
+            //public Dictionary<string, string> Props
+            //{
+            //    get
+            //    {
+            //        if (props is null)
+            //        {
+            //            int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, GET_PROP, out string stdout, out string stderr);
+            //            if (exitCode == 0)
+            //            {
+            //                props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToDictionary(
+            //                line => line.Split(':')[0].Trim('[', ']', ' '),
+            //                line => line.Split(':')[1].Trim('[', ']', ' '));
+            //            }
+            //        }
+            //        return props;
+            //    }
+            //}
         }
     }
 }
