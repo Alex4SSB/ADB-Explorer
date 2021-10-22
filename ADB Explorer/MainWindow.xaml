@@ -354,7 +354,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Pull: " />
+                                        <!--<TextBlock Text="Pull: " />-->
                                         <TextBlock Text="{Binding Status}" />
                                         <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.TotalPercentage}" />
                                     </StackPanel>
@@ -467,7 +467,11 @@
                         <ui:FontIcon Glyph="&#xE8C8;" />
                     </MenuItem.Header>
                 </MenuItem>
-                <MenuItem IsEnabled="False" ToolTip="Paste">
+                <MenuItem
+                    x:Name="PasteMenuButton"
+                    Click="PasteMenuButton_Click"
+                    IsEnabled="False"
+                    ToolTip="Paste">
                     <MenuItem.Header>
                         <ui:FontIcon Glyph="&#xE77F;" />
                     </MenuItem.Header>
@@ -909,14 +913,12 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <ScrollViewer>
-                                <ui:ListView
-                                    x:Name="CurrentOperationList"
-                                    Margin="0,10"
-                                    IsSelectionEnabled="False"
-                                    ItemContainerStyle="{StaticResource FileOpItemStyle}"
-                                    ItemsSource="{Binding}" />
-                            </ScrollViewer>
+                            <ui:ListView
+                                x:Name="CurrentOperationList"
+                                Margin="0,10"
+                                IsSelectionEnabled="False"
+                                ItemContainerStyle="{StaticResource FileOpItemStyle}"
+                                ItemsSource="{Binding}" />
                             <ScrollViewer Grid.Row="1">
                                 <ui:ListView
                                     x:Name="PendingOperationsList"
