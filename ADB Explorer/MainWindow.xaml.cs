@@ -290,7 +290,7 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
                 AutoOpenCheckBox.IsChecked = autoOpen;
 
-            CurrentOperationList.Items.Add(fileOperationQueue.CurrentOperation);
+            CurrentOperationList.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsList.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsList.ItemsSource = fileOperationQueue.CompletedOperations;
         }

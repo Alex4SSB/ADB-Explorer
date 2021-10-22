@@ -11,22 +11,25 @@ namespace ADB_Explorer.Models
         public Dispatcher Dispatcher { get; }
 
         public MyObservableCollection<FileOperation> PendingOperations { get; } = new();
+        public MyObservableCollection<FileOperation> CurrentOperations { get; } = new();
         public MyObservableCollection<FileOperation> CompletedOperations { get; } = new();
 
-        private FileOperation currentOperation = null;
         public FileOperation CurrentOperation
         {
             get
             {
-                return currentOperation;
+                return (CurrentOperations.Count > 0) ? CurrentOperations[0] : null;
             }
             private set
             {
-                if (currentOperation != value)
+                CurrentOperations.Clear();
+
+                if (value != null)
                 {
-                    currentOperation = value;
-                    NotifyPropertyChanged();
+                    CurrentOperations.Add(value);
                 }
+
+                NotifyPropertyChanged();
             }
         }
 
@@ -87,7 +90,7 @@ namespace ADB_Explorer.Models
         {
             get
             {
-                return PendingOperations.Count + ((CurrentOperation != null) ? 1 : 0) + CompletedOperations.Count;
+                return PendingOperations.Count + CurrentOperations.Count + CompletedOperations.Count;
             }
         }
 
@@ -95,7 +98,6 @@ namespace ADB_Explorer.Models
         {
             Dispatcher = dispatcher;
             PendingOperations.CollectionChanged += PendingOperations_CollectionChanged;
-            CompletedOperations.CollectionChanged += CompletedOperations_CollectionChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -161,8 +163,6 @@ namespace ADB_Explorer.Models
                     MoveToNextOperation();
                 }
             }
-
-            NotifyPropertyChanged("CurrentOperation");
         }
 
         private void PendingOperations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -173,13 +173,6 @@ namespace ADB_Explorer.Models
             {
                 Dispatcher.BeginInvoke(Start);
             }
-
-            NotifyPropertyChanged("PendingOperations");
-        }
-
-        private void CompletedOperations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            NotifyPropertyChanged("CompletedOperations");
         }
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
