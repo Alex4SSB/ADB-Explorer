@@ -334,7 +334,8 @@ namespace ADB_Explorer
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
-            PathBox.IsEnabled = true;
+            PathBox.IsEnabled =
+            PasteMenuButton.IsEnabled =
             HomeButton.IsEnabled = true;
             NavHistory.Reset();
 
@@ -768,6 +769,23 @@ namespace ADB_Explorer
             }
         }
 
+        private void PasteFiles()
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                DefaultDirectory = DefaultFolderBlock.Text,
+                Title = "Select files to copy"
+            };
+
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            foreach (var item in dialog.FileNames)
+            {
+                fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, item, CurrentPath));
+            }
+        }
+
         private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
         {
             if (fileOperationQueue.IsActive)
@@ -1017,13 +1035,14 @@ namespace ADB_Explorer
 
         private void ClearExplorer()
         {
-            Data.CurrentPrettyNames.Clear();
+            CurrentPrettyNames.Clear();
             AndroidFileList.Clear();
             ExplorerGrid.Items.Refresh();
             PathStackPanel.Children.Clear();
             CurrentPath = null;
             PathBox.Tag = null;
             NavHistory.Reset();
+            PasteMenuButton.IsEnabled =
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
             CopyMenuButton.IsEnabled =
@@ -1167,6 +1186,11 @@ namespace ADB_Explorer
             DrivesItemRepeater.Visibility = Visibility.Visible;
 
             ClearExplorer();
+        }
+
+        private void PasteMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            PasteFiles();
         }
     }
 }
