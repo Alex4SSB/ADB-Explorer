@@ -290,9 +290,13 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
                 AutoOpenCheckBox.IsChecked = autoOpen;
 
-            CurrentOperationList.ItemsSource = fileOperationQueue.CurrentOperations;
-            PendingOperationsList.ItemsSource = fileOperationQueue.PendingOperations;
-            CompletedOperationsList.ItemsSource = fileOperationQueue.CompletedOperations;
+            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
+            PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
+            CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
+
+            //CurrentOperationList.ItemsSource = fileOperationQueue.CurrentOperations;
+            //PendingOperationsList.ItemsSource = fileOperationQueue.PendingOperations;
+            //CompletedOperationsList.ItemsSource = fileOperationQueue.CompletedOperations;
         }
 
         private void InitDevice()
@@ -1190,6 +1194,7 @@ namespace ADB_Explorer
 
         private void PasteMenuButton_Click(object sender, RoutedEventArgs e)
         {
+            ExplorerGrid.Focus();
             PasteFiles();
         }
     }

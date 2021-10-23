@@ -332,12 +332,6 @@
                 <DataTrigger Binding="{Binding StatusInfo.TotalPercentage}" Value="{x:Null}">
                     <Setter Property="IsIndeterminate" Value="True" />
                 </DataTrigger>
-                <DataTrigger Binding="{Binding Status}" Value="Completed">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Status}" Value="Failed">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </DataTrigger>
             </Style.Triggers>
         </Style>
         <Style x:Key="FileOpItemStyle" TargetType="ui:ListViewItem">
@@ -481,11 +475,6 @@
                         <ui:FontIcon Glyph="&#xE8AC;" />
                     </MenuItem.Header>
                 </MenuItem>
-                <MenuItem IsEnabled="False" ToolTip="Share">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE72D;" />
-                    </MenuItem.Header>
-                </MenuItem>
                 <MenuItem IsEnabled="False" ToolTip="Delete">
                     <MenuItem.Header>
                         <ui:FontIcon Glyph="&#xE74D;" />
@@ -506,7 +495,6 @@
                 <MenuItem
                     x:Name="FileOperationsButton"
                     Click="FileOperationsButton_Click"
-                    IsEnabled="{Binding ElementName=FileOperationsList, Path=Items.Count}"
                     ToolTip="File Operations">
                     <MenuItem.Header>
                         <ui:FontIcon Glyph="&#xF16A;" />
@@ -894,11 +882,11 @@
         <ui:SplitView
             x:Name="FileOperationsSplitView"
             FocusVisualStyle="{x:Null}"
-            OpenPaneLength="280"
+            OpenPaneLength="500"
             PanePlacement="Right">
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                    <Grid Margin="0,8">
+                    <Grid Margin="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition Height="*" />
@@ -912,29 +900,79 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <ui:ListView
-                                x:Name="CurrentOperationList"
-                                Margin="0,10"
-                                IsSelectionEnabled="False"
-                                ItemContainerStyle="{StaticResource FileOpItemStyle}"
-                                ItemsSource="{Binding}" />
-                            <ScrollViewer Grid.Row="1">
-                                <ui:ListView
-                                    x:Name="PendingOperationsList"
-                                    Margin="0,10"
-                                    IsSelectionEnabled="False"
-                                    ItemContainerStyle="{StaticResource FileOpItemStyle}"
-                                    ItemsSource="{Binding}" />
-                            </ScrollViewer>
-                            <ScrollViewer Grid.Row="2">
-                                <ui:ListView
-                                    x:Name="CompletedOperationsList"
-                                    Margin="0,10"
-                                    IsSelectionEnabled="False"
-                                    ItemContainerStyle="{StaticResource FileOpItemStyle}"
-                                    ItemsSource="{Binding}" />
-                            </ScrollViewer>
+                            <TextBlock Text="Current" />
+                            <DataGrid
+                                x:Name="CurrentOperationDataGrid"
+                                Grid.Row="1"
+                                AutoGenerateColumns="False"
+                                CellStyle="{StaticResource CellVerticalStyle}"
+                                FocusVisualStyle="{x:Null}"
+                                HeadersVisibility="None"
+                                ItemsSource="{Binding}">
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn MinWidth="100">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ui:ProgressBar Style="{StaticResource ProgressBarStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Binding="{Binding FilePath, Mode=OneWay}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock Grid.Row="2" Text="Pending" />
+                            <DataGrid
+                                x:Name="PendingOperationsDataGrid"
+                                Grid.Row="3"
+                                MaxHeight="120"
+                                AutoGenerateColumns="False"
+                                CellStyle="{StaticResource CellVerticalStyle}"
+                                FocusVisualStyle="{x:Null}"
+                                HeadersVisibility="None"
+                                ItemsSource="{Binding}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding FilePath, Mode=OneWay}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <TextBlock Grid.Row="4" Text="Completed" />
+                            <DataGrid
+                                x:Name="CompletedOperationsDataGrid"
+                                Grid.Row="5"
+                                AutoGenerateColumns="False"
+                                CellStyle="{StaticResource CellVerticalStyle}"
+                                FocusVisualStyle="{x:Null}"
+                                HeadersVisibility="None"
+                                ItemsSource="{Binding}"
+                                SelectionUnit="FullRow">
+                                <DataGrid.Columns>
+                                    <!--<DataGridTextColumn Binding="{Binding Status, Mode=OneWay}" />-->
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <ui:FontIcon>
+                                                    <ui:FontIcon.Style>
+                                                        <Style TargetType="ui:FontIcon">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                                    <Setter Property="Glyph" Value="&#xF13E;" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                                    <Setter Property="Glyph" Value="&#xF13D;" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </ui:FontIcon.Style>
+                                                </ui:FontIcon>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Binding="{Binding FilePath, Mode=OneWay}" />
+                                </DataGrid.Columns>
+                            </DataGrid>
                         </Grid>
                     </Grid>
                 </Border>
