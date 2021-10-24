@@ -22,6 +22,14 @@ namespace ADB_Explorer.Services
         public ADBService.Device Device { get; }
         public string FilePath { get; }
 
+        public string FileName
+        { 
+            get
+            {
+                return System.IO.Path.GetFileName(FilePath);
+            } 
+        }
+
         private OperationStatus status;
         public OperationStatus Status
         {

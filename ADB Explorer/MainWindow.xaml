@@ -921,7 +921,7 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Binding="{Binding FilePath, Mode=OneWay}" />
+                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <TextBlock Grid.Row="2" Text="Pending" />
@@ -935,7 +935,7 @@
                                 HeadersVisibility="None"
                                 ItemsSource="{Binding}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding FilePath, Mode=OneWay}" />
+                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <TextBlock Grid.Row="4" Text="Completed" />
@@ -970,7 +970,7 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Binding="{Binding FilePath, Mode=OneWay}" />
+                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
