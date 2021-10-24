@@ -17,6 +17,8 @@ namespace ADB_Explorer.Services
             Failed
         }
 
+        public string OperationName { get; protected set; }
+
         public Dispatcher Dispatcher { get; }
 
         public ADBService.Device Device { get; }
