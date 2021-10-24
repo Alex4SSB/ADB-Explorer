@@ -149,7 +149,9 @@ namespace ADB_Explorer.Models
 
         private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (CurrentOperation.Status != FileOperation.OperationStatus.Waiting)
+            if ((CurrentOperation == sender) &&
+                (CurrentOperation.Status != FileOperation.OperationStatus.Waiting) &&
+                (CurrentOperation.Status != FileOperation.OperationStatus.InProgress))
             {
                 if ((PendingOperations.Count == 0) ||
                     (StopAfterFailure && (CurrentOperation.Status == FileOperation.OperationStatus.Failed)) ||
