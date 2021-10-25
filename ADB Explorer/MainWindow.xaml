@@ -85,6 +85,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+            <EventSetter Event="PreviewMouseDown" Handler="DataGridCell_PreviewMouseDown" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -899,9 +900,6 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <TextBlock Text="Current" />
@@ -924,55 +922,65 @@
                                     <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <TextBlock Grid.Row="2" Text="Pending" />
-                            <DataGrid
-                                x:Name="PendingOperationsDataGrid"
-                                Grid.Row="3"
-                                MaxHeight="120"
-                                AutoGenerateColumns="False"
-                                CellStyle="{StaticResource CellVerticalStyle}"
-                                FocusVisualStyle="{x:Null}"
-                                HeadersVisibility="None"
-                                ItemsSource="{Binding}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <TextBlock Grid.Row="4" Text="Completed" />
-                            <DataGrid
-                                x:Name="CompletedOperationsDataGrid"
-                                Grid.Row="5"
-                                AutoGenerateColumns="False"
-                                CellStyle="{StaticResource CellVerticalStyle}"
-                                FocusVisualStyle="{x:Null}"
-                                HeadersVisibility="None"
-                                ItemsSource="{Binding}"
-                                SelectionUnit="FullRow">
-                                <DataGrid.Columns>
-                                    <!--<DataGridTextColumn Binding="{Binding Status, Mode=OneWay}" />-->
-                                    <DataGridTemplateColumn>
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:FontIcon>
-                                                    <ui:FontIcon.Style>
-                                                        <Style TargetType="ui:FontIcon">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                                                    <Setter Property="Glyph" Value="&#xF13E;" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding Status}" Value="Failed">
-                                                                    <Setter Property="Glyph" Value="&#xF13D;" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </ui:FontIcon.Style>
-                                                </ui:FontIcon>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <ScrollViewer
+                                x:Name="PendingAndCompletedScrollViewer"
+                                Grid.Row="2"
+                                HorizontalScrollBarVisibility="Auto"
+                                PreviewMouseWheel="PendingAndCompletedScrollViewer_PreviewMouseWheel">
+                                <StackPanel>
+                                    <TextBlock Text="Pending" />
+                                    <DataGrid
+                                        x:Name="PendingOperationsDataGrid"
+                                        AutoGenerateColumns="False"
+                                        CellStyle="{StaticResource CellVerticalStyle}"
+                                        FocusVisualStyle="{x:Null}"
+                                        HeadersVisibility="None"
+                                        HorizontalScrollBarVisibility="Disabled"
+                                        ItemsSource="{Binding}"
+                                        SelectionUnit="FullRow"
+                                        VerticalScrollBarVisibility="Disabled">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBlock Text="Completed" />
+                                    <DataGrid
+                                        x:Name="CompletedOperationsDataGrid"
+                                        Width="Auto"
+                                        AutoGenerateColumns="False"
+                                        CellStyle="{StaticResource CellVerticalStyle}"
+                                        FocusVisualStyle="{x:Null}"
+                                        HeadersVisibility="None"
+                                        HorizontalScrollBarVisibility="Disabled"
+                                        ItemsSource="{Binding}"
+                                        SelectionUnit="FullRow"
+                                        VerticalScrollBarVisibility="Disabled">
+                                        <DataGrid.Columns>
+                                            <DataGridTemplateColumn>
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <ui:FontIcon>
+                                                            <ui:FontIcon.Style>
+                                                                <Style TargetType="ui:FontIcon">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                                                            <Setter Property="Glyph" Value="&#xF13E;" />
+                                                                        </DataTrigger>
+                                                                        <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                                                            <Setter Property="Glyph" Value="&#xF13D;" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </ui:FontIcon.Style>
+                                                        </ui:FontIcon>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </ScrollViewer>
                         </Grid>
                     </Grid>
                 </Border>

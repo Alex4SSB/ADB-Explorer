@@ -293,10 +293,6 @@ namespace ADB_Explorer
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
-
-            //CurrentOperationList.ItemsSource = fileOperationQueue.CurrentOperations;
-            //PendingOperationsList.ItemsSource = fileOperationQueue.PendingOperations;
-            //CompletedOperationsList.ItemsSource = fileOperationQueue.CompletedOperations;
         }
 
         private void InitDevice()
@@ -1196,6 +1192,20 @@ namespace ADB_Explorer
         {
             ExplorerGrid.Focus();
             PasteFiles();
+        }
+
+        private void PendingAndCompletedScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            if (sender is ScrollViewer sv)
+            {
+                sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta);
+                e.Handled = true;
+            }
+        }
+
+        private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // https://www.codeproject.com/Tips/5165488/Prevent-WPF-DataGrid-Auto-scrolling-Due-to-Clickin
         }
     }
 }
