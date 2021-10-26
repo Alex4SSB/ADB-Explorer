@@ -26,6 +26,20 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
+        <Style x:Key="DisabledGlyphStyle" TargetType="ui:FontIcon">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="Gray" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DisabledTextBlockStyle" TargetType="TextBlock">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="Gray" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <ContextMenu x:Key="RowContextMenu">
             <ContextMenu.Resources>
                 <Style TargetType="MenuItem">
@@ -43,20 +57,10 @@
         </ContextMenu>
         <MenuItem x:Key="ContextMenuCopyItem" Click="ContextMenuCopyItem_Click">
             <MenuItem.Resources>
-                <Style TargetType="ui:FontIcon">
+                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                     <Setter Property="FontSize" Value="16" />
-                    <Style.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="Gray" />
-                        </Trigger>
-                    </Style.Triggers>
                 </Style>
-                <Style TargetType="TextBlock">
-                    <Style.Triggers>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="Gray" />
-                        </Trigger>
-                    </Style.Triggers>
+                <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="Margin" Value="6,0,0,0" />
                 </Style>
             </MenuItem.Resources>
@@ -335,7 +339,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="FileOpItemStyle" TargetType="ui:ListViewItem">
+        <!--<Style x:Key="FileOpItemStyle" TargetType="ui:ListViewItem">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="Margin" Value="4,0,4,2" />
             <Setter Property="Template">
@@ -349,7 +353,7 @@
                                 </Grid.ColumnDefinitions>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <!--<TextBlock Text="Pull: " />-->
+                                        <TextBlock Text="Pull: " />
                                         <TextBlock Text="{Binding Status}" />
                                         <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.TotalPercentage}" />
                                     </StackPanel>
@@ -374,7 +378,23 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
+        </Style>-->
+        <DataTemplate x:Key="StatusIconTemplate">
+            <ui:FontIcon>
+                <ui:FontIcon.Style>
+                    <Style TargetType="ui:FontIcon">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                <Setter Property="Glyph" Value="&#xF13E;" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                <Setter Property="Glyph" Value="&#xF13D;" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+        </DataTemplate>
     </Window.Resources>
     <Grid>
         <Grid>
@@ -386,21 +406,10 @@
             </Grid.RowDefinitions>
             <Menu Margin="7,0" VerticalAlignment="Center">
                 <Menu.Resources>
-                    <Style TargetType="ui:FontIcon">
+                    <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                         <Setter Property="FontSize" Value="18" />
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="Gray" />
-                            </Trigger>
-                        </Style.Triggers>
                     </Style>
-                    <Style TargetType="TextBlock">
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="Gray" />
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
+                    <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock" />
                 </Menu.Resources>
                 <MenuItem
                     x:Name="OpenDevicesButton"
@@ -482,34 +491,51 @@
                     </MenuItem.Header>
                 </MenuItem>
             </Menu>
-            <Menu Margin="0,0,7,0" HorizontalAlignment="Right">
-                <Menu.Resources>
-                    <Style TargetType="ui:FontIcon">
+            <StackPanel
+                Margin="0,0,7,0"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                         <Setter Property="FontSize" Value="18" />
-                        <Style.Triggers>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Foreground" Value="Gray" />
-                            </Trigger>
-                        </Style.Triggers>
                     </Style>
-                </Menu.Resources>
-                <MenuItem
-                    x:Name="FileOperationsButton"
-                    Click="FileOperationsButton_Click"
-                    ToolTip="File Operations">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xF16A;" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem
-                    x:Name="SettingsButton"
-                    Click="SettingsButton_Click"
-                    ToolTip="Settings">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE713;" />
-                    </MenuItem.Header>
-                </MenuItem>
-            </Menu>
+                </StackPanel.Resources>
+                <Menu>
+                    <Menu.Style>
+                        <Style TargetType="Menu">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="0" />
+                                        <Condition Binding="{Binding ElementName=PendingOperationsDataGrid, Path=Items.Count}" Value="0" />
+                                        <Condition Binding="{Binding ElementName=CompletedOperationsDataGrid, Path=Items.Count}" Value="0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Menu.Style>
+                    <MenuItem
+                        x:Name="FileOperationsButton"
+                        Click="FileOperationsButton_Click"
+                        ToolTip="File Operations">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xF16A;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+                <Menu>
+                    <MenuItem
+                        x:Name="SettingsButton"
+                        Click="SettingsButton_Click"
+                        ToolTip="Settings">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE713;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
             <StackPanel Grid.Row="1">
                 <Separator />
                 <Grid>
@@ -519,13 +545,8 @@
                     </Grid.ColumnDefinitions>
                     <Menu Margin="7,0,0,0">
                         <Menu.Resources>
-                            <Style TargetType="ui:FontIcon">
+                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                                 <Setter Property="FontSize" Value="14" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Foreground" Value="Gray" />
-                                    </Trigger>
-                                </Style.Triggers>
                             </Style>
                         </Menu.Resources>
                         <MenuItem
@@ -912,6 +933,7 @@
                                 HeadersVisibility="None"
                                 ItemsSource="{Binding}">
                                 <DataGrid.Columns>
+                                    <DataGridTextColumn Binding="{Binding OperationName}" />
                                     <DataGridTemplateColumn MinWidth="100">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -940,6 +962,7 @@
                                         SelectionUnit="FullRow"
                                         VerticalScrollBarVisibility="Disabled">
                                         <DataGrid.Columns>
+                                            <DataGridTextColumn Binding="{Binding OperationName}" />
                                             <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
@@ -956,26 +979,8 @@
                                         SelectionUnit="FullRow"
                                         VerticalScrollBarVisibility="Disabled">
                                         <DataGrid.Columns>
-                                            <DataGridTemplateColumn>
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <ui:FontIcon>
-                                                            <ui:FontIcon.Style>
-                                                                <Style TargetType="ui:FontIcon">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                                                            <Setter Property="Glyph" Value="&#xF13E;" />
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding Status}" Value="Failed">
-                                                                            <Setter Property="Glyph" Value="&#xF13D;" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </ui:FontIcon.Style>
-                                                        </ui:FontIcon>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
+                                            <DataGridTextColumn Binding="{Binding OperationName}" />
+                                            <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
                                             <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                         </DataGrid.Columns>
                                     </DataGrid>

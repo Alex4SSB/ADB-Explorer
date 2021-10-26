@@ -298,10 +298,14 @@ namespace ADB_Explorer
         private void InitDevice()
         {
             Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
-            //InitDrive();
 
             Devices.Current.SetDrives(CurrentADBDevice.GetStorageInfo());
             DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
+
+            if (Devices.Current.Drives.Count < 1)
+            {
+                InitDrive();
+            }
         }
 
         private static void CombinePrettyNames()
@@ -335,26 +339,14 @@ namespace ADB_Explorer
 
             ExplorerGrid.ItemsSource = AndroidFileList;
             PathBox.IsEnabled =
-            PasteMenuButton.IsEnabled =
-            HomeButton.IsEnabled = true;
+            PasteMenuButton.IsEnabled = true;
+            HomeButton.IsEnabled = Devices.Current.Drives.Any();
             NavHistory.Reset();
 
             if (string.IsNullOrEmpty(path))
                 NavigateToPath(DEFAULT_PATH);
             else
                 NavigateToPath(path);
-
-            //if (string.IsNullOrEmpty(CurrentPath))
-            //{
-            //    NavigateToPath(DEFAULT_PATH);
-            //}
-            //else if (AndroidFileList.Any())
-            //{
-            //    PathBox.Tag = CurrentPath;
-            //    PopulateButtons(CurrentPath);
-            //}
-            //else
-            //    NavigateToPath(CurrentPath);
 
             ProgressCountTextBlock.Tag = 0;
         }
@@ -1027,6 +1019,7 @@ namespace ADB_Explorer
                     device.SetOpen(false);
                     CurrentADBDevice = null;
                     ClearExplorer();
+                    ClearDrives();
                 }
                 DeviceListSetup();
                 DevicesList.Items.Refresh();
@@ -1050,6 +1043,11 @@ namespace ADB_Explorer
             ForwardButton.IsEnabled =
             HomeButton.IsEnabled =
             ParentButton.IsEnabled = false;
+        }
+
+        private void ClearDrives()
+        {
+            Devices.Current.Drives.Clear();
         }
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
