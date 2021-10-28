@@ -674,6 +674,9 @@
                                                                     <DataTrigger Binding="{Binding Type}" Value="External">
                                                                         <Setter Property="Visibility" Value="Visible" />
                                                                     </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding Type}" Value="Emulated">
+                                                                        <Setter Property="Visibility" Value="Visible" />
+                                                                    </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </StackPanel.Style>
@@ -685,11 +688,22 @@
                                                         <TextBlock Text=")" />
                                                     </StackPanel>
                                                 </StackPanel>
-                                                <ui:ProgressBar Margin="0,6" Value="{Binding UsageP, Mode=OneWay}" />
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding Available, Mode=OneWay}" />
-                                                    <TextBlock Text=" free of " />
-                                                    <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                                                <StackPanel>
+                                                    <StackPanel.Style>
+                                                        <Style TargetType="StackPanel">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding UsageP}" Value="{x:Null}">
+                                                                    <Setter Property="Visibility" Value="Hidden" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </StackPanel.Style>
+                                                    <ui:ProgressBar Margin="0,6" Value="{Binding UsageP, Mode=OneWay}" />
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Available, Mode=OneWay}" />
+                                                        <TextBlock Text=" free of " />
+                                                        <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                                                    </StackPanel>
                                                 </StackPanel>
                                             </StackPanel>
                                         </Grid>

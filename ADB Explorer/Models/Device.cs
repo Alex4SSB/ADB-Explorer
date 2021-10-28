@@ -85,7 +85,8 @@ namespace ADB_Explorer.Models
             Local,
             Remote,
             Offline,
-            Unauthorized
+            Unauthorized,
+            Authorizing
         }
 
         public string Name { get; private set; }
@@ -97,6 +98,7 @@ namespace ADB_Explorer.Models
             DeviceType.Remote => "\uEE77",
             DeviceType.Offline => "\uEB5E",
             DeviceType.Unauthorized => "\uF476",
+            DeviceType.Authorizing => "\uF476",
             _ => throw new NotImplementedException(),
         };
         public bool IsOpen { get; private set; }
@@ -147,7 +149,8 @@ namespace ADB_Explorer.Models
                 "device" => DeviceType.Local,
                 "offline" => DeviceType.Offline,
                 "unauthorized" => DeviceType.Unauthorized,
-                _ => throw new System.NotImplementedException(),
+                "authorizing" => DeviceType.Authorizing,
+                _ => throw new NotImplementedException(),
             };
         }
 
@@ -174,6 +177,25 @@ namespace ADB_Explorer.Models
         internal void SetDrives(List<Drive> drives)
         {
             Drives = drives;
+
+            if (Drives.Count(d => d.Type == DriveType.Internal) == 0)
+            {
+                Drives.Insert(0, new("", "", "", null, AdbExplorerConst.DEFAULT_PATH));
+            }
+
+            if (Drives.Count(d => d.Type == DriveType.Root) == 0)
+            {
+                Drives.Insert(0, new("", "", "", null, "/"));
+            }
+        }
+
+        public static string DeviceName(string model, string device)
+        {
+            var name = device;
+            if (device == device.ToLower() && !device.Contains('_') && !device.Contains('-'))
+                name = model;
+
+            return name.Replace('_', ' ');
         }
     }
 
@@ -186,7 +208,7 @@ namespace ADB_Explorer.Models
 
         public int GetHashCode([DisallowNull] DeviceClass obj)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -153,7 +153,7 @@ namespace ADB_Explorer.Services
 
             return DEVICE_NAME_RE.Matches(stdout).Select(
                 m => new DeviceClass(
-                    name: m.Groups["name"].Value.Replace('_', ' '),
+                    name: DeviceClass.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                     id: m.Groups["id"].Value,
                     status: m.Groups["status"].Value)
                 );

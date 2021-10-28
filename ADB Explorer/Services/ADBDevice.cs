@@ -253,10 +253,10 @@ namespace ADB_Explorer.Services
                 if (match.Count > 2) // 2 matches means only root and internal storage, so no need to look for the MMC
                 {
                     var mmcId = GetMmcId();
-                    return match.Select(m => new Drive(m.Groups, m.Groups["path"].Value.Contains(mmcId))).ToList();
+                    return match.Select(m => new Drive(m.Groups, isMMC: m.Groups["path"].Value.Contains(mmcId))).ToList();
                 }
                 else
-                    return match.Select(m => new Drive(m.Groups)).ToList();
+                    return match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
             }
 
             public string GetMmcId()

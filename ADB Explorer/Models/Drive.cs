@@ -11,7 +11,8 @@ namespace ADB_Explorer.Models
         Internal,
         Expansion,
         External,
-        Unknown
+        Unknown,
+        Emulated
     }
 
     public class Drive
@@ -19,7 +20,7 @@ namespace ADB_Explorer.Models
         public string Size { get; private set; }
         public string Used { get; private set; }
         public string Available { get; private set; }
-        public byte UsageP { get; private set; }
+        public byte? UsageP { get; private set; }
         public string Path { get; private set; }
         public string ID {
             get
@@ -46,12 +47,13 @@ namespace ADB_Explorer.Models
                     DriveType.Expansion => "\uE7F1",
                     DriveType.External => "\uE88E",
                     DriveType.Unknown => "\uE9CE",
+                    DriveType.Emulated => "\uEDA2",
                     _ => throw new System.NotImplementedException(),
                 };
             }
         }
 
-        public Drive(string size, string used, string available, byte usageP, string path, bool isMMC = false)
+        public Drive(string size, string used, string available, byte? usageP, string path, bool isMMC = false, bool isEmulator = false)
         {
             Size = size;
             Used = used;
@@ -65,20 +67,29 @@ namespace ADB_Explorer.Models
                 if (Type is DriveType.Internal)
                     Path = "/sdcard";
             }
+            else if (isMMC)
+            {
+                Type = DriveType.Expansion;
+            }
+            else if (isEmulator)
+            {
+                Type = DriveType.Emulated;
+            }
             else
             {
-                Type = isMMC ? DriveType.Expansion : DriveType.External;
+                Type = DriveType.External;
             }
         }
 
-        public Drive(GroupCollection match, bool isMMC = false)
+        public Drive(GroupCollection match, bool isMMC = false, bool isEmulator = false)
             : this(
                   (ulong.Parse(match["size_kB"].Value) * 1024).ToSize(true, 2, 2),
                   (ulong.Parse(match["used_kB"].Value) * 1024).ToSize(true, 2, 2),
                   (ulong.Parse(match["available_kB"].Value) * 1024).ToSize(true, 2, 2),
                   byte.Parse(match["usage_P"].Value),
                   match["path"].Value,
-                  isMMC)
+                  isMMC,
+                  isEmulator)
         { }
     }
 }
