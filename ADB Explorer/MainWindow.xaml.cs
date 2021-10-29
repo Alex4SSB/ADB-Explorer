@@ -987,7 +987,7 @@ namespace ADB_Explorer
 
         private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is DeviceClass device && device.Type != DeviceClass.DeviceType.Offline)
+            if (sender is Button button && button.DataContext is DeviceClass device && device.Status != DeviceClass.DeviceStatus.Offline)
             {
                 device.SetOpen();
                 CurrentADBDevice = new(device.ID);
@@ -1006,7 +1006,14 @@ namespace ADB_Explorer
             {
                 try
                 {
-                    ADBService.DisconnectNetworkDevice(device.ID);
+                    if (device.Type == DeviceClass.DeviceType.Emulator)
+                    {
+                        ADBService.KillEmulator(device.ID);
+                    }
+                    else
+                    {
+                        ADBService.DisconnectNetworkDevice(device.ID);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -1047,7 +1054,7 @@ namespace ADB_Explorer
 
         private void ClearDrives()
         {
-            Devices.Current.Drives.Clear();
+            Devices.Current?.Drives.Clear();
         }
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

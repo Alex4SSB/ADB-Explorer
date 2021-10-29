@@ -166,6 +166,8 @@ namespace ADB_Explorer.Services
 
         public static void PairNetworkDevice(string fullAddress, string pairingCode) => NetworkDeviceOperation("pair", fullAddress, pairingCode);
 
+        public static void KillEmulator(string emulatorName) => ExecuteDeviceAdbCommand(emulatorName, "emu", out _, out _, "kill");
+
         /// <summary>
         /// 
         /// </summary>

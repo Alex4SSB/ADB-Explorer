@@ -23,8 +23,8 @@ namespace ADB_Explorer.Models
             {
                 if (List?.Find(thisDevice => thisDevice.ID == item.ID) is DeviceClass device)
                 {
-                    // Return (at the end of the function) true if current device type has changed
-                    if (device.IsOpen && device.Type != item.Type)
+                    // Return (at the end of the function) true if current device status has changed
+                    if (device.IsOpen && device.Status != item.Status)
                         isCurrentTypeUpdated = true;
 
                     device.UpdateDevice(item);
@@ -84,21 +84,32 @@ namespace ADB_Explorer.Models
         {
             Local,
             Remote,
+            Emulator
+        }
+
+        public enum DeviceStatus
+        {
+            Online,
             Offline,
-            Unauthorized,
-            Authorizing
+            Unauthorized
         }
 
         public string Name { get; private set; }
         public string ID { get; private set; }
         public DeviceType Type { get; private set; }
-        public string Icon => Type switch
+        public DeviceStatus Status { get; private set; }
+        public string TypeIcon => Type switch
         {
             DeviceType.Local => "\uE839",
             DeviceType.Remote => "\uEE77",
-            DeviceType.Offline => "\uEB5E",
-            DeviceType.Unauthorized => "\uF476",
-            DeviceType.Authorizing => "\uF476",
+            DeviceType.Emulator => "\uE99A",
+            _ => throw new NotImplementedException(),
+        };
+        public string StatusIcon => Status switch
+        {
+            DeviceStatus.Online => "",
+            DeviceStatus.Offline => "\uEBFF",
+            DeviceStatus.Unauthorized => "\uEC00",
             _ => throw new NotImplementedException(),
         };
         public bool IsOpen { get; private set; }
@@ -129,27 +140,25 @@ namespace ADB_Explorer.Models
                    ID == device.ID;
         }
 
-        public DeviceClass(string name, string id, DeviceType type = DeviceType.Local)
+        public DeviceClass(string name, string id)
         {
             Name = name;
             ID = id;
-            Type = type;
-
-            if (string.IsNullOrEmpty(Name))
-                Name = "[Unauthorized]";
-            else if (ID.Contains("emulator"))
-                Name = ID;
         }
 
         public DeviceClass(string name, string id, string status) : this(name, id)
         {
-            Type = status switch
+            Type = id.Contains('.')
+                ? DeviceType.Remote : id.Contains("emulator")
+                    ? DeviceType.Emulator
+                    : DeviceType.Local;
+
+            Status = status switch
             {
-                "device" when id.Contains('.') => DeviceType.Remote,
-                "device" => DeviceType.Local,
-                "offline" => DeviceType.Offline,
-                "unauthorized" => DeviceType.Unauthorized,
-                "authorizing" => DeviceType.Authorizing,
+                "device" => DeviceStatus.Online,
+                "offline" => DeviceStatus.Offline,
+                "unauthorized" => DeviceStatus.Unauthorized,
+                "authorizing" => DeviceStatus.Unauthorized,
                 _ => throw new NotImplementedException(),
             };
         }
@@ -170,8 +179,8 @@ namespace ADB_Explorer.Models
 
         public void UpdateDevice(DeviceClass other)
         {
-            Type = other.Type;
             Name = other.Name;
+            Status = other.Status;
         }
 
         internal void SetDrives(List<Drive> drives)
@@ -203,7 +212,7 @@ namespace ADB_Explorer.Models
     {
         public bool Equals(DeviceClass x, DeviceClass y)
         {
-            return x.ID == y.ID && x.Type == y.Type;
+            return x.ID == y.ID && x.Status == y.Status;
         }
 
         public int GetHashCode([DisallowNull] DeviceClass obj)
