@@ -213,6 +213,18 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style
+            x:Key="RemoveDeviceButtonStyle"
+            BasedOn="{StaticResource DisabledTextBlockStyle}"
+            TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="Text" Value="Remove" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Type}" Value="Emulator">
+                    <Setter Property="Text" Value="Kill" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="DeviceStyle" TargetType="ui:ListViewItem">
             <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_MouseDown" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -325,10 +337,12 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
-                                            <Button
-                                                x:Name="DisconnectDeviceButton"
-                                                Click="DisconnectDeviceButton_Click"
-                                                Content="Remove" />
+                                            <Button x:Name="DisconnectDeviceButton" Click="DisconnectDeviceButton_Click">
+                                                <Grid>
+                                                    <TextBlock Text="Remove" Visibility="Hidden" />
+                                                    <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
+                                                </Grid>
+                                            </Button>
                                         </Grid>
                                     </StackPanel>
                                 </StackPanel>

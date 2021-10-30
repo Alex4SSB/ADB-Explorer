@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 
 namespace ADB_Explorer.Services
@@ -250,38 +249,13 @@ namespace ADB_Explorer.Services
                     return new();
 
                 var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
-                if (match.Count > 2) // 2 matches means only root and internal storage, so no need to look for the MMC
-                {
-                    var mmcId = GetMmcId();
-                    return match.Select(m => new Drive(m.Groups, isMMC: m.Groups["path"].Value.Contains(mmcId))).ToList();
-                }
-                else
-                    return match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
-            }
-
-            public string GetMmcId()
-            {
-                // Check to see if the MMC block device (first partition) exists (MMC0 / MMC1)
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "file", out string stdout, out _, MMC_BLOCK_DEVICES);
-                if (exitCode != 0)
-                    return "";
-
-                // Get major and minor nodes
-                var match = AdbRegEx.MMC_BLOCK_DEVICE_NODE.Match(stdout);
-                if (!match.Success)
-                    return "";
-
-                // Get a list of all volumes (and their nodes)
-                // The public flag reduces execution time significantly
-                exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "sm", out stdout, out _, "list-volumes", "public");
-                if (exitCode != 0)
-                    return "";
-
-                var node = $"{match.Groups["major"].Value},{match.Groups["minor"].Value}";
-                // Find the ID of the device with the MMC node
-                var mmcVolumeId = Regex.Match(stdout, @$"{node}\smounted\s(?<id>[\w-]+)");
-
-                return mmcVolumeId.Success ? mmcVolumeId.Groups["id"].Value : "";
+                //if (match.Count > 2) // 2 matches means only root and internal storage, so no need to look for the MMC
+                //{
+                //    var mmcId = GetMmcId(deviceSerial);
+                //    return match.Select(m => new Drive(m.Groups, isMMC: m.Groups["path"].Value.Contains(mmcId))).ToList();
+                //}
+                //else
+                return match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
             }
 
             //private Dictionary<string, string> props { get; set; }

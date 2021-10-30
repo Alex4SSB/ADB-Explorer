@@ -1,10 +1,10 @@
 ﻿using ADB_Explorer.Models;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static ADB_Explorer.Models.AdbRegEx;
@@ -183,6 +183,31 @@ namespace ADB_Explorer.Services
             {
                 throw new Exception(stdout);
             }
+        }
+
+        public static string GetMmcId(string deviceID)
+        {
+            // Check to see if the MMC block device (first partition) exists (MMC0 / MMC1)
+            int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
+            //if (exitCode != 0)
+            //    return "";
+
+            // Get major and minor nodes
+            var match = MMC_BLOCK_DEVICE_NODE.Match(stdout);
+            if (!match.Success)
+                return "";
+
+            // Get a list of all volumes (and their nodes)
+            // The public flag reduces execution time significantly
+            exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out stdout, out _, "list-volumes", "public");
+            if (exitCode != 0)
+                return "";
+
+            var node = $"{Convert.ToInt32(match.Groups["major"].Value, 16)},{Convert.ToInt32(match.Groups["minor"].Value, 16)}";
+            // Find the ID of the device with the MMC node
+            var mmcVolumeId = Regex.Match(stdout, @$"{node}\smounted\s(?<id>[\w-]+)");
+
+            return mmcVolumeId.Success ? mmcVolumeId.Groups["id"].Value : "";
         }
     }
 }

@@ -91,5 +91,10 @@ namespace ADB_Explorer.Models
                   isMMC,
                   isEmulator)
         { }
+
+        public void SetMmc()
+        {
+            Type = DriveType.Expansion;
+        }
     }
 }

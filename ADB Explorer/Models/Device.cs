@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models
 {
@@ -187,6 +188,12 @@ namespace ADB_Explorer.Models
         {
             Drives = drives;
 
+            if (Drives.Count(d => d.Type == DriveType.External) > 0)
+            {
+                var MMC = ADBService.GetMmcId(ID);
+                Drives.Find(d => d.ID == MMC)?.SetMmc();
+            }
+
             if (Drives.Count(d => d.Type == DriveType.Internal) == 0)
             {
                 Drives.Insert(0, new("", "", "", null, AdbExplorerConst.DEFAULT_PATH));
@@ -201,7 +208,7 @@ namespace ADB_Explorer.Models
         public static string DeviceName(string model, string device)
         {
             var name = device;
-            if (device == device.ToLower() && !device.Contains('_') && !device.Contains('-'))
+            if (device == device.ToLower())
                 name = model;
 
             return name.Replace('_', ' ');
