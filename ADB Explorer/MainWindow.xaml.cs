@@ -1208,9 +1208,12 @@ namespace ADB_Explorer
             }
         }
 
-        private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
         {
-            // https://www.codeproject.com/Tips/5165488/Prevent-WPF-DataGrid-Auto-scrolling-Due-to-Clickin
+            if (e.OriginalSource is DataGridCell && e.TargetRect == Rect.Empty)
+            {
+                e.Handled = true;
+            }
         }
     }
 }
