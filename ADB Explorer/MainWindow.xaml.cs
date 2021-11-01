@@ -55,6 +55,18 @@ namespace ADB_Explorer
 
         private List<MenuItem> PathButtons = new();
 
+        /// <summary>
+        /// Sets the app resource font family for font icons depending on the OS build
+        /// </summary>
+        public static void SetIconFont()
+        {
+            Application.Current.Resources["GlyphFontFamily"] = new FontFamily(Environment.OSVersion.Version.Build switch
+            {
+                > 20000 => "Segoe Fluent Icons", // Windows 11
+                _ => "Segoe MDL2 Assets",
+            });
+        }
+
         private void GetExplorerContentPresenter()
         {
             if (ExplorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
@@ -80,6 +92,7 @@ namespace ADB_Explorer
         public MainWindow()
         {
             InitializeComponent();
+            SetIconFont();
 
             fileOperationQueue = new(this.Dispatcher);
             LaunchSequence();

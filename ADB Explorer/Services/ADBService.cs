@@ -185,25 +185,31 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static string GetMmcId(string deviceID)
+        public static bool MmcExists(string deviceID) => GetMmcNode(deviceID).Count > 1;
+
+        public static GroupCollection GetMmcNode(string deviceID)
         {
             // Check to see if the MMC block device (first partition) exists (MMC0 / MMC1)
-            int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
-            //if (exitCode != 0)
-            //    return "";
+            ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
+            // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
 
-            // Get major and minor nodes
-            var match = MMC_BLOCK_DEVICE_NODE.Match(stdout);
-            if (!match.Success)
+            // Get major and minor nodes in hex and return
+            return MMC_BLOCK_DEVICE_NODE.Match(stdout).Groups;
+        }
+
+        public static string GetMmcId(string deviceID)
+        {
+            var matchGroups = GetMmcNode(deviceID);
+            if (matchGroups.Count < 2)
                 return "";
 
             // Get a list of all volumes (and their nodes)
             // The public flag reduces execution time significantly
-            exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out stdout, out _, "list-volumes", "public");
+            int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out string stdout, out _, "list-volumes", "public");
             if (exitCode != 0)
                 return "";
 
-            var node = $"{Convert.ToInt32(match.Groups["major"].Value, 16)},{Convert.ToInt32(match.Groups["minor"].Value, 16)}";
+            var node = $"{Convert.ToInt32(matchGroups["major"].Value, 16)},{Convert.ToInt32(matchGroups["minor"].Value, 16)}";
             // Find the ID of the device with the MMC node
             var mmcVolumeId = Regex.Match(stdout, @$"{node}\smounted\s(?<id>[\w-]+)");
 

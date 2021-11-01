@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ADB_Explorer.Services;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models
 {
@@ -188,11 +188,7 @@ namespace ADB_Explorer.Models
         {
             Drives = drives;
 
-            if (Drives.Count(d => d.Type == DriveType.External) > 0)
-            {
-                var MMC = ADBService.GetMmcId(ID);
-                Drives.Find(d => d.ID == MMC)?.SetMmc();
-            }
+            SetMmcDrive();
 
             if (Drives.Count(d => d.Type == DriveType.Internal) == 0)
             {
@@ -212,6 +208,22 @@ namespace ADB_Explorer.Models
                 name = model;
 
             return name.Replace('_', ' ');
+        }
+
+        public void SetMmcDrive()
+        {
+            var externalDrives = Drives.Where(d => d.Type == DriveType.External);
+            switch (externalDrives.Count())
+            {
+                case > 1:
+                    var mmc = ADBService.GetMmcId(ID);
+                    Drives.Find(d => d.ID == mmc)?.SetMmc();
+                    break;
+                case 1:
+                    if (ADBService.MmcExists(ID))
+                        externalDrives.First().SetMmc();
+                    break;
+            }
         }
     }
 

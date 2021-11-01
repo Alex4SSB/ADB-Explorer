@@ -26,7 +26,13 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
-        <Style x:Key="DisabledGlyphStyle" TargetType="ui:FontIcon">
+        <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
+            <Setter Property="FontFamily" Value="{DynamicResource GlyphFontFamily}" />
+        </Style>
+        <Style
+            x:Key="DisabledGlyphStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
                     <Setter Property="Foreground" Value="Gray" />
@@ -46,7 +52,7 @@
                     <Setter Property="Height" Value="24" />
                     <Setter Property="Padding" Value="6,0" />
                 </Style>
-                <Style TargetType="ui:FontIcon">
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                     <Setter Property="Margin" Value="0,0,6,0" />
                     <Setter Property="FontSize" Value="16" />
                 </Style>
@@ -197,7 +203,10 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="DeviceStatusFontSizeStyle" TargetType="ui:FontIcon">
+        <Style
+            x:Key="DeviceStatusFontSizeStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
             <Setter Property="FontSize" Value="28" />
         </Style>
         <Style
@@ -283,7 +292,7 @@
                                     Foreground="Gray"
                                     Glyph="&#xE838;">
                                     <ui:FontIcon.Style>
-                                        <Style TargetType="ui:FontIcon">
+                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsOpen}" Value="False">
                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -388,7 +397,7 @@
         <DataTemplate x:Key="StatusIconTemplate">
             <ui:FontIcon>
                 <ui:FontIcon.Style>
-                    <Style TargetType="ui:FontIcon">
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Status}" Value="Completed">
                                 <Setter Property="Glyph" Value="&#xF13E;" />
@@ -414,7 +423,8 @@
                                 <ui:FontIcon
                                     Margin="0,0,8,0"
                                     FontSize="32"
-                                    Glyph="{Binding DriveIcon}" />
+                                    Glyph="{Binding DriveIcon}"
+                                    Style="{StaticResource GlyphFont}" />
                                 <StackPanel Grid.Column="1">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.Resources>
@@ -510,7 +520,8 @@
                             <ui:FontIcon
                                 Margin="0,0,8,0"
                                 FontSize="20"
-                                Glyph="&#xECC8;" />
+                                Glyph="&#xECC8;"
+                                Style="{StaticResource DisabledGlyphStyle}" />
                             <TextBlock VerticalAlignment="Center" Text="New" />
                         </StackPanel>
                     </MenuItem.Header>
@@ -949,6 +960,7 @@
                                 x:Name="CurrentOperationDataGrid"
                                 Grid.Row="1"
                                 AutoGenerateColumns="False"
+                                CanUserDeleteRows="False"
                                 CellStyle="{StaticResource CellVerticalStyle}"
                                 FocusVisualStyle="{x:Null}"
                                 HeadersVisibility="None"
@@ -1039,7 +1051,10 @@
                                 Click="OpenNewDeviceButton_Click"
                                 ToolTip="Add a device">
                                 <MenuItem.Header>
-                                    <ui:FontIcon FontSize="22" Glyph="&#xECC8;" />
+                                    <ui:FontIcon
+                                        FontSize="22"
+                                        Glyph="&#xECC8;"
+                                        Style="{StaticResource DisabledGlyphStyle}" />
                                 </MenuItem.Header>
                             </MenuItem>
                         </Menu>
@@ -1178,9 +1193,9 @@
                                         x:Name="ChangeDefaultFolderButton"
                                         Grid.Column="1"
                                         Click="ChangeDefaultFolderButton_Click"
-                                        Content="&#xE70F;"
-                                        FontFamily="Segoe MDL2 Assets"
-                                        ToolTip="Change" />
+                                        ToolTip="Change">
+                                        <ui:FontIcon Glyph="&#xE70F;" Style="{StaticResource GlyphFont}" />
+                                    </Button>
                                 </Grid>
                                 <TextBlock
                                     x:Name="DefaultFolderBlock"
