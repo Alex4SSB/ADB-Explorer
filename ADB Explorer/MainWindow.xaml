@@ -100,17 +100,12 @@
             <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         </Style>
-        <Style x:Key="TextBlockLightStyle" TargetType="TextBlock">
-            <Setter Property="Background" Value="White" />
-        </Style>
-        <Style x:Key="TextBlockDarkStyle" TargetType="TextBlock">
-            <Setter Property="Background" Value="#FF202020" />
-        </Style>
         <Style x:Key="RowStyle" TargetType="DataGridRow">
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
+            <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="DataGridRow">
@@ -126,25 +121,19 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-        <Style
-            x:Key="RowLightStyle"
-            BasedOn="{StaticResource RowStyle}"
-            TargetType="DataGridRow">
-            <Setter Property="Background" Value="White" />
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFE5F3FF" />
+                    <Setter Property="Background" Value="{DynamicResource MouseOverBackground}" />
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#FFCCE8FF" />
+                    <Setter Property="Background" Value="{DynamicResource SelectedBackground}" />
                 </Trigger>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
                         <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
                     </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FFD9D9D9" />
+                    <Setter Property="Background" Value="{DynamicResource SelectedInactiveBackground}" />
                 </MultiDataTrigger>
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
@@ -152,36 +141,7 @@
                         <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
                         <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
                     </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FFCCE8FF" />
-                </MultiDataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style
-            x:Key="RowDarkStyle"
-            BasedOn="{StaticResource RowStyle}"
-            TargetType="DataGridRow">
-            <Setter Property="Background" Value="#FF202020" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF4D4D4D" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#FF777777" />
-                </Trigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FF333333" />
-                </MultiDataTrigger>
-                <MultiDataTrigger>
-                    <MultiDataTrigger.Conditions>
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
-                        <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
-                    </MultiDataTrigger.Conditions>
-                    <Setter Property="Background" Value="#FF777777" />
+                    <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
                 </MultiDataTrigger>
             </Style.Triggers>
         </Style>
@@ -360,30 +320,12 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-        <Style
-            x:Key="DeviceLightStyle"
-            BasedOn="{StaticResource DeviceStyle}"
-            TargetType="ui:ListViewItem">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter Property="Background" Value="#FFD9D9D9" />
+                    <Setter Property="Background" Value="{DynamicResource SelectedInactiveBackground}" />
                 </DataTrigger>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FFC9C9C9" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <Style
-            x:Key="DeviceDarkStyle"
-            BasedOn="{StaticResource DeviceStyle}"
-            TargetType="ui:ListViewItem">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                    <Setter Property="Background" Value="#FF333333" />
-                </DataTrigger>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#FF4D4D4D" />
+                    <Setter Property="Background" Value="{DynamicResource DeviceMouseOverBackground}" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -714,118 +656,119 @@
                     </StackPanel>
                 </Grid>
             </StackPanel>
-            <TextBlock
+            <Border
                 x:Name="GridBackgroundBlock"
                 Grid.Row="2"
-                Style="{StaticResource TextBlockLightStyle}" />
-            <ui:ItemsRepeater
-                x:Name="DrivesItemRepeater"
-                Grid.Row="2"
-                Margin="10"
-                ItemTemplate="{StaticResource DriveItemTemplate}"
-                ItemsSource="{Binding}">
-                <ui:ItemsRepeater.Layout>
-                    <ui:UniformGridLayout
-                        MinColumnSpacing="10"
-                        MinItemHeight="60"
-                        MinItemWidth="280"
-                        MinRowSpacing="10" />
-                </ui:ItemsRepeater.Layout>
-            </ui:ItemsRepeater>
-            <DataGrid
-                x:Name="ExplorerGrid"
-                Grid.Row="2"
-                AutoGenerateColumns="False"
-                Background="Transparent"
-                CanUserResizeRows="False"
-                CellStyle="{StaticResource CellVerticalStyle}"
-                ContextMenu="{StaticResource RowContextMenu}"
-                ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
-                GridLinesVisibility="None"
-                HeadersVisibility="Column"
-                IsReadOnly="True"
-                ItemsSource="{Binding}"
-                KeyboardNavigation.TabNavigation="Once"
-                MinRowHeight="21"
-                MouseDown="ExplorerGrid_MouseDown"
-                PreviewMouseRightButtonDown="ExplorerGrid_PreviewMouseRightButtonDown"
-                RowStyle="{StaticResource RowLightStyle}"
-                SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-                SelectionChanged="ExplorerGrid_SelectionChanged"
-                SelectionMode="Extended"
-                SelectionUnit="FullRow"
-                Visibility="Collapsed">
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <Image
-                                    Width="16"
-                                    RenderOptions.BitmapScalingMode="HighQuality"
-                                    Source="{Binding Icon}" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn
-                        x:Name="Name"
-                        Binding="{Binding FileName}"
-                        FontSize="{Binding Source={StaticResource FontSize}}"
-                        Header="Name" />
-                    <DataGridTextColumn
-                        x:Name="Date"
-                        FontSize="{Binding Source={StaticResource FontSize}}"
-                        Header="Date modified"
-                        SortMemberPath="ModifiedTime">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="4,0,8,0" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Type}" Value="File">
-                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn
-                        x:Name="Type"
-                        FontSize="{Binding Source={StaticResource FontSize}}"
-                        Header="Type">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="4,0,0,0" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Type}" Value="File">
-                                        <Setter Property="Text" Value="{Binding Type}" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                        <Setter Property="Text" Value="{Binding Type}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                    <DataGridTextColumn
-                        x:Name="Size"
-                        FontSize="{Binding Source={StaticResource FontSize}}"
-                        Header="Size"
-                        SortMemberPath="Size">
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="4,0,0,0" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Type}" Value="File">
-                                        <Setter Property="Text" Value="{Binding SizeString}" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+                Background="{DynamicResource ControlBackground}">
+                <Grid>
+                    <ui:ItemsRepeater
+                        x:Name="DrivesItemRepeater"
+                        Margin="10"
+                        ItemTemplate="{StaticResource DriveItemTemplate}"
+                        ItemsSource="{Binding}">
+                        <ui:ItemsRepeater.Layout>
+                            <ui:UniformGridLayout
+                                MinColumnSpacing="10"
+                                MinItemHeight="60"
+                                MinItemWidth="280"
+                                MinRowSpacing="10" />
+                        </ui:ItemsRepeater.Layout>
+                    </ui:ItemsRepeater>
+                    <DataGrid
+                        x:Name="ExplorerGrid"
+                        AutoGenerateColumns="False"
+                        Background="Transparent"
+                        CanUserResizeRows="False"
+                        CellStyle="{StaticResource CellVerticalStyle}"
+                        ContextMenu="{StaticResource RowContextMenu}"
+                        ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
+                        GridLinesVisibility="None"
+                        HeadersVisibility="Column"
+                        IsReadOnly="True"
+                        ItemsSource="{Binding}"
+                        KeyboardNavigation.TabNavigation="Once"
+                        MinRowHeight="21"
+                        MouseDown="ExplorerGrid_MouseDown"
+                        PreviewMouseRightButtonDown="ExplorerGrid_PreviewMouseRightButtonDown"
+                        RowStyle="{StaticResource RowStyle}"
+                        SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                        SelectionChanged="ExplorerGrid_SelectionChanged"
+                        SelectionMode="Extended"
+                        SelectionUnit="FullRow"
+                        Visibility="Collapsed">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image
+                                            Width="16"
+                                            RenderOptions.BitmapScalingMode="HighQuality"
+                                            Source="{Binding Icon}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn
+                                x:Name="Name"
+                                Binding="{Binding FileName}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="Name" />
+                            <DataGridTextColumn
+                                x:Name="Date"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="Date modified"
+                                SortMemberPath="ModifiedTime">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,8,0" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="File">
+                                                <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                x:Name="Type"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="Type">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="File">
+                                                <Setter Property="Text" Value="{Binding Type}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                <Setter Property="Text" Value="{Binding Type}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
+                                x:Name="Size"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="Size"
+                                SortMemberPath="Size">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="File">
+                                                <Setter Property="Text" Value="{Binding SizeString}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
                 <StackPanel.Resources>
                     <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
@@ -1142,7 +1085,7 @@
                             x:Name="DevicesList"
                             Grid.Row="2"
                             IsSelectionEnabled="False"
-                            ItemContainerStyle="{StaticResource DeviceLightStyle}"
+                            ItemContainerStyle="{StaticResource DeviceStyle}"
                             ItemsSource="{Binding}"
                             MouseDown="DevicesList_MouseDown" />
                     </Grid>
@@ -1194,7 +1137,10 @@
                                         Grid.Column="1"
                                         Click="ChangeDefaultFolderButton_Click"
                                         ToolTip="Change">
-                                        <ui:FontIcon Glyph="&#xE70F;" Style="{StaticResource GlyphFont}" />
+                                        <ui:FontIcon
+                                            FontSize="16"
+                                            Glyph="&#xE70F;"
+                                            Style="{StaticResource DisabledGlyphStyle}" />
                                     </Button>
                                 </Grid>
                                 <TextBlock

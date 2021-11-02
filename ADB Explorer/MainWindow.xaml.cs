@@ -155,11 +155,17 @@ namespace ADB_Explorer
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
-            GridBackgroundBlock.Style = FindResource($"TextBlock{theme}Style") as Style;
-            ExplorerGrid.RowStyle = FindResource($"Row{theme}Style") as Style;
-            DevicesList.ItemContainerStyle = FindResource($"Device{theme}Style") as Style;
+            foreach (string key in ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys)
+            {
+                SetResourceColor(theme, key);
+            }
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
+        }
+
+        private static void SetResourceColor(ApplicationTheme theme, string resource)
+        {
+            Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]);
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)

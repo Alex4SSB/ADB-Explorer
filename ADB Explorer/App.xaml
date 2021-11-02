@@ -16,6 +16,28 @@
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
             <FontFamily x:Key="GlyphFontFamily">Segoe MDL2 Assets</FontFamily>
+
+            <Color x:Key="LightControlBackground">White</Color>
+            <Color x:Key="DarkControlBackground">#FF202020</Color>
+            <Color x:Key="LightMouseOverBackground">#FFE5F3FF</Color>
+            <Color x:Key="DarkMouseOverBackground">#FF4D4D4D</Color>
+            <Color x:Key="LightSelectedBackground">#FFCCE8FF</Color>
+            <Color x:Key="DarkSelectedBackground">#FF777777</Color>
+            <Color x:Key="LightSelectedInactiveBackground">#FFD9D9D9</Color>
+            <Color x:Key="DarkSelectedInactiveBackground">#FF333333</Color>
+            <Color x:Key="LightSelectedMouseOverInactiveBackground">#FFCCE8FF</Color>
+            <Color x:Key="DarkSelectedMouseOverInactiveBackground">#FF777777</Color>
+            <Color x:Key="LightDeviceMouseOverBackground">#FFC9C9C9</Color>
+            <Color x:Key="DarkDeviceMouseOverBackground">#FF4D4D4D</Color>
+
+            <ResourceDictionary x:Key="DynamicBrushes">
+                <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
+                <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
+                <SolidColorBrush x:Key="SelectedBackground" Color="{DynamicResource LightSelectedBackground}" />
+                <SolidColorBrush x:Key="SelectedInactiveBackground" Color="{DynamicResource LightSelectedInactiveBackground}" />
+                <SolidColorBrush x:Key="SelectedMouseOverInactiveBackground" Color="{DynamicResource LightSelectedMouseOverInactiveBackground}" />
+                <SolidColorBrush x:Key="DeviceMouseOverBackground" Color="{DynamicResource LightDeviceMouseOverBackground}" />
+            </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
