@@ -123,9 +123,9 @@ namespace ADB_Explorer.Models
             set
             {
                 drives = value;
-
-                var mmcTask = Task.Run(() => { return GetMmcDrive(); });
-                mmcTask.ContinueWith((t) => { App.Current.Dispatcher.BeginInvoke(() => { t.Result.SetMmc(); }); });
+                // TODO: uncomment these when async update is ready
+                //var mmcTask = Task.Run(() => { return GetMmcDrive(); });
+                //mmcTask.ContinueWith((t) => { App.Current.Dispatcher.BeginInvoke(() => { t.Result?.SetMmc(); }); });
             }
         }
 
