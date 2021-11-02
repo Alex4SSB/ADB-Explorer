@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Converters;
 using System.Text.RegularExpressions;
 using static ADB_Explorer.Models.AdbExplorerConst;
-using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Models
 {
@@ -53,7 +52,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public Drive(string size, string used, string available, byte? usageP, string path, bool isMMC = false, bool isEmulator = false)
+        public Drive(string size = "", string used = "", string available = "", byte? usageP = null, string path = "", bool isMMC = false, bool isEmulator = false)
         {
             Size = size;
             Used = used;
@@ -95,6 +94,44 @@ namespace ADB_Explorer.Models
         public void SetMmc()
         {
             Type = DriveType.Expansion;
+        }
+
+        public static implicit operator bool(Drive obj)
+        {
+            return obj is Drive;
+        }
+
+        public static bool operator ==(Drive lVal, Drive rVal)
+        {
+            return
+                lVal.Type == rVal.Type &&
+                lVal.Path == rVal.Path &&
+                lVal.Available == rVal.Available &&
+                lVal.Size == rVal.Size &&
+                lVal.Used == rVal.Used &&
+                lVal.UsageP == rVal.UsageP;
+        }
+
+        public static bool operator !=(Drive lVal, Drive rVal) => lVal != rVal;
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (ReferenceEquals(obj, null))
+            {
+                return false;
+            }
+
+            return this == (Drive)obj;
+        }
+
+        public override int GetHashCode()
+        {
+            return Path.GetHashCode();
         }
     }
 }

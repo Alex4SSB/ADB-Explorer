@@ -241,7 +241,7 @@ namespace ADB_Explorer.Services
 
             public string TranslateDeviceParentPath(string path) => TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
 
-            public List<Drive> GetStorageInfo()
+            public List<Drive> GetDrives()
             {
                 // Get all device partitions
                 int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr);
@@ -249,13 +249,19 @@ namespace ADB_Explorer.Services
                     return new();
 
                 var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
-                //if (match.Count > 2) // 2 matches means only root and internal storage, so no need to look for the MMC
-                //{
-                //    var mmcId = GetMmcId(deviceSerial);
-                //    return match.Select(m => new Drive(m.Groups, isMMC: m.Groups["path"].Value.Contains(mmcId))).ToList();
-                //}
-                //else
-                return match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
+                var drives = match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
+
+                if (drives.Count(d => d.Type == DriveType.Internal) == 0)
+                {
+                    drives.Insert(0, new(path: AdbExplorerConst.DEFAULT_PATH));
+                }
+
+                if (drives.Count(d => d.Type == DriveType.Root) == 0)
+                {
+                    drives.Insert(0, new(path: "/"));
+                }
+
+                return drives;
             }
 
             //private Dictionary<string, string> props { get; set; }

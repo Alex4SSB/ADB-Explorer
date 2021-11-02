@@ -318,7 +318,7 @@ namespace ADB_Explorer
         {
             Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
 
-            Devices.Current.SetDrives(CurrentADBDevice.GetStorageInfo());
+            Devices.Current.SetDrives(CurrentADBDevice.GetDrives());
             DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
 
             if (Devices.Current.Drives.Count < 1)

@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
 {
@@ -114,7 +116,18 @@ namespace ADB_Explorer.Models
             _ => throw new NotImplementedException(),
         };
         public bool IsOpen { get; private set; }
-        public List<Drive> Drives { get; private set; } = new();
+        private List<Drive> drives;
+        public List<Drive> Drives
+        {
+            get => drives;
+            set
+            {
+                drives = value;
+
+                var mmcTask = Task.Run(() => { return GetMmcDrive(); });
+                mmcTask.ContinueWith((t) => { App.Current.Dispatcher.BeginInvoke(() => { t.Result.SetMmc(); }); });
+            }
+        }
 
         public void SetOpen(bool openState = true)
         {
@@ -188,17 +201,7 @@ namespace ADB_Explorer.Models
         {
             Drives = drives;
 
-            SetMmcDrive();
-
-            if (Drives.Count(d => d.Type == DriveType.Internal) == 0)
-            {
-                Drives.Insert(0, new("", "", "", null, AdbExplorerConst.DEFAULT_PATH));
-            }
-
-            if (Drives.Count(d => d.Type == DriveType.Root) == 0)
-            {
-                Drives.Insert(0, new("", "", "", null, "/"));
-            }
+            GetMmcDrive().SetMmc(); // TODO: remove this line when INotify is implemented
         }
 
         public static string DeviceName(string model, string device)
@@ -210,21 +213,46 @@ namespace ADB_Explorer.Models
             return name.Replace('_', ' ');
         }
 
-        public void SetMmcDrive()
+        public Drive GetMmcDrive()
         {
             var externalDrives = Drives.Where(d => d.Type == DriveType.External);
             switch (externalDrives.Count())
             {
                 case > 1:
                     var mmc = ADBService.GetMmcId(ID);
-                    Drives.Find(d => d.ID == mmc)?.SetMmc();
-                    break;
+                    return Drives.Find(d => d.ID == mmc);
                 case 1:
-                    if (ADBService.MmcExists(ID))
-                        externalDrives.First().SetMmc();
-                    break;
+                    return ADBService.MmcExists(ID) ? externalDrives.First() : null;
+                default:
+                    return null;
             }
         }
+
+        //private DispatcherTimer dispatcherTimer;
+
+        //public void StartRefresh()
+        //{
+        //    dispatcherTimer = new()
+        //    {
+        //        Interval = AdbExplorerConst.DRIVE_UPDATE_INTERVAL
+        //    };
+        //    dispatcherTimer.Tick += DispatcherTimer_Tick;
+
+        //    dispatcherTimer.Start();
+        //}
+
+        //public void StopRefresh()
+        //{
+        //    dispatcherTimer.Stop();
+        //    dispatcherTimer = null;
+        //}
+
+        //private void DispatcherTimer_Tick(object sender, EventArgs e)
+        //{
+        //    var prev = Drives;
+
+
+        //}
     }
 
     public class DeviceTypeEqualityComparer : IEqualityComparer<DeviceClass>
