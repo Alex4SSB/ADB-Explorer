@@ -422,6 +422,12 @@
             </Border>
         </DataTemplate>
     </Window.Resources>
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo
+            x:Name="TaskBarInfo"
+            ProgressState="Normal"
+            ProgressValue="{Binding ElementName=OverallProgressBar, Path=Value}" />
+    </Window.TaskbarItemInfo>
     <Grid>
         <Grid>
             <Grid.RowDefinitions>

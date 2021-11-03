@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Shell;
 using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
@@ -812,10 +813,13 @@ namespace ADB_Explorer
                 {
                     OverallProgressBar.IsIndeterminate = false;
                     OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
+                    TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
+                    TaskBarInfo.ProgressValue = progressInfo.TotalPercentage.Value / 100.0;
                 }
                 else
                 {
                     OverallProgressBar.IsIndeterminate = true;
+                    TaskBarInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
                 }
             }
             else
