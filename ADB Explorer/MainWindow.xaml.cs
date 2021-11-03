@@ -35,7 +35,7 @@ namespace ADB_Explorer
         private CancellationTokenSource dirListCancelTokenSource;
         private CancellationTokenSource determineFoldersCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
-
+        private double totalOperations = 0.0;
         private ItemsPresenter ExplorerContentPresenter;
         private double ColumnHeaderHeight
         {
@@ -800,40 +800,49 @@ namespace ADB_Explorer
 
         private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
         {
-            if (fileOperationQueue.IsActive)
-            {
-                OperationCompletedTextBlock.Text = "";
+            if (fileOperationQueue.CurrentOperations.Count == 0)
+                totalOperations = 0;
 
-                if (ProgressGrid.Visibility == Visibility.Collapsed)
-                    ProgressGrid.Visibility = Visibility.Visible;
+            double operations = fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count;
+            if (totalOperations < operations)
+                totalOperations = operations;
 
-                ProgressCountTextBlock.Text = $"{fileOperationQueue.CompletedOperations.Count + 1}/{fileOperationQueue.TotalCount}";
+            TaskBarInfo.ProgressValue = 1.0 - (operations / totalOperations);
 
-                if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
-                {
-                    OverallProgressBar.IsIndeterminate = false;
-                    OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
-                    TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
-                    TaskBarInfo.ProgressValue = progressInfo.TotalPercentage.Value / 100.0;
-                }
-                else
-                {
-                    OverallProgressBar.IsIndeterminate = true;
-                    TaskBarInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
-                }
-            }
-            else
-            {
-                if ((int)ProgressCountTextBlock.Tag > 0)
-                {
-                    OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
-                }
+            //if (fileOperationQueue.IsActive)
+            //{
+            //    OperationCompletedTextBlock.Text = "";
 
-                ProgressCountTextBlock.Tag = 0;
+                //    if (ProgressGrid.Visibility == Visibility.Collapsed)
+                //        ProgressGrid.Visibility = Visibility.Visible;
 
-                ProgressGrid.Visibility = Visibility.Collapsed;
-                OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.TotalCount} item{((fileOperationQueue.TotalCount > 1) ? "s" : "")} done";
-            }
+                //    ProgressCountTextBlock.Text = $"{fileOperationQueue.CompletedOperations.Count + 1}/{fileOperationQueue.TotalCount}";
+
+                //    if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
+                //    {
+                //        OverallProgressBar.IsIndeterminate = false;
+                //        OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
+                //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
+                //        TaskBarInfo.ProgressValue = progressInfo.TotalPercentage.Value / 100.0;
+                //    }
+                //    else
+                //    {
+                //        OverallProgressBar.IsIndeterminate = true;
+                //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+                //    }
+                //}
+                //else
+                //{
+                //    if ((int)ProgressCountTextBlock.Tag > 0)
+                //    {
+                //        OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
+                //    }
+
+                //    ProgressCountTextBlock.Tag = 0;
+
+                //    ProgressGrid.Visibility = Visibility.Collapsed;
+                //    OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.TotalCount} item{((fileOperationQueue.TotalCount > 1) ? "s" : "")} done";
+                //}
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
