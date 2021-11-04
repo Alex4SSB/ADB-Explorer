@@ -423,10 +423,7 @@
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo
-            x:Name="TaskBarInfo"
-            ProgressState="Normal"
-            ProgressValue="{Binding ElementName=OverallProgressBar, Path=Value}" />
+        <TaskbarItemInfo x:Name="TaskBarInfo" ProgressValue="{Binding ElementName=OverallProgressBar, Path=Value}" />
     </Window.TaskbarItemInfo>
     <Grid>
         <Grid>
@@ -529,7 +526,10 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <StackPanel.Resources>
-                    <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                    <Style
+                        x:Key="RightMenuGlyph"
+                        BasedOn="{StaticResource DisabledGlyphStyle}"
+                        TargetType="ui:FontIcon">
                         <Setter Property="FontSize" Value="18" />
                     </Style>
                 </StackPanel.Resources>
@@ -555,7 +555,30 @@
                             Click="FileOperationsButton_Click"
                             ToolTip="File Operations">
                             <MenuItem.Header>
-                                <ui:FontIcon Glyph="&#xF16A;" />
+                                <Grid>
+                                    <ui:FontIcon Glyph="&#xF16A;">
+                                        <ui:FontIcon.Style>
+                                            <Style BasedOn="{StaticResource RightMenuGlyph}" TargetType="ui:FontIcon">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:FontIcon.Style>
+                                    </ui:FontIcon>
+                                    <ui:ProgressRing IsActive="True">
+                                        <ui:ProgressRing.Style>
+                                            <Style TargetType="ui:ProgressRing">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="0">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:ProgressRing.Style>
+                                    </ui:ProgressRing>
+                                </Grid>
                             </MenuItem.Header>
                         </MenuItem>
                     </Menu>
@@ -566,7 +589,7 @@
                         Click="SettingsButton_Click"
                         ToolTip="Settings">
                         <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE713;" />
+                            <ui:FontIcon Glyph="&#xE713;" Style="{DynamicResource RightMenuGlyph}" />
                         </MenuItem.Header>
                     </MenuItem>
                 </Menu>
@@ -894,6 +917,13 @@
                             <RowDefinition Height="48" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
+                        <Menu HorizontalAlignment="Right">
+                            <MenuItem Click="MenuItem_Click" ToolTip="Hide">
+                                <MenuItem.Header>
+                                    <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </Menu>
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontSize="24"
@@ -1117,7 +1147,17 @@
                             <RowDefinition Height="48" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock FontSize="24" Text="Settings" />
+                        <Menu Margin="0,0,-18,0" HorizontalAlignment="Right">
+                            <MenuItem Click="MenuItem_Click" ToolTip="Hide">
+                                <MenuItem.Header>
+                                    <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </Menu>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="24"
+                            Text="Settings" />
                         <ScrollViewer Grid.Row="1">
                             <StackPanel HorizontalAlignment="Left">
                                 <TextBlock Text="Theme" />

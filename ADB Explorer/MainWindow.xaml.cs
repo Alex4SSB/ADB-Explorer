@@ -800,6 +800,7 @@ namespace ADB_Explorer
 
         private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
         {
+            TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
             if (fileOperationQueue.CurrentOperations.Count == 0)
                 totalOperations = 0;
 
@@ -1246,6 +1247,11 @@ namespace ADB_Explorer
             {
                 e.Handled = true;
             }
+        }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ((MenuItem)sender).FindAscendant<SplitView>().IsPaneOpen = false;
         }
     }
 }
