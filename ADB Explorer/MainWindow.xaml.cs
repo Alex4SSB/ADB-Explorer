@@ -171,6 +171,11 @@ namespace ADB_Explorer
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
         {
+            FocusPathBox();
+        }
+
+        private void FocusPathBox()
+        {
             PathStackPanel.Visibility = Visibility.Collapsed;
             PathBox.Text = PathBox.Tag?.ToString();
             PathBox.IsReadOnly = false;
@@ -179,19 +184,45 @@ namespace ADB_Explorer
             UpdateInputLang();
         }
 
+        private void UnfocusPathBox()
+        {
+            PathStackPanel.Visibility = Visibility.Visible;
+            PathBox.Clear();
+            PathBox.IsReadOnly = true;
+            //FocusManager.SetFocusedElement(PathBox, null);
+            //Keyboard.ClearFocus();
+            FileOperationsSplitView.Focus();
+        }
+
         private void PathBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && NavigateToPath(PathBox.Text))
+            if (e.Key == Key.Enter)
             {
+                if (ExplorerGrid.IsVisible)
+                {
+                    if (NavigateToPath(PathBox.Text))
+                        return;
+                }
+                else
+                {
+                    if (!InitNavigation(PathBox.Text))
+                    {
+                        DriveViewNav();
+                        return;
+                    }
+                }
+
                 ExplorerGrid.Focus();
+            }
+            else if (e.Key == Key.Escape)
+            {
+                UnfocusPathBox();
             }
         }
 
         private void PathBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            PathStackPanel.Visibility = Visibility.Visible;
-            PathBox.Text = "";
-            PathBox.IsReadOnly = true;
+            UnfocusPathBox();
         }
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -321,11 +352,23 @@ namespace ADB_Explorer
 
             Devices.Current.SetDrives(CurrentADBDevice.GetDrives());
             DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
+            DriveViewNav();
 
             if (Devices.Current.Drives.Count < 1)
             {
-                InitDrive();
+                // Shouldn't actually happen
+                InitNavigation();
             }
+        }
+
+        private void DriveViewNav()
+        {
+            ClearExplorer();
+            ExplorerGrid.Visibility = Visibility.Collapsed;
+            DrivesItemRepeater.Visibility = Visibility.Visible;
+
+            PathBox.IsEnabled = true;
+            AddPathButton(CreatePathButton("", Devices.Current.Name));
         }
 
         private static void CombinePrettyNames()
@@ -341,7 +384,7 @@ namespace ADB_Explorer
             }
         }
 
-        private void InitDrive(string path = "")
+        private bool InitNavigation(string path = "")
         {
             DrivesItemRepeater.Visibility = Visibility.Collapsed;
             ExplorerGrid.Visibility = Visibility.Visible;
@@ -358,17 +401,18 @@ namespace ADB_Explorer
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
-            PathBox.IsEnabled =
             PasteMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = Devices.Current.Drives.Any();
             NavHistory.Reset();
 
+            bool navResult;
             if (string.IsNullOrEmpty(path))
-                NavigateToPath(DEFAULT_PATH);
+                navResult = NavigateToPath(DEFAULT_PATH);
             else
-                NavigateToPath(path);
+                navResult = NavigateToPath(path);
 
             ProgressCountTextBlock.Tag = 0;
+            return navResult;
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
@@ -492,6 +536,7 @@ namespace ADB_Explorer
 
             if (!bfNavigated)
                 NavHistory.Navigate(realPath);
+
             UpdateNavButtons();
 
             PathBox.Tag =
@@ -619,7 +664,12 @@ namespace ADB_Explorer
         private MenuItem CreatePathButton(KeyValuePair<string, string> kv) => CreatePathButton(kv.Key, kv.Value);
         private MenuItem CreatePathButton(string path, string name)
         {
-            MenuItem button = new() { Header = name, Tag = path, Height = 24 };
+            MenuItem button = new()
+            {
+                Header = name,
+                Tag = path,
+                Height = 24
+            };
             button.Click += PathButton_Click;
 
             return button;
@@ -651,7 +701,8 @@ namespace ADB_Explorer
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPath((sender as MenuItem).Tag.ToString());
+            if ((sender as MenuItem).Tag is string path and not "")
+                NavigateToPath(path);
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -1214,16 +1265,13 @@ namespace ADB_Explorer
         {
             if (sender is MenuItem menu && menu.DataContext is Drive drive)
             {
-                InitDrive(drive.Path);
+                InitNavigation(drive.Path);
             }
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            ExplorerGrid.Visibility = Visibility.Collapsed;
-            DrivesItemRepeater.Visibility = Visibility.Visible;
-
-            ClearExplorer();
+            DriveViewNav();
         }
 
         private void PasteMenuButton_Click(object sender, RoutedEventArgs e)
