@@ -1,4 +1,6 @@
 ﻿using ADB_Explorer.Converters;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
@@ -14,45 +16,39 @@ namespace ADB_Explorer.Models
         Emulated
     }
 
-    public class Drive
+    public class Drive : INotifyPropertyChanged
     {
         public string Size { get; private set; }
         public string Used { get; private set; }
         public string Available { get; private set; }
-        public byte? UsageP { get; private set; }
+        public sbyte UsageP { get; private set; }
         public string Path { get; private set; }
-        public string ID {
-            get
-            {
-                return Path[(Path.LastIndexOf('/') + 1)..];
-            }
-        }
-        public string PrettyName
+        public string ID => Path[(Path.LastIndexOf('/') + 1)..];
+        public string PrettyName => DRIVES_PRETTY_NAMES[Type];
+        private DriveType type;
+        public DriveType Type
         {
-            get
+            get => type;
+            private set
             {
-                return DRIVES_PRETTY_NAMES[Type];
+                type = value;
+                NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(DriveIcon));
+                NotifyPropertyChanged(nameof(PrettyName));
             }
         }
-        public DriveType Type { get; private set; }
-        public string DriveIcon
+        public string DriveIcon => Type switch
         {
-            get
-            {
-                return Type switch
-                {
-                    DriveType.Root => "\uE7EF",
-                    DriveType.Internal => "\uEDA2",
-                    DriveType.Expansion => "\uE7F1",
-                    DriveType.External => "\uE88E",
-                    DriveType.Unknown => "\uE9CE",
-                    DriveType.Emulated => "\uEDA2",
-                    _ => throw new System.NotImplementedException(),
-                };
-            }
-        }
+            DriveType.Root => "\uE7EF",
+            DriveType.Internal => "\uEDA2",
+            DriveType.Expansion => "\uE7F1",
+            DriveType.External => "\uE88E",
+            DriveType.Unknown => "\uE9CE",
+            DriveType.Emulated => "\uEDA2",
+            _ => throw new System.NotImplementedException(),
+        };
 
-        public Drive(string size = "", string used = "", string available = "", byte? usageP = null, string path = "", bool isMMC = false, bool isEmulator = false)
+        public Drive(string size = "", string used = "", string available = "", sbyte usageP = -1, string path = "", bool isMMC = false, bool isEmulator = false)
         {
             Size = size;
             Used = used;
@@ -76,7 +72,8 @@ namespace ADB_Explorer.Models
             }
             else
             {
-                Type = DriveType.External;
+                Type = DriveType.Unknown;
+                //Type = DriveType.External;
             }
         }
 
@@ -85,15 +82,25 @@ namespace ADB_Explorer.Models
                   (ulong.Parse(match["size_kB"].Value) * 1024).ToSize(true, 2, 2),
                   (ulong.Parse(match["used_kB"].Value) * 1024).ToSize(true, 2, 2),
                   (ulong.Parse(match["available_kB"].Value) * 1024).ToSize(true, 2, 2),
-                  byte.Parse(match["usage_P"].Value),
+                  sbyte.Parse(match["usage_P"].Value),
                   match["path"].Value,
                   isMMC,
                   isEmulator)
         { }
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         public void SetMmc()
         {
             Type = DriveType.Expansion;
+        }
+
+        public void SetOtg()
+        {
+            Type = DriveType.External;
         }
 
         public static implicit operator bool(Drive obj)
@@ -112,7 +119,7 @@ namespace ADB_Explorer.Models
                 lVal.UsageP == rVal.UsageP;
         }
 
-        public static bool operator !=(Drive lVal, Drive rVal) => lVal != rVal;
+        public static bool operator !=(Drive lVal, Drive rVal) => !(lVal == rVal);
 
         public override bool Equals(object obj)
         {
@@ -121,7 +128,7 @@ namespace ADB_Explorer.Models
                 return true;
             }
 
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return false;
             }

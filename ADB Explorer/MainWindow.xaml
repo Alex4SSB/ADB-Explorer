@@ -365,8 +365,17 @@
                                 <ui:FontIcon
                                     Margin="0,0,8,0"
                                     FontSize="32"
-                                    Glyph="{Binding DriveIcon}"
-                                    Style="{StaticResource GlyphFont}" />
+                                    Glyph="{Binding DriveIcon}">
+                                    <ui:FontIcon.Style>
+                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Type}" Value="Unknown">
+                                                    <Setter Property="Visibility" Value="Hidden" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:FontIcon.Style>
+                                </ui:FontIcon>
                                 <StackPanel Grid.Column="1">
                                     <StackPanel Orientation="Horizontal">
                                         <StackPanel.Resources>
@@ -401,7 +410,7 @@
                                         <StackPanel.Style>
                                             <Style TargetType="StackPanel">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding UsageP}" Value="{x:Null}">
+                                                    <DataTrigger Binding="{Binding UsageP}" Value="-1">
                                                         <Setter Property="Visibility" Value="Hidden" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -570,9 +579,10 @@
                                     <ui:ProgressRing IsActive="True">
                                         <ui:ProgressRing.Style>
                                             <Style TargetType="ui:ProgressRing">
+                                                <Setter Property="Visibility" Value="Collapsed" />
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="0">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1">
+                                                        <Setter Property="Visibility" Value="Visible" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>

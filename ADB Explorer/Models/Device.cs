@@ -1,8 +1,10 @@
 ﻿using ADB_Explorer.Services;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -81,7 +83,7 @@ namespace ADB_Explorer.Models
     }
 
 
-    public class DeviceClass
+    public class DeviceClass : INotifyPropertyChanged
     {
         public enum DeviceType
         {
@@ -123,11 +125,25 @@ namespace ADB_Explorer.Models
             set
             {
                 drives = value;
-                // TODO: uncomment these when async update is ready
-                //var mmcTask = Task.Run(() => { return GetMmcDrive(); });
-                //mmcTask.ContinueWith((t) => { App.Current.Dispatcher.BeginInvoke(() => { t.Result?.SetMmc(); }); });
+                
+                var mmcTask = Task.Run(() => { return GetMmcDrive(); });
+                mmcTask.ContinueWith((t) =>
+                {
+                    App.Current.Dispatcher.BeginInvoke(() =>
+                    {
+                        t.Result?.SetMmc();
+                        SetExternalDrives();
+                    });
+                });
+
+                NotifyPropertyChanged();
             }
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public void SetOpen(bool openState = true)
         {
@@ -197,11 +213,15 @@ namespace ADB_Explorer.Models
             Status = other.Status;
         }
 
-        internal void SetDrives(List<Drive> drives)
+        internal void SetDrives(List<Drive> drives, bool findMmc = false)
         {
             Drives = drives;
 
-            GetMmcDrive().SetMmc(); // TODO: remove this line when INotify is implemented
+            if (findMmc)
+            {
+                GetMmcDrive().SetMmc();
+                SetExternalDrives();
+            }
         }
 
         public static string DeviceName(string model, string device)
@@ -215,7 +235,7 @@ namespace ADB_Explorer.Models
 
         public Drive GetMmcDrive()
         {
-            var externalDrives = Drives.Where(d => d.Type == DriveType.External);
+            var externalDrives = Drives.Where(d => d.Type == DriveType.Unknown);
             switch (externalDrives.Count())
             {
                 case > 1:
@@ -227,6 +247,16 @@ namespace ADB_Explorer.Models
                     return null;
             }
         }
+
+        public void SetExternalDrives()
+        {
+            foreach (var item in Drives.Where(d => d.Type == DriveType.Unknown))
+            {
+                item.SetOtg();
+            }
+        }
+
+        public override string ToString() => Name;
 
         //private DispatcherTimer dispatcherTimer;
 
