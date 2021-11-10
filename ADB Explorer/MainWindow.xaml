@@ -604,7 +604,7 @@
                     </MenuItem>
                 </Menu>
             </StackPanel>
-            <Grid Grid.Row="1" >
+            <Grid Grid.Row="1">
                 <StackPanel Margin="0,4,0,2">
                     <Separator />
                     <Grid>
@@ -619,57 +619,57 @@
                                 </Style>
                             </Menu.Resources>
                             <MenuItem
-                            x:Name="HomeButton"
-                            Click="HomeButton_Click"
-                            IsEnabled="False"
-                            ToolTip="Device Drives">
+                                x:Name="HomeButton"
+                                Click="HomeButton_Click"
+                                IsEnabled="False"
+                                ToolTip="Device Drives">
                                 <MenuItem.Header>
                                     <ui:FontIcon FontSize="16" Glyph="&#xE80F;" />
                                 </MenuItem.Header>
                             </MenuItem>
                             <MenuItem
-                            x:Name="BackButton"
-                            Click="BackButton_Click"
-                            IsEnabled="False"
-                            ToolTip="Back">
+                                x:Name="BackButton"
+                                Click="BackButton_Click"
+                                IsEnabled="False"
+                                ToolTip="Back">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE72B;" />
                                 </MenuItem.Header>
                             </MenuItem>
                             <MenuItem
-                            x:Name="ForwardButton"
-                            Click="ForwardButton_Click"
-                            IsEnabled="False"
-                            ToolTip="Forward">
+                                x:Name="ForwardButton"
+                                Click="ForwardButton_Click"
+                                IsEnabled="False"
+                                ToolTip="Forward">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE72A;" />
                                 </MenuItem.Header>
                             </MenuItem>
                             <MenuItem
-                            x:Name="ParentButton"
-                            Click="ParentButton_Click"
-                            IsEnabled="False"
-                            ToolTip="Up">
+                                x:Name="ParentButton"
+                                Click="ParentButton_Click"
+                                IsEnabled="False"
+                                ToolTip="Up">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE197;" />
                                 </MenuItem.Header>
                             </MenuItem>
                         </Menu>
                         <TextBox
-                        x:Name="PathBox"
-                        Grid.Column="1"
-                        Margin="6"
-                        Padding="36,0,0,0"
-                        VerticalContentAlignment="Center"
-                        GotFocus="PathBox_GotFocus"
-                        IsEnabled="False"
-                        IsReadOnly="True"
-                        KeyDown="PathBox_KeyDown"
-                        LostFocus="PathBox_LostFocus" />
+                            x:Name="PathBox"
+                            Grid.Column="1"
+                            Margin="6"
+                            Padding="36,0,0,0"
+                            VerticalContentAlignment="Center"
+                            GotFocus="PathBox_GotFocus"
+                            IsEnabled="False"
+                            IsReadOnly="True"
+                            KeyDown="PathBox_KeyDown"
+                            LostFocus="PathBox_LostFocus" />
                         <StackPanel
-                        Grid.Column="1"
-                        Margin="10"
-                        Orientation="Horizontal">
+                            Grid.Column="1"
+                            Margin="10"
+                            Orientation="Horizontal">
                             <StackPanel.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -686,23 +686,26 @@
                                     </Style>
                                 </Border.Style>
                                 <TextBlock
-                                x:Name="InputLangBlock"
-                                Margin="5,0"
-                                FontSize="15"
-                                FontWeight="DemiBold"
-                                MouseDown="InputLangBlock_MouseDown" />
+                                    x:Name="InputLangBlock"
+                                    Margin="5,0"
+                                    FontSize="15"
+                                    FontWeight="DemiBold"
+                                    MouseDown="InputLangBlock_MouseDown" />
                             </Border>
                             <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-                <ui:ProgressBar CornerRadius="0" VerticalAlignment="Bottom" x:Name="UpperProgressBar">
+                <ui:ProgressBar
+                    x:Name="UpperProgressBar"
+                    VerticalAlignment="Bottom"
+                    CornerRadius="0">
                     <ui:ProgressBar.Style>
                         <Style TargetType="ui:ProgressBar">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Visibility" Value="Collapsed" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
