@@ -102,8 +102,10 @@ namespace ADB_Explorer
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
 
+            fileOperationQueue.PropertyChanged += FileOperationProgressUpdateHandler;
             fileOperationQueue.PendingOperations.CollectionChanged += FileOperationProgressUpdateHandler;
             fileOperationQueue.CompletedOperations.CollectionChanged += FileOperationProgressUpdateHandler;
+            fileOperationQueue.CurrentOperations.CollectionChanged += FileOperationProgressUpdateHandler;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -851,16 +853,23 @@ namespace ADB_Explorer
 
         private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
         {
-            TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
-            if (fileOperationQueue.CurrentOperations.Count == 0)
+            if (!fileOperationQueue.IsActive)
+            {
+                TaskBarInfo.ProgressState = TaskbarItemProgressState.None;
+                TaskBarInfo.ProgressValue = 0;
                 totalOperations = 0;
+            }
+            else
+            {
+                TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
 
-            double operations = fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count;
-            if (totalOperations < operations)
-                totalOperations = operations;
+                double operations = fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count;
+                if (totalOperations < operations)
+                    totalOperations = operations;
 
-            TaskBarInfo.ProgressValue = 1.0 - (operations / totalOperations);
-
+                TaskBarInfo.ProgressValue = 1.0 - (operations / totalOperations);
+            }
+                
             //if (fileOperationQueue.IsActive)
             //{
             //    OperationCompletedTextBlock.Text = "";
