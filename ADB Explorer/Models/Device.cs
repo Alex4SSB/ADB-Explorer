@@ -199,7 +199,7 @@ namespace ADB_Explorer.Models
 
         public static implicit operator bool(DeviceClass obj)
         {
-            return obj is object && !string.IsNullOrEmpty(obj.ID);
+            return obj is not null && !string.IsNullOrEmpty(obj.ID);
         }
 
         public override int GetHashCode()
