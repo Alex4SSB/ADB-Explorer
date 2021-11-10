@@ -35,7 +35,6 @@ namespace ADB_Explorer
         private CancellationTokenSource dirListCancelTokenSource;
         private CancellationTokenSource determineFoldersCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
-        private double totalOperations = 0.0;
         private ItemsPresenter ExplorerContentPresenter;
         private double ColumnHeaderHeight
         {
@@ -106,6 +105,7 @@ namespace ADB_Explorer
             fileOperationQueue.PendingOperations.CollectionChanged += FileOperationProgressUpdateHandler;
             fileOperationQueue.CompletedOperations.CollectionChanged += FileOperationProgressUpdateHandler;
             fileOperationQueue.CurrentOperations.CollectionChanged += FileOperationProgressUpdateHandler;
+            UpperProgressBar.DataContext = fileOperationQueue;
 
             InputLanguageManager.Current.InputLanguageChanged +=
                 new InputLanguageEventHandler((sender, e) =>
@@ -857,17 +857,22 @@ namespace ADB_Explorer
             {
                 TaskBarInfo.ProgressState = TaskbarItemProgressState.None;
                 TaskBarInfo.ProgressValue = 0;
-                totalOperations = 0;
+                //totalOperations = 0;
+                if (fileOperationQueue.CompletedOperations.Count > 0
+                    && fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count > 0)
+                    fileOperationQueue.CompletedOperations.Clear();
             }
             else
             {
                 TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
 
                 double operations = fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count;
-                if (totalOperations < operations)
-                    totalOperations = operations;
+                //if (totalOperations < operations)
+                //    totalOperations = operations;
 
-                TaskBarInfo.ProgressValue = 1.0 - (operations / totalOperations);
+                double value = 1.0 - (operations / (fileOperationQueue.CompletedOperations.Count + operations));
+                UpperProgressBar.Value = value * 100;
+                TaskBarInfo.ProgressValue = value;
             }
                 
             //if (fileOperationQueue.IsActive)

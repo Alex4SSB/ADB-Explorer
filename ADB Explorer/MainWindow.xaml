@@ -696,12 +696,12 @@
                         </StackPanel>
                     </Grid>
                 </StackPanel>
-                <ui:ProgressBar CornerRadius="0" VerticalAlignment="Bottom" Value="40">
+                <ui:ProgressBar CornerRadius="0" VerticalAlignment="Bottom" x:Name="UpperProgressBar">
                     <ui:ProgressBar.Style>
                         <Style TargetType="ui:ProgressBar">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding fileOperationQueue.IsActive}" Value="True">
+                                <DataTrigger Binding="{Binding IsActive}" Value="True">
                                     <Setter Property="Visibility" Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
