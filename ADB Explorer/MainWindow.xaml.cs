@@ -54,7 +54,7 @@ namespace ADB_Explorer
             }
         }
 
-        private List<MenuItem> PathButtons = new();
+        private readonly List<MenuItem> PathButtons = new();
 
         /// <summary>
         /// Sets the app resource font family for font icons depending on the OS build
@@ -63,7 +63,7 @@ namespace ADB_Explorer
         {
             Application.Current.Resources["GlyphFontFamily"] = new FontFamily(Environment.OSVersion.Version.Build switch
             {
-                > 20000 => "Segoe Fluent Icons", // Windows 11
+                > 21000 => "Segoe Fluent Icons", // Windows 11
                 _ => "Segoe MDL2 Assets",
             });
         }
@@ -150,9 +150,9 @@ namespace ADB_Explorer
             ConnectTimer.Stop();
         }
 
-        private void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
+        private static void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
 
-        private void SetTheme(ApplicationTheme theme)
+        private static void SetTheme(ApplicationTheme theme)
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
@@ -643,7 +643,7 @@ namespace ADB_Explorer
             }
         }
 
-        private MenuItem CreateExcessButton() => new MenuItem()
+        private static MenuItem CreateExcessButton() => new MenuItem()
         {
             Height = 24,
             Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
@@ -683,7 +683,7 @@ namespace ADB_Explorer
             PathStackPanel.Children.Add(menu);
         }
 
-        private FontIcon CreatePathArrow() => new()
+        private static FontIcon CreatePathArrow() => new()
         {
             Glyph = " \uE970 ",
             FontSize = 7,
@@ -1136,7 +1136,7 @@ namespace ADB_Explorer
             ParentButton.IsEnabled = false;
         }
 
-        private void ClearDrives()
+        private static void ClearDrives()
         {
             Devices.Current?.Drives.Clear();
         }

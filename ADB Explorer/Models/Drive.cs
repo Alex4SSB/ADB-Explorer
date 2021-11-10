@@ -105,7 +105,7 @@ namespace ADB_Explorer.Models
 
         public static implicit operator bool(Drive obj)
         {
-            return obj is Drive;
+            return obj is not null;
         }
 
         public static bool operator ==(Drive lVal, Drive rVal)
