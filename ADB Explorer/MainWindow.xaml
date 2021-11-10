@@ -437,12 +437,12 @@
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="50" />
-                <RowDefinition Height="54" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Menu Margin="7,0" VerticalAlignment="Center">
+            <Menu Margin="7,4" VerticalAlignment="Center">
                 <Menu.Resources>
                     <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                         <Setter Property="FontSize" Value="18" />
@@ -604,57 +604,58 @@
                     </MenuItem>
                 </Menu>
             </StackPanel>
-            <StackPanel Grid.Row="1">
-                <Separator />
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Menu Margin="7,0,0,0">
-                        <Menu.Resources>
-                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                                <Setter Property="FontSize" Value="14" />
-                            </Style>
-                        </Menu.Resources>
-                        <MenuItem
+            <Grid Grid.Row="1" >
+                <StackPanel Margin="0,4,0,2">
+                    <Separator />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Menu Margin="7,0,0,0">
+                            <Menu.Resources>
+                                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                    <Setter Property="FontSize" Value="14" />
+                                </Style>
+                            </Menu.Resources>
+                            <MenuItem
                             x:Name="HomeButton"
                             Click="HomeButton_Click"
                             IsEnabled="False"
                             ToolTip="Device Drives">
-                            <MenuItem.Header>
-                                <ui:FontIcon FontSize="16" Glyph="&#xE80F;" />
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem
+                                <MenuItem.Header>
+                                    <ui:FontIcon FontSize="16" Glyph="&#xE80F;" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem
                             x:Name="BackButton"
                             Click="BackButton_Click"
                             IsEnabled="False"
                             ToolTip="Back">
-                            <MenuItem.Header>
-                                <ui:FontIcon Glyph="&#xE72B;" />
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem
+                                <MenuItem.Header>
+                                    <ui:FontIcon Glyph="&#xE72B;" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem
                             x:Name="ForwardButton"
                             Click="ForwardButton_Click"
                             IsEnabled="False"
                             ToolTip="Forward">
-                            <MenuItem.Header>
-                                <ui:FontIcon Glyph="&#xE72A;" />
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem
+                                <MenuItem.Header>
+                                    <ui:FontIcon Glyph="&#xE72A;" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                            <MenuItem
                             x:Name="ParentButton"
                             Click="ParentButton_Click"
                             IsEnabled="False"
                             ToolTip="Up">
-                            <MenuItem.Header>
-                                <ui:FontIcon Glyph="&#xE197;" />
-                            </MenuItem.Header>
-                        </MenuItem>
-                    </Menu>
-                    <TextBox
+                                <MenuItem.Header>
+                                    <ui:FontIcon Glyph="&#xE197;" />
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </Menu>
+                        <TextBox
                         x:Name="PathBox"
                         Grid.Column="1"
                         Margin="6"
@@ -665,36 +666,49 @@
                         IsReadOnly="True"
                         KeyDown="PathBox_KeyDown"
                         LostFocus="PathBox_LostFocus" />
-                    <StackPanel
+                        <StackPanel
                         Grid.Column="1"
                         Margin="10"
                         Orientation="Horizontal">
-                        <StackPanel.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                            </Style>
-                        </StackPanel.Resources>
-                        <Border Background="DodgerBlue">
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=PathStackPanel, Path=Visibility}" Value="Visible">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
+                            <StackPanel.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
                                 </Style>
-                            </Border.Style>
-                            <TextBlock
+                            </StackPanel.Resources>
+                            <Border Background="DodgerBlue">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=PathStackPanel, Path=Visibility}" Value="Visible">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                                <TextBlock
                                 x:Name="InputLangBlock"
                                 Margin="5,0"
                                 FontSize="15"
                                 FontWeight="DemiBold"
                                 MouseDown="InputLangBlock_MouseDown" />
-                        </Border>
-                        <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
+                            </Border>
+                            <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+                <ui:ProgressBar CornerRadius="0" VerticalAlignment="Bottom" Value="40">
+                    <ui:ProgressBar.Style>
+                        <Style TargetType="ui:ProgressBar">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding fileOperationQueue.IsActive}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:ProgressBar.Style>
+                </ui:ProgressBar>
+            </Grid>
             <Border
                 x:Name="GridBackgroundBlock"
                 Grid.Row="2"
