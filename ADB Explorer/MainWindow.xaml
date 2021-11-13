@@ -659,23 +659,21 @@
                             x:Name="PathBox"
                             Grid.Column="1"
                             Margin="6"
-                            Padding="36,0,0,0"
                             VerticalContentAlignment="Center"
                             GotFocus="PathBox_GotFocus"
                             IsEnabled="False"
                             IsReadOnly="True"
                             KeyDown="PathBox_KeyDown"
                             LostFocus="PathBox_LostFocus" />
-                        <StackPanel
+                        <Grid
                             Grid.Column="1"
-                            Margin="10"
-                            Orientation="Horizontal">
-                            <StackPanel.Resources>
+                            Margin="6">
+                            <Grid.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                 </Style>
-                            </StackPanel.Resources>
-                            <Border Background="DodgerBlue">
+                            </Grid.Resources>
+                            <!--<Border Background="DodgerBlue" HorizontalAlignment="Left" Margin="3">
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Style.Triggers>
@@ -691,9 +689,12 @@
                                     FontSize="15"
                                     FontWeight="DemiBold"
                                     MouseDown="InputLangBlock_MouseDown" />
-                            </Border>
-                            <StackPanel x:Name="PathStackPanel" Orientation="Horizontal" />
-                        </StackPanel>
+                            </Border>-->
+                            <StackPanel x:Name="PathStackPanel"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Margin="5,0,0,0"/>
+                        </Grid>
                     </Grid>
                 </StackPanel>
                 <ui:ProgressBar

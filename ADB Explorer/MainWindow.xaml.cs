@@ -107,11 +107,11 @@ namespace ADB_Explorer
             fileOperationQueue.CurrentOperations.CollectionChanged += FileOperationProgressUpdateHandler;
             UpperProgressBar.DataContext = fileOperationQueue;
 
-            InputLanguageManager.Current.InputLanguageChanged +=
-                new InputLanguageEventHandler((sender, e) =>
-                {
-                    UpdateInputLang();
-                });
+            //InputLanguageManager.Current.InputLanguageChanged +=
+            //    new InputLanguageEventHandler((sender, e) =>
+            //    {
+            //        UpdateInputLang();
+            //    });
         }
 
         private void InitializeContextMenu(MenuType type, object dataContext = null)
@@ -183,7 +183,7 @@ namespace ADB_Explorer
             PathBox.IsReadOnly = false;
             PathBox.SelectAll();
 
-            UpdateInputLang();
+            //UpdateInputLang();
         }
 
         private void UnfocusPathBox()
@@ -377,7 +377,7 @@ namespace ADB_Explorer
         {
             foreach (var drive in Devices.Current.Drives.Where(d => d.Type != DriveType.Root))
             {
-                CurrentPrettyNames.Add(drive.Path, drive.Type == DriveType.External
+                CurrentPrettyNames.TryAdd(drive.Path, drive.Type == DriveType.External
                     ? drive.ID : drive.PrettyName);
             }
             foreach (var item in SPECIAL_FOLDERS_PRETTY_NAMES)
@@ -622,10 +622,10 @@ namespace ADB_Explorer
             List<MenuItem> excessButtons = new();
             PathStackPanel.Children.Clear();
 
-            if (excessLength > 0)
+            if (excessLength > -10)
             {
                 int i = 0;
-                while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
+                while (excessLength >= -10 && PathButtons.Count - excessButtons.Count > 1)
                 {
                     excessButtons.Add(PathButtons[i]);
                     excessLength -= PathButtonLength.ButtonLength(PathButtons[i]);
@@ -648,7 +648,7 @@ namespace ADB_Explorer
         private static MenuItem CreateExcessButton() => new MenuItem()
         {
             Height = 24,
-            Header = new FontIcon() { Glyph = "\uE712", FontSize = 12, FontWeight = FontWeights.Bold }
+            Header = new FontIcon() { Glyph = "\uE712", FontSize = 16 }
         };
 
         private void AddExcessButton(List<MenuItem> excessButtons = null)
@@ -668,9 +668,10 @@ namespace ADB_Explorer
         {
             MenuItem button = new()
             {
-                Header = name,
+                Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1) },
                 Tag = path,
-                Height = 24
+                Padding = new Thickness(10, 0, 10, 0),
+                Height = 24,
             };
             button.Click += PathButton_Click;
 
@@ -792,10 +793,10 @@ namespace ADB_Explorer
             e.Handled = true;
         }
 
-        private void UpdateInputLang()
-        {
-            InputLangBlock.Text = InputLanguageManager.Current.CurrentInputLanguage.TwoLetterISOLanguageName.ToUpper();
-        }
+        //private void UpdateInputLang()
+        //{
+        //    //InputLangBlock.Text = InputLanguageManager.Current.CurrentInputLanguage.TwoLetterISOLanguageName.ToUpper();
+        //}
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
