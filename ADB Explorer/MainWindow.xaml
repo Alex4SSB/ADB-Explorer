@@ -672,6 +672,7 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                 </Style>
+                                <Style TargetType="ui:FontIcon" BasedOn="{DynamicResource GlyphFont}"/>
                             </Grid.Resources>
                             <!--<Border Background="DodgerBlue" HorizontalAlignment="Left" Margin="3">
                                 <Border.Style>

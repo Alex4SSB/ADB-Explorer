@@ -60,12 +60,15 @@ namespace ADB_Explorer
         /// </summary>
         public static void SetIconFont()
         {
-            Application.Current.Resources["GlyphFontFamily"] = new FontFamily(Environment.OSVersion.Version.Build switch
+            Application.Current.Resources["GlyphFontFamily"] = GetIconFont();
+        }
+
+        public static FontFamily GetIconFont() =>
+            new(Environment.OSVersion.Version.Build switch
             {
                 > 21000 => "Segoe Fluent Icons", // Windows 11
                 _ => "Segoe MDL2 Assets",
             });
-        }
 
         private void GetExplorerContentPresenter()
         {
@@ -689,7 +692,7 @@ namespace ADB_Explorer
         private static FontIcon CreatePathArrow() => new()
         {
             Glyph = " \uE970 ",
-            FontSize = 7,
+            FontSize = 8,
         };
 
         private void AddPathArrow(bool append = true)
@@ -875,41 +878,41 @@ namespace ADB_Explorer
                 UpperProgressBar.Value = value * 100;
                 TaskBarInfo.ProgressValue = value;
             }
-                
+
             //if (fileOperationQueue.IsActive)
             //{
             //    OperationCompletedTextBlock.Text = "";
 
-                //    if (ProgressGrid.Visibility == Visibility.Collapsed)
-                //        ProgressGrid.Visibility = Visibility.Visible;
+            //    if (ProgressGrid.Visibility == Visibility.Collapsed)
+            //        ProgressGrid.Visibility = Visibility.Visible;
 
-                //    ProgressCountTextBlock.Text = $"{fileOperationQueue.CompletedOperations.Count + 1}/{fileOperationQueue.TotalCount}";
+            //    ProgressCountTextBlock.Text = $"{fileOperationQueue.CompletedOperations.Count + 1}/{fileOperationQueue.TotalCount}";
 
-                //    if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
-                //    {
-                //        OverallProgressBar.IsIndeterminate = false;
-                //        OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
-                //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
-                //        TaskBarInfo.ProgressValue = progressInfo.TotalPercentage.Value / 100.0;
-                //    }
-                //    else
-                //    {
-                //        OverallProgressBar.IsIndeterminate = true;
-                //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
-                //    }
-                //}
-                //else
-                //{
-                //    if ((int)ProgressCountTextBlock.Tag > 0)
-                //    {
-                //        OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
-                //    }
+            //    if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
+            //    {
+            //        OverallProgressBar.IsIndeterminate = false;
+            //        OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
+            //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
+            //        TaskBarInfo.ProgressValue = progressInfo.TotalPercentage.Value / 100.0;
+            //    }
+            //    else
+            //    {
+            //        OverallProgressBar.IsIndeterminate = true;
+            //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+            //    }
+            //}
+            //else
+            //{
+            //    if ((int)ProgressCountTextBlock.Tag > 0)
+            //    {
+            //        OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
+            //    }
 
-                //    ProgressCountTextBlock.Tag = 0;
+            //    ProgressCountTextBlock.Tag = 0;
 
-                //    ProgressGrid.Visibility = Visibility.Collapsed;
-                //    OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.TotalCount} item{((fileOperationQueue.TotalCount > 1) ? "s" : "")} done";
-                //}
+            //    ProgressGrid.Visibility = Visibility.Collapsed;
+            //    OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.TotalCount} item{((fileOperationQueue.TotalCount > 1) ? "s" : "")} done";
+            //}
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
