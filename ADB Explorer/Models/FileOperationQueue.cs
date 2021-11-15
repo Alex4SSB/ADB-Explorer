@@ -148,7 +148,7 @@ namespace ADB_Explorer.Models
                 currOperationLastProgress = currentProgress.Value;
             }
             
-            Progress = ((double)CompletedOperations.Count + (currOperationLastProgress / 100.0)) / TotalCount * 100.0;
+            Progress = ((double)CompletedOperations.Count + (currOperationLastProgress / 100.0)) / TotalCount; // * 100.0
         }
 
         public void Start()

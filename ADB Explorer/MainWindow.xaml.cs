@@ -104,10 +104,6 @@ namespace ADB_Explorer
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
 
-            fileOperationQueue.PropertyChanged += FileOperationProgressUpdateHandler;
-            fileOperationQueue.PendingOperations.CollectionChanged += FileOperationProgressUpdateHandler;
-            fileOperationQueue.CompletedOperations.CollectionChanged += FileOperationProgressUpdateHandler;
-            fileOperationQueue.CurrentOperations.CollectionChanged += FileOperationProgressUpdateHandler;
             UpperProgressBar.DataContext = fileOperationQueue;
 
             //InputLanguageManager.Current.InputLanguageChanged +=
@@ -879,21 +875,6 @@ namespace ADB_Explorer
             foreach (var item in dialog.FileNames)
             {
                 fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, item, CurrentPath));
-            }
-        }
-
-        private void FileOperationProgressUpdateHandler(object sender, EventArgs e)
-        {
-            if (!fileOperationQueue.IsActive)
-            {
-                TaskBarInfo.ProgressState = TaskbarItemProgressState.None;
-                TaskBarInfo.ProgressValue = 0;
-            }
-            else
-            {
-                TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
-                TaskBarInfo.ProgressValue = fileOperationQueue.Progress / 100;
-                UpperProgressBar.Value = fileOperationQueue.Progress;
             }
         }
 
