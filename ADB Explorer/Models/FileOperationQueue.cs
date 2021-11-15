@@ -3,6 +3,7 @@ using ADB_Explorer.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
+using static ADB_Explorer.Services.ADBService.Device;
 
 namespace ADB_Explorer.Models
 {
@@ -86,6 +87,23 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private bool autoClear = true;
+        public bool AutoClear
+        {
+            get
+            {
+                return autoClear;
+            }
+            set
+            {
+                if (autoClear != value)
+                {
+                    autoClear = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public int TotalCount
         {
             get
@@ -94,21 +112,57 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private double currOperationLastProgress = 0;
+        private double progress = 0;
+        public double Progress
+        {
+            get
+            {
+                return progress;
+            }
+            private set
+            {
+                if (progress != value)
+                {
+                    progress = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
         public FileOperationQueue(Dispatcher dispatcher)
         {
             Dispatcher = dispatcher;
             PendingOperations.CollectionChanged += PendingOperations_CollectionChanged;
+            CompletedOperations.CollectionChanged += CompletedOperations_CollectionChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void AddOperation(FileOperation fileOp) => PendingOperations.Add(fileOp);
 
+        private void UpdateProgress(double? currentProgress = null)
+        {
+            if (currentProgress != null)
+            {
+                currOperationLastProgress = currentProgress.Value;
+            }
+            
+            Progress = ((double)CompletedOperations.Count + (currOperationLastProgress / 100.0)) / TotalCount * 100.0;
+        }
+
         public void Start()
         {
             if ((!IsActive) && (PendingOperations.Count > 0))
             {
                 IsActive = true;
+                UpdateProgress(0);
+
+                if (AutoClear)
+                {
+                    CompletedOperations.Clear();
+                }
+
                 MoveToNextOperation();
             }
         }
@@ -120,6 +174,7 @@ namespace ADB_Explorer.Models
                 CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
                 CompletedOperations.Add(CurrentOperation);
                 CurrentOperation = null;
+                UpdateProgress(0);
             }
         }
 
@@ -149,7 +204,12 @@ namespace ADB_Explorer.Models
 
         private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if ((CurrentOperation == sender) &&
+            if (CurrentOperation != sender)
+            {
+                return;
+            }
+
+            if ((e.PropertyName == "Status") &&
                 (CurrentOperation.Status != FileOperation.OperationStatus.Waiting) &&
                 (CurrentOperation.Status != FileOperation.OperationStatus.InProgress))
             {
@@ -165,6 +225,14 @@ namespace ADB_Explorer.Models
                     MoveToNextOperation();
                 }
             }
+
+            if ((e.PropertyName == "StatusInfo") &&
+                (CurrentOperation.Status == FileOperation.OperationStatus.InProgress) &&
+                (CurrentOperation.StatusInfo is AdbSyncProgressInfo status) &&
+                (status.TotalPercentage is int percentage))
+            {
+                UpdateProgress(percentage);
+            }
         }
 
         private void PendingOperations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -175,6 +243,13 @@ namespace ADB_Explorer.Models
             {
                 Dispatcher.BeginInvoke(Start);
             }
+
+            UpdateProgress();
+        }
+
+        private void CompletedOperations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            UpdateProgress();
         }
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

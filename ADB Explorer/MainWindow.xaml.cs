@@ -888,58 +888,13 @@ namespace ADB_Explorer
             {
                 TaskBarInfo.ProgressState = TaskbarItemProgressState.None;
                 TaskBarInfo.ProgressValue = 0;
-                //totalOperations = 0;
-                if (fileOperationQueue.CompletedOperations.Count > 0
-                    && fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count > 0)
-                    fileOperationQueue.CompletedOperations.Clear();
             }
             else
             {
                 TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
-
-                double operations = fileOperationQueue.PendingOperations.Count + fileOperationQueue.CurrentOperations.Count;
-                //if (totalOperations < operations)
-                //    totalOperations = operations;
-
-                double value = 1.0 - (operations / (fileOperationQueue.CompletedOperations.Count + operations));
-                UpperProgressBar.Value = value * 100;
-                TaskBarInfo.ProgressValue = value;
+                TaskBarInfo.ProgressValue = fileOperationQueue.Progress / 100;
+                UpperProgressBar.Value = fileOperationQueue.Progress;
             }
-
-            //if (fileOperationQueue.IsActive)
-            //{
-            //    OperationCompletedTextBlock.Text = "";
-
-            //    if (ProgressGrid.Visibility == Visibility.Collapsed)
-            //        ProgressGrid.Visibility = Visibility.Visible;
-
-            //    ProgressCountTextBlock.Text = $"{fileOperationQueue.CompletedOperations.Count + 1}/{fileOperationQueue.TotalCount}";
-
-            //    if (fileOperationQueue.CurrentOperation.StatusInfo is ADBService.Device.AdbSyncProgressInfo progressInfo && progressInfo.TotalPercentage.HasValue)
-            //    {
-            //        OverallProgressBar.IsIndeterminate = false;
-            //        OverallProgressBar.Value = progressInfo.TotalPercentage.Value;
-            //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Normal;
-            //        TaskBarInfo.ProgressValue = progressInfo.TotalPercentage.Value / 100.0;
-            //    }
-            //    else
-            //    {
-            //        OverallProgressBar.IsIndeterminate = true;
-            //        TaskBarInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
-            //    }
-            //}
-            //else
-            //{
-            //    if ((int)ProgressCountTextBlock.Tag > 0)
-            //    {
-            //        OperationCompletedTextBlock.Tag = ProgressCountTextBlock.Tag;
-            //    }
-
-            //    ProgressCountTextBlock.Tag = 0;
-
-            //    ProgressGrid.Visibility = Visibility.Collapsed;
-            //    OperationCompletedTextBlock.Text = $"{DateTime.Now:HH:mm:ss} - {fileOperationQueue.TotalCount} item{((fileOperationQueue.TotalCount > 1) ? "s" : "")} done";
-            //}
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
