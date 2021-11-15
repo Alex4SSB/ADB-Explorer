@@ -117,7 +117,7 @@ namespace ADB_Explorer
             //    });
         }
 
-        private void InitializeContextMenu(MenuType type, object dataContext = null)
+        private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
         {
             MenuItem copyMenu = FindResource("ContextMenuCopyItem") as MenuItem;
             MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
@@ -141,6 +141,18 @@ namespace ADB_Explorer
                 default:
                     break;
             }
+        }
+
+        private void InitializePathContextMenu(FrameworkElement sender)
+        {
+            if (sender.ContextMenu is null)
+                return;
+
+            MenuItem editMenu = FindResource("PathMenuEdit") as MenuItem;
+            sender.ContextMenu.Items.Clear();
+            sender.ContextMenu.Items.Add(editMenu);
+
+            sender.ContextMenu.Visibility = Visible(sender.ContextMenu.HasItems);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -373,7 +385,9 @@ namespace ADB_Explorer
             DrivesItemRepeater.Visibility = Visibility.Visible;
 
             PathBox.IsEnabled = true;
-            AddPathButton(CreatePathButton("", Devices.Current.Name));
+            MenuItem button = CreatePathButton("", Devices.Current.Name);
+            button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
+            AddPathButton(button);
         }
 
         private static void CombinePrettyNames()
@@ -631,6 +645,7 @@ namespace ADB_Explorer
                 while (excessLength >= -10 && PathButtons.Count - excessButtons.Count > 1)
                 {
                     excessButtons.Add(PathButtons[i]);
+                    PathButtons[i].ContextMenu = null;
                     excessLength -= PathButtonLength.ButtonLength(PathButtons[i]);
 
                     i++;
@@ -644,14 +659,15 @@ namespace ADB_Explorer
                 if (PathStackPanel.Children.Count > 0)
                     AddPathArrow();
 
+                item.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
                 AddPathButton(item);
             }
         }
 
-        private static MenuItem CreateExcessButton() => new MenuItem()
+        private MenuItem CreateExcessButton() => new MenuItem()
         {
             Height = 24,
-            Header = new FontIcon() { Glyph = "\uE712", FontSize = 16 }
+            Header = new FontIcon() { Glyph = "\uE712", FontSize = 16, Style = Resources["GlyphFont"] as Style, ContextMenu = Resources["PathButtonsMenu"] as ContextMenu }
         };
 
         private void AddExcessButton(List<MenuItem> excessButtons = null)
@@ -662,6 +678,8 @@ namespace ADB_Explorer
             var button = CreateExcessButton();
             button.ItemsSource = excessButtons;
             Menu excessMenu = new() { Height = 24 };
+            excessMenu.ContextMenuOpening += PathButton_ContextMenuOpening;
+
             excessMenu.Items.Add(button);
             PathStackPanel.Children.Add(excessMenu);
         }
@@ -677,8 +695,14 @@ namespace ADB_Explorer
                 Height = 24,
             };
             button.Click += PathButton_Click;
+            button.ContextMenuOpening += PathButton_ContextMenuOpening;
 
             return button;
+        }
+
+        private void PathButton_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            InitializePathContextMenu((FrameworkElement)sender);
         }
 
         private void AddPathButton(MenuItem button)
@@ -689,15 +713,18 @@ namespace ADB_Explorer
             PathStackPanel.Children.Add(menu);
         }
 
-        private static FontIcon CreatePathArrow() => new()
+        private FontIcon CreatePathArrow() => new()
         {
             Glyph = " \uE970 ",
             FontSize = 8,
+            Style = Resources["GlyphFont"] as Style,
+            ContextMenu = Resources["PathButtonsMenu"] as ContextMenu
         };
 
         private void AddPathArrow(bool append = true)
         {
             var arrow = CreatePathArrow();
+            arrow.ContextMenuOpening += PathButton_ContextMenuOpening;
 
             if (append)
                 PathStackPanel.Children.Add(arrow);
@@ -941,7 +968,7 @@ namespace ADB_Explorer
 
             if (e.ChangedButton == MouseButton.Right)
             {
-                InitializeContextMenu(e.OriginalSource is Border ? MenuType.EmptySpace : MenuType.ExplorerItem, row.DataContext);
+                InitializeExplorerContextMenu(e.OriginalSource is Border ? MenuType.EmptySpace : MenuType.ExplorerItem, row.DataContext);
             }
 
             if (e.OriginalSource is Border)
@@ -1213,7 +1240,7 @@ namespace ADB_Explorer
                 ExplorerGrid.SelectedItems.Clear();
 
                 if (point.Y < ColumnHeaderHeight || point.X > DataGridContentWidth)
-                    InitializeContextMenu(MenuType.Header);
+                    InitializeExplorerContextMenu(MenuType.Header);
             }
         }
 
@@ -1230,14 +1257,14 @@ namespace ADB_Explorer
 
             if (DepObject is DataGridColumnHeader)
             {
-                InitializeContextMenu(MenuType.Header);
+                InitializeExplorerContextMenu(MenuType.Header);
             }
             else if (e.OriginalSource is FrameworkElement element && element.DataContext is FileClass file && ExplorerGrid.SelectedItems.Count > 0)
             {
-                InitializeContextMenu(MenuType.ExplorerItem, file);
+                InitializeExplorerContextMenu(MenuType.ExplorerItem, file);
             }
             else
-                InitializeContextMenu(MenuType.EmptySpace);
+                InitializeExplorerContextMenu(MenuType.EmptySpace);
         }
 
         private void DevicesList_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1315,9 +1342,14 @@ namespace ADB_Explorer
             }
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void PaneCollapse_Click(object sender, RoutedEventArgs e)
         {
             ((MenuItem)sender).FindAscendant<SplitView>().IsPaneOpen = false;
+        }
+
+        private void PathMenuEdit_Click(object sender, RoutedEventArgs e)
+        {
+            PathBox.Focus();
         }
     }
 }

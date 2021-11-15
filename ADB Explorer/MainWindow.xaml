@@ -46,30 +46,34 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <ContextMenu x:Key="RowContextMenu">
-            <ContextMenu.Resources>
-                <Style TargetType="MenuItem">
-                    <Setter Property="Height" Value="24" />
-                    <Setter Property="Padding" Value="6,0" />
-                </Style>
-                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                    <Setter Property="Margin" Value="0,0,6,0" />
-                    <Setter Property="FontSize" Value="16" />
-                </Style>
-                <Style TargetType="StackPanel">
-                    <Setter Property="Orientation" Value="Horizontal" />
-                </Style>
-            </ContextMenu.Resources>
+        <ResourceDictionary x:Key="ContextMenuStyles">
+            <Style TargetType="MenuItem">
+                <Setter Property="Height" Value="24" />
+                <Setter Property="Padding" Value="6,0" />
+            </Style>
+            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                <Setter Property="Margin" Value="0,0,6,0" />
+                <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style TargetType="StackPanel">
+                <Setter Property="Orientation" Value="Horizontal" />
+            </Style>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="ContextSubMenuStyles">
+            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                <Setter Property="FontSize" Value="16" />
+            </Style>
+            <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
+                <Setter Property="Margin" Value="6,0,0,0" />
+            </Style>
+        </ResourceDictionary>
+        <ContextMenu x:Key="RowContextMenu" Resources="{StaticResource ContextMenuStyles}" />
+        <ContextMenu Name="PathButtonsMenu" x:Key="PathButtonsMenu" Resources="{StaticResource ContextMenuStyles}" >
         </ContextMenu>
-        <MenuItem x:Key="ContextMenuCopyItem" Click="ContextMenuCopyItem_Click">
-            <MenuItem.Resources>
-                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                    <Setter Property="FontSize" Value="16" />
-                </Style>
-                <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
-                    <Setter Property="Margin" Value="6,0,0,0" />
-                </Style>
-            </MenuItem.Resources>
+        <MenuItem
+            x:Key="ContextMenuCopyItem"
+            Click="ContextMenuCopyItem_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE8C8;" />
@@ -77,11 +81,22 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
-        <MenuItem x:Key="ContextMenuDeleteItem">
+        <MenuItem x:Key="ContextMenuDeleteItem" Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE74D;" />
                     <TextBlock Text="Delete" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="PathMenuEdit"
+            Click="PathMenuEdit_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE70F;" />
+                    <TextBlock Text="Edit Path" />
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
@@ -672,7 +687,6 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                 </Style>
-                                <Style TargetType="ui:FontIcon" BasedOn="{DynamicResource GlyphFont}"/>
                             </Grid.Resources>
                             <!--<Border Background="DodgerBlue" HorizontalAlignment="Left" Margin="3">
                                 <Border.Style>
@@ -694,6 +708,7 @@
                             <StackPanel x:Name="PathStackPanel"
                                         Orientation="Horizontal"
                                         VerticalAlignment="Center"
+                                        
                                         Margin="5,0,0,0"/>
                         </Grid>
                     </Grid>
@@ -947,7 +962,7 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Menu HorizontalAlignment="Right">
-                            <MenuItem Click="MenuItem_Click" ToolTip="Hide">
+                            <MenuItem Click="PaneCollapse_Click" ToolTip="Hide">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
                                 </MenuItem.Header>
@@ -1177,7 +1192,7 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Menu Margin="0,0,-18,0" HorizontalAlignment="Right">
-                            <MenuItem Click="MenuItem_Click" ToolTip="Hide">
+                            <MenuItem Click="PaneCollapse_Click" ToolTip="Hide">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
                                 </MenuItem.Header>
