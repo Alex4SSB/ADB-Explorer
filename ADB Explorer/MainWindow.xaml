@@ -2,12 +2,12 @@
     x:Class="ADB_Explorer.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
-    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="ADB Explorer"
@@ -27,7 +27,7 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
-        <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter"/>
+        <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
         <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
             <Setter Property="FontFamily" Value="{DynamicResource GlyphFontFamily}" />
         </Style>
@@ -70,8 +70,10 @@
             </Style>
         </ResourceDictionary>
         <ContextMenu x:Key="RowContextMenu" Resources="{StaticResource ContextMenuStyles}" />
-        <ContextMenu Name="PathButtonsMenu" x:Key="PathButtonsMenu" Resources="{StaticResource ContextMenuStyles}" >
-        </ContextMenu>
+        <ContextMenu
+            x:Key="PathButtonsMenu"
+            Name="PathButtonsMenu"
+            Resources="{StaticResource ContextMenuStyles}" />
         <MenuItem
             x:Key="ContextMenuCopyItem"
             Click="ContextMenuCopyItem_Click"
@@ -161,24 +163,6 @@
                     <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
                 </MultiDataTrigger>
             </Style.Triggers>
-        </Style>
-        <Style x:Key="DriveInfoTemplate" TargetType="ui:ListViewItem">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ui:ListViewItem">
-                        <StackPanel>
-                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                <TextBlock Text="{Binding PrettyName}" />
-                                <TextBlock Text=": " />
-                                <TextBlock Text="{Binding Used, Mode=OneWay}" />
-                                <TextBlock Text=" / " />
-                                <TextBlock Text="{Binding Size, Mode=OneWay}" />
-                            </StackPanel>
-                            <ui:ProgressBar Margin="8,4,8,0" Value="{Binding UsageP, Mode=OneWay}" />
-                        </StackPanel>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
         <Style
             x:Key="DeviceStatusFontSizeStyle"
@@ -451,8 +435,8 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo
             x:Name="TaskBarInfo"
-            ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}"
-            ProgressState="{Binding ElementName=UpperProgressBar, Path=Visibility, Converter={StaticResource VisibilityToStateConverter}}"/>
+            ProgressState="{Binding ElementName=UpperProgressBar, Path=Visibility, Converter={StaticResource VisibilityToStateConverter}}"
+            ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
     </Window.TaskbarItemInfo>
     <Grid>
         <Grid>
@@ -462,94 +446,101 @@
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Menu Margin="7,4" VerticalAlignment="Center">
-                <Menu.Resources>
-                    <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                        <Setter Property="FontSize" Value="18" />
-                    </Style>
-                    <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock" />
-                </Menu.Resources>
-                <MenuItem
-                    x:Name="OpenDevicesButton"
-                    Click="OpenDevicesButton_Click"
-                    ToolTip="Devices">
-                    <MenuItem.Header>
-                        <Grid>
-                            <ui:FontIcon Glyph="&#xE8CC;" />
-                            <TextBlock
-                                Margin="0,0,-10,-12"
-                                HorizontalAlignment="Right"
-                                VerticalAlignment="Bottom"
-                                Text="{Binding ElementName=DevicesList, Path=Items.Count}" />
-                        </Grid>
-                    </MenuItem.Header>
-                </MenuItem>
-                <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                <MenuItem
-                    x:Name="NewMenuButton"
-                    Margin="2,0"
-                    IsEnabled="False">
-                    <MenuItem.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <ui:FontIcon
-                                Margin="0,0,8,0"
-                                FontSize="20"
-                                Glyph="&#xECC8;"
-                                Style="{StaticResource DisabledGlyphStyle}" />
-                            <TextBlock VerticalAlignment="Center" Text="New" />
-                        </StackPanel>
-                    </MenuItem.Header>
-                    <MenuItem>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Menu Margin="7,4" VerticalAlignment="Center">
+                    <Menu.Resources>
+                        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                            <Setter Property="FontSize" Value="18" />
+                        </Style>
+                        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock" />
+                    </Menu.Resources>
+                    <MenuItem
+                        x:Name="OpenDevicesButton"
+                        Click="OpenDevicesButton_Click"
+                        ToolTip="Devices">
+                        <MenuItem.Header>
+                            <Grid>
+                                <ui:FontIcon Glyph="&#xE8CC;" />
+                                <TextBlock
+                                    Margin="0,0,-10,-12"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Text="{Binding ElementName=DevicesList, Path=Items.Count}" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    <MenuItem
+                        x:Name="NewMenuButton"
+                        Margin="2,0"
+                        IsEnabled="False">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:FontIcon
                                     Margin="0,0,8,0"
-                                    FontSize="16"
-                                    Glyph="&#xECC8;" />
-                                <TextBlock Text="New Item" />
+                                    FontSize="20"
+                                    Glyph="&#xECC8;"
+                                    Style="{StaticResource DisabledGlyphStyle}" />
+                                <TextBlock VerticalAlignment="Center" Text="New" />
                             </StackPanel>
                         </MenuItem.Header>
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <StackPanel Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="0,0,8,0"
+                                        FontSize="16"
+                                        Glyph="&#xECC8;" />
+                                    <TextBlock Text="New Item" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem>
+                            <MenuItem.Header>
+                                New Folder
+                            </MenuItem.Header>
+                        </MenuItem>
                     </MenuItem>
-                    <MenuItem>
+                    <MenuItem IsEnabled="False" ToolTip="Cut">
                         <MenuItem.Header>
-                            New Folder
+                            <ui:FontIcon Glyph="&#xE8C6;" />
                         </MenuItem.Header>
                     </MenuItem>
-                </MenuItem>
-                <MenuItem IsEnabled="False" ToolTip="Cut">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE8C6;" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem
-                    x:Name="CopyMenuButton"
-                    Click="CopyMenuButton_Click"
-                    IsEnabled="False"
-                    ToolTip="Copy">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE8C8;" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem
-                    x:Name="PasteMenuButton"
-                    Click="PasteMenuButton_Click"
-                    IsEnabled="False"
-                    ToolTip="Paste">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE77F;" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem IsEnabled="False" ToolTip="Rename">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE8AC;" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <MenuItem IsEnabled="False" ToolTip="Delete">
-                    <MenuItem.Header>
-                        <ui:FontIcon Glyph="&#xE74D;" />
-                    </MenuItem.Header>
-                </MenuItem>
-            </Menu>
+                    <MenuItem
+                        x:Name="CopyMenuButton"
+                        Click="CopyMenuButton_Click"
+                        IsEnabled="False"
+                        ToolTip="Copy">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE8C8;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem
+                        x:Name="PasteMenuButton"
+                        Click="PasteMenuButton_Click"
+                        IsEnabled="False"
+                        ToolTip="Paste">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE77F;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem IsEnabled="False" ToolTip="Rename">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE8AC;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem IsEnabled="False" ToolTip="Delete">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE74D;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+                <Border Grid.Column="1" MouseDown="Window_MouseDown" />
+            </Grid>
             <StackPanel
                 Margin="0,0,7,0"
                 HorizontalAlignment="Right"
@@ -685,9 +676,7 @@
                             IsReadOnly="True"
                             KeyDown="PathBox_KeyDown"
                             LostFocus="PathBox_LostFocus" />
-                        <Grid
-                            Grid.Column="1"
-                            Margin="6">
+                        <Grid Grid.Column="1" Margin="6">
                             <Grid.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -710,18 +699,22 @@
                                     FontWeight="DemiBold"
                                     MouseDown="InputLangBlock_MouseDown" />
                             </Border>-->
-                            <StackPanel x:Name="PathStackPanel"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Center"
-                                        Margin="5,0,0,0"/>
+                            <StackPanel
+                                x:Name="PathStackPanel"
+                                Margin="5,0,0,0"
+                                VerticalAlignment="Center"
+                                Orientation="Horizontal" />
                         </Grid>
                     </Grid>
                 </StackPanel>
                 <ui:ProgressBar
                     x:Name="UpperProgressBar"
                     VerticalAlignment="Bottom"
-                    Value="{Binding Progress, Mode=OneWay}"
-                    CornerRadius="0" Maximum="1" SmallChange="0.0001" LargeChange="0.001">
+                    CornerRadius="0"
+                    LargeChange="0.001"
+                    Maximum="1"
+                    SmallChange="0.0001"
+                    Value="{Binding Progress, Mode=OneWay}">
                     <ui:ProgressBar.Style>
                         <Style TargetType="ui:ProgressBar">
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -737,7 +730,8 @@
             <Border
                 x:Name="GridBackgroundBlock"
                 Grid.Row="2"
-                Background="{DynamicResource ControlBackground}">
+                Background="{DynamicResource ControlBackground}"
+                MouseDown="GridBackgroundBlock_MouseDown">
                 <Grid>
                     <ui:ItemsRepeater
                         x:Name="DrivesItemRepeater"

@@ -202,8 +202,6 @@ namespace ADB_Explorer
             PathStackPanel.Visibility = Visibility.Visible;
             PathBox.Clear();
             PathBox.IsReadOnly = true;
-            //FocusManager.SetFocusedElement(PathBox, null);
-            //Keyboard.ClearFocus();
             FileOperationsSplitView.Focus();
         }
 
@@ -275,7 +273,7 @@ namespace ADB_Explorer
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            ExplorerGrid.Focus();
+            UnfocusPathBox();
         }
 
         private void LaunchSequence()
@@ -736,7 +734,7 @@ namespace ADB_Explorer
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            ExplorerGrid.Focus();
+            UnfocusPathBox();
             SettingsSplitView.IsPaneOpen = true;
         }
 
@@ -826,7 +824,7 @@ namespace ADB_Explorer
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            ExplorerGrid.Focus();
+            UnfocusPathBox();
             CopyFiles();
         }
 
@@ -942,7 +940,7 @@ namespace ADB_Explorer
 
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
         {
-            ExplorerGrid.Focus();
+            UnfocusPathBox();
             DevicesSplitView.IsPaneOpen = true;
         }
 
@@ -1252,12 +1250,13 @@ namespace ADB_Explorer
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
+            UnfocusPathBox();
             DriveViewNav();
         }
 
         private void PasteMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            ExplorerGrid.Focus();
+            UnfocusPathBox();
             PasteFiles();
         }
 
@@ -1286,6 +1285,11 @@ namespace ADB_Explorer
         private void PathMenuEdit_Click(object sender, RoutedEventArgs e)
         {
             PathBox.Focus();
+        }
+
+        private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            UnfocusPathBox();
         }
     }
 }
