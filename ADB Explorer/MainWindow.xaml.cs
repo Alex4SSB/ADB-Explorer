@@ -1240,14 +1240,6 @@ namespace ADB_Explorer
             ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}", PairingCodeBox.Text);
         }
 
-        private void DriveItem_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is MenuItem menu && menu.DataContext is Drive drive)
-            {
-                InitNavigation(drive.Path);
-            }
-        }
-
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
@@ -1290,6 +1282,14 @@ namespace ADB_Explorer
         private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             UnfocusPathBox();
+        }
+
+        private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is MenuItem menu && menu.DataContext is Drive drive)
+            {
+                InitNavigation(drive.Path);
+            }
         }
     }
 }

@@ -356,7 +356,7 @@
         <DataTemplate x:Key="DriveItemTemplate" DataType="Drive">
             <Border Background="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}">
                 <Menu Height="60">
-                    <MenuItem Height="60" Click="DriveItem_Click">
+                    <MenuItem Height="60" MouseDoubleClick="DriveItem_MouseDoubleClick">
                         <MenuItem.Header>
                             <Grid MinWidth="256">
                                 <Grid.ColumnDefinitions>
@@ -718,10 +718,14 @@
                     <ui:ProgressBar.Style>
                         <Style TargetType="ui:ProgressBar">
                             <Setter Property="Visibility" Value="Collapsed" />
+                            <Setter Property="IsIndeterminate" Value="False" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsActive}" Value="True">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <Trigger Property="Value" Value="0">
+                                    <Setter Property="IsIndeterminate" Value="True" />
+                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </ui:ProgressBar.Style>
@@ -977,68 +981,103 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
-                            <TextBlock Text="Current" />
-                            <DataGrid
-                                x:Name="CurrentOperationDataGrid"
-                                Grid.Row="1"
-                                AutoGenerateColumns="False"
-                                CanUserDeleteRows="False"
-                                CellStyle="{StaticResource CellVerticalStyle}"
-                                FocusVisualStyle="{x:Null}"
-                                HeadersVisibility="None"
-                                ItemsSource="{Binding}">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Binding="{Binding OperationName}" />
-                                    <DataGridTemplateColumn MinWidth="100">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <ui:ProgressBar Style="{StaticResource ProgressBarStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                </DataGrid.Columns>
-                            </DataGrid>
+                            <StackPanel>
+                                <TextBlock Text="Current" />
+                                <DataGrid
+                                    x:Name="CurrentOperationDataGrid"
+                                    AutoGenerateColumns="False"
+                                    CanUserDeleteRows="False"
+                                    CellStyle="{StaticResource CellVerticalStyle}"
+                                    FocusVisualStyle="{x:Null}"
+                                    HeadersVisibility="None"
+                                    ItemsSource="{Binding}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Binding="{Binding OperationName}" />
+                                        <DataGridTemplateColumn MinWidth="100">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <ui:ProgressBar Style="{StaticResource ProgressBarStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                        <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                            </StackPanel>
                             <ScrollViewer
                                 x:Name="PendingAndCompletedScrollViewer"
                                 Grid.Row="2"
                                 HorizontalScrollBarVisibility="Auto"
                                 PreviewMouseWheel="PendingAndCompletedScrollViewer_PreviewMouseWheel">
                                 <StackPanel>
-                                    <TextBlock Text="Pending" />
-                                    <DataGrid
-                                        x:Name="PendingOperationsDataGrid"
-                                        AutoGenerateColumns="False"
-                                        CellStyle="{StaticResource CellVerticalStyle}"
-                                        FocusVisualStyle="{x:Null}"
-                                        HeadersVisibility="None"
-                                        HorizontalScrollBarVisibility="Disabled"
-                                        ItemsSource="{Binding}"
-                                        SelectionUnit="FullRow"
-                                        VerticalScrollBarVisibility="Disabled">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Binding="{Binding OperationName}" />
-                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <TextBlock Text="Completed" />
-                                    <DataGrid
-                                        x:Name="CompletedOperationsDataGrid"
-                                        Width="Auto"
-                                        AutoGenerateColumns="False"
-                                        CellStyle="{StaticResource CellVerticalStyle}"
-                                        FocusVisualStyle="{x:Null}"
-                                        HeadersVisibility="None"
-                                        HorizontalScrollBarVisibility="Disabled"
-                                        ItemsSource="{Binding}"
-                                        SelectionUnit="FullRow"
-                                        VerticalScrollBarVisibility="Disabled">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Binding="{Binding OperationName}" />
-                                            <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
-                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
+                                    <StackPanel>
+                                        <TextBlock Text="Pending" />
+                                        <DataGrid
+                                            x:Name="PendingOperationsDataGrid"
+                                            AutoGenerateColumns="False"
+                                            CellStyle="{StaticResource CellVerticalStyle}"
+                                            FocusVisualStyle="{x:Null}"
+                                            HeadersVisibility="None"
+                                            HorizontalScrollBarVisibility="Disabled"
+                                            ItemsSource="{Binding}"
+                                            SelectionUnit="FullRow"
+                                            VerticalScrollBarVisibility="Disabled">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Binding="{Binding OperationName}" />
+                                                <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=PendingOperationsDataGrid, Path=Items.Count}" Value="1">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="Completed" />
+                                        <DataGrid
+                                            x:Name="CompletedOperationsDataGrid"
+                                            Width="Auto"
+                                            AutoGenerateColumns="False"
+                                            CellStyle="{StaticResource CellVerticalStyle}"
+                                            FocusVisualStyle="{x:Null}"
+                                            HeadersVisibility="None"
+                                            HorizontalScrollBarVisibility="Disabled"
+                                            ItemsSource="{Binding}"
+                                            SelectionUnit="FullRow"
+                                            VerticalScrollBarVisibility="Disabled">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Binding="{Binding OperationName}" />
+                                                <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
+                                                <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=CompletedOperationsDataGrid, Path=Items.Count}" Value="1">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>
