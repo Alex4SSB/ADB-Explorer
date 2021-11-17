@@ -36,12 +36,19 @@ namespace ADB_Explorer
         private CancellationTokenSource determineFoldersCancelTokenSource;
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ItemsPresenter ExplorerContentPresenter;
+        private ScrollViewer ExplorerScroller;
+
         private double ColumnHeaderHeight
         {
             get
             {
                 GetExplorerContentPresenter();
-                return ExplorerContentPresenter is null ? 0 : ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight;
+                if (ExplorerContentPresenter is null)
+                    return 0;
+                
+                double height = ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight - HorizontalScrollBarHeight;
+                
+                return height;
             }
         }
         private double DataGridContentWidth
@@ -52,6 +59,8 @@ namespace ADB_Explorer
                 return ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
             }
         }
+        private double HorizontalScrollBarHeight => ExplorerScroller.ComputedHorizontalScrollBarVisibility == Visibility.Visible
+                    ? SystemParameters.HorizontalScrollBarHeight : 0;
 
         private readonly List<MenuItem> PathButtons = new();
 
@@ -73,7 +82,10 @@ namespace ADB_Explorer
         private void GetExplorerContentPresenter()
         {
             if (ExplorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
+            {
+                ExplorerScroller = scroller;
                 ExplorerContentPresenter = presenter;
+            }
         }
 
         public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
@@ -303,10 +315,14 @@ namespace ADB_Explorer
             DevicesList.ItemsSource = Devices.List;
             DevicesList.Items.Refresh();
 
+            if (Devices.Current is null || Devices.Current.IsOpen && Devices.Current.Status != DeviceClass.DeviceStatus.Online)
+                ClearDrives();
+
             if (!Devices.DevicesAvailable())
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
+                ClearDrives();
                 return;
             }
             else
@@ -370,6 +386,7 @@ namespace ADB_Explorer
             Devices.Current.SetDrives(CurrentADBDevice.GetDrives());
             DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
             DriveViewNav();
+            //var ver = CurrentADBDevice.GetAndroidVersion();
 
             if (Devices.Current.Drives.Count < 1)
             {
@@ -1073,33 +1090,38 @@ namespace ADB_Explorer
         {
             if (sender is Button button && button.DataContext is DeviceClass device)
             {
-                try
-                {
-                    if (device.Type == DeviceClass.DeviceType.Emulator)
-                    {
-                        ADBService.KillEmulator(device.ID);
-                    }
-                    else
-                    {
-                        ADBService.DisconnectNetworkDevice(device.ID);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, "Disconnection Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
-
-                if (device.IsOpen)
-                {
-                    device.SetOpen(false);
-                    CurrentADBDevice = null;
-                    ClearExplorer();
-                    ClearDrives();
-                }
-                DeviceListSetup();
-                DevicesList.Items.Refresh();
+                RemoveDevice(device);
             }
+        }
+
+        private void RemoveDevice(DeviceClass device)
+        {
+            try
+            {
+                if (device.Type == DeviceClass.DeviceType.Emulator)
+                {
+                    ADBService.KillEmulator(device.ID);
+                }
+                else
+                {
+                    ADBService.DisconnectNetworkDevice(device.ID);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Disconnection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (device.IsOpen)
+            {
+                ClearDrives();
+                ClearExplorer();
+                device.SetOpen(false);
+                CurrentADBDevice = null;
+            }
+            DeviceListSetup();
+            DevicesList.Items.Refresh();
         }
 
         private void ClearExplorer()
@@ -1121,9 +1143,10 @@ namespace ADB_Explorer
             ParentButton.IsEnabled = false;
         }
 
-        private static void ClearDrives()
+        private void ClearDrives()
         {
             Devices.Current?.Drives.Clear();
+            DrivesItemRepeater.ItemsSource = null;
         }
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

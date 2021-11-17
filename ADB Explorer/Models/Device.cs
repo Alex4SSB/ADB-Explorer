@@ -47,7 +47,7 @@ namespace ADB_Explorer.Models
         private static IEnumerable<DeviceClass> AvailableDevices(bool current = false)
         {
             return List.Where(device => (!current || device.IsOpen)
-                && device.Type is DeviceClass.DeviceType.Local or DeviceClass.DeviceType.Remote);
+                && device.Status is DeviceClass.DeviceStatus.Online);
         }
 
         public static bool DevicesAvailable(bool current = false) => AvailableDevices(current).Any();
@@ -99,7 +99,17 @@ namespace ADB_Explorer.Models
             Unauthorized
         }
 
-        public string Name { get; private set; }
+        private string name;
+        public string Name { 
+            get
+            {
+                return Type == DeviceType.Emulator ? ID : name;
+            }
+            private set
+            {
+                name = value;
+            }
+        }
         public string ID { get; private set; }
         public DeviceType Type { get; private set; }
         public DeviceStatus Status { get; private set; }
@@ -126,15 +136,18 @@ namespace ADB_Explorer.Models
             {
                 drives = value;
                 
-                var mmcTask = Task.Run(() => { return GetMmcDrive(); });
-                mmcTask.ContinueWith((t) =>
+                if (drives is not null)
                 {
-                    App.Current.Dispatcher.BeginInvoke(() =>
+                    var mmcTask = Task.Run(() => { return GetMmcDrive(); });
+                    mmcTask.ContinueWith((t) =>
                     {
-                        t.Result?.SetMmc();
-                        SetExternalDrives();
+                        App.Current.Dispatcher.BeginInvoke(() =>
+                        {
+                            t.Result?.SetMmc();
+                            SetExternalDrives();
+                        });
                     });
-                });
+                }
 
                 NotifyPropertyChanged();
             }

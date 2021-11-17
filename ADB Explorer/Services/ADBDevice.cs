@@ -10,7 +10,8 @@ namespace ADB_Explorer.Services
 {
     public partial class ADBService
     {
-        //private const string GET_PROP = "getprop";
+        private const string GET_PROP = "getprop";
+        private const string ANDROID_VERSION = "ro.build.version.release";
         //private const string PRODUCT_MODEL = "ro.product.model";
         //private const string HOST_NAME = "net.hostname";
         //private const string VENDOR = "ro.vendor.config.CID";
@@ -264,24 +265,33 @@ namespace ADB_Explorer.Services
                 return drives;
             }
 
-            //private Dictionary<string, string> props { get; set; }
-            //public Dictionary<string, string> Props
-            //{
-            //    get
-            //    {
-            //        if (props is null)
-            //        {
-            //            int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, GET_PROP, out string stdout, out string stderr);
-            //            if (exitCode == 0)
-            //            {
-            //                props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).ToDictionary(
-            //                line => line.Split(':')[0].Trim('[', ']', ' '),
-            //                line => line.Split(':')[1].Trim('[', ']', ' '));
-            //            }
-            //        }
-            //        return props;
-            //    }
-            //}
+            private Dictionary<string, string> props;
+            public Dictionary<string, string> Props
+            {
+                get
+                {
+                    if (props is null)
+                    {
+                        int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, GET_PROP, out string stdout, out string stderr);
+                        if (exitCode == 0)
+                        {
+                            props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(
+                                l => l[0] == '[' && l[^1] == ']').ToDictionary(
+                                    line => line.Split(':')[0].Trim('[', ']', ' '),
+                                    line => line.Split(':')[1].Trim('[', ']', ' '));
+                        }
+                    }
+                    return props;
+                }
+            }
+
+            public string GetAndroidVersion()
+            {
+                if (Props.ContainsKey(ANDROID_VERSION))
+                    return Props[ANDROID_VERSION];
+                else
+                    return "";
+            }
         }
     }
 }
