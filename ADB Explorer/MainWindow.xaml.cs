@@ -144,9 +144,15 @@ namespace ADB_Explorer
             if (sender.ContextMenu is null)
                 return;
 
+            MenuItem headerMenu = FindResource("PathMenuHeader") as MenuItem;
             MenuItem editMenu = FindResource("PathMenuEdit") as MenuItem;
+            MenuItem copyMenu = FindResource("PathMenuCopy") as MenuItem;
             sender.ContextMenu.Items.Clear();
+
+            sender.ContextMenu.Items.Add(headerMenu);
+            sender.ContextMenu.Items.Add(new Separator());
             sender.ContextMenu.Items.Add(editMenu);
+            sender.ContextMenu.Items.Add(copyMenu);
 
             sender.ContextMenu.Visibility = Visible(sender.ContextMenu.HasItems);
         }
@@ -1290,6 +1296,12 @@ namespace ADB_Explorer
             {
                 InitNavigation(drive.Path);
             }
+        }
+
+        private void PathMenuCopy_Click(object sender, RoutedEventArgs e)
+        {
+            object tag = PathBox.Tag;
+            Clipboard.SetText(tag is null ? "" : (string)tag);
         }
     }
 }
