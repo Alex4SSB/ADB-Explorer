@@ -36,5 +36,7 @@ namespace ADB_Explorer.Models
         public static readonly TimeSpan SYNC_PROG_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(100);
         public static readonly TimeSpan CONNECT_TIMER_INTERVAL = TimeSpan.FromMilliseconds(2000);
         public static readonly TimeSpan DRIVE_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(2000);
+
+        public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
     }
 }

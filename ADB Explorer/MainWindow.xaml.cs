@@ -8,6 +8,7 @@ using ModernWpf.Controls;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -386,7 +387,7 @@ namespace ADB_Explorer
             Devices.Current.SetDrives(CurrentADBDevice.GetDrives());
             DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
             DriveViewNav();
-            //var ver = CurrentADBDevice.GetAndroidVersion();
+            UpdateAndroidVersion();
 
             if (Devices.Current.Drives.Count < 1)
             {
@@ -400,11 +401,21 @@ namespace ADB_Explorer
             ClearExplorer();
             ExplorerGrid.Visibility = Visibility.Collapsed;
             DrivesItemRepeater.Visibility = Visibility.Visible;
-
             PathBox.IsEnabled = true;
+
             MenuItem button = CreatePathButton("", Devices.Current.Name);
             button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
             AddPathButton(button);
+        }
+
+        private void UpdateAndroidVersion()
+        {
+            string androidVer = CurrentADBDevice.GetAndroidVersion();
+            AndroidVersionBlock.Text = $"Android {androidVer}";
+
+            sbyte ver = 0;
+            sbyte.TryParse(androidVer.Split('.')[0], out ver);
+            UnsupportedAndroidIcon.Visibility = Visible(ver < MIN_SUPPORTED_ANDROID_VER);
         }
 
         private static void CombinePrettyNames()
@@ -622,7 +633,7 @@ namespace ADB_Explorer
             {
                 pathItems.Add(dir);
                 var dirPath = string.Join('/', pathItems).Replace("//", "/");
-                MenuItem button = CreatePathButton(dirPath, dir.Replace("_", "__"));
+                MenuItem button = CreatePathButton(dirPath, dir);
                 tempButtons.Add(button);
                 expectedLength += PathButtonLength.ButtonLength(button);
             }
