@@ -1339,5 +1339,21 @@ namespace ADB_Explorer
             object tag = PathBox.Tag;
             Clipboard.SetText(tag is null ? "" : (string)tag);
         }
+
+        private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if ((FileOperationsSplitView.OpenPaneLength > Width * MAX_PANE_WIDTH_RATIO && e.HorizontalChange < 0)
+                || (e.HorizontalChange > 0 && FileOperationsSplitView.OpenPaneLength < MIN_PANE_WIDTH))
+                return;
+
+            FileOperationsSplitView.OpenPaneLength -= e.HorizontalChange;
+
+            FileOperationsCollapseMenu.Visibility = Visible(FileOperationsSplitView.OpenPaneLength > MIN_PANE_WIDTH_FOR_COLLAPSE);
+        }
+
+        private void GridSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            FileOperationsSplitView.OpenPaneLength = Width * MAX_PANE_WIDTH_RATIO;
+        }
     }
 }

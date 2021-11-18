@@ -273,12 +273,7 @@ namespace ADB_Explorer.Services
                 {
                     if (props is null)
                     {
-                        //Stopwatch sw = new();
-                        //sw.Start();
                         int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, GET_PROP, out string stdout, out string stderr);
-                        //sw.Stop();
-                        //Trace.WriteLine($"getprop: {sw.Elapsed}");
-                        //sw.Restart();
                         if (exitCode == 0)
                         {
                             props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(
@@ -286,8 +281,6 @@ namespace ADB_Explorer.Services
                                     line => line.Split(':')[0].Trim('[', ']', ' '),
                                     line => line.Split(':')[1].Trim('[', ']', ' '));
                         }
-                        //sw.Stop();
-                        //Trace.WriteLine($"to dictionary: {sw.Elapsed}");
                     }
                     return props;
                 }
@@ -299,17 +292,6 @@ namespace ADB_Explorer.Services
                     return Props[ANDROID_VERSION];
                 else
                     return "";
-            }
-
-            public string GetAndroidVersion(bool grep)
-            {
-                
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, GET_PROP, out string stdout, out string stderr, "|", "grep", ANDROID_VERSION);
-
-                if (exitCode != 0)
-                    return "";
-
-                return stdout.Split(':')[1].Trim('[', ']', ' ');
             }
         }
     }

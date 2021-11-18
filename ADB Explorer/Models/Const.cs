@@ -38,5 +38,8 @@ namespace ADB_Explorer.Models
         public static readonly TimeSpan DRIVE_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(2000);
 
         public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
+        public static readonly double MAX_PANE_WIDTH_RATIO = 0.9;
+        public static readonly int MIN_PANE_WIDTH = 200;
+        public static readonly int MIN_PANE_WIDTH_FOR_COLLAPSE = 260;
     }
 }
