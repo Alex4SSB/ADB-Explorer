@@ -687,6 +687,15 @@
                                 </MenuItem.Header>
                             </MenuItem>
                         </Menu>
+                        <ui:ProgressBar
+                            x:Name="DirectoryLoadingProgressBar"
+                            Grid.Column="1"
+                            Margin="6"
+                            VerticalAlignment="Stretch"
+                            Background="Transparent"
+                            CornerRadius="2"
+                            IsIndeterminate="True"
+                            Visibility="Collapsed" />
                         <TextBox
                             x:Name="PathBox"
                             Grid.Column="1"

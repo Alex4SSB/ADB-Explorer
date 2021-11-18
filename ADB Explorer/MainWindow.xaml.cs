@@ -491,6 +491,7 @@ namespace ADB_Explorer
                 }
                 else
                 {
+                    DirectoryLoadingProgressBar.Visibility =
                     UnfinishedBlock.Visibility = Visibility.Visible;
 
                     UpdateDirectoryList();
@@ -522,6 +523,7 @@ namespace ADB_Explorer
             if (listDirTask is null) return;
 
             Cursor = null;
+            DirectoryLoadingProgressBar.Visibility =
             UnfinishedBlock.Visibility = Visibility.Collapsed;
 
             dirListUpdateTimer.Stop();
