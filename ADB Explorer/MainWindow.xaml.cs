@@ -8,6 +8,7 @@ using ModernWpf.Controls;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -378,6 +379,61 @@ namespace ADB_Explorer
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
+
+            InitColumnConfig();
+        }
+
+        private void InitColumnConfig()
+        {
+            ColumnSettings.ColumnList = new()
+            {
+                "[remove]",
+                "Direction",
+                "Progress",
+                "File Name",
+                "Status",
+            };
+
+            ColumnConfig current = new()
+            {
+                Title = "Current Operation",
+                Items = new()
+                {
+                    new(selected: "Direction"),
+                    new(selected: "Progress"),
+                    new(selected: "File Name"),
+                    new()
+                }
+            };
+
+            ColumnConfig pending = new()
+            {
+                Title = "Pending Operations",
+                Items = new()
+                {
+                    new(selected: "Direction"),
+                    new(selected: "File Name"),
+                    new()
+                }
+            };
+
+            ColumnConfig completed = new()
+            {
+                Title = "Completed Operations",
+                Items = new()
+                {
+                    new(selected: "Direction"),
+                    new(selected: "Status"),
+                    new(selected: "File Name"),
+                    new()
+                }
+            };
+
+            ColumnSettings.Configs.Add(current);
+            ColumnSettings.Configs.Add(pending);
+            ColumnSettings.Configs.Add(completed);
+
+            FileOpSettingsTree.ItemsSource = ColumnSettings.Configs;
         }
 
         private void InitDevice()
@@ -1294,7 +1350,7 @@ namespace ADB_Explorer
             PasteFiles();
         }
 
-        private void PendingAndCompletedScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (sender is ScrollViewer sv)
             {
@@ -1355,5 +1411,6 @@ namespace ADB_Explorer
         {
             FileOperationsSplitView.OpenPaneLength = Width * MAX_PANE_WIDTH_RATIO;
         }
+
     }
 }

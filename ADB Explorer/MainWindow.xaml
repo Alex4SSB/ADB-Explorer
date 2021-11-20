@@ -125,7 +125,7 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
-        <Style x:Key="CellVerticalStyle" TargetType="{x:Type DataGridCell}">
+        <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type DataGridCell}">
@@ -452,6 +452,45 @@
                 </Menu>
             </Border>
         </DataTemplate>
+        <HierarchicalDataTemplate
+            x:Key="FileOpSettingsTreeTemplate"
+            DataType="ColumnConfig"
+            ItemsSource="{Binding Items}">
+            <Grid Width="200">
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <ComboBox
+                        HorizontalAlignment="Stretch"
+                        ItemsSource="{Binding ColumnList}"
+                        SelectedItem="{Binding Selected}" />
+                </Grid>
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontWeight="Bold"
+                        Text="{Binding Title}" />
+                </Grid>
+            </Grid>
+        </HierarchicalDataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo
@@ -785,7 +824,7 @@
                         AutoGenerateColumns="False"
                         Background="Transparent"
                         CanUserResizeRows="False"
-                        CellStyle="{StaticResource CellVerticalStyle}"
+                        CellStyle="{StaticResource DataGridCellStyle}"
                         ContextMenu="{StaticResource RowContextMenu}"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
@@ -1011,9 +1050,9 @@
                         <GridSplitter
                             Width="3"
                             HorizontalAlignment="Left"
-                            MouseDoubleClick="GridSplitter_MouseDoubleClick"
                             VerticalAlignment="Stretch"
-                            DragDelta="GridSplitter_DragDelta" />
+                            DragDelta="GridSplitter_DragDelta"
+                            MouseDoubleClick="GridSplitter_MouseDoubleClick" />
                         <Grid Margin="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="48" />
@@ -1042,7 +1081,7 @@
                                         x:Name="CurrentOperationDataGrid"
                                         AutoGenerateColumns="False"
                                         CanUserDeleteRows="False"
-                                        CellStyle="{StaticResource CellVerticalStyle}"
+                                        CellStyle="{StaticResource DataGridCellStyle}"
                                         FocusVisualStyle="{x:Null}"
                                         HeadersVisibility="None"
                                         ItemsSource="{Binding}">
@@ -1073,14 +1112,14 @@
                                     x:Name="PendingAndCompletedScrollViewer"
                                     Grid.Row="2"
                                     HorizontalScrollBarVisibility="Auto"
-                                    PreviewMouseWheel="PendingAndCompletedScrollViewer_PreviewMouseWheel">
+                                    PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                                     <StackPanel>
                                         <StackPanel>
                                             <TextBlock Text="Pending" />
                                             <DataGrid
                                                 x:Name="PendingOperationsDataGrid"
                                                 AutoGenerateColumns="False"
-                                                CellStyle="{StaticResource CellVerticalStyle}"
+                                                CellStyle="{StaticResource DataGridCellStyle}"
                                                 FocusVisualStyle="{x:Null}"
                                                 HeadersVisibility="None"
                                                 HorizontalScrollBarVisibility="Disabled"
@@ -1109,7 +1148,7 @@
                                                 x:Name="CompletedOperationsDataGrid"
                                                 Width="Auto"
                                                 AutoGenerateColumns="False"
-                                                CellStyle="{StaticResource CellVerticalStyle}"
+                                                CellStyle="{StaticResource DataGridCellStyle}"
                                                 FocusVisualStyle="{x:Null}"
                                                 HeadersVisibility="None"
                                                 HorizontalScrollBarVisibility="Disabled"
@@ -1296,7 +1335,7 @@
                             HorizontalAlignment="Center"
                             FontSize="24"
                             Text="Settings" />
-                        <ScrollViewer Grid.Row="1">
+                        <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                             <StackPanel HorizontalAlignment="Left">
                                 <TextBlock Text="Theme" />
                                 <StackPanel Margin="0,6,0,15">
@@ -1355,6 +1394,11 @@
                                         x:Name="AutoOpenCheckBox"
                                         Click="AutoOpenCheckBox_Click"
                                         Content="Automatically Open for Browsing" />
+                                </StackPanel>
+                                <Separator />
+                                <TextBlock Text="File Operations" />
+                                <StackPanel Margin="0,6,0,15">
+                                    <TreeView x:Name="FileOpSettingsTree" ItemTemplate="{StaticResource FileOpSettingsTreeTemplate}" />
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
