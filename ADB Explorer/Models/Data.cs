@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using ADB_Explorer.Helpers;
 using System;
+using System.Collections.ObjectModel;
 
 namespace ADB_Explorer.Models
 {
@@ -20,5 +21,7 @@ namespace ADB_Explorer.Models
         public static FileOperationQueue fileOperationQueue;
 
         public static Dictionary<string, string> CurrentPrettyNames = new();
+
+        public static ObservableCollection<ColumnConfig> ColumnConfigs = new();
     }
 }

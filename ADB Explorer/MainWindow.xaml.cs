@@ -385,55 +385,53 @@ namespace ADB_Explorer
 
         private void InitColumnConfig()
         {
-            ColumnSettings.ColumnList = new()
+            foreach (var type in (ColumnType[]) Enum.GetValues(typeof(ColumnType)))
             {
-                "[remove]",
-                "Direction",
-                "Progress",
-                "File Name",
-                "Status",
-            };
+                var possibleColumns = POSSIBLE_COLUMNS.Where(c => c.IsType(type)).Select(c => c.Name).ToList();
+                List<string> requestedColumns = new();
+                if (Storage.RetrieveValue(type) is List<string> cols)
+                    requestedColumns.AddRange(cols);
 
-            ColumnConfig current = new()
-            {
-                Title = "Current Operation",
-                Items = new()
+                var configs = requestedColumns?.Select(item => new ColumnConfig(selected: item, columnList: possibleColumns)).ToList();
+                configs.Add(new(columnList: possibleColumns, isExisting: false));
+
+                ColumnConfig columns = new()
                 {
-                    new(selected: "Direction"),
-                    new(selected: "Progress"),
-                    new(selected: "File Name"),
-                    new()
-                }
-            };
+                    Title = $"{type} Operation{(type is ColumnType.Current ? "" : "s")}",
+                    Items = configs
+                };
+                ColumnConfigs.Add(columns);
+            }
+            
 
-            ColumnConfig pending = new()
-            {
-                Title = "Pending Operations",
-                Items = new()
-                {
-                    new(selected: "Direction"),
-                    new(selected: "File Name"),
-                    new()
-                }
-            };
+            //ColumnConfig pending = new()
+            //{
+            //    Title = "Pending Operations",
+            //    Items = new()
+            //    {
+            //        new(selected: "Direction"),
+            //        new(selected: "File Name"),
+            //        new()
+            //    }
+            //};
 
-            ColumnConfig completed = new()
-            {
-                Title = "Completed Operations",
-                Items = new()
-                {
-                    new(selected: "Direction"),
-                    new(selected: "Status"),
-                    new(selected: "File Name"),
-                    new()
-                }
-            };
+            //ColumnConfig completed = new()
+            //{
+            //    Title = "Completed Operations",
+            //    Items = new()
+            //    {
+            //        new(selected: "Direction"),
+            //        new(selected: "Status"),
+            //        new(selected: "File Name"),
+            //        new()
+            //    }
+            //};
 
-            ColumnSettings.Configs.Add(current);
-            ColumnSettings.Configs.Add(pending);
-            ColumnSettings.Configs.Add(completed);
+            //ColumnSettings.Configs.Add(current);
+            //ColumnSettings.Configs.Add(pending);
+            //ColumnSettings.Configs.Add(completed);
 
-            FileOpSettingsTree.ItemsSource = ColumnSettings.Configs;
+            FileOpSettingsTree.ItemsSource = ColumnConfigs;
         }
 
         private void InitDevice()

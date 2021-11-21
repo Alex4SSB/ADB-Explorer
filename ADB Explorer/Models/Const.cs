@@ -41,5 +41,13 @@ namespace ADB_Explorer.Models
         public static readonly double MAX_PANE_WIDTH_RATIO = 0.9;
         public static readonly int MIN_PANE_WIDTH = 200;
         public static readonly int MIN_PANE_WIDTH_FOR_COLLAPSE = 260;
+
+        public static readonly List<FileOpColumn> POSSIBLE_COLUMNS = new()
+        {
+            new("Direction"),
+            new("Progress"),
+            new("File Name"),
+            new("Status"),
+        };
     }
 }

@@ -5,11 +5,11 @@ namespace ADB_Explorer.Services
 {
     public static class Storage
     {
-        public static string RetrieveValue(Enum key) => RetrieveValue(key.ToString());
+        public static object RetrieveValue(Enum key) => RetrieveValue(key.ToString());
 
-        public static string RetrieveValue(string key)
+        public static object RetrieveValue(string key)
         {
-            return (string)Application.Current.Properties[key];
+            return Application.Current.Properties[key];
         }
 
         public static void StoreValue(Enum key, object value) => StoreValue(key.ToString(), value);
