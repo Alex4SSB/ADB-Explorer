@@ -393,7 +393,7 @@ namespace ADB_Explorer
                     requestedColumns.AddRange(cols);
 
                 var configs = requestedColumns?.Select(item => new ColumnConfig(selected: item, columnList: possibleColumns)).ToList();
-                configs.Add(new(columnList: possibleColumns, isExisting: false));
+                configs.Add(new(selected: "[Add]",columnList: possibleColumns, isExisting: false));
 
                 ColumnConfig columns = new()
                 {
@@ -402,34 +402,6 @@ namespace ADB_Explorer
                 };
                 ColumnConfigs.Add(columns);
             }
-            
-
-            //ColumnConfig pending = new()
-            //{
-            //    Title = "Pending Operations",
-            //    Items = new()
-            //    {
-            //        new(selected: "Direction"),
-            //        new(selected: "File Name"),
-            //        new()
-            //    }
-            //};
-
-            //ColumnConfig completed = new()
-            //{
-            //    Title = "Completed Operations",
-            //    Items = new()
-            //    {
-            //        new(selected: "Direction"),
-            //        new(selected: "Status"),
-            //        new(selected: "File Name"),
-            //        new()
-            //    }
-            //};
-
-            //ColumnSettings.Configs.Add(current);
-            //ColumnSettings.Configs.Add(pending);
-            //ColumnSettings.Configs.Add(completed);
 
             FileOpSettingsTree.ItemsSource = ColumnConfigs;
         }

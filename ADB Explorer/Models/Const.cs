@@ -48,6 +48,17 @@ namespace ADB_Explorer.Models
             new("Progress"),
             new("File Name"),
             new("Status"),
+            new("Target Path"),
+            // AdbSyncProgressInfo
+            new("Current File", ColumnType.Current), // CurrentFile
+            new("Total Percentage", ColumnType.Current), // TotalPercentage
+            new("Current File Progress", ColumnType.Current), // CurrentFilePercentage \ CurrentFileBytesTransferred
+            // AdbSyncStatsInfo
+            new("Files Transferred", ColumnType.Completed), //FilesTransferred
+            new("Files Skipped", ColumnType.Completed), // FilesSkipped
+            new("Average Rate", ColumnType.Completed), // AverageRate
+            new("Total Transferred", ColumnType.Completed), // TotalBytes
+            new("Total Time", ColumnType.Completed), //TotalTime
         };
     }
 }

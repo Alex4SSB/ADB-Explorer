@@ -56,7 +56,7 @@ namespace ADB_Explorer.Services
             public class AdbSyncStatsInfo
             {
                 public string TargetPath { get; set; }
-                public UInt64 FilesPulled { get; set; }
+                public UInt64 FilesTransferred { get; set; }
                 public UInt64 FilesSkipped { get; set; }
                 public decimal? AverageRate { get; set; }
                 public UInt64? TotalBytes { get; set; }
@@ -206,7 +206,7 @@ namespace ADB_Explorer.Services
                 }
 
                 var path = match.Groups["TargetPath"].Value;
-                UInt64 totalPulled = UInt64.Parse(match.Groups["TotalPulled"].Value);
+                UInt64 totalTransferred = UInt64.Parse(match.Groups["TotalTransferred"].Value);
                 UInt64 totalSkipped = UInt64.Parse(match.Groups["TotalSkipped"].Value);
                 decimal? avrageRate = match.Groups["AverageRate"].Success ? decimal.Parse(match.Groups["AverageRate"].Value) : null;
                 UInt64? totalBytes = match.Groups["TotalBytes"].Success ? UInt64.Parse(match.Groups["TotalBytes"].Value) : null;
@@ -215,7 +215,7 @@ namespace ADB_Explorer.Services
                 return new AdbSyncStatsInfo
                 {
                     TargetPath = path,
-                    FilesPulled = totalPulled,
+                    FilesTransferred = totalTransferred,
                     FilesSkipped = totalSkipped,
                     AverageRate = avrageRate,
                     TotalBytes = totalBytes,
