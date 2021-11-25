@@ -375,13 +375,21 @@
                 </ui:FontIcon.Style>
             </ui:FontIcon>
         </DataTemplate>
+        <DataTemplate x:Key="FileOpProgressTemplate">
+            <StackPanel>
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource ProgressBarStyle}" TargetType="ui:ProgressBar">
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                </StackPanel.Resources>
+                <ui:ProgressBar Value="{Binding StatusInfo.TotalPercentage}" />
+                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage}" />
+            </StackPanel>
+        </DataTemplate>
         <DataTemplate x:Key="OperationIconTemplate">
-            <Grid>
-                <ui:FontIcon
-                    Margin="-2,0,0,0"
-                    HorizontalAlignment="Left"
-                    Glyph="&#xE8EA;" />
-                <ui:FontIcon Margin="12,0,0,0" FontSize="14">
+            <Grid Margin="0,0,6,0">
+                <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                <ui:FontIcon Margin="14,0,0,0" FontSize="14">
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                             <Style.Triggers>
@@ -396,6 +404,12 @@
                     </ui:FontIcon.Style>
                 </ui:FontIcon>
             </Grid>
+        </DataTemplate>
+        <DataTemplate x:Key="AverageRateCompletedTemplate">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding StatusInfo.AverageRate}" />
+                <TextBlock Text="MB/s" />
+            </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="DriveItemTemplate" DataType="Drive">
             <Border Background="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}">
@@ -1109,13 +1123,7 @@
                                         HeadersVisibility="None"
                                         ItemsSource="{Binding}">
                                         <DataGrid.Columns>
-                                            <DataGridTemplateColumn MinWidth="100">
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <ui:ProgressBar Style="{StaticResource ProgressBarStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
+                                            <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
                                             <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
                                             <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                         </DataGrid.Columns>
@@ -1181,6 +1189,7 @@
                                                 <DataGrid.Columns>
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
+                                                    <DataGridTemplateColumn CellTemplate="{StaticResource AverageRateCompletedTemplate}" />
                                                     <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
