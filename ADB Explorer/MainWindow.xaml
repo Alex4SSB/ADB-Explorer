@@ -330,10 +330,17 @@
                                                 </Style>
                                             </Grid.Style>
                                             <Button x:Name="DisconnectDeviceButton" Click="DisconnectDeviceButton_Click">
-                                                <Grid>
-                                                    <TextBlock Text="Remove" Visibility="Hidden" />
-                                                    <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
-                                                </Grid>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <ui:FontIcon
+                                                        Margin="-4,1,4,-2"
+                                                        VerticalAlignment="Center"
+                                                        Glyph="&#xECC9;"
+                                                        Style="{DynamicResource DisabledGlyphStyle}" />
+                                                    <Grid>
+                                                        <TextBlock Text="Remove" Visibility="Hidden" />
+                                                        <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
+                                                    </Grid>
+                                                </StackPanel>
                                             </Button>
                                         </Grid>
                                     </StackPanel>
@@ -412,82 +419,76 @@
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="DriveItemTemplate" DataType="Drive">
-            <Border Background="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}">
-                <Menu Height="60">
-                    <MenuItem Height="60" MouseDoubleClick="DriveItem_MouseDoubleClick">
-                        <MenuItem.Header>
-                            <Grid MinWidth="256">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <ui:FontIcon
-                                    Margin="0,0,8,0"
-                                    FontSize="32"
-                                    Glyph="{Binding DriveIcon}">
-                                    <ui:FontIcon.Style>
-                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Type}" Value="Unknown">
-                                                    <Setter Property="Visibility" Value="Hidden" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:FontIcon.Style>
-                                </ui:FontIcon>
-                                <StackPanel Grid.Column="1">
-                                    <StackPanel Orientation="Horizontal">
-                                        <StackPanel.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="FontWeight" Value="SemiBold" />
-                                            </Style>
-                                        </StackPanel.Resources>
-                                        <TextBlock Text="{Binding PrettyName}" />
-                                        <StackPanel Orientation="Horizontal">
-                                            <StackPanel.Style>
-                                                <Style TargetType="StackPanel">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Type}" Value="External">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Type}" Value="Emulated">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </StackPanel.Style>
-                                            <TextBlock Text=" (" />
-                                            <TextBlock
-                                                VerticalAlignment="Center"
-                                                FontFamily="Consolas"
-                                                Text="{Binding ID}" />
-                                            <TextBlock Text=")" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                    <StackPanel>
-                                        <StackPanel.Style>
-                                            <Style TargetType="StackPanel">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding UsageP}" Value="-1">
-                                                        <Setter Property="Visibility" Value="Hidden" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </StackPanel.Style>
-                                        <ui:ProgressBar Margin="0,6" Value="{Binding UsageP, Mode=OneWay}" />
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding Available, Mode=OneWay}" />
-                                            <TextBlock Text=" free of " />
-                                            <TextBlock Text="{Binding Size, Mode=OneWay}" />
-                                        </StackPanel>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </MenuItem.Header>
-                    </MenuItem>
-                </Menu>
-            </Border>
+            <ui:ListViewItem MouseDoubleClick="DriveItem_MouseDoubleClick">
+                <Grid MinWidth="256">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon
+                        Margin="0,0,8,0"
+                        FontSize="32"
+                        Glyph="{Binding DriveIcon}">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="Unknown">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <StackPanel Grid.Column="1">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <TextBlock Text="{Binding PrettyName}" />
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="External">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Emulated">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text=" (" />
+                                <TextBlock
+                                    VerticalAlignment="Center"
+                                    FontFamily="Consolas"
+                                    Text="{Binding ID}" />
+                                <TextBlock Text=")" />
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel>
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                            <Setter Property="Visibility" Value="Hidden" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <ui:ProgressBar Margin="0,6" Value="{Binding UsageP, Mode=OneWay}" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Available, Mode=OneWay}" />
+                                <TextBlock Text=" free of " />
+                                <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </ui:ListViewItem>
         </DataTemplate>
         <HierarchicalDataTemplate
             x:Key="FileOpSettingsTreeTemplate"
@@ -618,12 +619,35 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="PasteMenuButton"
-                        Click="PasteMenuButton_Click"
                         IsEnabled="False"
                         ToolTip="Paste">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE77F;" />
                         </MenuItem.Header>
+                        <MenuItem x:Name="PasteFilesMenu" Click="PasteMenuButton_Click">
+                            <MenuItem.Header>
+                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="0,0,8,0"
+                                        FontSize="20"
+                                        Glyph="&#xE8A5;"
+                                        Style="{StaticResource DisabledGlyphStyle}" />
+                                    <TextBlock VerticalAlignment="Center" Text="Files" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem x:Name="PasteFoldersMenu" Click="PasteMenuButton_Click">
+                            <MenuItem.Header>
+                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="0,0,8,0"
+                                        FontSize="20"
+                                        Glyph="&#xE8B7;"
+                                        Style="{StaticResource DisabledGlyphStyle}" />
+                                    <TextBlock VerticalAlignment="Center" Text="Folders" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
                     </MenuItem>
                     <MenuItem IsEnabled="False" ToolTip="Rename">
                         <MenuItem.Header>

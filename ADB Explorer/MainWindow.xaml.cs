@@ -921,12 +921,14 @@ namespace ADB_Explorer
             }
         }
 
-        private void PasteFiles()
+        private void PasteFiles(bool isFolderPicker)
         {
             var dialog = new CommonOpenFileDialog()
             {
+                IsFolderPicker = isFolderPicker,
+                Multiselect = true,
                 DefaultDirectory = DefaultFolderBlock.Text,
-                Title = "Select files to copy"
+                Title = $"Select {(isFolderPicker ? "folder" : "file")}s to copy"
             };
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -1317,7 +1319,7 @@ namespace ADB_Explorer
         private void PasteMenuButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
-            PasteFiles();
+            PasteFiles(((MenuItem)sender).Name == nameof(PasteFoldersMenu));
         }
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1354,7 +1356,7 @@ namespace ADB_Explorer
 
         private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is MenuItem menu && menu.DataContext is Drive drive)
+            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is Drive drive)
             {
                 InitNavigation(drive.Path);
             }
