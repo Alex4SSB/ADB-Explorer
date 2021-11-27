@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -446,9 +447,9 @@ namespace ADB_Explorer
 
         private static void CombinePrettyNames()
         {
-            foreach (var drive in Devices.Current.Drives.Where(d => d.Type != DriveType.Root))
+            foreach (var drive in Devices.Current.Drives.Where(d => d.Type != Models.DriveType.Root))
             {
-                CurrentPrettyNames.TryAdd(drive.Path, drive.Type == DriveType.External
+                CurrentPrettyNames.TryAdd(drive.Path, drive.Type == Models.DriveType.External
                     ? drive.ID : drive.PrettyName);
             }
             foreach (var item in SPECIAL_FOLDERS_PRETTY_NAMES)
@@ -913,6 +914,19 @@ namespace ADB_Explorer
                     return;
 
                 path = dialog.FileName;
+            }
+
+            if (!Directory.Exists(path))
+            {
+                try
+                {
+                    Directory.CreateDirectory(path);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, "Destination Path Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
             }
 
             foreach (FileClass item in ExplorerGrid.SelectedItems)
