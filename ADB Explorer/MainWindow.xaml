@@ -944,14 +944,15 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
-                                        <Style.Triggers>
+                                        <Setter Property="Text" Value="{Binding TypeName}" />
+                                        <!--<Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Text" Value="{Binding Type}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Type}" Value="Folder">
                                                 <Setter Property="Text" Value="{Binding Type}" />
                                             </DataTrigger>
-                                        </Style.Triggers>
+                                        </Style.Triggers>-->
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>

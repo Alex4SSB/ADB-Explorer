@@ -4,14 +4,15 @@ using System.Runtime.InteropServices;
 
 namespace ADB_Explorer.Helpers
 {
-    public static class ShellIconManager
+    public static class ShellInfoManager
     {
-        private const uint SHGFI_ICON = 0x100;
         private const uint SHGFI_LARGEICON = 0x0;
         private const uint SHGFI_SMALLICON = 0x1;
         private const uint SHGFI_USEFILEATTRIBUTES = 0x10;
-        private const uint SHGFI_LINKOVERLAY = 0x8000;
         private const uint FILE_ATTRIBUTE_NORMAL = 0x80;
+        private const uint SHGFI_ICON = 0x100;
+        private const uint SHGFI_TYPENAME = 0x400;
+        private const uint SHGFI_LINKOVERLAY = 0x8000;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct SHFILEINFO
@@ -84,5 +85,20 @@ namespace ADB_Explorer.Helpers
 
         [DllImport("shell32", CharSet = CharSet.Unicode)]
         private static extern int ExtractIconEx(string lpszFile, int nIconIndex, IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons);
+
+        public static string GetShellFileType(string fileName)
+        {
+            var shinfo = new SHFILEINFO();
+            const uint flags = SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES;
+
+            if (SHGetFileInfo(fileName,
+                              FILE_ATTRIBUTE_NORMAL,
+                              ref shinfo,
+                              (uint)Marshal.SizeOf(shinfo),
+                              flags) == IntPtr.Zero)
+                return "File";
+
+            return shinfo.szTypeName;
+        }
     }
 }

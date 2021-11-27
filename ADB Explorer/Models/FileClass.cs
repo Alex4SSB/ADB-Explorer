@@ -13,12 +13,13 @@ namespace ADB_Explorer.Models
 {
     public class FileClass : FileStat
     {
-        private const ShellIconManager.IconSize iconSize = ShellIconManager.IconSize.Small;
+        private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
 
         public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null) :
             base(fileName, path, type, isLink, size, modifiedTime)
         {
             icon = GetIcon();
+            typeName = GetTypeName();
         }
 
         public static FileClass GenerateAndroidFile(FileStat fileStat)
@@ -52,7 +53,16 @@ namespace ADB_Explorer.Models
         //    };
         //}
 
-        public string TypeName => Type.ToString();
+        private string typeName;
+        public string TypeName
+        {
+            get { return typeName; }
+            private set
+            {
+                typeName = value;
+                NotifyPropertyChanged();
+            }
+        }
         public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
         public string SizeString => Size?.ToSize();
 
@@ -68,9 +78,9 @@ namespace ADB_Explorer.Models
             }
         }
 
-        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
-        private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellIconManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
-        private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellIconManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
+        private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
+        private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
+        private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
 
         private static BitmapSource IconToBitmapSource(Icon icon)
         {
@@ -88,7 +98,17 @@ namespace ADB_Explorer.Models
             };
         }
 
-        private static Icon ExtIcon(string extension, ShellIconManager.IconSize iconSize, bool isLink)
+        private string GetTypeName()
+        {
+            return Type switch
+            {
+                FileType.File => IsLink ? "Link" : ShellInfoManager.GetShellFileType(FileName),
+                FileType.Folder => IsLink ? "Link" : "Folder",
+                _ => ShellInfoManager.GetShellFileType(FileName)
+            };
+        }
+
+        private static Icon ExtIcon(string extension, ShellInfoManager.IconSize iconSize, bool isLink)
         {
             // No extension -> "*" which means unknown file 
             if (extension == string.Empty)
@@ -100,7 +120,7 @@ namespace ADB_Explorer.Models
             var iconId = new Tuple<string, bool>(extension, isLink);
             if (!FileIcons.ContainsKey(iconId))
             {
-                icon = ShellIconManager.GetExtensionIcon(extension, iconSize, isLink);
+                icon = ShellInfoManager.GetExtensionIcon(extension, iconSize, isLink);
                 FileIcons.Add(iconId, icon);
             }
             else
@@ -116,6 +136,7 @@ namespace ADB_Explorer.Models
             if (propertyName == "FileName" || propertyName == "Type" || propertyName == "IsLink")
             {
                 Icon = GetIcon();
+                TypeName = GetTypeName();
             }
 
             base.NotifyPropertyChanged(propertyName);
