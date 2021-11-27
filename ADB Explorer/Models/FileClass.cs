@@ -104,7 +104,8 @@ namespace ADB_Explorer.Models
             {
                 FileType.File => IsLink ? "Link" : ShellInfoManager.GetShellFileType(FileName),
                 FileType.Folder => IsLink ? "Link" : "Folder",
-                _ => ShellInfoManager.GetShellFileType(FileName)
+                FileType.Unknown => "",
+                _ => Type.ToString(),
             };
         }
 
