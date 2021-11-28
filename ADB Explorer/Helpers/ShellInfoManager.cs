@@ -14,8 +14,6 @@ namespace ADB_Explorer.Helpers
         private const uint SHGFI_TYPENAME = 0x400;
         private const uint SHGFI_LINKOVERLAY = 0x8000;
 
-        private static readonly string[] APK_NAMES = { "APK", "XAPK", "APKS", "APKM" };
-
         [StructLayout(LayoutKind.Sequential)]
         private struct SHFILEINFO
         {
@@ -88,7 +86,7 @@ namespace ADB_Explorer.Helpers
         [DllImport("shell32", CharSet = CharSet.Unicode)]
         private static extern int ExtractIconEx(string lpszFile, int nIconIndex, IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons);
 
-        private static string GetShellFileType(string fileName)
+        public static string GetShellFileType(string fileName)
         {
             var shinfo = new SHFILEINFO();
             const uint flags = SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES;
@@ -101,22 +99,6 @@ namespace ADB_Explorer.Helpers
                 return "File";
 
             return shinfo.szTypeName;
-        }
-
-        public static string GetTypeName(string fileName)
-        {
-            return IsApk(fileName)
-                ? "Android Application Package"
-                : GetShellFileType(fileName);
-        }
-
-        private static bool IsApk(string fileName)
-        {
-            var extension = "";
-            if (fileName.Contains("."))
-                extension = fileName[(fileName.LastIndexOf(".") + 1)..].ToUpper();
-
-            return Array.IndexOf(APK_NAMES, extension) > -1;
         }
     }
 }

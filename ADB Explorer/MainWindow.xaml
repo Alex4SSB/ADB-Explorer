@@ -314,10 +314,9 @@
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
-                                            <Button
-                                                x:Name="OpenDeviceButton"
-                                                Click="OpenDeviceButton_Click"
-                                                Content="Browse" />
+                                            <Button x:Name="OpenDeviceButton" Click="OpenDeviceButton_Click">
+                                                <TextBlock Style="{StaticResource DisabledTextBlockStyle}" Text="Browse" />
+                                            </Button>
                                         </Grid>
                                         <Grid>
                                             <Grid.Style>
@@ -908,6 +907,7 @@
                                     <DataTemplate>
                                         <Image
                                             Width="16"
+                                            Margin="0,1,0,0"
                                             RenderOptions.BitmapScalingMode="HighQuality"
                                             Source="{Binding Icon}" />
                                     </DataTemplate>

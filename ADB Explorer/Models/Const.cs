@@ -60,5 +60,7 @@ namespace ADB_Explorer.Models
             new("Total Transferred", ColumnType.Completed), // TotalBytes
             new("Total Time", ColumnType.Completed), //TotalTime
         };
+
+        public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM" };
     }
 }

@@ -35,23 +35,38 @@ namespace ADB_Explorer.Models
             );
         }
 
-        //public static FileClass GenerateWindowsFile(string path, FileType type)
-        //{
-        //    return new FileClass
-        //    {
-        //        Path = path,
-        //        Type = type,
-        //        TypeName = ,
-        //        FileName = type switch
-        //        {
-        //            FileType.Drive => path,
-        //            FileType.Folder => System.IO.Path.GetFileName(path),
-        //            FileType.File => System.IO.Path.GetFileNameWithoutExtension(path),
-        //            FileType.Parent => "..",
-        //            _ => throw new NotImplementedException()
-        //        }
-        //    };
-        //}
+        private bool? isApk = null;
+        public bool IsApk
+        {
+            get
+            {
+                if (isApk is null)
+                {
+                    isApk = Array.IndexOf(AdbExplorerConst.APK_NAMES, Extension.ToUpper()) > -1;
+                }
+
+                return (bool)isApk;
+            }
+        }
+
+        private string extension;
+        public string Extension
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(extension))
+                    extension = System.IO.Path.GetExtension(FileName);
+
+                return extension;
+            }
+        }
+
+        public string GetTypeName(string fileName)
+        {
+            return IsApk
+                ? "Android Application Package"
+                : ShellInfoManager.GetShellFileType(fileName);
+        }
 
         private string typeName;
         public string TypeName
@@ -67,7 +82,6 @@ namespace ADB_Explorer.Models
         public string SizeString => Size?.ToSize();
 
         private object icon;
-
         public object Icon
         {
             get { return icon; }
@@ -91,7 +105,7 @@ namespace ADB_Explorer.Models
         {
             return Type switch
             {
-                FileType.File => IconToBitmapSource(ExtIcon(System.IO.Path.GetExtension(FileName), iconSize, IsLink)),
+                FileType.File => IconToBitmapSource(ExtIcon(Extension, iconSize, IsLink, IsApk)),
                 FileType.Folder => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
                 FileType.Unknown => unknownFileIconBitmapSource,
                 _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
@@ -102,14 +116,14 @@ namespace ADB_Explorer.Models
         {
             return Type switch
             {
-                FileType.File => IsLink ? "Link" : ShellInfoManager.GetTypeName(FileName),
+                FileType.File => IsLink ? "Link" : GetTypeName(FileName),
                 FileType.Folder => IsLink ? "Link" : "Folder",
                 FileType.Unknown => "",
                 _ => Type.ToString(),
             };
         }
 
-        private static Icon ExtIcon(string extension, ShellInfoManager.IconSize iconSize, bool isLink)
+        private static Icon ExtIcon(string extension, ShellInfoManager.IconSize iconSize, bool isLink, bool isApk = false)
         {
             // No extension -> "*" which means unknown file 
             if (extension == string.Empty)
@@ -121,7 +135,13 @@ namespace ADB_Explorer.Models
             var iconId = new Tuple<string, bool>(extension, isLink);
             if (!FileIcons.ContainsKey(iconId))
             {
-                icon = ShellInfoManager.GetExtensionIcon(extension, iconSize, isLink);
+                if (isApk)
+                {
+                    icon = Properties.Resources.APK_icon;
+                }
+                else
+                    icon = ShellInfoManager.GetExtensionIcon(extension, iconSize, isLink);
+
                 FileIcons.Add(iconId, icon);
             }
             else
