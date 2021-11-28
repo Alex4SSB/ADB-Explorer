@@ -102,7 +102,7 @@ namespace ADB_Explorer.Models
         {
             return Type switch
             {
-                FileType.File => IsLink ? "Link" : ShellInfoManager.GetShellFileType(FileName),
+                FileType.File => IsLink ? "Link" : ShellInfoManager.GetTypeName(FileName),
                 FileType.Folder => IsLink ? "Link" : "Folder",
                 FileType.Unknown => "",
                 _ => Type.ToString(),
