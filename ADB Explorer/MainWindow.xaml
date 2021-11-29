@@ -147,6 +147,7 @@
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
+            <Setter Property="Visibility" Value="Visible" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="DataGridRow">
@@ -183,6 +184,13 @@
                         <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
+                </MultiDataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding ElementName=ShowHiddenCheckBox, Path=IsChecked}" Value="False" />
+                        <Condition Binding="{Binding IsHidden}" Value="True" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Visibility" Value="Collapsed" />
                 </MultiDataTrigger>
             </Style.Triggers>
         </Style>
@@ -913,11 +921,24 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn
-                                x:Name="Name"
-                                Binding="{Binding FileName}"
-                                FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Name" />
+                            <DataGridTemplateColumn x:Name="Name" Header="Name">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock FontSize="{Binding Source={StaticResource FontSize}}">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Text" Value="{Binding FileName}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
+                                                            <Setter Property="Text" Value="{Binding NoExtName}" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 x:Name="Date"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
@@ -945,14 +966,6 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
                                         <Setter Property="Text" Value="{Binding TypeName}" />
-                                        <!--<Style.Triggers>
-                                            <DataTrigger Binding="{Binding Type}" Value="File">
-                                                <Setter Property="Text" Value="{Binding Type}" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                                <Setter Property="Text" Value="{Binding Type}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>-->
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -1453,9 +1466,22 @@
                                         Content="Automatically Open for Browsing" />
                                 </StackPanel>
                                 <Separator />
-                                <TextBlock Text="File Operations" />
-                                <StackPanel Margin="0,6,0,15">
+                                <TextBlock Text="File Operations" Visibility="Collapsed" />
+                                <StackPanel Margin="0,6,0,15" Visibility="Collapsed">
                                     <TreeView x:Name="FileOpSettingsTree" ItemTemplate="{StaticResource FileOpSettingsTreeTemplate}" />
+                                </StackPanel>
+                                <TextBlock Text="Show" />
+                                <StackPanel Margin="0,6,0,15">
+                                    <CheckBox
+                                        x:Name="ShowExtensionsCheckBox"
+                                        Click="ShowExtensionsCheckBox_Click"
+                                        Content="File Name Extensions"
+                                        IsChecked="True" />
+                                    <CheckBox
+                                        x:Name="ShowHiddenCheckBox"
+                                        Click="ShowHiddenCheckBox_Click"
+                                        Content="Hidden Items"
+                                        IsChecked="True" />
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>

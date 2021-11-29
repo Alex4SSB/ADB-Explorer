@@ -49,6 +49,25 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public string NoExtName
+        {
+            get
+            {
+                if (IsHidden && FileName.Split('.').Length == 2)
+                    return FileName;
+                else
+                    return FileName[..(FileName.Length - Extension.Length)];
+            }
+        }
+
+        public bool IsHidden
+        {
+            get
+            {
+                return FileName.StartsWith('.');
+            }
+        }
+
         private string extension;
         public string Extension
         {

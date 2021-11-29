@@ -9,6 +9,8 @@
         lastIp,
         rememberPort,
         lastPort,
-        autoOpen
+        autoOpen,
+        showExtensions,
+        showHiddenItems
     }
 }

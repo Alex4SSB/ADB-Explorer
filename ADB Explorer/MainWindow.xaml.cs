@@ -377,7 +377,13 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
                 AutoOpenCheckBox.IsChecked = autoOpen;
 
-            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
+            if (Storage.RetrieveBool(Settings.showExtensions) is bool showExt)
+                ShowExtensionsCheckBox.IsChecked = showExt;
+
+            if (Storage.RetrieveBool(Settings.showHiddenItems) is bool showHidden)
+                ShowHiddenCheckBox.IsChecked = showHidden;
+
+                CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
 
@@ -499,6 +505,7 @@ namespace ADB_Explorer
         private void StartDirectoryList(string path)
         {
             Cursor = Cursors.AppStarting;
+
             Dispatcher.BeginInvoke(() =>
             {
                 StopDirectoryList();
@@ -1398,5 +1405,14 @@ namespace ADB_Explorer
             FileOperationsSplitView.OpenPaneLength = Width * MAX_PANE_WIDTH_RATIO;
         }
 
+        private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.showHiddenItems, ShowHiddenCheckBox.IsChecked);
+        }
+
+        private void ShowExtensionsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.showExtensions, ShowExtensionsCheckBox.IsChecked);
+        }
     }
 }
