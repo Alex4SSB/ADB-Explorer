@@ -49,7 +49,11 @@ namespace ADB_Explorer.Services
 
                 public override string ToString()
                 {
-                    return TotalPercentage.ToString() + ", " + CurrentFile + ", " + CurrentFilePercentage?.ToString() + ", " + CurrentFileBytesTransferred?.ToString();
+                    string totalProgress = (TotalPercentage.HasValue) ? $"{TotalPercentage.Value}%" : "?";
+                    string currFileProgress = (CurrentFilePercentage.HasValue) ? $" ({CurrentFilePercentage.Value}% {CurrentFile})" :
+                                              (CurrentFileBytesTransferred.HasValue) ? $" ({CurrentFileBytesTransferred.Value} bytes {CurrentFile})" : "";
+
+                    return $"{totalProgress}{currFileProgress}";
                 }
             }
 
@@ -61,6 +65,18 @@ namespace ADB_Explorer.Services
                 public decimal? AverageRate { get; set; }
                 public UInt64? TotalBytes { get; set; }
                 public decimal? TotalTime { get; set; }
+
+                public override string ToString()
+                {
+                    string moreStats = (AverageRate.HasValue) ? $" @ {AverageRate.Value} MB/s ({TotalBytes.Value} bytes in {TotalTime.Value} seconds)" : "";
+                    
+                    if ((FilesTransferred == 1) && (FilesSkipped == 0))
+                    {
+                        return $"File transferred{moreStats}";
+                    }
+                    
+                    return $"{FilesTransferred} files transferred, {FilesSkipped} skipped{moreStats}";
+                }
             }
 
             private enum UnixFileMode : UInt32

@@ -1164,6 +1164,7 @@
                                             <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
                                             <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
                                             <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                            <DataGridTextColumn Binding="{Binding StatusInfo}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel.Style>
@@ -1227,8 +1228,8 @@
                                                 <DataGrid.Columns>
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
-                                                    <DataGridTemplateColumn CellTemplate="{StaticResource AverageRateCompletedTemplate}" />
                                                     <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                                    <DataGridTextColumn Binding="{Binding StatusInfo}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <StackPanel.Style>

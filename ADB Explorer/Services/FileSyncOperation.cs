@@ -58,6 +58,7 @@ namespace ADB_Explorer.Services
             }
 
             Status = OperationStatus.InProgress;
+            StatusInfo = "Calculating...";
             waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
             cancelTokenSource = new CancellationTokenSource();
 
@@ -65,8 +66,8 @@ namespace ADB_Explorer.Services
 
             operationTask.ContinueWith((t) => progressPollTimer.Stop());
             operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = t.Result; }, TaskContinuationOptions.OnlyOnRanToCompletion);
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Canceled; StatusInfo = new Exception("Canceled by user"); }, TaskContinuationOptions.OnlyOnCanceled);
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Failed; StatusInfo = t.Exception.InnerException; }, TaskContinuationOptions.OnlyOnFaulted);
+            operationTask.ContinueWith((t) => { Status = OperationStatus.Canceled; StatusInfo = "Canceled by user"; }, TaskContinuationOptions.OnlyOnCanceled);
+            operationTask.ContinueWith((t) => { Status = OperationStatus.Failed; StatusInfo = t.Exception.InnerException.Message; }, TaskContinuationOptions.OnlyOnFaulted);
 
             progressPollTimer.Start();
         }
