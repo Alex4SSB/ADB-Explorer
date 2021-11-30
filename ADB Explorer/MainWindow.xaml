@@ -81,8 +81,14 @@
             Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
-                    <ui:FontIcon Glyph="&#xE8C8;" />
-                    <TextBlock Text="Copy" />
+                    <Grid Margin="-3,0,-4,0">
+                        <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                        <ui:FontIcon
+                            Margin="11,0,0,0"
+                            FontSize="12"
+                            Glyph="&#xE974;" />
+                    </Grid>
+                    <TextBlock Text="Pull" />
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
@@ -580,6 +586,56 @@
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     <MenuItem
+                        x:Name="PullMenuButton"
+                        Click="PullMenuButton_Click"
+                        ToolTip="Pull">
+                        <MenuItem.Header>
+                            <Grid Margin="-4,0,-6,0">
+                                <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                                <ui:FontIcon
+                                    Margin="14,0,0,0"
+                                    FontSize="14"
+                                    Glyph="&#xE974;" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem x:Name="PushMenuButton" ToolTip="Push">
+                        <MenuItem.Header>
+                            <Grid Margin="-4,0,-6,0">
+                                <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                                <ui:FontIcon
+                                    Margin="14,0,0,0"
+                                    FontSize="14"
+                                    Glyph="&#xE973;" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem x:Name="PasteFilesMenu" Click="PushMenuButton_Click">
+                            <MenuItem.Header>
+                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="0,0,8,0"
+                                        FontSize="20"
+                                        Glyph="&#xE8A5;"
+                                        Style="{StaticResource DisabledGlyphStyle}" />
+                                    <TextBlock VerticalAlignment="Center" Text="Files" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem x:Name="PasteFoldersMenu" Click="PushMenuButton_Click">
+                            <MenuItem.Header>
+                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="0,0,8,0"
+                                        FontSize="20"
+                                        Glyph="&#xE8B7;"
+                                        Style="{StaticResource DisabledGlyphStyle}" />
+                                    <TextBlock VerticalAlignment="Center" Text="Folders" />
+                                </StackPanel>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </MenuItem>
+                    <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
+                    <MenuItem
                         x:Name="NewMenuButton"
                         Margin="2,0"
                         IsEnabled="False">
@@ -631,30 +687,6 @@
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE77F;" />
                         </MenuItem.Header>
-                        <MenuItem x:Name="PasteFilesMenu" Click="PasteMenuButton_Click">
-                            <MenuItem.Header>
-                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="20"
-                                        Glyph="&#xE8A5;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                    <TextBlock VerticalAlignment="Center" Text="Files" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem x:Name="PasteFoldersMenu" Click="PasteMenuButton_Click">
-                            <MenuItem.Header>
-                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="20"
-                                        Glyph="&#xE8B7;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                    <TextBlock VerticalAlignment="Center" Text="Folders" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
                     </MenuItem>
                     <MenuItem IsEnabled="False" ToolTip="Rename">
                         <MenuItem.Header>
@@ -1279,6 +1311,7 @@
                                 ToolTip="Add a device">
                                 <MenuItem.Header>
                                     <ui:FontIcon
+                                        Margin="0,0,-1,0"
                                         FontSize="22"
                                         Glyph="&#xECC8;"
                                         Style="{StaticResource DisabledGlyphStyle}" />
@@ -1446,9 +1479,9 @@
                                 <TextBlock Text="File Double-Click Behavior" />
                                 <StackPanel Margin="0,6,0,15">
                                     <CheckBox
-                                        x:Name="CopyOnDoubleClickCheckBox"
-                                        Checked="CopyOnDoubleClickCheckBox_Checked"
-                                        Content="Copy To Default Folder" />
+                                        x:Name="PullOnDoubleClickCheckBox"
+                                        Checked="PullOnDoubleClickCheckBox_Checked"
+                                        Content="Pull To Default Folder" />
                                 </StackPanel>
                                 <Separator />
                                 <TextBlock Text="Connection" />

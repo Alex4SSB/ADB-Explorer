@@ -4,7 +4,7 @@
     {
         theme,
         defaultFolder,
-        copyOnDoubleClick,
+        pullOnDoubleClick,
         rememberIp,
         lastIp,
         rememberPort,

@@ -130,18 +130,18 @@ namespace ADB_Explorer
 
         private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
         {
-            MenuItem copyMenu = FindResource("ContextMenuCopyItem") as MenuItem;
+            MenuItem pullMenu = FindResource("ContextMenuCopyItem") as MenuItem;
             MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
             {
                 case MenuType.ExplorerItem:
-                    copyMenu.IsEnabled = false;
+                    pullMenu.IsEnabled = false;
                     if (dataContext is FileClass file && file.Type is FileStat.FileType.File or FileStat.FileType.Folder)
-                        copyMenu.IsEnabled = true;
+                        pullMenu.IsEnabled = true;
 
-                    ExplorerGrid.ContextMenu.Items.Add(copyMenu);
+                    ExplorerGrid.ContextMenu.Items.Add(pullMenu);
                     ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                     break;
                 case MenuType.EmptySpace:
@@ -270,7 +270,7 @@ namespace ADB_Explorer
                 switch (file.Type)
                 {
                     case FileStat.FileType.File:
-                        if (CopyOnDoubleClickCheckBox.IsChecked == true)
+                        if (PullOnDoubleClickCheckBox.IsChecked == true)
                             CopyFiles(true);
                         break;
                     case FileStat.FileType.Folder:
@@ -287,7 +287,7 @@ namespace ADB_Explorer
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
             var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
-            CopyMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
+            PullMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
                 is FileStat.FileType.File
                 or FileStat.FileType.Folder);
         }
@@ -360,8 +360,8 @@ namespace ADB_Explorer
             if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
 
-            if (Storage.RetrieveBool(Settings.copyOnDoubleClick) is bool copy)
-                CopyOnDoubleClickCheckBox.IsChecked = copy;
+            if (Storage.RetrieveBool(Settings.pullOnDoubleClick) is bool copy)
+                PullOnDoubleClickCheckBox.IsChecked = copy;
 
             if (Storage.RetrieveBool(Settings.rememberIp) is bool remIp)
                 RememberIpCheckBox.IsChecked = remIp;
@@ -481,7 +481,7 @@ namespace ADB_Explorer
             dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
 
             ExplorerGrid.ItemsSource = AndroidFileList;
-            PasteMenuButton.IsEnabled = true;
+            PushMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = Devices.Current.Drives.Any();
             NavHistory.Reset();
 
@@ -894,8 +894,7 @@ namespace ADB_Explorer
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            UnfocusPathBox();
-            CopyFiles();
+            
         }
 
         private void CopyFiles(bool quick = false)
@@ -1013,9 +1012,9 @@ namespace ADB_Explorer
             }
         }
 
-        private void CopyOnDoubleClickCheckBox_Checked(object sender, RoutedEventArgs e)
+        private void PullOnDoubleClickCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.copyOnDoubleClick, CopyOnDoubleClickCheckBox.IsChecked);
+            Storage.StoreValue(Settings.pullOnDoubleClick, PullOnDoubleClickCheckBox.IsChecked);
         }
 
         private void InputLangBlock_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1195,10 +1194,10 @@ namespace ADB_Explorer
             CurrentPath = null;
             PathBox.Tag = null;
             NavHistory.Reset();
-            PasteMenuButton.IsEnabled =
+            PushMenuButton.IsEnabled =
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
-            CopyMenuButton.IsEnabled =
+            PullMenuButton.IsEnabled =
             BackButton.IsEnabled =
             ForwardButton.IsEnabled =
             HomeButton.IsEnabled =
@@ -1337,7 +1336,7 @@ namespace ADB_Explorer
             DriveViewNav();
         }
 
-        private void PasteMenuButton_Click(object sender, RoutedEventArgs e)
+        private void PushMenuButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
             PasteFiles(((MenuItem)sender).Name == nameof(PasteFoldersMenu));
@@ -1413,6 +1412,12 @@ namespace ADB_Explorer
         private void ShowExtensionsCheckBox_Click(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.showExtensions, ShowExtensionsCheckBox.IsChecked);
+        }
+
+        private void PullMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            UnfocusPathBox();
+            CopyFiles();
         }
     }
 }
