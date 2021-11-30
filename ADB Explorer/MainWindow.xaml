@@ -833,6 +833,7 @@
                             VerticalAlignment="Stretch"
                             Background="Transparent"
                             CornerRadius="2"
+                            Foreground="#780078D7"
                             IsIndeterminate="True"
                             Visibility="Collapsed" />
                         <TextBox
@@ -1196,7 +1197,7 @@
                                             <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
                                             <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
                                             <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                            <DataGridTextColumn Binding="{Binding StatusInfo}" />
+                                            <DataGridTextColumn Binding="{Binding StatusInfo, Mode=OneWay}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel.Style>
@@ -1261,7 +1262,7 @@
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
                                                     <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
-                                                    <DataGridTextColumn Binding="{Binding StatusInfo}" />
+                                                    <DataGridTextColumn Binding="{Binding StatusInfo, Mode=OneWay}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <StackPanel.Style>

@@ -417,8 +417,7 @@ namespace ADB_Explorer
         {
             Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
 
-            Devices.Current.SetDrives(CurrentADBDevice.GetDrives());
-            DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
+            RefreshDrives();
             DriveViewNav();
             UpdateAndroidVersion();
 
@@ -436,7 +435,7 @@ namespace ADB_Explorer
             DrivesItemRepeater.Visibility = Visibility.Visible;
             PathBox.IsEnabled = true;
 
-            MenuItem button = CreatePathButton("", Devices.Current.Name);
+            MenuItem button = CreatePathButton(Devices.Current, Devices.Current.Name);
             button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
             AddPathButton(button);
         }
@@ -448,7 +447,7 @@ namespace ADB_Explorer
 
             sbyte ver = 0;
             sbyte.TryParse(androidVer.Split('.')[0], out ver);
-            UnsupportedAndroidIcon.Visibility = Visible(ver < MIN_SUPPORTED_ANDROID_VER);
+            UnsupportedAndroidIcon.Visibility = Visible(ver > 0 && ver < MIN_SUPPORTED_ANDROID_VER);
         }
 
         private static void CombinePrettyNames()
@@ -749,7 +748,7 @@ namespace ADB_Explorer
         }
 
         private MenuItem CreatePathButton(KeyValuePair<string, string> kv) => CreatePathButton(kv.Key, kv.Value);
-        private MenuItem CreatePathButton(string path, string name)
+        private MenuItem CreatePathButton(object path, string name)
         {
             MenuItem button = new()
             {
@@ -798,8 +797,13 @@ namespace ADB_Explorer
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
         {
-            if ((sender as MenuItem).Tag is string path and not "")
-                NavigateToPath(path);
+            if (sender is MenuItem item)
+            {
+                if (item.Tag is string path and not "")
+                    NavigateToPath(path);
+                else if (item.Tag is DeviceClass)
+                    RefreshDrives(true);
+            }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
@@ -1333,7 +1337,14 @@ namespace ADB_Explorer
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
+            RefreshDrives();
             DriveViewNav();
+        }
+
+        private void RefreshDrives(bool findMmc = false)
+        {
+            Devices.Current.SetDrives(CurrentADBDevice.GetDrives(), findMmc);
+            DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
         }
 
         private void PushMenuButton_Click(object sender, RoutedEventArgs e)

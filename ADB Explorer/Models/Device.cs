@@ -153,6 +153,12 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private void DrivesSetBlocking(List<Drive> val)
+        {
+            drives = val;
+            NotifyPropertyChanged(nameof(Drives));
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
@@ -226,15 +232,16 @@ namespace ADB_Explorer.Models
             Status = other.Status;
         }
 
-        internal void SetDrives(List<Drive> drives, bool findMmc = false)
+        internal void SetDrives(List<Drive> value, bool findMmc = false)
         {
-            Drives = drives;
-
             if (findMmc)
             {
+                DrivesSetBlocking(value);
                 GetMmcDrive().SetMmc();
                 SetExternalDrives();
             }
+            else
+                Drives = value;
         }
 
         public static string DeviceName(string model, string device)
