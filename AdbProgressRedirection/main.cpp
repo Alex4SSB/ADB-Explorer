@@ -94,17 +94,36 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 		return -1;
 	}
 
+	// Set stderr to UTF-16
+	fflush(stderr);
+	int previous_stderr_mode = _setmode(_fileno(stderr), _O_U16TEXT);
+	if (previous_stderr_mode == -1) {
+		std::wcerr << L"Couldn't set STDERR mode to UTF16!" << std::endl;
+		return -1;
+	}
+
 #pragma warning(push)
 #pragma warning(disable: 6031)
 	// RAII guard to restore stdout's previous mode
 	auto stdout_mode_restore = [](int* m) { _setmode(_fileno(stdout), *m); };
 	auto stdout_mode_guard = MakeScopeFinallyGuard(&previous_stdout_mode, stdout_mode_restore);
+
+	// RAII guard to restore stderr's previous mode
+	auto stderr_mode_restore = [](int* m) { _setmode(_fileno(stderr), *m); };
+	auto stderr_mode_guard = MakeScopeFinallyGuard(&previous_stderr_mode, stderr_mode_restore);
+
 #pragma warning(pop)
 
 	// Create a new console screen buffer
 	HANDLE console_handle = CreateInheritableConsoleHandle();
 	if (console_handle == INVALID_HANDLE_VALUE) {
 		std::wcerr << L"Couldn't create a console screen buffer!" << std::endl;
+		return -1;
+	}
+
+	// Resize it to prevent "..." lines
+	if (SetConsoleScreenBufferSize(console_handle, COORD{ 1024, 1024 }) == 0) {
+		std::wcerr << L"Couldn't change console screen size!" << std::endl;
 		return -1;
 	}
 
