@@ -220,7 +220,7 @@ namespace ADB_Explorer.Models
                     MoveToCompleted();
                     IsActive = false;
                 }
-                else if (CurrentOperation.Status == FileOperation.OperationStatus.Completed)
+                else
                 {
                     MoveToNextOperation();
                 }
