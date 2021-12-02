@@ -372,13 +372,6 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="ProgressBarStyle" TargetType="ui:ProgressBar">
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding StatusInfo.TotalPercentage}" Value="{x:Null}">
-                    <Setter Property="IsIndeterminate" Value="True" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
         <DataTemplate x:Key="StatusIconTemplate">
             <ui:FontIcon>
                 <ui:FontIcon.Style>
@@ -397,13 +390,33 @@
         </DataTemplate>
         <DataTemplate x:Key="FileOpProgressTemplate">
             <StackPanel>
-                <StackPanel.Resources>
-                    <Style BasedOn="{StaticResource ProgressBarStyle}" TargetType="ui:ProgressBar">
-                        <Setter Property="CornerRadius" Value="0" />
-                    </Style>
-                </StackPanel.Resources>
-                <ui:ProgressBar Value="{Binding StatusInfo.TotalPercentage}" />
-                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage}" />
+                <ui:ProgressBar Value="{Binding StatusInfo.TotalPercentage}">
+                    <ui:ProgressBar.Style>
+                        <Style TargetType="ui:ProgressBar">
+                            <Setter Property="CornerRadius" Value="0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.TotalPercentage}" Value="{x:Null}">
+                                    <Setter Property="IsIndeterminate" Value="True" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:ProgressBar.Style>
+                </ui:ProgressBar>
+                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage}">
+                    <ui:ProgressBar.Style>
+                        <Style TargetType="ui:ProgressBar">
+                            <Setter Property="CornerRadius" Value="0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage}" Value="{x:Null}">
+                                    <Setter Property="IsIndeterminate" Value="True" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage}" Value="0">
+                                    <Setter Property="Value" Value="{Binding StatusInfo.TotalPercentage}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:ProgressBar.Style>
+                </ui:ProgressBar>
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="OperationIconTemplate">
@@ -997,7 +1010,8 @@
                             <DataGridTextColumn
                                 x:Name="Type"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Type">
+                                Header="Type"
+                                SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
