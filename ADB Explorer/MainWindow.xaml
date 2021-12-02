@@ -399,7 +399,7 @@
         <DataTemplate x:Key="FileOpProgressTemplate">
             <StackPanel>
                 <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
-                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage}">
+                <ui:ProgressBar>
                     <ui:ProgressBar.Style>
                         <Style BasedOn="{StaticResource FileOpProgressStyle}" TargetType="ui:ProgressBar">
                             <Style.Triggers>
