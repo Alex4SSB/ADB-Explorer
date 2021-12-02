@@ -954,7 +954,10 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn x:Name="Name" Header="Name">
+                            <DataGridTemplateColumn
+                                x:Name="Name"
+                                Header="Name"
+                                SortMemberPath="FileName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock FontSize="{Binding Source={StaticResource FontSize}}">

@@ -53,7 +53,7 @@ namespace ADB_Explorer.Models
         {
             get
             {
-                if (IsHidden && FileName.Split('.').Length == 2)
+                if (Type is not FileType.File || IsHidden && FileName.Split('.').Length == 2)
                     return FileName;
                 else
                     return FileName[..(FileName.Length - Extension.Length)];
@@ -73,6 +73,9 @@ namespace ADB_Explorer.Models
         {
             get
             {
+                if (Type is not FileType.File)
+                    return "";
+
                 if (string.IsNullOrEmpty(extension))
                     extension = System.IO.Path.GetExtension(FileName);
 
