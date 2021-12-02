@@ -372,7 +372,8 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="ProgressBarStyle" TargetType="ui:ProgressBar">
+        <Style x:Key="FileOpProgressStyle" TargetType="ui:ProgressBar">
+            <Setter Property="CornerRadius" Value="0" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding StatusInfo.TotalPercentage}" Value="{x:Null}">
                     <Setter Property="IsIndeterminate" Value="True" />
@@ -397,13 +398,18 @@
         </DataTemplate>
         <DataTemplate x:Key="FileOpProgressTemplate">
             <StackPanel>
-                <StackPanel.Resources>
-                    <Style BasedOn="{StaticResource ProgressBarStyle}" TargetType="ui:ProgressBar">
-                        <Setter Property="CornerRadius" Value="0" />
-                    </Style>
-                </StackPanel.Resources>
-                <ui:ProgressBar Value="{Binding StatusInfo.TotalPercentage}" />
-                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage}" />
+                <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
+                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage}">
+                    <ui:ProgressBar.Style>
+                        <Style BasedOn="{StaticResource FileOpProgressStyle}" TargetType="ui:ProgressBar">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage}" Value="{x:Null}">
+                                    <Setter Property="Value" Value="{Binding StatusInfo.TotalPercentage}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:ProgressBar.Style>
+                </ui:ProgressBar>
             </StackPanel>
         </DataTemplate>
         <DataTemplate x:Key="OperationIconTemplate">
@@ -997,7 +1003,8 @@
                             <DataGridTextColumn
                                 x:Name="Type"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Type">
+                                Header="Type"
+                                SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
