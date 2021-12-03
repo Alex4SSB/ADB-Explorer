@@ -481,14 +481,9 @@ namespace ADB_Explorer
             HomeButton.IsEnabled = Devices.Current.Drives.Any();
             NavHistory.Reset();
 
-            bool navResult;
-            if (string.IsNullOrEmpty(path))
-                navResult = NavigateToPath(DEFAULT_PATH);
-            else
-                navResult = NavigateToPath(path);
-
-            ProgressCountTextBlock.Tag = 0;
-            return navResult;
+            return string.IsNullOrEmpty(path)
+                ? NavigateToPath(DEFAULT_PATH)
+                : NavigateToPath(path);
         }
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
@@ -1396,22 +1391,6 @@ namespace ADB_Explorer
             Clipboard.SetText(tag is null ? "" : (string)tag);
         }
 
-        private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            if ((FileOperationsSplitView.OpenPaneLength > Width * MAX_PANE_WIDTH_RATIO && e.HorizontalChange < 0)
-                || (e.HorizontalChange > 0 && FileOperationsSplitView.OpenPaneLength < MIN_PANE_WIDTH))
-                return;
-
-            FileOperationsSplitView.OpenPaneLength -= e.HorizontalChange;
-
-            FileOperationsCollapseMenu.Visibility = Visible(FileOperationsSplitView.OpenPaneLength > MIN_PANE_WIDTH_FOR_COLLAPSE);
-        }
-
-        private void GridSplitter_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            FileOperationsSplitView.OpenPaneLength = Width * MAX_PANE_WIDTH_RATIO;
-        }
-
         private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.showHiddenItems, ShowHiddenCheckBox.IsChecked);
@@ -1426,6 +1405,18 @@ namespace ADB_Explorer
         {
             UnfocusPathBox();
             CopyFiles();
+        }
+
+        private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if ((FileOpDetailedGrid.ActualHeight > Height * MAX_PANE_HEIGHT_RATIO && e.VerticalChange < 0)
+                || (e.VerticalChange > 0 && FileOpDetailedGrid.ActualHeight < Height * MIN_PANE_HEIGHT_RATIO && FileOpDetailedGrid.ActualHeight < MIN_PANE_HEIGHT))
+                return;
+
+            if (FileOpDetailedGrid.Height is double.NaN)
+                FileOpDetailedGrid.Height = FileOpDetailedGrid.ActualHeight;
+
+            FileOpDetailedGrid.Height -= e.VerticalChange;
         }
     }
 }

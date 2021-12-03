@@ -562,6 +562,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -1032,7 +1033,26 @@
                     </DataGrid>
                 </Grid>
             </Border>
-            <StackPanel Grid.Row="3" Orientation="Horizontal">
+            <Grid x:Name="FileOpDetailedGrid" Grid.Row="3">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=FileOpExtendedSwitch, Path=IsOn}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <GridSplitter
+                    Height="3"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    BorderBrush="Gray"
+                    DragDelta="GridSplitter_DragDelta" />
+                <DataGrid Margin="0,3,0,0" />
+                <Separator VerticalAlignment="Bottom" />
+            </Grid>
+            <StackPanel Grid.Row="4" Orientation="Horizontal">
                 <StackPanel.Resources>
                     <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
                         <Setter Property="Margin" Value="8,6,4,6" />
@@ -1117,7 +1137,7 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel
-                Grid.Row="3"
+                Grid.Row="4"
                 Margin="6,0"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
@@ -1134,57 +1154,28 @@
                     Margin="0,1,0,0"
                     Text="" />
             </StackPanel>
-            <Grid Grid.Row="3" HorizontalAlignment="Right">
-                <TextBlock
-                    x:Name="OperationCompletedTextBlock"
-                    Margin="6,0"
-                    VerticalAlignment="Center" />
-                <Grid x:Name="ProgressGrid" Visibility="Collapsed">
-                    <ui:ProgressBar
-                        x:Name="OverallProgressBar"
-                        Width="200"
-                        Margin="4"
-                        VerticalAlignment="Stretch"
-                        CornerRadius="0"
-                        Maximum="100"
-                        Minimum="0"
-                        Value="50" />
-                    <TextBlock
-                        x:Name="ProgressCountTextBlock"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Text="0/0" />
-                </Grid>
-            </Grid>
         </Grid>
         <ui:SplitView
             x:Name="FileOperationsSplitView"
             FocusVisualStyle="{x:Null}"
-            OpenPaneLength="500"
+            OpenPaneLength="300"
             PanePlacement="Right">
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
                     <Grid>
-                        <GridSplitter
-                            Width="3"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Stretch"
-                            DragDelta="GridSplitter_DragDelta"
-                            MouseDoubleClick="GridSplitter_MouseDoubleClick" />
                         <Grid Margin="8">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="48" />
+                                <RowDefinition Height="52" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Menu x:Name="FileOperationsCollapseMenu" HorizontalAlignment="Right">
-                                <MenuItem Click="PaneCollapse_Click" ToolTip="Hide">
-                                    <MenuItem.Header>
-                                        <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
-                                    </MenuItem.Header>
-                                </MenuItem>
-                            </Menu>
+                            <StackPanel Margin="4,0">
+                                <TextBlock Text="Extended View" />
+                                <ui:ToggleSwitch x:Name="FileOpExtendedSwitch" />
+                            </StackPanel>
                             <TextBlock
-                                HorizontalAlignment="Center"
+                                Margin="6,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center"
                                 FontSize="24"
                                 Text="File Operations" />
                             <Grid Grid.Row="1">
