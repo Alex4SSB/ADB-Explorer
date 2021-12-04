@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -68,7 +69,7 @@ namespace ADB_Explorer.Services
 
                 public override string ToString()
                 {
-                    string moreStats = (AverageRate.HasValue) ? $" @ {AverageRate.Value} MB/s ({TotalBytes.Value} bytes in {TotalTime.Value} seconds)" : "";
+                    string moreStats = (AverageRate.HasValue) ? $" @ {AverageRate.Value} MB/s ({TotalBytes.Value.ToSize()} in {TotalTime.ToTime()})" : "";
                     
                     if ((FilesTransferred == 1) && (FilesSkipped == 0))
                     {
