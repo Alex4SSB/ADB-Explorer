@@ -380,6 +380,9 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.showHiddenItems) is bool showHidden)
                 ShowHiddenCheckBox.IsChecked = showHidden;
 
+            if (Storage.RetrieveBool(Settings.showExtendedView) is bool extendedView)
+                FileOpExtendedSwitch.IsOn = extendedView;
+
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
@@ -1298,17 +1301,22 @@ namespace ADB_Explorer
             NewDevicePanelVisibility(false);
         }
 
-        private void CloseOperationButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (e.OriginalSource is Button button && button.DataContext is FileOperation operation)
-            {
-                fileOperationQueue.CompletedOperations.Remove(operation); // FIXME: Cancelling current/pending tasks too (not implemented in fileOperationQueue yet...)
-            }
-        }
-
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             PopulateButtons((string)PathBox.Tag);
+            ResizeDetailedView();
+        }
+
+        private void ResizeDetailedView()
+        {
+            if (DetailedViewSize() is sbyte val && val == -1)
+            {
+                FileOpDetailedGrid.Height = Height * MIN_PANE_HEIGHT_RATIO;
+            }
+            else if (val == 1)
+            {
+                FileOpDetailedGrid.Height = Height * MAX_PANE_HEIGHT_RATIO;
+            }
         }
 
         private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
@@ -1409,14 +1417,56 @@ namespace ADB_Explorer
 
         private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            if ((FileOpDetailedGrid.ActualHeight > Height * MAX_PANE_HEIGHT_RATIO && e.VerticalChange < 0)
-                || (e.VerticalChange > 0 && FileOpDetailedGrid.ActualHeight < Height * MIN_PANE_HEIGHT_RATIO && FileOpDetailedGrid.ActualHeight < MIN_PANE_HEIGHT))
+            // -1 + 1 or 1 + -1 (0 + 0 shouldn't happen)
+            if (SimplifyNumber(e.VerticalChange) + DetailedViewSize() == 0)
                 return;
 
             if (FileOpDetailedGrid.Height is double.NaN)
                 FileOpDetailedGrid.Height = FileOpDetailedGrid.ActualHeight;
 
             FileOpDetailedGrid.Height -= e.VerticalChange;
+        }
+
+        /// <summary>
+        /// Reduces the number to 3 possible values
+        /// </summary>
+        /// <param name="num">The number to evaluate</param>
+        /// <returns>-1 if less than 0, 1 if greater than 0, 0 if 0</returns>
+        private static sbyte SimplifyNumber(double num) => num switch
+        {
+            < 0 => -1,
+            > 0 => 1,
+            _ => 0
+        };
+
+        /// <summary>
+        /// Compares the size of the detailed file op view to its limits
+        /// </summary>
+        /// <returns>0 if within limits, 1 if exceeds upper limits, -1 if exceeds lower limits</returns>
+        private sbyte DetailedViewSize()
+        {
+            if (FileOpDetailedGrid.ActualHeight > Height * MAX_PANE_HEIGHT_RATIO)
+                return 1;
+
+            if (FileOpDetailedGrid.ActualHeight < Height * MIN_PANE_HEIGHT_RATIO && FileOpDetailedGrid.ActualHeight < MIN_PANE_HEIGHT)
+                return -1;
+
+            return 0;
+        }
+
+        private void FileOpExtendedSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.showExtendedView, FileOpExtendedSwitch.IsOn);
+        }
+
+        private void FileOpDetailedGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            ResizeDetailedView();
+        }
+
+        private void HideExtendedViewButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileOpExtendedSwitch.IsOn = false;
         }
     }
 }

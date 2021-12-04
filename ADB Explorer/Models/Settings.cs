@@ -11,6 +11,7 @@
         lastPort,
         autoOpen,
         showExtensions,
-        showHiddenItems
+        showHiddenItems,
+        showExtendedView,
     }
 }
