@@ -1031,6 +1031,36 @@
                             </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
+                                            <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <StackPanel
+                            Margin="0,40"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="This folder " />
+                                <TextBlock FontStyle="Italic" Text="looks" />
+                                <TextBlock Text=" empty" />
+                            </StackPanel>
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="10"
+                                Text="... to the naked eye" />
+                        </StackPanel>
+                    </Grid>
                 </Grid>
             </Border>
             <Grid
