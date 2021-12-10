@@ -375,7 +375,7 @@
         <Style x:Key="FileOpProgressStyle" TargetType="ui:ProgressBar">
             <Setter Property="CornerRadius" Value="0" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding StatusInfo.TotalPercentage}" Value="{x:Null}">
+                <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
                     <Setter Property="IsIndeterminate" Value="True" />
                 </DataTrigger>
             </Style.Triggers>
@@ -398,13 +398,13 @@
         </DataTemplate>
         <DataTemplate x:Key="FileOpProgressTemplate">
             <StackPanel Margin="4,0">
-                <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
+                <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
                 <ui:ProgressBar>
                     <ui:ProgressBar.Style>
                         <Style BasedOn="{StaticResource FileOpProgressStyle}" TargetType="ui:ProgressBar">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage}" Value="{x:Null}">
-                                    <Setter Property="Value" Value="{Binding StatusInfo.TotalPercentage}" />
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Value" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -433,7 +433,7 @@
         </DataTemplate>
         <DataTemplate x:Key="AverageRateCompletedTemplate">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="{Binding StatusInfo.AverageRate}" />
+                <TextBlock Text="{Binding StatusInfo.AverageRate, Mode=OneWay}" />
                 <TextBlock Text="MB/s" />
             </StackPanel>
         </DataTemplate>
