@@ -167,6 +167,15 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public void Stop() => CurrentOperation?.Cancel();
+
+        public void Clear()
+        {
+            PendingOperations.Clear();
+            CompletedOperations.Clear();
+            Stop();
+        }
+
         private void MoveToCompleted()
         {
             if (CurrentOperation != null)
