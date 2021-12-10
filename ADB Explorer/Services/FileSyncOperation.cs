@@ -80,7 +80,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return $"{FilesTransferred} of {FilesSkipped}";
+                    return $"{FilesTransferred} of {FilesTransferred + FilesSkipped}";
                 }
             }
 
