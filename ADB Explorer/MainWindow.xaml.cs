@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
+using static ADB_Explorer.Helpers.VisibilityHelper;
 
 namespace ADB_Explorer
 {
@@ -37,6 +38,8 @@ namespace ADB_Explorer
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
+
+        public bool ListingInProgress { get { return listDirTask is not null; } }
 
         private double ColumnHeaderHeight
         {
@@ -87,8 +90,6 @@ namespace ADB_Explorer
                 ExplorerContentPresenter = presenter;
             }
         }
-
-        public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
 
         private string SelectedFilesTotalSize
         {
@@ -381,7 +382,10 @@ namespace ADB_Explorer
                 ShowHiddenCheckBox.IsChecked = showHidden;
 
             if (Storage.RetrieveBool(Settings.showExtendedView) is bool extendedView)
-                FileOpExtendedSwitch.IsOn = extendedView;
+            {
+                FileOpDetailedRadioButton.IsChecked = extendedView;
+                FileOpCompactRadioButton.IsChecked = !extendedView;
+            }
 
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
@@ -1323,7 +1327,10 @@ namespace ADB_Explorer
 
         private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
         {
-            FileOperationsSplitView.IsPaneOpen = true;
+            if (FileOperationsButton.Tag is null || (FileOperationsButton.Tag is bool tag && !tag))
+                FileOperationsButton.Tag = true;
+            else
+                FileOperationsButton.Tag = false;
         }
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1456,19 +1463,24 @@ namespace ADB_Explorer
             return 0;
         }
 
-        private void FileOpExtendedSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(Settings.showExtendedView, FileOpExtendedSwitch.IsOn);
-        }
-
         private void FileOpDetailedGrid_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             ResizeDetailedView();
         }
 
-        private void HideExtendedViewButton_Click(object sender, RoutedEventArgs e)
+        private void FileOpDetailedRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            FileOpExtendedSwitch.IsOn = false;
+            Storage.StoreValue(Settings.showExtendedView, true);
+        }
+
+        private void FileOpCompactRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(Settings.showExtendedView, false);
+        }
+
+        private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
+        {
+            FileOperationsButton.Tag = false;
         }
     }
 }

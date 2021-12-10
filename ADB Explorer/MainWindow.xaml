@@ -11,6 +11,7 @@
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="MainWin"
     Title="ADB Explorer"
     Width="800"
     Height="450"
@@ -732,22 +733,7 @@
                         <Setter Property="FontSize" Value="18" />
                     </Style>
                 </StackPanel.Resources>
-                <StackPanel x:Name="FileOpMenu">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Style.Triggers>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="0" />
-                                        <Condition Binding="{Binding ElementName=PendingOperationsDataGrid, Path=Items.Count}" Value="0" />
-                                        <Condition Binding="{Binding ElementName=CompletedOperationsDataGrid, Path=Items.Count}" Value="0" />
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="IsEnabled" Value="False" />
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
+                <StackPanel VerticalAlignment="Center">
                     <Menu>
                         <MenuItem
                             x:Name="FileOperationsButton"
@@ -1055,6 +1041,7 @@
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
+                                            <Condition Binding="{Binding ElementName=MainWin, Path=ListingInProgress}" Value="False" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>
@@ -1084,10 +1071,15 @@
                 IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
                 <Grid.Style>
                     <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=FileOpExtendedSwitch, Path=IsOn}" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding ElementName=FileOpDetailedRadioButton, Path=IsChecked}" Value="True" />
+                                    <Condition Binding="{Binding ElementName=FileOperationsButton, Path=Tag}" Value="True" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible" />
+                            </MultiDataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
@@ -1211,23 +1203,6 @@
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
-                        <Grid>
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=FileOpMenu, Path=IsEnabled}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <Button
-                                x:Name="HideExtendedViewButton"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Click="HideExtendedViewButton_Click"
-                                Content="Hide Extended View" />
-                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>
@@ -1338,7 +1313,22 @@
             x:Name="FileOperationsSplitView"
             FocusVisualStyle="{x:Null}"
             OpenPaneLength="300"
+            PaneClosing="FileOperationsSplitView_PaneClosing"
             PanePlacement="Right">
+            <ui:SplitView.Style>
+                <Style TargetType="ui:SplitView">
+                    <Setter Property="IsPaneOpen" Value="False" />
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=FileOpCompactRadioButton, Path=IsChecked}" Value="True" />
+                                <Condition Binding="{Binding ElementName=FileOperationsButton, Path=Tag}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="IsPaneOpen" Value="True" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:SplitView.Style>
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
                     <Grid>
@@ -1347,16 +1337,18 @@
                                 <RowDefinition Height="52" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <StackPanel Margin="4,0">
-                                <TextBlock Text="Extended View" />
-                                <ui:ToggleSwitch x:Name="FileOpExtendedSwitch" Toggled="FileOpExtendedSwitch_Toggled" />
-                            </StackPanel>
                             <TextBlock
-                                Margin="6,0"
-                                HorizontalAlignment="Right"
+                                HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 FontSize="24"
                                 Text="File Operations" />
+                            <Menu HorizontalAlignment="Right">
+                                <MenuItem Click="FileOperationsButton_Click" ToolTip="Hide">
+                                    <MenuItem.Header>
+                                        <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
+                                    </MenuItem.Header>
+                                </MenuItem>
+                            </Menu>
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -1699,6 +1691,18 @@
                                         Click="ShowHiddenCheckBox_Click"
                                         Content="Hidden Items"
                                         IsChecked="True" />
+                                </StackPanel>
+                                <Separator />
+                                <TextBlock Text="File Operations" />
+                                <StackPanel Margin="0,6,0,15">
+                                    <RadioButton
+                                        x:Name="FileOpCompactRadioButton"
+                                        Checked="FileOpCompactRadioButton_Checked"
+                                        Content="Compact" />
+                                    <RadioButton
+                                        x:Name="FileOpDetailedRadioButton"
+                                        Checked="FileOpDetailedRadioButton_Checked"
+                                        Content="Detailed" />
                                 </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
