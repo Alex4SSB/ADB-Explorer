@@ -1,4 +1,6 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -25,6 +27,87 @@ namespace ADB_Explorer.Services
         private CancellationTokenSource cancelTokenSource;
         private ConcurrentQueue<AdbSyncProgressInfo> waitingProgress;
         private System.Timers.Timer progressPollTimer;
+
+        public class InProgressInfo
+        {
+            private AdbSyncProgressInfo adbInfo;
+
+            public InProgressInfo(AdbSyncProgressInfo adbInfo)
+            {
+                this.adbInfo = adbInfo;
+            }
+
+            public int? TotalPercentage => adbInfo.TotalPercentage;
+            public int? CurrentFilePercentage => adbInfo.CurrentFilePercentage;
+            public UInt64? CurrentFileBytesTransferred => adbInfo.CurrentFileBytesTransferred;
+            public string CurrentFileName => adbInfo.CurrentFile;
+
+            public string TotalProgress
+            {
+                get
+                {
+                    return TotalPercentage.HasValue ? $"{TotalPercentage.Value}%" : "?";
+                }
+            }
+
+            public string CurrentFileProgress
+            {
+                get
+                {
+                    return CurrentFilePercentage.HasValue       ? $"{CurrentFilePercentage.Value}%" :
+                           CurrentFileBytesTransferred.HasValue ? SizeConverter.ToSize(CurrentFileBytesTransferred.Value)
+                                                                : string.Empty;
+                }
+            }
+        }
+
+        public class CompletedInfo
+        {
+            private AdbSyncStatsInfo adbInfo;
+
+            public CompletedInfo(AdbSyncStatsInfo adbInfo)
+            {
+                this.adbInfo = adbInfo;
+            }
+
+            public UInt64 FilesTransferred => adbInfo.FilesTransferred;
+            public UInt64 FilesSkipped => adbInfo.FilesSkipped;
+            public decimal? AverageRateMBps => adbInfo.AverageRate;
+            public UInt64? TotalBytes => adbInfo.TotalBytes;
+            public decimal? TotalSeconds => adbInfo.TotalTime;
+
+            public string FileCountCompleted
+            {
+                get
+                {
+                    return $"{FilesTransferred} of {FilesTransferred + FilesSkipped}";
+                }
+            }
+
+            public string AverateRateString
+            {
+                get
+                {
+                    return AverageRateMBps.HasValue ? $"{SizeConverter.ToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : String.Empty;
+                }
+            }
+
+            public string TotalSize
+            {
+                get
+                {
+                    return TotalBytes.HasValue ? SizeConverter.ToSize(TotalBytes.Value) : String.Empty;
+                }
+            }
+
+            public string TotalTime
+            {
+                get
+                {
+                    return TotalSeconds.HasValue ? SizeConverter.ToTime(TotalSeconds.Value) : String.Empty;
+                }
+            }
+        }
 
         public string TargetPath { get; }
 
@@ -65,7 +148,7 @@ namespace ADB_Explorer.Services
             operationTask = Task.Run(() => adbMethod(TargetPath, FilePath, ref waitingProgress, cancelTokenSource.Token));
 
             operationTask.ContinueWith((t) => progressPollTimer.Stop());
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = t.Result; }, TaskContinuationOptions.OnlyOnRanToCompletion);
+            operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = new CompletedInfo(t.Result); }, TaskContinuationOptions.OnlyOnRanToCompletion);
             operationTask.ContinueWith((t) => { Status = OperationStatus.Canceled; StatusInfo = "Canceled by user"; }, TaskContinuationOptions.OnlyOnCanceled);
             operationTask.ContinueWith((t) => { Status = OperationStatus.Failed; StatusInfo = t.Exception.InnerException.Message; }, TaskContinuationOptions.OnlyOnFaulted);
 
@@ -87,7 +170,7 @@ namespace ADB_Explorer.Services
             var currProgress = waitingProgress.DequeueAllExisting().LastOrDefault();
             if ((Status == OperationStatus.InProgress) && (currProgress != null))
             {
-                StatusInfo = currProgress;
+                StatusInfo = new InProgressInfo(currProgress);
             }
         }
     }
