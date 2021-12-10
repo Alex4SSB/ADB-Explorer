@@ -1309,13 +1309,15 @@ namespace ADB_Explorer
 
         private void ResizeDetailedView()
         {
+            double windowHeight = WindowState == WindowState.Maximized ? ActualHeight : Height;
+
             if (DetailedViewSize() is sbyte val && val == -1)
             {
-                FileOpDetailedGrid.Height = Height * MIN_PANE_HEIGHT_RATIO;
+                FileOpDetailedGrid.Height = windowHeight * MIN_PANE_HEIGHT_RATIO;
             }
             else if (val == 1)
             {
-                FileOpDetailedGrid.Height = Height * MAX_PANE_HEIGHT_RATIO;
+                FileOpDetailedGrid.Height = windowHeight * MAX_PANE_HEIGHT_RATIO;
             }
         }
 
@@ -1445,10 +1447,10 @@ namespace ADB_Explorer
         /// <returns>0 if within limits, 1 if exceeds upper limits, -1 if exceeds lower limits</returns>
         private sbyte DetailedViewSize()
         {
-            if (FileOpDetailedGrid.ActualHeight > Height * MAX_PANE_HEIGHT_RATIO)
+            if (FileOpDetailedGrid.ActualHeight > ActualHeight * MAX_PANE_HEIGHT_RATIO)
                 return 1;
 
-            if (FileOpDetailedGrid.ActualHeight < Height * MIN_PANE_HEIGHT_RATIO && FileOpDetailedGrid.ActualHeight < MIN_PANE_HEIGHT)
+            if (ActualHeight == 0 || (FileOpDetailedGrid.ActualHeight < ActualHeight * MIN_PANE_HEIGHT_RATIO && FileOpDetailedGrid.ActualHeight < MIN_PANE_HEIGHT))
                 return -1;
 
             return 0;

@@ -396,6 +396,18 @@
                 </ui:FontIcon.Style>
             </ui:FontIcon>
         </DataTemplate>
+        <DataTemplate x:Key="FileOpFileNameTemplate">
+            <TextBlock
+                Margin="4,0"
+                Text="{Binding FileName}"
+                TextTrimming="CharacterEllipsis" />
+        </DataTemplate>
+        <DataTemplate x:Key="FileOpStatusTemplate">
+            <TextBlock
+                Margin="4,0"
+                Text="{Binding Status}"
+                TextTrimming="CharacterEllipsis" />
+        </DataTemplate>
         <DataTemplate x:Key="FileOpProgressTemplate">
             <StackPanel Margin="4,0">
                 <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage}" />
@@ -967,7 +979,7 @@
                                 SortMemberPath="FileName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <TextBlock FontSize="{Binding Source={StaticResource FontSize}}">
+                                        <TextBlock FontSize="{Binding Source={StaticResource FontSize}}" TextTrimming="CharacterEllipsis">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Text" Value="{Binding FileName}" />
@@ -990,6 +1002,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,8,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
@@ -1009,6 +1022,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Text" Value="{Binding TypeName}" />
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
@@ -1021,6 +1035,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Text" Value="{Binding SizeString}" />
@@ -1107,8 +1122,8 @@
                                     Width="30"
                                     CanUserResize="False"
                                     CellTemplate="{StaticResource OperationIconTemplate}" />
-                                <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" Header="File Name" />
-                                <DataGridTextColumn Binding="{Binding StatusInfo, Mode=OneWay}" Header="Status" />
+                                <DataGridTemplateColumn CellTemplate="{StaticResource FileOpFileNameTemplate}" Header="File Name" />
+                                <DataGridTemplateColumn CellTemplate="{StaticResource FileOpStatusTemplate}" Header="Status" />
                             </DataGrid.Columns>
                         </DataGrid>
                         <StackPanel.Style>
@@ -1144,7 +1159,7 @@
                                                 Width="30"
                                                 CanUserResize="False"
                                                 CellTemplate="{StaticResource OperationIconTemplate}" />
-                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" Header="File Name" />
+                                            <DataGridTemplateColumn CellTemplate="{StaticResource FileOpFileNameTemplate}" Header="File Name" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel.Style>
@@ -1179,8 +1194,8 @@
                                                 Width="30"
                                                 CanUserResize="False"
                                                 CellTemplate="{StaticResource OperationIconTemplate}" />
-                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" Header="File Name" />
-                                            <DataGridTextColumn Binding="{Binding StatusInfo, Mode=OneWay}" Header="Status" />
+                                            <DataGridTemplateColumn CellTemplate="{StaticResource FileOpFileNameTemplate}" Header="File Name" />
+                                            <DataGridTemplateColumn CellTemplate="{StaticResource FileOpStatusTemplate}" Header="Status" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel.Style>
@@ -1351,16 +1366,19 @@
                                     <TextBlock Text="Current" />
                                     <DataGrid
                                         x:Name="CurrentOperationDataGrid"
+                                        Width="Auto"
+                                        MaxWidth="282"
                                         AutoGenerateColumns="False"
                                         CanUserDeleteRows="False"
                                         CellStyle="{StaticResource DataGridCellStyle}"
                                         FocusVisualStyle="{x:Null}"
                                         HeadersVisibility="None"
+                                        HorizontalScrollBarVisibility="Disabled"
                                         ItemsSource="{Binding}">
                                         <DataGrid.Columns>
                                             <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
                                             <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
-                                            <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                            <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <StackPanel.Style>
@@ -1377,13 +1395,15 @@
                                 <ScrollViewer
                                     x:Name="PendingAndCompletedScrollViewer"
                                     Grid.Row="1"
-                                    HorizontalScrollBarVisibility="Auto"
+                                    HorizontalScrollBarVisibility="Disabled"
                                     PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                                     <StackPanel>
                                         <StackPanel>
                                             <TextBlock Text="Pending" />
                                             <DataGrid
                                                 x:Name="PendingOperationsDataGrid"
+                                                Width="Auto"
+                                                MaxWidth="282"
                                                 AutoGenerateColumns="False"
                                                 CellStyle="{StaticResource DataGridCellStyle}"
                                                 FocusVisualStyle="{x:Null}"
@@ -1394,7 +1414,7 @@
                                                 VerticalScrollBarVisibility="Disabled">
                                                 <DataGrid.Columns>
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
-                                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                                    <DataGridTemplateColumn MaxWidth="200" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <StackPanel.Style>
@@ -1424,7 +1444,7 @@
                                                 <DataGrid.Columns>
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource StatusIconTemplate}" />
                                                     <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
-                                                    <DataGridTextColumn Binding="{Binding FileName, Mode=OneWay}" />
+                                                    <DataGridTemplateColumn MaxWidth="200" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
                                                 </DataGrid.Columns>
                                             </DataGrid>
                                             <StackPanel.Style>
