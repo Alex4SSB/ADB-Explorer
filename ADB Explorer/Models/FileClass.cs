@@ -84,9 +84,10 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public string ShortExtension { get { return (char.GetUnicodeCategory(Extension[1]) == UnicodeCategory.Surrogate) ? Extension[1..] : ""; } }
+        public string ShortExtension { get { return (Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(Extension[1])) > -1) ? Extension[1..] : ""; } }
 
         public bool ExtensionIsGlyph { get; set; }
+        public bool ExtensionIsFontIcon { get; set; }
 
         public string GetTypeName(string fileName)
         {
@@ -95,9 +96,13 @@ namespace ADB_Explorer.Models
             {
                 var name = ShellInfoManager.GetShellFileType(fileName);
 
-                if (name.EndsWith("?? File"))
+                if (name.EndsWith("? File"))
                 {
-                    ExtensionIsGlyph = true;
+                    if (ShortExtension.Length == 1)
+                        ExtensionIsGlyph = true;
+                    else
+                        ExtensionIsFontIcon = true;
+
                     return $"{ShortExtension} File";
                 }
                 else

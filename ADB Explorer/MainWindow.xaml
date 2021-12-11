@@ -956,28 +956,36 @@
                                                 Width="16"
                                                 Margin="0,1,0,0"
                                                 RenderOptions.BitmapScalingMode="HighQuality"
-                                                Source="{Binding Icon}" >
+                                                Source="{Binding Icon}">
                                                 <Image.Style>
                                                     <Style TargetType="Image">
-                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Setter Property="Visibility" Value="Visible" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
-                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Image.Style>
                                             </Image>
                                             <TextBlock
-                                                Text="{Binding ShortExtension}"
                                                 HorizontalAlignment="Center"
-                                                FontSize="16">
+                                                FontSize="16"
+                                                Text="{Binding ShortExtension}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
-                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Setter Property="Visibility" Value="Collapsed" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
-                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible" />
+                                                                <Setter Property="Margin" Value="-1,-6,0,0" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -1000,6 +1008,9 @@
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
                                                             <Setter Property="Text" Value="{Binding NoExtName}" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                                                            <Setter Property="FontFamily" Value="Segoe UI Symbol" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
@@ -1035,6 +1046,11 @@
                                 SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                                                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
                                         <Setter Property="Margin" Value="4,0,0,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Text" Value="{Binding TypeName}" />

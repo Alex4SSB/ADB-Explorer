@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace ADB_Explorer.Models
 {
@@ -62,5 +63,7 @@ namespace ADB_Explorer.Models
         };
 
         public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM" };
+
+        public static readonly UnicodeCategory[] UNICODE_ICONS = { UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned };
     }
 }
