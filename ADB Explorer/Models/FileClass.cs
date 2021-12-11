@@ -84,6 +84,10 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public string ShortExtension { get { return (char.GetUnicodeCategory(Extension[1]) == UnicodeCategory.Surrogate) ? Extension[1..] : ""; } }
+
+        public bool ExtensionIsGlyph { get; set; }
+
         public string GetTypeName(string fileName)
         {
             if (IsApk)
@@ -92,7 +96,10 @@ namespace ADB_Explorer.Models
                 var name = ShellInfoManager.GetShellFileType(fileName);
 
                 if (name.EndsWith("?? File"))
-                    return $"{fileName[(fileName.LastIndexOf('.') + 1)..]} File";
+                {
+                    ExtensionIsGlyph = true;
+                    return $"{ShortExtension} File";
+                }
                 else
                     return name;
             }

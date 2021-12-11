@@ -951,11 +951,39 @@
                             <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Image
-                                            Width="16"
-                                            Margin="0,1,0,0"
-                                            RenderOptions.BitmapScalingMode="HighQuality"
-                                            Source="{Binding Icon}" />
+                                        <Grid>
+                                            <Image
+                                                Width="16"
+                                                Margin="0,1,0,0"
+                                                RenderOptions.BitmapScalingMode="HighQuality"
+                                                Source="{Binding Icon}" >
+                                                <Image.Style>
+                                                    <Style TargetType="Image">
+                                                        <Setter Property="Visibility" Value="Visible"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Image.Style>
+                                            </Image>
+                                            <TextBlock
+                                                Text="{Binding ShortExtension}"
+                                                HorizontalAlignment="Center"
+                                                FontSize="16">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                                                                <Setter Property="Visibility" Value="Visible"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </Grid>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
