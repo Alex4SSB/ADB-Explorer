@@ -1,23 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer.Models
 {
     public class FileStat : INotifyPropertyChanged
     {
-        public enum FileType
-        {
-            Socket,
-            File,
-            BlockDevice,
-            Folder,
-            CharDevice,
-            FIFO,
-            Drive,
-            Unknown
-        }
-
         public FileStat(string fileName, string path, FileType type, bool isLink = false, ulong? size = null, DateTime? modifiedTime = null)
         {
             this.fileName = fileName;

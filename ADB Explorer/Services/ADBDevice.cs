@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer.Services
 {
@@ -102,14 +103,14 @@ namespace ADB_Explorer.Services
                         path: ConcatPaths(path, name),
                         type: (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
                         {
-                            UnixFileMode.S_IFSOCK => FileStat.FileType.Socket,
-                            UnixFileMode.S_IFLNK => FileStat.FileType.Unknown,
-                            UnixFileMode.S_IFREG => FileStat.FileType.File,
-                            UnixFileMode.S_IFBLK => FileStat.FileType.BlockDevice,
-                            UnixFileMode.S_IFDIR => FileStat.FileType.Folder,
-                            UnixFileMode.S_IFCHR => FileStat.FileType.CharDevice,
-                            UnixFileMode.S_IFIFO => FileStat.FileType.FIFO,
-                            (UnixFileMode)0 => FileStat.FileType.Unknown,
+                            UnixFileMode.S_IFSOCK => FileType.Socket,
+                            UnixFileMode.S_IFLNK => FileType.Unknown,
+                            UnixFileMode.S_IFREG => FileType.File,
+                            UnixFileMode.S_IFBLK => FileType.BlockDevice,
+                            UnixFileMode.S_IFDIR => FileType.Folder,
+                            UnixFileMode.S_IFCHR => FileType.CharDevice,
+                            UnixFileMode.S_IFIFO => FileType.FIFO,
+                            (UnixFileMode)0 => FileType.Unknown,
                             _ => throw new Exception($"Unexpected file type for \"{name}\" with mode: {mode}")
                         },
                         size: (mode != 0) ? size : new UInt64?(),

@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media.Imaging;
+using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Models
@@ -85,9 +86,16 @@ namespace ADB_Explorer.Models
 
         public string GetTypeName(string fileName)
         {
-            return IsApk
-                ? "Android Application Package"
-                : ShellInfoManager.GetShellFileType(fileName);
+            if (IsApk)
+                return "Android Application Package";
+            {
+                var name = ShellInfoManager.GetShellFileType(fileName);
+
+                if (name.EndsWith("?? File"))
+                    return $"{fileName[(fileName.LastIndexOf('.') + 1)..]} File";
+                else
+                    return name;
+            }
         }
 
         private string typeName;
@@ -141,7 +149,7 @@ namespace ADB_Explorer.Models
                 FileType.File => IsLink ? "Link" : GetTypeName(FileName),
                 FileType.Folder => IsLink ? "Link" : "Folder",
                 FileType.Unknown => "",
-                _ => Type.ToString(),
+                _ => Type.Name(),
             };
         }
 

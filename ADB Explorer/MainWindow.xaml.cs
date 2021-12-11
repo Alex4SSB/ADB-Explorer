@@ -21,6 +21,7 @@ using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Helpers.VisibilityHelper;
+using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer
 {
@@ -96,7 +97,7 @@ namespace ADB_Explorer
             get
             {
                 var files = ExplorerGrid.SelectedItems.OfType<FileClass>().ToList();
-                if (files.Any(i => i.Type != FileStat.FileType.File)) return "0";
+                if (files.Any(i => i.Type != FileType.File)) return "0";
 
                 ulong totalSize = 0;
                 files.ForEach(f => totalSize += f.Size.GetValueOrDefault(0));
@@ -136,7 +137,7 @@ namespace ADB_Explorer
             {
                 case MenuType.ExplorerItem:
                     pullMenu.IsEnabled = false;
-                    if (dataContext is FileClass file && file.Type is FileStat.FileType.File or FileStat.FileType.Folder)
+                    if (dataContext is FileClass file && file.Type is FileType.File or FileType.Folder)
                         pullMenu.IsEnabled = true;
 
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
@@ -267,11 +268,11 @@ namespace ADB_Explorer
             {
                 switch (file.Type)
                 {
-                    case FileStat.FileType.File:
+                    case FileType.File:
                         if (PullOnDoubleClickCheckBox.IsChecked == true)
                             CopyFiles(true);
                         break;
-                    case FileStat.FileType.Folder:
+                    case FileType.Folder:
                         NavigateToPath(file.Path);
                         break;
                     default:
@@ -286,8 +287,8 @@ namespace ADB_Explorer
 
             var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
             PullMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
-                is FileStat.FileType.File
-                or FileStat.FileType.Folder);
+                is FileType.File
+                or FileType.Folder);
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -381,11 +382,9 @@ namespace ADB_Explorer
             if (Storage.RetrieveBool(Settings.showHiddenItems) is bool showHidden)
                 ShowHiddenCheckBox.IsChecked = showHidden;
 
-            if (Storage.RetrieveBool(Settings.showExtendedView) is bool extendedView)
-            {
-                FileOpDetailedRadioButton.IsChecked = extendedView;
-                FileOpCompactRadioButton.IsChecked = !extendedView;
-            }
+            bool extendedView = Storage.RetrieveBool(Settings.showExtendedView) is bool val && val;
+            FileOpDetailedRadioButton.IsChecked = extendedView;
+            FileOpCompactRadioButton.IsChecked = !extendedView;
 
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
@@ -541,7 +540,7 @@ namespace ADB_Explorer
 
             var newFiles = waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)).ToArray();
             AndroidFileList.AddRange(newFiles);
-            var unknownFiles = newFiles.Where(f => f.Type == FileStat.FileType.Unknown);
+            var unknownFiles = newFiles.Where(f => f.Type == FileType.Unknown);
             StartDetermineFolders(unknownFiles);
 
             if (wasEmpty && (AndroidFileList.Count > 0))
@@ -587,7 +586,7 @@ namespace ADB_Explorer
                 }
                 else if (CurrentADBDevice.IsDirectory(file.Path))
                 {
-                    Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileStat.FileType.Folder; });
+                    Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileType.Folder; });
                 }
             }
         }
