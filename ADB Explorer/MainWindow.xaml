@@ -997,6 +997,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
                                 x:Name="Name"
+                                Width="300"
                                 Header="Name"
                                 SortMemberPath="FileName">
                                 <DataGridTemplateColumn.CellTemplate>
@@ -1021,6 +1022,7 @@
                             </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 x:Name="Date"
+                                Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Date modified"
                                 SortMemberPath="ModifiedTime">
@@ -1041,6 +1043,7 @@
                             </DataGridTextColumn>
                             <DataGridTextColumn
                                 x:Name="Type"
+                                Width="150"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Type"
                                 SortMemberPath="TypeName">
@@ -1059,12 +1062,13 @@
                             </DataGridTextColumn>
                             <DataGridTextColumn
                                 x:Name="Size"
+                                Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Size"
                                 SortMemberPath="Size">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
-                                        <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Setter Property="Margin" Value="4,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
@@ -1139,115 +1143,130 @@
                     DragDelta="GridSplitter_DragDelta"
                     FocusVisualStyle="{x:Null}" />
                 <Grid Grid.Row="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <StackPanel>
-                        <DataGrid
-                            x:Name="CurrentOperationDetailedDataGrid"
-                            AutoGenerateColumns="False"
-                            CanUserDeleteRows="False"
-                            CellStyle="{StaticResource DataGridCellStyle}"
-                            FocusVisualStyle="{x:Null}"
-                            HeadersVisibility="Column"
-                            ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
-                                <DataGridTemplateColumn
-                                    Width="30"
-                                    CanUserResize="False"
-                                    CellTemplate="{StaticResource OperationIconTemplate}" />
-                                <DataGridTemplateColumn CellTemplate="{StaticResource FileOpFileNameTemplate}" Header="File Name" />
-                                <DataGridTemplateColumn CellTemplate="{StaticResource FileOpStatusTemplate}" Header="Status" />
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Style>
-                    </StackPanel>
-                    <Grid Grid.Row="1">
-                        <ScrollViewer
-                            x:Name="PendingAndCompletedDetailedScrollViewer"
-                            HorizontalScrollBarVisibility="Auto"
-                            PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                            <StackPanel>
-                                <StackPanel>
-                                    <DataGrid
-                                        x:Name="PendingOperationsDetailedDataGrid"
-                                        AutoGenerateColumns="False"
-                                        CellStyle="{StaticResource DataGridCellStyle}"
-                                        FocusVisualStyle="{x:Null}"
-                                        HeadersVisibility="Column"
-                                        HorizontalScrollBarVisibility="Disabled"
-                                        ItemsSource="{Binding ElementName=PendingOperationsDataGrid, Path=ItemsSource}"
-                                        SelectionUnit="FullRow"
-                                        VerticalScrollBarVisibility="Disabled">
-                                        <DataGrid.Columns>
-                                            <DataGridTemplateColumn
-                                                Width="30"
-                                                CanUserResize="False"
-                                                CellTemplate="{StaticResource OperationIconTemplate}" />
-                                            <DataGridTemplateColumn CellTemplate="{StaticResource FileOpFileNameTemplate}" Header="File Name" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=PendingOperationsDataGrid, Path=Items.Count}" Value="0">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                </StackPanel>
-                                <StackPanel>
-                                    <DataGrid
-                                        x:Name="CompletedOperationsDetailedDataGrid"
-                                        Width="Auto"
-                                        AutoGenerateColumns="False"
-                                        CellStyle="{StaticResource DataGridCellStyle}"
-                                        FocusVisualStyle="{x:Null}"
-                                        HeadersVisibility="Column"
-                                        HorizontalScrollBarVisibility="Disabled"
-                                        ItemsSource="{Binding ElementName=CompletedOperationsDataGrid, Path=ItemsSource}"
-                                        SelectionUnit="FullRow"
-                                        VerticalScrollBarVisibility="Disabled">
-                                        <DataGrid.Columns>
-                                            <DataGridTemplateColumn
-                                                Width="20"
-                                                CanUserResize="False"
-                                                CellTemplate="{StaticResource StatusIconTemplate}" />
-                                            <DataGridTemplateColumn
-                                                Width="30"
-                                                CanUserResize="False"
-                                                CellTemplate="{StaticResource OperationIconTemplate}" />
-                                            <DataGridTemplateColumn CellTemplate="{StaticResource FileOpFileNameTemplate}" Header="File Name" />
-                                            <DataGridTemplateColumn CellTemplate="{StaticResource FileOpStatusTemplate}" Header="Status" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=CompletedOperationsDataGrid, Path=Items.Count}" Value="0">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                </StackPanel>
-                            </StackPanel>
-                        </ScrollViewer>
-                    </Grid>
+                    <ScrollViewer
+                        x:Name="PendingAndCompletedDetailedScrollViewer"
+                        HorizontalScrollBarVisibility="Auto"
+                        PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <DataGrid
+                                    x:Name="CurrentOperationDetailedDataGrid"
+                                    Grid.Column="1"
+                                    AutoGenerateColumns="False"
+                                    CanUserDeleteRows="False"
+                                    CellStyle="{StaticResource DataGridCellStyle}"
+                                    FocusVisualStyle="{x:Null}"
+                                    HeadersVisibility="Column"
+                                    ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn
+                                            MinWidth="100"
+                                            CellTemplate="{StaticResource FileOpProgressTemplate}"
+                                            Header="Progress" />
+                                        <DataGridTemplateColumn
+                                            Width="30"
+                                            CanUserResize="False"
+                                            CellTemplate="{StaticResource OperationIconTemplate}" />
+                                        <DataGridTemplateColumn
+                                            Width="300"
+                                            CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                                            Header="File Name" />
+                                        <DataGridTemplateColumn
+                                            Width="Auto"
+                                            CellTemplate="{StaticResource FileOpStatusTemplate}"
+                                            Header="Status" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <ui:FontIcon
+                                    Margin="4,6"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Glyph="&#xE9F3;"
+                                    ToolTip="Current" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <DataGrid
+                                    x:Name="PendingOperationsDetailedDataGrid"
+                                    Grid.Column="1"
+                                    AutoGenerateColumns="False"
+                                    CellStyle="{StaticResource DataGridCellStyle}"
+                                    FocusVisualStyle="{x:Null}"
+                                    HeadersVisibility="Column"
+                                    HorizontalScrollBarVisibility="Disabled"
+                                    ItemsSource="{Binding ElementName=PendingOperationsDataGrid, Path=ItemsSource}"
+                                    SelectionUnit="FullRow"
+                                    VerticalScrollBarVisibility="Disabled">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn
+                                            Width="30"
+                                            CanUserResize="False"
+                                            CellTemplate="{StaticResource OperationIconTemplate}" />
+                                        <DataGridTemplateColumn
+                                            Width="300"
+                                            CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                                            Header="File Name" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <ui:FontIcon
+                                    Margin="4,6"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Glyph="&#xECC5;"
+                                    ToolTip="Pending" />
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <DataGrid
+                                    x:Name="CompletedOperationsDetailedDataGrid"
+                                    Grid.Column="1"
+                                    Width="Auto"
+                                    AutoGenerateColumns="False"
+                                    CellStyle="{StaticResource DataGridCellStyle}"
+                                    FocusVisualStyle="{x:Null}"
+                                    HeadersVisibility="Column"
+                                    HorizontalScrollBarVisibility="Disabled"
+                                    ItemsSource="{Binding ElementName=CompletedOperationsDataGrid, Path=ItemsSource}"
+                                    SelectionUnit="FullRow"
+                                    VerticalScrollBarVisibility="Disabled">
+                                    <DataGrid.Columns>
+                                        <DataGridTemplateColumn
+                                            Width="30"
+                                            CanUserResize="False"
+                                            CellTemplate="{StaticResource StatusIconTemplate}" />
+                                        <DataGridTemplateColumn
+                                            Width="30"
+                                            CanUserResize="False"
+                                            CellTemplate="{StaticResource OperationIconTemplate}" />
+                                        <DataGridTemplateColumn
+                                            Width="300"
+                                            CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                                            Header="File Name" />
+                                        <DataGridTemplateColumn
+                                            Width="Auto"
+                                            CellTemplate="{StaticResource FileOpStatusTemplate}"
+                                            Header="Status" />
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <ui:FontIcon
+                                    Margin="4,6"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Glyph="&#xE930;"
+                                    ToolTip="Completed" />
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
                 </Grid>
             </Grid>
             <StackPanel Grid.Row="3" Orientation="Horizontal">
