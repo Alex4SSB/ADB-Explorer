@@ -412,7 +412,7 @@
         <DataTemplate x:Key="FileOpProgressTemplate">
             <StackPanel Margin="4,0">
                 <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
-                <ui:ProgressBar>
+                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}">
                     <ui:ProgressBar.Style>
                         <Style BasedOn="{StaticResource FileOpProgressStyle}" TargetType="ui:ProgressBar">
                             <Style.Triggers>
@@ -1170,7 +1170,14 @@
                                         <DataGridTemplateColumn
                                             Width="30"
                                             CanUserResize="False"
-                                            CellTemplate="{StaticResource OperationIconTemplate}" />
+                                            CellTemplate="{StaticResource OperationIconTemplate}">
+                                            <DataGridTemplateColumn.Header>
+                                                <ui:FontIcon
+                                                    Margin="-7,0"
+                                                    Glyph="&#xE8AF;"
+                                                    ToolTip="Operation" />
+                                            </DataGridTemplateColumn.Header>
+                                        </DataGridTemplateColumn>
                                         <DataGridTemplateColumn
                                             Width="300"
                                             CellTemplate="{StaticResource FileOpFileNameTemplate}"
@@ -1208,7 +1215,14 @@
                                         <DataGridTemplateColumn
                                             Width="30"
                                             CanUserResize="False"
-                                            CellTemplate="{StaticResource OperationIconTemplate}" />
+                                            CellTemplate="{StaticResource OperationIconTemplate}">
+                                            <DataGridTemplateColumn.Header>
+                                                <ui:FontIcon
+                                                    Margin="-7,0"
+                                                    Glyph="&#xE8AF;"
+                                                    ToolTip="Operation" />
+                                            </DataGridTemplateColumn.Header>
+                                        </DataGridTemplateColumn>
                                         <DataGridTemplateColumn
                                             Width="300"
                                             CellTemplate="{StaticResource FileOpFileNameTemplate}"
@@ -1243,11 +1257,25 @@
                                         <DataGridTemplateColumn
                                             Width="30"
                                             CanUserResize="False"
-                                            CellTemplate="{StaticResource StatusIconTemplate}" />
+                                            CellTemplate="{StaticResource StatusIconTemplate}">
+                                            <DataGridTemplateColumn.Header>
+                                                <ui:FontIcon
+                                                    Margin="-7,0"
+                                                    Glyph="&#xE9CE;"
+                                                    ToolTip="Status" />
+                                            </DataGridTemplateColumn.Header>
+                                        </DataGridTemplateColumn>
                                         <DataGridTemplateColumn
                                             Width="30"
                                             CanUserResize="False"
-                                            CellTemplate="{StaticResource OperationIconTemplate}" />
+                                            CellTemplate="{StaticResource OperationIconTemplate}">
+                                            <DataGridTemplateColumn.Header>
+                                                <ui:FontIcon
+                                                    Margin="-7,0"
+                                                    Glyph="&#xE8AF;"
+                                                    ToolTip="Operation" />
+                                            </DataGridTemplateColumn.Header>
+                                        </DataGridTemplateColumn>
                                         <DataGridTemplateColumn
                                             Width="300"
                                             CellTemplate="{StaticResource FileOpFileNameTemplate}"
