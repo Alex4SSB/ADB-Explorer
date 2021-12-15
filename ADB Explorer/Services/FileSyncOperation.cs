@@ -32,15 +32,20 @@ namespace ADB_Explorer.Services
         {
             private AdbSyncProgressInfo adbInfo;
 
+            public InProgressInfo()
+            {
+                this.adbInfo = null;
+            }
+
             public InProgressInfo(AdbSyncProgressInfo adbInfo)
             {
                 this.adbInfo = adbInfo;
             }
 
-            public int? TotalPercentage => adbInfo.TotalPercentage;
-            public int? CurrentFilePercentage => adbInfo.CurrentFilePercentage;
-            public UInt64? CurrentFileBytesTransferred => adbInfo.CurrentFileBytesTransferred;
-            public string CurrentFileName => adbInfo.CurrentFile;
+            public int? TotalPercentage => adbInfo?.TotalPercentage;
+            public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
+            public UInt64? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
+            public string CurrentFileName => adbInfo?.CurrentFile;
 
             public string TotalProgress
             {
@@ -141,7 +146,7 @@ namespace ADB_Explorer.Services
             }
 
             Status = OperationStatus.InProgress;
-            StatusInfo = "Calculating...";
+            StatusInfo = new InProgressInfo();
             waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
             cancelTokenSource = new CancellationTokenSource();
 
@@ -149,7 +154,7 @@ namespace ADB_Explorer.Services
 
             operationTask.ContinueWith((t) => progressPollTimer.Stop());
             operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = new CompletedInfo(t.Result); }, TaskContinuationOptions.OnlyOnRanToCompletion);
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Canceled; StatusInfo = "Canceled by user"; }, TaskContinuationOptions.OnlyOnCanceled);
+            operationTask.ContinueWith((t) => { Status = OperationStatus.Canceled; StatusInfo = null; }, TaskContinuationOptions.OnlyOnCanceled);
             operationTask.ContinueWith((t) => { Status = OperationStatus.Failed; StatusInfo = t.Exception.InnerException.Message; }, TaskContinuationOptions.OnlyOnFaulted);
 
             progressPollTimer.Start();
