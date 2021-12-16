@@ -374,7 +374,6 @@
             </Style.Triggers>
         </Style>
         <Style x:Key="FileOpProgressStyle" TargetType="ui:ProgressBar">
-            <Setter Property="CornerRadius" Value="0" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
                     <Setter Property="IsIndeterminate" Value="True" />
@@ -410,20 +409,30 @@
                 TextTrimming="CharacterEllipsis" />
         </DataTemplate>
         <DataTemplate x:Key="FileOpProgressTemplate">
-            <StackPanel Margin="4,0">
+            <Grid Margin="4,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
-                <ui:ProgressBar Value="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}">
-                    <ui:ProgressBar.Style>
-                        <Style BasedOn="{StaticResource FileOpProgressStyle}" TargetType="ui:ProgressBar">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
-                                    <Setter Property="Value" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:ProgressBar.Style>
-                </ui:ProgressBar>
-            </StackPanel>
+                <ui:ProgressBar
+                    Grid.Row="1"
+                    Style="{StaticResource FileOpProgressStyle}"
+                    Value="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="4,0,0,0"
+                    Text="{Binding StatusInfo.TotalProgress, Mode=OneWay}" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Margin="4,0,0,0"
+                    Text="{Binding StatusInfo.CurrentFileProgress, Mode=OneWay}" />
+            </Grid>
         </DataTemplate>
         <DataTemplate x:Key="OperationIconTemplate">
             <Grid Margin="0,0,6,0">
@@ -1164,10 +1173,6 @@
                                     ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
                                     <DataGrid.Columns>
                                         <DataGridTemplateColumn
-                                            MinWidth="100"
-                                            CellTemplate="{StaticResource FileOpProgressTemplate}"
-                                            Header="Progress" />
-                                        <DataGridTemplateColumn
                                             Width="30"
                                             CanUserResize="False"
                                             CellTemplate="{StaticResource OperationIconTemplate}">
@@ -1183,9 +1188,9 @@
                                             CellTemplate="{StaticResource FileOpFileNameTemplate}"
                                             Header="File Name" />
                                         <DataGridTemplateColumn
-                                            Width="Auto"
-                                            CellTemplate="{StaticResource FileOpStatusTemplate}"
-                                            Header="Status" />
+                                            MinWidth="100"
+                                            CellTemplate="{StaticResource FileOpProgressTemplate}"
+                                            Header="Progress" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                                 <ui:FontIcon
@@ -1257,17 +1262,6 @@
                                         <DataGridTemplateColumn
                                             Width="30"
                                             CanUserResize="False"
-                                            CellTemplate="{StaticResource StatusIconTemplate}">
-                                            <DataGridTemplateColumn.Header>
-                                                <ui:FontIcon
-                                                    Margin="-7,0"
-                                                    Glyph="&#xE9CE;"
-                                                    ToolTip="Status" />
-                                            </DataGridTemplateColumn.Header>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn
-                                            Width="30"
-                                            CanUserResize="False"
                                             CellTemplate="{StaticResource OperationIconTemplate}">
                                             <DataGridTemplateColumn.Header>
                                                 <ui:FontIcon
@@ -1280,6 +1274,17 @@
                                             Width="300"
                                             CellTemplate="{StaticResource FileOpFileNameTemplate}"
                                             Header="File Name" />
+                                        <DataGridTemplateColumn
+                                            Width="30"
+                                            CanUserResize="False"
+                                            CellTemplate="{StaticResource StatusIconTemplate}">
+                                            <DataGridTemplateColumn.Header>
+                                                <ui:FontIcon
+                                                    Margin="-7,0"
+                                                    Glyph="&#xE9CE;"
+                                                    ToolTip="Status" />
+                                            </DataGridTemplateColumn.Header>
+                                        </DataGridTemplateColumn>
                                         <DataGridTemplateColumn
                                             Width="Auto"
                                             CellTemplate="{StaticResource FileOpStatusTemplate}"
