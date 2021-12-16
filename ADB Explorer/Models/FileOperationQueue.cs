@@ -148,7 +148,7 @@ namespace ADB_Explorer.Models
                 currOperationLastProgress = currentProgress.Value;
             }
             
-            Progress = ((double)CompletedOperations.Count + (currOperationLastProgress / 100.0)) / TotalCount; // * 100.0
+            Progress = ((double)CompletedOperations.Count + (currOperationLastProgress / 100.0)) / TotalCount;
         }
 
         public void Start()
@@ -237,7 +237,7 @@ namespace ADB_Explorer.Models
 
             if ((e.PropertyName == "StatusInfo") &&
                 (CurrentOperation.Status == FileOperation.OperationStatus.InProgress) &&
-                (CurrentOperation.StatusInfo is AdbSyncProgressInfo status) &&
+                (CurrentOperation.StatusInfo is FileSyncOperation.InProgressInfo status) &&
                 (status.TotalPercentage is int percentage))
             {
                 UpdateProgress(percentage);
