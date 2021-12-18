@@ -16,12 +16,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using static ADB_Explorer.Converters.FileTypeClass;
+using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
-using static ADB_Explorer.Helpers.VisibilityHelper;
-using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer
 {
@@ -39,6 +41,8 @@ namespace ADB_Explorer
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
+
+        private SolidColorBrush qrForeground, qrBackground;
 
         public bool ListingInProgress { get { return listDirTask is not null; } }
 
@@ -183,9 +187,9 @@ namespace ADB_Explorer
             ConnectTimer.Stop();
         }
 
-        private static void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
+        private void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
 
-        private static void SetTheme(ApplicationTheme theme)
+        private void SetTheme(ApplicationTheme theme)
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
@@ -195,11 +199,30 @@ namespace ADB_Explorer
             }
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
+
+            SetQrColors(theme);
         }
 
         private static void SetResourceColor(ApplicationTheme theme, string resource)
         {
             Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]);
+        }
+
+        private void SetQrColors(ApplicationTheme theme)
+        {
+            switch (theme)
+            {
+                case ApplicationTheme.Light:
+                    qrBackground = QR_BACKGROUND_LIGHT;
+                    qrForeground = QR_FOREGROUND_LIGHT;
+                    break;
+                case ApplicationTheme.Dark:
+                    qrBackground = QR_BACKGROUND_DARK;
+                    qrForeground = QR_FOREGROUND_DARK;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
@@ -1044,7 +1067,14 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (ex.Message.Contains($"failed to connect to {deviceAddress}"))
+                {
+                    // propose pairing
+
+                }
+                else
+                    MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
 
@@ -1083,7 +1113,11 @@ namespace ADB_Explorer
             DevicesList.Items.Refresh();
 
             if (NewDevicePanelVisibility())
+            {
                 RetrieveIp();
+
+                PairingQrImage.Source = WiFiPairingService.GenerateQrCode(qrBackground, qrForeground);
+            }
         }
 
         private void NewDevicePanelVisibility(bool open)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Windows.Media;
 
 namespace ADB_Explorer.Models
 {
@@ -65,5 +66,13 @@ namespace ADB_Explorer.Models
         public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM" };
 
         public static readonly UnicodeCategory[] UNICODE_ICONS = { UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned };
+
+        public static readonly SolidColorBrush QR_BACKGROUND_LIGHT = new(Color.FromRgb(242, 242, 242));
+        public static readonly SolidColorBrush QR_FOREGROUND_LIGHT = new(Color.FromRgb(40, 40, 40));
+        public static readonly SolidColorBrush QR_BACKGROUND_DARK = new(Color.FromRgb(23, 23, 23));
+        public static readonly SolidColorBrush QR_FOREGROUND_DARK = new(Color.FromRgb(162, 162, 162));
+
+        public static readonly char[] ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
+        public static readonly string PAIRING_SERVICE_PREFIX = "adbexplorer-";
     }
 }
