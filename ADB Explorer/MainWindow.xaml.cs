@@ -429,6 +429,8 @@ namespace ADB_Explorer
                 // Shouldn't actually happen
                 InitNavigation();
             }
+
+            TestCurrentOperation();
         }
 
         private void DriveViewNav()
@@ -960,6 +962,13 @@ namespace ADB_Explorer
             {
                 fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, item, CurrentPath));
             }
+        }
+
+        private void TestCurrentOperation()
+        {
+            // fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "Shalom.exe"));
+            // fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "Shalom.exe"));
+            // fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Shalom"));
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
