@@ -89,7 +89,8 @@ namespace ADB_Explorer.Models
         {
             Local,
             Remote,
-            Emulator
+            Emulator,
+            Service
         }
 
         public enum DeviceStatus
@@ -118,6 +119,7 @@ namespace ADB_Explorer.Models
             DeviceType.Local => "\uE839",
             DeviceType.Remote => "\uEE77",
             DeviceType.Emulator => "\uE99A",
+            DeviceType.Service => "\uEDE4",
             _ => throw new NotImplementedException(),
         };
         public string StatusIcon => Status switch
@@ -197,10 +199,14 @@ namespace ADB_Explorer.Models
 
         public DeviceClass(string name, string id, string status) : this(name, id)
         {
-            Type = id.Contains('.')
-                ? DeviceType.Remote : id.Contains("emulator")
-                    ? DeviceType.Emulator
-                    : DeviceType.Local;
+            if (id.Contains("._adb-tls-connect."))
+                Type = DeviceType.Service;
+            else if (id.Contains('.'))
+                Type = DeviceType.Remote;
+            else if (id.Contains("emulator"))
+                Type = DeviceType.Emulator;
+            else
+                Type = DeviceType.Local;
 
             Status = status switch
             {
