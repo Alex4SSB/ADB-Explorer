@@ -44,6 +44,8 @@ namespace ADB_Explorer
 
         private SolidColorBrush qrForeground, qrBackground;
 
+        public static MDNS MdnsService { get; set; } = new();
+
         public bool ListingInProgress { get { return listDirTask is not null; } }
 
         private double ColumnHeaderHeight
@@ -519,9 +521,25 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
-            // do nothing if amount of devices and their types haven't changed
-            if (Devices.DevicesChanged(ADBService.GetDevices()))
-                DeviceListSetup();
+            if (MdnsService.State == MDNS.MdnsState.Disabled)
+            {
+                // do nothing if amount of devices and their types haven't changed
+                if (Devices.DevicesChanged(ADBService.GetDevices()))
+                    DeviceListSetup();
+            }
+        }
+
+        private void MdnsCheck()
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                Task.Run(() =>
+                {
+                    return MdnsService.State = ADBService.CheckMDNS()
+                        ? MDNS.MdnsState.Running
+                        : MDNS.MdnsState.NotRunning;
+                });
+            });
         }
 
         private void StartDirectoryList(string path)
@@ -1518,6 +1536,17 @@ namespace ADB_Explorer
         private void FileOpCompactRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.showExtendedView, false);
+        }
+
+        private void ConnectionTypeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (ManualConnectionRadioButton.IsChecked == false
+                && NewDevicePanel.Visible()
+                && MdnsService.State == MDNS.MdnsState.Disabled)
+            {
+                MdnsService.State = MDNS.MdnsState.Unchecked;
+                MdnsCheck();
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

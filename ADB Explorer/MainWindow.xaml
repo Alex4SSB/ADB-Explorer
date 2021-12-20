@@ -1626,13 +1626,134 @@
                         <StackPanel
                             x:Name="NewDevicePanel"
                             Grid.Row="1"
+                            Margin="8,0,8,0"
                             VerticalAlignment="Bottom"
                             Visibility="Collapsed">
-                            <StackPanel Margin="8">
-                                <Image
-                                    x:Name="PairingQrImage"
-                                    Margin="0,0,0,6"
-                                    RenderOptions.EdgeMode="Aliased" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Text="mDNS"
+                                Visibility="Collapsed" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock
+                                    Grid.Row="1"
+                                    Margin="0,0,6,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Text="mDNS" />
+                                <Separator Grid.Row="1" VerticalAlignment="Top" />
+                                <RadioButton
+                                    x:Name="ManualConnectionRadioButton"
+                                    Grid.Column="1"
+                                    Checked="ConnectionTypeRadioButton_Checked"
+                                    Content="Manual"
+                                    GroupName="ConnectionType"
+                                    IsChecked="True"
+                                    Unchecked="ConnectionTypeRadioButton_Checked" />
+                                <StackPanel Grid.Row="1" Grid.Column="1">
+                                    <Separator />
+                                    <RadioButton
+                                        x:Name="QrConnectionRadioButton"
+                                        Checked="ConnectionTypeRadioButton_Checked"
+                                        Content="QR code"
+                                        GroupName="ConnectionType"
+                                        Unchecked="ConnectionTypeRadioButton_Checked" />
+                                    <RadioButton
+                                        x:Name="PasswordConnectionRadioButton"
+                                        Checked="ConnectionTypeRadioButton_Checked"
+                                        Content="6 digit code"
+                                        GroupName="ConnectionType"
+                                        Unchecked="ConnectionTypeRadioButton_Checked" />
+                                </StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                                <Grid>
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Grid.Style>
+                                    <StackPanel x:Name="QrPairingPanel">
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=QrConnectionRadioButton, Path=IsChecked}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <Image
+                                            x:Name="PairingQrImage"
+                                            Margin="0,0,0,6"
+                                            RenderOptions.EdgeMode="Aliased" />
+                                    </StackPanel>
+                                </Grid>
+                                <StackPanel x:Name="MdnsLoadingPanel">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Unchecked">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock HorizontalAlignment="Center" Text="Please wait..." />
+                                    <ui:ProgressRing
+                                        Margin="6"
+                                        HorizontalAlignment="Center"
+                                        IsActive="True" />
+                                </StackPanel>
+                                <StackPanel>
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock x:Name="MdnsDownBlock" Text="mDNS server is not running" />
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel>
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
                                 <TextBlock Text="IP:" />
                                 <TextBox
                                     x:Name="NewDeviceIpBox"
@@ -1666,7 +1787,7 @@
                                 </Grid>
                                 <Button
                                     x:Name="ConnectNewDeviceButton"
-                                    Margin="0,6,0,0"
+                                    Margin="0,6,0,8"
                                     HorizontalAlignment="Center"
                                     Click="ConnectNewDeviceButton_Click"
                                     Content="Connect"

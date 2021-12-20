@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static ADB_Explorer.Models.AdbRegEx;
+using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Services
 {
@@ -15,6 +16,7 @@ namespace ADB_Explorer.Services
     {
         private const string ADB_PATH = "adb";
         private const string GET_DEVICES = "devices";
+        private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
 
         public class ProcessFailedException : Exception
         {
@@ -52,6 +54,8 @@ namespace ADB_Explorer.Services
             cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
             cmdProcess.StartInfo.StandardErrorEncoding = encoding;
+            // TODO: disable when mDNS is disabled
+            cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
             cmdProcess.Start();
             return cmdProcess;
         }
@@ -123,7 +127,7 @@ namespace ADB_Explorer.Services
             var result = string.Concat(str.Select(c =>
                 c switch
                 {
-                    var ch when new[] { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`'}.Contains(ch) => "\\" + ch,
+                    var ch when ESCAPE_ADB_SHELL_CHARS.Contains(ch) => "\\" + ch,
                     _ => new string(c, 1)
                 }));
 
@@ -135,7 +139,7 @@ namespace ADB_Explorer.Services
             var result = string.Concat(str.Select(c =>
                 c switch
                 {
-                    var ch when new[] { '$', '`', '"', '\\' }.Contains(ch) => "\\" + ch,
+                    var ch when ESCAPE_ADB_CHARS.Contains(ch) => "\\" + ch,
                     _ => new string(c, 1)
                 }));
 
@@ -215,5 +219,19 @@ namespace ADB_Explorer.Services
 
             return mmcVolumeId.Success ? mmcVolumeId.Groups["id"].Value : "";
         }
+
+        public static bool CheckMDNS()
+        {
+            var res = ExecuteAdbCommandAsync("mdns", new(), "check");
+
+            return res.First().Contains("mdns daemon version");
+        }
+
+        //public static void RestartAdbServer()
+        //{
+        //    ExecuteAdbCommand("kill-server", out _, out _);
+
+        //    ExecuteAdbCommand("start-server", out _, out _);
+        //}
     }
 }
