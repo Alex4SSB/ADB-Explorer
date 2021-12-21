@@ -1130,6 +1130,7 @@ namespace ADB_Explorer
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            TextBoxSeparation(sender as TextBox, numeric:true, moveCaret:false, allowedChars: '.');
             EnableConnectButton();
         }
 
@@ -1547,6 +1548,95 @@ namespace ADB_Explorer
                 MdnsService.State = MDNS.MdnsState.Unchecked;
                 MdnsCheck();
             }
+            else
+            {
+                MdnsService.State = MDNS.MdnsState.Disabled;
+            }
+        }
+
+        private static void TextBoxSeparation(TextBox textBox,
+                                              char? separator = null,
+                                              int maxChars = -1,
+                                              bool numeric = true,
+                                              bool moveCaret = true,
+                                              params char[] allowedChars)
+        {
+            var caretIndex = textBox.CaretIndex;
+            var output = "";
+            var numbers = "";
+            var deletedChars = 0;
+
+            if (numeric)
+            {
+                foreach (var c in textBox.Text)
+                {
+                    if (!char.IsDigit(c) && !allowedChars.Contains(c))
+                    {
+                        if (c != separator)
+                            deletedChars++;
+
+                        continue;
+                    }
+
+                    numbers += c;
+                }
+            }
+
+            if (separator is null)
+            {
+                output = numbers;
+            }
+            else
+            {
+                for (int i = 0; i < numbers.Length; i++)
+                {
+                    output += $"{(i > 0 ? separator : "")}{numbers[i]}";
+                }
+            }
+
+            if (deletedChars > 0 && textBox.Tag is string prev && prev.Length > output.Length)
+            {
+                textBox.Text = prev;
+                textBox.CaretIndex = caretIndex - deletedChars;
+                return;
+            }
+
+            if (maxChars > -1)
+                textBox.MaxLength = separator is null ? maxChars : (maxChars * 2) - 1;
+
+            textBox.Text = output;
+
+            if (moveCaret)
+                textBox.CaretIndex = output.Length;
+            else
+                textBox.CaretIndex = caretIndex - deletedChars;
+
+            textBox.Tag = output;
+        }
+
+        private static string NumericText(string text)
+        {
+            var output = "";
+            foreach (var c in text)
+            {
+                if (!char.IsDigit(c))
+                    continue;
+
+                output += c;
+            }
+
+            return output;
+        }
+
+        private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, '-', 6, moveCaret: false);
+        }
+
+        private void NewDevicePortBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, maxChars:5, moveCaret: false);
+            EnableConnectButton();
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

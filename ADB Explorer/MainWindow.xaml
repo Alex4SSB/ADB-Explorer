@@ -1708,8 +1708,27 @@
                                         </StackPanel.Style>
                                         <Image
                                             x:Name="PairingQrImage"
-                                            Margin="0,0,0,6"
+                                            Margin="0,6"
                                             RenderOptions.EdgeMode="Aliased" />
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <StackPanel.Style>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ElementName=PasswordConnectionRadioButton, Path=IsChecked}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Style>
+                                        <Grid>
+                                            <TextBox
+                                                x:Name="PairingCodeTextBox"
+                                                Margin="0,6"
+                                                FontSize="18"
+                                                TextChanged="PairingCodeTextBox_TextChanged" />
+                                        </Grid>
                                     </StackPanel>
                                 </Grid>
                                 <StackPanel x:Name="MdnsLoadingPanel">
@@ -1761,11 +1780,25 @@
                                     KeyDown="NewDeviceIpBox_KeyDown"
                                     TextChanged="NewDeviceIpBox_TextChanged" />
                                 <TextBlock Margin="0,6,0,0" Text="Port:" />
-                                <TextBox
-                                    x:Name="NewDevicePortBox"
-                                    FontFamily="Consolas"
-                                    KeyDown="NewDeviceIpBox_KeyDown"
-                                    TextChanged="NewDeviceIpBox_TextChanged" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        x:Name="NewDevicePortBox"
+                                        VerticalContentAlignment="Center"
+                                        FontFamily="Consolas"
+                                        KeyDown="NewDeviceIpBox_KeyDown"
+                                        TextChanged="NewDevicePortBox_TextChanged" />
+                                    <Button
+                                        x:Name="ConnectNewDeviceButton"
+                                        Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        Click="ConnectNewDeviceButton_Click"
+                                        Content="Connect"
+                                        IsEnabled="False" />
+                                </Grid>
                                 <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -1785,13 +1818,7 @@
                                         Content="Pair"
                                         IsEnabled="False" />
                                 </Grid>
-                                <Button
-                                    x:Name="ConnectNewDeviceButton"
-                                    Margin="0,6,0,8"
-                                    HorizontalAlignment="Center"
-                                    Click="ConnectNewDeviceButton_Click"
-                                    Content="Connect"
-                                    IsEnabled="False" />
+
                             </StackPanel>
                         </StackPanel>
                         <ui:ListView
