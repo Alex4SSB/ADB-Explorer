@@ -24,5 +24,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex MMC_BLOCK_DEVICE_NODE =
             new(@"(?<major>[a-f\d]+),(?<minor>[a-f\d]+)");
+
+        public static readonly Regex MDNS_SERVICE =
+            new(@"(?<ID>[^\s]+)\t*_adb-tls-(?<PortType>pairing|connect)\._tcp\.*\t*(?<IpAddress>[^:]+):(?<Port>\d+)");
     }
 }

@@ -16,9 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Helpers.VisibilityHelper;
@@ -533,11 +531,19 @@ namespace ADB_Explorer
         {
             Dispatcher.BeginInvoke(() =>
             {
-                Task.Run(() =>
+                var check = Task.Run(() =>
                 {
                     return MdnsService.State = ADBService.CheckMDNS()
                         ? MDNS.MdnsState.Running
                         : MDNS.MdnsState.NotRunning;
+                });
+
+                check.ContinueWith((t) =>
+                {
+                    if (MdnsService.State == MDNS.MdnsState.Running)
+                    {
+                        WiFiPairingService.GetServices();
+                    }
                 });
             });
         }
