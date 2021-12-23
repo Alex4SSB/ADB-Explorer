@@ -39,7 +39,7 @@ namespace ADB_Explorer
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
-
+        private bool TextBoxChangedMutex;
         private SolidColorBrush qrForeground, qrBackground;
 
         public static MDNS MdnsService { get; set; } = new();
@@ -1136,7 +1136,7 @@ namespace ADB_Explorer
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, numeric:true, moveCaret:false, allowedChars: '.');
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric:true, allowedChars: '.');
             EnableConnectButton();
         }
 
@@ -1561,20 +1561,26 @@ namespace ADB_Explorer
         }
 
         private static void TextBoxSeparation(TextBox textBox,
+                                              ref bool inProgress,
                                               char? separator = null,
                                               int maxChars = -1,
                                               bool numeric = true,
-                                              bool moveCaret = true,
                                               params char[] allowedChars)
         {
+            if (inProgress)
+                return;
+            else
+                inProgress = true;
+
             var caretIndex = textBox.CaretIndex;
             var output = "";
             var numbers = "";
             var deletedChars = 0;
+            var text = textBox.Text;
 
             if (numeric)
             {
-                foreach (var c in textBox.Text)
+                foreach (var c in text)
                 {
                     if (!char.IsDigit(c) && !allowedChars.Contains(c))
                     {
@@ -1612,12 +1618,21 @@ namespace ADB_Explorer
 
             textBox.Text = output;
 
-            if (moveCaret)
-                textBox.CaretIndex = output.Length;
-            else
-                textBox.CaretIndex = caretIndex - deletedChars;
+            if ($"{textBox.Tag}" != output)
+            {
+                caretIndex -= deletedChars;
+                if (separator is not null)
+                    caretIndex += output.Count(c => c == separator) - text.Count(c => c == separator);
+
+                if (caretIndex < 0)
+                    caretIndex = 0;
+            }
+
+            textBox.CaretIndex = caretIndex;
 
             textBox.Tag = output;
+
+            inProgress = false;
         }
 
         private static string NumericText(string text)
@@ -1636,12 +1651,13 @@ namespace ADB_Explorer
 
         private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, '-', 6, moveCaret: false);
+            var offset = e.Changes.First().Offset;
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
         }
 
         private void NewDevicePortBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, maxChars:5, moveCaret: false);
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars:5);
             EnableConnectButton();
         }
 
