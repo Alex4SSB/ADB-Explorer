@@ -43,6 +43,8 @@ namespace ADB_Explorer
         private SolidColorBrush qrForeground, qrBackground;
 
         public static MDNS MdnsService { get; set; } = new();
+        public List<MdnsService> ServiceDevices { get; set; } = new();
+        public PairingQrClass QrClass { get; set; }
 
         public bool ListingInProgress { get { return listDirTask is not null; } }
 
@@ -525,6 +527,10 @@ namespace ADB_Explorer
                 if (Devices.DevicesChanged(ADBService.GetDevices()))
                     DeviceListSetup();
             }
+            else if (MdnsService.State == MDNS.MdnsState.Running)
+            {
+                ServiceDevices = WiFiPairingService.GetServices();
+            }
         }
 
         private void MdnsCheck()
@@ -536,14 +542,6 @@ namespace ADB_Explorer
                     return MdnsService.State = ADBService.CheckMDNS()
                         ? MDNS.MdnsState.Running
                         : MDNS.MdnsState.NotRunning;
-                });
-
-                check.ContinueWith((t) =>
-                {
-                    if (MdnsService.State == MDNS.MdnsState.Running)
-                    {
-                        WiFiPairingService.GetServices();
-                    }
                 });
             });
         }
@@ -1149,8 +1147,6 @@ namespace ADB_Explorer
             if (NewDevicePanelVisibility())
             {
                 RetrieveIp();
-
-                PairingQrImage.Source = WiFiPairingService.GenerateQrCode(qrBackground, qrForeground);
             }
         }
 
@@ -1553,8 +1549,14 @@ namespace ADB_Explorer
             {
                 MdnsService.State = MDNS.MdnsState.Unchecked;
                 MdnsCheck();
+
+                if (QrConnectionRadioButton.IsChecked == true)
+                {
+                    QrClass = new PairingQrClass(qrBackground, qrForeground);
+                    PairingQrImage.Source = QrClass.Image;
+                }
             }
-            else
+            else if (ManualConnectionRadioButton.IsChecked == true)
             {
                 MdnsService.State = MDNS.MdnsState.Disabled;
             }
@@ -1659,6 +1661,11 @@ namespace ADB_Explorer
         {
             TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars:5);
             EnableConnectButton();
+        }
+
+        private void PairServiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            ADBService.PairNetworkDevice(ServiceDevices[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

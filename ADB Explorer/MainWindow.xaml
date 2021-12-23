@@ -340,6 +340,9 @@
                                                         <DataTrigger Binding="{Binding Type}" Value="Local">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Type}" Value="Service">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
@@ -1723,11 +1726,30 @@
                                             </Style>
                                         </StackPanel.Style>
                                         <Grid>
-                                            <TextBox
-                                                x:Name="PairingCodeTextBox"
-                                                Margin="0,6"
-                                                FontSize="18"
-                                                TextChanged="PairingCodeTextBox_TextChanged" />
+                                            <StackPanel>
+                                                <TextBox
+                                                    x:Name="PairingCodeTextBox"
+                                                    Margin="0,6"
+                                                    FontSize="18"
+                                                    TextChanged="PairingCodeTextBox_TextChanged" />
+                                                <Grid>
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=ServiceDevices.Count}" Value="0">
+                                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Grid.Style>
+                                                    <Button
+                                                        x:Name="PairServiceButton"
+                                                        HorizontalAlignment="Center"
+                                                        Click="PairServiceButton_Click"
+                                                        Content="Pair" />
+                                                </Grid>
+                                            </StackPanel>
                                         </Grid>
                                     </StackPanel>
                                 </Grid>
@@ -1824,6 +1846,7 @@
                         <ui:ListView
                             x:Name="DevicesList"
                             Grid.Row="2"
+                            Margin="0,6,0,0"
                             IsSelectionEnabled="False"
                             ItemContainerStyle="{StaticResource DeviceStyle}"
                             ItemsSource="{Binding}"

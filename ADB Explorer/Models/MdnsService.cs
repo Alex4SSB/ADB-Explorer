@@ -18,5 +18,6 @@
         public string ConnectPort { get; set; }
         public ServiceType Type { get; set; }
 
+        public string PairingAddress => $"{IpAddress}:{PairingPort}";
     }
 }
