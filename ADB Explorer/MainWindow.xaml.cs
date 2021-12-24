@@ -43,7 +43,7 @@ namespace ADB_Explorer
         private SolidColorBrush qrForeground, qrBackground;
 
         public static MDNS MdnsService { get; set; } = new();
-        public List<MdnsService> ServiceDevices { get; set; } = new();
+        public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
 
         public bool ListingInProgress { get { return listDirTask is not null; } }
@@ -341,7 +341,7 @@ namespace ADB_Explorer
         {
             var init = !Devices.Update(ADBService.GetDevices());
 
-            DevicesList.ItemsSource = Devices.List;
+            DevicesList.ItemsSource = Devices.DeviceList;
             DevicesList.Items.Refresh();
 
             if (Devices.Current is null || Devices.Current.IsOpen && Devices.Current.Status != DeviceClass.DeviceStatus.Online)
@@ -529,7 +529,7 @@ namespace ADB_Explorer
             }
             else if (MdnsService.State == MDNS.MdnsState.Running)
             {
-                ServiceDevices = WiFiPairingService.GetServices();
+                DevicesObject.ServiceList = WiFiPairingService.GetServices();
             }
         }
 
@@ -1178,7 +1178,7 @@ namespace ADB_Explorer
 
             if (RememberIpCheckBox.IsChecked == true
                 && Storage.RetrieveValue(Settings.lastIp) is string lastIp
-                && !Devices.List.Find(d => d.ID.Split(':')[0] == lastIp))
+                && !Devices.DeviceList.Find(d => d.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
                 if (RememberPortCheckBox.IsChecked == true
@@ -1665,7 +1665,7 @@ namespace ADB_Explorer
 
         private void PairServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            ADBService.PairNetworkDevice(ServiceDevices[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
+            ADBService.PairNetworkDevice(DevicesObject.ServiceList[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

@@ -7,7 +7,6 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:properties="clr-namespace:ADB_Explorer.Properties"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
@@ -1843,14 +1842,20 @@
 
                             </StackPanel>
                         </StackPanel>
-                        <ui:ListView
-                            x:Name="DevicesList"
-                            Grid.Row="2"
-                            Margin="0,6,0,0"
-                            IsSelectionEnabled="False"
-                            ItemContainerStyle="{StaticResource DeviceStyle}"
-                            ItemsSource="{Binding}"
-                            MouseDown="DevicesList_MouseDown" />
+                        <StackPanel Grid.Row="2">
+                            <ui:ListView
+                                x:Name="ServicesList"
+                                Margin="0,6,0,0"
+                                DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
+                                ItemsSource="{Binding ServiceList}" />
+                            <ui:ListView
+                                x:Name="DevicesList"
+                                Margin="0,6,0,0"
+                                IsSelectionEnabled="False"
+                                ItemContainerStyle="{StaticResource DeviceStyle}"
+                                ItemsSource="{Binding}"
+                                MouseDown="DevicesList_MouseDown" />
+                        </StackPanel>
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

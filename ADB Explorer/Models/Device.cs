@@ -10,23 +10,33 @@ using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
 {
-    public static class Devices
+    public class Devices : INotifyPropertyChanged
     {
-        public static List<DeviceClass> List { get; private set; } = new();
+        public static List<DeviceClass> DeviceList { get; private set; } = new();
 
-        public static DeviceClass Current => List?.Find(device => device.IsOpen);
+        private List<MdnsService> serviceList = new();
+        public List<MdnsService> ServiceList { 
+            get { return serviceList; } 
+            set
+            {
+                serviceList = value;
+                NotifyPropertyChanged();
+            }
+        }
+        
+        public static DeviceClass Current => DeviceList?.Find(device => device.IsOpen);
 
         public static bool Update(IEnumerable<DeviceClass> other)
         {
             bool isCurrentTypeUpdated = false;
 
             // First remove all devices that no longer exist
-            List.RemoveAll(thisDevice => !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
+            DeviceList.RemoveAll(thisDevice => !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
 
             // Then update existing devices' types and names
             foreach (var item in other)
             {
-                if (List?.Find(thisDevice => thisDevice.ID == item.ID) is DeviceClass device)
+                if (DeviceList?.Find(thisDevice => thisDevice.ID == item.ID) is DeviceClass device)
                 {
                     // Return (at the end of the function) true if current device status has changed
                     if (device.IsOpen && device.Status != item.Status)
@@ -37,7 +47,7 @@ namespace ADB_Explorer.Models
                 else
                 {
                     // And add the new devices
-                    List.Add(item);
+                    DeviceList.Add(item);
                 }
             }
 
@@ -46,7 +56,7 @@ namespace ADB_Explorer.Models
 
         private static IEnumerable<DeviceClass> AvailableDevices(bool current = false)
         {
-            return List.Where(device => (!current || device.IsOpen)
+            return DeviceList.Where(device => (!current || device.IsOpen)
                 && device.Status is DeviceClass.DeviceStatus.Online);
         }
 
@@ -73,13 +83,17 @@ namespace ADB_Explorer.Models
         public static bool DevicesChanged(IEnumerable<DeviceClass> other)
         {
             return other is not null
-                && !List.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
+                && !DeviceList.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
         }
 
         public static void UnselectAll()
         {
             DeviceClass.SetSelected();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
 
@@ -168,7 +182,7 @@ namespace ADB_Explorer.Models
 
         public void SetOpen(bool openState = true)
         {
-            Devices.List.ForEach(device => device.IsOpen =
+            Devices.DeviceList.ForEach(device => device.IsOpen =
                 device == this && openState);
         }
 
@@ -176,13 +190,13 @@ namespace ADB_Explorer.Models
 
         public void SetSelected(bool selectedState = true)
         {
-            Devices.List.ForEach(device => device.IsSelected =
+            Devices.DeviceList.ForEach(device => device.IsSelected =
                 device == this && selectedState);
         }
 
         public static void SetSelected()
         {
-            Devices.List.ForEach(device => device.IsSelected = false);
+            Devices.DeviceList.ForEach(device => device.IsSelected = false);
         }
 
         public override bool Equals(object obj)
