@@ -12,21 +12,54 @@ namespace ADB_Explorer.Models
 {
     public class Devices : INotifyPropertyChanged
     {
-        public static List<DeviceClass> DeviceList { get; private set; } = new();
-
-        private List<MdnsService> serviceList = new();
-        public List<MdnsService> ServiceList { 
-            get { return serviceList; } 
-            set
+        private List<Device> devices = new();
+        public List<Device> DeviceList
+        {
+            get { return devices; }
+            private set
             {
-                serviceList = value;
+                devices = value;
                 NotifyPropertyChanged();
+                NotifyPropertyChanged(nameof(UIList));
             }
         }
-        
-        public static DeviceClass Current => DeviceList?.Find(device => device.IsOpen);
+        public List<UIDevice> UIList => GetUIDevices(DeviceList);
+        public IEnumerable<LogicalDevice> LogicalDevices => DeviceList?.OfType<LogicalDevice>();
+        public IEnumerable<ServiceDevice> ServiceDevices => DeviceList?.OfType<ServiceDevice>();
+        public IEnumerable<UILogicalDevice> UILogicalDevices => UIList?.OfType<UILogicalDevice>();
+        public IEnumerable<UIServiceDevice> UIServiceDevices => UIList?.OfType<UIServiceDevice>();
 
-        public static bool Update(IEnumerable<DeviceClass> other)
+        public LogicalDevice Current
+        {
+            get
+            {
+                var devices = UILogicalDevices?.Where(device => device.IsOpen);
+                return devices.Any() && devices.First().DeviceRef is LogicalDevice device ? device : null;
+            }
+        }
+
+        public void SetOpen(LogicalDevice device, bool openState = true) => device.UIRef.SetOpen(UILogicalDevices.ToList(), openState);
+
+        public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
+
+        public void SetSelected(UIDevice device, bool selectState = true) => device.SetSelected(UIList, selectState);
+
+        public void UnselectAll() => UIDevice.SetSelected(UIList);
+
+        private static List<UIDevice> GetUIDevices(List<Device> devices)
+        {
+            List<UIDevice> result = new();
+
+            result.AddRange(from service in devices.Where(d => d is ServiceDevice)
+                            select new UIServiceDevice((ServiceDevice)service));
+
+            result.AddRange(from device in devices.Where(d => d is LogicalDevice)
+                            select new UILogicalDevice((LogicalDevice)device));
+
+            return result;
+        }
+
+        public bool Update(IEnumerable<LogicalDevice> other)
         {
             bool isCurrentTypeUpdated = false;
 
@@ -36,10 +69,10 @@ namespace ADB_Explorer.Models
             // Then update existing devices' types and names
             foreach (var item in other)
             {
-                if (DeviceList?.Find(thisDevice => thisDevice.ID == item.ID) is DeviceClass device)
+                if (DeviceList?.Find(thisDevice => thisDevice.ID == item.ID) is LogicalDevice device)
                 {
                     // Return (at the end of the function) true if current device status has changed
-                    if (device.IsOpen && device.Status != item.Status)
+                    if (device.UIRef is not null && device.UIRef.IsOpen && device.Status != item.Status)
                         isCurrentTypeUpdated = true;
 
                     device.UpdateDevice(item);
@@ -54,15 +87,17 @@ namespace ADB_Explorer.Models
             return isCurrentTypeUpdated;
         }
 
-        private static IEnumerable<DeviceClass> AvailableDevices(bool current = false)
+        private IEnumerable<LogicalDevice> AvailableDevices(bool current = false)
         {
-            return DeviceList.Where(device => (!current || device.IsOpen)
-                && device.Status is DeviceClass.DeviceStatus.Online);
+            return UILogicalDevices.Where(
+                    device => (!current || device.IsOpen)
+                    && device.Status is Device.DeviceStatus.Online
+                ).Select(d => d.DeviceRef as LogicalDevice);
         }
 
-        public static bool DevicesAvailable(bool current = false) => AvailableDevices(current).Any();
+        public bool DevicesAvailable(bool current = false) => AvailableDevices(current).Any();
 
-        public static bool SetCurrentDevice(string selectedId)
+        public bool SetCurrentDevice(string selectedId)
         {
             var availableDevices = AvailableDevices();
 
@@ -71,24 +106,19 @@ namespace ADB_Explorer.Models
                 availableDevices = availableDevices.Where(device => device.ID == selectedId);
             }
 
-            if (availableDevices.Any())
+            if (availableDevices.Any() && availableDevices.First().UIRef is UILogicalDevice ui)
             {
-                availableDevices.First().SetOpen();
+                ui.SetOpen(UILogicalDevices.ToList());
                 return true;
             }
             else
                 return false;
         }
 
-        public static bool DevicesChanged(IEnumerable<DeviceClass> other)
+        public bool DevicesChanged(IEnumerable<LogicalDevice> other)
         {
             return other is not null
                 && !DeviceList.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
-        }
-
-        public static void UnselectAll()
-        {
-            DeviceClass.SetSelected();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -96,8 +126,7 @@ namespace ADB_Explorer.Models
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-
-    public class DeviceClass : INotifyPropertyChanged
+    public abstract class Device
     {
         public enum DeviceType
         {
@@ -114,20 +143,32 @@ namespace ADB_Explorer.Models
             Unauthorized
         }
 
-        private string name;
-        public string Name { 
-            get
-            {
-                return Type == DeviceType.Emulator ? ID : name;
-            }
-            private set
-            {
-                name = value;
-            }
+        public DeviceType Type { get; protected set; }
+        public DeviceStatus Status { get; protected set; }
+        public string ID { get; protected set; }
+
+        public static implicit operator bool(Device obj)
+        {
+            return obj is not null && !string.IsNullOrEmpty(obj.ID);
         }
-        public string ID { get; private set; }
-        public DeviceType Type { get; private set; }
-        public DeviceStatus Status { get; private set; }
+
+        public override int GetHashCode()
+        {
+            return ID is null ? 0 : ID.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Device device &&
+                   ID == device.ID;
+        }
+    }
+
+    public abstract class UIDevice : Device
+    {
+        public Device DeviceRef { get; protected set; }
+        public bool IsSelected { get; protected set; }
+
         public string TypeIcon => Type switch
         {
             DeviceType.Local => "\uE839",
@@ -143,7 +184,36 @@ namespace ADB_Explorer.Models
             DeviceStatus.Unauthorized => "\uEC00",
             _ => throw new NotImplementedException(),
         };
-        public bool IsOpen { get; private set; }
+
+        public void SetSelected(List<UIDevice> devices, bool selectedState = true)
+        {
+            devices.ForEach(device => device.IsSelected =
+                device.Equals(this) && selectedState);
+        }
+
+        public static void SetSelected(List<UIDevice> devices)
+        {
+            devices.ForEach(device => device.IsSelected = false);
+        }
+    }
+
+    public class LogicalDevice : Device, INotifyPropertyChanged
+    {
+        public UILogicalDevice UIRef { get; set; }
+
+        private string name;
+        public string Name
+        {
+            get
+            {
+                return Type == DeviceType.Emulator ? ID : name;
+            }
+            private set
+            {
+                name = value;
+            }
+        }
+        
         private List<Drive> drives;
         public List<Drive> Drives
         {
@@ -151,7 +221,7 @@ namespace ADB_Explorer.Models
             set
             {
                 drives = value;
-                
+
                 if (drives is not null)
                 {
                     var mmcTask = Task.Run(() => { return GetMmcDrive(); });
@@ -169,60 +239,21 @@ namespace ADB_Explorer.Models
             }
         }
 
-        private void DrivesSetBlocking(List<Drive> val)
-        {
-            drives = val;
-            NotifyPropertyChanged(nameof(Drives));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        public void SetOpen(bool openState = true)
-        {
-            Devices.DeviceList.ForEach(device => device.IsOpen =
-                device == this && openState);
-        }
-
-        public bool IsSelected { get; private set; }
-
-        public void SetSelected(bool selectedState = true)
-        {
-            Devices.DeviceList.ForEach(device => device.IsSelected =
-                device == this && selectedState);
-        }
-
-        public static void SetSelected()
-        {
-            Devices.DeviceList.ForEach(device => device.IsSelected = false);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is DeviceClass device &&
-                   ID == device.ID;
-        }
-
-        public DeviceClass(string name, string id)
+        public LogicalDevice(string name, string id)
         {
             Name = name;
             ID = id;
         }
 
-        public DeviceClass(string name, string id, string status) : this(name, id)
+        public LogicalDevice(string name, string id, string status) : this(name, id)
         {
-            if (id.Contains("._adb-tls-connect."))
-                Type = DeviceType.Service;
-            else if (id.Contains('.'))
-                Type = DeviceType.Remote;
-            else if (id.Contains("emulator"))
-                Type = DeviceType.Emulator;
-            else
-                Type = DeviceType.Local;
+            Type = GetType(id);
+            Status = GetStatus(status);
+        }
 
-            Status = status switch
+        private static DeviceStatus GetStatus(string status)
+        {
+            return status switch
             {
                 "device" => DeviceStatus.Online,
                 "offline" => DeviceStatus.Offline,
@@ -232,24 +263,28 @@ namespace ADB_Explorer.Models
             };
         }
 
-        public DeviceClass()
+        private static DeviceType GetType(string id)
         {
+            if (id.Contains("._adb-tls-connect."))
+                return DeviceType.Service;
+            else if (id.Contains('.'))
+                return DeviceType.Remote;
+            else if (id.Contains("emulator"))
+                return DeviceType.Emulator;
+            else
+                return DeviceType.Local;
         }
 
-        public static implicit operator bool(DeviceClass obj)
-        {
-            return obj is not null && !string.IsNullOrEmpty(obj.ID);
-        }
-
-        public override int GetHashCode()
-        {
-            return ID.GetHashCode();
-        }
-
-        public void UpdateDevice(DeviceClass other)
+        public void UpdateDevice(LogicalDevice other)
         {
             Name = other.Name;
             Status = other.Status;
+        }
+
+        private void DrivesSetBlocking(List<Drive> val)
+        {
+            drives = val;
+            NotifyPropertyChanged(nameof(Drives));
         }
 
         internal void SetDrives(List<Drive> value, bool findMmc = false)
@@ -262,15 +297,6 @@ namespace ADB_Explorer.Models
             }
             else
                 Drives = value;
-        }
-
-        public static string DeviceName(string model, string device)
-        {
-            var name = device;
-            if (device == device.ToLower())
-                name = model;
-
-            return name.Replace('_', ' ');
         }
 
         public Drive GetMmcDrive()
@@ -296,7 +322,21 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public static string DeviceName(string model, string device)
+        {
+            var name = device;
+            if (device == device.ToLower())
+                name = model;
+
+            return name.Replace('_', ' ');
+        }
+
         public override string ToString() => Name;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         //private DispatcherTimer dispatcherTimer;
 
@@ -325,14 +365,77 @@ namespace ADB_Explorer.Models
         //}
     }
 
-    public class DeviceTypeEqualityComparer : IEqualityComparer<DeviceClass>
+    public class UILogicalDevice : UIDevice
     {
-        public bool Equals(DeviceClass x, DeviceClass y)
+        public bool IsOpen { get; protected set; }
+
+        public string Name => ((LogicalDevice)DeviceRef).Name;
+
+        public UILogicalDevice(LogicalDevice device)
+        {
+            DeviceRef = device;
+            device.UIRef = this;
+        }
+
+        public void SetOpen(List<UILogicalDevice> list, bool openState = true)
+        {
+            list.ForEach(device => device.IsOpen =
+                device.Equals(this) && openState);
+        }
+
+        public static void SetOpen(List<UILogicalDevice> list)
+        {
+            list.ForEach((device) => device.IsOpen = false);
+        }
+    }
+
+    public class ServiceDevice : Device
+    {
+        public ServiceDevice()
+        {
+            Type = DeviceType.Service;
+            Status = DeviceStatus.Unauthorized;
+        }
+
+        public ServiceDevice(string id, string ipAddress) : this()
+        {
+            ID = id;
+            IpAddress = ipAddress;
+        }
+
+        public enum ServiceType
+        {
+            QrCode,
+            PairingCode
+        }
+
+        public UIServiceDevice UIRef { get; set; }
+        public string IpAddress { get; set; }
+        public string PairingPort { get; set; }
+        public string ConnectPort { get; set; }
+        public ServiceType MdnsType { get; set; }
+
+        public string PairingAddress => $"{IpAddress}:{PairingPort}";
+    }
+
+    public class UIServiceDevice : UIDevice
+    {
+        public UIServiceDevice(ServiceDevice service)
+        {
+            DeviceRef = service;
+            service.UIRef = this;
+        }
+
+    }
+
+    public class DeviceTypeEqualityComparer : IEqualityComparer<Device>
+    {
+        public bool Equals(Device x, Device y)
         {
             return x.ID == y.ID && x.Status == y.Status;
         }
 
-        public int GetHashCode([DisallowNull] DeviceClass obj)
+        public int GetHashCode([DisallowNull] Device obj)
         {
             throw new NotImplementedException();
         }

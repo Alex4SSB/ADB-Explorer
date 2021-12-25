@@ -53,11 +53,11 @@ namespace ADB_Explorer.Services
             return $"WIFI:T:ADB;S:{service};P:{password};;";
         }
 
-        public static List<MdnsService> GetServices()
+        public static List<ServiceDevice> GetServices()
         {
             ADBService.ExecuteAdbCommand("mdns", out string services, out _, "services");
 
-            List<MdnsService> mdnsServices = new();
+            List<ServiceDevice> mdnsServices = new();
             var matches = AdbRegEx.MDNS_SERVICE.Matches(services);
             foreach (Match item in matches)
             {
@@ -66,7 +66,7 @@ namespace ADB_Explorer.Services
                 var ipAddress = item.Groups["IpAddress"].Value;
                 var port = item.Groups["Port"].Value;
 
-                if (mdnsServices.Find(s => s.IpAddress == ipAddress) is MdnsService existing)
+                if (mdnsServices.Find(s => s.IpAddress == ipAddress) is ServiceDevice existing)
                 {
                     if (string.IsNullOrEmpty(existing.PairingPort) && portType == "pairing")
                         existing.PairingPort = port;
@@ -75,15 +75,15 @@ namespace ADB_Explorer.Services
                 }
                 else
                 {
-                    MdnsService service = new() { ID = id, IpAddress = ipAddress };
+                    ServiceDevice service = new(id, ipAddress);
                     if (portType == "pairing")
                         service.PairingPort = port;
                     else if (portType == "connect")
                         service.ConnectPort = port;
 
-                    service.Type = id.Contains(PAIRING_SERVICE_PREFIX)
-                        ? MdnsService.ServiceType.QrCode
-                        : MdnsService.ServiceType.PairingCode;
+                    service.MdnsType = id.Contains(PAIRING_SERVICE_PREFIX)
+                        ? ServiceDevice.ServiceType.QrCode
+                        : ServiceDevice.ServiceType.PairingCode;
 
                     mdnsServices.Add(service);
                 }

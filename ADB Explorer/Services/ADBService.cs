@@ -151,13 +151,13 @@ namespace ADB_Explorer.Services
             return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
         }
 
-        public static IEnumerable<DeviceClass> GetDevices()
+        public static IEnumerable<LogicalDevice> GetDevices()
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
 
             return DEVICE_NAME_RE.Matches(stdout).Select(
-                m => new DeviceClass(
-                    name: DeviceClass.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
+                m => new LogicalDevice(
+                    name: LogicalDevice.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                     id: m.Groups["id"].Value,
                     status: m.Groups["status"].Value)
                 );

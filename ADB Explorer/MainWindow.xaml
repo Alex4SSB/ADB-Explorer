@@ -1736,7 +1736,7 @@
                                                         <Style TargetType="Grid">
                                                             <Setter Property="Visibility" Value="Visible" />
                                                             <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=ServiceDevices.Count}" Value="0">
+                                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=DevicesObject.ServiceDevices.Count}" Value="0">
                                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                                 </DataTrigger>
                                                             </Style.Triggers>
@@ -1844,16 +1844,12 @@
                         </StackPanel>
                         <StackPanel Grid.Row="2">
                             <ui:ListView
-                                x:Name="ServicesList"
-                                Margin="0,6,0,0"
-                                DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
-                                ItemsSource="{Binding ServiceList}" />
-                            <ui:ListView
                                 x:Name="DevicesList"
                                 Margin="0,6,0,0"
+                                DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
                                 IsSelectionEnabled="False"
                                 ItemContainerStyle="{StaticResource DeviceStyle}"
-                                ItemsSource="{Binding}"
+                                ItemsSource="{Binding UIList}"
                                 MouseDown="DevicesList_MouseDown" />
                         </StackPanel>
                     </Grid>

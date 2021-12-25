@@ -339,15 +339,12 @@ namespace ADB_Explorer
 
         private void DeviceListSetup(string selectedAddress = "")
         {
-            var init = !Devices.Update(ADBService.GetDevices());
+            var init = !DevicesObject.Update(ADBService.GetDevices());
 
-            DevicesList.ItemsSource = Devices.DeviceList;
-            DevicesList.Items.Refresh();
-
-            if (Devices.Current is null || Devices.Current.IsOpen && Devices.Current.Status != DeviceClass.DeviceStatus.Online)
+            if (DevicesObject.Current is null || DevicesObject.Current.UIRef.IsOpen && DevicesObject.Current.Status != Device.DeviceStatus.Online)
                 ClearDrives();
 
-            if (!Devices.DevicesAvailable())
+            if (!DevicesObject.DevicesAvailable())
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
@@ -356,27 +353,27 @@ namespace ADB_Explorer
             }
             else
             {
-                if (Devices.DevicesAvailable(true))
+                if (DevicesObject.DevicesAvailable(true))
                     return;
 
                 if (AutoOpenCheckBox.IsChecked != true)
                 {
-                    Devices.Current?.SetOpen(false);
+                    DevicesObject.CloseAll();
 
                     Title = Properties.Resources.AppDisplayName;
                     ClearExplorer();
                     return;
                 }
 
-                if (!Devices.SetCurrentDevice(selectedAddress))
+                if (!DevicesObject.SetCurrentDevice(selectedAddress))
                     return;
 
                 if (!ConnectTimer.IsEnabled)
                     DevicesSplitView.IsPaneOpen = false;
             }
 
-            Devices.Current.SetOpen(true);
-            CurrentADBDevice = new(Devices.Current.ID);
+            DevicesObject.SetOpen(DevicesObject.Current, true);
+            CurrentADBDevice = new(DevicesObject.Current.ID);
             if (init)
                 InitDevice();
         }
@@ -445,13 +442,13 @@ namespace ADB_Explorer
 
         private void InitDevice()
         {
-            Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
+            Title = $"{Properties.Resources.AppDisplayName} - {DevicesObject.Current.Name}";
 
             RefreshDrives();
             DriveViewNav();
             UpdateAndroidVersion();
 
-            if (Devices.Current.Drives.Count < 1)
+            if (DevicesObject.Current.Drives.Count < 1)
             {
                 // Shouldn't actually happen
                 InitNavigation();
@@ -465,7 +462,7 @@ namespace ADB_Explorer
             DrivesItemRepeater.Visibility = Visibility.Visible;
             PathBox.IsEnabled = true;
 
-            MenuItem button = CreatePathButton(Devices.Current, Devices.Current.Name);
+            MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
             button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
             AddPathButton(button);
         }
@@ -480,9 +477,9 @@ namespace ADB_Explorer
             UnsupportedAndroidIcon.Visibility = Visible(ver > 0 && ver < MIN_SUPPORTED_ANDROID_VER);
         }
 
-        private static void CombinePrettyNames()
+        private void CombinePrettyNames()
         {
-            foreach (var drive in Devices.Current.Drives.Where(d => d.Type != Models.DriveType.Root))
+            foreach (var drive in DevicesObject.Current.Drives.Where(d => d.Type != Models.DriveType.Root))
             {
                 CurrentPrettyNames.TryAdd(drive.Path, drive.Type == Models.DriveType.External
                     ? drive.ID : drive.PrettyName);
@@ -511,7 +508,7 @@ namespace ADB_Explorer
 
             ExplorerGrid.ItemsSource = AndroidFileList;
             PushMenuButton.IsEnabled = true;
-            HomeButton.IsEnabled = Devices.Current.Drives.Any();
+            HomeButton.IsEnabled = DevicesObject.Current.Drives.Any();
             NavHistory.Reset();
 
             return string.IsNullOrEmpty(path)
@@ -524,12 +521,12 @@ namespace ADB_Explorer
             if (MdnsService.State == MDNS.MdnsState.Disabled)
             {
                 // do nothing if amount of devices and their types haven't changed
-                if (Devices.DevicesChanged(ADBService.GetDevices()))
+                if (DevicesObject.DevicesChanged(ADBService.GetDevices()))
                     DeviceListSetup();
             }
             else if (MdnsService.State == MDNS.MdnsState.Running)
             {
-                DevicesObject.ServiceList = WiFiPairingService.GetServices();
+                DevicesObject.DeviceList.AddRange(WiFiPairingService.GetServices());
             }
         }
 
@@ -846,7 +843,7 @@ namespace ADB_Explorer
             {
                 if (item.Tag is string path and not "")
                     NavigateToPath(path);
-                else if (item.Tag is DeviceClass)
+                else if (item.Tag is LogicalDevice)
                     RefreshDrives(true);
             }
         }
@@ -1141,8 +1138,8 @@ namespace ADB_Explorer
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanelVisibility(!NewDevicePanelVisibility());
-            Devices.UnselectAll();
-            DevicesList.Items.Refresh();
+            DevicesObject.UnselectAll();
+            //DevicesList.Items.Refresh();
 
             if (NewDevicePanelVisibility())
             {
@@ -1178,7 +1175,7 @@ namespace ADB_Explorer
 
             if (RememberIpCheckBox.IsChecked == true
                 && Storage.RetrieveValue(Settings.lastIp) is string lastIp
-                && !Devices.DeviceList.Find(d => d.ID.Split(':')[0] == lastIp))
+                && !DevicesObject.DeviceList.Find(d => d.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
                 if (RememberPortCheckBox.IsChecked == true
@@ -1200,13 +1197,13 @@ namespace ADB_Explorer
 
         private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is DeviceClass device && device.Status != DeviceClass.DeviceStatus.Offline)
+            if (sender is Button button && button.DataContext is LogicalDevice device && device.Status != Device.DeviceStatus.Offline)
             {
-                device.SetOpen();
+                DevicesObject.SetOpen(device);
                 CurrentADBDevice = new(device.ID);
 
                 ClearExplorer();
-                DevicesList.Items.Refresh();
+                //DevicesList.Items.Refresh();
                 InitDevice();
 
                 DevicesSplitView.IsPaneOpen = false;
@@ -1215,17 +1212,17 @@ namespace ADB_Explorer
 
         private void DisconnectDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is DeviceClass device)
+            if (sender is Button button && button.DataContext is LogicalDevice device)
             {
                 RemoveDevice(device);
             }
         }
 
-        private void RemoveDevice(DeviceClass device)
+        private void RemoveDevice(LogicalDevice device)
         {
             try
             {
-                if (device.Type == DeviceClass.DeviceType.Emulator)
+                if (device.Type == Device.DeviceType.Emulator)
                 {
                     ADBService.KillEmulator(device.ID);
                 }
@@ -1240,15 +1237,15 @@ namespace ADB_Explorer
                 return;
             }
 
-            if (device.IsOpen)
+            if (device.UIRef.IsOpen)
             {
                 ClearDrives();
                 ClearExplorer();
-                device.SetOpen(false);
+                DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
             }
             DeviceListSetup();
-            DevicesList.Items.Refresh();
+            //DevicesList.Items.Refresh();
         }
 
         private void ClearExplorer()
@@ -1272,15 +1269,15 @@ namespace ADB_Explorer
 
         private void ClearDrives()
         {
-            Devices.Current?.Drives.Clear();
+            DevicesObject.Current?.Drives.Clear();
             DrivesItemRepeater.ItemsSource = null;
         }
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
             NewDevicePanelVisibility(false);
-            Devices.UnselectAll();
-            DevicesList.Items.Refresh();
+            DevicesObject.UnselectAll();
+            //DevicesList.Items.Refresh();
         }
 
         private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)
@@ -1301,10 +1298,10 @@ namespace ADB_Explorer
 
         private void ListViewItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is DeviceClass device && !device.IsSelected)
+            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.IsSelected)
             {
-                device.SetSelected();
-                DevicesList.Items.Refresh();
+                DevicesObject.SetSelected(device);
+                //DevicesList.Items.Refresh();
             }
         }
 
@@ -1359,8 +1356,8 @@ namespace ADB_Explorer
 
         private void DevicesList_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Devices.UnselectAll();
-            DevicesList.Items.Refresh();
+            DevicesObject.UnselectAll();
+            //DevicesList.Items.Refresh();
         }
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
@@ -1415,8 +1412,8 @@ namespace ADB_Explorer
 
         private void RefreshDrives(bool findMmc = false)
         {
-            Devices.Current.SetDrives(CurrentADBDevice.GetDrives(), findMmc);
-            DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
+            DevicesObject.Current.SetDrives(CurrentADBDevice.GetDrives(), findMmc);
+            DrivesItemRepeater.ItemsSource = DevicesObject.Current.Drives;
         }
 
         private void PushMenuButton_Click(object sender, RoutedEventArgs e)
@@ -1665,7 +1662,7 @@ namespace ADB_Explorer
 
         private void PairServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            ADBService.PairNetworkDevice(DevicesObject.ServiceList[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
+            //ADBService.PairNetworkDevice(DevicesObject.ServiceList[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
