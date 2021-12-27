@@ -339,9 +339,9 @@ namespace ADB_Explorer
 
         private void DeviceListSetup(string selectedAddress = "")
         {
-            var init = !DevicesObject.Update(ADBService.GetDevices());
+            var init = !DevicesObject.UpdateDevices(ADBService.GetDevices());
 
-            if (DevicesObject.Current is null || DevicesObject.Current.UIRef.IsOpen && DevicesObject.Current.Status != Device.DeviceStatus.Online)
+            if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.Current.Device.Status != AbstractDevice.DeviceStatus.Online)
                 ClearDrives();
 
             if (!DevicesObject.DevicesAvailable())

@@ -10,123 +10,7 @@ using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
 {
-    public class Devices : INotifyPropertyChanged
-    {
-        private List<Device> devices = new();
-        public List<Device> DeviceList
-        {
-            get { return devices; }
-            private set
-            {
-                devices = value;
-                NotifyPropertyChanged();
-                NotifyPropertyChanged(nameof(UIList));
-            }
-        }
-        public List<UIDevice> UIList => GetUIDevices(DeviceList);
-        public IEnumerable<LogicalDevice> LogicalDevices => DeviceList?.OfType<LogicalDevice>();
-        public IEnumerable<ServiceDevice> ServiceDevices => DeviceList?.OfType<ServiceDevice>();
-        public IEnumerable<UILogicalDevice> UILogicalDevices => UIList?.OfType<UILogicalDevice>();
-        public IEnumerable<UIServiceDevice> UIServiceDevices => UIList?.OfType<UIServiceDevice>();
-
-        public LogicalDevice Current
-        {
-            get
-            {
-                var devices = UILogicalDevices?.Where(device => device.IsOpen);
-                return devices.Any() && devices.First().DeviceRef is LogicalDevice device ? device : null;
-            }
-        }
-
-        public void SetOpen(LogicalDevice device, bool openState = true) => device.UIRef.SetOpen(UILogicalDevices.ToList(), openState);
-
-        public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
-
-        public void SetSelected(UIDevice device, bool selectState = true) => device.SetSelected(UIList, selectState);
-
-        public void UnselectAll() => UIDevice.SetSelected(UIList);
-
-        private static List<UIDevice> GetUIDevices(List<Device> devices)
-        {
-            List<UIDevice> result = new();
-
-            result.AddRange(from service in devices.Where(d => d is ServiceDevice)
-                            select new UIServiceDevice((ServiceDevice)service));
-
-            result.AddRange(from device in devices.Where(d => d is LogicalDevice)
-                            select new UILogicalDevice((LogicalDevice)device));
-
-            return result;
-        }
-
-        public bool Update(IEnumerable<LogicalDevice> other)
-        {
-            bool isCurrentTypeUpdated = false;
-
-            // First remove all devices that no longer exist
-            DeviceList.RemoveAll(thisDevice => !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
-
-            // Then update existing devices' types and names
-            foreach (var item in other)
-            {
-                if (DeviceList?.Find(thisDevice => thisDevice.ID == item.ID) is LogicalDevice device)
-                {
-                    // Return (at the end of the function) true if current device status has changed
-                    if (device.UIRef is not null && device.UIRef.IsOpen && device.Status != item.Status)
-                        isCurrentTypeUpdated = true;
-
-                    device.UpdateDevice(item);
-                }
-                else
-                {
-                    // And add the new devices
-                    DeviceList.Add(item);
-                }
-            }
-
-            return isCurrentTypeUpdated;
-        }
-
-        private IEnumerable<LogicalDevice> AvailableDevices(bool current = false)
-        {
-            return UILogicalDevices.Where(
-                    device => (!current || device.IsOpen)
-                    && device.Status is Device.DeviceStatus.Online
-                ).Select(d => d.DeviceRef as LogicalDevice);
-        }
-
-        public bool DevicesAvailable(bool current = false) => AvailableDevices(current).Any();
-
-        public bool SetCurrentDevice(string selectedId)
-        {
-            var availableDevices = AvailableDevices();
-
-            if (availableDevices.Count() > 1)
-            {
-                availableDevices = availableDevices.Where(device => device.ID == selectedId);
-            }
-
-            if (availableDevices.Any() && availableDevices.First().UIRef is UILogicalDevice ui)
-            {
-                ui.SetOpen(UILogicalDevices.ToList());
-                return true;
-            }
-            else
-                return false;
-        }
-
-        public bool DevicesChanged(IEnumerable<LogicalDevice> other)
-        {
-            return other is not null
-                && !DeviceList.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    public abstract class Device
+    public abstract class AbstractDevice
     {
         public enum DeviceType
         {
@@ -142,7 +26,122 @@ namespace ADB_Explorer.Models
             Offline,
             Unauthorized
         }
+    }
 
+    public class Devices : AbstractDevice, INotifyPropertyChanged
+    {
+        private List<Device> devices = new();
+        public List<Device> DeviceList
+        {
+            get { return devices; }
+            private set
+            {
+                devices = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private List<UIDevice> uiDevices = new();
+        public List<UIDevice> UIList
+        {
+            get { return uiDevices; }
+            private set
+            {
+                uiDevices = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        public IEnumerable<LogicalDevice> LogicalDevices => DeviceList?.OfType<LogicalDevice>();
+        public IEnumerable<ServiceDevice> ServiceDevices => DeviceList?.OfType<ServiceDevice>();
+        public IEnumerable<UILogicalDevice> UILogicalDevices => UIList?.OfType<UILogicalDevice>();
+        public IEnumerable<UIServiceDevice> UIServiceDevices => UIList?.OfType<UIServiceDevice>();
+
+        public UILogicalDevice Current
+        {
+            get
+            {
+                var devices = UILogicalDevices?.Where(device => device.IsOpen);
+                return devices.Any() ? devices.First() : null;
+            }
+        }
+
+        public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
+
+        public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
+
+        public void SetSelected(UIDevice device, bool selectState = true) => device.SetSelected(UIList, selectState);
+
+        public void UnselectAll() => UIDevice.SetSelected(UIList);
+
+        public static bool UpdateDevices(ref List<UIDevice> self, IEnumerable<LogicalDevice> other, UILogicalDevice current)
+        {
+            bool isCurrentTypeUpdated = false;
+
+            // First remove all devices that no longer exist
+            self.RemoveAll(thisDevice => thisDevice is UILogicalDevice && !other.Any(otherDevice => otherDevice.ID == thisDevice.Device.ID));
+
+            // Then update existing devices' types and names
+            foreach (var item in other)
+            {
+                if (self?.Find(thisDevice => thisDevice.Device.ID == item.ID) is UILogicalDevice device)
+                {
+                    // Return (at the end of the function) true if current device status has changed
+                    if (device is not null && device.IsOpen && device.Device.Status != item.Status)
+                        isCurrentTypeUpdated = true;
+
+                    ((LogicalDevice)device.Device).UpdateDevice(item);
+                }
+                else
+                {
+                    // And add the new devices
+                    self.Add(new UILogicalDevice(item));
+                }
+            }
+
+            return isCurrentTypeUpdated;
+        }
+
+        private IEnumerable<UILogicalDevice> AvailableDevices(bool current = false)
+        {
+            return UILogicalDevices.Where(
+                    device => (!current || device.IsOpen)
+                    && device.Device.Status is DeviceStatus.Online);
+        }
+
+        public bool DevicesAvailable(bool current = false) => AvailableDevices(current).Any();
+
+        public bool SetCurrentDevice(string selectedId)
+        {
+            var availableDevices = AvailableDevices();
+
+            if (availableDevices.Count() > 1)
+            {
+                availableDevices = availableDevices.Where(device => device.Device.ID == selectedId);
+            }
+
+            if (availableDevices.Any() && availableDevices.First() is UILogicalDevice ui)
+            {
+                ui.SetOpen(UILogicalDevices.ToList());
+                return true;
+            }
+            else
+                return false;
+        }
+
+        public bool DevicesChanged(IEnumerable<Device> other)
+        {
+            return other is not null
+                && !DeviceList.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public abstract class Device : AbstractDevice
+    {
         public DeviceType Type { get; protected set; }
         public DeviceStatus Status { get; protected set; }
         public string ID { get; protected set; }
@@ -164,12 +163,12 @@ namespace ADB_Explorer.Models
         }
     }
 
-    public abstract class UIDevice : Device
+    public abstract class UIDevice : AbstractDevice
     {
-        public Device DeviceRef { get; protected set; }
+        public Device Device { get; protected set; }
         public bool IsSelected { get; protected set; }
 
-        public string TypeIcon => Type switch
+        public string TypeIcon => Device.Type switch
         {
             DeviceType.Local => "\uE839",
             DeviceType.Remote => "\uEE77",
@@ -177,7 +176,7 @@ namespace ADB_Explorer.Models
             DeviceType.Service => "\uEDE4",
             _ => throw new NotImplementedException(),
         };
-        public string StatusIcon => Status switch
+        public string StatusIcon => Device.Status switch
         {
             DeviceStatus.Online => "",
             DeviceStatus.Offline => "\uEBFF",
@@ -199,8 +198,6 @@ namespace ADB_Explorer.Models
 
     public class LogicalDevice : Device, INotifyPropertyChanged
     {
-        public UILogicalDevice UIRef { get; set; }
-
         private string name;
         public string Name
         {
@@ -369,12 +366,11 @@ namespace ADB_Explorer.Models
     {
         public bool IsOpen { get; protected set; }
 
-        public string Name => ((LogicalDevice)DeviceRef).Name;
+        public string Name => ((LogicalDevice)Device).Name;
 
         public UILogicalDevice(LogicalDevice device)
         {
-            DeviceRef = device;
-            device.UIRef = this;
+            Device = device;
         }
 
         public void SetOpen(List<UILogicalDevice> list, bool openState = true)
@@ -409,7 +405,6 @@ namespace ADB_Explorer.Models
             PairingCode
         }
 
-        public UIServiceDevice UIRef { get; set; }
         public string IpAddress { get; set; }
         public string PairingPort { get; set; }
         public string ConnectPort { get; set; }
@@ -422,8 +417,7 @@ namespace ADB_Explorer.Models
     {
         public UIServiceDevice(ServiceDevice service)
         {
-            DeviceRef = service;
-            service.UIRef = this;
+            Device = service;
         }
 
     }
