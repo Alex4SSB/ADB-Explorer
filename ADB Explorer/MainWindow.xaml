@@ -214,7 +214,7 @@
             <Setter Property="VerticalAlignment" Value="Bottom" />
             <Setter Property="Glyph" Value="&#xEBFE;" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Status}" Value="Offline">
+                <DataTrigger Binding="{Binding Device.Status}" Value="Offline">
                     <Setter Property="Glyph" Value="&#xEBFD;" />
                 </DataTrigger>
             </Style.Triggers>
@@ -226,7 +226,7 @@
             <Setter Property="HorizontalAlignment" Value="Center" />
             <Setter Property="Text" Value="Remove" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Type}" Value="Emulator">
+                <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
                     <Setter Property="Text" Value="Kill" />
                 </DataTrigger>
             </Style.Triggers>
@@ -254,7 +254,7 @@
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Status}" Value="Online">
+                                                        <DataTrigger Binding="{Binding Device.Status}" Value="Online">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -272,10 +272,10 @@
                                                     <DataTrigger Binding="{Binding IsOpen}" Value="True">
                                                         <Setter Property="FontWeight" Value="Bold" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+                                                    <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
                                                         <Setter Property="Text" Value="[Unauthorized]" />
                                                     </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Type}" Value="Emulator">
+                                                    <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
                                                         <Setter Property="Text" Value="{Binding ID}" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -301,6 +301,7 @@
                                 <StackPanel Grid.Row="1">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Visible" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsSelected}" Value="False">
                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -319,10 +320,10 @@
                                                         <DataTrigger Binding="{Binding IsOpen}" Value="True">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="Offline">
+                                                        <DataTrigger Binding="{Binding Device.Status}" Value="Offline">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+                                                        <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -336,10 +337,10 @@
                                             <Grid.Style>
                                                 <Style TargetType="Grid">
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Type}" Value="Local">
+                                                        <DataTrigger Binding="{Binding Device.Type}" Value="Local">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Type}" Value="Service">
+                                                        <DataTrigger Binding="{Binding Device.Type}" Value="Service">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
@@ -1842,16 +1843,15 @@
 
                             </StackPanel>
                         </StackPanel>
-                        <StackPanel Grid.Row="2">
-                            <ui:ListView
-                                x:Name="DevicesList"
-                                Margin="0,6,0,0"
-                                DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
-                                IsSelectionEnabled="False"
-                                ItemContainerStyle="{StaticResource DeviceStyle}"
-                                ItemsSource="{Binding UIList}"
-                                MouseDown="DevicesList_MouseDown" />
-                        </StackPanel>
+                        <ui:ListView
+                            x:Name="DevicesList"
+                            Grid.Row="2"
+                            Margin="0,6,0,0"
+                            DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
+                            IsSelectionEnabled="False"
+                            ItemContainerStyle="{StaticResource DeviceStyle}"
+                            ItemsSource="{Binding UIList}"
+                            MouseDown="DevicesList_MouseDown" />
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

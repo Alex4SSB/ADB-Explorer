@@ -10,7 +10,7 @@ using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
 {
-    public abstract class AbstractDevice
+    public abstract class AbstractDevice : INotifyPropertyChanged
     {
         public enum DeviceType
         {
@@ -26,21 +26,14 @@ namespace ADB_Explorer.Models
             Offline,
             Unauthorized
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public class Devices : AbstractDevice, INotifyPropertyChanged
+    public class Devices : AbstractDevice
     {
-        private List<Device> devices = new();
-        public List<Device> DeviceList
-        {
-            get { return devices; }
-            private set
-            {
-                devices = value;
-                NotifyPropertyChanged();
-            }
-        }
-
         private List<UIDevice> uiDevices = new();
         public List<UIDevice> UIList
         {
@@ -52,10 +45,10 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public IEnumerable<LogicalDevice> LogicalDevices => DeviceList?.OfType<LogicalDevice>();
-        public IEnumerable<ServiceDevice> ServiceDevices => DeviceList?.OfType<ServiceDevice>();
         public IEnumerable<UILogicalDevice> UILogicalDevices => UIList?.OfType<UILogicalDevice>();
         public IEnumerable<UIServiceDevice> UIServiceDevices => UIList?.OfType<UIServiceDevice>();
+        public IEnumerable<LogicalDevice> LogicalDevices => UILogicalDevices.Select(d => d.Device as LogicalDevice);
+        public IEnumerable<ServiceDevice> ServiceDevices => UIServiceDevices.Select(d => d.Device as ServiceDevice);
 
         public UILogicalDevice Current
         {
@@ -66,6 +59,8 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public LogicalDevice CurrentDevice => (LogicalDevice)Current?.Device;
+
         public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
 
         public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
@@ -74,7 +69,24 @@ namespace ADB_Explorer.Models
 
         public void UnselectAll() => UIDevice.SetSelected(UIList);
 
-        public static bool UpdateDevices(ref List<UIDevice> self, IEnumerable<LogicalDevice> other, UILogicalDevice current)
+        public void UpdateServices(IEnumerable<ServiceDevice> other) => UpdateServices(UIList, other);
+
+        public static void UpdateServices(List<UIDevice> self, IEnumerable<ServiceDevice> other)
+        {
+            self.RemoveAll(thisDevice => thisDevice is UIServiceDevice && !other.Any(otherDevice => otherDevice.ID == thisDevice.Device.ID));
+
+            foreach (var item in other)
+            {
+                if (self is null || !self.Any(thisDevice => thisDevice is UIServiceDevice && thisDevice.Device.ID == item.ID))
+                {
+                    self.Add(new UIServiceDevice(item));
+                }
+            }
+        }
+
+        public bool UpdateDevices(IEnumerable<LogicalDevice> other) => UpdateDevices(UIList, other, Current);
+
+        public static bool UpdateDevices(List<UIDevice> self, IEnumerable<LogicalDevice> other, UILogicalDevice current)
         {
             bool isCurrentTypeUpdated = false;
 
@@ -132,18 +144,34 @@ namespace ADB_Explorer.Models
         public bool DevicesChanged(IEnumerable<Device> other)
         {
             return other is not null
-                && !DeviceList.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
+                && !LogicalDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public abstract class Device : AbstractDevice
     {
-        public DeviceType Type { get; protected set; }
-        public DeviceStatus Status { get; protected set; }
+        private DeviceType type;
+        public DeviceType Type
+        {
+            get { return type; }
+            protected set
+            {
+                type = value;
+                NotifyPropertyChanged();
+            }
+        }
+
+        private DeviceStatus status;
+        public DeviceStatus Status
+        {
+            get { return status; }
+            protected set
+            {
+                status = value;
+                NotifyPropertyChanged();
+            }
+        }
+
         public string ID { get; protected set; }
 
         public static implicit operator bool(Device obj)
@@ -166,7 +194,17 @@ namespace ADB_Explorer.Models
     public abstract class UIDevice : AbstractDevice
     {
         public Device Device { get; protected set; }
-        public bool IsSelected { get; protected set; }
+
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            protected set
+            {
+                isSelected = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         public string TypeIcon => Device.Type switch
         {
@@ -194,6 +232,8 @@ namespace ADB_Explorer.Models
         {
             devices.ForEach(device => device.IsSelected = false);
         }
+
+        public static implicit operator bool(UIDevice obj) => obj?.Device;
     }
 
     public class LogicalDevice : Device, INotifyPropertyChanged
@@ -208,6 +248,7 @@ namespace ADB_Explorer.Models
             private set
             {
                 name = value;
+                NotifyPropertyChanged();
             }
         }
         
@@ -329,11 +370,6 @@ namespace ADB_Explorer.Models
         }
 
         public override string ToString() => Name;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         //private DispatcherTimer dispatcherTimer;
 
