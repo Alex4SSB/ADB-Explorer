@@ -1567,31 +1567,52 @@
             PanePlacement="Left">
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="0,1,1,0">
-                    <Grid Margin="6,8">
+                    <Grid Margin="6,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="50" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="{Binding ElementName=NewDeviceRect, Path=ActualHeight}" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <TextBlock
-                            Margin="0,5"
-                            HorizontalAlignment="Center"
-                            FontSize="24"
-                            Text="Devices" />
-                        <Menu HorizontalAlignment="Right">
-                            <MenuItem
-                                x:Name="OpenNewDeviceButton"
-                                Click="OpenNewDeviceButton_Click"
-                                ToolTip="Add a device">
-                                <MenuItem.Header>
-                                    <ui:FontIcon
-                                        Margin="0,0,-1,0"
-                                        FontSize="22"
-                                        Glyph="&#xECC8;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </Menu>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <ui:ProgressRing IsActive="True" />
+                            <StackPanel Grid.Column="1" Margin="4">
+                                <TextBlock HorizontalAlignment="Center" Text="Looking for:" />
+                                <TextBlock
+                                    Margin="0,-4,0,0"
+                                    HorizontalAlignment="Center"
+                                    FontSize="24">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
+                                                    <Setter Property="Text" Value="Services" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                            <Setter Property="Text" Value="Devices" />
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                            <Menu Grid.Column="2" HorizontalAlignment="Right">
+                                <MenuItem
+                                    x:Name="OpenNewDeviceButton"
+                                    Click="OpenNewDeviceButton_Click"
+                                    ToolTip="Add a device">
+                                    <MenuItem.Header>
+                                        <ui:FontIcon
+                                            Margin="0,0,-1,0"
+                                            FontSize="22"
+                                            Glyph="&#xECC8;"
+                                            Style="{StaticResource DisabledGlyphStyle}" />
+                                    </MenuItem.Header>
+                                </MenuItem>
+                            </Menu>
+                        </Grid>
                         <Rectangle
                             x:Name="NewDeviceRect"
                             Grid.Row="1"
@@ -1687,9 +1708,9 @@
                                         </Style.Triggers>
                                     </Style>
                                 </Grid.Style>
-                                <Grid>
-                                    <Grid.Style>
-                                        <Style TargetType="Grid">
+                                <StackPanel x:Name="MdnsPairingPanel">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running">
@@ -1697,7 +1718,7 @@
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </Grid.Style>
+                                    </StackPanel.Style>
                                     <StackPanel x:Name="QrPairingPanel">
                                         <StackPanel.Style>
                                             <Style TargetType="StackPanel">
@@ -1714,7 +1735,7 @@
                                             Margin="0,6"
                                             RenderOptions.EdgeMode="Aliased" />
                                     </StackPanel>
-                                    <StackPanel>
+                                    <StackPanel x:Name="SixDigitPairingPanel">
                                         <StackPanel.Style>
                                             <Style TargetType="StackPanel">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -1752,7 +1773,7 @@
                                             </StackPanel>
                                         </Grid>
                                     </StackPanel>
-                                </Grid>
+                                </StackPanel>
                                 <StackPanel x:Name="MdnsLoadingPanel">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
@@ -1770,7 +1791,7 @@
                                         HorizontalAlignment="Center"
                                         IsActive="True" />
                                 </StackPanel>
-                                <StackPanel>
+                                <StackPanel x:Name="MdnsDownPanel">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -1784,13 +1805,16 @@
                                     <TextBlock x:Name="MdnsDownBlock" Text="mDNS server is not running" />
                                 </StackPanel>
                             </Grid>
-                            <StackPanel>
+                            <StackPanel x:Name="ManualDeviceConnectPanel">
                                 <StackPanel.Style>
                                     <Style TargetType="StackPanel">
-                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Visibility" Value="Visible" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
+                                            <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ElementName=ManualPairingPanel, Path=IsEnabled}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -1821,26 +1845,64 @@
                                         Content="Connect"
                                         IsEnabled="False" />
                                 </Grid>
-                                <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
+                            </StackPanel>
+                            <StackPanel x:Name="ManualPairingPanel" IsEnabled="False">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
+                                    <ui:FontIcon
+                                        Margin="0,0,8,0"
+                                        Glyph="&#xE783;"
+                                        Style="{StaticResource GlyphFont}" />
+                                    <TextBlock
+                                        Width="110"
+                                        Text="Unable to connect. Try pairing"
+                                        TextWrapping="Wrap" />
+                                    <Button
+                                        x:Name="CancelManualPairing"
+                                        Click="CancelManualPairing_Click"
+                                        ToolTip="Cancel">
+                                        <ui:FontIcon
+                                            FontSize="10"
+                                            Glyph="&#xE8BB;"
+                                            Style="{StaticResource GlyphFont}" />
+                                    </Button>
+                                </StackPanel>
+                                <TextBlock Margin="0,10,0,0" Text="Pairing Port:" />
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
                                     <TextBox
-                                        x:Name="PairingCodeBox"
+                                        x:Name="ManualPairingPortBox"
+                                        VerticalContentAlignment="Center"
                                         FontFamily="Consolas"
-                                        TextChanged="PairingCodeBox_TextChanged" />
+                                        KeyDown="NewDeviceIpBox_KeyDown"
+                                        TextChanged="ManualPairingPortBox_TextChanged" />
                                     <Button
                                         x:Name="PairNewDeviceButton"
                                         Grid.Column="1"
-                                        Margin="4,0,0,0"
+                                        Margin="8,0,0,0"
                                         HorizontalAlignment="Right"
                                         Click="PairNewDeviceButton_Click"
                                         Content="Pair"
                                         IsEnabled="False" />
                                 </Grid>
-
+                                <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
+                                <TextBox
+                                    x:Name="ManualPairingCodeBox"
+                                    FontFamily="Consolas"
+                                    FontSize="18"
+                                    TextChanged="PairingCodeBox_TextChanged" />
                             </StackPanel>
                         </StackPanel>
                         <ui:ListView

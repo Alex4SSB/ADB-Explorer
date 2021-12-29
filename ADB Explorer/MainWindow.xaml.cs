@@ -1097,8 +1097,7 @@ namespace ADB_Explorer
             {
                 if (ex.Message.Contains($"failed to connect to {deviceAddress}"))
                 {
-                    // propose pairing
-
+                    ManualPairingPanel.IsEnabled = true;
                 }
                 else
                     MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1127,6 +1126,18 @@ namespace ADB_Explorer
                 && NewDevicePortBox.Text is string port
                 && !string.IsNullOrWhiteSpace(port)
                 && ushort.TryParse(port, out _);
+        }
+
+        private void EnablePairButton()
+        {
+            PairNewDeviceButton.IsEnabled = ManualPairingPortBox.Text is string port
+                && !string.IsNullOrWhiteSpace(port)
+                && ushort.TryParse(port, out _)
+                && ManualPairingCodeBox.Text is string text
+                && text.Replace("-", "") is string password
+                && !string.IsNullOrWhiteSpace(password)
+                && uint.TryParse(password, out _)
+                && password.Length == 6;
         }
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1395,12 +1406,13 @@ namespace ADB_Explorer
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            PairNewDeviceButton.IsEnabled = PairingCodeBox.Text.Length == 6 && double.TryParse(PairingCodeBox.Text, out double _);
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
+            EnablePairButton();
         }
 
         private void PairNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}", PairingCodeBox.Text);
+            ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{ManualPairingPortBox.Text}", ManualPairingCodeBox.Text);
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -1546,16 +1558,21 @@ namespace ADB_Explorer
             {
                 MdnsService.State = MDNS.MdnsState.Unchecked;
                 MdnsCheck();
-
-                if (QrConnectionRadioButton.IsChecked == true)
-                {
-                    QrClass = new PairingQrClass(qrBackground, qrForeground);
-                    PairingQrImage.Source = QrClass.Image;
-                }
             }
             else if (ManualConnectionRadioButton.IsChecked == true)
             {
                 MdnsService.State = MDNS.MdnsState.Disabled;
+            }
+
+            if (QrConnectionRadioButton?.IsChecked == true && QrClass is null)
+            {
+                QrClass = new PairingQrClass(qrBackground, qrForeground);
+                PairingQrImage.Source = QrClass.Image;
+            }
+
+            if (ManualPairingPanel is not null)
+            {
+                ManualPairingPanel.IsEnabled = false;
             }
         }
 
@@ -1650,7 +1667,6 @@ namespace ADB_Explorer
 
         private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var offset = e.Changes.First().Offset;
             TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
         }
 
@@ -1663,6 +1679,17 @@ namespace ADB_Explorer
         private void PairServiceButton_Click(object sender, RoutedEventArgs e)
         {
             //ADBService.PairNetworkDevice(DevicesObject.ServiceList[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
+        }
+
+        private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars: 5);
+            EnablePairButton();
+        }
+
+        private void CancelManualPairing_Click(object sender, RoutedEventArgs e)
+        {
+            ManualPairingPanel.IsEnabled = false;
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
