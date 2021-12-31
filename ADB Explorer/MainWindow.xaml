@@ -231,6 +231,26 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <ui:Flyout x:Key="PairServiceFlyout">
+            <StackPanel>
+                <TextBlock Text="On phone: Switch Wireless debugging off then on" />
+                <TextBlock Margin="0,8" Text="Click the button below to switch to device discovery" />
+                <Grid>
+                    <ui:FontIcon
+                        Margin="6"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Glyph="&#xE946;"
+                        Style="{StaticResource GlyphFont}" />
+                    <Button
+                        x:Name="PairFlyoutCloseButton"
+                        Margin="0,10,4,0"
+                        HorizontalAlignment="Right"
+                        Click="PairFlyoutCloseButton_Click"
+                        Content="Close" />
+                </Grid>
+            </StackPanel>
+        </ui:Flyout>
         <Style x:Key="DeviceStyle" TargetType="ui:ListViewItem">
             <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_MouseDown" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -267,7 +287,6 @@
                                     <TextBlock Margin="4" VerticalAlignment="Center">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Text" Value="{Binding Name}" />
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding IsOpen}" Value="True">
                                                         <Setter Property="FontWeight" Value="Bold" />
@@ -278,7 +297,11 @@
                                                     <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
                                                         <Setter Property="Text" Value="{Binding ID}" />
                                                     </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                                        <Setter Property="Text" Value="{Binding Device.IpAddress}" />
+                                                    </DataTrigger>
                                                 </Style.Triggers>
+                                                <Setter Property="Text" Value="{Binding Name}" />
                                             </Style>
                                         </TextBlock.Style>
                                     </TextBlock>
@@ -291,10 +314,11 @@
                                     <ui:FontIcon.Style>
                                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsOpen}" Value="False">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
                                                 </DataTrigger>
                                             </Style.Triggers>
+                                            <Setter Property="Visibility" Value="Collapsed" />
                                         </Style>
                                     </ui:FontIcon.Style>
                                 </ui:FontIcon>
@@ -326,6 +350,9 @@
                                                         <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
@@ -343,6 +370,9 @@
                                                         <DataTrigger Binding="{Binding Device.Type}" Value="Service">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </Grid.Style>
@@ -359,6 +389,26 @@
                                                     </Grid>
                                                 </StackPanel>
                                             </Button>
+                                        </Grid>
+                                        <Grid>
+                                            <Grid.Style>
+                                                <Style TargetType="Grid">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ElementName=PairingCodeTextBox, Path=Text.Length}" Value="11">
+                                                            <Setter Property="IsEnabled" Value="True" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding IsMdns}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                    <Setter Property="IsEnabled" Value="False" />
+                                                </Style>
+                                            </Grid.Style>
+                                            <Button
+                                                Padding="14,5,14,6"
+                                                ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
+                                                Click="PairServiceButton_Click"
+                                                Content="Pair" />
                                         </Grid>
                                     </StackPanel>
                                 </StackPanel>
@@ -1102,6 +1152,7 @@
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
                                             <Condition Binding="{Binding ElementName=MainWin, Path=ListingInProgress}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>
@@ -1579,7 +1630,21 @@
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <ui:ProgressRing IsActive="True" />
+                            <ui:ProgressRing>
+                                <ui:ProgressRing.Style>
+                                    <Style TargetType="ui:ProgressRing">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=MdnsLoadingPanel, Path=Visibility}" Value="Visible">
+                                                <Setter Property="IsActive" Value="False" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ElementName=MdnsDownPanel, Path=Visibility}" Value="Visible">
+                                                <Setter Property="IsActive" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="IsActive" Value="True" />
+                                    </Style>
+                                </ui:ProgressRing.Style>
+                            </ui:ProgressRing>
                             <StackPanel Grid.Column="1" Margin="4">
                                 <TextBlock HorizontalAlignment="Center" Text="Looking for:" />
                                 <TextBlock
@@ -1591,6 +1656,12 @@
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
                                                     <Setter Property="Text" Value="Services" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=MdnsLoadingPanel, Path=Visibility}" Value="Visible">
+                                                    <Setter Property="Text" Value="Server" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=MdnsDownPanel, Path=Visibility}" Value="Visible">
+                                                    <Setter Property="Text" Value="" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                             <Setter Property="Text" Value="Devices" />
@@ -1746,35 +1817,17 @@
                                                 </Style.Triggers>
                                             </Style>
                                         </StackPanel.Style>
-                                        <Grid>
-                                            <StackPanel>
-                                                <TextBox
-                                                    x:Name="PairingCodeTextBox"
-                                                    Margin="0,6"
-                                                    FontSize="18"
-                                                    TextChanged="PairingCodeTextBox_TextChanged" />
-                                                <Grid>
-                                                    <Grid.Style>
-                                                        <Style TargetType="Grid">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=DevicesObject.ServiceDevices.Count}" Value="0">
-                                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </Grid.Style>
-                                                    <Button
-                                                        x:Name="PairServiceButton"
-                                                        HorizontalAlignment="Center"
-                                                        Click="PairServiceButton_Click"
-                                                        Content="Pair" />
-                                                </Grid>
-                                            </StackPanel>
-                                        </Grid>
+                                        <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
+                                        <TextBox
+                                            x:Name="PairingCodeTextBox"
+                                            Margin="0,6"
+                                            FontFamily="Consolas"
+                                            FontSize="18"
+                                            KeyDown="PairingCodeTextBox_KeyDown"
+                                            TextChanged="PairingCodeTextBox_TextChanged" />
                                     </StackPanel>
                                 </StackPanel>
-                                <StackPanel x:Name="MdnsLoadingPanel">
+                                <StackPanel x:Name="MdnsLoadingPanel" Margin="0,6">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -1791,7 +1844,7 @@
                                         HorizontalAlignment="Center"
                                         IsActive="True" />
                                 </StackPanel>
-                                <StackPanel x:Name="MdnsDownPanel">
+                                <StackPanel x:Name="MdnsDownPanel" Margin="0,6">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -1802,7 +1855,13 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <TextBlock x:Name="MdnsDownBlock" Text="mDNS server is not running" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <ui:FontIcon
+                                            Margin="0,0,8,0"
+                                            Glyph="&#xE783;"
+                                            Style="{StaticResource GlyphFont}" />
+                                        <TextBlock x:Name="MdnsDownBlock" Text="mDNS server is down" />
+                                    </StackPanel>
                                 </StackPanel>
                             </Grid>
                             <StackPanel x:Name="ManualDeviceConnectPanel">

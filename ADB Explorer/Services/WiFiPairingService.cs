@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Services
@@ -53,7 +55,7 @@ namespace ADB_Explorer.Services
             return $"WIFI:T:ADB;S:{service};P:{password};;";
         }
 
-        public static List<ServiceDevice> GetServices()
+        public static IEnumerable<ServiceDevice> GetServices()
         {
             ADBService.ExecuteAdbCommand("mdns", out string services, out _, "services");
 
@@ -70,16 +72,18 @@ namespace ADB_Explorer.Services
                 {
                     if (string.IsNullOrEmpty(existing.PairingPort) && portType == "pairing")
                         existing.PairingPort = port;
-                    else if (string.IsNullOrEmpty(existing.ConnectPort) && portType == "connect")
-                        existing.ConnectPort = port;
+                    //else if (string.IsNullOrEmpty(existing.ConnectPort) && portType == "connect")
+                    //    existing.ConnectPort = port;
                 }
-                else
+                else if (portType == "pairing")
                 {
                     ServiceDevice service = new(id, ipAddress);
-                    if (portType == "pairing")
-                        service.PairingPort = port;
-                    else if (portType == "connect")
-                        service.ConnectPort = port;
+                    service.PairingPort = port;
+
+                    //if (portType == "connect")
+                    //{
+                        //service.ConnectPort = port;
+                    //}
 
                     service.MdnsType = id.Contains(PAIRING_SERVICE_PREFIX)
                         ? ServiceDevice.ServiceType.QrCode
@@ -90,6 +94,16 @@ namespace ADB_Explorer.Services
             }
 
             return mdnsServices;
+        }
+
+        public static async Task<IEnumerable<ServiceDevice>> GetServicesAsync()
+        {
+            IEnumerable<ServiceDevice> result = null;
+            await App.Current.Dispatcher.BeginInvoke(() =>
+            {
+                result = GetServices();
+            });
+            return result;
         }
     }
 }

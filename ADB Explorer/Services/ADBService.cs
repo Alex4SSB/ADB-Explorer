@@ -7,8 +7,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using static ADB_Explorer.Models.AdbRegEx;
+using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
+using static ADB_Explorer.Models.AdbRegEx;
 
 namespace ADB_Explorer.Services
 {
@@ -163,6 +164,16 @@ namespace ADB_Explorer.Services
                 );
         }
 
+        public static async Task<IEnumerable<LogicalDevice>> GetDevicesAsync()
+        {
+            IEnumerable<LogicalDevice> result = null;
+            await App.Current.Dispatcher.BeginInvoke(() =>
+            {
+                result = GetDevices();
+            });
+            return result;
+        }
+
         public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");
         public static void ConnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("connect", fullAddress);
         public static void DisonnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");
@@ -183,7 +194,8 @@ namespace ADB_Explorer.Services
         private static void NetworkDeviceOperation(string cmd, string fullAddress, string pairingCode = null)
         {
             ExecuteAdbCommand(cmd, out string stdout, out _, fullAddress, pairingCode);
-            if (stdout.Contains("cannot connect") || stdout.Contains("error") || stdout.Contains("failed"))
+            if (stdout.ToLower() is string lower
+                && (lower.Contains("cannot connect") || lower.Contains("error") || lower.Contains("failed")))
             {
                 throw new Exception(stdout);
             }

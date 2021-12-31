@@ -61,6 +61,8 @@ namespace ADB_Explorer.Models
 
         public LogicalDevice CurrentDevice => (LogicalDevice)Current?.Device;
 
+        public UIDevice SelectedDevice => UIList?.Find(device => device.IsSelected);
+
         public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
 
         public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
@@ -79,9 +81,12 @@ namespace ADB_Explorer.Models
             {
                 if (self is null || !self.Any(thisDevice => thisDevice is UIServiceDevice && thisDevice.Device.ID == item.ID))
                 {
-                    self.Add(new UIServiceDevice(item));
+                    // Services should always be displayed first in the list
+                    self.Insert(0, new UIServiceDevice(item));
                 }
             }
+
+            ConsolidateDevices(self);
         }
 
         public bool UpdateDevices(IEnumerable<LogicalDevice> other) => UpdateDevices(UIList, other, Current);
@@ -110,6 +115,8 @@ namespace ADB_Explorer.Models
                     self.Add(new UILogicalDevice(item));
                 }
             }
+
+            ConsolidateDevices(self);
 
             return isCurrentTypeUpdated;
         }
@@ -141,10 +148,26 @@ namespace ADB_Explorer.Models
                 return false;
         }
 
-        public bool DevicesChanged(IEnumerable<Device> other)
+        public bool ServicesChanged(IEnumerable<ServiceDevice> other)
         {
             return other is not null
-                && !LogicalDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new DeviceTypeEqualityComparer());
+                && other.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
+                && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
+                    other.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
+        }
+
+        public bool DevicesChanged(IEnumerable<LogicalDevice> other)
+        {
+            return other is not null
+                && !LogicalDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
+                    other.OrderBy(otherDevice => otherDevice.ID), new LogicalDeviceEqualityComparer());
+        }
+
+        public void ConsolidateDevices() => ConsolidateDevices(UIList);
+
+        public static void ConsolidateDevices(List<UIDevice> devices)
+        {
+            devices.RemoveAll(device => device is UIServiceDevice && devices.OfType<UILogicalDevice>().Any(logical => logical.Device is LogicalDevice ld && ld.Status == DeviceStatus.Online && ld.BaseID == device.Device.ID));
         }
     }
 
@@ -205,6 +228,7 @@ namespace ADB_Explorer.Models
                 NotifyPropertyChanged();
             }
         }
+        public bool IsMdns { get; protected set; }
 
         public string TypeIcon => Device.Type switch
         {
@@ -276,6 +300,8 @@ namespace ADB_Explorer.Models
                 NotifyPropertyChanged();
             }
         }
+
+        public string BaseID => Type == DeviceType.Service ? ID.Split('.')[0] : ID;
 
         public LogicalDevice(string name, string id)
         {
@@ -407,6 +433,7 @@ namespace ADB_Explorer.Models
         public UILogicalDevice(LogicalDevice device)
         {
             Device = device;
+            IsMdns = false;
         }
 
         public void SetOpen(List<UILogicalDevice> list, bool openState = true)
@@ -454,18 +481,32 @@ namespace ADB_Explorer.Models
         public UIServiceDevice(ServiceDevice service)
         {
             Device = service;
+            IsMdns = true;
         }
 
     }
 
-    public class DeviceTypeEqualityComparer : IEqualityComparer<Device>
+    public class LogicalDeviceEqualityComparer : IEqualityComparer<LogicalDevice>
     {
-        public bool Equals(Device x, Device y)
+        public bool Equals(LogicalDevice x, LogicalDevice y)
         {
             return x.ID == y.ID && x.Status == y.Status;
         }
 
-        public int GetHashCode([DisallowNull] Device obj)
+        public int GetHashCode([DisallowNull] LogicalDevice obj)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ServiceDeviceEqualityComparer : IEqualityComparer<ServiceDevice>
+    {
+        public bool Equals(ServiceDevice x, ServiceDevice y)
+        {
+            return x.ID == y.ID;
+        }
+
+        public int GetHashCode([DisallowNull] ServiceDevice obj)
         {
             throw new NotImplementedException();
         }

@@ -41,6 +41,8 @@ namespace ADB_Explorer
         private ScrollViewer ExplorerScroller;
         private bool TextBoxChangedMutex;
         private SolidColorBrush qrForeground, qrBackground;
+        private IEnumerable<LogicalDevice> tempLogicalDevices;
+        private IEnumerable<ServiceDevice> tempServiceDevices;
 
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
@@ -337,9 +339,9 @@ namespace ADB_Explorer
             TestCurrentOperation();
         }
 
-        private void DeviceListSetup(string selectedAddress = "")
+        private void DeviceListSetup(IEnumerable<LogicalDevice> devices = null, string selectedAddress = "")
         {
-            var init = !DevicesObject.UpdateDevices(ADBService.GetDevices());
+            var init = !DevicesObject.UpdateDevices(devices is null ? ADBService.GetDevices() : devices);
 
             if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.CurrentDevice.Status != AbstractDevice.DeviceStatus.Online)
                 ClearDrives();
@@ -518,16 +520,39 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
+            bool update = false;
+
             if (MdnsService.State == MDNS.MdnsState.Disabled)
             {
-                // do nothing if amount of devices and their types haven't changed
-                if (DevicesObject.DevicesChanged(ADBService.GetDevices()))
-                    DeviceListSetup();
+                Task.Run(async () =>
+                {
+                    tempLogicalDevices = await ADBService.GetDevicesAsync();
+                });
+                
+                if (tempLogicalDevices is not null && DevicesObject.DevicesChanged(tempLogicalDevices))
+                {
+                    DeviceListSetup(tempLogicalDevices);
+                    tempLogicalDevices = null;
+                    update = true;
+                }
             }
             else if (MdnsService.State == MDNS.MdnsState.Running)
             {
-                DevicesObject.UpdateServices(WiFiPairingService.GetServices());
+                Task.Run(async () =>
+                {
+                    tempServiceDevices = await WiFiPairingService.GetServicesAsync();
+                });
+
+                if (tempServiceDevices is not null && DevicesObject.ServicesChanged(tempServiceDevices))
+                {
+                    DevicesObject.UpdateServices(tempServiceDevices);
+                    tempServiceDevices = null;
+                    update = true;
+                }
             }
+
+            if (update)
+                DevicesList.Items.Refresh();
         }
 
         private void MdnsCheck()
@@ -1098,6 +1123,8 @@ namespace ADB_Explorer
                 if (ex.Message.Contains($"failed to connect to {deviceAddress}"))
                 {
                     ManualPairingPanel.IsEnabled = true;
+                    ManualPairingPortBox.Clear();
+                    ManualPairingCodeBox.Clear();
                 }
                 else
                     MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -1111,10 +1138,10 @@ namespace ADB_Explorer
             if (RememberPortCheckBox.IsChecked == true)
                 Storage.StoreValue(Settings.lastPort, NewDevicePortBox.Text);
 
-            NewDeviceIpBox.Text = "";
-            NewDevicePortBox.Text = "";
+            NewDeviceIpBox.Clear();
+            NewDevicePortBox.Clear();
             NewDevicePanelVisibility(false);
-            DeviceListSetup(deviceAddress);
+            DeviceListSetup(selectedAddress: deviceAddress);
         }
 
         private void EnableConnectButton()
@@ -1150,7 +1177,7 @@ namespace ADB_Explorer
         {
             NewDevicePanelVisibility(!NewDevicePanelVisibility());
             DevicesObject.UnselectAll();
-            //DevicesList.Items.Refresh();
+            DevicesList.Items.Refresh();
 
             if (NewDevicePanelVisibility())
             {
@@ -1181,8 +1208,8 @@ namespace ADB_Explorer
 
         private void RetrieveIp()
         {
-            NewDeviceIpBox.Clear();
-            NewDevicePortBox.Clear();
+            if (!string.IsNullOrWhiteSpace(NewDeviceIpBox.Text) && !string.IsNullOrWhiteSpace(NewDevicePortBox.Text))
+                return;
 
             if (RememberIpCheckBox.IsChecked == true
                 && Storage.RetrieveValue(Settings.lastIp) is string lastIp
@@ -1214,7 +1241,7 @@ namespace ADB_Explorer
                 CurrentADBDevice = new(device.Device.ID);
 
                 ClearExplorer();
-                //DevicesList.Items.Refresh();
+                DevicesList.Items.Refresh();
                 InitDevice();
 
                 DevicesSplitView.IsPaneOpen = false;
@@ -1256,7 +1283,7 @@ namespace ADB_Explorer
                 CurrentADBDevice = null;
             }
             DeviceListSetup();
-            //DevicesList.Items.Refresh();
+            DevicesList.Items.Refresh();
         }
 
         private void ClearExplorer()
@@ -1288,13 +1315,19 @@ namespace ADB_Explorer
         {
             NewDevicePanelVisibility(false);
             DevicesObject.UnselectAll();
-            //DevicesList.Items.Refresh();
+            DevicesList.Items.Refresh();
         }
 
         private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && ConnectNewDeviceButton.IsEnabled)
-                ConnectNewDevice();
+            if (e.Key == Key.Enter)
+            {
+                if (ConnectNewDeviceButton.Visible() && ConnectNewDeviceButton.IsEnabled)
+                    ConnectNewDevice();
+                else if (PairNewDeviceButton.Visible() && PairNewDeviceButton.IsEnabled)
+                    PairDeviceManual();    
+            }
+                
         }
 
         private void RememberPortCheckBox_Click(object sender, RoutedEventArgs e)
@@ -1311,8 +1344,11 @@ namespace ADB_Explorer
         {
             if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.IsSelected)
             {
+                if (device is UIServiceDevice && PasswordConnectionRadioButton.IsChecked == false)
+                    return;
+
                 DevicesObject.SetSelected(device);
-                //DevicesList.Items.Refresh();
+                DevicesList.Items.Refresh();
             }
         }
 
@@ -1368,7 +1404,7 @@ namespace ADB_Explorer
         private void DevicesList_MouseDown(object sender, MouseButtonEventArgs e)
         {
             DevicesObject.UnselectAll();
-            //DevicesList.Items.Refresh();
+            DevicesList.Items.Refresh();
         }
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
@@ -1412,7 +1448,25 @@ namespace ADB_Explorer
 
         private void PairNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{ManualPairingPortBox.Text}", ManualPairingCodeBox.Text);
+            PairDeviceManual();
+        }
+
+        private void PairDeviceManual()
+        {
+            try
+            {
+                ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{ManualPairingPortBox.Text}", ManualPairingCodeBox.Text.Replace("-", ""));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                (FindResource("PairServiceFlyout") as Flyout).Hide();
+                return;
+            }
+
+            ConnectNewDevice();
+            ManualPairingPanel.IsEnabled = false;
+            NewDevicePanelVisibility(false);
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -1678,7 +1732,20 @@ namespace ADB_Explorer
 
         private void PairServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            //ADBService.PairNetworkDevice(DevicesObject.ServiceList[0].PairingAddress, PairingCodeTextBox.Text.Replace("-", ""));
+            PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+        }
+
+        private void PairService(ServiceDevice service)
+        {
+            try
+            {
+                ADBService.PairNetworkDevice(service.ID, PairingCodeTextBox.Text.Replace("-", ""));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
         }
 
         private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1690,6 +1757,27 @@ namespace ADB_Explorer
         private void CancelManualPairing_Click(object sender, RoutedEventArgs e)
         {
             ManualPairingPanel.IsEnabled = false;
+        }
+
+        private void PairFlyoutCloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (FindResource("PairServiceFlyout") is Flyout flyout)
+            {
+                flyout.Hide();
+                ManualConnectionRadioButton.IsChecked = true;
+                NewDevicePanelVisibility(false);
+                DevicesObject.UnselectAll();
+                DevicesObject.ConsolidateDevices();
+                DevicesList.Items.Refresh();
+            }
+        }
+
+        private void PairingCodeTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
