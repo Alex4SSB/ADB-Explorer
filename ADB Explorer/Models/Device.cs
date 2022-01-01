@@ -17,7 +17,8 @@ namespace ADB_Explorer.Models
             Local,
             Remote,
             Emulator,
-            Service
+            Service,
+            Sideload
         }
 
         public enum DeviceStatus
@@ -151,7 +152,7 @@ namespace ADB_Explorer.Models
         public bool ServicesChanged(IEnumerable<ServiceDevice> other)
         {
             return other is not null
-                && other.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
+                && other.All(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
                 && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
                     other.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
         }
@@ -236,6 +237,7 @@ namespace ADB_Explorer.Models
             DeviceType.Remote => "\uEE77",
             DeviceType.Emulator => "\uE99A",
             DeviceType.Service => "\uEDE4",
+            DeviceType.Sideload => "\uED10",
             _ => throw new NotImplementedException(),
         };
         public string StatusIcon => Device.Status switch
@@ -311,7 +313,7 @@ namespace ADB_Explorer.Models
 
         public LogicalDevice(string name, string id, string status) : this(name, id)
         {
-            Type = GetType(id);
+            Type = GetType(id, status);
             Status = GetStatus(status);
         }
 
@@ -319,7 +321,7 @@ namespace ADB_Explorer.Models
         {
             return status switch
             {
-                "device" => DeviceStatus.Online,
+                "device" or "recovery" => DeviceStatus.Online,
                 "offline" => DeviceStatus.Offline,
                 "unauthorized" => DeviceStatus.Unauthorized,
                 "authorizing" => DeviceStatus.Unauthorized,
@@ -327,9 +329,11 @@ namespace ADB_Explorer.Models
             };
         }
 
-        private static DeviceType GetType(string id)
+        private static DeviceType GetType(string id, string status)
         {
-            if (id.Contains("._adb-tls-connect."))
+            if (status == "recovery")
+                return DeviceType.Sideload;
+            else if (id.Contains("._adb-tls-connect."))
                 return DeviceType.Service;
             else if (id.Contains('.'))
                 return DeviceType.Remote;

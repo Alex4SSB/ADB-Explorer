@@ -370,6 +370,9 @@
                                                         <DataTrigger Binding="{Binding Device.Type}" Value="Service">
                                                             <Setter Property="IsEnabled" Value="False" />
                                                         </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
                                                         <DataTrigger Binding="{Binding IsMdns}" Value="True">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>

@@ -548,6 +548,12 @@ namespace ADB_Explorer
                     DevicesObject.UpdateServices(tempServiceDevices);
                     tempServiceDevices = null;
                     update = true;
+
+                    var qrServices = DevicesObject.ServiceDevices.Where(service => service.MdnsType == ServiceDevice.ServiceType.QrCode);
+                    foreach (var item in qrServices)
+                    {
+                        PairService(item);
+                    }
                 }
             }
 
@@ -1737,9 +1743,13 @@ namespace ADB_Explorer
 
         private void PairService(ServiceDevice service)
         {
+            var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
+                ? QrClass.Password
+                : PairingCodeTextBox.Text.Replace("-", "");
+
             try
             {
-                ADBService.PairNetworkDevice(service.ID, PairingCodeTextBox.Text.Replace("-", ""));
+                ADBService.PairNetworkDevice(service.ID, code);
             }
             catch (Exception ex)
             {
