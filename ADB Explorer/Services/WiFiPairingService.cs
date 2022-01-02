@@ -95,15 +95,5 @@ namespace ADB_Explorer.Services
 
             return mdnsServices;
         }
-
-        public static async Task<IEnumerable<ServiceDevice>> GetServicesAsync()
-        {
-            IEnumerable<ServiceDevice> result = null;
-            await App.Current.Dispatcher.BeginInvoke(() =>
-            {
-                result = GetServices();
-            });
-            return result;
-        }
     }
 }

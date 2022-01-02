@@ -164,16 +164,6 @@ namespace ADB_Explorer.Services
                 );
         }
 
-        public static async Task<IEnumerable<LogicalDevice>> GetDevicesAsync()
-        {
-            IEnumerable<LogicalDevice> result = null;
-            await App.Current.Dispatcher.BeginInvoke(() =>
-            {
-                result = GetDevices();
-            });
-            return result;
-        }
-
         public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");
         public static void ConnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("connect", fullAddress);
         public static void DisonnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");

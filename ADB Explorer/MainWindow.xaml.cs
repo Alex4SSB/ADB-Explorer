@@ -41,8 +41,6 @@ namespace ADB_Explorer
         private ScrollViewer ExplorerScroller;
         private bool TextBoxChangedMutex;
         private SolidColorBrush qrForeground, qrBackground;
-        private IEnumerable<LogicalDevice> tempLogicalDevices;
-        private IEnumerable<ServiceDevice> tempServiceDevices;
 
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
@@ -518,59 +516,49 @@ namespace ADB_Explorer
                 : NavigateToPath(path);
         }
 
-        private void ConnectTimer_Tick(object sender, EventArgs e)
+        private void ListDevices(IEnumerable<LogicalDevice> devices)
         {
-            bool update = false;
-
-            if (MdnsService.State == MDNS.MdnsState.Disabled)
+            if (devices is not null && DevicesObject.DevicesChanged(devices))
             {
-                Task.Run(async () =>
-                {
-                    tempLogicalDevices = await ADBService.GetDevicesAsync();
-                });
-                
-                if (tempLogicalDevices is not null && DevicesObject.DevicesChanged(tempLogicalDevices))
-                {
-                    DeviceListSetup(tempLogicalDevices);
-                    tempLogicalDevices = null;
-                    update = true;
-                }
-            }
-            else if (MdnsService.State == MDNS.MdnsState.Running)
-            {
-                Task.Run(async () =>
-                {
-                    tempServiceDevices = await WiFiPairingService.GetServicesAsync();
-                });
-
-                if (tempServiceDevices is not null && DevicesObject.ServicesChanged(tempServiceDevices))
-                {
-                    DevicesObject.UpdateServices(tempServiceDevices);
-                    tempServiceDevices = null;
-                    update = true;
-
-                    var qrServices = DevicesObject.ServiceDevices.Where(service => service.MdnsType == ServiceDevice.ServiceType.QrCode);
-                    foreach (var item in qrServices)
-                    {
-                        PairService(item);
-                    }
-                }
-            }
-
-            if (update)
+                DeviceListSetup(devices);
                 DevicesList.Items.Refresh();
+            }
         }
 
-        private void MdnsCheck()
+        private void ListServices(IEnumerable<ServiceDevice> services)
         {
-            Dispatcher.BeginInvoke(() =>
+            if (services is not null && DevicesObject.ServicesChanged(services))
             {
-                var check = Task.Run(() =>
+                DevicesObject.UpdateServices(services);
+
+                var qrServices = DevicesObject.ServiceDevices.Where(service => service.MdnsType == ServiceDevice.ServiceType.QrCode);
+                foreach (var item in qrServices)
                 {
-                    return MdnsService.State = ADBService.CheckMDNS()
-                        ? MDNS.MdnsState.Running
-                        : MDNS.MdnsState.NotRunning;
-                });
+                    PairService(item);
+                }
+
+                DevicesList.Items.Refresh();
+            }
+        }
+
+        private void ConnectTimer_Tick(object sender, EventArgs e)
+        {
+            Task.Run(() =>
+            {
+                Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
+
+                if (MdnsService.State == MDNS.MdnsState.Running)
+                {
+                    Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices());
+                }
+            });
+        }
+
+        private static void MdnsCheck()
+        {
+            Task.Run(() =>
+            {
+                return MdnsService.State = ADBService.CheckMDNS() ? MDNS.MdnsState.Running : MDNS.MdnsState.NotRunning;
             });
         }
 
