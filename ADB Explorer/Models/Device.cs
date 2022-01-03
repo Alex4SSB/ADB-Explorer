@@ -151,10 +151,18 @@ namespace ADB_Explorer.Models
 
         public bool ServicesChanged(IEnumerable<ServiceDevice> other)
         {
-            return other is not null
-                && other.All(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
-                && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
-                    other.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
+            // if the list is null, were probably not ready to update
+            if (other is null)
+                return false;
+
+            // if the list is empty, we need to update (and remove all items)
+            if (!other.Any())
+                return true;
+
+            // if there's any service whose ID is not found in any logical device,
+            // AND an ordering of both new and old lists doesn't match up all IDs
+            return other.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
+                   && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
         }
 
         public bool DevicesChanged(IEnumerable<LogicalDevice> other)
@@ -168,7 +176,46 @@ namespace ADB_Explorer.Models
 
         public static void ConsolidateDevices(List<UIDevice> devices)
         {
-            devices.RemoveAll(device => device is UIServiceDevice && devices.OfType<UILogicalDevice>().Any(logical => logical.Device is LogicalDevice ld && ld.Status == DeviceStatus.Online && ld.BaseID == device.Device.ID));
+            foreach (var device in devices.OfType<UILogicalDevice>().ToList())
+            {
+                var services = devices.Where(s => s is UIServiceDevice && s.Device.ID == ((LogicalDevice)device.Device).BaseID).ToList();
+                if (!services.Any())
+                    continue;
+
+                var qrServices = devices.Where(q => q is UIServiceDevice
+                    && q.Device is ServiceDevice service
+                    && service.MdnsType == ServiceDevice.ServiceType.QrCode
+                    && service.IpAddress == ((ServiceDevice)services.First().Device).IpAddress
+                ).ToList();
+
+                switch (device.Device.Status)
+                {
+                    // if logical device is online - remove all related services
+                    case DeviceStatus.Online:
+                    {
+                        services.ForEach(s => devices.Remove(s));
+                        qrServices.ForEach(s => devices.Remove(s));
+                        break;
+                    }
+                    // if logical device is offline, and we have one of its services - remove the logical device
+                    case DeviceStatus.Offline:
+                    {
+                        devices.Remove(device);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+
+            // if there's a QR service and a regular service, but no logical - the regular service is probably outdated so it is removed here
+            devices.RemoveAll(s => s is UIServiceDevice
+                && s.Device is ServiceDevice serv
+                && serv.MdnsType == ServiceDevice.ServiceType.PairingCode
+                && !devices.OfType<UILogicalDevice>().Any(l => ((LogicalDevice)l.Device).BaseID == serv.ID)
+                && devices.Any(q => q is UIServiceDevice && q.Device is ServiceDevice qr
+                    && qr.IpAddress == serv.IpAddress
+                    && qr.MdnsType == ServiceDevice.ServiceType.QrCode));
         }
     }
 
@@ -474,7 +521,6 @@ namespace ADB_Explorer.Models
 
         public string IpAddress { get; set; }
         public string PairingPort { get; set; }
-        public string ConnectPort { get; set; }
         public ServiceType MdnsType { get; set; }
 
         public string PairingAddress => $"{IpAddress}:{PairingPort}";

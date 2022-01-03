@@ -74,6 +74,7 @@ namespace ADB_Explorer.Models
 
         public static readonly char[] ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
         public static readonly string PAIRING_SERVICE_PREFIX = "adbexplorer-";
+        public static readonly string LOOPBACK_IP = "0.0.0.0";
 
         public static readonly char[] ESCAPE_ADB_SHELL_CHARS = { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`' };
         public static readonly char[] ESCAPE_ADB_CHARS = { '$', '`', '"', '\\' };

@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Media;
-using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Services
@@ -68,22 +66,17 @@ namespace ADB_Explorer.Services
                 var ipAddress = item.Groups["IpAddress"].Value;
                 var port = item.Groups["Port"].Value;
 
-                if (mdnsServices.Find(s => s.IpAddress == ipAddress) is ServiceDevice existing)
+                if (mdnsServices.Find(s => s.IpAddress == ipAddress && s.ID == id) is ServiceDevice existing)
                 {
                     if (string.IsNullOrEmpty(existing.PairingPort) && portType == "pairing")
                         existing.PairingPort = port;
-                    //else if (string.IsNullOrEmpty(existing.ConnectPort) && portType == "connect")
-                    //    existing.ConnectPort = port;
                 }
-                else if (portType == "pairing")
+                else if (ipAddress != LOOPBACK_IP)
                 {
                     ServiceDevice service = new(id, ipAddress);
-                    service.PairingPort = port;
-
-                    //if (portType == "connect")
-                    //{
-                        //service.ConnectPort = port;
-                    //}
+                    
+                    if (portType == "pairing")
+                        service.PairingPort = port;
 
                     service.MdnsType = id.Contains(PAIRING_SERVICE_PREFIX)
                         ? ServiceDevice.ServiceType.QrCode

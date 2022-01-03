@@ -531,7 +531,10 @@ namespace ADB_Explorer
             {
                 DevicesObject.UpdateServices(services);
 
-                var qrServices = DevicesObject.ServiceDevices.Where(service => service.MdnsType == ServiceDevice.ServiceType.QrCode);
+                var qrServices = DevicesObject.ServiceDevices.Where(service => 
+                    service.MdnsType == ServiceDevice.ServiceType.QrCode
+                    && service.ID == QrClass.ServiceName).ToList();
+
                 foreach (var item in qrServices)
                 {
                     PairService(item);
@@ -1338,8 +1341,9 @@ namespace ADB_Explorer
         {
             if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.IsSelected)
             {
-                if (device is UIServiceDevice && PasswordConnectionRadioButton.IsChecked == false)
+                if (device is UIServiceDevice service && (PasswordConnectionRadioButton.IsChecked == false || string.IsNullOrEmpty(((ServiceDevice)service.Device).PairingPort)))
                     return;
+
 
                 DevicesObject.SetSelected(device);
                 DevicesList.Items.Refresh();
@@ -1610,6 +1614,8 @@ namespace ADB_Explorer
             else if (ManualConnectionRadioButton.IsChecked == true)
             {
                 MdnsService.State = MDNS.MdnsState.Disabled;
+                DevicesObject.UIList.RemoveAll(device => device is UIServiceDevice);
+                DevicesList.Items.Refresh();
             }
 
             if (QrConnectionRadioButton?.IsChecked == true && QrClass is null)
