@@ -4,10 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="MainWin"
@@ -1625,68 +1622,57 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="{Binding ElementName=NewDeviceRect, Path=ActualHeight}" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <ui:ProgressRing>
-                                <ui:ProgressRing.Style>
-                                    <Style TargetType="ui:ProgressRing">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=MdnsLoadingPanel, Path=Visibility}" Value="Visible">
-                                                <Setter Property="IsActive" Value="False" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding ElementName=MdnsDownPanel, Path=Visibility}" Value="Visible">
-                                                <Setter Property="IsActive" Value="False" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                        <Setter Property="IsActive" Value="True" />
-                                    </Style>
-                                </ui:ProgressRing.Style>
-                            </ui:ProgressRing>
-                            <StackPanel Grid.Column="1" Margin="4">
-                                <TextBlock HorizontalAlignment="Center" Text="Looking for:" />
-                                <TextBlock
-                                    Margin="0,-4,0,0"
-                                    HorizontalAlignment="Center"
-                                    FontSize="24">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
-                                                    <Setter Property="Text" Value="Services" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=MdnsLoadingPanel, Path=Visibility}" Value="Visible">
-                                                    <Setter Property="Text" Value="Server" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=MdnsDownPanel, Path=Visibility}" Value="Visible">
-                                                    <Setter Property="Text" Value="" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                            <Setter Property="Text" Value="Devices" />
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </StackPanel>
-                            <Menu Grid.Column="2" HorizontalAlignment="Right">
-                                <MenuItem
-                                    x:Name="OpenNewDeviceButton"
-                                    Click="OpenNewDeviceButton_Click"
-                                    ToolTip="Add a device">
-                                    <MenuItem.Header>
-                                        <ui:FontIcon
-                                            Margin="0,0,-1,0"
-                                            FontSize="22"
-                                            Glyph="&#xECC8;"
-                                            Style="{StaticResource DisabledGlyphStyle}" />
-                                    </MenuItem.Header>
-                                </MenuItem>
-                            </Menu>
-                        </Grid>
+                        <Menu Margin="0,4,0,0" HorizontalAlignment="Center">
+                            <MenuItem x:Name="OpenNewDeviceButton" Click="OpenNewDeviceButton_Click">
+                                <MenuItem.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <ui:FontIcon Margin="0,-1,6,0" FontSize="22">
+                                            <ui:FontIcon.Style>
+                                                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
+                                                            <Setter Property="Glyph" Value="&#xE70E;" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                    <Setter Property="Glyph" Value="&#xE70D;" />
+                                                </Style>
+                                            </ui:FontIcon.Style>
+                                        </ui:FontIcon>
+                                        <TextBlock Grid.Column="1" Text="Pair / Connect Device">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
+                                                            <Setter Property="Visibility" Value="Hidden" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                        <TextBlock Grid.Column="1" Text="Hide">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                    <Setter Property="Visibility" Value="Hidden" />
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </MenuItem.Header>
+                            </MenuItem>
+                        </Menu>
                         <Rectangle
                             x:Name="NewDeviceRect"
                             Grid.Row="1"
@@ -1727,11 +1713,17 @@
                             Margin="8,0,8,0"
                             VerticalAlignment="Bottom"
                             Visibility="Collapsed">
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                Text="mDNS"
-                                Visibility="Collapsed" />
                             <Grid>
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=EnableMdnsCheckBox, Path=IsChecked}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Style>
+                                </Grid.Style>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
@@ -1746,7 +1738,11 @@
                                     VerticalAlignment="Center"
                                     FontWeight="Bold"
                                     Text="mDNS" />
-                                <Separator Grid.Row="1" VerticalAlignment="Top" />
+                                <Separator
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="10,0"
+                                    VerticalAlignment="Top" />
                                 <RadioButton
                                     x:Name="ManualConnectionRadioButton"
                                     Grid.Column="1"
@@ -1756,7 +1752,6 @@
                                     IsChecked="True"
                                     Unchecked="ConnectionTypeRadioButton_Checked" />
                                 <StackPanel Grid.Row="1" Grid.Column="1">
-                                    <Separator />
                                     <RadioButton
                                         x:Name="QrConnectionRadioButton"
                                         Checked="ConnectionTypeRadioButton_Checked"
@@ -1770,6 +1765,29 @@
                                         GroupName="ConnectionType"
                                         Unchecked="ConnectionTypeRadioButton_Checked" />
                                 </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,0,0,6">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=EnableMdnsCheckBox, Path=IsChecked}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <ui:FontIcon Glyph="&#xE946;" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="6,0,0,0"
+                                    FontSize="13"
+                                    Text="mDNS can be enabled in the settings"
+                                    TextWrapping="Wrap" />
                             </Grid>
                             <Grid>
                                 <Grid.Style>
@@ -1967,10 +1985,19 @@
                                     TextChanged="PairingCodeBox_TextChanged" />
                             </StackPanel>
                         </StackPanel>
+                        <Grid Grid.Row="2" Margin="0,6">
+                            <ui:ProgressRing
+                                Margin="6,4,0,0"
+                                HorizontalAlignment="Left"
+                                IsActive="True" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="24"
+                                Text="Devices" />
+                        </Grid>
                         <ui:ListView
                             x:Name="DevicesList"
-                            Grid.Row="2"
-                            Margin="0,6,0,0"
+                            Grid.Row="3"
                             DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
                             IsSelectionEnabled="False"
                             ItemContainerStyle="{StaticResource DeviceStyle}"
@@ -2057,6 +2084,20 @@
                                 <Separator />
                                 <TextBlock Text="Connection" />
                                 <StackPanel Margin="0,6,0,15">
+                                    <CheckBox x:Name="EnableMdnsCheckBox" Click="EnableMdnsCheckBox_Click">
+                                        <StackPanel>
+                                            <TextBlock Text="Enable mDNS" />
+                                            <TextBlock
+                                                Margin="0,2,0,0"
+                                                FontSize="13"
+                                                Text="Changing this will restart ADB server." />
+                                            <TextBlock
+                                                Margin="0,0,0,6"
+                                                FontSize="13"
+                                                Text="When enabled, ADB server is restarted on each app launch."
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
+                                    </CheckBox>
                                     <CheckBox
                                         x:Name="RememberIpCheckBox"
                                         Click="RememberIpCheckBox_Click"

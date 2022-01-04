@@ -11,29 +11,21 @@ namespace ADB_Explorer.Services
 {
     public class PairingQrClass : INotifyPropertyChanged
     {
-        public PairingQrClass(SolidColorBrush background, SolidColorBrush foreground)
+        public PairingQrClass(SolidColorBrush background, SolidColorBrush foreground) : this()
         {
             Background = background;
             Foreground = foreground;
+        }
 
+        public PairingQrClass()
+        {
             ServiceName = PAIRING_SERVICE_PREFIX + RandomString.GetUniqueKey(10);
             Password = RandomString.GetUniqueKey(12);
-            Image = QrGenerator.GenerateQR(PairingString, Background, Foreground);
         }
 
-        public string ServiceName { get; set; }
-        public string Password { get; set; }
-        private DrawingImage image;
-
-        public DrawingImage Image
-        {
-            get => image; 
-            set
-            {
-                image = value;
-                NotifyPropertyChanged();
-            }
-        }
+        public string ServiceName { get; private set; }
+        public string Password { get; private set; }
+        public DrawingImage Image => string.IsNullOrEmpty(PairingString) ? null : QrGenerator.GenerateQR(PairingString, Background, Foreground);
         public string PairingString => WiFiPairingService.CreatePairingString(ServiceName, Password);
         public SolidColorBrush Background { get; set; }
         public SolidColorBrush Foreground { get; set; }

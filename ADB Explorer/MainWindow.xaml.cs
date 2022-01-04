@@ -202,7 +202,11 @@ namespace ADB_Explorer
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
 
-            SetQrColors(theme);
+            if (EnableMdnsCheckBox.IsChecked == true)
+            {
+                SetQrColors(theme);
+                UpdateQrClass();
+            }
         }
 
         private static void SetResourceColor(ApplicationTheme theme, string resource)
@@ -323,6 +327,9 @@ namespace ADB_Explorer
 
         private void LaunchSequence()
         {
+            if (EnableMdnsCheckBox.IsChecked == true)
+                QrClass = new();
+
             var theme = Storage.RetrieveEnum<ApplicationTheme>();
             SetTheme(theme);
             if (theme == ApplicationTheme.Light)
@@ -380,6 +387,9 @@ namespace ADB_Explorer
 
         private void LoadSettings()
         {
+            if (Storage.RetrieveBool(Settings.enableMdns) is bool enable)
+                EnableMdnsCheckBox.IsChecked = enable;
+
             if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
 
@@ -535,10 +545,8 @@ namespace ADB_Explorer
                     service.MdnsType == ServiceDevice.ServiceType.QrCode
                     && service.ID == QrClass.ServiceName).ToList();
 
-                foreach (var item in qrServices)
-                {
-                    PairService(item);
-                }
+                if (qrServices.Any() && PairService(qrServices.First()))
+                    NewDevicePanelVisibility(false);
 
                 DevicesList.Items.Refresh();
             }
@@ -1615,19 +1623,25 @@ namespace ADB_Explorer
             {
                 MdnsService.State = MDNS.MdnsState.Disabled;
                 DevicesObject.UIList.RemoveAll(device => device is UIServiceDevice);
-                DevicesList.Items.Refresh();
+                DevicesList?.Items.Refresh();
             }
 
             if (QrConnectionRadioButton?.IsChecked == true && QrClass is null)
             {
-                QrClass = new PairingQrClass(qrBackground, qrForeground);
-                PairingQrImage.Source = QrClass.Image;
+                UpdateQrClass();
             }
 
             if (ManualPairingPanel is not null)
             {
                 ManualPairingPanel.IsEnabled = false;
             }
+        }
+
+        private void UpdateQrClass()
+        {
+            QrClass.Background = qrBackground;
+            QrClass.Foreground = qrForeground;
+            PairingQrImage.Source = QrClass.Image;
         }
 
         private static void TextBoxSeparation(TextBox textBox,
@@ -1735,7 +1749,7 @@ namespace ADB_Explorer
             PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
         }
 
-        private void PairService(ServiceDevice service)
+        private bool PairService(ServiceDevice service)
         {
             var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
                 ? QrClass.Password
@@ -1748,8 +1762,10 @@ namespace ADB_Explorer
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
+                return false;
             }
+
+            return true;
         }
 
         private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1768,7 +1784,6 @@ namespace ADB_Explorer
             if (FindResource("PairServiceFlyout") is Flyout flyout)
             {
                 flyout.Hide();
-                ManualConnectionRadioButton.IsChecked = true;
                 NewDevicePanelVisibility(false);
                 DevicesObject.UnselectAll();
                 DevicesObject.ConsolidateDevices();
@@ -1781,6 +1796,19 @@ namespace ADB_Explorer
             if (e.Key == Key.Enter)
             {
                 PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+            }
+        }
+
+        private void EnableMdnsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            bool isChecked = EnableMdnsCheckBox.IsChecked == true;
+            Storage.StoreValue(Settings.enableMdns, isChecked);
+
+            ADBService.IsMdnsEnabled = isChecked;
+            ADBService.KillAdbServer();
+            if (!isChecked)
+            {
+                ManualConnectionRadioButton.IsChecked = true;
             }
         }
 

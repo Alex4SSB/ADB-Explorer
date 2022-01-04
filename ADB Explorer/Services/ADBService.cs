@@ -19,6 +19,8 @@ namespace ADB_Explorer.Services
         private const string GET_DEVICES = "devices";
         private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
 
+        public static bool IsMdnsEnabled { get; set; }
+
         public class ProcessFailedException : Exception
         {
             public ProcessFailedException() { }
@@ -55,8 +57,10 @@ namespace ADB_Explorer.Services
             cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
             cmdProcess.StartInfo.StandardErrorEncoding = encoding;
-            // TODO: disable when mDNS is disabled
-            cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
+            
+            if (IsMdnsEnabled)
+                cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
+
             cmdProcess.Start();
             return cmdProcess;
         }
@@ -229,11 +233,12 @@ namespace ADB_Explorer.Services
             return res.First().Contains("mdns daemon version");
         }
 
-        //public static void RestartAdbServer()
-        //{
-        //    ExecuteAdbCommand("kill-server", out _, out _);
+        public static void KillAdbServer(bool restart = false)
+        {
+            ExecuteAdbCommand("kill-server", out _, out _);
 
-        //    ExecuteAdbCommand("start-server", out _, out _);
-        //}
+            if (restart)
+                ExecuteAdbCommand("start-server", out _, out _);
+        }
     }
 }

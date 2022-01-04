@@ -117,7 +117,8 @@ namespace ADB_Explorer.Models
                 }
             }
 
-            ConsolidateDevices(self);
+            if (self.OfType<UIServiceDevice>().Any())
+                ConsolidateDevices(self);
 
             return isCurrentTypeUpdated;
         }

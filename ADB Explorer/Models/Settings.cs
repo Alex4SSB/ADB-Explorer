@@ -13,5 +13,6 @@
         showExtensions,
         showHiddenItems,
         showExtendedView,
+        enableMdns,
     }
 }
