@@ -18,10 +18,10 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static ADB_Explorer.Converters.FileTypeClass;
+using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
-using static ADB_Explorer.Helpers.VisibilityHelper;
-using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer
 {
@@ -39,6 +39,12 @@ namespace ADB_Explorer
         private ConcurrentQueue<FileStat> waitingFileStats;
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
+        private bool TextBoxChangedMutex;
+        private SolidColorBrush qrForeground, qrBackground;
+
+        public static MDNS MdnsService { get; set; } = new();
+        public Devices DevicesObject { get; set; } = new();
+        public PairingQrClass QrClass { get; set; }
 
         public bool ListingInProgress { get { return listDirTask is not null; } }
 
@@ -183,9 +189,9 @@ namespace ADB_Explorer
             ConnectTimer.Stop();
         }
 
-        private static void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
+        private void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
 
-        private static void SetTheme(ApplicationTheme theme)
+        private void SetTheme(ApplicationTheme theme)
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
@@ -195,11 +201,34 @@ namespace ADB_Explorer
             }
 
             Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
+
+            if (EnableMdnsCheckBox.IsChecked == true)
+            {
+                SetQrColors(theme);
+                UpdateQrClass();
+            }
         }
 
         private static void SetResourceColor(ApplicationTheme theme, string resource)
         {
             Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]);
+        }
+
+        private void SetQrColors(ApplicationTheme theme)
+        {
+            switch (theme)
+            {
+                case ApplicationTheme.Light:
+                    qrBackground = QR_BACKGROUND_LIGHT;
+                    qrForeground = QR_FOREGROUND_LIGHT;
+                    break;
+                case ApplicationTheme.Dark:
+                    qrBackground = QR_BACKGROUND_DARK;
+                    qrForeground = QR_FOREGROUND_DARK;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
@@ -298,6 +327,9 @@ namespace ADB_Explorer
 
         private void LaunchSequence()
         {
+            if (EnableMdnsCheckBox.IsChecked == true)
+                QrClass = new();
+
             var theme = Storage.RetrieveEnum<ApplicationTheme>();
             SetTheme(theme);
             if (theme == ApplicationTheme.Light)
@@ -308,19 +340,18 @@ namespace ADB_Explorer
             Title = Properties.Resources.AppDisplayName;
             LoadSettings();
             DeviceListSetup();
+
+            TestCurrentOperation();
         }
 
-        private void DeviceListSetup(string selectedAddress = "")
+        private void DeviceListSetup(IEnumerable<LogicalDevice> devices = null, string selectedAddress = "")
         {
-            var init = !Devices.Update(ADBService.GetDevices());
+            var init = !DevicesObject.UpdateDevices(devices is null ? ADBService.GetDevices() : devices);
 
-            DevicesList.ItemsSource = Devices.List;
-            DevicesList.Items.Refresh();
-
-            if (Devices.Current is null || Devices.Current.IsOpen && Devices.Current.Status != DeviceClass.DeviceStatus.Online)
+            if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.CurrentDevice.Status != AbstractDevice.DeviceStatus.Online)
                 ClearDrives();
 
-            if (!Devices.DevicesAvailable())
+            if (!DevicesObject.DevicesAvailable())
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
@@ -329,33 +360,36 @@ namespace ADB_Explorer
             }
             else
             {
-                if (Devices.DevicesAvailable(true))
+                if (DevicesObject.DevicesAvailable(true))
                     return;
 
                 if (AutoOpenCheckBox.IsChecked != true)
                 {
-                    Devices.Current?.SetOpen(false);
+                    DevicesObject.CloseAll();
 
                     Title = Properties.Resources.AppDisplayName;
                     ClearExplorer();
                     return;
                 }
 
-                if (!Devices.SetCurrentDevice(selectedAddress))
+                if (!DevicesObject.SetCurrentDevice(selectedAddress))
                     return;
 
                 if (!ConnectTimer.IsEnabled)
                     DevicesSplitView.IsPaneOpen = false;
             }
 
-            Devices.Current.SetOpen(true);
-            CurrentADBDevice = new(Devices.Current.ID);
+            DevicesObject.SetOpen(DevicesObject.Current, true);
+            CurrentADBDevice = new(DevicesObject.CurrentDevice.ID);
             if (init)
                 InitDevice();
         }
 
         private void LoadSettings()
         {
+            if (Storage.RetrieveBool(Settings.enableMdns) is bool enable)
+                EnableMdnsCheckBox.IsChecked = enable;
+
             if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
 
@@ -418,13 +452,13 @@ namespace ADB_Explorer
 
         private void InitDevice()
         {
-            Title = $"{Properties.Resources.AppDisplayName} - {Devices.Current.Name}";
+            Title = $"{Properties.Resources.AppDisplayName} - {DevicesObject.Current.Name}";
 
             RefreshDrives();
             DriveViewNav();
             UpdateAndroidVersion();
 
-            if (Devices.Current.Drives.Count < 1)
+            if (DevicesObject.CurrentDevice.Drives.Count < 1)
             {
                 // Shouldn't actually happen
                 InitNavigation();
@@ -440,7 +474,7 @@ namespace ADB_Explorer
             DrivesItemRepeater.Visibility = Visibility.Visible;
             PathBox.IsEnabled = true;
 
-            MenuItem button = CreatePathButton(Devices.Current, Devices.Current.Name);
+            MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
             button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
             AddPathButton(button);
         }
@@ -455,9 +489,9 @@ namespace ADB_Explorer
             UnsupportedAndroidIcon.Visibility = Visible(ver > 0 && ver < MIN_SUPPORTED_ANDROID_VER);
         }
 
-        private static void CombinePrettyNames()
+        private void CombinePrettyNames()
         {
-            foreach (var drive in Devices.Current.Drives.Where(d => d.Type != Models.DriveType.Root))
+            foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Type != Models.DriveType.Root))
             {
                 CurrentPrettyNames.TryAdd(drive.Path, drive.Type == Models.DriveType.External
                     ? drive.ID : drive.PrettyName);
@@ -486,7 +520,7 @@ namespace ADB_Explorer
 
             ExplorerGrid.ItemsSource = AndroidFileList;
             PushMenuButton.IsEnabled = true;
-            HomeButton.IsEnabled = Devices.Current.Drives.Any();
+            HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
             NavHistory.Reset();
 
             return string.IsNullOrEmpty(path)
@@ -494,11 +528,51 @@ namespace ADB_Explorer
                 : NavigateToPath(path);
         }
 
+        private void ListDevices(IEnumerable<LogicalDevice> devices)
+        {
+            if (devices is not null && DevicesObject.DevicesChanged(devices))
+            {
+                DeviceListSetup(devices);
+                DevicesList.Items.Refresh();
+            }
+        }
+
+        private void ListServices(IEnumerable<ServiceDevice> services)
+        {
+            if (services is not null && DevicesObject.ServicesChanged(services))
+            {
+                DevicesObject.UpdateServices(services);
+
+                var qrServices = DevicesObject.ServiceDevices.Where(service => 
+                    service.MdnsType == ServiceDevice.ServiceType.QrCode
+                    && service.ID == QrClass.ServiceName).ToList();
+
+                if (qrServices.Any() && PairService(qrServices.First()))
+                    NewDevicePanelVisibility(false);
+
+                DevicesList.Items.Refresh();
+            }
+        }
+
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
-            // do nothing if amount of devices and their types haven't changed
-            if (Devices.DevicesChanged(ADBService.GetDevices()))
-                DeviceListSetup();
+            Task.Run(() =>
+            {
+                Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
+
+                if (MdnsService.State == MDNS.MdnsState.Running)
+                {
+                    Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices());
+                }
+            });
+        }
+
+        private static void MdnsCheck()
+        {
+            Task.Run(() =>
+            {
+                return MdnsService.State = ADBService.CheckMDNS() ? MDNS.MdnsState.Running : MDNS.MdnsState.NotRunning;
+            });
         }
 
         private void StartDirectoryList(string path)
@@ -801,7 +875,7 @@ namespace ADB_Explorer
             {
                 if (item.Tag is string path and not "")
                     NavigateToPath(path);
-                else if (item.Tag is DeviceClass)
+                else if (item.Tag is LogicalDevice)
                     RefreshDrives(true);
             }
         }
@@ -1053,7 +1127,15 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                if (ex.Message.Contains($"failed to connect to {deviceAddress}"))
+                {
+                    ManualPairingPanel.IsEnabled = true;
+                    ManualPairingPortBox.Clear();
+                    ManualPairingCodeBox.Clear();
+                }
+                else
+                    MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
                 return;
             }
 
@@ -1063,10 +1145,10 @@ namespace ADB_Explorer
             if (RememberPortCheckBox.IsChecked == true)
                 Storage.StoreValue(Settings.lastPort, NewDevicePortBox.Text);
 
-            NewDeviceIpBox.Text = "";
-            NewDevicePortBox.Text = "";
+            NewDeviceIpBox.Clear();
+            NewDevicePortBox.Clear();
             NewDevicePanelVisibility(false);
-            DeviceListSetup(deviceAddress);
+            DeviceListSetup(selectedAddress: deviceAddress);
         }
 
         private void EnableConnectButton()
@@ -1080,19 +1162,34 @@ namespace ADB_Explorer
                 && ushort.TryParse(port, out _);
         }
 
+        private void EnablePairButton()
+        {
+            PairNewDeviceButton.IsEnabled = ManualPairingPortBox.Text is string port
+                && !string.IsNullOrWhiteSpace(port)
+                && ushort.TryParse(port, out _)
+                && ManualPairingCodeBox.Text is string text
+                && text.Replace("-", "") is string password
+                && !string.IsNullOrWhiteSpace(password)
+                && uint.TryParse(password, out _)
+                && password.Length == 6;
+        }
+
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric:true, allowedChars: '.');
             EnableConnectButton();
         }
 
         private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
             NewDevicePanelVisibility(!NewDevicePanelVisibility());
-            Devices.UnselectAll();
+            DevicesObject.UnselectAll();
             DevicesList.Items.Refresh();
 
             if (NewDevicePanelVisibility())
+            {
                 RetrieveIp();
+            }
         }
 
         private void NewDevicePanelVisibility(bool open)
@@ -1118,12 +1215,12 @@ namespace ADB_Explorer
 
         private void RetrieveIp()
         {
-            NewDeviceIpBox.Clear();
-            NewDevicePortBox.Clear();
+            if (!string.IsNullOrWhiteSpace(NewDeviceIpBox.Text) && !string.IsNullOrWhiteSpace(NewDevicePortBox.Text))
+                return;
 
             if (RememberIpCheckBox.IsChecked == true
                 && Storage.RetrieveValue(Settings.lastIp) is string lastIp
-                && !Devices.List.Find(d => d.ID.Split(':')[0] == lastIp))
+                && !DevicesObject.UIList.Find(d => d.Device.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
                 if (RememberPortCheckBox.IsChecked == true
@@ -1145,10 +1242,10 @@ namespace ADB_Explorer
 
         private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is DeviceClass device && device.Status != DeviceClass.DeviceStatus.Offline)
+            if (sender is Button button && button.DataContext is UILogicalDevice device && device.Device.Status != AbstractDevice.DeviceStatus.Offline)
             {
-                device.SetOpen();
-                CurrentADBDevice = new(device.ID);
+                DevicesObject.SetOpen(device);
+                CurrentADBDevice = new(device.Device.ID);
 
                 ClearExplorer();
                 DevicesList.Items.Refresh();
@@ -1160,23 +1257,23 @@ namespace ADB_Explorer
 
         private void DisconnectDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && button.DataContext is DeviceClass device)
+            if (sender is Button button && button.DataContext is UILogicalDevice device)
             {
                 RemoveDevice(device);
             }
         }
 
-        private void RemoveDevice(DeviceClass device)
+        private void RemoveDevice(UILogicalDevice device)
         {
             try
             {
-                if (device.Type == DeviceClass.DeviceType.Emulator)
+                if (device.Device.Type == AbstractDevice.DeviceType.Emulator)
                 {
-                    ADBService.KillEmulator(device.ID);
+                    ADBService.KillEmulator(device.Device.ID);
                 }
                 else
                 {
-                    ADBService.DisconnectNetworkDevice(device.ID);
+                    ADBService.DisconnectNetworkDevice(device.Device.ID);
                 }
             }
             catch (Exception ex)
@@ -1189,7 +1286,7 @@ namespace ADB_Explorer
             {
                 ClearDrives();
                 ClearExplorer();
-                device.SetOpen(false);
+                DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
             }
             DeviceListSetup();
@@ -1217,21 +1314,27 @@ namespace ADB_Explorer
 
         private void ClearDrives()
         {
-            Devices.Current?.Drives.Clear();
+            DevicesObject.CurrentDevice?.Drives.Clear();
             DrivesItemRepeater.ItemsSource = null;
         }
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
             NewDevicePanelVisibility(false);
-            Devices.UnselectAll();
+            DevicesObject.UnselectAll();
             DevicesList.Items.Refresh();
         }
 
         private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && ConnectNewDeviceButton.IsEnabled)
-                ConnectNewDevice();
+            if (e.Key == Key.Enter)
+            {
+                if (ConnectNewDeviceButton.Visible() && ConnectNewDeviceButton.IsEnabled)
+                    ConnectNewDevice();
+                else if (PairNewDeviceButton.Visible() && PairNewDeviceButton.IsEnabled)
+                    PairDeviceManual();    
+            }
+                
         }
 
         private void RememberPortCheckBox_Click(object sender, RoutedEventArgs e)
@@ -1246,9 +1349,13 @@ namespace ADB_Explorer
 
         private void ListViewItem_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is DeviceClass device && !device.IsSelected)
+            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.IsSelected)
             {
-                device.SetSelected();
+                if (device is UIServiceDevice service && (PasswordConnectionRadioButton.IsChecked == false || string.IsNullOrEmpty(((ServiceDevice)service.Device).PairingPort)))
+                    return;
+
+
+                DevicesObject.SetSelected(device);
                 DevicesList.Items.Refresh();
             }
         }
@@ -1304,7 +1411,7 @@ namespace ADB_Explorer
 
         private void DevicesList_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            Devices.UnselectAll();
+            DevicesObject.UnselectAll();
             DevicesList.Items.Refresh();
         }
 
@@ -1343,12 +1450,31 @@ namespace ADB_Explorer
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            PairNewDeviceButton.IsEnabled = PairingCodeBox.Text.Length == 6 && double.TryParse(PairingCodeBox.Text, out double _);
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
+            EnablePairButton();
         }
 
         private void PairNewDeviceButton_Click(object sender, RoutedEventArgs e)
         {
-            ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{NewDevicePortBox.Text}", PairingCodeBox.Text);
+            PairDeviceManual();
+        }
+
+        private void PairDeviceManual()
+        {
+            try
+            {
+                ADBService.PairNetworkDevice($"{NewDeviceIpBox.Text}:{ManualPairingPortBox.Text}", ManualPairingCodeBox.Text.Replace("-", ""));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                (FindResource("PairServiceFlyout") as Flyout).Hide();
+                return;
+            }
+
+            ConnectNewDevice();
+            ManualPairingPanel.IsEnabled = false;
+            NewDevicePanelVisibility(false);
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -1360,8 +1486,8 @@ namespace ADB_Explorer
 
         private void RefreshDrives(bool findMmc = false)
         {
-            Devices.Current.SetDrives(CurrentADBDevice.GetDrives(), findMmc);
-            DrivesItemRepeater.ItemsSource = Devices.Current.Drives;
+            DevicesObject.CurrentDevice.SetDrives(CurrentADBDevice.GetDrives(), findMmc);
+            DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
         }
 
         private void PushMenuButton_Click(object sender, RoutedEventArgs e)
@@ -1484,6 +1610,208 @@ namespace ADB_Explorer
         private void FileOpCompactRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(Settings.showExtendedView, false);
+        }
+
+        private void ConnectionTypeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            if (ManualConnectionRadioButton.IsChecked == false
+                && NewDevicePanel.Visible()
+                && MdnsService.State == MDNS.MdnsState.Disabled)
+            {
+                MdnsService.State = MDNS.MdnsState.Unchecked;
+                MdnsCheck();
+            }
+            else if (ManualConnectionRadioButton.IsChecked == true)
+            {
+                MdnsService.State = MDNS.MdnsState.Disabled;
+                DevicesObject.UIList.RemoveAll(device => device is UIServiceDevice);
+                DevicesList?.Items.Refresh();
+            }
+
+            if (QrConnectionRadioButton?.IsChecked == true && QrClass is null)
+            {
+                UpdateQrClass();
+            }
+
+            if (ManualPairingPanel is not null)
+            {
+                ManualPairingPanel.IsEnabled = false;
+            }
+        }
+
+        private void UpdateQrClass()
+        {
+            QrClass.Background = qrBackground;
+            QrClass.Foreground = qrForeground;
+            PairingQrImage.Source = QrClass.Image;
+        }
+
+        private static void TextBoxSeparation(TextBox textBox,
+                                              ref bool inProgress,
+                                              char? separator = null,
+                                              int maxChars = -1,
+                                              bool numeric = true,
+                                              params char[] allowedChars)
+        {
+            if (inProgress)
+                return;
+            else
+                inProgress = true;
+
+            var caretIndex = textBox.CaretIndex;
+            var output = "";
+            var numbers = "";
+            var deletedChars = 0;
+            var text = textBox.Text;
+
+            if (numeric)
+            {
+                foreach (var c in text)
+                {
+                    if (!char.IsDigit(c) && !allowedChars.Contains(c))
+                    {
+                        if (c != separator)
+                            deletedChars++;
+
+                        continue;
+                    }
+
+                    numbers += c;
+                }
+            }
+
+            if (separator is null)
+            {
+                output = numbers;
+            }
+            else
+            {
+                for (int i = 0; i < numbers.Length; i++)
+                {
+                    output += $"{(i > 0 ? separator : "")}{numbers[i]}";
+                }
+            }
+
+            if (deletedChars > 0 && textBox.Tag is string prev && prev.Length > output.Length)
+            {
+                textBox.Text = prev;
+                textBox.CaretIndex = caretIndex - deletedChars;
+                return;
+            }
+
+            if (maxChars > -1)
+                textBox.MaxLength = separator is null ? maxChars : (maxChars * 2) - 1;
+
+            textBox.Text = output;
+
+            if ($"{textBox.Tag}" != output)
+            {
+                caretIndex -= deletedChars;
+                if (separator is not null)
+                    caretIndex += output.Count(c => c == separator) - text.Count(c => c == separator);
+
+                if (caretIndex < 0)
+                    caretIndex = 0;
+            }
+
+            textBox.CaretIndex = caretIndex;
+
+            textBox.Tag = output;
+
+            inProgress = false;
+        }
+
+        private static string NumericText(string text)
+        {
+            var output = "";
+            foreach (var c in text)
+            {
+                if (!char.IsDigit(c))
+                    continue;
+
+                output += c;
+            }
+
+            return output;
+        }
+
+        private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
+        }
+
+        private void NewDevicePortBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars:5);
+            EnableConnectButton();
+        }
+
+        private void PairServiceButton_Click(object sender, RoutedEventArgs e)
+        {
+            PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+        }
+
+        private bool PairService(ServiceDevice service)
+        {
+            var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
+                ? QrClass.Password
+                : PairingCodeTextBox.Text.Replace("-", "");
+
+            try
+            {
+                ADBService.PairNetworkDevice(service.ID, code);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            return true;
+        }
+
+        private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars: 5);
+            EnablePairButton();
+        }
+
+        private void CancelManualPairing_Click(object sender, RoutedEventArgs e)
+        {
+            ManualPairingPanel.IsEnabled = false;
+        }
+
+        private void PairFlyoutCloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (FindResource("PairServiceFlyout") is Flyout flyout)
+            {
+                flyout.Hide();
+                NewDevicePanelVisibility(false);
+                DevicesObject.UnselectAll();
+                DevicesObject.ConsolidateDevices();
+                DevicesList.Items.Refresh();
+            }
+        }
+
+        private void PairingCodeTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+            }
+        }
+
+        private void EnableMdnsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            bool isChecked = EnableMdnsCheckBox.IsChecked == true;
+            Storage.StoreValue(Settings.enableMdns, isChecked);
+
+            ADBService.IsMdnsEnabled = isChecked;
+            ADBService.KillAdbServer();
+            if (!isChecked)
+            {
+                ManualConnectionRadioButton.IsChecked = true;
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

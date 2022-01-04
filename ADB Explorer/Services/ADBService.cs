@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
+using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
 
 namespace ADB_Explorer.Services
@@ -15,6 +17,9 @@ namespace ADB_Explorer.Services
     {
         private const string ADB_PATH = "adb";
         private const string GET_DEVICES = "devices";
+        private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
+
+        public static bool IsMdnsEnabled { get; set; }
 
         public class ProcessFailedException : Exception
         {
@@ -52,6 +57,10 @@ namespace ADB_Explorer.Services
             cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
             cmdProcess.StartInfo.StandardErrorEncoding = encoding;
+            
+            if (IsMdnsEnabled)
+                cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
+
             cmdProcess.Start();
             return cmdProcess;
         }
@@ -123,7 +132,7 @@ namespace ADB_Explorer.Services
             var result = string.Concat(str.Select(c =>
                 c switch
                 {
-                    var ch when new[] { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`'}.Contains(ch) => "\\" + ch,
+                    var ch when ESCAPE_ADB_SHELL_CHARS.Contains(ch) => "\\" + ch,
                     _ => new string(c, 1)
                 }));
 
@@ -135,7 +144,7 @@ namespace ADB_Explorer.Services
             var result = string.Concat(str.Select(c =>
                 c switch
                 {
-                    var ch when new[] { '$', '`', '"', '\\' }.Contains(ch) => "\\" + ch,
+                    var ch when ESCAPE_ADB_CHARS.Contains(ch) => "\\" + ch,
                     _ => new string(c, 1)
                 }));
 
@@ -147,13 +156,13 @@ namespace ADB_Explorer.Services
             return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
         }
 
-        public static IEnumerable<DeviceClass> GetDevices()
+        public static IEnumerable<LogicalDevice> GetDevices()
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
 
             return DEVICE_NAME_RE.Matches(stdout).Select(
-                m => new DeviceClass(
-                    name: DeviceClass.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
+                m => new LogicalDevice(
+                    name: LogicalDevice.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                     id: m.Groups["id"].Value,
                     status: m.Groups["status"].Value)
                 );
@@ -179,7 +188,8 @@ namespace ADB_Explorer.Services
         private static void NetworkDeviceOperation(string cmd, string fullAddress, string pairingCode = null)
         {
             ExecuteAdbCommand(cmd, out string stdout, out _, fullAddress, pairingCode);
-            if (stdout.Contains("cannot connect") || stdout.Contains("error") || stdout.Contains("failed"))
+            if (stdout.ToLower() is string lower
+                && (lower.Contains("cannot connect") || lower.Contains("error") || lower.Contains("failed")))
             {
                 throw new Exception(stdout);
             }
@@ -214,6 +224,21 @@ namespace ADB_Explorer.Services
             var mmcVolumeId = Regex.Match(stdout, @$"{node}\smounted\s(?<id>[\w-]+)");
 
             return mmcVolumeId.Success ? mmcVolumeId.Groups["id"].Value : "";
+        }
+
+        public static bool CheckMDNS()
+        {
+            var res = ExecuteAdbCommandAsync("mdns", new(), "check");
+
+            return res.First().Contains("mdns daemon version");
+        }
+
+        public static void KillAdbServer(bool restart = false)
+        {
+            ExecuteAdbCommand("kill-server", out _, out _);
+
+            if (restart)
+                ExecuteAdbCommand("start-server", out _, out _);
         }
     }
 }
