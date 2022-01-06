@@ -327,17 +327,6 @@ namespace ADB_Explorer
 
         private void LaunchSequence()
         {
-            if (EnableMdnsCheckBox.IsChecked == true)
-                QrClass = new();
-
-            var theme = Storage.RetrieveEnum<ApplicationTheme>();
-            SetTheme(theme);
-            if (theme == ApplicationTheme.Light)
-                LightThemeRadioButton.IsChecked = true;
-            else
-                DarkThemeRadioButton.IsChecked = true;
-
-            Title = Properties.Resources.AppDisplayName;
             LoadSettings();
             DeviceListSetup();
 
@@ -387,8 +376,23 @@ namespace ADB_Explorer
 
         private void LoadSettings()
         {
+            Title = Properties.Resources.AppDisplayName;
+
             if (Storage.RetrieveBool(Settings.enableMdns) is bool enable)
+            {
+                // Intentional invocation of the checked event
                 EnableMdnsCheckBox.IsChecked = enable;
+
+                if (enable)
+                    QrClass = new();
+            }
+
+            var theme = Storage.RetrieveEnum<ApplicationTheme>();
+            SetTheme(theme);
+            if (theme == ApplicationTheme.Light)
+                LightThemeRadioButton.IsChecked = true;
+            else
+                DarkThemeRadioButton.IsChecked = true;
 
             if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
@@ -1755,7 +1759,7 @@ namespace ADB_Explorer
         {
             var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
                 ? QrClass.Password
-                : PairingCodeTextBox.Text.Replace("-", "");
+                : service.PairingCode;
 
             try
             {
@@ -1801,8 +1805,10 @@ namespace ADB_Explorer
             }
         }
 
-        private void EnableMdnsCheckBox_Click(object sender, RoutedEventArgs e)
+        private void EnableMdnsCheckBox_Checked(object sender, RoutedEventArgs e)
         {
+            // Intentionally invoked from InitSettings
+
             bool isChecked = EnableMdnsCheckBox.IsChecked == true;
             Storage.StoreValue(Settings.enableMdns, isChecked);
 

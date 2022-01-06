@@ -80,7 +80,11 @@ namespace ADB_Explorer.Models
 
             foreach (var item in other)
             {
-                if (self is null || !self.Any(thisDevice => thisDevice is UIServiceDevice && thisDevice.Device.ID == item.ID))
+                if (self?.Find(thisDevice => thisDevice.Device.ID == item.ID) is UIServiceDevice service)
+                {
+                    ((ServiceDevice)service.Device).UpdateService(item);
+                }
+                else
                 {
                     // Services should always be displayed first in the list
                     self.Insert(0, new UIServiceDevice(item));
@@ -381,7 +385,7 @@ namespace ADB_Explorer.Models
         {
             if (status == "recovery")
                 return DeviceType.Sideload;
-            else if (id.Contains("._adb-tls-connect."))
+            else if (id.Contains("._adb-tls-"))
                 return DeviceType.Service;
             else if (id.Contains('.'))
                 return DeviceType.Remote;
@@ -505,7 +509,7 @@ namespace ADB_Explorer.Models
         public ServiceDevice()
         {
             Type = DeviceType.Service;
-            Status = DeviceStatus.Unauthorized;
+            UpdateStatus();
         }
 
         public ServiceDevice(string id, string ipAddress) : this()
@@ -520,9 +524,21 @@ namespace ADB_Explorer.Models
             PairingCode
         }
 
+        public void UpdateService(ServiceDevice other)
+        {
+            PairingPort = other.PairingPort;
+            UpdateStatus();
+        }
+
+        private void UpdateStatus()
+        {
+            Status = string.IsNullOrEmpty(PairingPort) ? DeviceStatus.Offline : DeviceStatus.Unauthorized;
+        }
+
         public string IpAddress { get; set; }
         public string PairingPort { get; set; }
         public ServiceType MdnsType { get; set; }
+        public string PairingCode { get; set; }
 
         public string PairingAddress => $"{IpAddress}:{PairingPort}";
     }
@@ -535,6 +551,16 @@ namespace ADB_Explorer.Models
             IsMdns = true;
         }
 
+        private string uiPairingCode;
+        public string UIPairingCode
+        {
+            get => uiPairingCode;
+            set
+            {
+                uiPairingCode = value;
+                ((ServiceDevice)Device).PairingCode = uiPairingCode.Replace("-", "");
+            }
+        }
     }
 
     public class LogicalDeviceEqualityComparer : IEqualityComparer<LogicalDevice>
@@ -554,7 +580,9 @@ namespace ADB_Explorer.Models
     {
         public bool Equals(ServiceDevice x, ServiceDevice y)
         {
-            return x.ID == y.ID;
+            // IDs are equal and either both ports have a value, or they're both null
+            // We do not update the port since it can change too frequently, and we do not use it anyway
+            return x.ID == y.ID && !(string.IsNullOrEmpty(x.PairingPort) ^ string.IsNullOrEmpty(y.PairingPort));
         }
 
         public int GetHashCode([DisallowNull] ServiceDevice obj)

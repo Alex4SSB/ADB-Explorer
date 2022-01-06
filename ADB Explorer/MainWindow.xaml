@@ -330,6 +330,50 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
+                                    <Grid Margin="4,0,4,-4">
+                                        <Grid.Style>
+                                            <Style TargetType="Grid">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </Style>
+                                        </Grid.Style>
+                                        <StackPanel>
+                                            <TextBlock Margin="0,6,0,6" Text="Pairing Code:" />
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBox
+                                                    ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                                                    FontFamily="Consolas"
+                                                    FontSize="18"
+                                                    KeyDown="PairingCodeTextBox_KeyDown"
+                                                    Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                    TextChanged="PairingCodeTextBox_TextChanged" />
+                                                <Grid Grid.Column="1" Margin="4,0,0,0">
+                                                    <Grid.Style>
+                                                        <Style TargetType="Grid">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding UIPairingCode.Length}" Value="11">
+                                                                    <Setter Property="IsEnabled" Value="True" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </Style>
+                                                    </Grid.Style>
+                                                    <Button
+                                                        ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
+                                                        Click="PairServiceButton_Click"
+                                                        Content="Pair" />
+                                                </Grid>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Grid>
                                     <StackPanel
                                         Margin="4"
                                         HorizontalAlignment="Right"
@@ -389,26 +433,6 @@
                                                     </Grid>
                                                 </StackPanel>
                                             </Button>
-                                        </Grid>
-                                        <Grid>
-                                            <Grid.Style>
-                                                <Style TargetType="Grid">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=PairingCodeTextBox, Path=Text.Length}" Value="11">
-                                                            <Setter Property="IsEnabled" Value="True" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding IsMdns}" Value="False">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                </Style>
-                                            </Grid.Style>
-                                            <Button
-                                                Padding="14,5,14,6"
-                                                ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
-                                                Click="PairServiceButton_Click"
-                                                Content="Pair" />
                                         </Grid>
                                     </StackPanel>
                                 </StackPanel>
@@ -1811,42 +1835,23 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <StackPanel x:Name="QrPairingPanel">
-                                        <StackPanel.Style>
-                                            <Style TargetType="StackPanel">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=QrConnectionRadioButton, Path=IsChecked}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </StackPanel.Style>
-                                        <Image
-                                            x:Name="PairingQrImage"
-                                            Margin="0,6"
-                                            RenderOptions.EdgeMode="Aliased" />
-                                    </StackPanel>
-                                    <StackPanel x:Name="SixDigitPairingPanel">
-                                        <StackPanel.Style>
-                                            <Style TargetType="StackPanel">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=PasswordConnectionRadioButton, Path=IsChecked}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </StackPanel.Style>
-                                        <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
-                                        <TextBox
-                                            x:Name="PairingCodeTextBox"
-                                            Margin="0,6"
-                                            FontFamily="Consolas"
-                                            FontSize="18"
-                                            KeyDown="PairingCodeTextBox_KeyDown"
-                                            TextChanged="PairingCodeTextBox_TextChanged" />
-                                    </StackPanel>
+
+                                </StackPanel>
+                                <StackPanel x:Name="QrPairingPanel">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=QrConnectionRadioButton, Path=IsChecked}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <Image
+                                        x:Name="PairingQrImage"
+                                        Margin="0,6"
+                                        RenderOptions.EdgeMode="Aliased" />
                                 </StackPanel>
                                 <StackPanel x:Name="MdnsLoadingPanel" Margin="0,6">
                                     <StackPanel.Style>
@@ -1859,11 +1864,20 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <TextBlock HorizontalAlignment="Center" Text="Please wait..." />
-                                    <ui:ProgressRing
-                                        Margin="6"
-                                        HorizontalAlignment="Center"
-                                        IsActive="True" />
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <ui:FontIcon
+                                            Margin="0,0,8,0"
+                                            Glyph="&#xE946;"
+                                            Style="{StaticResource GlyphFont}" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="Checking mDNS status please wait"
+                                            TextWrapping="Wrap" />
+                                    </Grid>
                                 </StackPanel>
                                 <StackPanel x:Name="MdnsDownPanel" Margin="0,6">
                                     <StackPanel.Style>
@@ -2084,7 +2098,10 @@
                                 <Separator />
                                 <TextBlock Text="Connection" />
                                 <StackPanel Margin="0,6,0,15">
-                                    <CheckBox x:Name="EnableMdnsCheckBox" Click="EnableMdnsCheckBox_Click">
+                                    <CheckBox
+                                        x:Name="EnableMdnsCheckBox"
+                                        Checked="EnableMdnsCheckBox_Checked"
+                                        Unchecked="EnableMdnsCheckBox_Checked">
                                         <StackPanel>
                                             <TextBlock Text="Enable mDNS" />
                                             <TextBlock
