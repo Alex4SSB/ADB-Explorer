@@ -121,7 +121,7 @@ namespace ADB_Explorer
             fileOperationQueue = new(this.Dispatcher);
             LaunchSequence();
 
-            ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
+            ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
             ConnectTimer.Start();
 
@@ -329,7 +329,6 @@ namespace ADB_Explorer
         private void LaunchSequence()
         {
             LoadSettings();
-            //DeviceListSetup();
 
             TestCurrentOperation();
         }
@@ -561,6 +560,8 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
+            ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
+
             Task.Run(() =>
             {
                 if (!connectTimerMutex.WaitOne(0))
