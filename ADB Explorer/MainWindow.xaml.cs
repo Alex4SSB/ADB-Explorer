@@ -31,6 +31,7 @@ namespace ADB_Explorer
     public partial class MainWindow : Window
     {
         private readonly DispatcherTimer ConnectTimer = new();
+        private Mutex connectTimerMutex = new();
         private Task listDirTask;
         private Task unknownFoldersTask;
         private DispatcherTimer dirListUpdateTimer;
@@ -562,12 +563,19 @@ namespace ADB_Explorer
         {
             Task.Run(() =>
             {
+                if (!connectTimerMutex.WaitOne(0))
+                {
+                    return;
+                }
+
                 Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
 
                 if (MdnsService.State == MDNS.MdnsState.Running)
                 {
-                    Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices());
+                    Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
                 }
+
+                connectTimerMutex.ReleaseMutex();
             });
         }
 
