@@ -1044,9 +1044,11 @@ namespace ADB_Explorer
 
         private void TestCurrentOperation()
         {
-            // fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "Shalom.exe"));
-            // fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "Shalom.exe"));
-            // fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Shalom"));
+            fileOperationQueue.Clear();
+
+            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "Shalom.exe"));
+            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "Shalom.exe"));
+            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Shalom"));
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -1814,7 +1816,11 @@ namespace ADB_Explorer
 
             ADBService.IsMdnsEnabled = isChecked;
             ADBService.KillAdbServer();
-            if (!isChecked)
+            if (isChecked)
+            {
+                QrClass = new();
+            }
+            else
             {
                 ManualConnectionRadioButton.IsChecked = true;
             }
