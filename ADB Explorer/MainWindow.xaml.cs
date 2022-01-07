@@ -190,7 +190,7 @@ namespace ADB_Explorer
             ConnectTimer.Stop();
         }
 
-        private void SetTheme(object theme) => SetTheme((ApplicationTheme)theme);
+        private void SetTheme() => SetTheme((ApplicationTheme)ThemeManager.Current.ApplicationTheme);
 
         private void SetTheme(ApplicationTheme theme)
         {
@@ -329,7 +329,7 @@ namespace ADB_Explorer
         private void LaunchSequence()
         {
             LoadSettings();
-            DeviceListSetup();
+            //DeviceListSetup();
 
             TestCurrentOperation();
         }
@@ -1642,7 +1642,7 @@ namespace ADB_Explorer
                 DevicesList?.Items.Refresh();
             }
 
-            if (QrConnectionRadioButton?.IsChecked == true && QrClass is null)
+            if (QrConnectionRadioButton?.IsChecked == true)
             {
                 UpdateQrClass();
             }
@@ -1655,6 +1655,9 @@ namespace ADB_Explorer
 
         private void UpdateQrClass()
         {
+            if (qrBackground == null)
+                SetTheme();
+
             QrClass.Background = qrBackground;
             QrClass.Foreground = qrForeground;
             PairingQrImage.Source = QrClass.Image;

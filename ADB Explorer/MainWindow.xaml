@@ -1934,12 +1934,16 @@
                                 <StackPanel x:Name="QrPairingPanel">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Collapsed" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=QrConnectionRadioButton, Path=IsChecked}" Value="True">
+                                                <MultiDataTrigger>
+                                                    <MultiDataTrigger.Conditions>
+                                                        <Condition Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running" />
+                                                        <Condition Binding="{Binding ElementName=QrConnectionRadioButton, Path=IsChecked}" Value="True" />
+                                                    </MultiDataTrigger.Conditions>
                                                     <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
+                                                </MultiDataTrigger>
                                             </Style.Triggers>
+                                            <Setter Property="Visibility" Value="Collapsed" />
                                         </Style>
                                     </StackPanel.Style>
                                     <Image
