@@ -8,6 +8,7 @@ using ModernWpf.Controls;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -1837,6 +1838,26 @@ namespace ADB_Explorer
             {
                 ManualConnectionRadioButton.IsChecked = true;
             }
+        }
+
+        private void RemovePending_Click(object sender, RoutedEventArgs e)
+        {
+            fileOperationQueue.PendingOperations.Clear();
+        }
+
+        private void RemoveCompleted_Click(object sender, RoutedEventArgs e)
+        {
+            fileOperationQueue.CompletedOperations.Clear();
+        }
+
+        private void OpenDefaultFolder_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", DefaultFolderBlock.Text);
+        }
+
+        private void RemovePendingAndCompleted_Click(object sender, RoutedEventArgs e)
+        {
+            fileOperationQueue.Clear();
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
