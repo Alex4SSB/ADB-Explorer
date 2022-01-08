@@ -561,6 +561,7 @@ namespace ADB_Explorer
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
+            var devicesVisible = DevicesSplitView.IsPaneOpen;
 
             Task.Run(() =>
             {
@@ -571,7 +572,7 @@ namespace ADB_Explorer
 
                 Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
 
-                if (MdnsService.State == MDNS.MdnsState.Running)
+                if (MdnsService.State == MDNS.MdnsState.Running && devicesVisible)
                 {
                     Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
                 }

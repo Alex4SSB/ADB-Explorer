@@ -779,6 +779,7 @@
                     <MenuItem
                         x:Name="PullMenuButton"
                         Click="PullMenuButton_Click"
+                        IsEnabled="False"
                         ToolTip="Pull">
                         <MenuItem.Header>
                             <Grid Margin="-4,0,-6,0">
@@ -790,7 +791,10 @@
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
-                    <MenuItem x:Name="PushMenuButton" ToolTip="Push">
+                    <MenuItem
+                        x:Name="PushMenuButton"
+                        IsEnabled="False"
+                        ToolTip="Push">
                         <MenuItem.Header>
                             <Grid Margin="-4,0,-6,0">
                                 <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
@@ -2201,7 +2205,7 @@
                                         Checked="EnableMdnsCheckBox_Checked"
                                         Unchecked="EnableMdnsCheckBox_Checked">
                                         <StackPanel>
-                                            <TextBlock Text="Enable mDNS" />
+                                            <TextBlock Text="Enable mDNS (experimental)" />
                                             <TextBlock
                                                 Margin="0,2,0,0"
                                                 FontSize="13"
