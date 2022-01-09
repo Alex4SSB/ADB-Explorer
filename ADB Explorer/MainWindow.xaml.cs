@@ -1860,6 +1860,11 @@ namespace ADB_Explorer
             fileOperationQueue.Clear();
         }
 
+        private void StopFileOperations_Click(object sender, RoutedEventArgs e)
+        {
+            fileOperationQueue.Stop();
+        }
+
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
             FileOperationsButton.Tag = false;

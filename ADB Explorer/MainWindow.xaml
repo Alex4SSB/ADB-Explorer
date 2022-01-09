@@ -129,6 +129,100 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
+        <Style x:Key="MenuStyle" TargetType="Menu">
+            <Setter Property="Background" Value="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}" />
+        </Style>
+        <Menu x:Key="FileOpStopMenu" x:Shared="False">
+            <Menu.Style>
+                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=CurrentOperationDetailedDataGrid, Path=Items.Count}" Value="0">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                    <Setter Property="IsEnabled" Value="True" />
+                </Style>
+            </Menu.Style>
+            <MenuItem Click="StopFileOperations_Click" ToolTip="Stop">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE71A;" />
+                </MenuItem.Header>
+            </MenuItem>
+        </Menu>
+        <Menu
+            x:Key="FileOpRemoveMenu"
+            x:Shared="False"
+            FlowDirection="LeftToRight">
+            <Menu.Style>
+                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=PendingOperationsDetailedDataGrid, Path=Items.Count}" Value="0" />
+                                <Condition Binding="{Binding ElementName=CompletedOperationsDetailedDataGrid, Path=Items.Count}" Value="0" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="IsEnabled" Value="False" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                    <Setter Property="IsEnabled" Value="True" />
+                </Style>
+            </Menu.Style>
+            <MenuItem ToolTip="Remove Operations">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xE711;" />
+                </MenuItem.Header>
+                <MenuItem Click="RemovePending_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                Margin="0,0,4,0"
+                                FontSize="16"
+                                Glyph="&#xECC5;" />
+                            <TextBlock Text="Pending" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="RemoveCompleted_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                Margin="0,0,4,0"
+                                FontSize="16"
+                                Glyph="&#xE930;" />
+                            <TextBlock Text="Completed" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Click="RemovePendingAndCompleted_Click">
+                    <MenuItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <ui:FontIcon
+                                Margin="0,0,4,0"
+                                FontSize="16"
+                                Glyph="&#xECC9;" />
+                            <TextBlock Text="All" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Menu x:Key="FileOpDefaultFolderMenu" x:Shared="False">
+            <Menu.Style>
+                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ElementName=DefaultFolderBlock, Path=Text}" Value="[not set]">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                    <Setter Property="IsEnabled" Value="True" />
+                </Style>
+            </Menu.Style>
+            <MenuItem Click="OpenDefaultFolder_Click" ToolTip="Open Default Folder">
+                <MenuItem.Header>
+                    <ui:FontIcon Glyph="&#xED25;" />
+                </MenuItem.Header>
+            </MenuItem>
+        </Menu>
         <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -1492,77 +1586,9 @@
                         <WrapPanel.Resources>
                             <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
                         </WrapPanel.Resources>
-                        <Menu>
-                            <Menu.Style>
-                                <Style TargetType="Menu">
-                                    <Style.Triggers>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding ElementName=PendingOperationsDetailedDataGrid, Path=Items.Count}" Value="0" />
-                                                <Condition Binding="{Binding ElementName=CompletedOperationsDetailedDataGrid, Path=Items.Count}" Value="0" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </MultiDataTrigger>
-                                    </Style.Triggers>
-                                    <Setter Property="IsEnabled" Value="True" />
-                                </Style>
-                            </Menu.Style>
-                            <MenuItem ToolTip="Remove Operations">
-                                <MenuItem.Header>
-                                    <ui:FontIcon Glyph="&#xE711;" />
-                                </MenuItem.Header>
-                                <MenuItem Click="RemovePending_Click">
-                                    <MenuItem.Header>
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:FontIcon
-                                                Margin="0,0,4,0"
-                                                FontSize="16"
-                                                Glyph="&#xECC5;" />
-                                            <TextBlock Text="Pending" />
-                                        </StackPanel>
-                                    </MenuItem.Header>
-                                </MenuItem>
-                                <MenuItem Click="RemoveCompleted_Click">
-                                    <MenuItem.Header>
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:FontIcon
-                                                Margin="0,0,4,0"
-                                                FontSize="16"
-                                                Glyph="&#xE930;" />
-                                            <TextBlock Text="Completed" />
-                                        </StackPanel>
-                                    </MenuItem.Header>
-                                </MenuItem>
-                                <MenuItem Click="RemovePendingAndCompleted_Click">
-                                    <MenuItem.Header>
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:FontIcon
-                                                Margin="0,0,4,0"
-                                                FontSize="16"
-                                                Glyph="&#xECC9;" />
-                                            <TextBlock Text="All" />
-                                        </StackPanel>
-                                    </MenuItem.Header>
-                                </MenuItem>
-                            </MenuItem>
-                        </Menu>
-                        <Menu>
-                            <Menu.Style>
-                                <Style TargetType="Menu">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=DefaultFolderBlock, Path=Text}" Value="[not set]">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                    <Setter Property="IsEnabled" Value="True" />
-                                </Style>
-                            </Menu.Style>
-                            <MenuItem Click="OpenDefaultFolder_Click" ToolTip="Open Default Folder">
-                                <MenuItem.Header>
-                                    <ui:FontIcon Glyph="&#xED25;" />
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </Menu>
+                        <StaticResource ResourceKey="FileOpStopMenu" />
+                        <StaticResource ResourceKey="FileOpRemoveMenu" />
+                        <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
                     </WrapPanel>
                 </Grid>
             </Grid>
@@ -1695,6 +1721,7 @@
                         <Grid Margin="8">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="52" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <TextBlock
@@ -1709,7 +1736,21 @@
                                     </MenuItem.Header>
                                 </MenuItem>
                             </Menu>
-                            <Grid Grid.Row="1">
+                            <Border
+                                Grid.Row="1"
+                                Margin="0,0,0,6"
+                                BorderBrush="Gray"
+                                BorderThickness="1">
+                                <WrapPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                                    <WrapPanel.Resources>
+                                        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
+                                    </WrapPanel.Resources>
+                                    <StaticResource ResourceKey="FileOpStopMenu" />
+                                    <StaticResource ResourceKey="FileOpRemoveMenu" />
+                                    <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
+                                </WrapPanel>
+                            </Border>
+                            <Grid Grid.Row="2">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition />
