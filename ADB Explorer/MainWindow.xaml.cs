@@ -118,7 +118,7 @@ namespace ADB_Explorer
         {
             InitializeComponent();
             SetIconFont();
-
+            
             fileOperationQueue = new(this.Dispatcher);
             LaunchSequence();
 
@@ -189,6 +189,17 @@ namespace ADB_Explorer
             }
 
             ConnectTimer.Stop();
+            StoreClosingValues();
+        }
+
+        private void StoreClosingValues()
+        {
+            Storage.StoreValue(SystemVals.windowMaximized, WindowState == WindowState.Maximized);
+
+            var detailedVisible = FileOpVisibility() && FileOpDetailedRadioButton.IsChecked == true;
+            Storage.StoreValue(SystemVals.detailedVisible, detailedVisible);
+            if (detailedVisible)
+                Storage.StoreValue(SystemVals.detailedHeight, FileOpDetailedGrid.Height);
         }
 
         private void SetTheme() => SetTheme((ApplicationTheme)ThemeManager.Current.ApplicationTheme);
@@ -379,7 +390,7 @@ namespace ADB_Explorer
         {
             Title = Properties.Resources.AppDisplayName;
 
-            if (Storage.RetrieveBool(Settings.enableMdns) is bool enable)
+            if (Storage.RetrieveBool(UserPrefs.enableMdns) is bool enable)
             {
                 // Intentional invocation of the checked event
                 EnableMdnsCheckBox.IsChecked = enable;
@@ -395,33 +406,33 @@ namespace ADB_Explorer
             else
                 DarkThemeRadioButton.IsChecked = true;
 
-            if (Storage.RetrieveValue(Settings.defaultFolder) is string path && !string.IsNullOrEmpty(path))
+            if (Storage.RetrieveValue(UserPrefs.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
 
-            if (Storage.RetrieveBool(Settings.pullOnDoubleClick) is bool copy)
+            if (Storage.RetrieveBool(UserPrefs.pullOnDoubleClick) is bool copy)
                 PullOnDoubleClickCheckBox.IsChecked = copy;
 
-            if (Storage.RetrieveBool(Settings.rememberIp) is bool remIp)
+            if (Storage.RetrieveBool(UserPrefs.rememberIp) is bool remIp)
                 RememberIpCheckBox.IsChecked = remIp;
 
             RememberPortCheckBox.IsEnabled = (bool)RememberIpCheckBox.IsChecked;
 
             if (RememberPortCheckBox.IsEnabled
-                    && Storage.RetrieveBool(Settings.rememberPort) is bool remPort)
+                    && Storage.RetrieveBool(UserPrefs.rememberPort) is bool remPort)
             {
                 RememberPortCheckBox.IsChecked = remPort;
             }
 
-            if (Storage.RetrieveBool(Settings.autoOpen) is bool autoOpen)
+            if (Storage.RetrieveBool(UserPrefs.autoOpen) is bool autoOpen)
                 AutoOpenCheckBox.IsChecked = autoOpen;
 
-            if (Storage.RetrieveBool(Settings.showExtensions) is bool showExt)
+            if (Storage.RetrieveBool(UserPrefs.showExtensions) is bool showExt)
                 ShowExtensionsCheckBox.IsChecked = showExt;
 
-            if (Storage.RetrieveBool(Settings.showHiddenItems) is bool showHidden)
+            if (Storage.RetrieveBool(UserPrefs.showHiddenItems) is bool showHidden)
                 ShowHiddenCheckBox.IsChecked = showHidden;
 
-            bool extendedView = Storage.RetrieveBool(Settings.showExtendedView) is bool val && val;
+            bool extendedView = Storage.RetrieveBool(UserPrefs.showExtendedView) is bool val && val;
             FileOpDetailedRadioButton.IsChecked = extendedView;
             FileOpCompactRadioButton.IsChecked = !extendedView;
 
@@ -1110,13 +1121,13 @@ namespace ADB_Explorer
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 DefaultFolderBlock.Text = dialog.FileName;
-                Storage.StoreValue(Settings.defaultFolder, dialog.FileName);
+                Storage.StoreValue(UserPrefs.defaultFolder, dialog.FileName);
             }
         }
 
         private void PullOnDoubleClickCheckBox_Checked(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.pullOnDoubleClick, PullOnDoubleClickCheckBox.IsChecked);
+            Storage.StoreValue(UserPrefs.pullOnDoubleClick, PullOnDoubleClickCheckBox.IsChecked);
         }
 
         private void InputLangBlock_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1157,10 +1168,10 @@ namespace ADB_Explorer
             }
 
             if (RememberIpCheckBox.IsChecked == true)
-                Storage.StoreValue(Settings.lastIp, NewDeviceIpBox.Text);
+                Storage.StoreValue(UserPrefs.lastIp, NewDeviceIpBox.Text);
 
             if (RememberPortCheckBox.IsChecked == true)
-                Storage.StoreValue(Settings.lastPort, NewDevicePortBox.Text);
+                Storage.StoreValue(UserPrefs.lastPort, NewDevicePortBox.Text);
 
             NewDeviceIpBox.Clear();
             NewDevicePortBox.Clear();
@@ -1236,12 +1247,12 @@ namespace ADB_Explorer
                 return;
 
             if (RememberIpCheckBox.IsChecked == true
-                && Storage.RetrieveValue(Settings.lastIp) is string lastIp
+                && Storage.RetrieveValue(UserPrefs.lastIp) is string lastIp
                 && !DevicesObject.UIList.Find(d => d.Device.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
                 if (RememberPortCheckBox.IsChecked == true
-                    && Storage.RetrieveValue(Settings.lastPort) is string lastPort)
+                    && Storage.RetrieveValue(UserPrefs.lastPort) is string lastPort)
                 {
                     NewDevicePortBox.Text = lastPort;
                 }
@@ -1254,7 +1265,7 @@ namespace ADB_Explorer
             if (!RememberPortCheckBox.IsEnabled)
                 RememberPortCheckBox.IsChecked = false;
 
-            Storage.StoreValue(Settings.rememberIp, RememberIpCheckBox.IsChecked);
+            Storage.StoreValue(UserPrefs.rememberIp, RememberIpCheckBox.IsChecked);
         }
 
         private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
@@ -1356,7 +1367,7 @@ namespace ADB_Explorer
 
         private void RememberPortCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.rememberPort, RememberPortCheckBox.IsChecked);
+            Storage.StoreValue(UserPrefs.rememberPort, RememberPortCheckBox.IsChecked);
         }
 
         private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -1379,7 +1390,7 @@ namespace ADB_Explorer
 
         private void AutoOpenCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.autoOpen, AutoOpenCheckBox.IsChecked);
+            Storage.StoreValue(UserPrefs.autoOpen, AutoOpenCheckBox.IsChecked);
         }
 
         private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1459,10 +1470,23 @@ namespace ADB_Explorer
 
         private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
         {
-            if (FileOperationsButton.Tag is null || (FileOperationsButton.Tag is bool tag && !tag))
-                FileOperationsButton.Tag = true;
-            else
-                FileOperationsButton.Tag = false;
+            FileOpVisibility(null);
+        }
+
+        private void FileOpVisibility(bool? value = null)
+        {
+            if (value is not null)
+            {
+                FileOperationsButton.Tag = value;
+                return;
+            }
+
+            FileOperationsButton.Tag = !FileOpVisibility();
+        }
+
+        private bool FileOpVisibility()
+        {
+            return FileOperationsButton.Tag is bool and true;
         }
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -1561,12 +1585,12 @@ namespace ADB_Explorer
 
         private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.showHiddenItems, ShowHiddenCheckBox.IsChecked);
+            Storage.StoreValue(UserPrefs.showHiddenItems, ShowHiddenCheckBox.IsChecked);
         }
 
         private void ShowExtensionsCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.showExtensions, ShowExtensionsCheckBox.IsChecked);
+            Storage.StoreValue(UserPrefs.showExtensions, ShowExtensionsCheckBox.IsChecked);
         }
 
         private void PullMenuButton_Click(object sender, RoutedEventArgs e)
@@ -1605,10 +1629,14 @@ namespace ADB_Explorer
         /// <returns>0 if within limits, 1 if exceeds upper limits, -1 if exceeds lower limits</returns>
         private sbyte DetailedViewSize()
         {
-            if (FileOpDetailedGrid.ActualHeight > ActualHeight * MAX_PANE_HEIGHT_RATIO)
+            double height = FileOpDetailedGrid.ActualHeight;
+            if (height == 0 && FileOpDetailedGrid.Height > 0)
+                height = FileOpDetailedGrid.Height;
+
+            if (height > ActualHeight * MAX_PANE_HEIGHT_RATIO)
                 return 1;
 
-            if (ActualHeight == 0 || (FileOpDetailedGrid.ActualHeight < ActualHeight * MIN_PANE_HEIGHT_RATIO && FileOpDetailedGrid.ActualHeight < MIN_PANE_HEIGHT))
+            if (ActualHeight == 0 || height < ActualHeight * MIN_PANE_HEIGHT_RATIO && height < MIN_PANE_HEIGHT)
                 return -1;
 
             return 0;
@@ -1621,12 +1649,12 @@ namespace ADB_Explorer
 
         private void FileOpDetailedRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.showExtendedView, true);
+            Storage.StoreValue(UserPrefs.showExtendedView, true);
         }
 
         private void FileOpCompactRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(Settings.showExtendedView, false);
+            Storage.StoreValue(UserPrefs.showExtendedView, false);
         }
 
         private void ConnectionTypeRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -1826,7 +1854,7 @@ namespace ADB_Explorer
             // Intentionally invoked from InitSettings
 
             bool isChecked = EnableMdnsCheckBox.IsChecked == true;
-            Storage.StoreValue(Settings.enableMdns, isChecked);
+            Storage.StoreValue(UserPrefs.enableMdns, isChecked);
 
             ADBService.IsMdnsEnabled = isChecked;
             ADBService.KillAdbServer();
@@ -1863,6 +1891,23 @@ namespace ADB_Explorer
         private void StopFileOperations_Click(object sender, RoutedEventArgs e)
         {
             fileOperationQueue.Stop();
+        }
+
+        private void Window_SourceInitialized(object sender, EventArgs e)
+        {
+            if (Storage.RetrieveBool(SystemVals.windowMaximized) == true)
+                WindowState = WindowState.Maximized;
+
+            if (Storage.RetrieveBool(SystemVals.detailedVisible) is bool and true)
+            {
+                FileOpVisibility(true);
+            }
+
+            if (double.TryParse(Storage.RetrieveValue(SystemVals.detailedHeight)?.ToString(), out double detailedHeight))
+            {
+                FileOpDetailedGrid.Height = detailedHeight;
+                ResizeDetailedView();
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

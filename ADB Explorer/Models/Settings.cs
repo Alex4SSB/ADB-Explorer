@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.Models
 {
-    public enum Settings
+    public enum UserPrefs
     {
         theme,
         defaultFolder,
@@ -14,5 +14,12 @@
         showHiddenItems,
         showExtendedView,
         enableMdns,
+    }
+
+    public enum SystemVals
+    {
+        windowMaximized,
+        detailedVisible,
+        detailedHeight,
     }
 }

@@ -21,6 +21,7 @@
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
     SizeChanged="Window_SizeChanged"
+    SourceInitialized="Window_SourceInitialized"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
