@@ -2129,6 +2129,12 @@
                                             Style="{StaticResource GlyphFont}" />
                                         <TextBlock x:Name="MdnsDownBlock" Text="mDNS server is down" />
                                     </StackPanel>
+                                    <Button
+                                        x:Name="RestartAdbButton"
+                                        Margin="0,6,0,0"
+                                        HorizontalAlignment="Center"
+                                        Click="RestartAdbButton_Click"
+                                        Content="Restart ADB" />
                                 </StackPanel>
                             </Grid>
                             <StackPanel x:Name="ManualDeviceConnectPanel">
@@ -2333,20 +2339,8 @@
                                     <CheckBox
                                         x:Name="EnableMdnsCheckBox"
                                         Checked="EnableMdnsCheckBox_Checked"
-                                        Unchecked="EnableMdnsCheckBox_Checked">
-                                        <StackPanel>
-                                            <TextBlock Text="Enable mDNS (experimental)" />
-                                            <TextBlock
-                                                Margin="0,2,0,0"
-                                                FontSize="13"
-                                                Text="Changing this will restart ADB server." />
-                                            <TextBlock
-                                                Margin="0,0,0,6"
-                                                FontSize="13"
-                                                Text="When enabled, ADB server is restarted on each app launch."
-                                                TextWrapping="Wrap" />
-                                        </StackPanel>
-                                    </CheckBox>
+                                        Content="Enable mDNS (experimental)"
+                                        Unchecked="EnableMdnsCheckBox_Checked" />
                                     <CheckBox
                                         x:Name="RememberIpCheckBox"
                                         Click="RememberIpCheckBox_Click"

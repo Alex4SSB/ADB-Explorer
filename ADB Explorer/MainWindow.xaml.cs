@@ -1659,9 +1659,14 @@ namespace ADB_Explorer
 
         private void ConnectionTypeRadioButton_Checked(object sender, RoutedEventArgs e)
         {
+            ChangeConnectionType();
+        }
+
+        private void ChangeConnectionType()
+        {
             if (ManualConnectionRadioButton.IsChecked == false
-                && NewDevicePanel.Visible()
-                && MdnsService.State == MDNS.MdnsState.Disabled)
+                            && NewDevicePanel.Visible()
+                            && MdnsService.State == MDNS.MdnsState.Disabled)
             {
                 MdnsService.State = MDNS.MdnsState.Unchecked;
                 MdnsCheck();
@@ -1857,7 +1862,6 @@ namespace ADB_Explorer
             Storage.StoreValue(UserPrefs.enableMdns, isChecked);
 
             ADBService.IsMdnsEnabled = isChecked;
-            ADBService.KillAdbServer();
             if (isChecked)
             {
                 QrClass = new();
@@ -1908,6 +1912,13 @@ namespace ADB_Explorer
                 FileOpDetailedGrid.Height = detailedHeight;
                 ResizeDetailedView();
             }
+        }
+
+        private void RestartAdbButton_Click(object sender, RoutedEventArgs e)
+        {
+            ADBService.KillAdbServer();
+            MdnsService.State = MDNS.MdnsState.Disabled;
+            ChangeConnectionType();
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
