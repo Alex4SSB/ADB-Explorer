@@ -91,21 +91,42 @@ namespace ADB_Explorer.Services
             string file, string cmd, CancellationToken cancellationToken, Encoding encoding, params string[] args)
         {
             using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
-
-            var stdoutLine = cmdProcess.StandardOutput.ReadLine();
-            while (stdoutLine != null)
+            
+            Task<string?> stdoutLineTask = null;
+            string stdoutLine = null;
+            do
             {
-                yield return stdoutLine;
-                stdoutLine = cmdProcess.StandardOutput.ReadLine();
+                if (stdoutLine != null)
+                {
+                    yield return stdoutLine;
+                }
 
-                if (cancellationToken.IsCancellationRequested)
+                try
+                {
+                    stdoutLineTask = cmdProcess.StandardOutput.ReadLineAsync();
+                    stdoutLineTask.Wait(cancellationToken);
+                }
+                catch (OperationCanceledException e)
                 {
                     cmdProcess.Kill();
-                    yield break;
+                    throw;
                 }
             }
+            while ((stdoutLine = stdoutLineTask.Result) != null);
 
-            string stderr = cmdProcess.StandardError.ReadToEnd();
+            string stderr = null;
+            try
+            {
+                var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
+                stderrTask.Wait(cancellationToken);
+                stderr = stderrTask.Result;
+            }
+            catch (OperationCanceledException e)
+            {
+                cmdProcess.Kill();
+                throw;
+            }
+
             cmdProcess.WaitForExit();
 
             if (cmdProcess.ExitCode != 0)

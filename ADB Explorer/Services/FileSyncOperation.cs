@@ -150,7 +150,7 @@ namespace ADB_Explorer.Services
             waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
             cancelTokenSource = new CancellationTokenSource();
 
-            operationTask = Task.Run(() => adbMethod(TargetPath, FilePath, ref waitingProgress, cancelTokenSource.Token));
+            operationTask = Task.Run(() => adbMethod(TargetPath, FilePath, ref waitingProgress, cancelTokenSource.Token), cancelTokenSource.Token);
 
             operationTask.ContinueWith((t) => progressPollTimer.Stop());
             operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = new CompletedInfo(t.Result); }, TaskContinuationOptions.OnlyOnRanToCompletion);
