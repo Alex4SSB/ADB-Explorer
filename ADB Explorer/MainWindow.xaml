@@ -73,6 +73,23 @@
             x:Key="PathButtonsMenu"
             Name="PathButtonsMenu"
             Resources="{StaticResource ContextMenuStyles}" />
+        <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextMenuStyles}">
+            <MenuItem>
+                <MenuItem.Header>
+                    <CheckBox Content="Operation Type" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem>
+                <MenuItem.Header>
+                    <CheckBox Content="File Name" />
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem>
+                <MenuItem.Header>
+                    <CheckBox Content="Progress" />
+                </MenuItem.Header>
+            </MenuItem>
+        </ContextMenu>
         <MenuItem
             x:Key="ContextMenuCopyItem"
             Click="ContextMenuCopyItem_Click"
@@ -1446,6 +1463,11 @@
                                     FocusVisualStyle="{x:Null}"
                                     HeadersVisibility="Column"
                                     ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
+                                    <DataGrid.Resources>
+                                        <Style BasedOn="{StaticResource DefaultDataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
+                                            <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
+                                        </Style>
+                                    </DataGrid.Resources>
                                     <DataGrid.Columns>
                                         <DataGridTemplateColumn
                                             Width="30"
