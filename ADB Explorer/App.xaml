@@ -30,6 +30,30 @@
             <Color x:Key="LightDeviceMouseOverBackground">#FFC9C9C9</Color>
             <Color x:Key="DarkDeviceMouseOverBackground">#FF4D4D4D</Color>
 
+            <Color x:Key="DarkAdbButtonBackgroundNormal">#FF373737</Color>
+            <Color x:Key="DarkAdbButtonBackgroundMouseOver">#FF3C3C3C</Color>
+            <Color x:Key="DarkAdbButtonBackgroundPressed">#FF323232</Color>
+            <Color x:Key="DarkAdbButtonBackgroundDisabled">#FF343434</Color>
+            <Color x:Key="DarkAdbButtonUpperBorderNormal">#FF3F3F3F</Color>
+            <Color x:Key="DarkAdbButtonLowerBorderNormal">#FF3A3A3A</Color>
+            <Color x:Key="DarkAdbButtonSideBorderNormal">#FF3A3A3A</Color>
+            <Color x:Key="DarkAdbButtonUpperBorderMouseOver">#FF3F3F3F</Color>
+            <Color x:Key="DarkAdbButtonLowerBorderMouseOver">#FF3A3A3A</Color>
+            <Color x:Key="DarkAdbButtonSideBorderMouseOver">#FF3A3A3A</Color>
+            <Color x:Key="DarkAdbButtonBorderPressedOrDisabled">#FF3A3A3A</Color>
+
+            <Color x:Key="LightAdbButtonBackgroundNormal">#FFFEFEFE</Color>
+            <Color x:Key="LightAdbButtonBackgroundMouseOver">#FFFAFAFA</Color>
+            <Color x:Key="LightAdbButtonBackgroundPressed">#FFFAFAFA</Color>
+            <Color x:Key="LightAdbButtonBackgroundDisabled">#FFFAFAFA</Color>
+            <Color x:Key="LightAdbButtonUpperBorderNormal">#FFECECEC</Color>
+            <Color x:Key="LightAdbButtonLowerBorderNormal">#FFD3D3D3</Color>
+            <Color x:Key="LightAdbButtonSideBorderNormal">#FFECECEC</Color>
+            <Color x:Key="LightAdbButtonUpperBorderMouseOver">#FFECECEC</Color>
+            <Color x:Key="LightAdbButtonLowerBorderMouseOver">#FFD3D3D3</Color>
+            <Color x:Key="LightAdbButtonSideBorderMouseOver">#FFECECEC</Color>
+            <Color x:Key="LightAdbButtonBorderPressedOrDisabled">#FFECECEC</Color>
+
             <ResourceDictionary x:Key="DynamicBrushes">
                 <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
                 <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
@@ -37,6 +61,18 @@
                 <SolidColorBrush x:Key="SelectedInactiveBackground" Color="{DynamicResource LightSelectedInactiveBackground}" />
                 <SolidColorBrush x:Key="SelectedMouseOverInactiveBackground" Color="{DynamicResource LightSelectedMouseOverInactiveBackground}" />
                 <SolidColorBrush x:Key="DeviceMouseOverBackground" Color="{DynamicResource LightDeviceMouseOverBackground}" />
+
+                <SolidColorBrush x:Key="AdbButtonBackgroundNormal" Color="{DynamicResource LightAdbButtonBackgroundNormal}" />
+                <SolidColorBrush x:Key="AdbButtonBackgroundMouseOver" Color="{DynamicResource LightAdbButtonBackgroundMouseOver}" />
+                <SolidColorBrush x:Key="AdbButtonBackgroundPressed" Color="{DynamicResource LightAdbButtonBackgroundPressed}" />
+                <SolidColorBrush x:Key="AdbButtonBackgroundDisabled" Color="{DynamicResource LightAdbButtonBackgroundDisabled}" />
+                <SolidColorBrush x:Key="AdbButtonUpperBorderNormal" Color="{DynamicResource LightAdbButtonUpperBorderNormal}" />
+                <SolidColorBrush x:Key="AdbButtonLowerBorderNormal" Color="{DynamicResource LightAdbButtonLowerBorderNormal}" />
+                <SolidColorBrush x:Key="AdbButtonSideBorderNormal" Color="{DynamicResource LightAdbButtonSideBorderNormal}" />
+                <SolidColorBrush x:Key="AdbButtonUpperBorderMouseOver" Color="{DynamicResource LightAdbButtonUpperBorderMouseOver}" />
+                <SolidColorBrush x:Key="AdbButtonLowerBorderMouseOver" Color="{DynamicResource LightAdbButtonLowerBorderMouseOver}" />
+                <SolidColorBrush x:Key="AdbButtonSideBorderMouseOver" Color="{DynamicResource LightAdbButtonSideBorderMouseOver}" />
+                <SolidColorBrush x:Key="AdbButtonBorderPressedOrDisabled" Color="{DynamicResource LightAdbButtonBorderPressedOrDisabled}" />
             </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>

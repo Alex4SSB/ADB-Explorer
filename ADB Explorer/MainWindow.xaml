@@ -241,6 +241,73 @@
                 </MenuItem.Header>
             </MenuItem>
         </Menu>
+        <Style
+            x:Key="ButtonStyle"
+            BasedOn="{StaticResource DefaultButtonStyle}"
+            TargetType="Button">
+            <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="Background"
+                            Background="{DynamicResource AdbButtonBackgroundNormal}"
+                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
+                            SnapsToDevicePixels="True">
+                            <Grid>
+                                <Border Padding="{TemplateBinding Padding}" CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
+                                    <ContentPresenter
+                                        x:Name="ContentPresenter"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Focusable="False"
+                                        RecognizesAccessKey="True"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </Border>
+                                <Border
+                                    x:Name="UpperBorder"
+                                    BorderBrush="{DynamicResource AdbButtonUpperBorderNormal}"
+                                    BorderThickness="0,1,0,0"
+                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                <Border
+                                    x:Name="LowerBorder"
+                                    BorderBrush="{DynamicResource AdbButtonLowerBorderNormal}"
+                                    BorderThickness="0,0,0,1"
+                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                <Border
+                                    x:Name="SideBorder"
+                                    BorderBrush="{DynamicResource AdbButtonSideBorderNormal}"
+                                    BorderThickness="1,0,1,0"
+                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+                                <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonUpperBorderMouseOver}" />
+                                <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonLowerBorderMouseOver}" />
+                                <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonSideBorderMouseOver}" />
+                                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
+                                <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPressed}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
+                                <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style x:Key="DataGridCellStyle" TargetType="{x:Type DataGridCell}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -356,7 +423,8 @@
                         Margin="0,10,4,0"
                         HorizontalAlignment="Right"
                         Click="PairFlyoutCloseButton_Click"
-                        Content="Close" />
+                        Content="Close"
+                        Style="{StaticResource ButtonStyle}" />
                 </Grid>
             </StackPanel>
         </ui:Flyout>
@@ -2197,7 +2265,8 @@
                                         Margin="8,0,0,0"
                                         Click="ConnectNewDeviceButton_Click"
                                         Content="Connect"
-                                        IsEnabled="False" />
+                                        IsEnabled="False"
+                                        Style="{StaticResource ButtonStyle}" />
                                 </Grid>
                             </StackPanel>
                             <StackPanel x:Name="ManualPairingPanel" IsEnabled="False">
