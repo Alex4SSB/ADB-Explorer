@@ -30,6 +30,25 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="FocusVisualRoundedStyle" BasedOn="{StaticResource HighVisibilityFocusVisual}">
+        <Setter Property="Control.Template">
+            <!--  Template copied from ModernWPF to be modified  -->
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border
+                        BorderBrush="{TemplateBinding ui:FocusVisualHelper.FocusVisualPrimaryBrush}"
+                        BorderThickness="{TemplateBinding ui:FocusVisualHelper.FocusVisualPrimaryThickness}"
+                        CornerRadius="5"
+                        SnapsToDevicePixels="True">
+                        <Border
+                            BorderBrush="{TemplateBinding ui:FocusVisualHelper.FocusVisualSecondaryBrush}"
+                            BorderThickness="{TemplateBinding ui:FocusVisualHelper.FocusVisualSecondaryThickness}"
+                            CornerRadius="5" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <Style
         x:Key="ButtonStyle"
         BasedOn="{StaticResource DefaultButtonStyle}"
@@ -37,75 +56,78 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+                <Setter Property="Template">
+                    <!--  Template copied from ModernWPF to be modified  -->
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border
+                                x:Name="Background"
+                                Background="{DynamicResource AdbButtonBackgroundNormal}"
+                                CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
+                                SnapsToDevicePixels="True">
+                                <Grid>
+                                    <Border Padding="{TemplateBinding Padding}" CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
+                                        <ContentPresenter
+                                            x:Name="ContentPresenter"
+                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                            Focusable="False"
+                                            RecognizesAccessKey="True"
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    </Border>
+                                    <Border
+                                        x:Name="UpperBorder"
+                                        BorderBrush="{DynamicResource AdbButtonUpperBorderNormal}"
+                                        BorderThickness="0,1,0,0"
+                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                    <Border
+                                        x:Name="LowerBorder"
+                                        BorderBrush="{DynamicResource AdbButtonLowerBorderNormal}"
+                                        BorderThickness="0,0,0,1"
+                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                    <Border
+                                        x:Name="SideBorder"
+                                        BorderBrush="{DynamicResource AdbButtonSideBorderNormal}"
+                                        BorderThickness="1,0,1,0"
+                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                </Grid>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonUpperBorderMouseOver}" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonLowerBorderMouseOver}" />
+                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonSideBorderMouseOver}" />
+                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
+                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
+                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
+                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                                </Trigger>
+                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False">
+                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="Transparent" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="Transparent" />
+                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="Transparent" />
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border
-                        x:Name="Background"
-                        Background="{DynamicResource AdbButtonBackgroundNormal}"
-                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
-                        SnapsToDevicePixels="True">
-                        <Grid>
-                            <Border Padding="{TemplateBinding Padding}" CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
-                                <ContentPresenter
-                                    x:Name="ContentPresenter"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Focusable="False"
-                                    RecognizesAccessKey="True"
-                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                            </Border>
-                            <Border
-                                x:Name="UpperBorder"
-                                BorderBrush="{DynamicResource AdbButtonUpperBorderNormal}"
-                                BorderThickness="0,1,0,0"
-                                CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                            <Border
-                                x:Name="LowerBorder"
-                                BorderBrush="{DynamicResource AdbButtonLowerBorderNormal}"
-                                BorderThickness="0,0,0,1"
-                                CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                            <Border
-                                x:Name="SideBorder"
-                                BorderBrush="{DynamicResource AdbButtonSideBorderNormal}"
-                                BorderThickness="1,0,1,0"
-                                CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
-                            <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonUpperBorderMouseOver}" />
-                            <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonLowerBorderMouseOver}" />
-                            <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonSideBorderMouseOver}" />
-                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
-                            <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                            <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                            <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
-                            <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                            <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                            <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                        </Trigger>
-                        <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False">
-                            <Setter TargetName="UpperBorder" Property="BorderBrush" Value="Transparent" />
-                            <Setter TargetName="LowerBorder" Property="BorderBrush" Value="Transparent" />
-                            <Setter TargetName="SideBorder" Property="BorderBrush" Value="Transparent" />
-                        </DataTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
     </Style>
     <Style x:Key="BorderStyle" TargetType="Border">
         <Style.Triggers>
@@ -178,6 +200,27 @@
             <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
                 <Setter Property="IsIndeterminate" Value="True" />
             </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="NumericTextBoxStyle"
+        BasedOn="{StaticResource TextBoxFluentStyle}"
+        TargetType="TextBox">
+        <Style.Triggers>
+            <Trigger Property="Text" Value="">
+                <Setter Property="FontFamily" Value="Segoe UI" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="FontFamily" Value="Consolas" />
+    </Style>
+    <Style
+        x:Key="PairingTextBoxStyle"
+        BasedOn="{StaticResource NumericTextBoxStyle}"
+        TargetType="TextBox">
+        <Style.Triggers>
+            <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
+                <Setter Property="FontSize" Value="18" />
+            </Trigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

@@ -676,17 +676,16 @@
                                             </Style>
                                         </Grid.Style>
                                         <StackPanel>
-                                            <TextBlock Margin="0,6,0,6" Text="Pairing Code:" />
-                                            <Grid>
+                                            <Grid Margin="2,6,2,2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition />
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <TextBox
+                                                    ui:ControlHelper.PlaceholderText="Pairing Code"
                                                     ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                                                    FontFamily="Consolas"
-                                                    FontSize="18"
                                                     KeyDown="PairingCodeTextBox_KeyDown"
+                                                    Style="{StaticResource PairingTextBoxStyle}"
                                                     Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                     TextChanged="PairingCodeTextBox_TextChanged" />
                                                 <Button
@@ -1935,6 +1934,12 @@
                                 Visibility="Collapsed">
                                 <Border Margin="0,9" />
                                 <Grid>
+                                    <Grid.Resources>
+                                        <Style BasedOn="{StaticResource DefaultRadioButtonStyle}" TargetType="RadioButton">
+                                            <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
+                                            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+                                        </Style>
+                                    </Grid.Resources>
                                     <Grid.Style>
                                         <Style TargetType="Grid">
                                             <Style.Triggers>
@@ -2108,13 +2113,13 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <TextBlock Text="IP:" />
                                     <TextBox
                                         x:Name="NewDeviceIpBox"
-                                        FontFamily="Consolas"
+                                        Margin="0,6,0,12"
+                                        ui:ControlHelper.PlaceholderText="IP Address"
                                         KeyDown="NewDeviceIpBox_KeyDown"
+                                        Style="{StaticResource NumericTextBoxStyle}"
                                         TextChanged="NewDeviceIpBox_TextChanged" />
-                                    <TextBlock Margin="0,6,0,0" Text="Port:" />
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
@@ -2123,8 +2128,9 @@
                                         <TextBox
                                             x:Name="NewDevicePortBox"
                                             VerticalContentAlignment="Center"
-                                            FontFamily="Consolas"
+                                            ui:ControlHelper.PlaceholderText="Port"
                                             KeyDown="NewDeviceIpBox_KeyDown"
+                                            Style="{StaticResource NumericTextBoxStyle}"
                                             TextChanged="NewDevicePortBox_TextChanged" />
                                         <Button
                                             x:Name="ConnectNewDeviceButton"
@@ -2147,17 +2153,24 @@
                                             </Style.Triggers>
                                         </Style>
                                     </StackPanel.Style>
-                                    <StackPanel Margin="0,6,0,0" Orientation="Horizontal">
+                                    <Grid Margin="0,6,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
                                         <ui:FontIcon
                                             Margin="0,0,8,0"
                                             Glyph="&#xE783;"
                                             Style="{StaticResource GlyphFont}" />
                                         <TextBlock
-                                            Width="110"
+                                            Grid.Column="1"
                                             Text="Unable to connect. Try pairing"
                                             TextWrapping="Wrap" />
                                         <Button
                                             x:Name="CancelManualPairing"
+                                            Grid.Column="2"
+                                            Margin="4"
                                             Click="CancelManualPairing_Click"
                                             Style="{StaticResource ButtonStyle}"
                                             ToolTip="Cancel">
@@ -2166,9 +2179,8 @@
                                                 Glyph="&#xE8BB;"
                                                 Style="{StaticResource DisabledButtonGlyphStyle}" />
                                         </Button>
-                                    </StackPanel>
-                                    <TextBlock Margin="0,10,0,0" Text="Pairing Port:" />
-                                    <Grid>
+                                    </Grid>
+                                    <Grid Margin="0,8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
                                             <ColumnDefinition Width="Auto" />
@@ -2176,8 +2188,9 @@
                                         <TextBox
                                             x:Name="ManualPairingPortBox"
                                             VerticalContentAlignment="Center"
-                                            FontFamily="Consolas"
+                                            ui:ControlHelper.PlaceholderText="Pairing Port"
                                             KeyDown="NewDeviceIpBox_KeyDown"
+                                            Style="{StaticResource NumericTextBoxStyle}"
                                             TextChanged="ManualPairingPortBox_TextChanged" />
                                         <Button
                                             x:Name="PairNewDeviceButton"
@@ -2189,11 +2202,10 @@
                                             IsEnabled="False"
                                             Style="{StaticResource ButtonStyle}" />
                                     </Grid>
-                                    <TextBlock Margin="0,6,0,0" Text="Pairing Code:" />
                                     <TextBox
                                         x:Name="ManualPairingCodeBox"
-                                        FontFamily="Consolas"
-                                        FontSize="18"
+                                        ui:ControlHelper.PlaceholderText="Pairing Code"
+                                        Style="{StaticResource PairingTextBoxStyle}"
                                         TextChanged="PairingCodeBox_TextChanged" />
                                 </StackPanel>
                             </StackPanel>
@@ -2234,7 +2246,7 @@
             </ui:SplitView.Resources>
             <ui:SplitView.Pane>
                 <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
-                    <Grid Margin="24,8">
+                    <Grid Margin="18,8,24,8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition Height="*" />
@@ -2251,7 +2263,17 @@
                             FontSize="24"
                             Text="Settings" />
                         <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                            <StackPanel HorizontalAlignment="Left">
+                            <StackPanel Margin="6,0,0,0" HorizontalAlignment="Left">
+                                <StackPanel.Resources>
+                                    <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="CheckBox">
+                                        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-6,0" />
+                                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+                                    </Style>
+                                    <Style BasedOn="{StaticResource DefaultRadioButtonStyle}" TargetType="RadioButton">
+                                        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
+                                        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+                                    </Style>
+                                </StackPanel.Resources>
                                 <TextBlock Text="Theme" />
                                 <StackPanel Margin="0,6,0,15">
                                     <RadioButton
