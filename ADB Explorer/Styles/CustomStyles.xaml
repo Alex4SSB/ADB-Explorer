@@ -605,4 +605,16 @@
     <Style x:Key="ExplorerViewBackgroundStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
     </Style>
+    <Storyboard x:Key="RevealingStoryBoard">
+        <DoubleAnimation
+            Storyboard.TargetProperty="Height"
+            From="0"
+            Duration="0:00:00.2" />
+    </Storyboard>
+    <Storyboard x:Key="CollapsingStoryBoard">
+        <DoubleAnimation
+            Storyboard.TargetProperty="Height"
+            To="0"
+            Duration="0:00:00.2" />
+    </Storyboard>
 </ResourceDictionary>

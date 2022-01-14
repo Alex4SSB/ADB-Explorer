@@ -386,24 +386,10 @@
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsSelected}" Value="True">
                                                     <DataTrigger.EnterActions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimation
-                                                                    Storyboard.TargetProperty="Height"
-                                                                    From="0"
-                                                                    Duration="0:00:00.2" />
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
+                                                        <BeginStoryboard Storyboard="{StaticResource RevealingStoryBoard}" />
                                                     </DataTrigger.EnterActions>
                                                     <DataTrigger.ExitActions>
-                                                        <BeginStoryboard>
-                                                            <Storyboard>
-                                                                <DoubleAnimation
-                                                                    Storyboard.TargetProperty="Height"
-                                                                    To="0"
-                                                                    Duration="0:00:00.2" />
-                                                            </Storyboard>
-                                                        </BeginStoryboard>
+                                                        <BeginStoryboard Storyboard="{StaticResource CollapsingStoryBoard}" />
                                                     </DataTrigger.ExitActions>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -1594,24 +1580,10 @@
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
                                             <DataTrigger.EnterActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation
-                                                            Storyboard.TargetProperty="Height"
-                                                            From="0"
-                                                            Duration="0:00:00.2" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
+                                                <BeginStoryboard Storyboard="{StaticResource RevealingStoryBoard}" />
                                             </DataTrigger.EnterActions>
                                             <DataTrigger.ExitActions>
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation
-                                                            Storyboard.TargetProperty="Height"
-                                                            To="0"
-                                                            Duration="0:00:00.2" />
-                                                    </Storyboard>
-                                                </BeginStoryboard>
+                                                <BeginStoryboard Storyboard="{StaticResource CollapsingStoryBoard}" />
                                             </DataTrigger.ExitActions>
                                         </DataTrigger>
                                     </Style.Triggers>
