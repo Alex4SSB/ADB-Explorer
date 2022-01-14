@@ -330,13 +330,13 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ui:ListViewItem">
                         <Border Background="{TemplateBinding Background}" Style="{StaticResource DeviceBorderStyle}">
-                            <Grid>
+                            <Grid Margin="6">
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
-                                    <RowDefinition />
+                                    <RowDefinition Height="{Binding ElementName=DeviceExpandRect, Path=ActualHeight}" />
                                 </Grid.RowDefinitions>
                                 <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
-                                    <Grid Margin="6,4">
+                                    <Grid>
                                         <Grid.Resources>
                                             <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
                                         </Grid.Resources>
@@ -376,18 +376,55 @@
                                         </Style>
                                     </ui:FontIcon.Style>
                                 </ui:FontIcon>
-                                <StackPanel Grid.Row="1">
+                                <Rectangle
+                                    x:Name="DeviceExpandRect"
+                                    Grid.Row="1"
+                                    Height="{Binding ElementName=DeviceExpandPanel, Path=ActualHeight}"
+                                    Fill="Transparent">
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                                    <DataTrigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="Height"
+                                                                    From="0"
+                                                                    Duration="0:00:00.2" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </DataTrigger.EnterActions>
+                                                    <DataTrigger.ExitActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation
+                                                                    Storyboard.TargetProperty="Height"
+                                                                    To="0"
+                                                                    Duration="0:00:00.2" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </DataTrigger.ExitActions>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
+                                <StackPanel
+                                    x:Name="DeviceExpandPanel"
+                                    Grid.Row="1"
+                                    VerticalAlignment="Bottom">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
-                                            <Setter Property="Visibility" Value="Visible" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding IsSelected}" Value="False">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
+                                            <Setter Property="Visibility" Value="Visible" />
                                         </Style>
                                     </StackPanel.Style>
-                                    <Grid Margin="6,6,6,0">
+                                    <Grid Margin="0,6,0,0">
                                         <Grid.Style>
                                             <Style TargetType="Grid">
                                                 <Style.Triggers>
@@ -428,7 +465,7 @@
                                         </Button>
                                     </Grid>
                                     <StackPanel
-                                        Margin="4"
+                                        Margin="0,6,0,0"
                                         HorizontalAlignment="Right"
                                         Orientation="Horizontal">
                                         <Button
