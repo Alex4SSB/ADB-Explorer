@@ -113,12 +113,6 @@ namespace ADB_Explorer
             ConnectTimer.Start();
 
             UpperProgressBar.DataContext = fileOperationQueue;
-
-            //InputLanguageManager.Current.InputLanguageChanged +=
-            //    new InputLanguageEventHandler((sender, e) =>
-            //    {
-            //        UpdateInputLang();
-            //    });
         }
 
         private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
@@ -241,8 +235,6 @@ namespace ADB_Explorer
             PathBox.Text = PathBox.Tag?.ToString();
             PathBox.IsReadOnly = false;
             PathBox.SelectAll();
-
-            //UpdateInputLang();
         }
 
         private void UnfocusPathBox()
@@ -977,11 +969,6 @@ namespace ADB_Explorer
             e.Handled = true;
         }
 
-        //private void UpdateInputLang()
-        //{
-        //    //InputLangBlock.Text = InputLanguageManager.Current.CurrentInputLanguage.TwoLetterISOLanguageName.ToUpper();
-        //}
-
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
             
@@ -1114,11 +1101,6 @@ namespace ADB_Explorer
         private void PullOnDoubleClickCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             Storage.StoreValue(UserPrefs.pullOnDoubleClick, PullOnDoubleClickCheckBox.IsChecked);
-        }
-
-        private void InputLangBlock_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
         }
 
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
