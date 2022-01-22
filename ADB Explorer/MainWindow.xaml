@@ -1906,9 +1906,13 @@
                     <Setter Property="Margin" Value="0,0,20,6" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
+                <Style x:Key="SettingsCategoryStyle" TargetType="Border" />
             </ui:SplitView.Resources>
             <ui:SplitView.Pane>
-                <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                <Border
+                    BorderBrush="Gray"
+                    BorderThickness="1,1,0,0"
+                    Style="{StaticResource DevicesListStyle}">
                     <Grid Margin="18,8,24,8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
@@ -1931,17 +1935,21 @@
                                     <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox" />
                                     <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
                                 </StackPanel.Resources>
-                                <TextBlock Text="Theme" />
-                                <StackPanel Margin="0,6,0,15">
-                                    <RadioButton
-                                        x:Name="LightThemeRadioButton"
-                                        Checked="LightThemeRadioButton_Checked"
-                                        Content="Light" />
-                                    <RadioButton
-                                        x:Name="DarkThemeRadioButton"
-                                        Checked="DarkThemeRadioButton_Checked"
-                                        Content="Dark" />
-                                </StackPanel>
+                                <Expander
+                                    Margin="0,6,18,6"
+                                    Header="Theme"
+                                    Style="{StaticResource ExpanderStyle}">
+                                    <StackPanel VerticalAlignment="Bottom">
+                                        <RadioButton
+                                            x:Name="LightThemeRadioButton"
+                                            Checked="LightThemeRadioButton_Checked"
+                                            Content="Light" />
+                                        <RadioButton
+                                            x:Name="DarkThemeRadioButton"
+                                            Checked="DarkThemeRadioButton_Checked"
+                                            Content="Dark" />
+                                    </StackPanel>
+                                </Expander>
                                 <Separator />
                                 <Grid>
                                     <Grid.ColumnDefinitions>

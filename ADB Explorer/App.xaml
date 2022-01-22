@@ -11,9 +11,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
-                <ResourceDictionary Source="Styles\TextBoxStyle.xaml" />
+                <ResourceDictionary Source="Styles\TextBox.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
-
+                <ResourceDictionary Source="Styles\Expander.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->

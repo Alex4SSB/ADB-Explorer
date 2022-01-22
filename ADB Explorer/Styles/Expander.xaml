@@ -1,0 +1,121 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+
+    <converters:MultiplyConverter x:Key="multiplyConverter" />
+
+    <Style x:Key="ExpanderStyle" TargetType="Expander">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
+        <Setter Property="Template">
+            <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control#:~:text=Below%20is%20the%20XAML%20for%20the%20%22reveal%22%20animation.%20Note%20the%20first%20line%20to%20declare%20the%20converter%20that%20was%20used.  -->
+            <Setter.Value>
+                <ControlTemplate TargetType="Expander">
+                    <Border
+                        Padding="0,6"
+                        SnapsToDevicePixels="true"
+                        Style="{StaticResource DeviceConnectionStyle}">
+                        <DockPanel x:Name="DockPanel">
+                            <ToggleButton
+                                x:Name="HeaderSite"
+                                MinWidth="0"
+                                MinHeight="0"
+                                Margin="7,1,1,1"
+                                Padding="{TemplateBinding Padding}"
+                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                ui:FocusVisualHelper.FocusVisualMargin="-3"
+                                ui:FocusVisualHelper.UseSystemFocusVisuals="True"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                                DockPanel.Dock="Top"
+                                FocusVisualStyle="{x:Null}"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                FontStretch="{TemplateBinding FontStretch}"
+                                FontStyle="{TemplateBinding FontStyle}"
+                                FontWeight="{TemplateBinding FontWeight}"
+                                Foreground="{TemplateBinding Foreground}"
+                                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                Style="{StaticResource ExpanderDownHeaderStyle}" />
+                            <StackPanel
+                                x:Name="ExpandSite"
+                                VerticalAlignment="Bottom"
+                                DockPanel.Dock="Bottom">
+                                <StackPanel.Tag>
+                                    <sys:Double>0.0</sys:Double>
+                                </StackPanel.Tag>
+                                <StackPanel.Height>
+                                    <MultiBinding Converter="{StaticResource multiplyConverter}">
+                                        <Binding ElementName="ExpanderContent" Path="ActualHeight" />
+                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                    </MultiBinding>
+                                </StackPanel.Height>
+                                <Border
+                                    Height="1"
+                                    Margin="0,6,0,0"
+                                    CornerRadius="0"
+                                    Style="{StaticResource DeviceConnectionStyle}" />
+                                <StackPanel x:Name="ExpanderContent" Margin="6,0">
+                                    <ContentPresenter
+                                        Margin="0,2"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        ContentSource="Content"
+                                        Focusable="false" />
+                                </StackPanel>
+                                <Border Margin="0,2" />
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsExpanded" Value="true">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ExpandSite"
+                                            Storyboard.TargetProperty="Tag"
+                                            To="1"
+                                            Duration="00:00:00.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="ExpandSite"
+                                            Storyboard.TargetProperty="Tag"
+                                            To="0"
+                                            Duration="00:00:00.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="ExpandDirection" Value="Right">
+                            <Setter TargetName="ExpandSite" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="HeaderSite" Property="DockPanel.Dock" Value="Left" />
+                            <Setter TargetName="HeaderSite" Property="Style" Value="{StaticResource ExpanderRightHeaderStyle}" />
+                        </Trigger>
+                        <Trigger Property="ExpandDirection" Value="Up">
+                            <Setter TargetName="ExpandSite" Property="DockPanel.Dock" Value="Top" />
+                            <Setter TargetName="HeaderSite" Property="DockPanel.Dock" Value="Bottom" />
+                            <Setter TargetName="HeaderSite" Property="Style" Value="{StaticResource ExpanderUpHeaderStyle}" />
+                        </Trigger>
+                        <Trigger Property="ExpandDirection" Value="Left">
+                            <Setter TargetName="ExpandSite" Property="DockPanel.Dock" Value="Left" />
+                            <Setter TargetName="HeaderSite" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="HeaderSite" Property="Style" Value="{StaticResource ExpanderLeftHeaderStyle}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
