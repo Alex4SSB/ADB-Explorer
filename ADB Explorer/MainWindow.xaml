@@ -1901,24 +1901,30 @@
             OpenPaneLength="350"
             PanePlacement="Right">
             <ui:SplitView.Resources>
-                <Style TargetType="Separator">
+                <Style
+                    x:Key="CategorySeparator"
+                    BasedOn="{StaticResource SeparatorStyle}"
+                    TargetType="Separator">
                     <Setter Property="Width" Value="300" />
-                    <Setter Property="Margin" Value="0,0,20,6" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
-                <Style x:Key="SettingsCategoryStyle" TargetType="Border" />
+                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox" />
+                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
+                <Style BasedOn="{StaticResource ExpanderStyle}" TargetType="Expander">
+                    <Setter Property="Margin" Value="0,6" />
+                </Style>
             </ui:SplitView.Resources>
             <ui:SplitView.Pane>
                 <Border
                     BorderBrush="Gray"
                     BorderThickness="1,1,0,0"
                     Style="{StaticResource DevicesListStyle}">
-                    <Grid Margin="18,8,24,8">
+                    <Grid Margin="18,8,0,8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Menu Margin="0,0,-18,0" HorizontalAlignment="Right">
+                        <Menu Margin="0,0,8,0" HorizontalAlignment="Right">
                             <MenuItem Click="PaneCollapse_Click" ToolTip="Hide">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
@@ -1930,15 +1936,8 @@
                             FontSize="24"
                             Text="Settings" />
                         <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                            <StackPanel Margin="6,0,0,0" HorizontalAlignment="Left">
-                                <StackPanel.Resources>
-                                    <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox" />
-                                    <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
-                                </StackPanel.Resources>
-                                <Expander
-                                    Margin="0,6,18,6"
-                                    Header="Theme"
-                                    Style="{StaticResource ExpanderStyle}">
+                            <StackPanel Margin="6,0,24,0" HorizontalAlignment="Left">
+                                <Expander Header="Theme">
                                     <StackPanel VerticalAlignment="Bottom">
                                         <RadioButton
                                             x:Name="LightThemeRadioButton"
@@ -1950,89 +1949,72 @@
                                             Content="Dark" />
                                     </StackPanel>
                                 </Expander>
-                                <Separator />
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="120" />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center" Text="Default Folder" />
-                                    <Button
-                                        x:Name="ChangeDefaultFolderButton"
-                                        Grid.Column="1"
-                                        Click="ChangeDefaultFolderButton_Click"
-                                        Style="{StaticResource ButtonStyle}"
-                                        ToolTip="Change">
-                                        <ui:FontIcon
-                                            FontSize="16"
-                                            Glyph="&#xE70F;"
-                                            Style="{StaticResource DisabledButtonGlyphStyle}" />
-                                    </Button>
-                                </Grid>
-                                <TextBlock
-                                    x:Name="DefaultFolderBlock"
-                                    Margin="0,6,0,15"
-                                    FontFamily="Consolas"
-                                    Text="[not set]" />
-                                <Separator />
-                                <TextBlock Text="File Double-Click Behavior" />
-                                <StackPanel Margin="0,6,0,15">
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="Default Folder">
+                                    <TextBox
+                                        x:Name="DefaultFolderBlock"
+                                        Margin="0,6"
+                                        ui:ControlHelper.PlaceholderText="Click To Browse"
+                                        MouseUp="ChangeDefaultFolderButton_Click"
+                                        Style="{StaticResource NumericTextBoxStyle}" />
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="File Double-Click Behavior">
                                     <CheckBox
                                         x:Name="PullOnDoubleClickCheckBox"
                                         Checked="PullOnDoubleClickCheckBox_Checked"
                                         Content="Pull To Default Folder" />
-                                </StackPanel>
-                                <Separator />
-                                <TextBlock Text="Connection" />
-                                <StackPanel Margin="0,6,0,15">
-                                    <CheckBox
-                                        x:Name="EnableMdnsCheckBox"
-                                        Checked="EnableMdnsCheckBox_Checked"
-                                        Content="Enable mDNS (experimental)"
-                                        Unchecked="EnableMdnsCheckBox_Checked" />
-                                    <CheckBox
-                                        x:Name="RememberIpCheckBox"
-                                        Click="RememberIpCheckBox_Click"
-                                        Content="Remember Last IP" />
-                                    <CheckBox
-                                        x:Name="RememberPortCheckBox"
-                                        Click="RememberPortCheckBox_Click"
-                                        Content="Remember Last Port" />
-                                    <CheckBox
-                                        x:Name="AutoOpenCheckBox"
-                                        Click="AutoOpenCheckBox_Click"
-                                        Content="Automatically Open for Browsing" />
-                                </StackPanel>
-                                <Separator />
-                                <TextBlock Text="File Operations" Visibility="Collapsed" />
-                                <StackPanel Margin="0,6,0,15" Visibility="Collapsed">
-                                    <TreeView x:Name="FileOpSettingsTree" ItemTemplate="{StaticResource FileOpSettingsTreeTemplate}" />
-                                </StackPanel>
-                                <TextBlock Text="Show" />
-                                <StackPanel Margin="0,6,0,15">
-                                    <CheckBox
-                                        x:Name="ShowExtensionsCheckBox"
-                                        Click="ShowExtensionsCheckBox_Click"
-                                        Content="File Name Extensions"
-                                        IsChecked="True" />
-                                    <CheckBox
-                                        x:Name="ShowHiddenCheckBox"
-                                        Click="ShowHiddenCheckBox_Click"
-                                        Content="Hidden Items"
-                                        IsChecked="True" />
-                                </StackPanel>
-                                <Separator />
-                                <TextBlock Text="File Operations" />
-                                <StackPanel Margin="0,6,0,15">
-                                    <RadioButton
-                                        x:Name="FileOpCompactRadioButton"
-                                        Checked="FileOpCompactRadioButton_Checked"
-                                        Content="Compact" />
-                                    <RadioButton
-                                        x:Name="FileOpDetailedRadioButton"
-                                        Checked="FileOpDetailedRadioButton_Checked"
-                                        Content="Detailed" />
-                                </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="Connection">
+                                    <StackPanel>
+                                        <CheckBox
+                                            x:Name="EnableMdnsCheckBox"
+                                            Checked="EnableMdnsCheckBox_Checked"
+                                            Content="Enable mDNS (experimental)"
+                                            Unchecked="EnableMdnsCheckBox_Checked" />
+                                        <CheckBox
+                                            x:Name="RememberIpCheckBox"
+                                            Click="RememberIpCheckBox_Click"
+                                            Content="Remember Last IP" />
+                                        <CheckBox
+                                            x:Name="RememberPortCheckBox"
+                                            Click="RememberPortCheckBox_Click"
+                                            Content="Remember Last Port" />
+                                        <CheckBox
+                                            x:Name="AutoOpenCheckBox"
+                                            Click="AutoOpenCheckBox_Click"
+                                            Content="Automatically Open for Browsing" />
+                                    </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="Show">
+                                    <StackPanel>
+                                        <CheckBox
+                                            x:Name="ShowExtensionsCheckBox"
+                                            Click="ShowExtensionsCheckBox_Click"
+                                            Content="File Name Extensions"
+                                            IsChecked="True" />
+                                        <CheckBox
+                                            x:Name="ShowHiddenCheckBox"
+                                            Click="ShowHiddenCheckBox_Click"
+                                            Content="Hidden Items"
+                                            IsChecked="True" />
+                                    </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="File Operations">
+                                    <StackPanel>
+                                        <RadioButton
+                                            x:Name="FileOpCompactRadioButton"
+                                            Checked="FileOpCompactRadioButton_Checked"
+                                            Content="Compact" />
+                                        <RadioButton
+                                            x:Name="FileOpDetailedRadioButton"
+                                            Checked="FileOpDetailedRadioButton_Checked"
+                                            Content="Detailed" />
+                                    </StackPanel>
+                                </Expander>
                             </StackPanel>
                         </ScrollViewer>
                     </Grid>

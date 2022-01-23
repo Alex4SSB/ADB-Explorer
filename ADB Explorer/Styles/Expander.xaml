@@ -16,7 +16,7 @@
                     <Border
                         Padding="0,6"
                         SnapsToDevicePixels="true"
-                        Style="{StaticResource DeviceConnectionStyle}">
+                        Style="{StaticResource ExpanderBorderStyle}">
                         <DockPanel x:Name="DockPanel">
                             <ToggleButton
                                 x:Name="HeaderSite"
@@ -54,11 +54,7 @@
                                         <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
                                     </MultiBinding>
                                 </StackPanel.Height>
-                                <Border
-                                    Height="1"
-                                    Margin="0,6,0,0"
-                                    CornerRadius="0"
-                                    Style="{StaticResource DeviceConnectionStyle}" />
+                                <Separator Margin="0,6,0,0" Style="{StaticResource ExpanderSeparatorStyle}" />
                                 <StackPanel x:Name="ExpanderContent" Margin="6,0">
                                     <ContentPresenter
                                         Margin="0,2"
