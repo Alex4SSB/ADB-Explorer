@@ -79,5 +79,7 @@ namespace ADB_Explorer.Models
 
         public static readonly char[] ESCAPE_ADB_SHELL_CHARS = { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`' };
         public static readonly char[] ESCAPE_ADB_CHARS = { '$', '`', '"', '\\' };
+
+        public static readonly Version MIN_ADB_VERSION = new(31, 0, 2);
     }
 }

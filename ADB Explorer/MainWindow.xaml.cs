@@ -106,21 +106,14 @@ namespace ADB_Explorer
         public MainWindow()
         {
             InitializeComponent();
-            
+
             fileOperationQueue = new(this.Dispatcher);
             LaunchSequence();
 
             ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
-            
-            int exitCode = 1;
-            try
-            {
-                exitCode = ADBService.ExecuteCommand("adb", "version", out _, out _, Encoding.UTF8);
-            }
-            catch (Exception) { }
 
-            if (exitCode == 0)
+            if (CheckAdbVersion())
             {
                 ConnectTimer.Start();
                 OpenDevicesButton.IsEnabled = true;
@@ -128,6 +121,34 @@ namespace ADB_Explorer
             }
 
             UpperProgressBar.DataContext = fileOperationQueue;
+        }
+
+        private bool CheckAdbVersion()
+        {
+            int exitCode = 1;
+            string stdout = "";
+            try
+            {
+                exitCode = ADBService.ExecuteCommand("adb", "version", out stdout, out _, Encoding.UTF8);
+            }
+            catch (Exception) { }
+
+            if (exitCode == 0)
+            {
+                string version = AdbRegEx.ADB_VERSION.Match(stdout).Groups["version"]?.Value;
+                if (new Version(version) < MIN_ADB_VERSION)
+                {
+                    MissingAdbTextblock.Visibility = Visibility.Collapsed;
+                    AdbVersionTooLowTextblock.Visibility = Visibility.Visible;
+                }
+                else
+                    return true;
+            }
+            SettingsSplitView.IsPaneOpen = true;
+            WorkingDirectoriesExpander.IsExpanded = true;
+            MissingAdbGrid.Visibility = Visibility.Visible;
+
+            return false;
         }
 
         private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
@@ -1912,8 +1933,9 @@ namespace ADB_Explorer
             var dialog = new OpenFileDialog()
             {
                 Multiselect = false,
+                Title = "Select ADB Executable",
+                Filter = "ADB Executable|adb.exe",
             };
-            dialog.Filter = "ADB|adb.exe";
 
             if (ManualAdbPath.Text != "")
             {

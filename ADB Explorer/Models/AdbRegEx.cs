@@ -27,5 +27,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex MDNS_SERVICE =
             new(@"(?<ID>[^\s]+)\t*_adb-tls-(?<PortType>pairing|connect)\._tcp\.*\t*(?<IpAddress>[^:]+):(?<Port>\d+)");
+
+        public static readonly Regex ADB_VERSION =
+            new(@"^Version[\t ]*(?<version>[\d.]+)", RegexOptions.Multiline);
     }
 }

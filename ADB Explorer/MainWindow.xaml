@@ -1922,6 +1922,7 @@
                     <Grid Margin="18,8,0,8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Menu Margin="0,0,8,0" HorizontalAlignment="Right">
@@ -1932,10 +1933,39 @@
                             </MenuItem>
                         </Menu>
                         <TextBlock
+                            Margin="0,0,9,0"
                             HorizontalAlignment="Center"
                             FontSize="24"
                             Text="Settings" />
-                        <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                        <Grid
+                            x:Name="MissingAdbGrid"
+                            Grid.Row="1"
+                            Margin="30,0,40,8"
+                            HorizontalAlignment="Center"
+                            Visibility="Collapsed">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <ui:FontIcon
+                                Margin="8,2,8,0"
+                                Glyph="&#xEA39;"
+                                Style="{StaticResource GlyphFont}" />
+                            <TextBlock
+                                x:Name="MissingAdbTextblock"
+                                Grid.Column="1"
+                                FontWeight="Bold"
+                                Text="Could not find ADB in the environment PATH"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                x:Name="AdbVersionTooLowTextblock"
+                                Grid.Column="1"
+                                FontWeight="Bold"
+                                Text="ADB version too low"
+                                TextWrapping="Wrap"
+                                Visibility="Collapsed" />
+                        </Grid>
+                        <ScrollViewer Grid.Row="2" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                             <StackPanel Margin="6,0,24,0" HorizontalAlignment="Left">
                                 <Expander Header="Theme">
                                     <StackPanel VerticalAlignment="Bottom">
@@ -1950,7 +1980,7 @@
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="Working Directories">
+                                <Expander x:Name="WorkingDirectoriesExpander" Header="Working Directories">
                                     <StackPanel>
                                         <TextBlock Margin="4,0" Text="Default Folder" />
                                         <TextBox
