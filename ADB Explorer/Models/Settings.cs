@@ -14,6 +14,7 @@
         showHiddenItems,
         showExtendedView,
         enableMdns,
+        manualAdbPath,
     }
 
     public enum SystemVals

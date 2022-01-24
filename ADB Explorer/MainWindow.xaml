@@ -515,6 +515,7 @@
                     <MenuItem
                         x:Name="OpenDevicesButton"
                         Click="OpenDevicesButton_Click"
+                        IsEnabled="False"
                         ToolTip="Devices">
                         <MenuItem.Header>
                             <Grid>
@@ -1505,7 +1506,6 @@
         <ui:SplitView
             x:Name="DevicesSplitView"
             FocusVisualStyle="{x:Null}"
-            IsPaneOpen="True"
             OpenPaneLength="200"
             PaneClosing="DevicesSplitView_PaneClosing"
             PaneOpening="DevicesSplitView_PaneOpening"
@@ -1950,13 +1950,23 @@
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="Default Folder">
-                                    <TextBox
-                                        x:Name="DefaultFolderBlock"
-                                        Margin="0,6"
-                                        ui:ControlHelper.PlaceholderText="Click To Browse"
-                                        MouseUp="ChangeDefaultFolderButton_Click"
-                                        Style="{StaticResource NumericTextBoxStyle}" />
+                                <Expander Header="Working Directories">
+                                    <StackPanel>
+                                        <TextBlock Margin="4,0" Text="Default Folder" />
+                                        <TextBox
+                                            x:Name="DefaultFolderBlock"
+                                            Margin="0,6"
+                                            ui:ControlHelper.PlaceholderText="Click To Browse"
+                                            MouseUp="ChangeDefaultFolderButton_Click"
+                                            Style="{StaticResource NumericTextBoxStyle}" />
+                                        <TextBlock Margin="4,8,4,0" Text="Override ADB Path (Requires App Restart)" />
+                                        <TextBox
+                                            x:Name="ManualAdbPath"
+                                            Margin="0,6"
+                                            ui:ControlHelper.PlaceholderText="Click To Browse"
+                                            MouseUp="ManualAdbPath_MouseUp"
+                                            Style="{StaticResource NumericTextBoxStyle}" />
+                                    </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
                                 <Expander Header="File Double-Click Behavior">

@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
 
@@ -15,7 +14,19 @@ namespace ADB_Explorer.Services
 {
     public partial class ADBService
     {
-        private const string ADB_PATH = "adb";
+        private static string adbPath = "";
+        private static string ADB_PATH
+        {
+            get
+            {
+                if (adbPath == "")
+                {
+                    adbPath = Storage.RetrieveValue(UserPrefs.manualAdbPath) is string path ? path : "adb";
+                }
+                return adbPath;
+            }
+        }
+
         private const string GET_DEVICES = "devices";
         private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
 

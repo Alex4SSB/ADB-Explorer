@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using ModernWpf;
 using ModernWpf.Controls;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -110,7 +112,20 @@ namespace ADB_Explorer
 
             ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
-            ConnectTimer.Start();
+            
+            int exitCode = 1;
+            try
+            {
+                exitCode = ADBService.ExecuteCommand("adb", "version", out _, out _, Encoding.UTF8);
+            }
+            catch (Exception) { }
+
+            if (exitCode == 0)
+            {
+                ConnectTimer.Start();
+                OpenDevicesButton.IsEnabled = true;
+                DevicesSplitView.IsPaneOpen = true;
+            }
 
             UpperProgressBar.DataContext = fileOperationQueue;
         }
@@ -129,10 +144,10 @@ namespace ADB_Explorer
                         pullMenu.IsEnabled = true;
 
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
-                    ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+                    //ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                     break;
                 case MenuType.EmptySpace:
-                    ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+                    //ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                     break;
                 case MenuType.Header:
                     break;
@@ -367,6 +382,9 @@ namespace ADB_Explorer
         private void LoadSettings()
         {
             Title = Properties.Resources.AppDisplayName;
+
+            if (Storage.RetrieveValue(UserPrefs.manualAdbPath) is string adbPath)
+                ManualAdbPath.Text = adbPath;
 
             if (Storage.RetrieveBool(UserPrefs.enableMdns) is bool enable)
             {
@@ -1081,7 +1099,7 @@ namespace ADB_Explorer
             row.IsSelected = true;
         }
 
-        private void ChangeDefaultFolderButton_Click(object sender, RoutedEventArgs e)
+        private void ChangeDefaultFolderButton_Click(object sender, MouseButtonEventArgs e)
         {
             var dialog = new CommonOpenFileDialog()
             {
@@ -1887,6 +1905,30 @@ namespace ADB_Explorer
             ADBService.KillAdbServer();
             MdnsService.State = MDNS.MdnsState.Disabled;
             ChangeConnectionType();
+        }
+
+        private void ManualAdbPath_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                Multiselect = false,
+            };
+            dialog.Filter = "ADB|adb.exe";
+
+            if (ManualAdbPath.Text != "")
+            {
+                try
+                {
+                    dialog.InitialDirectory = Directory.GetParent(ManualAdbPath.Text).FullName;
+                }
+                catch (Exception) { }
+            }
+
+            if (dialog.ShowDialog() == true)
+            {
+                ManualAdbPath.Text = dialog.FileName;
+                Storage.StoreValue(UserPrefs.manualAdbPath, dialog.FileName);
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
