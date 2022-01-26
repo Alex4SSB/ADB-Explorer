@@ -325,161 +325,133 @@
             x:Key="DeviceStyle"
             BasedOn="{StaticResource BaseDeviceStyle}"
             TargetType="ui:ListViewItem">
-            <EventSetter Event="PreviewMouseDown" Handler="ListViewItem_MouseDown" />
+            <EventSetter Event="PreviewMouseDown" Handler="DeviceStyle_PreviewMouseDown" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ui:ListViewItem">
-                        <Border Background="{TemplateBinding Background}" Style="{StaticResource DeviceBorderStyle}">
-                            <Grid Margin="6">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition Height="{Binding ElementName=DeviceExpandRect, Path=ActualHeight}" />
-                                </Grid.RowDefinitions>
-                                <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
-                                    <Grid>
-                                        <Grid.Resources>
-                                            <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                                        </Grid.Resources>
-                                        <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                        <Expander
+                            x:Name="DeviceExpander"
+                            Background="{TemplateBinding Background}"
+                            IsExpanded="{Binding IsSelected, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                            Style="{StaticResource ExpanderStyle}"
+                            Tag="Device">
+                            <Expander.Header>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
                                         <Grid>
-                                            <Grid.Style>
-                                                <Style TargetType="Grid">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Device.Status}" Value="Online">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </Grid.Style>
-                                            <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                                            <ui:FontIcon Foreground="{TemplateBinding Background}" Glyph="{Binding StatusIcon}" />
+                                            <Grid.Resources>
+                                                <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
+                                            </Grid.Resources>
+                                            <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                                            <Grid>
+                                                <Grid.Style>
+                                                    <Style TargetType="Grid">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Device.Status}" Value="Online">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Grid.Style>
+                                                <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
+                                                <ui:FontIcon Foreground="{TemplateBinding Background}" Glyph="{Binding StatusIcon}" />
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                    <TextBlock
+                                        <TextBlock
+                                            Margin="4"
+                                            VerticalAlignment="Center"
+                                            Style="{StaticResource DeviceNameTextBlockStyle}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <ui:FontIcon
                                         Margin="4"
-                                        VerticalAlignment="Center"
-                                        Style="{StaticResource DeviceNameTextBlockStyle}" />
-                                </StackPanel>
-                                <ui:FontIcon
-                                    Margin="4"
-                                    HorizontalAlignment="Right"
-                                    Foreground="Gray"
-                                    Glyph="&#xE838;">
-                                    <ui:FontIcon.Style>
-                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </Style>
-                                    </ui:FontIcon.Style>
-                                </ui:FontIcon>
-                                <Rectangle
-                                    x:Name="DeviceExpandRect"
-                                    Grid.Row="1"
-                                    Height="{Binding ElementName=DeviceExpandPanel, Path=ActualHeight}"
-                                    Fill="Transparent">
-                                    <Rectangle.Style>
-                                        <Style TargetType="Rectangle">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                                    <DataTrigger.EnterActions>
-                                                        <BeginStoryboard Storyboard="{StaticResource RevealingStoryBoard}" />
-                                                    </DataTrigger.EnterActions>
-                                                    <DataTrigger.ExitActions>
-                                                        <BeginStoryboard Storyboard="{StaticResource CollapsingStoryBoard}" />
-                                                    </DataTrigger.ExitActions>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Rectangle.Style>
-                                </Rectangle>
-                                <StackPanel
-                                    x:Name="DeviceExpandPanel"
-                                    Grid.Row="1"
-                                    VerticalAlignment="Bottom">
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </Style>
-                                    </StackPanel.Style>
-                                    <Grid Margin="0,6,0,0">
-                                        <Grid.Style>
-                                            <Style TargetType="Grid">
+                                        HorizontalAlignment="Right"
+                                        Foreground="Gray"
+                                        Glyph="&#xE838;">
+                                        <ui:FontIcon.Style>
+                                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
                                                         <Setter Property="Visibility" Value="Visible" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </Style>
-                                        </Grid.Style>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBox
-                                            ui:ControlHelper.PlaceholderText="Pairing Code"
-                                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                                            KeyDown="PairingCodeTextBox_KeyDown"
-                                            Style="{StaticResource PairingTextBoxStyle}"
-                                            Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            TextChanged="PairingCodeTextBox_TextChanged" />
-                                        <Button
-                                            Grid.Column="1"
-                                            Margin="6,0,0,0"
-                                            ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
-                                            Click="PairServiceButton_Click"
-                                            Content="Pair">
-                                            <Button.Style>
-                                                <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding UIPairingCode.Length}" Value="11">
-                                                            <Setter Property="IsEnabled" Value="True" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                </Style>
-                                            </Button.Style>
-                                        </Button>
-                                    </Grid>
-                                    <StackPanel
-                                        Margin="0,6,0,0"
-                                        HorizontalAlignment="Right"
-                                        Orientation="Horizontal">
-                                        <Button
-                                            x:Name="OpenDeviceButton"
-                                            Margin="8,0"
-                                            Click="OpenDeviceButton_Click"
-                                            Content="Browse"
-                                            Style="{StaticResource DeviceBrowseButtonStyle}" />
-                                        <Button
-                                            x:Name="DisconnectDeviceButton"
-                                            Click="DisconnectDeviceButton_Click"
-                                            Style="{StaticResource DeviceRemoveButtonStyle}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <ui:FontIcon
-                                                    Margin="-4,1,4,-2"
-                                                    VerticalAlignment="Center"
-                                                    Glyph="&#xECC9;"
-                                                    Style="{DynamicResource DisabledButtonGlyphStyle}" />
-                                                <Grid>
-                                                    <TextBlock Text="Remove" Visibility="Hidden" />
-                                                    <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
-                                                </Grid>
-                                            </StackPanel>
-                                        </Button>
-                                    </StackPanel>
+                                        </ui:FontIcon.Style>
+                                    </ui:FontIcon>
+                                </Grid>
+                            </Expander.Header>
+                            <StackPanel x:Name="DeviceExpandPanel" Margin="0,5">
+                                <Grid>
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </Style>
+                                    </Grid.Style>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox
+                                        ui:ControlHelper.PlaceholderText="Pairing Code"
+                                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                                        KeyDown="PairingCodeTextBox_KeyDown"
+                                        Style="{StaticResource PairingTextBoxStyle}"
+                                        Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                        TextChanged="PairingCodeTextBox_TextChanged" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Margin="6,0,0,0"
+                                        ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
+                                        Click="PairServiceButton_Click"
+                                        Content="Pair">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding UIPairingCode.Length}" Value="11">
+                                                        <Setter Property="IsEnabled" Value="True" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                    <Button
+                                        x:Name="OpenDeviceButton"
+                                        Margin="8,0"
+                                        Click="OpenDeviceButton_Click"
+                                        Content="Browse"
+                                        Style="{StaticResource DeviceBrowseButtonStyle}" />
+                                    <Button
+                                        x:Name="DisconnectDeviceButton"
+                                        Click="DisconnectDeviceButton_Click"
+                                        Style="{StaticResource DeviceRemoveButtonStyle}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <ui:FontIcon
+                                                Margin="-4,1,4,-2"
+                                                VerticalAlignment="Center"
+                                                Glyph="&#xECC9;"
+                                                Style="{DynamicResource DisabledButtonGlyphStyle}" />
+                                            <Grid>
+                                                <TextBlock Text="Remove" Visibility="Hidden" />
+                                                <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </Button>
                                 </StackPanel>
-                            </Grid>
-                        </Border>
+                            </StackPanel>
+                        </Expander>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -1515,90 +1487,19 @@
                     BorderBrush="Gray"
                     BorderThickness="0,1,1,0"
                     Style="{StaticResource DevicesListStyle}">
-                    <Grid Margin="6,0">
+                    <Grid Margin="6">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="{Binding ElementName=NewDeviceRect, Path=ActualHeight}" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Menu Margin="2,4" HorizontalAlignment="Left">
-                            <MenuItem x:Name="OpenNewDeviceButton" Click="OpenNewDeviceButton_Click">
-                                <MenuItem.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <ui:FontIcon Margin="0,-1,6,0" FontSize="22">
-                                            <ui:FontIcon.Style>
-                                                <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
-                                                            <Setter Property="Glyph" Value="&#xE70E;" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                    <Setter Property="Glyph" Value="&#xE70D;" />
-                                                </Style>
-                                            </ui:FontIcon.Style>
-                                        </ui:FontIcon>
-                                        <TextBlock Grid.Column="1" Text="Pair / Connect Device">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
-                                                            <Setter Property="Visibility" Value="Hidden" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                        <TextBlock Grid.Column="1" Text="Hide">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                    <Setter Property="Visibility" Value="Hidden" />
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Grid>
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </Menu>
-                        <Rectangle
-                            x:Name="NewDeviceRect"
-                            Grid.Row="1"
-                            Height="{Binding ElementName=NewDevicePanel, Path=ActualHeight}"
-                            Fill="Transparent">
-                            <Rectangle.Style>
-                                <Style TargetType="Rectangle">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=NewDevicePanel, Path=Tag}" Value="Open">
-                                            <DataTrigger.EnterActions>
-                                                <BeginStoryboard Storyboard="{StaticResource RevealingStoryBoard}" />
-                                            </DataTrigger.EnterActions>
-                                            <DataTrigger.ExitActions>
-                                                <BeginStoryboard Storyboard="{StaticResource CollapsingStoryBoard}" />
-                                            </DataTrigger.ExitActions>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Rectangle.Style>
-                        </Rectangle>
-                        <Border
-                            Grid.Row="1"
-                            Padding="8"
-                            Style="{StaticResource DeviceConnectionStyle}">
-                            <StackPanel
-                                x:Name="NewDevicePanel"
-                                VerticalAlignment="Bottom"
-                                Visibility="Collapsed">
-                                <Border Margin="0,9" />
+                        <Expander
+                            x:Name="PairingExpander"
+                            Collapsed="PairingExpander_Expanded"
+                            Expanded="PairingExpander_Expanded"
+                            Header="Pair / Connect Device"
+                            Style="{StaticResource ExpanderStyle}">
+                            <StackPanel x:Name="NewDevicePanel" Margin="0,0,0,6">
                                 <Grid>
                                     <Grid.Resources>
                                         <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
@@ -1872,8 +1773,8 @@
                                         TextChanged="PairingCodeBox_TextChanged" />
                                 </StackPanel>
                             </StackPanel>
-                        </Border>
-                        <Grid Grid.Row="2" Margin="0,6">
+                        </Expander>
+                        <Grid Grid.Row="1" Margin="0,6">
                             <ui:ProgressRing
                                 Margin="6,4,0,0"
                                 HorizontalAlignment="Left"
@@ -1885,12 +1786,13 @@
                         </Grid>
                         <ui:ListView
                             x:Name="DevicesList"
-                            Grid.Row="3"
+                            Grid.Row="2"
                             DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
                             IsSelectionEnabled="False"
                             ItemContainerStyle="{StaticResource DeviceStyle}"
                             ItemsSource="{Binding UIList}"
-                            MouseDown="DevicesList_MouseDown" />
+                            MouseDown="DevicesList_MouseDown"
+                            ScrollViewer.CanContentScroll="False" />
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

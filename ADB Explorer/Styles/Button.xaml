@@ -9,7 +9,7 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+                <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusVisualRoundedStyle}" />
                 <Setter Property="Template">
                     <!--  Template copied from ModernWPF to be modified  -->
                     <Setter.Value>

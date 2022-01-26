@@ -4,13 +4,108 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
-
+    <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control  -->
     <converters:MultiplyConverter x:Key="multiplyConverter" />
+
+    <Storyboard x:Key="RotateTo180DegreesStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="0"
+            To="180"
+            Duration="00:00:00.2" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo0DegreesStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="180"
+            To="360"
+            Duration="00:00:00.2" />
+    </Storyboard>
+
+    <Storyboard x:Key="ExpandingStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="Tag"
+            To="1"
+            Duration="00:00:00.2" />
+    </Storyboard>
+
+    <Storyboard x:Key="CollapsingStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="Tag"
+            To="0"
+            Duration="00:00:00.2" />
+    </Storyboard>
+
+    <Style x:Key="ExpanderHeaderStyle" TargetType="ToggleButton">
+        <Setter Property="Template">
+            <!--  Template copied from ModernWPF to be modified  -->
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border Padding="{TemplateBinding Padding}">
+                        <Grid Background="Transparent" SnapsToDevicePixels="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ui:FontIcon
+                                x:Name="arrow"
+                                Margin="0,0,8,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                Glyph="&#xE70D;"
+                                RenderTransformOrigin="0.5, 0.5"
+                                SnapsToDevicePixels="false"
+                                Style="{StaticResource GlyphFont}">
+                                <ui:FontIcon.RenderTransform>
+                                    <RotateTransform x:Name="ArrowRotateTransform" />
+                                </ui:FontIcon.RenderTransform>
+                            </ui:FontIcon>
+                            <ContentPresenter
+                                Grid.Column="1"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True"
+                                SnapsToDevicePixels="True" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource RotateTo180DegreesStoryboard}" />
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource RotateTo0DegreesStoryboard}" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="true">
+                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseMediumBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="true">
+                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource SystemControlHighlightBaseMediumLowBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="false">
+                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+                        </Trigger>
+                        <Trigger Property="Tag" Value="Device">
+                            <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 
     <Style x:Key="ExpanderStyle" TargetType="Expander">
         <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
         <Setter Property="Template">
-            <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control#:~:text=Below%20is%20the%20XAML%20for%20the%20%22reveal%22%20animation.%20Note%20the%20first%20line%20to%20declare%20the%20converter%20that%20was%20used.  -->
+            <!--  Template copied from ModernWPF to be modified  -->
             <Setter.Value>
                 <ControlTemplate TargetType="Expander">
                     <Border
@@ -40,7 +135,8 @@
                                 FontWeight="{TemplateBinding FontWeight}"
                                 Foreground="{TemplateBinding Foreground}"
                                 IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                Style="{StaticResource ExpanderDownHeaderStyle}" />
+                                Style="{StaticResource ExpanderHeaderStyle}"
+                                Tag="{TemplateBinding Tag}" />
                             <StackPanel
                                 x:Name="ExpandSite"
                                 VerticalAlignment="Bottom"
@@ -67,46 +163,15 @@
                         </DockPanel>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsExpanded" Value="true">
+                        <Trigger Property="IsExpanded" Value="True">
                             <Trigger.EnterActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="ExpandSite"
-                                            Storyboard.TargetProperty="Tag"
-                                            To="1"
-                                            Duration="00:00:00.2" />
-                                    </Storyboard>
-                                </BeginStoryboard>
+                                <BeginStoryboard Storyboard="{StaticResource ExpandingStoryboard}" />
                             </Trigger.EnterActions>
                             <Trigger.ExitActions>
-                                <BeginStoryboard>
-                                    <Storyboard>
-                                        <DoubleAnimation
-                                            Storyboard.TargetName="ExpandSite"
-                                            Storyboard.TargetProperty="Tag"
-                                            To="0"
-                                            Duration="00:00:00.2" />
-                                    </Storyboard>
-                                </BeginStoryboard>
+                                <BeginStoryboard Storyboard="{StaticResource CollapsingStoryboard}" />
                             </Trigger.ExitActions>
                         </Trigger>
-                        <Trigger Property="ExpandDirection" Value="Right">
-                            <Setter TargetName="ExpandSite" Property="DockPanel.Dock" Value="Right" />
-                            <Setter TargetName="HeaderSite" Property="DockPanel.Dock" Value="Left" />
-                            <Setter TargetName="HeaderSite" Property="Style" Value="{StaticResource ExpanderRightHeaderStyle}" />
-                        </Trigger>
-                        <Trigger Property="ExpandDirection" Value="Up">
-                            <Setter TargetName="ExpandSite" Property="DockPanel.Dock" Value="Top" />
-                            <Setter TargetName="HeaderSite" Property="DockPanel.Dock" Value="Bottom" />
-                            <Setter TargetName="HeaderSite" Property="Style" Value="{StaticResource ExpanderUpHeaderStyle}" />
-                        </Trigger>
-                        <Trigger Property="ExpandDirection" Value="Left">
-                            <Setter TargetName="ExpandSite" Property="DockPanel.Dock" Value="Left" />
-                            <Setter TargetName="HeaderSite" Property="DockPanel.Dock" Value="Right" />
-                            <Setter TargetName="HeaderSite" Property="Style" Value="{StaticResource ExpanderLeftHeaderStyle}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="false">
+                        <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
                         </Trigger>
                     </ControlTemplate.Triggers>

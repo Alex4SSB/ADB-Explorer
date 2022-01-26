@@ -581,7 +581,7 @@ namespace ADB_Explorer
                     && service.ID == QrClass.ServiceName).ToList();
 
                 if (qrServices.Any() && PairService(qrServices.First()))
-                    NewDevicePanelVisibility(false);
+                    PairingExpander.IsExpanded = false;
 
                 DevicesList.Items.Refresh();
             }
@@ -1182,7 +1182,7 @@ namespace ADB_Explorer
 
             NewDeviceIpBox.Clear();
             NewDevicePortBox.Clear();
-            NewDevicePanelVisibility(false);
+            PairingExpander.IsExpanded = false;
             DeviceListSetup(selectedAddress: deviceAddress);
         }
 
@@ -1213,39 +1213,6 @@ namespace ADB_Explorer
         {
             TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric:true, allowedChars: '.');
             EnableConnectButton();
-        }
-
-        private void OpenNewDeviceButton_Click(object sender, RoutedEventArgs e)
-        {
-            NewDevicePanelVisibility(!NewDevicePanelVisibility());
-            DevicesObject.UnselectAll();
-            DevicesList.Items.Refresh();
-
-            if (NewDevicePanelVisibility())
-            {
-                RetrieveIp();
-            }
-        }
-
-        private void NewDevicePanelVisibility(bool open)
-        {
-            if (NewDevicePanel is null)
-                return;
-
-            if (open)
-            {
-                if (NewDevicePanel.Visibility == Visibility.Collapsed)
-                    NewDevicePanel.Visibility = Visibility.Visible;
-
-                NewDevicePanel.Tag = "Open";
-            }
-            else
-                NewDevicePanel.Tag = "Closed";
-        }
-
-        private bool NewDevicePanelVisibility()
-        {
-            return NewDevicePanel?.Tag?.ToString() == "Open";
         }
 
         private void RetrieveIp()
@@ -1355,7 +1322,7 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
-            NewDevicePanelVisibility(false);
+            PairingExpander.IsExpanded = false;
             DevicesObject.UnselectAll();
             DevicesList.Items.Refresh();
         }
@@ -1382,7 +1349,7 @@ namespace ADB_Explorer
             ExplorerGrid.ContextMenu.Visibility = Visible(ExplorerGrid.ContextMenu.HasItems);
         }
 
-        private void ListViewItem_MouseDown(object sender, MouseButtonEventArgs e)
+        private void SelectDevice(object sender)
         {
             if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.IsSelected)
             {
@@ -1391,7 +1358,7 @@ namespace ADB_Explorer
 
 
                 DevicesObject.SetSelected(device);
-                DevicesList.Items.Refresh();
+                //DevicesList.Items.Refresh();
             }
         }
 
@@ -1452,7 +1419,7 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
         {
-            NewDevicePanelVisibility(false);
+            PairingExpander.IsExpanded = false;
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1522,7 +1489,7 @@ namespace ADB_Explorer
 
             ConnectNewDevice();
             ManualPairingPanel.IsEnabled = false;
-            NewDevicePanelVisibility(false);
+            PairingExpander.IsExpanded = false;
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -1672,7 +1639,7 @@ namespace ADB_Explorer
         private void ChangeConnectionType()
         {
             if (ManualConnectionRadioButton.IsChecked == false
-                            && NewDevicePanel.Visible()
+                            && PairingExpander.IsExpanded
                             && MdnsService.State == MDNS.MdnsState.Disabled)
             {
                 MdnsService.State = MDNS.MdnsState.Unchecked;
@@ -1846,7 +1813,7 @@ namespace ADB_Explorer
             if (FindResource("PairServiceFlyout") is Flyout flyout)
             {
                 flyout.Hide();
-                NewDevicePanelVisibility(false);
+                PairingExpander.IsExpanded = false;
                 DevicesObject.UnselectAll();
                 DevicesObject.ConsolidateDevices();
                 DevicesList.Items.Refresh();
@@ -1951,6 +1918,22 @@ namespace ADB_Explorer
                 ManualAdbPath.Text = dialog.FileName;
                 Storage.StoreValue(UserPrefs.manualAdbPath, dialog.FileName);
             }
+        }
+
+        private void PairingExpander_Expanded(object sender, RoutedEventArgs e)
+        {
+            DevicesObject.UnselectAll();
+            DevicesList.Items.Refresh();
+
+            if (PairingExpander.IsExpanded)
+            {
+                RetrieveIp();
+            }
+        }
+
+        private void DeviceStyle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            SelectDevice(sender);
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

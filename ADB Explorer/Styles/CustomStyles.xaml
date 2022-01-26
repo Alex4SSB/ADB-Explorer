@@ -63,13 +63,6 @@
         <Setter Property="Background" Value="{DynamicResource DevicesListBackground}" />
     </Style>
     <Style
-        x:Key="DeviceConnectionStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
-    </Style>
-    <Style
         x:Key="DeviceBorderStyle"
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
@@ -525,18 +518,6 @@
     <Style x:Key="ExplorerViewBackgroundStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
     </Style>
-    <Storyboard x:Key="RevealingStoryBoard">
-        <DoubleAnimation
-            Storyboard.TargetProperty="Height"
-            From="0"
-            Duration="0:00:00.2" />
-    </Storyboard>
-    <Storyboard x:Key="CollapsingStoryBoard">
-        <DoubleAnimation
-            Storyboard.TargetProperty="Height"
-            To="0"
-            Duration="0:00:00.2" />
-    </Storyboard>
     <Style x:Key="SeparatorStyle" TargetType="Separator">
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
