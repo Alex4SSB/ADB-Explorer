@@ -456,32 +456,7 @@ namespace ADB_Explorer
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
-
-            //InitColumnConfig();
         }
-
-        //private void InitColumnConfig()
-        //{
-        //    foreach (var type in (ColumnType[]) Enum.GetValues(typeof(ColumnType)))
-        //    {
-        //        var possibleColumns = POSSIBLE_COLUMNS.Where(c => c.IsType(type)).Select(c => c.Name).ToList();
-        //        List<string> requestedColumns = new();
-        //        if (Storage.RetrieveValue(type) is List<string> cols)
-        //            requestedColumns.AddRange(cols);
-
-        //        var configs = requestedColumns?.Select(item => new ColumnConfig(selected: item, columnList: possibleColumns)).ToList();
-        //        configs.Add(new(selected: "[Add]",columnList: possibleColumns, isExisting: false));
-
-        //        ColumnConfig columns = new()
-        //        {
-        //            Title = $"{type} Operation{(type is ColumnType.Current ? "" : "s")}",
-        //            Items = configs
-        //        };
-        //        ColumnConfigs.Add(columns);
-        //    }
-
-        //    FileOpSettingsTree.ItemsSource = ColumnConfigs;
-        //}
 
         private void InitDevice()
         {

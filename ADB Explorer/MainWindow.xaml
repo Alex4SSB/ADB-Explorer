@@ -331,10 +331,9 @@
                     <ControlTemplate TargetType="ui:ListViewItem">
                         <Expander
                             x:Name="DeviceExpander"
-                            Background="{TemplateBinding Background}"
                             IsExpanded="{Binding IsSelected, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                            Style="{StaticResource ExpanderStyle}"
-                            Tag="Device">
+                            Style="{StaticResource FluentExpanderStyle}"
+                            Tag="HideArrow">
                             <Expander.Header>
                                 <Grid>
                                     <Grid.ColumnDefinitions>
@@ -1498,7 +1497,7 @@
                             Collapsed="PairingExpander_Expanded"
                             Expanded="PairingExpander_Expanded"
                             Header="Pair / Connect Device"
-                            Style="{StaticResource ExpanderStyle}">
+                            Style="{StaticResource FluentExpanderStyle}">
                             <StackPanel x:Name="NewDevicePanel" Margin="0,0,0,6">
                                 <Grid>
                                     <Grid.Resources>
@@ -1812,7 +1811,7 @@
                 </Style>
                 <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox" />
                 <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
-                <Style BasedOn="{StaticResource ExpanderStyle}" TargetType="Expander">
+                <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                     <Setter Property="Margin" Value="0,6" />
                 </Style>
             </ui:SplitView.Resources>

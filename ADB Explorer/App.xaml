@@ -39,6 +39,14 @@
             <Color x:Key="DarkDeviceConnectionPanelBackground">#FF2B2B2B</Color>
             <Color x:Key="LightDeviceConnectionPanelBorder">#FFE5E5E5</Color>
             <Color x:Key="DarkDeviceConnectionPanelBorder">#FF1D1D1D</Color>
+            <Color x:Key="LightExpanderBorderExpanded">#FFFBFBFB</Color>
+            <Color x:Key="DarkExpanderBorderExpanded">#FF2D2D2D</Color>
+            <Color x:Key="LightExpanderUpperBorderMouseOver">#FFE5E5E5</Color>
+            <Color x:Key="DarkExpanderUpperBorderMouseOver">#FF353535</Color>
+            <Color x:Key="LightExpanderSideBorderMouseOver">#FFE5E5E5</Color>
+            <Color x:Key="DarkExpanderSideBorderMouseOver">#FF303030</Color>
+            <Color x:Key="LightExpanderLowerBorderMouseOver">#FFCCCCCC</Color>
+            <Color x:Key="DarkExpanderLowerBorderMouseOver">#FF303030</Color>
 
             <Color x:Key="LightAdbTextBoxUpperBorder">#FFECECEC</Color>
             <Color x:Key="DarkAdbTextBoxUpperBorder">#FF3A3A3A</Color>
@@ -92,6 +100,10 @@
                 <SolidColorBrush x:Key="DevicesListBackground" Color="{DynamicResource LightDevicesListBackground}" />
                 <SolidColorBrush x:Key="DeviceConnectionPanelBackground" Color="{DynamicResource LightDeviceConnectionPanelBackground}" />
                 <SolidColorBrush x:Key="DeviceConnectionPanelBorder" Color="{DynamicResource LightDeviceConnectionPanelBorder}" />
+                <SolidColorBrush x:Key="ExpanderBorderExpanded" Color="{DynamicResource LightExpanderBorderExpanded}" />
+                <SolidColorBrush x:Key="ExpanderUpperBorderMouseOver" Color="{DynamicResource LightExpanderUpperBorderMouseOver}" />
+                <SolidColorBrush x:Key="ExpanderLowerBorderMouseOver" Color="{DynamicResource LightExpanderLowerBorderMouseOver}" />
+                <SolidColorBrush x:Key="ExpanderSideBorderMouseOver" Color="{DynamicResource LightExpanderSideBorderMouseOver}" />
 
                 <SolidColorBrush x:Key="AdbTextBoxUpperBorder" Color="{DynamicResource LightTextBoxUpperBorder}" />
                 <SolidColorBrush x:Key="AdbTextBoxLowerBorder" Color="{DynamicResource LightTextBoxLowerBorder}" />

@@ -41,7 +41,43 @@
             Duration="00:00:00.2" />
     </Storyboard>
 
+    <Style
+        x:Key="ExpanderHeaderUpperBorderStyle"
+        BasedOn="{StaticResource BorderStyle}"
+        TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="CornerRadius" Value="5,5,0,0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ExpanderHeaderLowerBorderStyle"
+        BasedOn="{StaticResource BorderStyle}"
+        TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="CornerRadius" Value="5,5,0,0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="ExpanderContentBorderStyle"
+        BasedOn="{StaticResource BorderStyle}"
+        TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="CornerRadius" Value="0,0,5,5" />
+                <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style x:Key="ExpanderHeaderStyle" TargetType="ToggleButton">
+
         <Setter Property="Template">
             <!--  Template copied from ModernWPF to be modified  -->
             <Setter.Value>
@@ -67,10 +103,12 @@
                                     <RotateTransform x:Name="ArrowRotateTransform" />
                                 </ui:FontIcon.RenderTransform>
                             </ui:FontIcon>
-                            <ContentPresenter
+                            <ui:ContentPresenterEx
+                                x:Name="Content"
                                 Grid.Column="1"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Center"
+                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
                                 RecognizesAccessKey="True"
                                 SnapsToDevicePixels="True" />
                         </Grid>
@@ -85,15 +123,18 @@
                             </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseMediumBrush}" />
+                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="true">
-                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource SystemControlHighlightBaseMediumLowBrush}" />
+                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
                         </Trigger>
-                        <Trigger Property="Tag" Value="Device">
+                        <Trigger Property="Tag" Value="HideArrow">
                             <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -108,39 +149,65 @@
             <!--  Template copied from ModernWPF to be modified  -->
             <Setter.Value>
                 <ControlTemplate TargetType="Expander">
-                    <Border
-                        Padding="0,6"
-                        SnapsToDevicePixels="true"
-                        Style="{StaticResource ExpanderBorderStyle}">
-                        <DockPanel x:Name="DockPanel">
-                            <ToggleButton
-                                x:Name="HeaderSite"
+                    <DockPanel x:Name="DockPanel">
+                        <Grid DockPanel.Dock="Top">
+                            <Border
+                                x:Name="DummyBorder"
+                                CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
+                                Visibility="Collapsed" />
+                            <Border
+                                x:Name="HeaderBorder"
                                 MinWidth="0"
                                 MinHeight="0"
-                                Margin="7,1,1,1"
-                                Padding="{TemplateBinding Padding}"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                ui:FocusVisualHelper.FocusVisualMargin="-3"
-                                ui:FocusVisualHelper.UseSystemFocusVisuals="True"
-                                Content="{TemplateBinding Header}"
-                                ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
-                                DockPanel.Dock="Top"
-                                FocusVisualStyle="{x:Null}"
-                                FontFamily="{TemplateBinding FontFamily}"
-                                FontSize="{TemplateBinding FontSize}"
-                                FontStretch="{TemplateBinding FontStretch}"
-                                FontStyle="{TemplateBinding FontStyle}"
-                                FontWeight="{TemplateBinding FontWeight}"
-                                Foreground="{TemplateBinding Foreground}"
-                                IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                Style="{StaticResource ExpanderHeaderStyle}"
-                                Tag="{TemplateBinding Tag}" />
-                            <StackPanel
-                                x:Name="ExpandSite"
-                                VerticalAlignment="Bottom"
-                                DockPanel.Dock="Bottom">
+                                Margin="0"
+                                Padding="0,6"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="{Binding ElementName=HeaderUpperBorder, Path=CornerRadius}"
+                                SnapsToDevicePixels="True">
+                                <ToggleButton
+                                    x:Name="HeaderSite"
+                                    Margin="7,1,1,1"
+                                    Padding="{TemplateBinding Padding}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    ui:FocusVisualHelper.FocusVisualMargin="-3"
+                                    ui:FocusVisualHelper.UseSystemFocusVisuals="True"
+                                    Content="{TemplateBinding Header}"
+                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                    ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                                    FocusVisualStyle="{x:Null}"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    FontStretch="{TemplateBinding FontStretch}"
+                                    FontStyle="{TemplateBinding FontStyle}"
+                                    FontWeight="{TemplateBinding FontWeight}"
+                                    Foreground="{TemplateBinding Foreground}"
+                                    IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                    Style="{StaticResource ExpanderHeaderStyle}"
+                                    Tag="{TemplateBinding Tag}" />
+                            </Border>
+                            <Border
+                                x:Name="HeaderUpperBorder"
+                                BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
+                                BorderThickness="0,1,0,1"
+                                Style="{StaticResource ExpanderHeaderUpperBorderStyle}" />
+                            <Border
+                                x:Name="HeaderLowerBorder"
+                                BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
+                                BorderThickness="0,0,0,1"
+                                Style="{StaticResource ExpanderHeaderLowerBorderStyle}" />
+                            <Border
+                                x:Name="HeaderSideBorder"
+                                BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
+                                BorderThickness="1,0,1,0"
+                                Style="{StaticResource ExpanderHeaderLowerBorderStyle}" />
+                        </Grid>
+                        <Border
+                            x:Name="ContentBorder"
+                            BorderThickness="1,0,1,1"
+                            DockPanel.Dock="Bottom"
+                            Style="{StaticResource ExpanderContentBorderStyle}">
+                            <StackPanel x:Name="ExpandSite" VerticalAlignment="Top">
                                 <StackPanel.Tag>
                                     <sys:Double>0.0</sys:Double>
                                 </StackPanel.Tag>
@@ -150,7 +217,6 @@
                                         <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
                                     </MultiBinding>
                                 </StackPanel.Height>
-                                <Separator Margin="0,6,0,0" Style="{StaticResource ExpanderSeparatorStyle}" />
                                 <StackPanel x:Name="ExpanderContent" Margin="6,0">
                                     <ContentPresenter
                                         Margin="0,2"
@@ -160,8 +226,8 @@
                                 </StackPanel>
                                 <Border Margin="0,2" />
                             </StackPanel>
-                        </DockPanel>
-                    </Border>
+                        </Border>
+                    </DockPanel>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsExpanded" Value="True">
                             <Trigger.EnterActions>
@@ -174,9 +240,39 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
                         </Trigger>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
+                        </Trigger>
+                        <Trigger SourceName="HeaderSite" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
+                            <Setter TargetName="HeaderUpperBorder" Property="BorderBrush" Value="{DynamicResource ExpanderUpperBorderMouseOver}" />
+                            <Setter TargetName="HeaderLowerBorder" Property="BorderBrush" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
+                            <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="{DynamicResource ExpanderSideBorderMouseOver}" />
+                        </Trigger>
+                        <Trigger SourceName="ExpandSite" Property="Height" Value="0">
+                            <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style
+        x:Key="FluentExpanderStyle"
+        BasedOn="{StaticResource ExpanderStyle}"
+        TargetType="Expander">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="Background" Value="Transparent" />
     </Style>
 </ResourceDictionary>

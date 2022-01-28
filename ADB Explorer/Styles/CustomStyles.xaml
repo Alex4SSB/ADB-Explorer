@@ -77,15 +77,6 @@
         <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
     <Style x:Key="BaseDeviceStyle" TargetType="ui:ListViewItem">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
-            </DataTrigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
-            </Trigger>
-        </Style.Triggers>
-        <Setter Property="Background" Value="{DynamicResource DevicesListBackground}" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Margin" Value="0,1" />
     </Style>
@@ -533,17 +524,5 @@
                 <Setter Property="Height" Value="0" />
             </DataTrigger>
         </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ExpanderBorderStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
-                <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
-                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="Background" Value="Transparent" />
     </Style>
 </ResourceDictionary>
