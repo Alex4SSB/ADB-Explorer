@@ -1878,6 +1878,10 @@
                                             x:Name="DarkThemeRadioButton"
                                             Checked="DarkThemeRadioButton_Checked"
                                             Content="Dark" />
+                                        <RadioButton
+                                            x:Name="DefaultThemeRadioButton"
+                                            Checked="DefaultThemeRadioButton_Checked"
+                                            Content="Windows Default" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />

@@ -45,6 +45,7 @@ namespace ADB_Explorer
         private ScrollViewer ExplorerScroller;
         private bool TextBoxChangedMutex;
         private SolidColorBrush qrForeground, qrBackground;
+        private ThemeService themeService = new();
 
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
@@ -113,6 +114,8 @@ namespace ADB_Explorer
             ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
 
+            themeService.PropertyChanged += ThemeService_PropertyChanged;
+
             if (CheckAdbVersion())
             {
                 ConnectTimer.Start();
@@ -121,6 +124,15 @@ namespace ADB_Explorer
             }
 
             UpperProgressBar.DataContext = fileOperationQueue;
+        }
+
+        private void ThemeService_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                if (SettingsTheme() is AppTheme.windowsDefault)
+                    SetTheme(themeService.WindowsTheme);
+            });
         }
 
         private bool CheckAdbVersion()
@@ -229,13 +241,38 @@ namespace ADB_Explorer
                 SetResourceColor(theme, key);
             }
 
-            Storage.StoreEnum(ThemeManager.Current.ApplicationTheme);
+            Storage.StoreEnum(SettingsTheme());
 
             if (EnableMdnsCheckBox.IsChecked == true)
             {
                 SetQrColors(theme);
                 UpdateQrClass();
             }
+        }
+
+        private void SettingsTheme(AppTheme theme)
+        {
+            switch (theme)
+            {
+                case AppTheme.light:
+                    LightThemeRadioButton.IsChecked = true;
+                    break;
+                case AppTheme.dark:
+                    DarkThemeRadioButton.IsChecked = true;
+                    break;
+                case AppTheme.windowsDefault:
+                    DefaultThemeRadioButton.IsChecked = true;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private AppTheme SettingsTheme()
+        {
+            if (LightThemeRadioButton.IsChecked == true) return AppTheme.light;
+            else if (DarkThemeRadioButton.IsChecked == true) return AppTheme.dark;
+            else return AppTheme.windowsDefault;
         }
 
         private static void SetResourceColor(ApplicationTheme theme, string resource)
@@ -416,12 +453,15 @@ namespace ADB_Explorer
                     QrClass = new();
             }
 
-            var theme = Storage.RetrieveEnum<ApplicationTheme>();
-            SetTheme(theme);
-            if (theme == ApplicationTheme.Light)
-                LightThemeRadioButton.IsChecked = true;
-            else
-                DarkThemeRadioButton.IsChecked = true;
+            var appTheme = Storage.RetrieveEnum<AppTheme>();
+            SettingsTheme(appTheme);
+            SetTheme(appTheme switch
+            {
+                AppTheme.light => ApplicationTheme.Light,
+                AppTheme.dark => ApplicationTheme.Dark,
+                AppTheme.windowsDefault => themeService.WindowsTheme,
+                _ => throw new NotImplementedException(),
+            });
 
             if (Storage.RetrieveValue(UserPrefs.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
@@ -1909,6 +1949,12 @@ namespace ADB_Explorer
         private void DeviceStyle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             SelectDevice(sender);
+        }
+
+        private void DefaultThemeRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            themeService.WatchTheme();
+            SetTheme(themeService.WindowsTheme);
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

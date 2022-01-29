@@ -2,7 +2,6 @@
 {
     public enum UserPrefs
     {
-        theme,
         defaultFolder,
         pullOnDoubleClick,
         rememberIp,
@@ -22,5 +21,12 @@
         windowMaximized,
         detailedVisible,
         detailedHeight,
+    }
+
+    public enum AppTheme
+    {
+        windowsDefault,
+        light,
+        dark,
     }
 }
