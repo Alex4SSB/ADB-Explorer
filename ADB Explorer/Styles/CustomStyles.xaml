@@ -510,14 +510,22 @@
         BasedOn="{StaticResource DefaultCheckBoxStyle}"
         TargetType="CheckBox">
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-6,0" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="RadioButtonStyle"
         BasedOn="{StaticResource DefaultRadioButtonStyle}"
         TargetType="RadioButton">
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
-        <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="FileOpColumnHeaderStyle"

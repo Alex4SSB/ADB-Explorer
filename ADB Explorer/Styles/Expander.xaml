@@ -48,8 +48,10 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
+                <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
     </Style>
 
     <Style
@@ -59,8 +61,10 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
+                <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
     </Style>
 
     <Style
@@ -73,12 +77,19 @@
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
             </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                    <Condition Binding="{Binding ElementName=HeaderSite, Path=Tag}" Value="HideArrow" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
 
     <ControlTemplate x:Key="DefaultExpanderHeaderTemplate" TargetType="ToggleButton">
         <!--  Template copied from ModernWPF to be modified  -->
-        <Border Padding="{TemplateBinding Padding}">
+        <Border>
             <Grid Background="Transparent" SnapsToDevicePixels="False">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -86,7 +97,7 @@
                 </Grid.ColumnDefinitions>
                 <ui:FontIcon
                     x:Name="arrow"
-                    Margin="0,0,8,0"
+                    Margin="6,0,2,0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     FontSize="12"
@@ -102,6 +113,7 @@
                 <ui:ContentPresenterEx
                     x:Name="Content"
                     Grid.Column="1"
+                    Margin="6"
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center"
                     Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
@@ -156,15 +168,11 @@
                                 x:Name="HeaderBorder"
                                 MinWidth="0"
                                 MinHeight="0"
-                                Margin="0"
-                                Padding="0,6"
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{Binding ElementName=HeaderUpperBorder, Path=CornerRadius}"
                                 SnapsToDevicePixels="True">
                                 <ToggleButton
                                     x:Name="HeaderSite"
-                                    Margin="7,1,1,1"
-                                    Padding="{TemplateBinding Padding}"
                                     HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                     ui:FocusVisualHelper.FocusVisualMargin="-3"
@@ -246,6 +254,35 @@
                             <Setter TargetName="HeaderLowerBorder" Property="BorderBrush" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
                             <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="{DynamicResource ExpanderSideBorderMouseOver}" />
                         </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Margin" Value="1,1,1,0" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
+                                <Condition Binding="{Binding ElementName=ContentBorder, Path=Visibility}" Value="Visible" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
+                                <Condition Binding="{Binding ElementName=HeaderSite, Path=Tag}" Value="HideArrow" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
+                        </MultiDataTrigger>
                         <Trigger SourceName="ExpandSite" Property="Height" Value="0">
                             <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
@@ -271,5 +308,20 @@
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Background" Value="Transparent" />
+    </Style>
+
+    <Style
+        x:Key="DeviceExpanderStyle"
+        BasedOn="{StaticResource FluentExpanderStyle}"
+        TargetType="Expander">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

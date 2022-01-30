@@ -332,7 +332,7 @@
                         <Expander
                             x:Name="DeviceExpander"
                             IsExpanded="{Binding IsSelected, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                            Style="{StaticResource FluentExpanderStyle}"
+                            Style="{StaticResource DeviceExpanderStyle}"
                             Tag="HideArrow">
                             <Expander.Header>
                                 <Grid>
