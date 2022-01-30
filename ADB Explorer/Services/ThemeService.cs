@@ -9,6 +9,8 @@ namespace ADB_Explorer.Services
 {
     internal class ThemeService : INotifyPropertyChanged
     {
+        //https://medium.com/southworks/handling-dark-light-modes-in-wpf-3f89c8a4f2db
+
         private const string RegistryKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
         private const string RegistryValueName = "AppsUseLightTheme";
         private const string QueryPrefix = "SELECT * FROM RegistryValueChangeEvent WHERE Hive = 'HKEY_USERS' AND KeyPath";

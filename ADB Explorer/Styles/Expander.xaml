@@ -76,71 +76,68 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="ExpanderHeaderStyle" TargetType="ToggleButton">
+    <ControlTemplate x:Key="DefaultExpanderHeaderTemplate" TargetType="ToggleButton">
+        <!--  Template copied from ModernWPF to be modified  -->
+        <Border Padding="{TemplateBinding Padding}">
+            <Grid Background="Transparent" SnapsToDevicePixels="False">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon
+                    x:Name="arrow"
+                    Margin="0,0,8,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                    Glyph="&#xE70D;"
+                    RenderTransformOrigin="0.5, 0.5"
+                    SnapsToDevicePixels="false"
+                    Style="{StaticResource GlyphFont}">
+                    <ui:FontIcon.RenderTransform>
+                        <RotateTransform x:Name="ArrowRotateTransform" />
+                    </ui:FontIcon.RenderTransform>
+                </ui:FontIcon>
+                <ui:ContentPresenterEx
+                    x:Name="Content"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                    RecognizesAccessKey="True"
+                    SnapsToDevicePixels="True" />
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Trigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo180DegreesStoryboard}" />
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo0DegreesStoryboard}" />
+                </Trigger.ExitActions>
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="true">
+                <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+                <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="true">
+                <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </Trigger>
+            <Trigger Property="Tag" Value="HideArrow">
+                <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
 
-        <Setter Property="Template">
-            <!--  Template copied from ModernWPF to be modified  -->
-            <Setter.Value>
-                <ControlTemplate TargetType="ToggleButton">
-                    <Border Padding="{TemplateBinding Padding}">
-                        <Grid Background="Transparent" SnapsToDevicePixels="False">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <ui:FontIcon
-                                x:Name="arrow"
-                                Margin="0,0,8,0"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontSize="12"
-                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                Glyph="&#xE70D;"
-                                RenderTransformOrigin="0.5, 0.5"
-                                SnapsToDevicePixels="false"
-                                Style="{StaticResource GlyphFont}">
-                                <ui:FontIcon.RenderTransform>
-                                    <RotateTransform x:Name="ArrowRotateTransform" />
-                                </ui:FontIcon.RenderTransform>
-                            </ui:FontIcon>
-                            <ui:ContentPresenterEx
-                                x:Name="Content"
-                                Grid.Column="1"
-                                HorizontalAlignment="Stretch"
-                                VerticalAlignment="Center"
-                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                RecognizesAccessKey="True"
-                                SnapsToDevicePixels="True" />
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <Trigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource RotateTo180DegreesStoryboard}" />
-                            </Trigger.EnterActions>
-                            <Trigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource RotateTo0DegreesStoryboard}" />
-                            </Trigger.ExitActions>
-                        </Trigger>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-                        </Trigger>
-                        <Trigger Property="IsPressed" Value="true">
-                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="false">
-                            <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                            <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                        </Trigger>
-                        <Trigger Property="Tag" Value="HideArrow">
-                            <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+    <Style x:Key="ExpanderHeaderStyle" TargetType="ToggleButton">
+        <Setter Property="Template" Value="{StaticResource DefaultExpanderHeaderTemplate}" />
     </Style>
 
     <Style x:Key="ExpanderStyle" TargetType="Expander">

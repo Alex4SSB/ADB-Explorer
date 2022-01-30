@@ -95,8 +95,21 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="DeviceStatusFontSizeStyle"
+        x:Key="DeviceHeaderIcon"
         BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DeviceStatusFontSizeStyle"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Setter Property="FontSize" Value="28" />
     </Style>
@@ -211,6 +224,12 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding IsMdns}" Value="True">
                 <Setter Property="Text" Value="{Binding Device.IpAddress}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Text" Value="{Binding Name}" />
@@ -522,6 +541,24 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False">
                 <Setter Property="Height" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DeviceOpenIconStyle"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
+    </Style>
+    <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.Status}" Value="Online">
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

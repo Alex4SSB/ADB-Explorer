@@ -346,42 +346,21 @@
                                                 <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
                                             </Grid.Resources>
                                             <ui:FontIcon Glyph="{Binding TypeIcon}" />
-                                            <Grid>
-                                                <Grid.Style>
-                                                    <Style TargetType="Grid">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Device.Status}" Value="Online">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Grid.Style>
+                                            <Grid Style="{StaticResource DeviceStatusGridStyle}">
                                                 <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
                                                 <ui:FontIcon Foreground="{TemplateBinding Background}" Glyph="{Binding StatusIcon}" />
                                             </Grid>
                                         </Grid>
                                         <TextBlock
                                             Margin="4"
-                                            VerticalAlignment="Center"
                                             Style="{StaticResource DeviceNameTextBlockStyle}"
                                             TextTrimming="CharacterEllipsis" />
                                     </StackPanel>
                                     <ui:FontIcon
-                                        Margin="4"
+                                        Margin="4,0"
                                         HorizontalAlignment="Right"
-                                        Foreground="Gray"
-                                        Glyph="&#xE838;">
-                                        <ui:FontIcon.Style>
-                                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </Style>
-                                        </ui:FontIcon.Style>
-                                    </ui:FontIcon>
+                                        Glyph="&#xE838;"
+                                        Style="{StaticResource DeviceOpenIconStyle}" />
                                 </Grid>
                             </Expander.Header>
                             <StackPanel x:Name="DeviceExpandPanel" Margin="0,5">
@@ -838,7 +817,7 @@
                         SelectionUnit="FullRow"
                         Visibility="Collapsed">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn x:Name="Icon" CanUserResize="False">
+                            <DataGridTemplateColumn x:Name="IconColumn" CanUserResize="False">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -886,7 +865,7 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTemplateColumn
-                                x:Name="Name"
+                                x:Name="NameColumn"
                                 Width="300"
                                 Header="Name"
                                 SortMemberPath="FileName">
