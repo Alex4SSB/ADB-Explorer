@@ -81,5 +81,6 @@ namespace ADB_Explorer.Models
         public static readonly char[] ESCAPE_ADB_CHARS = { '$', '`', '"', '\\' };
 
         public static readonly Version MIN_ADB_VERSION = new(31, 0, 2);
+        public static readonly Version WIN11_VERSION = new(10, 0, 22000);
     }
 }

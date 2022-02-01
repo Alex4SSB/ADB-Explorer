@@ -79,7 +79,8 @@ namespace ADB_Explorer
 
         private readonly List<MenuItem> PathButtons = new();
 
-        public static bool UseFluentStyles => Environment.OSVersion.Version.Build > 21000;
+        private static bool ForceFluentStyles => Storage.RetrieveBool(UserPrefs.forceFluentStyles) == true;
+        public static bool UseFluentStyles => Environment.OSVersion.Version > WIN11_VERSION || ForceFluentStyles;
 
         private void GetExplorerContentPresenter()
         {
@@ -130,8 +131,7 @@ namespace ADB_Explorer
         {
             Dispatcher.Invoke(() =>
             {
-                if (SettingsTheme() is AppTheme.windowsDefault)
-                    SetTheme(themeService.WindowsTheme);
+                SetTheme();
             });
         }
 
@@ -230,7 +230,12 @@ namespace ADB_Explorer
                 Storage.StoreValue(SystemVals.detailedHeight, FileOpDetailedGrid.Height);
         }
 
-        private void SetTheme() => SetTheme((ApplicationTheme)ThemeManager.Current.ApplicationTheme);
+        private void SetTheme()
+        {
+            SetTheme(SettingsTheme() is AppTheme.windowsDefault
+                ? themeService.WindowsTheme
+                : ThemeManager.Current.ApplicationTheme.Value);
+        }
 
         private void SetTheme(ApplicationTheme theme)
         {
@@ -462,6 +467,9 @@ namespace ADB_Explorer
                 AppTheme.windowsDefault => themeService.WindowsTheme,
                 _ => throw new NotImplementedException(),
             });
+
+            if (Storage.RetrieveBool(UserPrefs.forceFluentStyles) is bool forceFluent)
+                ForceFluentStylesCheckbox.IsChecked = forceFluent;
 
             if (Storage.RetrieveValue(UserPrefs.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
@@ -1953,8 +1961,13 @@ namespace ADB_Explorer
 
         private void DefaultThemeRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            themeService.WatchTheme();
             SetTheme(themeService.WindowsTheme);
+        }
+
+        private void ForceFluentStylesCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            SetTheme();
+            Storage.StoreValue(UserPrefs.forceFluentStyles, ForceFluentStylesCheckbox.IsChecked);
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

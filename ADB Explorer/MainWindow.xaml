@@ -1861,6 +1861,25 @@
                                             x:Name="DefaultThemeRadioButton"
                                             Checked="DefaultThemeRadioButton_Checked"
                                             Content="Windows Default" />
+                                        <CheckBox
+                                            x:Name="ForceFluentStylesCheckbox"
+                                            Checked="ForceFluentStylesCheckbox_Checked"
+                                            Unchecked="ForceFluentStylesCheckbox_Checked">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Force Fluent Styles" />
+                                                <Grid Margin="10,0">
+                                                    <Grid.Resources>
+                                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                                            <Setter Property="FontSize" Value="18" />
+                                                            <Setter Property="ToolTip" Value="App Restart Required" />
+                                                        </Style>
+                                                    </Grid.Resources>
+                                                    <ui:FontIcon Glyph="&#xF83E;" />
+                                                    <ui:FontIcon Glyph="&#xF83F;" />
+                                                    <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}" Glyph="&#xEA84;" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </CheckBox>
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />

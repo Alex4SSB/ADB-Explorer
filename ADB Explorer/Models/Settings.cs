@@ -14,6 +14,7 @@
         showExtendedView,
         enableMdns,
         manualAdbPath,
+        forceFluentStyles,
     }
 
     public enum SystemVals
