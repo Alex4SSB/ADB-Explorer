@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
@@ -321,119 +322,110 @@
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
         </Style>
-        <Style
-            x:Key="DeviceStyle"
-            BasedOn="{StaticResource BaseDeviceStyle}"
-            TargetType="ui:ListViewItem">
-            <EventSetter Event="PreviewMouseDown" Handler="DeviceStyle_PreviewMouseDown" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ui:ListViewItem">
-                        <Expander
-                            x:Name="DeviceExpander"
-                            IsExpanded="{Binding IsSelected, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
-                            Style="{StaticResource DeviceExpanderStyle}"
-                            Tag="HideArrow">
-                            <Expander.Header>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
-                                        <Grid>
-                                            <Grid.Resources>
-                                                <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                                            </Grid.Resources>
-                                            <ui:FontIcon Glyph="{Binding TypeIcon}" />
-                                            <Grid Style="{StaticResource DeviceStatusGridStyle}">
-                                                <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                                                <ui:FontIcon Foreground="{TemplateBinding Background}" Glyph="{Binding StatusIcon}" />
-                                            </Grid>
-                                        </Grid>
-                                        <TextBlock
-                                            Margin="4"
-                                            Style="{StaticResource DeviceNameTextBlockStyle}"
-                                            TextTrimming="CharacterEllipsis" />
-                                    </StackPanel>
-                                    <ui:FontIcon
-                                        Margin="4,0"
-                                        HorizontalAlignment="Right"
-                                        Glyph="&#xE838;"
-                                        Style="{StaticResource DeviceOpenIconStyle}" />
+        <DataTemplate x:Key="DeviceDataTemplate" DataType="Device">
+            <Expander
+                x:Name="DeviceExpander"
+                IsExpanded="{Binding DeviceSelected, Mode=TwoWay}"
+                Style="{StaticResource DeviceExpanderStyle}"
+                Tag="HideArrow">
+                <Expander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
+                            <Grid>
+                                <Grid.Resources>
+                                    <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
+                                </Grid.Resources>
+                                <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                                <Grid Style="{StaticResource DeviceStatusGridStyle}">
+                                    <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
+                                    <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
                                 </Grid>
-                            </Expander.Header>
-                            <StackPanel x:Name="DeviceExpandPanel" Margin="0,5">
+                            </Grid>
+                            <TextBlock
+                                Margin="4"
+                                Style="{StaticResource DeviceNameTextBlockStyle}"
+                                TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                        <ui:FontIcon
+                            Margin="4,0"
+                            HorizontalAlignment="Right"
+                            Glyph="&#xE838;"
+                            Style="{StaticResource DeviceOpenIconStyle}" />
+                        <helpers:FluentForwarder x:Name="MainWin" />
+                    </Grid>
+                </Expander.Header>
+                <StackPanel x:Name="DeviceExpandPanel" Margin="0,5">
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            ui:ControlHelper.PlaceholderText="Pairing Code"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            KeyDown="PairingCodeTextBox_KeyDown"
+                            Style="{StaticResource PairingTextBoxStyle}"
+                            Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            TextChanged="PairingCodeTextBox_TextChanged" />
+                        <Button
+                            Grid.Column="1"
+                            Margin="6,0,0,0"
+                            ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
+                            Click="PairServiceButton_Click"
+                            Content="Pair">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding UIPairingCode.Length}" Value="11">
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="IsEnabled" Value="False" />
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </Grid>
+                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                        <Button
+                            x:Name="OpenDeviceButton"
+                            Margin="8,0"
+                            Click="OpenDeviceButton_Click"
+                            Content="Browse"
+                            Style="{StaticResource DeviceBrowseButtonStyle}" />
+                        <Button
+                            x:Name="DisconnectDeviceButton"
+                            Click="DisconnectDeviceButton_Click"
+                            Style="{StaticResource DeviceRemoveButtonStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:FontIcon
+                                    Margin="-4,1,4,-2"
+                                    VerticalAlignment="Center"
+                                    Glyph="&#xECC9;"
+                                    Style="{DynamicResource DisabledButtonGlyphStyle}" />
                                 <Grid>
-                                    <Grid.Style>
-                                        <Style TargetType="Grid">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsMdns}" Value="True">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </Style>
-                                    </Grid.Style>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox
-                                        ui:ControlHelper.PlaceholderText="Pairing Code"
-                                        ui:TextBoxHelper.IsDeleteButtonVisible="False"
-                                        KeyDown="PairingCodeTextBox_KeyDown"
-                                        Style="{StaticResource PairingTextBoxStyle}"
-                                        Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                        TextChanged="PairingCodeTextBox_TextChanged" />
-                                    <Button
-                                        Grid.Column="1"
-                                        Margin="6,0,0,0"
-                                        ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
-                                        Click="PairServiceButton_Click"
-                                        Content="Pair">
-                                        <Button.Style>
-                                            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding UIPairingCode.Length}" Value="11">
-                                                        <Setter Property="IsEnabled" Value="True" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="IsEnabled" Value="False" />
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
+                                    <TextBlock Text="Remove" Visibility="Hidden" />
+                                    <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
                                 </Grid>
-                                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                    <Button
-                                        x:Name="OpenDeviceButton"
-                                        Margin="8,0"
-                                        Click="OpenDeviceButton_Click"
-                                        Content="Browse"
-                                        Style="{StaticResource DeviceBrowseButtonStyle}" />
-                                    <Button
-                                        x:Name="DisconnectDeviceButton"
-                                        Click="DisconnectDeviceButton_Click"
-                                        Style="{StaticResource DeviceRemoveButtonStyle}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <ui:FontIcon
-                                                Margin="-4,1,4,-2"
-                                                VerticalAlignment="Center"
-                                                Glyph="&#xECC9;"
-                                                Style="{DynamicResource DisabledButtonGlyphStyle}" />
-                                            <Grid>
-                                                <TextBlock Text="Remove" Visibility="Hidden" />
-                                                <TextBlock Style="{StaticResource RemoveDeviceButtonStyle}" />
-                                            </Grid>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
                             </StackPanel>
-                        </Expander>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Expander>
+        </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo
@@ -474,7 +466,7 @@
                                     Margin="0,0,-10,-12"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
-                                    Text="{Binding ElementName=DevicesList, Path=Items.Count}" />
+                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count}" />
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
@@ -1568,7 +1560,7 @@
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </Style>
                                     </Grid.Style>
-                                    <StackPanel x:Name="QrPairingPanel">
+                                    <StackPanel x:Name="QrPairingPanel" Margin="-6,-6,-6,-8">
                                         <StackPanel.Style>
                                             <Style TargetType="StackPanel">
                                                 <Style.Triggers>
@@ -1583,10 +1575,12 @@
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </Style>
                                         </StackPanel.Style>
-                                        <Image
-                                            x:Name="PairingQrImage"
-                                            Margin="0,6,0,0"
-                                            RenderOptions.EdgeMode="Aliased" />
+                                        <Border Style="{StaticResource QrBackgroundStyle}">
+                                            <Image
+                                                x:Name="PairingQrImage"
+                                                Margin="6"
+                                                RenderOptions.EdgeMode="Aliased" />
+                                        </Border>
                                     </StackPanel>
                                     <StackPanel x:Name="MdnsLoadingPanel">
                                         <StackPanel.Style>
@@ -1762,15 +1756,36 @@
                                 FontSize="24"
                                 Text="Devices" />
                         </Grid>
-                        <ui:ListView
-                            x:Name="DevicesList"
+                        <ScrollViewer
                             Grid.Row="2"
-                            DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
-                            IsSelectionEnabled="False"
-                            ItemContainerStyle="{StaticResource DeviceStyle}"
-                            ItemsSource="{Binding UIList}"
-                            MouseDown="DevicesList_MouseDown"
-                            ScrollViewer.CanContentScroll="False" />
+                            Margin="0,0,-6,0"
+                            HorizontalScrollBarVisibility="Disabled">
+                            <Grid Grid.Row="2">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ScrollViewer, Mode=FindAncestor}, Path=ScrollableHeight}" Value="0">
+                                                <Setter Property="Margin" Value="0,0,6,0" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Margin" Value="0,0,18,0" />
+                                    </Style>
+                                </Grid.Style>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <ui:ItemsRepeater
+                                    x:Name="DevicesList"
+                                    DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
+                                    ItemTemplate="{StaticResource DeviceDataTemplate}"
+                                    ItemsSource="{Binding UIList}" />
+                                <Border
+                                    Grid.Row="1"
+                                    Background="Transparent"
+                                    MouseDown="Border_MouseDown" />
+                            </Grid>
+                        </ScrollViewer>
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>
@@ -1864,19 +1879,23 @@
                                         <CheckBox
                                             x:Name="ForceFluentStylesCheckbox"
                                             Checked="ForceFluentStylesCheckbox_Checked"
+                                            Style="{StaticResource ForceFluentVisibility}"
                                             Unchecked="ForceFluentStylesCheckbox_Checked">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Force Fluent Styles" />
                                                 <Grid Margin="10,0">
                                                     <Grid.Resources>
                                                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                                            <Setter Property="FontSize" Value="18" />
+                                                            <Setter Property="FontSize" Value="22" />
                                                             <Setter Property="ToolTip" Value="App Restart Required" />
                                                         </Style>
                                                     </Grid.Resources>
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
-                                                    <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}" Glyph="&#xEA84;" />
+                                                    <ui:FontIcon
+                                                        Margin="4,0,0,0"
+                                                        Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                        Glyph="&#xEA84;" />
                                                 </Grid>
                                             </StackPanel>
                                         </CheckBox>

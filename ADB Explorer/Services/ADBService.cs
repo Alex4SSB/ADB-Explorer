@@ -193,11 +193,11 @@ namespace ADB_Explorer.Services
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
 
             return DEVICE_NAME_RE.Matches(stdout).Select(
-                m => new LogicalDevice(
+                m => LogicalDevice.New(
                     name: LogicalDevice.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                     id: m.Groups["id"].Value,
                     status: m.Groups["status"].Value)
-                );
+                ).Where(d => d);
         }
 
         public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");

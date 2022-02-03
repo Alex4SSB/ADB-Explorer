@@ -11,9 +11,9 @@ namespace ADB_Explorer.Models
     {
         public Dispatcher Dispatcher { get; }
 
-        public MyObservableCollection<FileOperation> PendingOperations { get; } = new();
-        public MyObservableCollection<FileOperation> CurrentOperations { get; } = new();
-        public MyObservableCollection<FileOperation> CompletedOperations { get; } = new();
+        public ObservableList<FileOperation> PendingOperations { get; } = new();
+        public ObservableList<FileOperation> CurrentOperations { get; } = new();
+        public ObservableList<FileOperation> CompletedOperations { get; } = new();
 
         public FileOperation CurrentOperation
         {

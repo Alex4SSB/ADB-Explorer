@@ -283,6 +283,9 @@
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
                         </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=HeaderSite, Path=Tag}" Value="HideArrow">
+                            <Setter TargetName="DockPanel" Property="Margin" Value="0,1" />
+                        </DataTrigger>
                         <Trigger SourceName="ExpandSite" Property="Height" Value="0">
                             <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />

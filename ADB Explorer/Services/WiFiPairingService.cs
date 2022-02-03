@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Windows.Media;
@@ -78,7 +79,10 @@ namespace ADB_Explorer.Services
                 }
             }
 
-            return mdnsServices;
+            if (!DISPLAY_OFFLINE_SERVICES)
+                return mdnsServices.Where(s => !string.IsNullOrEmpty(s.PairingPort));
+            else
+                return mdnsServices;
         }
     }
 }

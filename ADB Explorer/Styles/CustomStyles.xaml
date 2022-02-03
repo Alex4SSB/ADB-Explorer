@@ -5,7 +5,7 @@
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
-                <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
@@ -75,10 +75,6 @@
             </Trigger>
         </Style.Triggers>
         <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-    <Style x:Key="BaseDeviceStyle" TargetType="ui:ListViewItem">
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="Margin" Value="0,1" />
     </Style>
     <Style x:Key="DisabledTextBlockStyle" TargetType="TextBlock">
         <Style.Triggers>
@@ -222,6 +218,14 @@
             <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
                 <Setter Property="Text" Value="{Binding ID}" />
             </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Device.Type}" Value="Service" />
+                    <Condition Binding="{Binding IsMdns}" Value="False" />
+                    <Condition Binding="{Binding Name}" Value="" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Text" Value="[Service]" />
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding IsMdns}" Value="True">
                 <Setter Property="Text" Value="{Binding Device.IpAddress}" />
             </DataTrigger>
@@ -569,5 +573,25 @@
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ForceFluentVisibility"
+        BasedOn="{StaticResource CheckBoxStyle}"
+        TargetType="CheckBox">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="QrBackgroundStyle" TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+                <Setter Property="CornerRadius" Value="0,0,5,5" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Background" Value="#FFFBFBFB" />
+        <Setter Property="Margin" Value="0,6,0,0" />
     </Style>
 </ResourceDictionary>

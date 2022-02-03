@@ -222,15 +222,13 @@ namespace ADB_Explorer.Services
 
             public bool IsDirectory(string path)
             {
-                string stdout, stderr;
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "cd", out stdout, out stderr, EscapeAdbShellString(path));
+                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "cd", out string stdout, out string stderr, EscapeAdbShellString(path));
                 return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
             }
 
             public string TranslateDevicePath(string path)
             {
-                string stdout, stderr;
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "cd", out stdout, out stderr, EscapeAdbShellString(path), "&&", "pwd");
+                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "cd", out string stdout, out string stderr, EscapeAdbShellString(path), "&&", "pwd");
                 if (exitCode != 0)
                 {
                     throw new Exception(stderr);
@@ -250,12 +248,12 @@ namespace ADB_Explorer.Services
                 var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
                 var drives = match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
 
-                if (drives.Count(d => d.Type == DriveType.Internal) == 0)
+                if (!drives.Any(d => d.Type == DriveType.Internal))
                 {
                     drives.Insert(0, new(path: AdbExplorerConst.DEFAULT_PATH));
                 }
 
-                if (drives.Count(d => d.Type == DriveType.Root) == 0)
+                if (!drives.Any(d => d.Type == DriveType.Root))
                 {
                     drives.Insert(0, new(path: "/"));
                 }

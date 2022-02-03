@@ -71,7 +71,7 @@ namespace ADB_Explorer.Models
         public static readonly SolidColorBrush QR_BACKGROUND_LIGHT = new(Colors.Transparent);
         public static readonly SolidColorBrush QR_FOREGROUND_LIGHT = new(Color.FromRgb(40, 40, 40));
         public static readonly SolidColorBrush QR_BACKGROUND_DARK = new(Colors.Transparent);
-        public static readonly SolidColorBrush QR_FOREGROUND_DARK = new(Color.FromRgb(242, 242, 242));
+        public static readonly SolidColorBrush QR_FOREGROUND_DARK = new(Color.FromRgb(40, 40, 40));
 
         public static readonly char[] ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
         public static readonly string PAIRING_SERVICE_PREFIX = "adbexplorer-";
@@ -82,5 +82,7 @@ namespace ADB_Explorer.Models
 
         public static readonly Version MIN_ADB_VERSION = new(31, 0, 2);
         public static readonly Version WIN11_VERSION = new(10, 0, 22000);
+
+        public static readonly bool DISPLAY_OFFLINE_SERVICES = false;
     }
 }

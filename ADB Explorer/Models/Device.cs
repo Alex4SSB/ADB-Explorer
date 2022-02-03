@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Services;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,8 +36,8 @@ namespace ADB_Explorer.Models
 
     public class Devices : AbstractDevice
     {
-        private List<UIDevice> uiDevices = new();
-        public List<UIDevice> UIList
+        private ObservableList<UIDevice> uiDevices = new();
+        public ObservableList<UIDevice> UIList
         {
             get { return uiDevices; }
             private set
@@ -62,7 +63,7 @@ namespace ADB_Explorer.Models
 
         public LogicalDevice CurrentDevice => (LogicalDevice)Current?.Device;
 
-        public UIDevice SelectedDevice => UIList?.Find(device => device.IsSelected);
+        public UIDevice SelectedDevice => UIList?.Find(device => device.DeviceSelected);
 
         public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
 
@@ -74,7 +75,7 @@ namespace ADB_Explorer.Models
 
         public void UpdateServices(IEnumerable<ServiceDevice> other) => UpdateServices(UIList, other);
 
-        public static void UpdateServices(List<UIDevice> self, IEnumerable<ServiceDevice> other)
+        public static void UpdateServices(ObservableList<UIDevice> self, IEnumerable<ServiceDevice> other)
         {
             self.RemoveAll(thisDevice => thisDevice is UIServiceDevice && !other.Any(otherDevice => otherDevice.ID == thisDevice.Device.ID));
 
@@ -96,7 +97,7 @@ namespace ADB_Explorer.Models
 
         public bool UpdateDevices(IEnumerable<LogicalDevice> other) => UpdateDevices(UIList, other, Current);
 
-        public static bool UpdateDevices(List<UIDevice> self, IEnumerable<LogicalDevice> other, UILogicalDevice current)
+        public static bool UpdateDevices(ObservableList<UIDevice> self, IEnumerable<LogicalDevice> other, UILogicalDevice current)
         {
             bool isCurrentTypeUpdated = false;
 
@@ -162,7 +163,7 @@ namespace ADB_Explorer.Models
 
             // if the list is empty, we need to update (and remove all items)
             if (!other.Any())
-                return true;
+                return ServiceDevices.Any();
 
             // if there's any service whose ID is not found in any logical device,
             // AND an ordering of both new and old lists doesn't match up all IDs
@@ -179,7 +180,7 @@ namespace ADB_Explorer.Models
 
         public void ConsolidateDevices() => ConsolidateDevices(UIList);
 
-        public static void ConsolidateDevices(List<UIDevice> devices)
+        public static void ConsolidateDevices(ObservableList<UIDevice> devices)
         {
             foreach (var device in devices.OfType<UILogicalDevice>().ToList())
             {
@@ -272,10 +273,10 @@ namespace ADB_Explorer.Models
         public Device Device { get; protected set; }
 
         private bool isSelected;
-        public bool IsSelected
+        public bool DeviceSelected
         {
             get { return isSelected; }
-            protected set
+            set
             {
                 isSelected = value;
                 NotifyPropertyChanged();
@@ -300,15 +301,15 @@ namespace ADB_Explorer.Models
             _ => throw new NotImplementedException(),
         };
 
-        public void SetSelected(List<UIDevice> devices, bool selectedState = true)
+        public void SetSelected(ObservableList<UIDevice> devices, bool selectedState = true)
         {
-            devices.ForEach(device => device.IsSelected =
+            devices.ForEach(device => device.DeviceSelected =
                 device.Equals(this) && selectedState);
         }
 
-        public static void SetSelected(List<UIDevice> devices)
+        public static void SetSelected(ObservableList<UIDevice> devices)
         {
-            devices.ForEach(device => device.IsSelected = false);
+            devices.ForEach(device => device.DeviceSelected = false);
         }
 
         public static implicit operator bool(UIDevice obj) => obj?.Device;
@@ -357,16 +358,21 @@ namespace ADB_Explorer.Models
 
         public string BaseID => Type == DeviceType.Service ? ID.Split('.')[0] : ID;
 
-        public LogicalDevice(string name, string id)
+        private LogicalDevice(string name, string id)
         {
             Name = name;
             ID = id;
         }
 
-        public LogicalDevice(string name, string id, string status) : this(name, id)
+        public static LogicalDevice New(string name, string id, string status)
         {
-            Type = GetType(id, status);
-            Status = GetStatus(status);
+            var deviceType = GetType(id, status);
+            var deviceStatus = GetStatus(status);
+
+            if (!AdbExplorerConst.DISPLAY_OFFLINE_SERVICES && deviceType is DeviceType.Service && deviceStatus is DeviceStatus.Offline)
+                return null;
+
+            return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus };
         }
 
         private static DeviceStatus GetStatus(string status)

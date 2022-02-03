@@ -399,6 +399,7 @@ namespace ADB_Explorer
             LoadSettings();
 
             TestCurrentOperation();
+            TestDevices();
         }
 
         private void DeviceListSetup(IEnumerable<LogicalDevice> devices = null, string selectedAddress = "")
@@ -444,7 +445,7 @@ namespace ADB_Explorer
 
         private void LoadSettings()
         {
-            Title = Properties.Resources.AppDisplayName;
+            Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
 
             if (Storage.RetrieveValue(UserPrefs.manualAdbPath) is string adbPath)
                 ManualAdbPath.Text = adbPath;
@@ -589,7 +590,6 @@ namespace ADB_Explorer
             if (devices is not null && DevicesObject.DevicesChanged(devices))
             {
                 DeviceListSetup(devices);
-                DevicesList.Items.Refresh();
             }
         }
 
@@ -605,8 +605,6 @@ namespace ADB_Explorer
 
                 if (qrServices.Any() && PairService(qrServices.First()))
                     PairingExpander.IsExpanded = false;
-
-                DevicesList.Items.Refresh();
             }
         }
 
@@ -1101,11 +1099,16 @@ namespace ADB_Explorer
 
         private void TestCurrentOperation()
         {
-            fileOperationQueue.Clear();
-
+            //fileOperationQueue.Clear();
             //fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "Shalom.exe"));
             //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "Shalom.exe"));
             //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Shalom"));
+        }
+
+        private void TestDevices()
+        {
+            //ConnectTimer.IsEnabled = false;
+            //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "offline") });
         }
 
         private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
@@ -1273,7 +1276,6 @@ namespace ADB_Explorer
                 CurrentADBDevice = new(device.Device.ID);
 
                 ClearExplorer();
-                DevicesList.Items.Refresh();
                 InitDevice();
 
                 DevicesSplitView.IsPaneOpen = false;
@@ -1315,7 +1317,6 @@ namespace ADB_Explorer
                 CurrentADBDevice = null;
             }
             DeviceListSetup();
-            DevicesList.Items.Refresh();
         }
 
         private void ClearExplorer()
@@ -1347,7 +1348,6 @@ namespace ADB_Explorer
         {
             PairingExpander.IsExpanded = false;
             DevicesObject.UnselectAll();
-            DevicesList.Items.Refresh();
         }
 
         private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)
@@ -1374,14 +1374,12 @@ namespace ADB_Explorer
 
         private void SelectDevice(object sender)
         {
-            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.IsSelected)
+            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.DeviceSelected)
             {
                 if (device is UIServiceDevice service && (PasswordConnectionRadioButton.IsChecked == false || string.IsNullOrEmpty(((ServiceDevice)service.Device).PairingPort)))
                     return;
 
-
                 DevicesObject.SetSelected(device);
-                //DevicesList.Items.Refresh();
             }
         }
 
@@ -1432,12 +1430,6 @@ namespace ADB_Explorer
             }
             else
                 InitializeExplorerContextMenu(MenuType.EmptySpace);
-        }
-
-        private void DevicesList_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            DevicesObject.UnselectAll();
-            DevicesList.Items.Refresh();
         }
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
@@ -1672,7 +1664,7 @@ namespace ADB_Explorer
             {
                 MdnsService.State = MDNS.MdnsState.Disabled;
                 DevicesObject.UIList.RemoveAll(device => device is UIServiceDevice);
-                DevicesList?.Items.Refresh();
+                //DevicesList?.Items.Refresh();
             }
 
             if (QrConnectionRadioButton?.IsChecked == true)
@@ -1839,7 +1831,6 @@ namespace ADB_Explorer
                 PairingExpander.IsExpanded = false;
                 DevicesObject.UnselectAll();
                 DevicesObject.ConsolidateDevices();
-                DevicesList.Items.Refresh();
             }
         }
 
@@ -1946,7 +1937,6 @@ namespace ADB_Explorer
         private void PairingExpander_Expanded(object sender, RoutedEventArgs e)
         {
             DevicesObject.UnselectAll();
-            DevicesList.Items.Refresh();
 
             if (PairingExpander.IsExpanded)
             {
@@ -1968,6 +1958,11 @@ namespace ADB_Explorer
         {
             SetTheme();
             Storage.StoreValue(UserPrefs.forceFluentStyles, ForceFluentStylesCheckbox.IsChecked);
+        }
+
+        private void Border_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            DevicesObject.UnselectAll();
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
