@@ -1,7 +1,9 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+    <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
@@ -358,11 +360,55 @@
             </TextBlock>
         </Grid>
     </DataTemplate>
+    <DataTemplate x:Key="FileOpSourcePathTemplate">
+        <TextBlock
+            Margin="4,0"
+            Text="{Binding FilePath}"
+            TextTrimming="CharacterEllipsis" />
+    </DataTemplate>
+    <DataTemplate x:Key="FileOpTargetPathTemplate">
+        <TextBlock
+            Margin="4,0"
+            Text="{Binding TargetPath}"
+            TextTrimming="CharacterEllipsis" />
+    </DataTemplate>
     <DataTemplate x:Key="FileOpStatusTemplate">
         <TextBlock
             Margin="4,0"
             Text="{Binding Status}"
             TextTrimming="CharacterEllipsis" />
+    </DataTemplate>
+    <Style x:Key="CompletedOperationsProgressStyle" TargetType="ui:ProgressBar">
+        <Style.Triggers>
+            <Trigger Property="Value" Value="100">
+                <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="Foreground" Value="{StaticResource SystemControlErrorTextForegroundBrush}" />
+    </Style>
+    <DataTemplate x:Key="FileOpCompletedInfoTemplate">
+        <Grid Margin="4,0">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="100" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="4,0"
+                    Text="{Binding StatusInfo.FileCountCompleted}"
+                    TextTrimming="CharacterEllipsis" />
+            </Grid>
+            <TextBlock
+                Grid.Row="1"
+                Text="{Binding StatusInfo, Converter={StaticResource CompletedStatsConverter}}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
     </DataTemplate>
     <DataTemplate x:Key="FileOpProgressTemplate">
         <Grid Margin="4,0">

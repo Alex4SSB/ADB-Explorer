@@ -1051,6 +1051,14 @@
                                             MinWidth="100"
                                             CellTemplate="{StaticResource FileOpProgressTemplate}"
                                             Header="Progress" />
+                                        <DataGridTemplateColumn
+                                            Width="300"
+                                            CellTemplate="{StaticResource FileOpSourcePathTemplate}"
+                                            Header="Source Path" />
+                                        <DataGridTemplateColumn
+                                            Width="300"
+                                            CellTemplate="{StaticResource FileOpTargetPathTemplate}"
+                                            Header="Destination Path" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                                 <ui:FontIcon
@@ -1101,7 +1109,7 @@
                                     Glyph="&#xECC5;"
                                     ToolTip="Pending" />
                             </Grid>
-                            <Grid>
+                            <Grid Margin="0,0,0,20">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition />
@@ -1149,6 +1157,10 @@
                                             Width="Auto"
                                             CellTemplate="{StaticResource FileOpStatusTemplate}"
                                             Header="Status" />
+                                        <DataGridTemplateColumn
+                                            MinWidth="100"
+                                            CellTemplate="{StaticResource FileOpCompletedInfoTemplate}"
+                                            Header="Progress" />
                                     </DataGrid.Columns>
                                 </DataGrid>
                                 <ui:FontIcon

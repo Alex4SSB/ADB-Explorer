@@ -89,7 +89,7 @@ namespace ADB_Explorer.Services
                 }
             }
 
-            public string AverateRateString
+            public string AverageRateString
             {
                 get
                 {

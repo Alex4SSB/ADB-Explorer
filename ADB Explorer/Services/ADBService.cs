@@ -21,7 +21,7 @@ namespace ADB_Explorer.Services
             {
                 if (adbPath == "")
                 {
-                    adbPath = Storage.RetrieveValue(UserPrefs.manualAdbPath) is string path ? path : "adb";
+                    adbPath = Storage.RetrieveValue(UserPrefs.manualAdbPath) is string path ? $"\"{path}\"" : "adb";
                 }
                 return adbPath;
             }
@@ -65,7 +65,7 @@ namespace ADB_Explorer.Services
             var cmdProcess = new Process();
             InitProcess(cmdProcess);
             cmdProcess.StartInfo.FileName = file;
-            cmdProcess.StartInfo.Arguments = string.Join(' ', new[] { cmd }.Concat(args));
+            cmdProcess.StartInfo.Arguments = $"{cmd} {string.Join(' ', args)}";
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
             cmdProcess.StartInfo.StandardErrorEncoding = encoding;
             

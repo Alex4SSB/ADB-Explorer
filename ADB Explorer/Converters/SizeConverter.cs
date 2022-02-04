@@ -19,10 +19,46 @@ namespace ADB_Explorer.Converters
             if (milli is null)
                 return "";
 
-            int scale = (milli == 0) ? 0 : Convert.ToInt32(Math.Floor(Math.Round(Math.Log((double)milli, 1000), 2)));
-            double value = (double)milli / Math.Pow(1000, scale);
+            TimeSpan span = TimeSpan.FromSeconds((double)milli);
+            string resolution;
+            string value;
 
-            return $"{value}{(scaleSpace ? " " : "")}{scale_table[scale]}S";
+            if (span.Days == 0)
+            {
+                if (span.Hours == 0)
+                {
+                    if (span.Minutes == 0)
+                    {
+                        if (span.Seconds == 0)
+                        {
+                            value = $"{Math.Round(span.TotalMilliseconds, span.TotalMilliseconds < 100 ? 2 : 1)}";
+                            resolution = "mS";
+                        }
+                        else
+                        {
+                            value = $"{Math.Round(span.TotalSeconds, 2)}";
+                            resolution = "s";
+                        }
+                    }
+                    else
+                    {
+                        value = $"{span.Minutes}:{span.Seconds:00}";
+                        resolution = "m";
+                    }
+                }
+                else
+                {
+                    value = $"{span.Hours}:{span.Minutes:00}:{span.Seconds:00}";
+                    resolution = "h";
+                }
+            }
+            else
+            {
+                value = $"{Math.Round(span.TotalHours)}";
+                resolution = "h";
+            }
+
+            return $"{value}{(scaleSpace ? " " : "")}{resolution}";
         }
     }
 }
