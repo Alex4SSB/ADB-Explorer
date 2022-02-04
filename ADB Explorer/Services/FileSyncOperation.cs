@@ -4,6 +4,7 @@ using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -45,7 +46,9 @@ namespace ADB_Explorer.Services
             public int? TotalPercentage => adbInfo?.TotalPercentage;
             public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
             public UInt64? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
-            public string CurrentFileName => adbInfo?.CurrentFile;
+            public string CurrentFilePath => adbInfo?.CurrentFile;
+            public string CurrentFileName => Path.GetFileName(CurrentFilePath);
+            public string CurrentFileNameWithoutExtension => Path.GetFileNameWithoutExtension(CurrentFilePath);
 
             public string TotalProgress
             {
@@ -80,8 +83,9 @@ namespace ADB_Explorer.Services
             public decimal? AverageRateMBps => adbInfo.AverageRate;
             public UInt64? TotalBytes => adbInfo.TotalBytes;
             public decimal? TotalSeconds => adbInfo.TotalTime;
+            public int FileCountCompletedRate => (int)((float)FilesTransferred / (FilesTransferred + FilesSkipped) * 100.0);
 
-            public string FileCountCompleted
+            public string FileCountCompletedString
             {
                 get
                 {
