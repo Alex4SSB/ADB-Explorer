@@ -28,9 +28,9 @@ namespace ADB_Explorer.Models
             }
             set
             {
-                if (value != this.fileName)
+                if (value != fileName)
                 {
-                    this.fileName = value;
+                    fileName = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -45,9 +45,9 @@ namespace ADB_Explorer.Models
             }
             set
             {
-                if (value != this.path)
+                if (value != path)
                 {
-                    this.path = value;
+                    path = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -62,9 +62,9 @@ namespace ADB_Explorer.Models
             }
             set
             {
-                if (value != this.type)
+                if (value != type)
                 {
-                    this.type = value;
+                    type = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -79,9 +79,9 @@ namespace ADB_Explorer.Models
             }
             set
             {
-                if (value != this.size)
+                if (value != size)
                 {
-                    this.size = value;
+                    size = value;
                     NotifyPropertyChanged();
                 }
             }
@@ -96,9 +96,9 @@ namespace ADB_Explorer.Models
             }
             set
             {
-                if (value != this.modifiedTime)
+                if (value != modifiedTime)
                 {
-                    this.modifiedTime = value;
+                    modifiedTime = value;
                     NotifyPropertyChanged();
                 }
             }
