@@ -316,7 +316,7 @@
                 <ui:FontIcon.Style>
                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding StatusInfo.CurrentFile}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -336,25 +336,37 @@
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding StatusInfo.CurrentFile}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Completed">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
+                        <Setter Property="Visibility" Value="Visible" />
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="1"
-                Text="{Binding StatusInfo.CurrentFile}"
+                Text="{Binding StatusInfo.CurrentFileName}"
                 TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding StatusInfo.CurrentFile}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
+                                <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Completed">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
@@ -363,7 +375,7 @@
     <DataTemplate x:Key="FileOpSourcePathTemplate">
         <TextBlock
             Margin="4,0"
-            Text="{Binding FilePath}"
+            Text="{Binding ParentPath}"
             TextTrimming="CharacterEllipsis" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
@@ -397,11 +409,11 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="100" />
+                <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding StatusInfo.FileCountCompletedRate, Mode=OneWay}" />
                 <TextBlock
                     Grid.Column="1"
                     Margin="4,0"
-                    Text="{Binding StatusInfo.FileCountCompleted}"
+                    Text="{Binding StatusInfo.FileCountCompletedString}"
                     TextTrimming="CharacterEllipsis" />
             </Grid>
             <TextBlock

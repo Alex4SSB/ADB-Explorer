@@ -1158,6 +1158,7 @@
                                             CellTemplate="{StaticResource FileOpStatusTemplate}"
                                             Header="Status" />
                                         <DataGridTemplateColumn
+                                            Width="180"
                                             MinWidth="100"
                                             CellTemplate="{StaticResource FileOpCompletedInfoTemplate}"
                                             Header="Progress" />

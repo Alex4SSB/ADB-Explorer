@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 
@@ -23,12 +24,13 @@ namespace ADB_Explorer.Services
 
         public ADBService.Device Device { get; }
         public string FilePath { get; }
+        public string ParentPath => FilePath[..FilePath.LastIndexOf(this is FilePushOperation ? '\\' : '/')];
 
         public string FileName
         { 
             get
             {
-                return System.IO.Path.GetFileName(FilePath);
+                return Path.GetFileName(FilePath);
             } 
         }
 
