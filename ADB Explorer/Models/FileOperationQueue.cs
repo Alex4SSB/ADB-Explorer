@@ -3,7 +3,6 @@ using ADB_Explorer.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
-using static ADB_Explorer.Services.ADBService.Device;
 
 namespace ADB_Explorer.Models
 {

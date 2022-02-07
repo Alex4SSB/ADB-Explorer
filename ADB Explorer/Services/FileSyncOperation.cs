@@ -1,17 +1,14 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
-using static ADB_Explorer.Services.ADBService.Device;
+using static ADB_Explorer.Services.ADBService.AdbDevice;
 
 namespace ADB_Explorer.Services
 {
@@ -124,7 +121,7 @@ namespace ADB_Explorer.Services
             Dispatcher dispatcher,
             string operationName,
             FileSyncMethod adbMethod,
-            ADBService.Device adbDevice,
+            ADBService.AdbDevice adbDevice,
             string sourcePath,
             string targetPath) : base(dispatcher, adbDevice, sourcePath)
         {

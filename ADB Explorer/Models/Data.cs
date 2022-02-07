@@ -1,15 +1,15 @@
-﻿using ADB_Explorer.Services;
-using System.Collections.Generic;
-using System.Drawing;
-using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using static ADB_Explorer.Services.ADBService;
 
 namespace ADB_Explorer.Models
 {
     public static class Data
     {
-        public static ADBService.Device CurrentADBDevice = null;
+        public static AdbDevice CurrentADBDevice = null;
 
         public static ObservableList<FileClass> AndroidFileList = new();
 

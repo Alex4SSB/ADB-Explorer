@@ -438,7 +438,7 @@ namespace ADB_Explorer
             }
 
             DevicesObject.SetOpen(DevicesObject.Current, true);
-            CurrentADBDevice = new(DevicesObject.CurrentDevice.ID);
+            CurrentADBDevice = new(DevicesObject.CurrentDevice);
             if (init)
                 InitDevice();
         }
@@ -1273,7 +1273,7 @@ namespace ADB_Explorer
             if (sender is Button button && button.DataContext is UILogicalDevice device && device.Device.Status != AbstractDevice.DeviceStatus.Offline)
             {
                 DevicesObject.SetOpen(device);
-                CurrentADBDevice = new(device.Device.ID);
+                CurrentADBDevice = new(device);
 
                 ClearExplorer();
                 InitDevice();

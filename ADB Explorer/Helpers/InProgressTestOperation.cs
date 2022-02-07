@@ -1,17 +1,6 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using ADB_Explorer.Services;
 using System.Windows.Threading;
-using static ADB_Explorer.Models.AdbExplorerConst;
-using static ADB_Explorer.Services.ADBService.Device;
+using static ADB_Explorer.Services.ADBService.AdbDevice;
 
 namespace ADB_Explorer.Helpers
 {
@@ -19,13 +8,13 @@ namespace ADB_Explorer.Helpers
     {
         private AdbSyncProgressInfo info;
 
-        private InProgressTestOperation(Dispatcher dispatcher, ADBService.Device adbDevice, string filePath, AdbSyncProgressInfo info) :
+        private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo info) :
             base(dispatcher, adbDevice, filePath)
         {
             this.info = info;
         }
 
-        public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.Device adbDevice, string filePath)
+        public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
         {
             return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
             {
@@ -36,7 +25,7 @@ namespace ADB_Explorer.Helpers
             });
         }
 
-        public static InProgressTestOperation CreateFileInProgress(Dispatcher dispatcher, ADBService.Device adbDevice, string filePath)
+        public static InProgressTestOperation CreateFileInProgress(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
         {
             return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
             {
@@ -47,7 +36,7 @@ namespace ADB_Explorer.Helpers
             });
         }
 
-        public static InProgressTestOperation CreateFolderInProgress(Dispatcher dispatcher, ADBService.Device adbDevice, string filePath)
+        public static InProgressTestOperation CreateFolderInProgress(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
         {
             return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
             {

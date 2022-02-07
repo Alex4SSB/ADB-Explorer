@@ -1,9 +1,7 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -21,18 +19,16 @@ namespace ADB_Explorer.Services
 
         private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" }; // first partition
 
-        public class Device
+        public class AdbDevice : Device
         {
-            private string deviceSerial;
-
-            public string DeviceSerial
+            public AdbDevice(UIDevice other)
             {
-                get { return deviceSerial; }
+                ID = other.Device.ID;
             }
 
-            public Device(string deviceSerial)
+            public AdbDevice(LogicalDevice other)
             {
-                this.deviceSerial = deviceSerial;
+                ID = other.ID;
             }
 
             private const string ADB_PROGRESS_HELPER_PATH = "AdbProgressRedirection.exe";
@@ -78,7 +74,7 @@ namespace ADB_Explorer.Services
                 path = TranslateDevicePath(path);
 
                 // Execute adb ls to get file list
-                var stdout = ExecuteDeviceAdbCommandAsync(deviceSerial, "ls", cancellationToken, EscapeAdbString(path));
+                var stdout = ExecuteDeviceAdbCommandAsync(ID, "ls", cancellationToken, EscapeAdbString(path));
                 foreach (string stdoutLine in stdout)
                 {
                     var match = AdbRegEx.LS_FILE_ENTRY_RE.Match(stdoutLine);
@@ -149,7 +145,7 @@ namespace ADB_Explorer.Services
                     cancellationToken,
                     Encoding.Unicode,
                     "-s",
-                    deviceSerial,
+                    ID,
                     opertation,
                     operationArgs,
                     EscapeAdbString(sourcePath),
@@ -222,13 +218,13 @@ namespace ADB_Explorer.Services
 
             public bool IsDirectory(string path)
             {
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "cd", out string stdout, out string stderr, EscapeAdbShellString(path));
+                int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, EscapeAdbShellString(path));
                 return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
             }
 
             public string TranslateDevicePath(string path)
             {
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "cd", out string stdout, out string stderr, EscapeAdbShellString(path), "&&", "pwd");
+                int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, EscapeAdbShellString(path), "&&", "pwd");
                 if (exitCode != 0)
                 {
                     throw new Exception(stderr);
@@ -241,12 +237,12 @@ namespace ADB_Explorer.Services
             public List<Drive> GetDrives()
             {
                 // Get all device partitions
-                int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, "df", out string stdout, out string stderr);
+                int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr);
                 if (exitCode != 0)
                     return new();
 
                 var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
-                var drives = match.Select(m => new Drive(m.Groups, isEmulator: deviceSerial.Contains("emulator"))).ToList();
+                var drives = match.Select(m => new Drive(m.Groups, isEmulator: ID.Contains("emulator"))).ToList();
 
                 if (!drives.Any(d => d.Type == DriveType.Internal))
                 {
@@ -268,7 +264,7 @@ namespace ADB_Explorer.Services
                 {
                     if (props is null)
                     {
-                        int exitCode = ExecuteDeviceAdbShellCommand(deviceSerial, GET_PROP, out string stdout, out string stderr);
+                        int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr);
                         if (exitCode == 0)
                         {
                             props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(

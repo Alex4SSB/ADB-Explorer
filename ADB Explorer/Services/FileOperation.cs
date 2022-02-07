@@ -22,7 +22,7 @@ namespace ADB_Explorer.Services
 
         public Dispatcher Dispatcher { get; }
 
-        public ADBService.Device Device { get; }
+        public ADBService.AdbDevice Device { get; }
         public string FilePath { get; }
         public string ParentPath => FilePath[..FilePath.LastIndexOf(this is FilePushOperation ? '\\' : '/')];
 
@@ -74,7 +74,7 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public FileOperation(Dispatcher dispatcher, ADBService.Device adbDevice, string filePath)
+        public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
         {
             Dispatcher = dispatcher;
             Device = adbDevice;

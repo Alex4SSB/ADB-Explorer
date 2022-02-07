@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using static ADB_Explorer.Converters.FileTypeClass;
+using static ADB_Explorer.Services.ADBService;
 
 namespace ADB_Explorer.Models
 {
@@ -10,7 +11,7 @@ namespace ADB_Explorer.Models
         Windows,
     }
 
-    internal class FilePath
+    public class FilePath
     {
         public PathType Type { get; set; }
 
@@ -23,7 +24,7 @@ namespace ADB_Explorer.Models
                 {
                     isDirectory = Type switch
                     {
-                        PathType.Android => fileClass.Type == FileType.Folder,
+                        PathType.Android => FileObject.Type == FileType.Folder,
                         PathType.Windows => Directory.Exists(FullPath),
                         _ => throw new NotImplementedException(),
                     };
@@ -40,7 +41,7 @@ namespace ADB_Explorer.Models
             get
             {
                 if (IsDirectory                                                             // directories do not have extensions
-                    || (Type is PathType.Android && (fileClass.Type is not FileType.File    // do not trim if not a regular file
+                    || (Type is PathType.Android && (FileObject.Type is not FileType.File   // do not trim if not a regular file
                     || (FullName.StartsWith('.') && FullName.Split('.').Length == 2))))     // don't try to trim the name of a hidden file that has no extension
                     return FullName;
                 else
@@ -48,20 +49,20 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public LogicalDevice Device { get; set; } // will be left null for PC
-        private readonly FileStat fileClass; // will be left null for PC
+        public readonly AdbDevice Device; // will be left null for PC
+        public readonly FileStat FileObject; // will be left null for PC
 
-        public FilePath(string fullPath)
+        public FilePath(string windowsPath)
         {
-            FullPath = fullPath;
+            FullPath = windowsPath;
             FullName = FullPath[FullPath.LastIndexOf('\\')..];
 
             Type = PathType.Windows;
         }
 
-        public FilePath(FileStat fileClass, LogicalDevice device = null)
+        public FilePath(FileStat fileClass, AdbDevice device = null)
         {
-            this.fileClass = fileClass;
+            FileObject = fileClass;
             FullPath = fileClass.Path;
             FullName = fileClass.FileName;
             Device = device;
