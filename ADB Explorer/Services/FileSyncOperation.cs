@@ -94,7 +94,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return AverageRateMBps.HasValue ? $"{SizeConverter.ToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : String.Empty;
+                    return AverageRateMBps.HasValue ? $"{SizeConverter.ToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : string.Empty;
                 }
             }
 
@@ -102,7 +102,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return TotalBytes.HasValue ? SizeConverter.ToSize(TotalBytes.Value) : String.Empty;
+                    return TotalBytes.HasValue ? SizeConverter.ToSize(TotalBytes.Value) : string.Empty;
                 }
             }
 
@@ -110,7 +110,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return TotalSeconds.HasValue ? SizeConverter.ToTime(TotalSeconds.Value) : String.Empty;
+                    return TotalSeconds.HasValue ? SizeConverter.ToTime(TotalSeconds.Value) : string.Empty;
                 }
             }
         }

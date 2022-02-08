@@ -866,7 +866,7 @@
                                         <TextBlock FontSize="{Binding Source={StaticResource FontSize}}" TextTrimming="CharacterEllipsis">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="{Binding FileName}" />
+                                                    <Setter Property="Text" Value="{Binding FullName}" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
                                                             <Setter Property="Text" Value="{Binding NoExtName}" />

@@ -371,7 +371,7 @@ namespace ADB_Explorer
                             CopyFiles(true);
                         break;
                     case FileType.Folder:
-                        NavigateToPath(file.Path);
+                        NavigateToPath(file.FullPath);
                         break;
                     default:
                         break;
@@ -724,7 +724,7 @@ namespace ADB_Explorer
                 {
                     break;
                 }
-                else if (CurrentADBDevice.IsDirectory(file.Path))
+                else if (CurrentADBDevice.IsDirectory(file.FullPath))
                 {
                     Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileType.Folder; });
                 }
@@ -1074,7 +1074,7 @@ namespace ADB_Explorer
 
             foreach (FileClass item in ExplorerGrid.SelectedItems)
             {
-                fileOperationQueue.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item.Path, path));
+                fileOperationQueue.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item.FullPath, path));
             }
         }
 

@@ -27,8 +27,8 @@ namespace ADB_Explorer.Models
         {
             return new FileClass
             (
-                fileName: fileStat.FileName,
-                path: fileStat.Path,
+                fileName: fileStat.FullName,
+                path: fileStat.FullPath,
                 type: fileStat.Type,
                 size: fileStat.Size,
                 modifiedTime: fileStat.ModifiedTime,
@@ -50,24 +50,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public string NoExtName
-        {
-            get
-            {
-                if (Type is not FileType.File || IsHidden && FileName.Split('.').Length == 2)
-                    return FileName;
-                else
-                    return FileName[..(FileName.Length - Extension.Length)];
-            }
-        }
-
-        public bool IsHidden
-        {
-            get
-            {
-                return FileName.StartsWith('.');
-            }
-        }
+        public bool IsHidden => FullName.StartsWith('.');
 
         private string extension;
         public string Extension
@@ -78,7 +61,7 @@ namespace ADB_Explorer.Models
                     return "";
 
                 if (string.IsNullOrEmpty(extension))
-                    extension = System.IO.Path.GetExtension(FileName);
+                    extension = System.IO.Path.GetExtension(FullName);
 
                 return extension;
             }
@@ -113,25 +96,18 @@ namespace ADB_Explorer.Models
         private string typeName;
         public string TypeName
         {
-            get { return typeName; }
-            private set
-            {
-                typeName = value;
-                NotifyPropertyChanged();
-            }
+            get => typeName;
+            private set => Set(ref typeName, value);
         }
+
         public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
         public string SizeString => Size?.ToSize();
 
         private object icon;
         public object Icon
         {
-            get { return icon; }
-            private set
-            {
-                icon = value;
-                NotifyPropertyChanged();
-            }
+            get => icon;
+            private set => Set(ref icon, value);
         }
 
         private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
@@ -158,7 +134,7 @@ namespace ADB_Explorer.Models
         {
             return Type switch
             {
-                FileType.File => IsLink ? "Link" : GetTypeName(FileName),
+                FileType.File => IsLink ? "Link" : GetTypeName(FullName),
                 FileType.Folder => IsLink ? "Link" : "Folder",
                 FileType.Unknown => "",
                 _ => Type.Name(),
@@ -194,7 +170,7 @@ namespace ADB_Explorer.Models
             return icon;
         }
 
-        protected override void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        protected override void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (propertyName == "FileName" || propertyName == "Type" || propertyName == "IsLink")
             {
@@ -202,7 +178,7 @@ namespace ADB_Explorer.Models
                 TypeName = GetTypeName();
             }
 
-            base.NotifyPropertyChanged(propertyName);
+            base.Set(ref storage, value, propertyName);
         }
     }
 }
