@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAPICodePack.Shell;
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -39,13 +40,13 @@ namespace ADB_Explorer.Models
 
         
 
-        public FilePath(string windowsPath)
+        public FilePath(ShellObject windowsPath)
         {
             PathType = PathType.Windows;
-
-            FullPath = windowsPath;
-            FullName = GetFullName(windowsPath);
-            IsDirectory = Directory.Exists(windowsPath);
+            
+            FullPath = windowsPath.Name;
+            FullName = GetFullName(FullPath);
+            IsDirectory = Directory.Exists(FullPath);
             IsRegularFile = !IsDirectory;
         }
 
