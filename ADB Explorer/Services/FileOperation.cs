@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using ADB_Explorer.Models;
+using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
@@ -23,16 +24,7 @@ namespace ADB_Explorer.Services
         public Dispatcher Dispatcher { get; }
 
         public ADBService.AdbDevice Device { get; }
-        public string FilePath { get; }
-        public string ParentPath => FilePath[..FilePath.LastIndexOf(this is FilePushOperation ? '\\' : '/')];
-
-        public string FileName
-        { 
-            get
-            {
-                return Path.GetFileName(FilePath);
-            } 
-        }
+        public FilePath FilePath { get; }
 
         private OperationStatus status;
         public OperationStatus Status
@@ -74,7 +66,7 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
+        public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath)
         {
             Dispatcher = dispatcher;
             Device = adbDevice;

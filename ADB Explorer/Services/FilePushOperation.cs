@@ -1,10 +1,11 @@
-﻿using System.Windows.Threading;
+﻿using ADB_Explorer.Models;
+using System.Windows.Threading;
 
 namespace ADB_Explorer.Services
 {
     public class FilePushOperation : FileSyncOperation
     {
-        public FilePushOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string sourcePath, string targetPath)
+        public FilePushOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath sourcePath, FilePath targetPath)
             : base(dispatcher, "Push", adbDevice.PushFile, adbDevice, sourcePath, targetPath) {}
     }
 }

@@ -44,7 +44,7 @@ namespace ADB_Explorer.Models
         {
             PathType = PathType.Windows;
             
-            FullPath = windowsPath.Name;
+            FullPath = windowsPath.ParsingName;
             FullName = GetFullName(FullPath);
             IsDirectory = Directory.Exists(FullPath);
             IsRegularFile = !IsDirectory;

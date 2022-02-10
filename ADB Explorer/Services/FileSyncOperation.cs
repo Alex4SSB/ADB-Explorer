@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -115,15 +116,15 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public string TargetPath { get; }
+        public FilePath TargetPath { get; }
 
         public FileSyncOperation(
             Dispatcher dispatcher,
             string operationName,
             FileSyncMethod adbMethod,
             ADBService.AdbDevice adbDevice,
-            string sourcePath,
-            string targetPath) : base(dispatcher, adbDevice, sourcePath)
+            FilePath sourcePath,
+            FilePath targetPath) : base(dispatcher, adbDevice, sourcePath)
         {
             OperationName = operationName;
             TargetPath = targetPath;
@@ -151,7 +152,7 @@ namespace ADB_Explorer.Services
             waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
             cancelTokenSource = new CancellationTokenSource();
 
-            operationTask = Task.Run(() => adbMethod(TargetPath, FilePath, ref waitingProgress, cancelTokenSource.Token), cancelTokenSource.Token);
+            operationTask = Task.Run(() => adbMethod(TargetPath.FullPath, FilePath.FullPath, ref waitingProgress, cancelTokenSource.Token), cancelTokenSource.Token);
 
             operationTask.ContinueWith((t) => progressPollTimer.Stop());
             operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = new CompletedInfo(t.Result); }, TaskContinuationOptions.OnlyOnRanToCompletion);

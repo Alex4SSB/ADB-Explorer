@@ -4,6 +4,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Microsoft.WindowsAPICodePack.Shell;
 using ModernWpf;
 using ModernWpf.Controls;
 using System;
@@ -1037,11 +1038,11 @@ namespace ADB_Explorer
         private void CopyFiles(bool quick = false)
         {
             int itemsCount = ExplorerGrid.SelectedItems.Count;
-            string path;
+            ShellObject path;
 
             if (quick)
             {
-                path = DefaultFolderBlock.Text;
+                path = ShellObject.FromParsingName(DefaultFolderBlock.Text);
             }
             else
             {
@@ -1056,14 +1057,16 @@ namespace ADB_Explorer
                 if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                     return;
 
-                path = dialog.FileName;
+                path = dialog.FileAsShellObject;
             }
 
-            if (!Directory.Exists(path))
+            var dirPath = new FilePath(path);
+
+            if (!Directory.Exists(path.ParsingName))
             {
                 try
                 {
-                    Directory.CreateDirectory(path);
+                    Directory.CreateDirectory(path.ParsingName);
                 }
                 catch (Exception e)
                 {
@@ -1074,7 +1077,7 @@ namespace ADB_Explorer
 
             foreach (FileClass item in ExplorerGrid.SelectedItems)
             {
-                fileOperationQueue.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item.FullPath, path));
+                fileOperationQueue.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item, dirPath));
             }
         }
 
@@ -1091,9 +1094,9 @@ namespace ADB_Explorer
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
-            foreach (var item in dialog.FileNames)
+            foreach (var item in dialog.FilesAsShellObject)
             {
-                fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, item, CurrentPath));
+                fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), new FilePath(CurrentPath)));
             }
         }
 
