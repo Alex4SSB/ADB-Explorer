@@ -110,6 +110,7 @@
         BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Setter Property="FontSize" Value="28" />
+        <Setter Property="ToolTip" Value="{Binding Tooltip}" />
     </Style>
     <Style
         x:Key="DeviceStatusIconStyle"
@@ -651,5 +652,50 @@
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="Background" Value="#FFFBFBFB" />
         <Setter Property="Margin" Value="0,6,0,0" />
+    </Style>
+    <Style
+        x:Key="RootIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.Root}" Value="Disabled">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter Property="ToolTip" Value="Root Can Be Enabled" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="ToolTip" Value="Root Access Enabled" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
+    </Style>
+    <Style
+        x:Key="ToggleButtonStyle"
+        BasedOn="{StaticResource DefaultToggleButtonStyle}"
+        TargetType="ToggleButton" />
+    <Style
+        x:Key="RootToggleStyle"
+        BasedOn="{StaticResource ToggleButtonStyle}"
+        TargetType="ToggleButton">
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Content">
+            <Setter.Value>
+                <ui:FontIcon
+                    FontSize="16"
+                    Glyph="&#xE7EF;"
+                    Style="{StaticResource GlyphFont}" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ToolTip" Value="Enable Root Access" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
+                <Setter Property="IsChecked" Value="True" />
+                <Setter Property="ToolTip" Value="Disable Root Access" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

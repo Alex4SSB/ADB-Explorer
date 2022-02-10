@@ -272,5 +272,17 @@ namespace ADB_Explorer.Services
             if (restart)
                 ExecuteAdbCommand("start-server", out _, out _);
         }
+
+        public static bool Root(Device device)
+        {
+            ExecuteDeviceAdbCommand(device.ID, "root", out string stdout, out string stderr);
+            return !stdout.Contains("cannot run as root");
+        }
+
+        public static bool Unroot(Device device)
+        {
+            ExecuteDeviceAdbCommand(device.ID, "unroot", out string stdout, out string stderr);
+            return stdout.Contains("restarting adbd as non root");
+        }
     }
 }

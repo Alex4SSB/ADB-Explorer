@@ -29,9 +29,27 @@ namespace ADB_Explorer.Models
             Unauthorized
         }
 
+        public enum RootStatus
+        {
+            Unchecked,
+            Forbidden,
+            Disabled,
+            Enabled,
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+        }
+
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public class Devices : AbstractDevice
@@ -39,12 +57,8 @@ namespace ADB_Explorer.Models
         private ObservableList<UIDevice> uiDevices = new();
         public ObservableList<UIDevice> UIList
         {
-            get { return uiDevices; }
-            private set
-            {
-                uiDevices = value;
-                NotifyPropertyChanged();
-            }
+            get => uiDevices;
+            private set => Set(ref uiDevices, value);
         }
 
         public IEnumerable<UILogicalDevice> UILogicalDevices => UIList?.OfType<UILogicalDevice>();
@@ -230,23 +244,15 @@ namespace ADB_Explorer.Models
         private DeviceType type;
         public DeviceType Type
         {
-            get { return type; }
-            protected set
-            {
-                type = value;
-                NotifyPropertyChanged();
-            }
+            get => type;
+            protected set => Set(ref type, value);
         }
 
         private DeviceStatus status;
         public DeviceStatus Status
         {
-            get { return status; }
-            protected set
-            {
-                status = value;
-                NotifyPropertyChanged();
-            }
+            get => status;
+            protected set => Set(ref status, value);
         }
 
         public string ID { get; protected set; }
@@ -275,12 +281,8 @@ namespace ADB_Explorer.Models
         private bool isSelected;
         public bool DeviceSelected
         {
-            get { return isSelected; }
-            set
-            {
-                isSelected = value;
-                NotifyPropertyChanged();
-            }
+            get => isSelected;
+            set => Set(ref isSelected, value);
         }
         public bool IsMdns { get; protected set; }
 
@@ -320,26 +322,19 @@ namespace ADB_Explorer.Models
         private string name;
         public string Name
         {
-            get
-            {
-                return Type == DeviceType.Emulator ? ID : name;
-            }
-            private set
-            {
-                name = value;
-                NotifyPropertyChanged();
-            }
+            get => Type == DeviceType.Emulator ? ID : name;
+            private set => Set(ref name, value);
         }
-        
+
         private List<Drive> drives;
         public List<Drive> Drives
         {
             get => drives;
             set
             {
-                drives = value;
+                Set(ref drives, value);
 
-                if (drives is not null)
+                if (value is not null)
                 {
                     var mmcTask = Task.Run(() => { return GetMmcDrive(); });
                     mmcTask.ContinueWith((t) =>
@@ -351,17 +346,33 @@ namespace ADB_Explorer.Models
                         });
                     });
                 }
-
-                NotifyPropertyChanged();
             }
         }
 
         public string BaseID => Type == DeviceType.Service ? ID.Split('.')[0] : ID;
 
+        private RootStatus root = RootStatus.Unchecked;
+        public RootStatus Root
+        {
+            get => root;
+            set
+            {
+                Set(ref root, value);
+
+                if (Data.DevicesRoot.ContainsKey(ID))
+                    Data.DevicesRoot[ID] = value;
+                else
+                    Data.DevicesRoot.Add(ID, value);
+            }
+        }
+
         private LogicalDevice(string name, string id)
         {
             Name = name;
             ID = id;
+
+            if (Data.DevicesRoot.ContainsKey(ID))
+                root = Data.DevicesRoot[ID];
         }
 
         public static LogicalDevice New(string name, string id, string status)
@@ -409,8 +420,7 @@ namespace ADB_Explorer.Models
 
         private void DrivesSetBlocking(List<Drive> val)
         {
-            drives = val;
-            NotifyPropertyChanged(nameof(Drives));
+            Set(ref drives, val, nameof(Drives));
         }
 
         internal void SetDrives(List<Drive> value, bool findMmc = false)
@@ -457,6 +467,16 @@ namespace ADB_Explorer.Models
             return name.Replace('_', ' ');
         }
 
+        public void EnableRoot(bool enable)
+        {
+            Task.Run(() =>
+            {
+                Root = enable
+                    ? ADBService.Root(this) ? RootStatus.Enabled : RootStatus.Forbidden
+                    : ADBService.Unroot(this) ? RootStatus.Disabled : RootStatus.Unchecked;
+            });
+        }
+
         public override string ToString() => Name;
 
         //private DispatcherTimer dispatcherTimer;
@@ -491,6 +511,34 @@ namespace ADB_Explorer.Models
         public bool IsOpen { get; protected set; }
 
         public string Name => ((LogicalDevice)Device).Name;
+
+        public string Tooltip
+        {
+            get
+            {
+                string result = "";
+
+                result += Device.Type switch
+                {
+                    DeviceType.Local => "USB",
+                    DeviceType.Remote => "WiFi",
+                    DeviceType.Emulator => "Emulator",
+                    DeviceType.Service => "mDNS Service",
+                    DeviceType.Sideload => "USB (Sideload)",
+                    _ => throw new NotImplementedException(),
+                };
+
+                result += Device.Status switch
+                {
+                    DeviceStatus.Online => "",
+                    DeviceStatus.Offline => " - Offline",
+                    DeviceStatus.Unauthorized => " - Unauthorized",
+                    _ => throw new NotImplementedException(),
+                };
+
+                return result;
+            }
+        }
 
         public UILogicalDevice(LogicalDevice device)
         {

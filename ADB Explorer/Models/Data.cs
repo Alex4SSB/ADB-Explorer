@@ -9,19 +9,21 @@ namespace ADB_Explorer.Models
 {
     public static class Data
     {
-        public static AdbDevice CurrentADBDevice = null;
+        public static AdbDevice CurrentADBDevice { get; set; } = null;
 
-        public static ObservableList<FileClass> AndroidFileList = new();
+        public static ObservableList<FileClass> AndroidFileList { get; set; } = new();
 
         public static string CurrentPath { get; set; }
         public static string ParentPath { get; set; }
 
-        public static Dictionary<Tuple<string, bool>, Icon> FileIcons = new();
+        public static Dictionary<Tuple<string, bool>, Icon> FileIcons { get; set; } = new();
 
-        public static FileOperationQueue fileOperationQueue;
+        public static FileOperationQueue fileOperationQueue { get; set; }
 
-        public static Dictionary<string, string> CurrentPrettyNames = new();
+        public static Dictionary<string, string> CurrentPrettyNames { get; set; } = new();
 
-        public static ObservableCollection<ColumnConfig> ColumnConfigs = new();
+        public static ObservableCollection<ColumnConfig> ColumnConfigs { get; set; } = new();
+
+        public static Dictionary<string, AbstractDevice.RootStatus> DevicesRoot { get; set; } = new();
     }
 }
