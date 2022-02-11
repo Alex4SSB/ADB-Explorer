@@ -73,17 +73,16 @@ namespace ADB_Explorer.Models
             else
             {
                 Type = DriveType.Unknown;
-                //Type = DriveType.External;
             }
         }
 
-        public Drive(GroupCollection match, bool isMMC = false, bool isEmulator = false)
+        public Drive(GroupCollection match, bool isMMC = false, bool isEmulator = false, string forcePath = "")
             : this(
                   (ulong.Parse(match["size_kB"].Value) * 1024).ToSize(true, 2, 2),
                   (ulong.Parse(match["used_kB"].Value) * 1024).ToSize(true, 2, 2),
                   (ulong.Parse(match["available_kB"].Value) * 1024).ToSize(true, 2, 2),
                   sbyte.Parse(match["usage_P"].Value),
-                  match["path"].Value,
+                  string.IsNullOrEmpty(forcePath) ? match["path"].Value : forcePath,
                   isMMC,
                   isEmulator)
         { }

@@ -415,7 +415,12 @@
                             x:Name="EnableDeviceRootToggle"
                             VerticalAlignment="Stretch"
                             Click="EnableDeviceRootToggle_Click"
-                            Style="{StaticResource RootToggleStyle}" />
+                            Style="{StaticResource RootToggleStyle}">
+                            <ui:FontIcon
+                                FontSize="16"
+                                Glyph="&#xE7EF;"
+                                Style="{StaticResource GlyphFont}" />
+                        </ToggleButton>
                         <Button
                             x:Name="OpenDeviceButton"
                             Click="OpenDeviceButton_Click"
@@ -956,7 +961,7 @@
                             </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Grid>
+                    <Grid Margin="0,40">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -973,10 +978,17 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <StackPanel
-                            Margin="0,40"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=MainWin, Path=DevicesObject.CurrentDevice.Root}" Value="Enabled">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </Style>
+                            </StackPanel.Style>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="This folder " />
                                 <TextBlock FontStyle="Italic" Text="looks" />
@@ -986,6 +998,19 @@
                                 HorizontalAlignment="Center"
                                 FontSize="10"
                                 Text="... to the naked eye" />
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=MainWin, Path=DevicesObject.CurrentDevice.Root}" Value="Enabled">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="This folder is empty." />
                         </StackPanel>
                     </Grid>
                 </Grid>

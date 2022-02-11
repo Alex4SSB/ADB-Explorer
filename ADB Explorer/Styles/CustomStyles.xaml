@@ -689,14 +689,6 @@
         BasedOn="{StaticResource ToggleButtonStyle}"
         TargetType="ToggleButton">
         <Setter Property="Padding" Value="6" />
-        <Setter Property="Content">
-            <Setter.Value>
-                <ui:FontIcon
-                    FontSize="16"
-                    Glyph="&#xE7EF;"
-                    Style="{StaticResource GlyphFont}" />
-            </Setter.Value>
-        </Setter>
         <Setter Property="ToolTip" Value="Enable Root Access" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">

@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using static ADB_Explorer.Converters.FileTypeClass;
 
@@ -236,13 +237,30 @@ namespace ADB_Explorer.Services
 
             public List<Drive> GetDrives()
             {
-                // Get all device partitions
-                int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr);
-                if (exitCode != 0)
-                    return new();
+                List<Drive> drives = new();
 
-                var match = AdbRegEx.EMULATED_STORAGE_SIZE.Matches(stdout);
-                var drives = match.Select(m => new Drive(m.Groups, isEmulator: ID.Contains("emulator"))).ToList();
+                var root = ReadDrives(AdbRegEx.EMULATED_STORAGE_SINGLE, "/");
+                if (root is null)
+                    return null;
+                else if (root.Any())
+                    drives.Add(root.First());
+
+                var intStorage = ReadDrives(AdbRegEx.EMULATED_STORAGE_SINGLE, "/sdcard");
+                if (intStorage is null)
+                    return drives;
+                else if (intStorage.Any())
+                    drives.Add(intStorage.First());
+
+                var extStorage = ReadDrives(AdbRegEx.EMULATED_ONLY, "|", "grep", "/storage/");
+                if (extStorage is null)
+                    return drives;
+                else
+                {
+                    Func<Drive, bool> predicate = drives.Any(drive => drive.Type is DriveType.Internal)
+                        ? d => d.Type is not DriveType.Internal or DriveType.Root
+                        : d => d.Type is not DriveType.Root;
+                    drives.AddRange(extStorage.Where(predicate));
+                }
 
                 if (!drives.Any(d => d.Type == DriveType.Internal))
                 {
@@ -255,6 +273,15 @@ namespace ADB_Explorer.Services
                 }
 
                 return drives;
+            }
+
+            private IEnumerable<Drive> ReadDrives(Regex re, params string[] args)
+            {
+                int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr, args);
+                if (exitCode != 0)
+                    return null;
+
+                return re.Matches(stdout).Select(m => new Drive(m.Groups, isEmulator: ID.Contains("emulator"), forcePath: args[0] == "/" ? "/" : ""));
             }
 
             private Dictionary<string, string> props;

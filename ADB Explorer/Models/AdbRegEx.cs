@@ -19,8 +19,12 @@ namespace ADB_Explorer.Models
             new(@"^(?<TargetPath>.+?): (?<TotalTransferred>\d+) files? (?>pulled|pushed), (?<TotalSkipped>\d+) skipped\.(?> (?<AverageRate>\d+(?>\.\d+)?) MB\/s \((?<TotalBytes>\d+) bytes in (?<TotalTime>\d+(?>\.\d+)?)s\))? *$",
                       RegexOptions.Multiline);
 
-        public static readonly Regex EMULATED_STORAGE_SIZE =
-            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage\/[\w-]+)?)[\r\n]");
+        public static readonly Regex EMULATED_STORAGE_SINGLE =
+            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]");
+
+        public static readonly Regex EMULATED_ONLY =
+            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/storage\/[\w-]+?)[\r\n]",
+                RegexOptions.Multiline);
 
         public static readonly Regex MMC_BLOCK_DEVICE_NODE =
             new(@"(?<major>[a-f\d]+),(?<minor>[a-f\d]+)");
