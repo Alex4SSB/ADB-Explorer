@@ -448,18 +448,6 @@ namespace ADB_Explorer
         {
             Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
 
-            if (Storage.RetrieveValue(UserPrefs.manualAdbPath) is string adbPath)
-                ManualAdbPath.Text = adbPath;
-
-            if (Storage.RetrieveBool(UserPrefs.enableMdns) is bool enable)
-            {
-                // Intentional invocation of the checked event
-                EnableMdnsCheckBox.IsChecked = enable;
-
-                if (enable)
-                    QrClass = new();
-            }
-
             var appTheme = Storage.RetrieveEnum<AppTheme>();
             SettingsTheme(appTheme);
             SetTheme(appTheme switch
@@ -472,6 +460,21 @@ namespace ADB_Explorer
 
             if (Storage.RetrieveBool(UserPrefs.forceFluentStyles) is bool forceFluent)
                 ForceFluentStylesCheckbox.IsChecked = forceFluent;
+            
+            if (Storage.RetrieveValue(UserPrefs.manualAdbPath) is string adbPath)
+                ManualAdbPath.Text = adbPath;
+
+            if (Storage.RetrieveBool(UserPrefs.enableMdns) is bool enable)
+            {
+                // Intentional invocation of the checked event
+                EnableMdnsCheckBox.IsChecked = enable;
+
+                if (enable)
+                    QrClass = new();
+            }
+
+            if (Storage.RetrieveBool(UserPrefs.autoRoot) is bool autoRoot)
+                AutoRootCheckBox.IsChecked = autoRoot;
 
             if (Storage.RetrieveValue(UserPrefs.defaultFolder) is string path && !string.IsNullOrEmpty(path))
                 DefaultFolderBlock.Text = path;
@@ -591,6 +594,14 @@ namespace ADB_Explorer
             if (devices is not null && DevicesObject.DevicesChanged(devices))
             {
                 DeviceListSetup(devices);
+
+                if (AutoRootCheckBox.IsChecked == true)
+                {
+                    foreach (var item in DevicesObject.LogicalDevices.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
+                    {
+                        item.EnableRoot(true);
+                    }
+                }
             }
         }
 
@@ -1094,7 +1105,7 @@ namespace ADB_Explorer
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
-            foreach (var item in dialog.FilesAsShellObject)
+            foreach (var item in dialog.FilesAsShellObject
             {
                 fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), new FilePath(CurrentPath)));
             }
@@ -1966,6 +1977,21 @@ namespace ADB_Explorer
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
             DevicesObject.UnselectAll();
+        }
+
+        private void AutoRootCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Storage.StoreValue(UserPrefs.autoRoot, AutoRootCheckBox.IsChecked);
+        }
+
+        private void EnableDeviceRootToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is ToggleButton toggle && toggle.DataContext is UILogicalDevice device && device.Device is LogicalDevice logical)
+            {
+                logical.EnableRoot(toggle.IsChecked.Value);
+                if (logical.Root is AbstractDevice.RootStatus.Forbidden)
+                    MessageBox.Show("Root access cannot be enabled on selected device.", "Root Access", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

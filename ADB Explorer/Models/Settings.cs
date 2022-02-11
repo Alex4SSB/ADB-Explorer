@@ -15,6 +15,7 @@
         enableMdns,
         manualAdbPath,
         forceFluentStyles,
+        autoRoot,
     }
 
     public enum SystemVals

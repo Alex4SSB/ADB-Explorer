@@ -331,30 +331,37 @@
                 <Expander.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <StackPanel x:Name="DeviceDetailsPanel" Orientation="Horizontal">
-                            <Grid>
-                                <Grid.Resources>
-                                    <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                                </Grid.Resources>
-                                <ui:FontIcon Glyph="{Binding TypeIcon}" />
-                                <Grid Style="{StaticResource DeviceStatusGridStyle}">
-                                    <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                                    <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
-                                </Grid>
+                        <Grid>
+                            <Grid.Resources>
+                                <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
+                            </Grid.Resources>
+                            <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                            <Grid Style="{StaticResource DeviceStatusGridStyle}">
+                                <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
+                                <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
                             </Grid>
-                            <TextBlock
-                                Margin="4"
-                                Style="{StaticResource DeviceNameTextBlockStyle}"
-                                TextTrimming="CharacterEllipsis" />
-                        </StackPanel>
-                        <ui:FontIcon
-                            Margin="4,0"
-                            HorizontalAlignment="Right"
-                            Glyph="&#xE838;"
-                            Style="{StaticResource DeviceOpenIconStyle}" />
+                        </Grid>
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="4"
+                            Style="{StaticResource DeviceNameTextBlockStyle}"
+                            TextTrimming="CharacterEllipsis" />
+                        <ui:SimpleStackPanel
+                            Grid.Column="2"
+                            Margin="2,0,0,0"
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="6">
+                            <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
+                            <ui:FontIcon
+                                Glyph="&#xE838;"
+                                Style="{StaticResource DeviceOpenIconStyle}"
+                                ToolTip="Open" />
+                        </ui:SimpleStackPanel>
                         <helpers:FluentForwarder x:Name="MainWin" />
                     </Grid>
                 </Expander.Header>
@@ -399,10 +406,17 @@
                             </Button.Style>
                         </Button>
                     </Grid>
-                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                    <ui:SimpleStackPanel
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <ToggleButton
+                            x:Name="EnableDeviceRootToggle"
+                            VerticalAlignment="Stretch"
+                            Click="EnableDeviceRootToggle_Click"
+                            Style="{StaticResource RootToggleStyle}" />
                         <Button
                             x:Name="OpenDeviceButton"
-                            Margin="8,0"
                             Click="OpenDeviceButton_Click"
                             Content="Browse"
                             Style="{StaticResource DeviceBrowseButtonStyle}" />
@@ -422,7 +436,7 @@
                                 </Grid>
                             </StackPanel>
                         </Button>
-                    </StackPanel>
+                    </ui:SimpleStackPanel>
                 </StackPanel>
             </Expander>
         </DataTemplate>
@@ -1461,7 +1475,7 @@
         <ui:SplitView
             x:Name="DevicesSplitView"
             FocusVisualStyle="{x:Null}"
-            OpenPaneLength="200"
+            OpenPaneLength="220"
             PaneClosing="DevicesSplitView_PaneClosing"
             PaneOpening="DevicesSplitView_PaneOpening"
             PanePlacement="Left">
@@ -1949,6 +1963,11 @@
                                             Content="Enable mDNS (experimental)"
                                             Unchecked="EnableMdnsCheckBox_Checked" />
                                         <CheckBox
+                                            x:Name="AutoRootCheckBox"
+                                            Checked="AutoRootCheckBox_Checked"
+                                            Content="Automatically Enable Root"
+                                            Unchecked="AutoRootCheckBox_Checked" />
+                                        <CheckBox
                                             x:Name="RememberIpCheckBox"
                                             Click="RememberIpCheckBox_Click"
                                             Content="Remember Last IP" />
@@ -1959,7 +1978,7 @@
                                         <CheckBox
                                             x:Name="AutoOpenCheckBox"
                                             Click="AutoOpenCheckBox_Click"
-                                            Content="Automatically Open for Browsing" />
+                                            Content="Automatically Open For Browsing" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
