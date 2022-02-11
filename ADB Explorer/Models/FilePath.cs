@@ -23,7 +23,7 @@ namespace ADB_Explorer.Models
         public bool IsDirectory { get; protected set; }
 
         public string FullPath { get; protected set; }
-        public string ParentPath => FullPath[..FullPath.LastIndexOf(PathSeparator())];
+        public string ParentPath => FullPath[..(FullPath.LastIndexOf(PathSeparator()) is int index && index > 0 ? index : ^0)];
         public string FullName { get; protected set; }
         public string NoExtName
         {
@@ -38,15 +38,13 @@ namespace ADB_Explorer.Models
 
         public readonly AdbDevice Device; // will be left null for PC
 
-        
-
         public FilePath(ShellObject windowsPath)
         {
             PathType = PathType.Windows;
             
-            FullPath = windowsPath.Name;
-            FullName = GetFullName(FullPath);
-            IsDirectory = Directory.Exists(FullPath);
+            FullPath = windowsPath.ParsingName;
+            FullName = windowsPath.Name;
+            IsDirectory = windowsPath is ShellFolder;
             IsRegularFile = !IsDirectory;
         }
 
@@ -66,7 +64,7 @@ namespace ADB_Explorer.Models
         }
 
         private string GetFullName(string fullPath) =>
-            fullPath[fullPath.LastIndexOf(PathSeparator())..];
+            fullPath[(fullPath.LastIndexOf(PathSeparator()) + 1)..];
 
         private static bool HiddenOrWithoutExt(string fullName) => fullName.Count(c => c == '.') switch
         {

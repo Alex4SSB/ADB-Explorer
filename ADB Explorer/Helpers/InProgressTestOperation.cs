@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Services;
+﻿using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 using System.Windows.Threading;
 using static ADB_Explorer.Services.ADBService.AdbDevice;
 
@@ -9,7 +10,7 @@ namespace ADB_Explorer.Helpers
         private AdbSyncProgressInfo info;
 
         private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo info) :
-            base(dispatcher, adbDevice, filePath)
+            base(dispatcher, adbDevice, new FilePath(filePath))
         {
             this.info = info;
         }

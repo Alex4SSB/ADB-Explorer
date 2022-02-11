@@ -317,17 +317,25 @@
                 <ui:FontIcon.Style>
                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </ui:FontIcon.Style>
             </ui:FontIcon>
-            <TextBlock
-                Grid.Column="1"
-                Text="{Binding FileName}"
-                TextTrimming="CharacterEllipsis" />
+            <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="True">
+                                <Setter Property="Text" Value="{Binding FilePath.FullName}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
             <TextBlock
                 Grid.Row="1"
                 Margin="0,-3,0,0"
@@ -337,10 +345,13 @@
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -351,7 +362,6 @@
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="1"
-                Text="{Binding StatusInfo.CurrentFileName}"
                 TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -376,13 +386,13 @@
     <DataTemplate x:Key="FileOpSourcePathTemplate">
         <TextBlock
             Margin="4,0"
-            Text="{Binding ParentPath}"
+            Text="{Binding FilePath.ParentPath}"
             TextTrimming="CharacterEllipsis" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
         <TextBlock
             Margin="4,0"
-            Text="{Binding TargetPath}"
+            Text="{Binding TargetPath.FullPath}"
             TextTrimming="CharacterEllipsis" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpStatusTemplate">
