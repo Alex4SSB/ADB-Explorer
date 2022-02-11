@@ -629,40 +629,28 @@
                             x:Name="FileOperationsButton"
                             Click="FileOperationsButton_Click"
                             ToolTip="File Operations">
+                            <MenuItem.Triggers>
+                                <EventTrigger RoutedEvent="MenuItem.Click">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation
+                                                Storyboard.TargetName="RotateTransform"
+                                                Storyboard.TargetProperty="Angle"
+                                                From="0"
+                                                To="360"
+                                                Duration="00:00:00.2" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </MenuItem.Triggers>
                             <MenuItem.Header>
                                 <Grid>
-                                    <ui:FontIcon Glyph="&#xF16A;">
-                                        <ui:FontIcon.Style>
-                                            <Style BasedOn="{StaticResource RightMenuGlyph}" TargetType="ui:FontIcon">
-                                                <Style.Triggers>
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1" />
-                                                            <Condition Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False" />
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </MultiDataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </Style>
-                                        </ui:FontIcon.Style>
+                                    <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}">
+                                        <ui:FontIcon.RenderTransform>
+                                            <RotateTransform x:Name="RotateTransform" />
+                                        </ui:FontIcon.RenderTransform>
                                     </ui:FontIcon>
-                                    <ui:ProgressRing IsActive="True">
-                                        <ui:ProgressRing.Style>
-                                            <Style TargetType="ui:ProgressRing">
-                                                <Style.Triggers>
-                                                    <MultiDataTrigger>
-                                                        <MultiDataTrigger.Conditions>
-                                                            <Condition Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1" />
-                                                            <Condition Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False" />
-                                                        </MultiDataTrigger.Conditions>
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </MultiDataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </Style>
-                                        </ui:ProgressRing.Style>
-                                    </ui:ProgressRing>
+                                    <ui:ProgressRing IsActive="True" Style="{StaticResource OperationsProgressRingStyle}" />
                                 </Grid>
                             </MenuItem.Header>
                         </MenuItem>

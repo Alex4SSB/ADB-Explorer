@@ -681,10 +681,6 @@
         <Setter Property="Visibility" Value="Collapsed" />
     </Style>
     <Style
-        x:Key="ToggleButtonStyle"
-        BasedOn="{StaticResource DefaultToggleButtonStyle}"
-        TargetType="ToggleButton" />
-    <Style
         x:Key="RootToggleStyle"
         BasedOn="{StaticResource ToggleButtonStyle}"
         TargetType="ToggleButton">
@@ -699,5 +695,34 @@
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="OperationsIconStyle"
+        BasedOn="{StaticResource DisabledGlyphStyle}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1" />
+                    <Condition Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+        <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="RenderTransformOrigin" Value="0.5, 0.5" />
+        <Setter Property="FontSize" Value="18" />
+    </Style>
+    <Style x:Key="OperationsProgressRingStyle" TargetType="ui:ProgressRing">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="1" />
+                    <Condition Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Visible" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
     </Style>
 </ResourceDictionary>
