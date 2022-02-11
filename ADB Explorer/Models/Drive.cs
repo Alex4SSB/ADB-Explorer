@@ -39,7 +39,7 @@ namespace ADB_Explorer.Models
         }
         public string DriveIcon => Type switch
         {
-            DriveType.Root => "\uE7EF",
+            DriveType.Root => "\uF259",
             DriveType.Internal => "\uEDA2",
             DriveType.Expansion => "\uE7F1",
             DriveType.External => "\uE88E",

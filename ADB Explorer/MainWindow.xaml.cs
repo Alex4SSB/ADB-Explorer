@@ -599,7 +599,7 @@ namespace ADB_Explorer
                 {
                     foreach (var item in DevicesObject.LogicalDevices.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
                     {
-                        item.EnableRoot(true);
+                        Task.Run(() => item.EnableRoot(true));
                     }
                 }
             }
@@ -1105,7 +1105,7 @@ namespace ADB_Explorer
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
-            foreach (var item in dialog.FilesAsShellObject
+            foreach (var item in dialog.FilesAsShellObject)
             {
                 fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), new FilePath(CurrentPath)));
             }
@@ -1988,9 +1988,16 @@ namespace ADB_Explorer
         {
             if (sender is ToggleButton toggle && toggle.DataContext is UILogicalDevice device && device.Device is LogicalDevice logical)
             {
-                logical.EnableRoot(toggle.IsChecked.Value);
-                if (logical.Root is AbstractDevice.RootStatus.Forbidden)
-                    MessageBox.Show("Root access cannot be enabled on selected device.", "Root Access", MessageBoxButton.OK, MessageBoxImage.Error);
+                bool rootToggle = toggle.IsChecked.Value;
+                var rootTask = Task.Run(() =>
+                {
+                    logical.EnableRoot(rootToggle);
+                });
+                rootTask.ContinueWith((t) => Dispatcher.BeginInvoke(() =>
+                {
+                    if (logical.Root is AbstractDevice.RootStatus.Forbidden)
+                        MessageBox.Show("Root access cannot be enabled on selected device.", "Root Access", MessageBoxButton.OK, MessageBoxImage.Error);
+                }));
             }
         }
 

@@ -469,12 +469,9 @@ namespace ADB_Explorer.Models
 
         public void EnableRoot(bool enable)
         {
-            Task.Run(() =>
-            {
-                Root = enable
-                    ? ADBService.Root(this) ? RootStatus.Enabled : RootStatus.Forbidden
-                    : ADBService.Unroot(this) ? RootStatus.Disabled : RootStatus.Unchecked;
-            });
+            Root = enable
+                ? ADBService.Root(this) ? RootStatus.Enabled : RootStatus.Forbidden
+                : ADBService.Unroot(this) ? RootStatus.Disabled : RootStatus.Unchecked;
         }
 
         public override string ToString() => Name;

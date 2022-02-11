@@ -204,6 +204,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    <helpers:FluentForwarder x:Name="MainWin" />
                     <ui:FontIcon
                         Margin="0,0,8,0"
                         FontSize="32"
