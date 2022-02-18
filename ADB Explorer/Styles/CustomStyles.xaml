@@ -2,11 +2,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
             </DataTrigger>
         </Style.Triggers>
@@ -53,7 +55,7 @@
     </Style>
     <Style x:Key="BorderStyle" TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="CornerRadius" Value="5" />
                 <Setter Property="BorderThickness" Value="1" />
             </DataTrigger>
@@ -584,7 +586,7 @@
         TargetType="CheckBox">
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-6,0" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
             </DataTrigger>
         </Style.Triggers>
@@ -595,7 +597,7 @@
         TargetType="RadioButton">
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
             </DataTrigger>
         </Style.Triggers>
@@ -611,7 +613,7 @@
     </Style>
     <Style x:Key="SeparatorStyle" TargetType="Separator">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="Height" Value="0" />
                 <Setter Property="Margin" Value="0" />
             </DataTrigger>
@@ -620,7 +622,7 @@
     <Style x:Key="ExpanderSeparatorStyle" TargetType="Separator">
         <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBorder}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
                 <Setter Property="Height" Value="0" />
             </DataTrigger>
         </Style.Triggers>
@@ -648,14 +650,14 @@
         BasedOn="{StaticResource CheckBoxStyle}"
         TargetType="CheckBox">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="QrBackgroundStyle" TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="CornerRadius" Value="0,0,5,5" />
             </DataTrigger>
         </Style.Triggers>
@@ -686,6 +688,7 @@
         TargetType="ToggleButton">
         <Setter Property="Padding" Value="6" />
         <Setter Property="ToolTip" Value="Enable Root Access" />
+        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="Bounce" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
                 <Setter Property="IsChecked" Value="True" />

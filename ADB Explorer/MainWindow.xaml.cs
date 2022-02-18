@@ -80,9 +80,6 @@ namespace ADB_Explorer
 
         private readonly List<MenuItem> PathButtons = new();
 
-        private static bool ForceFluentStyles => Storage.RetrieveBool(UserPrefs.forceFluentStyles) == true;
-        public static bool UseFluentStyles => Environment.OSVersion.Version > WIN11_VERSION || ForceFluentStyles;
-
         private void GetExplorerContentPresenter()
         {
             if (ExplorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)

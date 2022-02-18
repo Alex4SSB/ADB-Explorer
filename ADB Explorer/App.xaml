@@ -90,6 +90,9 @@
             <Color x:Key="LightAdbButtonBorderPressedOrDisabled">#FFECECEC</Color>
             <Color x:Key="LightAdbButtonForegroundPressedOrDisabled">#FF5F5F5F</Color>
 
+            <Color x:Key="DarkAdbWindowBackground">#FF2B2B2B</Color>
+            <Color x:Key="LightAdbWindowBackground">#FFF2F2F2</Color>
+
             <ResourceDictionary x:Key="DynamicBrushes">
                 <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
                 <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
@@ -126,6 +129,8 @@
                 <SolidColorBrush x:Key="AdbButtonSideBorderMouseOver" Color="{DynamicResource LightAdbButtonSideBorderMouseOver}" />
                 <SolidColorBrush x:Key="AdbButtonBorderPressedOrDisabled" Color="{DynamicResource LightAdbButtonBorderPressedOrDisabled}" />
                 <SolidColorBrush x:Key="AdbButtonForegroundPressedOrDisabled" Color="{DynamicResource LightAdbButtonForegroundPressedOrDisabled}" />
+
+                <SolidColorBrush x:Key="AdbWindowBackground" Color="{DynamicResource LightAdbWindowBackground}" />
             </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>

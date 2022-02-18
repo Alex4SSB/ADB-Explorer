@@ -3,6 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control  -->
@@ -47,7 +49,7 @@
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
@@ -60,7 +62,7 @@
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
@@ -73,15 +75,15 @@
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="CornerRadius" Value="0,0,5,5" />
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
-                    <Condition Binding="{Binding ElementName=HeaderSite, Path=Tag}" Value="HideArrow" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.IsListItem)}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
             </MultiDataTrigger>
@@ -143,9 +145,9 @@
                 <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
                 <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
             </Trigger>
-            <Trigger Property="Tag" Value="HideArrow">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.IsArrowVisible)}" Value="False">
                 <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
-            </Trigger>
+            </DataTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
@@ -154,6 +156,9 @@
     </Style>
 
     <Style x:Key="ExpanderStyle" TargetType="Expander">
+        <Style.Resources>
+            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button" />
+        </Style.Resources>
         <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
         <Setter Property="Template">
             <!--  Template copied from ModernWPF to be modified  -->
@@ -189,8 +194,7 @@
                                     FontWeight="{TemplateBinding FontWeight}"
                                     Foreground="{TemplateBinding Foreground}"
                                     IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                    Style="{StaticResource ExpanderHeaderStyle}"
-                                    Tag="{TemplateBinding Tag}" />
+                                    Style="{StaticResource ExpanderHeaderStyle}" />
                             </Border>
                             <Border
                                 x:Name="HeaderUpperBorder"
@@ -257,13 +261,13 @@
                         </Trigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Margin" Value="1,1,1,0" />
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
                                 <Condition Binding="{Binding ElementName=ContentBorder, Path=Visibility}" Value="Visible" />
                             </MultiDataTrigger.Conditions>
@@ -271,20 +275,20 @@
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
                                 <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
                                 <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
-                                <Condition Binding="{Binding ElementName=HeaderSite, Path=Tag}" Value="HideArrow" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsListItem)}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
                         </MultiDataTrigger>
-                        <DataTrigger Binding="{Binding ElementName=HeaderSite, Path=Tag}" Value="HideArrow">
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsArrowVisible)}" Value="False">
                             <Setter TargetName="DockPanel" Property="Margin" Value="0,1" />
                         </DataTrigger>
                         <Trigger SourceName="ExpandSite" Property="Height" Value="0">
@@ -305,13 +309,15 @@
         BasedOn="{StaticResource ExpanderStyle}"
         TargetType="Expander">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="True" />
+        <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
     </Style>
 
     <Style
@@ -321,11 +327,13 @@
         <Style.Triggers>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
             </MultiDataTrigger>
         </Style.Triggers>
+        <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="False" />
+        <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
     </Style>
 </ResourceDictionary>

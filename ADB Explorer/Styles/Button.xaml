@@ -2,13 +2,14 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <Style
         x:Key="ButtonStyle"
         BasedOn="{StaticResource DefaultButtonStyle}"
         TargetType="Button">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
                 <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusVisualRoundedStyle}" />
                 <Setter Property="Template">
@@ -69,7 +70,7 @@
                                     <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
                                     <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
                                 </Trigger>
-                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=UseFluentStyles}" Value="False">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
                                     <Setter TargetName="UpperBorder" Property="BorderBrush" Value="Transparent" />
                                     <Setter TargetName="LowerBorder" Property="BorderBrush" Value="Transparent" />
                                     <Setter TargetName="SideBorder" Property="BorderBrush" Value="Transparent" />
