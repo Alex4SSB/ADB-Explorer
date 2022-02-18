@@ -7,12 +7,12 @@ namespace ADB_Explorer.Helpers
 {
     public class InProgressTestOperation : FileOperation
     {
-        private AdbSyncProgressInfo info;
+        private FileSyncOperation.InProgressInfo info;
 
-        private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo info) :
+        private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
             base(dispatcher, adbDevice, new FilePath(filePath))
         {
-            this.info = info;
+            this.info = new FileSyncOperation.InProgressInfo(adbInfo);
         }
 
         public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
