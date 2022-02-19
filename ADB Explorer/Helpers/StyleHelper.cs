@@ -10,6 +10,8 @@ namespace ADB_Explorer.Helpers
             None,
             Bounce,
             Rotate,
+            LeftMarquee,
+            RightMarquee,
         }
 
         public static ContentAnimation GetContentAnimation(Control control) =>
@@ -38,5 +40,17 @@ namespace ADB_Explorer.Helpers
                 typeof(StyleHelper),
                 null);
 
+        public static bool GetUseFluentStyles(Control control) =>
+            (bool)control.GetValue(UseFluentStylesProperty);
+
+        public static void SetUseFluentStyles(Control control, bool value) =>
+            control.SetValue(UseFluentStylesProperty, value);
+
+        public static readonly DependencyProperty UseFluentStylesProperty =
+            DependencyProperty.RegisterAttached(
+                "UseFluentStyles",
+                typeof(bool),
+                typeof(StyleHelper),
+                null);
     }
 }

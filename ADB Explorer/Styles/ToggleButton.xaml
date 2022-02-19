@@ -46,6 +46,50 @@
                                         To="360"
                                         Duration="00:00:00.2" />
                                 </Storyboard>
+                                <Storyboard x:Key="LeftMarqueeStoryBoard">
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="ContentPresenter"
+                                        Storyboard.TargetProperty="RenderTransform.X"
+                                        From="0"
+                                        To="-30"
+                                        Duration="00:00:00.1" />
+                                    <DoubleAnimation
+                                        BeginTime="00:00:00.1"
+                                        Storyboard.TargetName="ContentPresenter"
+                                        Storyboard.TargetProperty="RenderTransform.X"
+                                        From="30"
+                                        To="0"
+                                        Duration="00:00:00.1">
+                                        <DoubleAnimation.EasingFunction>
+                                            <BounceEase
+                                                Bounces="2"
+                                                Bounciness="4"
+                                                EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
+                                <Storyboard x:Key="RightMarqueeStoryBoard">
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="ContentPresenter"
+                                        Storyboard.TargetProperty="RenderTransform.X"
+                                        From="0"
+                                        To="30"
+                                        Duration="00:00:00.1" />
+                                    <DoubleAnimation
+                                        BeginTime="00:00:00.1"
+                                        Storyboard.TargetName="ContentPresenter"
+                                        Storyboard.TargetProperty="RenderTransform.X"
+                                        From="-30"
+                                        To="0"
+                                        Duration="00:00:00.1">
+                                        <DoubleAnimation.EasingFunction>
+                                            <BounceEase
+                                                Bounces="2"
+                                                Bounciness="4"
+                                                EasingMode="EaseOut" />
+                                        </DoubleAnimation.EasingFunction>
+                                    </DoubleAnimation>
+                                </Storyboard>
                             </ControlTemplate.Resources>
                             <Border
                                 x:Name="Background"
@@ -103,10 +147,7 @@
                                     </MultiTrigger.Conditions>
                                     <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource BounceTransform}" />
                                     <MultiTrigger.EnterActions>
-                                        <BeginStoryboard
-                                            x:Name="BeginBounce"
-                                            HandoffBehavior="SnapshotAndReplace"
-                                            Storyboard="{StaticResource BouncingStoryBoard}" />
+                                        <BeginStoryboard Storyboard="{StaticResource BouncingStoryBoard}" />
                                     </MultiTrigger.EnterActions>
                                 </MultiTrigger>
                                 <MultiTrigger>
@@ -118,6 +159,26 @@
                                     <Setter TargetName="ContentPresenter" Property="RenderTransformOrigin" Value="0.5, 0.5" />
                                     <MultiTrigger.EnterActions>
                                         <BeginStoryboard Storyboard="{StaticResource RotatingStoryBoard}" />
+                                    </MultiTrigger.EnterActions>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+                                        <Condition Property="helpers:StyleHelper.ContentAnimation" Value="LeftMarquee" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource BounceTransform}" />
+                                    <MultiTrigger.EnterActions>
+                                        <BeginStoryboard Storyboard="{StaticResource LeftMarqueeStoryBoard}" />
+                                    </MultiTrigger.EnterActions>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+                                        <Condition Property="helpers:StyleHelper.ContentAnimation" Value="RightMarquee" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource BounceTransform}" />
+                                    <MultiTrigger.EnterActions>
+                                        <BeginStoryboard Storyboard="{StaticResource RightMarqueeStoryBoard}" />
                                     </MultiTrigger.EnterActions>
                                 </MultiTrigger>
                                 <!--  PointerOver  -->
@@ -256,6 +317,12 @@
                                     <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminateDisabled}" />
                                     <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminateDisabled}" />
                                 </MultiTrigger>
+                                <!--  Non-fluent  -->
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="Transparent" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="Transparent" />
+                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="Transparent" />
+                                </DataTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>

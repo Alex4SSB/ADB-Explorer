@@ -9,6 +9,7 @@
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control  -->
     <converters:MultiplyConverter x:Key="multiplyConverter" />
+    <Duration x:Key="AnimationDuration">00:00:00.2</Duration>
 
     <Storyboard x:Key="RotateTo180DegreesStoryboard">
         <DoubleAnimation
@@ -16,7 +17,7 @@
             Storyboard.TargetProperty="Angle"
             From="0"
             To="180"
-            Duration="00:00:00.2" />
+            Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
     <Storyboard x:Key="RotateTo0DegreesStoryboard">
@@ -25,7 +26,7 @@
             Storyboard.TargetProperty="Angle"
             From="180"
             To="360"
-            Duration="00:00:00.2" />
+            Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
     <Storyboard x:Key="ExpandingStoryboard">
@@ -33,7 +34,7 @@
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="Tag"
             To="1"
-            Duration="00:00:00.2" />
+            Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
     <Storyboard x:Key="CollapsingStoryboard">
@@ -41,7 +42,7 @@
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="Tag"
             To="0"
-            Duration="00:00:00.2" />
+            Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
     <Style

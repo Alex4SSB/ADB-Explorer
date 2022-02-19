@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
@@ -424,6 +425,7 @@
                             x:Name="OpenDeviceButton"
                             Grid.Column="1"
                             Margin="4,0"
+                            Padding="0,5,0,6"
                             HorizontalAlignment="Stretch"
                             Click="OpenDeviceButton_Click"
                             Content="Browse"
@@ -480,6 +482,7 @@
                     </Menu.Resources>
                     <MenuItem
                         x:Name="OpenDevicesButton"
+                        helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="OpenDevicesButton_Click"
                         IsEnabled="False"
                         ToolTip="Devices">
@@ -627,45 +630,22 @@
                         <Setter Property="FontSize" Value="18" />
                     </Style>
                 </StackPanel.Resources>
-                <StackPanel VerticalAlignment="Center">
-                    <Menu>
-                        <MenuItem
-                            x:Name="FileOperationsButton"
-                            Click="FileOperationsButton_Click"
-                            ToolTip="File Operations">
-                            <MenuItem.Triggers>
-                                <EventTrigger RoutedEvent="MenuItem.Click">
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation
-                                                Storyboard.TargetName="RotateTransform"
-                                                Storyboard.TargetProperty="Angle"
-                                                From="0"
-                                                To="360"
-                                                Duration="00:00:00.2" />
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger>
-                            </MenuItem.Triggers>
-                            <MenuItem.Header>
-                                <Grid>
-                                    <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}">
-                                        <ui:FontIcon.RenderTransformOrigin>
-                                            <Point X="0.5" Y="0.5" />
-                                        </ui:FontIcon.RenderTransformOrigin>
-                                        <ui:FontIcon.RenderTransform>
-                                            <RotateTransform x:Name="RotateTransform" />
-                                        </ui:FontIcon.RenderTransform>
-                                    </ui:FontIcon>
-                                    <ui:ProgressRing IsActive="True" Style="{StaticResource OperationsProgressRingStyle}" />
-                                </Grid>
-                            </MenuItem.Header>
-                        </MenuItem>
-                    </Menu>
-                </StackPanel>
                 <Menu>
                     <MenuItem
+                        x:Name="FileOperationsButton"
+                        helpers:StyleHelper.ContentAnimation="Rotate"
+                        Click="FileOperationsButton_Click"
+                        ToolTip="File Operations">
+                        <MenuItem.Header>
+                            <Grid>
+                                <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}" />
+                                <ui:ProgressRing IsActive="True" Style="{StaticResource OperationsProgressRingStyle}" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem
                         x:Name="SettingsButton"
+                        helpers:StyleHelper.ContentAnimation="Rotate"
                         Click="SettingsButton_Click"
                         ToolTip="Settings">
                         <MenuItem.Header>
@@ -690,6 +670,7 @@
                             </Menu.Resources>
                             <MenuItem
                                 x:Name="HomeButton"
+                                helpers:StyleHelper.ContentAnimation="Bounce"
                                 Click="HomeButton_Click"
                                 IsEnabled="False"
                                 ToolTip="Device Drives">
@@ -699,6 +680,7 @@
                             </MenuItem>
                             <MenuItem
                                 x:Name="BackButton"
+                                helpers:StyleHelper.ContentAnimation="LeftMarquee"
                                 Click="BackButton_Click"
                                 IsEnabled="False"
                                 ToolTip="Back">
@@ -708,6 +690,7 @@
                             </MenuItem>
                             <MenuItem
                                 x:Name="ForwardButton"
+                                helpers:StyleHelper.ContentAnimation="RightMarquee"
                                 Click="ForwardButton_Click"
                                 IsEnabled="False"
                                 ToolTip="Forward">
@@ -717,6 +700,7 @@
                             </MenuItem>
                             <MenuItem
                                 x:Name="ParentButton"
+                                helpers:StyleHelper.ContentAnimation="Bounce"
                                 Click="ParentButton_Click"
                                 IsEnabled="False"
                                 ToolTip="Up">
