@@ -409,7 +409,7 @@
                 <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
             </Trigger>
         </Style.Triggers>
-        <Setter Property="Foreground" Value="{StaticResource SystemControlErrorTextForegroundBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlErrorTextForegroundBrush}" />
     </Style>
     <DataTemplate x:Key="FileOpCompletedInfoTemplate">
         <Grid Margin="4,0">
@@ -727,5 +727,39 @@
             </MultiDataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
+    </Style>
+    <Style x:Key="DirectoryLoadingProgressStyle" TargetType="ui:ProgressBar">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=PathBox, Path=IsFocused}" Value="True">
+                <Setter Property="IsIndeterminate" Value="False" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="False">
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="Margin" Value="0" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+                <Setter Property="CornerRadius" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="IsIndeterminate" Value="True" />
+        <Setter Property="CornerRadius" Value="4,4,2,2" />
+        <Setter Property="Margin" Value="0,0,0,1" />
+    </Style>
+    <Style
+        x:Key="DriveItemStyle"
+        BasedOn="{StaticResource ButtonStyle}"
+        TargetType="Button">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="False">
+                <Setter Property="Background" Value="Transparent" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DriveUsageBarStyle" TargetType="ui:ProgressBar">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding UsageWarning}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

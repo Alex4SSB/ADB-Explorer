@@ -332,4 +332,6 @@
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
     </Style>
+
+    <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton" />
 </ResourceDictionary>
