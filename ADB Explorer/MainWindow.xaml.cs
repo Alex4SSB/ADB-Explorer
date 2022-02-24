@@ -36,23 +36,17 @@ namespace ADB_Explorer
     {
         private readonly DispatcherTimer ConnectTimer = new();
         private Mutex connectTimerMutex = new();
-        private Task listDirTask;
-        private Task unknownFoldersTask;
-        private DispatcherTimer dirListUpdateTimer;
-        private CancellationTokenSource dirListCancelTokenSource;
-        private CancellationTokenSource determineFoldersCancelTokenSource;
-        private ConcurrentQueue<FileStat> waitingFileStats;
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
         private bool TextBoxChangedMutex;
         private SolidColorBrush qrForeground, qrBackground;
         private ThemeService themeService = new();
 
+        public DirectoryLister DirectoryLister { get; private set; }
+
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
-
-        public bool ListingInProgress { get { return listDirTask is not null; } }
 
         private double ColumnHeaderHeight
         {
@@ -207,11 +201,9 @@ namespace ADB_Explorer
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (listDirTask is not null)
+            if (DirectoryLister is not null)
             {
-                StopDirectoryList();
-                StopDetermineFolders();
-                AndroidFileList.RemoveAll();
+                DirectoryLister.Stop();
             }
 
             ConnectTimer.Stop();
@@ -437,6 +429,7 @@ namespace ADB_Explorer
 
             DevicesObject.SetOpen(DevicesObject.Current, true);
             CurrentADBDevice = new(DevicesObject.CurrentDevice);
+            DirectoryLister = new(Dispatcher, CurrentADBDevice);
             if (init)
                 InitDevice();
         }
@@ -566,17 +559,7 @@ namespace ADB_Explorer
             ExplorerGrid.Visibility = Visibility.Visible;
             CombinePrettyNames();
 
-            unknownFoldersTask = Task.Run(() => { });
-            dirListCancelTokenSource = new CancellationTokenSource();
-            determineFoldersCancelTokenSource = new CancellationTokenSource();
-            waitingFileStats = new ConcurrentQueue<FileStat>();
-            dirListUpdateTimer = new DispatcherTimer
-            {
-                Interval = DIR_LIST_UPDATE_INTERVAL
-            };
-            dirListUpdateTimer.Tick += DirListUpdateTimer_Tick;
-
-            ExplorerGrid.ItemsSource = AndroidFileList;
+            ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             PushMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
             NavHistory.Reset();
@@ -648,105 +631,6 @@ namespace ADB_Explorer
             });
         }
 
-        private void StartDirectoryList(string path)
-        {
-            Cursor = Cursors.AppStarting;
-
-            Dispatcher.BeginInvoke(() =>
-            {
-                StopDirectoryList();
-                StopDetermineFolders();
-
-                AndroidFileList.RemoveAll();
-
-                determineFoldersCancelTokenSource = new CancellationTokenSource();
-                dirListCancelTokenSource = new CancellationTokenSource();
-                waitingFileStats = new ConcurrentQueue<FileStat>();
-
-                listDirTask = Task.Run(() => CurrentADBDevice.ListDirectory(path, ref waitingFileStats, dirListCancelTokenSource.Token));
-
-                if (listDirTask.Wait(DIR_LIST_SYNC_TIMEOUT))
-                {
-                    StopDirectoryList();
-                }
-                else
-                {
-                    DirectoryLoadingProgressBar.Visibility =
-                    UnfinishedBlock.Visibility = Visibility.Visible;
-
-                    UpdateDirectoryList();
-                    dirListUpdateTimer.Start();
-                    listDirTask.ContinueWith((t) => Application.Current?.Dispatcher.BeginInvoke(() => StopDirectoryList()));
-                }
-            });
-        }
-
-        private void UpdateDirectoryList()
-        {
-            if (listDirTask is null) return;
-
-            bool wasEmpty = (AndroidFileList.Count == 0);
-
-            var newFiles = waitingFileStats.DequeueAllExisting().Select(f => FileClass.GenerateAndroidFile(f)).ToArray();
-            AndroidFileList.AddRange(newFiles);
-            var unknownFiles = newFiles.Where(f => f.Type == FileType.Unknown);
-            StartDetermineFolders(unknownFiles);
-
-            if (wasEmpty && (AndroidFileList.Count > 0))
-            {
-                ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
-            }
-        }
-
-        private void StopDirectoryList()
-        {
-            if (listDirTask is null) return;
-
-            Cursor = null;
-            DirectoryLoadingProgressBar.Visibility =
-            UnfinishedBlock.Visibility = Visibility.Collapsed;
-
-            dirListUpdateTimer.Stop();
-            dirListCancelTokenSource.Cancel();
-            listDirTask.Wait();
-            UpdateDirectoryList();
-            listDirTask = null;
-            dirListCancelTokenSource = null;
-        }
-
-        private void StartDetermineFolders(IEnumerable<FileClass> files)
-        {
-            unknownFoldersTask.ContinueWith((t) =>
-            {
-                if (determineFoldersCancelTokenSource != null)
-                {
-                    DetermineFolders(files, determineFoldersCancelTokenSource.Token);
-                }
-            });
-        }
-
-        private static void DetermineFolders(IEnumerable<FileClass> files, CancellationToken cancellationToken)
-        {
-            foreach (var file in files)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-                else if (CurrentADBDevice.IsDirectory(file.FullPath))
-                {
-                    Application.Current?.Dispatcher.BeginInvoke(() => { file.Type = FileType.Folder; });
-                }
-            }
-        }
-
-        private void StopDetermineFolders()
-        {
-            determineFoldersCancelTokenSource.Cancel();
-            unknownFoldersTask.Wait();
-            determineFoldersCancelTokenSource = null;
-        }
-
         public bool NavigateToPath(string path, bool bfNavigated = false)
         {
             ExplorerGrid.Focus();
@@ -775,7 +659,7 @@ namespace ADB_Explorer
 
             ParentButton.IsEnabled = CurrentPath != ParentPath;
 
-            StartDirectoryList(realPath);
+            DirectoryLister.Navigate(realPath);
             return true;
         }
 
@@ -783,11 +667,6 @@ namespace ADB_Explorer
         {
             BackButton.IsEnabled = NavHistory.BackAvailable;
             ForwardButton.IsEnabled = NavHistory.ForwardAvailable;
-        }
-
-        private void DirListUpdateTimer_Tick(object sender, EventArgs e)
-        {
-            UpdateDirectoryList();
         }
 
         private void PopulateButtons(string path)
@@ -1285,6 +1164,7 @@ namespace ADB_Explorer
             {
                 DevicesObject.SetOpen(device);
                 CurrentADBDevice = new(device);
+                DirectoryLister = new(Dispatcher, CurrentADBDevice);
 
                 ClearExplorer();
                 InitDevice();
@@ -1326,6 +1206,7 @@ namespace ADB_Explorer
                 ClearExplorer();
                 DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
+                DirectoryLister = null;
             }
             DeviceListSetup();
         }
@@ -1333,7 +1214,6 @@ namespace ADB_Explorer
         private void ClearExplorer()
         {
             CurrentPrettyNames.Clear();
-            AndroidFileList.Clear();
             ExplorerGrid.Items.Refresh();
             PathStackPanel.Children.Clear();
             CurrentPath = null;

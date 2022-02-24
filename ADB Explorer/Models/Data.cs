@@ -11,8 +11,6 @@ namespace ADB_Explorer.Models
     {
         public static ADBService.AdbDevice CurrentADBDevice { get; set; } = null;
 
-        public static ObservableList<FileClass> AndroidFileList { get; set; } = new();
-
         public static string CurrentPath { get; set; }
         public static string ParentPath { get; set; }
 
