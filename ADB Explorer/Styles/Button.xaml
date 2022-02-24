@@ -13,6 +13,7 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+                <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundNormal}" />
                 <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="False" />
                 <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusVisualRoundedStyle}" />
                 <Setter Property="Template">
@@ -93,7 +94,7 @@
                             </ControlTemplate.Resources>
                             <Border
                                 x:Name="Background"
-                                Background="{DynamicResource AdbButtonBackgroundNormal}"
+                                Background="{TemplateBinding Background}"
                                 CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
                                 SnapsToDevicePixels="True">
                                 <Grid>
@@ -213,4 +214,6 @@
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
     </Style>
+
+    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button" />
 </ResourceDictionary>

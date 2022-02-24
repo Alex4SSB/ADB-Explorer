@@ -198,8 +198,8 @@
             </StackPanel>
         </ui:Flyout>
         <DataTemplate x:Key="DriveItemTemplate" DataType="Drive">
-            <ui:ListViewItem MouseDoubleClick="DriveItem_MouseDoubleClick">
-                <Grid MinWidth="256">
+            <Button MouseDoubleClick="DriveItem_MouseDoubleClick" Style="{StaticResource DriveItemStyle}">
+                <Grid Width="260" Margin="0,-4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
@@ -258,7 +258,10 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <ui:ProgressBar Margin="0,6" Value="{Binding UsageP, Mode=OneWay}" />
+                            <ui:ProgressBar
+                                Margin="0,6"
+                                Style="{StaticResource DriveUsageBarStyle}"
+                                Value="{Binding UsageP, Mode=OneWay}" />
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding Available, Mode=OneWay}" />
                                 <TextBlock Text=" free of " />
@@ -267,7 +270,7 @@
                         </StackPanel>
                     </StackPanel>
                 </Grid>
-            </ui:ListViewItem>
+            </Button>
         </DataTemplate>
         <HierarchicalDataTemplate
             x:Key="FileOpSettingsTreeTemplate"
@@ -709,16 +712,7 @@
                                 </MenuItem.Header>
                             </MenuItem>
                         </Menu>
-                        <ui:ProgressBar
-                            x:Name="DirectoryLoadingProgressBar"
-                            Grid.Column="1"
-                            Margin="6"
-                            VerticalAlignment="Stretch"
-                            Background="Transparent"
-                            CornerRadius="2"
-                            Foreground="#780078D7"
-                            IsIndeterminate="True"
-                            Visibility="Collapsed" />
+
                         <Grid Grid.Column="1" Margin="6">
                             <Grid.Resources>
                                 <Style TargetType="TextBlock">
@@ -734,6 +728,14 @@
                                 KeyDown="PathBox_KeyDown"
                                 LostFocus="PathBox_LostFocus"
                                 Style="{StaticResource TextBoxFluentStyle}" />
+                            <ui:ProgressBar
+                                x:Name="DirectoryLoadingProgressBar"
+                                VerticalAlignment="Stretch"
+                                Background="Transparent"
+                                Foreground="#780078D7"
+                                IsHitTestVisible="False"
+                                Style="{StaticResource DirectoryLoadingProgressStyle}"
+                                Visibility="Collapsed" />
                             <StackPanel
                                 x:Name="PathStackPanel"
                                 Margin="5,0,0,0"

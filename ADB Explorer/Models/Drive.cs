@@ -18,6 +18,8 @@ namespace ADB_Explorer.Models
 
     public class Drive : INotifyPropertyChanged
     {
+        private const sbyte usageWarningTh = 90;
+
         public string Size { get; private set; }
         public string Used { get; private set; }
         public string Available { get; private set; }
@@ -25,6 +27,8 @@ namespace ADB_Explorer.Models
         public string Path { get; private set; }
         public string ID => Path[(Path.LastIndexOf('/') + 1)..];
         public string PrettyName => DRIVES_PRETTY_NAMES[Type];
+        public bool UsageWarning => UsageP >= usageWarningTh;
+
         private DriveType type;
         public DriveType Type
         {

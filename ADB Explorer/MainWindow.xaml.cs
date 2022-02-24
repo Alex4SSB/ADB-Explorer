@@ -1451,7 +1451,7 @@ namespace ADB_Explorer
 
         private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is Drive drive)
+            if (sender is Button item && item.DataContext is Drive drive)
             {
                 InitNavigation(drive.Path);
             }
