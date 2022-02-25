@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace ADB_Explorer.Converters
 {
-    public class MultiplyConverter : IMultiValueConverter
+    public class HeightConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {

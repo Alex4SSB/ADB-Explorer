@@ -1477,16 +1477,16 @@ namespace ADB_Explorer
         {
             if (value is not null)
             {
-                FileOperationsButton.Tag = value;
+                RemoteToggle.SetIsTargetVisible(FileOperationsButton, value.Value);
                 return;
             }
 
-            FileOperationsButton.Tag = !FileOpVisibility();
+            RemoteToggle.SetIsTargetVisible(FileOperationsButton,!FileOpVisibility());
         }
 
         private bool FileOpVisibility()
         {
-            return FileOperationsButton.Tag is bool and true;
+            return RemoteToggle.GetIsTargetVisible(FileOperationsButton);
         }
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -2000,7 +2000,7 @@ namespace ADB_Explorer
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
-            FileOperationsButton.Tag = false;
+            FileOpVisibility(false);
         }
     }
 }

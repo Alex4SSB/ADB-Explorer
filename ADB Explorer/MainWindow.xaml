@@ -639,6 +639,11 @@
                         helpers:StyleHelper.ContentAnimation="Rotate"
                         Click="FileOperationsButton_Click"
                         ToolTip="File Operations">
+                        <MenuItem.Style>
+                            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                <Setter Property="helpers:RemoteToggle.IsTargetVisible" Value="False" />
+                            </Style>
+                        </MenuItem.Style>
                         <MenuItem.Header>
                             <Grid>
                                 <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}" />
@@ -996,222 +1001,228 @@
                     </Grid>
                 </Grid>
             </Border>
-            <Grid
-                x:Name="FileOpDetailedGrid"
+            <Expander
                 Grid.Row="4"
-                IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed" />
+                helpers:ExpanderHelper.IsArrowVisible="False"
+                helpers:ExpanderHelper.IsHeaderVisible="False">
+                <Expander.Style>
+                    <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
                                     <Condition Binding="{Binding ElementName=FileOpDetailedRadioButton, Path=IsChecked}" Value="True" />
-                                    <Condition Binding="{Binding ElementName=FileOperationsButton, Path=Tag}" Value="True" />
+                                    <Condition Binding="{Binding ElementName=FileOperationsButton, Path=(helpers:RemoteToggle.IsTargetVisible)}" Value="True" />
                                 </MultiDataTrigger.Conditions>
-                                <Setter Property="Visibility" Value="Visible" />
+                                <Setter Property="IsExpanded" Value="True" />
                             </MultiDataTrigger>
                         </Style.Triggers>
+                        <Setter Property="IsExpanded" Value="False" />
                     </Style>
-                </Grid.Style>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
-                <GridSplitter
-                    Height="3"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Top"
-                    BorderBrush="Gray"
-                    DragDelta="GridSplitter_DragDelta"
-                    FocusVisualStyle="{x:Null}" />
-                <Grid Grid.Row="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ScrollViewer
-                        x:Name="PendingAndCompletedDetailedScrollViewer"
-                        HorizontalScrollBarVisibility="Auto"
-                        PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <DataGrid
-                                    x:Name="CurrentOperationDetailedDataGrid"
-                                    Grid.Column="1"
-                                    AutoGenerateColumns="False"
-                                    CanUserDeleteRows="False"
-                                    CellStyle="{StaticResource DataGridCellStyle}"
-                                    FocusVisualStyle="{x:Null}"
-                                    HeadersVisibility="Column"
-                                    ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
-                                    <DataGrid.Resources>
-                                        <Style BasedOn="{StaticResource FileOpColumnHeaderStyle}" TargetType="DataGridColumnHeader" />
-                                    </DataGrid.Resources>
-                                    <DataGrid.Columns>
-                                        <DataGridTemplateColumn
-                                            Width="30"
-                                            CanUserResize="False"
-                                            CellTemplate="{StaticResource OperationIconTemplate}">
-                                            <DataGridTemplateColumn.Header>
-                                                <ui:FontIcon
-                                                    Margin="-7,0"
-                                                    Glyph="&#xE8AF;"
-                                                    ToolTip="Operation" />
-                                            </DataGridTemplateColumn.Header>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn
-                                            Width="300"
-                                            CellTemplate="{StaticResource FileOpFileNameTemplate}"
-                                            Header="File Name" />
-                                        <DataGridTemplateColumn
-                                            MinWidth="100"
-                                            CellTemplate="{StaticResource FileOpProgressTemplate}"
-                                            Header="Progress" />
-                                        <DataGridTemplateColumn
-                                            Width="300"
-                                            CellTemplate="{StaticResource FileOpSourcePathTemplate}"
-                                            Header="Source Path" />
-                                        <DataGridTemplateColumn
-                                            Width="300"
-                                            CellTemplate="{StaticResource FileOpTargetPathTemplate}"
-                                            Header="Destination Path" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <ui:FontIcon
-                                    Margin="4,6"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Glyph="&#xE9F3;"
-                                    ToolTip="Current" />
-                            </Grid>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <DataGrid
-                                    x:Name="PendingOperationsDetailedDataGrid"
-                                    Grid.Column="1"
-                                    AutoGenerateColumns="False"
-                                    CellStyle="{StaticResource DataGridCellStyle}"
-                                    FocusVisualStyle="{x:Null}"
-                                    HeadersVisibility="Column"
-                                    HorizontalScrollBarVisibility="Disabled"
-                                    ItemsSource="{Binding ElementName=PendingOperationsDataGrid, Path=ItemsSource}"
-                                    SelectionUnit="FullRow"
-                                    VerticalScrollBarVisibility="Disabled">
-                                    <DataGrid.Columns>
-                                        <DataGridTemplateColumn
-                                            Width="30"
-                                            CanUserResize="False"
-                                            CellTemplate="{StaticResource OperationIconTemplate}">
-                                            <DataGridTemplateColumn.Header>
-                                                <ui:FontIcon
-                                                    Margin="-7,0"
-                                                    Glyph="&#xE8AF;"
-                                                    ToolTip="Operation" />
-                                            </DataGridTemplateColumn.Header>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn
-                                            Width="300"
-                                            CellTemplate="{StaticResource FileOpFileNameTemplate}"
-                                            Header="File Name" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <ui:FontIcon
-                                    Margin="4,6"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Glyph="&#xECC5;"
-                                    ToolTip="Pending" />
-                            </Grid>
-                            <Grid Margin="0,0,0,20">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition />
-                                </Grid.ColumnDefinitions>
-                                <DataGrid
-                                    x:Name="CompletedOperationsDetailedDataGrid"
-                                    Grid.Column="1"
-                                    Width="Auto"
-                                    AutoGenerateColumns="False"
-                                    CellStyle="{StaticResource DataGridCellStyle}"
-                                    FocusVisualStyle="{x:Null}"
-                                    HeadersVisibility="Column"
-                                    HorizontalScrollBarVisibility="Disabled"
-                                    ItemsSource="{Binding ElementName=CompletedOperationsDataGrid, Path=ItemsSource}"
-                                    SelectionUnit="FullRow"
-                                    VerticalScrollBarVisibility="Disabled">
-                                    <DataGrid.Columns>
-                                        <DataGridTemplateColumn
-                                            Width="30"
-                                            CanUserResize="False"
-                                            CellTemplate="{StaticResource OperationIconTemplate}">
-                                            <DataGridTemplateColumn.Header>
-                                                <ui:FontIcon
-                                                    Margin="-7,0"
-                                                    Glyph="&#xE8AF;"
-                                                    ToolTip="Operation" />
-                                            </DataGridTemplateColumn.Header>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn
-                                            Width="300"
-                                            CellTemplate="{StaticResource FileOpFileNameTemplate}"
-                                            Header="File Name" />
-                                        <DataGridTemplateColumn
-                                            Width="30"
-                                            CanUserResize="False"
-                                            CellTemplate="{StaticResource StatusIconTemplate}">
-                                            <DataGridTemplateColumn.Header>
-                                                <ui:FontIcon
-                                                    Margin="-7,0"
-                                                    Glyph="&#xE9CE;"
-                                                    ToolTip="Status" />
-                                            </DataGridTemplateColumn.Header>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTemplateColumn
+                </Expander.Style>
+                <Expander.Content>
+                    <Grid x:Name="FileOpDetailedGrid" IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <GridSplitter
+                            x:Name="FileOpDetailedSplitter"
+                            Height="3"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            BorderBrush="Gray"
+                            DragDelta="GridSplitter_DragDelta"
+                            FocusVisualStyle="{x:Null}" />
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ScrollViewer
+                                x:Name="PendingAndCompletedDetailedScrollViewer"
+                                HorizontalScrollBarVisibility="Auto"
+                                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <DataGrid
+                                            x:Name="CurrentOperationDetailedDataGrid"
+                                            Grid.Column="1"
+                                            AutoGenerateColumns="False"
+                                            CanUserDeleteRows="False"
+                                            CellStyle="{StaticResource DataGridCellStyle}"
+                                            FocusVisualStyle="{x:Null}"
+                                            HeadersVisibility="Column"
+                                            ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
+                                            <DataGrid.Resources>
+                                                <Style BasedOn="{StaticResource FileOpColumnHeaderStyle}" TargetType="DataGridColumnHeader" />
+                                            </DataGrid.Resources>
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn
+                                                    Width="30"
+                                                    CanUserResize="False"
+                                                    CellTemplate="{StaticResource OperationIconTemplate}">
+                                                    <DataGridTemplateColumn.Header>
+                                                        <ui:FontIcon
+                                                            Margin="-7,0"
+                                                            Glyph="&#xE8AF;"
+                                                            ToolTip="Operation" />
+                                                    </DataGridTemplateColumn.Header>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTemplateColumn
+                                                    Width="300"
+                                                    CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                                                    Header="File Name" />
+                                                <DataGridTemplateColumn
+                                                    MinWidth="100"
+                                                    CellTemplate="{StaticResource FileOpProgressTemplate}"
+                                                    Header="Progress" />
+                                                <DataGridTemplateColumn
+                                                    Width="300"
+                                                    CellTemplate="{StaticResource FileOpSourcePathTemplate}"
+                                                    Header="Source Path" />
+                                                <DataGridTemplateColumn
+                                                    Width="300"
+                                                    CellTemplate="{StaticResource FileOpTargetPathTemplate}"
+                                                    Header="Destination Path" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <ui:FontIcon
+                                            Margin="4,6"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Glyph="&#xE9F3;"
+                                            ToolTip="Current" />
+                                    </Grid>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <DataGrid
+                                            x:Name="PendingOperationsDetailedDataGrid"
+                                            Grid.Column="1"
+                                            AutoGenerateColumns="False"
+                                            CellStyle="{StaticResource DataGridCellStyle}"
+                                            FocusVisualStyle="{x:Null}"
+                                            HeadersVisibility="Column"
+                                            HorizontalScrollBarVisibility="Disabled"
+                                            ItemsSource="{Binding ElementName=PendingOperationsDataGrid, Path=ItemsSource}"
+                                            SelectionUnit="FullRow"
+                                            VerticalScrollBarVisibility="Disabled">
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn
+                                                    Width="30"
+                                                    CanUserResize="False"
+                                                    CellTemplate="{StaticResource OperationIconTemplate}">
+                                                    <DataGridTemplateColumn.Header>
+                                                        <ui:FontIcon
+                                                            Margin="-7,0"
+                                                            Glyph="&#xE8AF;"
+                                                            ToolTip="Operation" />
+                                                    </DataGridTemplateColumn.Header>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTemplateColumn
+                                                    Width="300"
+                                                    CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                                                    Header="File Name" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <ui:FontIcon
+                                            Margin="4,6"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Glyph="&#xECC5;"
+                                            ToolTip="Pending" />
+                                    </Grid>
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <DataGrid
+                                            x:Name="CompletedOperationsDetailedDataGrid"
+                                            Grid.Column="1"
                                             Width="Auto"
-                                            CellTemplate="{StaticResource FileOpStatusTemplate}"
-                                            Header="Status" />
-                                        <DataGridTemplateColumn
-                                            Width="180"
-                                            MinWidth="100"
-                                            CellTemplate="{StaticResource FileOpCompletedInfoTemplate}"
-                                            Header="Progress" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                                <ui:FontIcon
-                                    Margin="4,6"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Top"
-                                    Glyph="&#xE930;"
-                                    ToolTip="Completed" />
-                            </Grid>
-                        </StackPanel>
-                    </ScrollViewer>
-                    <Border
-                        Grid.Column="1"
-                        BorderBrush="Gray"
-                        BorderThickness="1,0,0,0" />
-                    <WrapPanel
-                        Grid.Column="1"
-                        Margin="1,0,0,0"
-                        FlowDirection="RightToLeft"
-                        Orientation="Vertical">
-                        <WrapPanel.Resources>
-                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
-                        </WrapPanel.Resources>
-                        <StaticResource ResourceKey="FileOpStopMenu" />
-                        <StaticResource ResourceKey="FileOpRemoveMenu" />
-                        <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
-                    </WrapPanel>
-                </Grid>
-            </Grid>
+                                            AutoGenerateColumns="False"
+                                            CellStyle="{StaticResource DataGridCellStyle}"
+                                            FocusVisualStyle="{x:Null}"
+                                            HeadersVisibility="Column"
+                                            HorizontalScrollBarVisibility="Disabled"
+                                            ItemsSource="{Binding ElementName=CompletedOperationsDataGrid, Path=ItemsSource}"
+                                            SelectionUnit="FullRow"
+                                            VerticalScrollBarVisibility="Disabled">
+                                            <DataGrid.Columns>
+                                                <DataGridTemplateColumn
+                                                    Width="30"
+                                                    CanUserResize="False"
+                                                    CellTemplate="{StaticResource OperationIconTemplate}">
+                                                    <DataGridTemplateColumn.Header>
+                                                        <ui:FontIcon
+                                                            Margin="-7,0"
+                                                            Glyph="&#xE8AF;"
+                                                            ToolTip="Operation" />
+                                                    </DataGridTemplateColumn.Header>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTemplateColumn
+                                                    Width="300"
+                                                    CellTemplate="{StaticResource FileOpFileNameTemplate}"
+                                                    Header="File Name" />
+                                                <DataGridTemplateColumn
+                                                    Width="30"
+                                                    CanUserResize="False"
+                                                    CellTemplate="{StaticResource StatusIconTemplate}">
+                                                    <DataGridTemplateColumn.Header>
+                                                        <ui:FontIcon
+                                                            Margin="-7,0"
+                                                            Glyph="&#xE9CE;"
+                                                            ToolTip="Status" />
+                                                    </DataGridTemplateColumn.Header>
+                                                </DataGridTemplateColumn>
+                                                <DataGridTemplateColumn
+                                                    Width="Auto"
+                                                    CellTemplate="{StaticResource FileOpStatusTemplate}"
+                                                    Header="Status" />
+                                                <DataGridTemplateColumn
+                                                    Width="180"
+                                                    MinWidth="100"
+                                                    CellTemplate="{StaticResource FileOpCompletedInfoTemplate}"
+                                                    Header="Progress" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <ui:FontIcon
+                                            Margin="4,6"
+                                            HorizontalAlignment="Left"
+                                            VerticalAlignment="Top"
+                                            Glyph="&#xE930;"
+                                            ToolTip="Completed" />
+                                    </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
+                            <Border
+                                Grid.Column="1"
+                                BorderBrush="Gray"
+                                BorderThickness="1,0,0,0" />
+                            <WrapPanel
+                                Grid.Column="1"
+                                Margin="1,0,0,0"
+                                FlowDirection="RightToLeft"
+                                Orientation="Vertical">
+                                <WrapPanel.Resources>
+                                    <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
+                                </WrapPanel.Resources>
+                                <StaticResource ResourceKey="FileOpStopMenu" />
+                                <StaticResource ResourceKey="FileOpRemoveMenu" />
+                                <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
+                            </WrapPanel>
+                        </Grid>
+                    </Grid>
+                </Expander.Content>
+            </Expander>
+
             <StackPanel Grid.Row="3" Orientation="Horizontal">
                 <StackPanel.Resources>
                     <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
@@ -1328,7 +1339,7 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding ElementName=FileOpCompactRadioButton, Path=IsChecked}" Value="True" />
-                                <Condition Binding="{Binding ElementName=FileOperationsButton, Path=Tag}" Value="True" />
+                                <Condition Binding="{Binding ElementName=FileOperationsButton, Path=(helpers:RemoteToggle.IsTargetVisible)}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="IsPaneOpen" Value="True" />
                         </MultiDataTrigger>

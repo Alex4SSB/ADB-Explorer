@@ -8,8 +8,11 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control  -->
-    <converters:MultiplyConverter x:Key="multiplyConverter" />
+    <converters:MarginConverter x:Key="marginConverter" />
+    <converters:HeightConverter x:Key="heightConverter" />
     <Duration x:Key="AnimationDuration">00:00:00.2</Duration>
+    <Duration x:Key="ExpandDuration">00:00:00.3</Duration>
+    <Duration x:Key="CollapseDuration">00:00:00.4</Duration>
 
     <Storyboard x:Key="RotateTo180DegreesStoryboard">
         <DoubleAnimation
@@ -34,10 +37,26 @@
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="Tag"
             To="1"
-            Duration="{StaticResource AnimationDuration}" />
+            Duration="{StaticResource ExpandDuration}" />
     </Storyboard>
 
     <Storyboard x:Key="CollapsingStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="Tag"
+            To="0"
+            Duration="{StaticResource CollapseDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="ShortExpandingStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="Tag"
+            To="1"
+            Duration="{StaticResource AnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="ShortCollapsingStoryboard">
         <DoubleAnimation
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="Tag"
@@ -166,7 +185,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Expander">
                     <DockPanel x:Name="DockPanel">
-                        <Grid DockPanel.Dock="Top">
+                        <Grid x:Name="HeaderArea" DockPanel.Dock="Top">
                             <Border
                                 x:Name="DummyBorder"
                                 CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
@@ -216,6 +235,7 @@
                         <Border
                             x:Name="ContentBorder"
                             BorderThickness="1,0,1,1"
+                            ClipToBounds="True"
                             DockPanel.Dock="Bottom"
                             Style="{StaticResource ExpanderContentBorderStyle}">
                             <StackPanel x:Name="ExpandSite" VerticalAlignment="Top">
@@ -223,12 +243,24 @@
                                     <sys:Double>0.0</sys:Double>
                                 </StackPanel.Tag>
                                 <StackPanel.Height>
-                                    <MultiBinding Converter="{StaticResource multiplyConverter}">
+                                    <MultiBinding Converter="{StaticResource heightConverter}">
                                         <Binding ElementName="ExpanderContent" Path="ActualHeight" />
                                         <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
                                     </MultiBinding>
                                 </StackPanel.Height>
-                                <StackPanel x:Name="ExpanderContent" Margin="6,0">
+                                <StackPanel.Margin>
+                                    <MultiBinding Converter="{StaticResource marginConverter}">
+                                        <Binding ElementName="ExpanderContent" Path="ActualHeight" />
+                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                        <Binding Path="(helpers:ExpanderHelper.IsHeaderVisible)" RelativeSource="{RelativeSource AncestorType=Expander, Mode=FindAncestor}" />
+                                    </MultiBinding>
+                                </StackPanel.Margin>
+                                <StackPanel x:Name="ExpanderContent">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Setter Property="Margin" Value="6,0" />
+                                        </Style>
+                                    </StackPanel.Style>
                                     <ContentPresenter
                                         Margin="0,2"
                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -240,14 +272,30 @@
                         </Border>
                     </DockPanel>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="IsExpanded" Value="True">
-                            <Trigger.EnterActions>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsExpanded" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource ExpandingStoryboard}" />
-                            </Trigger.EnterActions>
-                            <Trigger.ExitActions>
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
                                 <BeginStoryboard Storyboard="{StaticResource CollapsingStoryboard}" />
-                            </Trigger.ExitActions>
-                        </Trigger>
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsExpanded" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsHeaderVisible" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.EnterActions>
+                                <BeginStoryboard Storyboard="{StaticResource ShortExpandingStoryboard}" />
+                            </MultiTrigger.EnterActions>
+                            <MultiTrigger.ExitActions>
+                                <BeginStoryboard Storyboard="{StaticResource ShortCollapsingStoryboard}" />
+                            </MultiTrigger.ExitActions>
+                        </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
                         </Trigger>
@@ -299,6 +347,11 @@
                             <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                         </Trigger>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderVisible)}" Value="False">
+                            <Setter TargetName="HeaderArea" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ContentBorder" Property="BorderThickness" Value="0" />
+                            <Setter TargetName="ExpanderContent" Property="Margin" Value="0" />
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -319,6 +372,7 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="True" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
+        <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
     </Style>
 
     <Style

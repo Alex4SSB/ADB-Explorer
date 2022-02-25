@@ -30,5 +30,18 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(ExpanderHelper),
                 null);
+
+        public static bool GetIsHeaderVisible(Control control) =>
+            (bool)control.GetValue(IsHeaderVisibleProperty);
+
+        public static void SetIsHeaderVisible(Control control, bool value) =>
+            control.SetValue(IsHeaderVisibleProperty, value);
+
+        public static readonly DependencyProperty IsHeaderVisibleProperty =
+            DependencyProperty.RegisterAttached(
+                "IsHeaderVisible",
+                typeof(bool),
+                typeof(ExpanderHelper),
+                null);
     }
 }
