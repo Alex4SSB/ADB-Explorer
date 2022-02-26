@@ -1956,7 +1956,23 @@
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ChangeDefaultFolderButton_Click"
                                             Style="{StaticResource NumericTextBoxStyle}" />
-                                        <TextBlock Margin="4,8,4,0" Text="Override ADB Path (Requires App Restart)" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                            <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
+                                            <Grid Margin="10,0">
+                                                <Grid.Resources>
+                                                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                                        <Setter Property="FontSize" Value="22" />
+                                                        <Setter Property="ToolTip" Value="App Restart Required" />
+                                                    </Style>
+                                                </Grid.Resources>
+                                                <ui:FontIcon Glyph="&#xF83E;" />
+                                                <ui:FontIcon Glyph="&#xF83F;" />
+                                                <ui:FontIcon
+                                                        Margin="4,0,0,0"
+                                                        Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                        Glyph="&#xEA84;" />
+                                            </Grid>
+                                        </StackPanel>
                                         <TextBox
                                             x:Name="ManualAdbPath"
                                             Margin="0,6"

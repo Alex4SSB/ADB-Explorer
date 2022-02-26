@@ -650,7 +650,7 @@
         BasedOn="{StaticResource CheckBoxStyle}"
         TargetType="CheckBox">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.IsWin11}}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
