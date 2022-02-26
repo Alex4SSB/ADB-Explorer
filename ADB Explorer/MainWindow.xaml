@@ -18,6 +18,7 @@
     ui:WindowHelper.UseModernWindowStyle="True"
     Background="{DynamicResource AdbWindowBackground}"
     Closing="Window_Closing"
+    Cursor="{Binding ElementName=UnfinishedBlock, Path=Cursor}"
     KeyDown="Window_KeyDown"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
@@ -738,9 +739,18 @@
                                 VerticalAlignment="Stretch"
                                 Background="Transparent"
                                 Foreground="#780078D7"
-                                IsHitTestVisible="False"
-                                Style="{StaticResource DirectoryLoadingProgressStyle}"
-                                Visibility="Collapsed" />
+                                IsHitTestVisible="False">
+                                <ui:ProgressBar.Style>
+                                    <Style BasedOn="{StaticResource DirectoryLoadingProgressStyle}" TargetType="ui:ProgressBar">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Style>
+                                </ui:ProgressBar.Style>
+                            </ui:ProgressBar>
                             <StackPanel
                                 x:Name="PathStackPanel"
                                 Margin="5,0,0,0"
@@ -956,7 +966,7 @@
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
-                                            <Condition Binding="{Binding ElementName=MainWin, Path=ListingInProgress}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
@@ -1258,11 +1268,21 @@
                     <TextBlock
                         x:Name="UnfinishedBlock"
                         Margin="0,4"
-                        Text=" *"
-                        Visibility="Collapsed" />
-                    <StackPanel Orientation="Horizontal">
-                        <Separator />
-                    </StackPanel>
+                        Text=" *">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Setter Property="Cursor" Value="AppStarting" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Setter Property="Cursor" Value="Arrow" />
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <Separator />
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <StackPanel.Style>
@@ -1302,9 +1322,7 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <StackPanel Orientation="Horizontal">
-                        <Separator />
-                    </StackPanel>
+                    <Separator />
                 </StackPanel>
             </StackPanel>
             <StackPanel
@@ -1956,7 +1974,7 @@
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ChangeDefaultFolderButton_Click"
                                             Style="{StaticResource NumericTextBoxStyle}" />
-                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
                                             <Grid Margin="10,0">
                                                 <Grid.Resources>
@@ -1968,9 +1986,9 @@
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
                                                 <ui:FontIcon
-                                                        Margin="4,0,0,0"
-                                                        Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
-                                                        Glyph="&#xEA84;" />
+                                                    Margin="4,0,0,0"
+                                                    Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                    Glyph="&#xEA84;" />
                                             </Grid>
                                         </StackPanel>
                                         <TextBox
