@@ -1014,6 +1014,7 @@
             <Expander
                 Grid.Row="4"
                 helpers:ExpanderHelper.IsArrowVisible="False"
+                ExpandDirection="Up"
                 helpers:ExpanderHelper.IsHeaderVisible="False">
                 <Expander.Style>
                     <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
@@ -1948,17 +1949,14 @@
                                                 <TextBlock Text="Force Fluent Styles" />
                                                 <Grid Margin="10,0">
                                                     <Grid.Resources>
-                                                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                                            <Setter Property="FontSize" Value="22" />
-                                                            <Setter Property="ToolTip" Value="App Restart Required" />
-                                                        </Style>
+                                                        <Style BasedOn="{StaticResource RestartResuiredIconsStyle}" TargetType="ui:FontIcon" />
                                                     </Grid.Resources>
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
                                                     <ui:FontIcon
-                                                        Margin="4,0,0,0"
                                                         Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
-                                                        Glyph="&#xEA84;" />
+                                                        Glyph="&#xEA84;"
+                                                        Style="{StaticResource RestartWarningIconStyle}" />
                                                 </Grid>
                                             </StackPanel>
                                         </CheckBox>
@@ -1978,17 +1976,14 @@
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
                                             <Grid Margin="10,0">
                                                 <Grid.Resources>
-                                                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                                        <Setter Property="FontSize" Value="22" />
-                                                        <Setter Property="ToolTip" Value="App Restart Required" />
-                                                    </Style>
+                                                    <Style BasedOn="{StaticResource RestartResuiredIconsStyle}" TargetType="ui:FontIcon" />
                                                 </Grid.Resources>
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
                                                 <ui:FontIcon
-                                                    Margin="4,0,0,0"
                                                     Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
-                                                    Glyph="&#xEA84;" />
+                                                    Glyph="&#xEA84;"
+                                                    Style="{StaticResource RestartWarningIconStyle}" />
                                             </Grid>
                                         </StackPanel>
                                         <TextBox

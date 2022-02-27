@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 
 namespace ADB_Explorer.Converters
@@ -9,17 +10,18 @@ namespace ADB_Explorer.Converters
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values.Length == 3 && values[2] is bool and false)
-                return new Thickness(0, 0, 0, 0);
+            var isUp = values.Length == 3 && values[2] is ExpandDirection and ExpandDirection.Up;
 
-            double result = 1.0;
-            for (int i = 0; i < values.Length; i++)
+            if (values[0] is double size && values[1] is double factor)
             {
-                if (values[i] is double val)
-                    result *= val;
+                var result = -size * (1 - factor);
+                var marginAbove = isUp ? 0 : result;
+                var marginBelow = isUp ? result : 0;
+
+                return new Thickness(0, marginAbove, 0, marginBelow);
             }
 
-            return new Thickness(0, result - ((double)values[0]), 0, 0);
+            return new Thickness(0, 0, 0, 0);
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

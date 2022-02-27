@@ -43,5 +43,18 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(ExpanderHelper),
                 null);
+
+        public static bool GetIsContentCollapsed(Control control) =>
+            (bool)control.GetValue(IsContentCollapsedProperty);
+
+        public static void SetIsContentCollapsed(Control control, bool value) =>
+            control.SetValue(IsContentCollapsedProperty, value);
+
+        public static readonly DependencyProperty IsContentCollapsedProperty =
+            DependencyProperty.RegisterAttached(
+                "IsContentCollapsed",
+                typeof(bool),
+                typeof(ExpanderHelper),
+                null);
     }
 }

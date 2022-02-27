@@ -655,6 +655,24 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="RestartResuiredIconsStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="FontSize" Value="22" />
+        <Setter Property="ToolTip" Value="App Restart Required" />
+    </Style>
+    <Style
+        x:Key="RestartWarningIconStyle"
+        BasedOn="{StaticResource RestartResuiredIconsStyle}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+                <Setter Property="Margin" Value="4,0,0,0" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="Margin" Value="0" />
+    </Style>
     <Style x:Key="QrBackgroundStyle" TargetType="Border">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">

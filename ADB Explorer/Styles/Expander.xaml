@@ -11,8 +11,6 @@
     <converters:MarginConverter x:Key="marginConverter" />
     <converters:HeightConverter x:Key="heightConverter" />
     <Duration x:Key="AnimationDuration">00:00:00.2</Duration>
-    <Duration x:Key="ExpandDuration">00:00:00.3</Duration>
-    <Duration x:Key="CollapseDuration">00:00:00.4</Duration>
 
     <Storyboard x:Key="RotateTo180DegreesStoryboard">
         <DoubleAnimation
@@ -33,11 +31,16 @@
     </Storyboard>
 
     <Storyboard x:Key="ExpandingStoryboard">
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00"
+                                        Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
+            <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="False"/>
+        </BooleanAnimationUsingKeyFrames>
         <DoubleAnimation
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="Tag"
             To="1"
-            Duration="{StaticResource ExpandDuration}" />
+            BeginTime="00:00:00"
+            Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
     <Storyboard x:Key="CollapsingStoryboard">
@@ -45,23 +48,12 @@
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="Tag"
             To="0"
-            Duration="{StaticResource CollapseDuration}" />
-    </Storyboard>
-
-    <Storyboard x:Key="ShortExpandingStoryboard">
-        <DoubleAnimation
-            Storyboard.TargetName="ExpandSite"
-            Storyboard.TargetProperty="Tag"
-            To="1"
+            BeginTime="00:00:00"
             Duration="{StaticResource AnimationDuration}" />
-    </Storyboard>
-
-    <Storyboard x:Key="ShortCollapsingStoryboard">
-        <DoubleAnimation
-            Storyboard.TargetName="ExpandSite"
-            Storyboard.TargetProperty="Tag"
-            To="0"
-            Duration="{StaticResource AnimationDuration}" />
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.2" 
+                                        Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
+            <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="True" />
+        </BooleanAnimationUsingKeyFrames>
     </Storyboard>
 
     <Style
@@ -180,6 +172,7 @@
             <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button" />
         </Style.Resources>
         <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
+        <Setter Property="helpers:ExpanderHelper.IsContentCollapsed" Value="True"/>
         <Setter Property="Template">
             <!--  Template copied from ModernWPF to be modified  -->
             <Setter.Value>
@@ -242,17 +235,11 @@
                                 <StackPanel.Tag>
                                     <sys:Double>0.0</sys:Double>
                                 </StackPanel.Tag>
-                                <StackPanel.Height>
-                                    <MultiBinding Converter="{StaticResource heightConverter}">
-                                        <Binding ElementName="ExpanderContent" Path="ActualHeight" />
-                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
-                                    </MultiBinding>
-                                </StackPanel.Height>
                                 <StackPanel.Margin>
                                     <MultiBinding Converter="{StaticResource marginConverter}">
                                         <Binding ElementName="ExpanderContent" Path="ActualHeight" />
                                         <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
-                                        <Binding Path="(helpers:ExpanderHelper.IsHeaderVisible)" RelativeSource="{RelativeSource AncestorType=Expander, Mode=FindAncestor}" />
+                                        <Binding Path="ExpandDirection" RelativeSource="{RelativeSource AncestorType=Expander, Mode=FindAncestor}" />
                                     </MultiBinding>
                                 </StackPanel.Margin>
                                 <StackPanel x:Name="ExpanderContent">
@@ -263,11 +250,12 @@
                                     </StackPanel.Style>
                                     <ContentPresenter
                                         Margin="0,2"
+                                        x:Name="ContentPresenter"
+                                        Tag="False"
                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         ContentSource="Content"
                                         Focusable="false" />
                                 </StackPanel>
-                                <Border Margin="0,2" />
                             </StackPanel>
                         </Border>
                     </DockPanel>
@@ -275,25 +263,12 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsExpanded" Value="True" />
-                                <Condition Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
                             </MultiTrigger.Conditions>
                             <MultiTrigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource ExpandingStoryboard}" />
                             </MultiTrigger.EnterActions>
                             <MultiTrigger.ExitActions>
                                 <BeginStoryboard Storyboard="{StaticResource CollapsingStoryboard}" />
-                            </MultiTrigger.ExitActions>
-                        </MultiTrigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsExpanded" Value="True" />
-                                <Condition Property="helpers:ExpanderHelper.IsHeaderVisible" Value="False" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.EnterActions>
-                                <BeginStoryboard Storyboard="{StaticResource ShortExpandingStoryboard}" />
-                            </MultiTrigger.EnterActions>
-                            <MultiTrigger.ExitActions>
-                                <BeginStoryboard Storyboard="{StaticResource ShortCollapsingStoryboard}" />
                             </MultiTrigger.ExitActions>
                         </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -340,7 +315,7 @@
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsArrowVisible)}" Value="False">
                             <Setter TargetName="DockPanel" Property="Margin" Value="0,1" />
                         </DataTrigger>
-                        <Trigger SourceName="ExpandSite" Property="Height" Value="0">
+                        <Trigger Property="helpers:ExpanderHelper.IsContentCollapsed" Value="True">
                             <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
@@ -373,6 +348,7 @@
         <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="True" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
         <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
+        <Setter Property="ExpandDirection" Value="Down"/>
     </Style>
 
     <Style
