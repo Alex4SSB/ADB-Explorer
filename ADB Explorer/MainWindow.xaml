@@ -199,7 +199,10 @@
             </StackPanel>
         </ui:Flyout>
         <DataTemplate x:Key="DriveItemTemplate" DataType="Drive">
-            <Button MouseDoubleClick="DriveItem_MouseDoubleClick" Style="{StaticResource DriveItemStyle}">
+            <Button
+                Click="DriveItem_Click"
+                MouseDoubleClick="DriveItem_MouseDoubleClick"
+                Style="{StaticResource DriveItemStyle}">
                 <Grid Width="260" Margin="0,-4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -208,23 +211,12 @@
                     <ui:FontIcon
                         Margin="0,0,8,0"
                         FontSize="32"
-                        Glyph="{Binding DriveIcon}">
-                        <ui:FontIcon.Style>
-                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Type}" Value="Unknown">
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ui:FontIcon.Style>
-                    </ui:FontIcon>
+                        Glyph="{Binding DriveIcon}"
+                        Style="{StaticResource DriveIconStyle}" />
                     <StackPanel Grid.Column="1">
                         <StackPanel Orientation="Horizontal">
                             <StackPanel.Resources>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontWeight" Value="SemiBold" />
-                                </Style>
+                                <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
                             </StackPanel.Resources>
                             <TextBlock Text="{Binding PrettyName}" />
                             <StackPanel Orientation="Horizontal">
@@ -250,6 +242,9 @@
                             </StackPanel>
                         </StackPanel>
                         <StackPanel>
+                            <StackPanel.Resources>
+                                <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock" />
+                            </StackPanel.Resources>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
                                     <Style.Triggers>
@@ -1014,8 +1009,8 @@
             <Expander
                 Grid.Row="4"
                 helpers:ExpanderHelper.IsArrowVisible="False"
-                ExpandDirection="Up"
-                helpers:ExpanderHelper.IsHeaderVisible="False">
+                helpers:ExpanderHelper.IsHeaderVisible="False"
+                ExpandDirection="Up">
                 <Expander.Style>
                     <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                         <Style.Triggers>

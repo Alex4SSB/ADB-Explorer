@@ -1447,6 +1447,7 @@ namespace ADB_Explorer
         private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
         {
             UnfocusPathBox();
+            ClearSelectedDrives();
         }
 
         private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1875,6 +1876,21 @@ namespace ADB_Explorer
                     if (logical.Root is AbstractDevice.RootStatus.Forbidden)
                         MessageBox.Show("Root access cannot be enabled on selected device.", "Root Access", MessageBoxButton.OK, MessageBoxImage.Error);
                 }));
+            }
+        }
+
+        private void DriveItem_Click(object sender, RoutedEventArgs e)
+        {
+            ClearSelectedDrives();
+
+            RepeaterHelper.SetIsSelected(sender as Button, true);
+        }
+
+        private void ClearSelectedDrives()
+        {
+            foreach (Button drive in DrivesItemRepeater.Children)
+            {
+                RepeaterHelper.SetIsSelected(drive, false);
             }
         }
 
