@@ -1079,19 +1079,19 @@
                                                     </DataGridTemplateColumn.Header>
                                                 </DataGridTemplateColumn>
                                                 <DataGridTemplateColumn
-                                                    Width="300"
+                                                    Width="250"
                                                     CellTemplate="{StaticResource FileOpFileNameTemplate}"
                                                     Header="File Name" />
                                                 <DataGridTemplateColumn
-                                                    MinWidth="100"
+                                                    MinWidth="180"
                                                     CellTemplate="{StaticResource FileOpProgressTemplate}"
                                                     Header="Progress" />
                                                 <DataGridTemplateColumn
-                                                    Width="300"
+                                                    Width="200"
                                                     CellTemplate="{StaticResource FileOpSourcePathTemplate}"
                                                     Header="Source Path" />
                                                 <DataGridTemplateColumn
-                                                    Width="300"
+                                                    Width="200"
                                                     CellTemplate="{StaticResource FileOpTargetPathTemplate}"
                                                     Header="Destination Path" />
                                             </DataGrid.Columns>
@@ -1132,9 +1132,18 @@
                                                     </DataGridTemplateColumn.Header>
                                                 </DataGridTemplateColumn>
                                                 <DataGridTemplateColumn
-                                                    Width="300"
+                                                    Width="250"
                                                     CellTemplate="{StaticResource FileOpFileNameTemplate}"
                                                     Header="File Name" />
+                                                <DataGridTemplateColumn MinWidth="180" Header="Progress" />
+                                                <DataGridTemplateColumn
+                                                    Width="200"
+                                                    CellTemplate="{StaticResource FileOpSourcePathTemplate}"
+                                                    Header="Source Path" />
+                                                <DataGridTemplateColumn
+                                                    Width="200"
+                                                    CellTemplate="{StaticResource FileOpTargetPathTemplate}"
+                                                    Header="Destination Path" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <ui:FontIcon
@@ -1174,29 +1183,22 @@
                                                     </DataGridTemplateColumn.Header>
                                                 </DataGridTemplateColumn>
                                                 <DataGridTemplateColumn
-                                                    Width="300"
+                                                    Width="250"
                                                     CellTemplate="{StaticResource FileOpFileNameTemplate}"
                                                     Header="File Name" />
-                                                <DataGridTemplateColumn
-                                                    Width="30"
-                                                    CanUserResize="False"
-                                                    CellTemplate="{StaticResource StatusIconTemplate}">
-                                                    <DataGridTemplateColumn.Header>
-                                                        <ui:FontIcon
-                                                            Margin="-7,0"
-                                                            Glyph="&#xE9CE;"
-                                                            ToolTip="Status" />
-                                                    </DataGridTemplateColumn.Header>
-                                                </DataGridTemplateColumn>
-                                                <DataGridTemplateColumn
-                                                    Width="Auto"
-                                                    CellTemplate="{StaticResource FileOpStatusTemplate}"
-                                                    Header="Status" />
                                                 <DataGridTemplateColumn
                                                     Width="180"
                                                     MinWidth="100"
                                                     CellTemplate="{StaticResource FileOpCompletedInfoTemplate}"
                                                     Header="Progress" />
+                                                <DataGridTemplateColumn
+                                                    Width="200"
+                                                    CellTemplate="{StaticResource FileOpSourcePathTemplate}"
+                                                    Header="Source Path" />
+                                                <DataGridTemplateColumn
+                                                    Width="200"
+                                                    CellTemplate="{StaticResource FileOpTargetPathTemplate}"
+                                                    Header="Destination Path" />
                                             </DataGrid.Columns>
                                         </DataGrid>
                                         <ui:FontIcon

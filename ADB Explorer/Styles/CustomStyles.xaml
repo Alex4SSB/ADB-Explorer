@@ -286,6 +286,9 @@
             </MenuItem.Header>
         </MenuItem>
     </ContextMenu>
+    <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
+    </Style>
     <DataTemplate x:Key="StatusIconTemplate">
         <ui:FontIcon>
             <ui:FontIcon.Style>
@@ -295,6 +298,9 @@
                             <Setter Property="Glyph" Value="&#xF13E;" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Status}" Value="Failed">
+                            <Setter Property="Glyph" Value="&#xF13D;" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Status}" Value="Canceled">
                             <Setter Property="Glyph" Value="&#xF13D;" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -328,7 +334,7 @@
             </ui:FontIcon>
             <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
-                    <Style TargetType="TextBlock">
+                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="True">
                                 <Setter Property="Text" Value="{Binding FilePath.FullName}" />
@@ -366,7 +372,7 @@
                 Grid.Column="1"
                 TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
-                    <Style TargetType="TextBlock">
+                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
                                 <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
@@ -388,19 +394,15 @@
     <DataTemplate x:Key="FileOpSourcePathTemplate">
         <TextBlock
             Margin="4,0"
+            Style="{StaticResource TooltipTextBlockStyle}"
             Text="{Binding FilePath.ParentPath}"
             TextTrimming="CharacterEllipsis" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
         <TextBlock
             Margin="4,0"
+            Style="{StaticResource TooltipTextBlockStyle}"
             Text="{Binding TargetPath.FullPath}"
-            TextTrimming="CharacterEllipsis" />
-    </DataTemplate>
-    <DataTemplate x:Key="FileOpStatusTemplate">
-        <TextBlock
-            Margin="4,0"
-            Text="{Binding Status}"
             TextTrimming="CharacterEllipsis" />
     </DataTemplate>
     <Style x:Key="CompletedOperationsProgressStyle" TargetType="ui:ProgressBar">
@@ -413,26 +415,57 @@
     </Style>
     <DataTemplate x:Key="FileOpCompletedInfoTemplate">
         <Grid Margin="4,0">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding StatusInfo.FileCountCompletedRate, Mode=OneWay}" />
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding StatusInfo.FileCountCompletedRate, Mode=OneWay}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4,0"
+                        Text="{Binding StatusInfo.FileCountCompletedString}"
+                        TextTrimming="CharacterEllipsis" />
+                </Grid>
                 <TextBlock
-                    Grid.Column="1"
-                    Margin="4,0"
-                    Text="{Binding StatusInfo.FileCountCompletedString}"
+                    Grid.Row="1"
+                    Text="{Binding StatusInfo, Converter={StaticResource CompletedStatsConverter}}"
                     TextTrimming="CharacterEllipsis" />
             </Grid>
-            <TextBlock
-                Grid.Row="1"
-                Text="{Binding StatusInfo, Converter={StaticResource CompletedStatsConverter}}"
-                TextTrimming="CharacterEllipsis" />
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="Canceled">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Style>
+                </Grid.Style>
+                <ui:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                    <ui:FontIcon Glyph="&#xE711;" Style="{StaticResource GlyphFont}" />
+                    <TextBlock Text="{Binding Status}" />
+                </ui:SimpleStackPanel>
+            </Grid>
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="FileOpProgressTemplate">
