@@ -770,6 +770,7 @@
                         Background="Transparent"
                         CanUserResizeRows="False"
                         CellStyle="{StaticResource DataGridCellStyle}"
+                        ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                         ContextMenu="{StaticResource RowContextMenu}"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
@@ -1028,12 +1029,10 @@
                                             CanUserDeleteRows="False"
                                             CellStyle="{StaticResource DataGridCellStyle}"
                                             ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
+                                            ColumnHeaderStyle="{StaticResource FileOpHeaderResizeStyle}"
                                             FocusVisualStyle="{x:Null}"
                                             HeadersVisibility="Column"
                                             ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
-                                            <DataGrid.Resources>
-                                                <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader" />
-                                            </DataGrid.Resources>
                                             <DataGrid.Columns>
                                                 <DataGridTemplateColumn
                                                     x:Name="OpTypeColumn"

@@ -515,7 +515,8 @@ namespace ADB_Explorer
 
         private void InitFileOpColumns()
         {
-            foreach (var item in ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items)
+            var fileOpContext = FindResource("FileOpHeaderContextMenu") as ContextMenu;
+            foreach (var item in fileOpContext.Items)
             {
                 var checkbox = ((MenuItem)item).Header as CheckBox;
                 checkbox.Click += ColumnCheckbox_Click;
@@ -531,6 +532,8 @@ namespace ADB_Explorer
                 column.Visibility = Visible(config.IsVisible);
                 column.DisplayIndex = config.Index;
             }
+
+            EnableContextItems();
         }
 
         private DataGridColumn GetCheckboxColumn(CheckBox checkBox)
@@ -562,6 +565,15 @@ namespace ADB_Explorer
             return FileOpContextItems.Where(cb => cb.Name == $"FileOpContext{ColumnName(column).Split("Column")[0]}CheckBox").First();
         }
 
+        private void EnableContextItems()
+        {
+            var visibleColumns = FileOpContextItems.Count(cb => cb.IsChecked == true);
+            foreach (var checkbox in FileOpContextItems)
+            {
+                checkbox.IsEnabled = visibleColumns > 1 ? true : checkbox.IsChecked == false;
+            }
+        }
+
         private void ColumnCheckbox_Click(object sender, RoutedEventArgs e)
         {
             var checkbox = sender as CheckBox;
@@ -578,6 +590,7 @@ namespace ADB_Explorer
             }
 
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+            EnableContextItems();
         }
 
         private static FileOpColumn CreateColumnConfig(DataGridColumn column) => new FileOpColumn()
