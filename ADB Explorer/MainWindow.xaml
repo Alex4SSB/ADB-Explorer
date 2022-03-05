@@ -976,6 +976,7 @@
             </Border>
             <Expander
                 Grid.Row="4"
+                Margin="0,0,0,-3"
                 helpers:ExpanderHelper.IsArrowVisible="False"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
                 ExpandDirection="Up">
@@ -1002,6 +1003,7 @@
                         <GridSplitter
                             x:Name="FileOpDetailedSplitter"
                             Height="3"
+                            Margin="0,-2,0,0"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
                             BorderBrush="Gray"
@@ -1836,8 +1838,12 @@
                     <Setter Property="Width" Value="300" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
-                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox" />
-                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
+                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
                 <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                     <Setter Property="Margin" Value="0,6" />
                 </Style>
@@ -1923,7 +1929,7 @@
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
                                                     <ui:FontIcon
-                                                        Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                        Foreground="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}"
                                                         Glyph="&#xEA84;"
                                                         Style="{StaticResource RestartWarningIconStyle}" />
                                                 </Grid>
@@ -1950,7 +1956,7 @@
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
                                                 <ui:FontIcon
-                                                    Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}"
                                                     Glyph="&#xEA84;"
                                                     Style="{StaticResource RestartWarningIconStyle}" />
                                             </Grid>
