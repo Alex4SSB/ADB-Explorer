@@ -29,6 +29,12 @@
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
+        <Style
+            x:Key="FileOpHeaderResizeStyle"
+            BasedOn="{StaticResource FileOpColumnHeaderStyle}"
+            TargetType="DataGridColumnHeader">
+            <EventSetter Event="SizeChanged" Handler="DataGridColumnHeader_SizeChanged" />
+        </Style>
         <MenuItem
             x:Key="ContextMenuCopyItem"
             Click="ContextMenuCopyItem_Click"
@@ -268,45 +274,6 @@
                 </Grid>
             </Button>
         </DataTemplate>
-        <HierarchicalDataTemplate
-            x:Key="FileOpSettingsTreeTemplate"
-            DataType="ColumnConfig"
-            ItemsSource="{Binding Items}">
-            <Grid Width="200">
-                <Grid>
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Style>
-                    <ComboBox
-                        HorizontalAlignment="Stretch"
-                        ItemsSource="{Binding ColumnList}"
-                        SelectedItem="{Binding Selected}" />
-                </Grid>
-                <Grid>
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Visibility" Value="Visible" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Title}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Style>
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontWeight="Bold"
-                        Text="{Binding Title}" />
-                </Grid>
-            </Grid>
-        </HierarchicalDataTemplate>
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
@@ -1060,14 +1027,16 @@
                                             AutoGenerateColumns="False"
                                             CanUserDeleteRows="False"
                                             CellStyle="{StaticResource DataGridCellStyle}"
+                                            ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
                                             FocusVisualStyle="{x:Null}"
                                             HeadersVisibility="Column"
                                             ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
                                             <DataGrid.Resources>
-                                                <Style BasedOn="{StaticResource FileOpColumnHeaderStyle}" TargetType="DataGridColumnHeader" />
+                                                <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader" />
                                             </DataGrid.Resources>
                                             <DataGrid.Columns>
                                                 <DataGridTemplateColumn
+                                                    x:Name="OpTypeColumn"
                                                     Width="30"
                                                     CanUserResize="False"
                                                     CellTemplate="{StaticResource OperationIconTemplate}">
@@ -1079,18 +1048,22 @@
                                                     </DataGridTemplateColumn.Header>
                                                 </DataGridTemplateColumn>
                                                 <DataGridTemplateColumn
+                                                    x:Name="FileNameColumn"
                                                     Width="250"
                                                     CellTemplate="{StaticResource FileOpFileNameTemplate}"
                                                     Header="File Name" />
                                                 <DataGridTemplateColumn
+                                                    x:Name="ProgressColumn"
                                                     MinWidth="180"
                                                     CellTemplate="{StaticResource FileOpProgressTemplate}"
                                                     Header="Progress" />
                                                 <DataGridTemplateColumn
+                                                    x:Name="SourceColumn"
                                                     Width="200"
                                                     CellTemplate="{StaticResource FileOpSourcePathTemplate}"
                                                     Header="Source Path" />
                                                 <DataGridTemplateColumn
+                                                    x:Name="DestColumn"
                                                     Width="200"
                                                     CellTemplate="{StaticResource FileOpTargetPathTemplate}"
                                                     Header="Destination Path" />
@@ -1968,7 +1941,7 @@
                                             Margin="0,6"
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ChangeDefaultFolderButton_Click"
-                                            Style="{StaticResource NumericTextBoxStyle}" />
+                                            Style="{StaticResource TooltipTextBoxStyle}" />
                                         <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
                                             <Grid Margin="10,0">
@@ -1988,7 +1961,7 @@
                                             Margin="0,6"
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ManualAdbPath_MouseUp"
-                                            Style="{StaticResource NumericTextBoxStyle}" />
+                                            Style="{StaticResource TooltipTextBoxStyle}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />

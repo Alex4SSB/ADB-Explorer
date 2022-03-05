@@ -387,6 +387,7 @@ namespace ADB_Explorer
         private void LaunchSequence()
         {
             LoadSettings();
+            InitFileOpColumns();
 
             TestCurrentOperation();
             TestDevices();
@@ -500,6 +501,91 @@ namespace ADB_Explorer
             PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
             CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
         }
+
+        private IEnumerable<CheckBox> FileOpContextItems
+        {
+            get
+            {
+                var items = ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items;
+                return from MenuItem item in ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items
+                                let checkbox = item.Header as CheckBox
+                                select checkbox;
+            }
+        }
+
+        private void InitFileOpColumns()
+        {
+            foreach (var item in ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items)
+            {
+                var checkbox = ((MenuItem)item).Header as CheckBox;
+                checkbox.Click += ColumnCheckbox_Click;
+
+                var config = Storage.Retrieve<FileOpColumn>(checkbox.Name);
+                if (config is null)
+                    continue;
+
+                var column = GetCheckboxColumn(checkbox);
+                checkbox.DataContext = config;
+                checkbox.IsChecked = config.IsVisible;
+                column.Width = config.Width;
+                column.Visibility = Visible(config.IsVisible);
+                column.DisplayIndex = config.Index;
+            }
+        }
+
+        private DataGridColumn GetCheckboxColumn(CheckBox checkBox)
+        {
+            return checkBox.Name.Split("FileOpContext")[1].Split("CheckBox")[0] switch
+            {
+                "OpType" => OpTypeColumn,
+                "FileName" => FileNameColumn,
+                "Progress" => ProgressColumn,
+                "Source" => SourceColumn,
+                "Dest" => DestColumn,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        private string ColumnName(DataGridColumn column)
+        {
+            if (column == OpTypeColumn) return "OpTypeColumn";
+            if (column == FileNameColumn) return "FileNameColumn";
+            if (column == ProgressColumn) return "ProgressColumn";
+            if (column == SourceColumn) return "SourceColumn";
+            if (column == DestColumn) return "DestColumn";
+
+            return "";
+        }
+
+        private CheckBox GetColumnCheckbox(DataGridColumn column)
+        {
+            return FileOpContextItems.Where(cb => cb.Name == $"FileOpContext{ColumnName(column).Split("Column")[0]}CheckBox").First();
+        }
+
+        private void ColumnCheckbox_Click(object sender, RoutedEventArgs e)
+        {
+            var checkbox = sender as CheckBox;
+            var column = GetCheckboxColumn(checkbox);
+
+            column.Visibility = Visible(checkbox.IsChecked);
+            if (checkbox.DataContext is FileOpColumn config)
+            {
+                config.IsVisible = checkbox.IsChecked;
+            }
+            else
+            {
+                checkbox.DataContext = CreateColumnConfig(column);
+            }
+
+            Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+        }
+
+        private static FileOpColumn CreateColumnConfig(DataGridColumn column) => new FileOpColumn()
+        {
+            Index = column.DisplayIndex,
+            IsVisible = column.Visibility == Visibility.Visible,
+            Width = column.ActualWidth
+        };
 
         private void InitDevice()
         {
@@ -1892,6 +1978,44 @@ namespace ADB_Explorer
             {
                 RepeaterHelper.SetIsSelected(drive, false);
             }
+        }
+
+        private void CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
+        {
+            if (e.Column is not DataGridColumn column)
+                return;
+
+            var checkbox = GetColumnCheckbox(column);
+
+            if (checkbox.DataContext is FileOpColumn config)
+            {
+                config.Index = column.DisplayIndex;
+            }
+            else
+            {
+                checkbox.DataContext = CreateColumnConfig(column);
+            }
+
+            Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+        }
+
+        private void DataGridColumnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (((DataGridColumnHeader)sender).Column is not DataGridColumn column)
+                return;
+
+            var checkbox = GetColumnCheckbox(column);
+
+            if (checkbox.DataContext is FileOpColumn config)
+            {
+                config.Width = e.NewSize.Width;
+            }
+            else
+            {
+                checkbox.DataContext = CreateColumnConfig(column);
+            }
+
+            Storage.StoreValue(checkbox.Name, checkbox.DataContext);
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

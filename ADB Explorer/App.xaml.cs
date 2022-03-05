@@ -1,9 +1,11 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Newtonsoft.Json;
 
 namespace ADB_Explorer
 {
@@ -25,8 +27,15 @@ namespace ADB_Explorer
                 // Restore each application-scope property individually
                 while (!reader.EndOfStream)
                 {
-                    string[] keyValue = reader.ReadLine().Split(new char[] { ',' });
-                    Properties[keyValue[0]] = keyValue[1];
+                    string[] keyValue = reader.ReadLine().TrimEnd(';').Split(':', 2);
+                    try
+                    {
+                        Properties[keyValue[0]] = JsonConvert.DeserializeObject(keyValue[1], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                    }
+                    catch (Exception)
+                    {
+                        Properties[keyValue[0]] = keyValue[1];
+                    }
                 }
             }
             catch // FileNotFoundException ex
@@ -54,7 +63,7 @@ namespace ADB_Explorer
             // Persist each application-scope property individually
             foreach (string key in Properties.Keys)
             {
-                writer.WriteLine("{0},{1}", key, Properties[key]);
+                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects})};");
             }
         }
 

@@ -171,6 +171,12 @@
         </Style.Triggers>
     </Style>
     <Style
+        x:Key="TooltipTextBoxStyle"
+        BasedOn="{StaticResource NumericTextBoxStyle}"
+        TargetType="TextBox">
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
+    </Style>
+    <Style
         x:Key="DeviceButtonStyle"
         BasedOn="{StaticResource ButtonStyle}"
         TargetType="Button">
@@ -272,17 +278,42 @@
     <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextMenuStyles}">
         <MenuItem>
             <MenuItem.Header>
-                <CheckBox Content="Operation Type" />
+                <CheckBox
+                    x:Name="FileOpContextOpTypeCheckBox"
+                    Content="Operation Type"
+                    IsChecked="True" />
             </MenuItem.Header>
         </MenuItem>
         <MenuItem>
             <MenuItem.Header>
-                <CheckBox Content="File Name" />
+                <CheckBox
+                    x:Name="FileOpContextFileNameCheckBox"
+                    Content="File Name"
+                    IsChecked="True" />
             </MenuItem.Header>
         </MenuItem>
         <MenuItem>
             <MenuItem.Header>
-                <CheckBox Content="Progress" />
+                <CheckBox
+                    x:Name="FileOpContextProgressCheckBox"
+                    Content="Progress"
+                    IsChecked="True" />
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem>
+            <MenuItem.Header>
+                <CheckBox
+                    x:Name="FileOpContextSourceCheckBox"
+                    Content="Source"
+                    IsChecked="True" />
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem>
+            <MenuItem.Header>
+                <CheckBox
+                    x:Name="FileOpContextDestCheckBox"
+                    Content="Destination"
+                    IsChecked="True" />
             </MenuItem.Header>
         </MenuItem>
     </ContextMenu>

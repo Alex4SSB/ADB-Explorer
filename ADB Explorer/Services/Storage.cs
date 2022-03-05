@@ -12,6 +12,11 @@ namespace ADB_Explorer.Services
             return Application.Current.Properties[key];
         }
 
+        public static T Retrieve<T>(string key)
+        {
+            return (T)Application.Current.Properties[key];
+        }
+
         public static void StoreValue(Enum key, object value) => StoreValue(key.ToString(), value);
 
         public static void StoreValue(string key, object value)

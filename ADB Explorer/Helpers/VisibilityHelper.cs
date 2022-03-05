@@ -4,7 +4,7 @@ namespace ADB_Explorer.Helpers
 {
     public static class VisibilityHelper
     {
-        public static Visibility Visible(bool value) => value ? Visibility.Visible : Visibility.Collapsed;
+        public static Visibility Visible(bool? value) => value is bool and true ? Visibility.Visible : Visibility.Collapsed;
 
         public static void Visible(this FrameworkElement control, bool value) => control.Visibility = Visible(value);
 

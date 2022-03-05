@@ -44,25 +44,6 @@ namespace ADB_Explorer.Models
         public static readonly int MIN_PANE_HEIGHT = 150;
         public static readonly double MIN_PANE_HEIGHT_RATIO = 0.15;
 
-        public static readonly List<FileOpColumn> POSSIBLE_COLUMNS = new()
-        {
-            new("Direction"),
-            new("Progress"),
-            new("File Name"),
-            new("Status"),
-            new("Target Path"),
-            // AdbSyncProgressInfo
-            new("Current File", ColumnType.Current), // CurrentFile
-            new("Total Percentage", ColumnType.Current), // TotalPercentage
-            new("Current File Progress", ColumnType.Current), // CurrentFilePercentage \ CurrentFileBytesTransferred
-            // AdbSyncStatsInfo
-            new("Files Transferred", ColumnType.Completed), //FilesTransferred
-            new("Files Skipped", ColumnType.Completed), // FilesSkipped
-            new("Average Rate", ColumnType.Completed), // AverageRate
-            new("Total Transferred", ColumnType.Completed), // TotalBytes
-            new("Total Time", ColumnType.Completed), //TotalTime
-        };
-
         public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM" };
 
         public static readonly UnicodeCategory[] UNICODE_ICONS = { UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned };
