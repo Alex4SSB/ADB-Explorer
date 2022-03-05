@@ -10,26 +10,15 @@ namespace ADB_Explorer.Models
     {
         public Dispatcher Dispatcher { get; }
 
-        public ObservableList<FileOperation> PendingOperations { get; } = new();
-        public ObservableList<FileOperation> CurrentOperations { get; } = new();
-        public ObservableList<FileOperation> CompletedOperations { get; } = new();
+        public ObservableList<FileOperation> Operations { get; } = new();
+
+        public int CurrentOperationIndex { get; private set; } = -1;
 
         public FileOperation CurrentOperation
         {
             get
             {
-                return (CurrentOperations.Count > 0) ? CurrentOperations[0] : null;
-            }
-            private set
-            {
-                CurrentOperations.Clear();
-
-                if (value != null)
-                {
-                    CurrentOperations.Add(value);
-                }
-
-                NotifyPropertyChanged();
+                return (CurrentOperationIndex != -1) ? Operations[CurrentOperationIndex] : null;
             }
         }
 
@@ -107,7 +96,7 @@ namespace ADB_Explorer.Models
         {
             get
             {
-                return PendingOperations.Count + CurrentOperations.Count + CompletedOperations.Count;
+                return Operations.Count;
             }
         }
 
@@ -132,13 +121,29 @@ namespace ADB_Explorer.Models
         public FileOperationQueue(Dispatcher dispatcher)
         {
             Dispatcher = dispatcher;
-            PendingOperations.CollectionChanged += PendingOperations_CollectionChanged;
-            CompletedOperations.CollectionChanged += CompletedOperations_CollectionChanged;
+            Operations.CollectionChanged += Operations_CollectionChanged;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void AddOperation(FileOperation fileOp) => PendingOperations.Add(fileOp);
+        public void AddOperation(FileOperation fileOp)
+        {
+            Operations.Add(fileOp);
+
+            if (AutoStart)
+            {
+                Start();
+            }
+        }
+
+        public void ClearCompleted()
+        {
+            while (CurrentOperationIndex > 0)
+            {
+                Operations.RemoveAt(0);
+                --CurrentOperationIndex;
+            }
+        }
 
         private void UpdateProgress(double? currentProgress = null)
         {
@@ -147,32 +152,33 @@ namespace ADB_Explorer.Models
                 currOperationLastProgress = currentProgress.Value;
             }
             
-            Progress = ((double)CompletedOperations.Count + (currOperationLastProgress / 100.0)) / TotalCount;
+            Progress = ((double)CurrentOperationIndex + (currOperationLastProgress / 100.0)) / TotalCount;
         }
 
         public void Start()
         {
-            if ((!IsActive) && (PendingOperations.Count > 0))
+            if (IsActive || (TotalCount == 0))
             {
-                IsActive = true;
-                UpdateProgress(0);
-
-                if (AutoClear)
-                {
-                    CompletedOperations.Clear();
-                }
-
-                MoveToNextOperation();
+                return;
             }
+
+            IsActive = true;
+            UpdateProgress(0);
+
+            if (AutoClear)
+            {
+                ClearCompleted();
+            }
+
+            MoveToNextOperation();
         }
 
         public void Stop() => CurrentOperation?.Cancel();
 
         public void Clear()
         {
-            PendingOperations.Clear();
-            CompletedOperations.Clear();
             Stop();
+            Operations.Clear();
         }
 
         private void MoveToCompleted()
@@ -180,8 +186,7 @@ namespace ADB_Explorer.Models
             if (CurrentOperation != null)
             {
                 CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
-                CompletedOperations.Add(CurrentOperation);
-                CurrentOperation = null;
+                ++CurrentOperationIndex;
                 UpdateProgress(0);
             }
         }
@@ -190,13 +195,10 @@ namespace ADB_Explorer.Models
         {
             MoveToCompleted();
 
-            if (PendingOperations.Count == 0)
+            if (CurrentOperationIndex == TotalCount)
             {
                 return;
             }
-
-            CurrentOperation = PendingOperations[0];
-            PendingOperations.RemoveAt(0);
 
             CurrentOperation.PropertyChanged += CurrentOperation_PropertyChanged;
 
@@ -221,7 +223,7 @@ namespace ADB_Explorer.Models
                 (CurrentOperation.Status != FileOperation.OperationStatus.Waiting) &&
                 (CurrentOperation.Status != FileOperation.OperationStatus.InProgress))
             {
-                if ((PendingOperations.Count == 0) ||
+                if ((CurrentOperationIndex == TotalCount) ||
                     (StopAfterFailure && (CurrentOperation.Status == FileOperation.OperationStatus.Failed)) ||
                     (CurrentOperation.Status == FileOperation.OperationStatus.Canceled))
                 {
@@ -243,19 +245,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        private void PendingOperations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (AutoStart && (!IsActive) && (PendingOperations.Count > 0) &&
-                ((e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add) ||
-                 (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)))
-            {
-                Dispatcher.BeginInvoke(Start);
-            }
-
-            UpdateProgress();
-        }
-
-        private void CompletedOperations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void Operations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             UpdateProgress();
         }
