@@ -59,5 +59,11 @@ namespace ADB_Explorer.Helpers
             Status = OperationStatus.Canceled;
             StatusInfo = null;
         }
+
+        public void Fail(string errorMsg)
+        {
+            Status = OperationStatus.Failed;
+            StatusInfo = errorMsg;
+        }
     }
 }
