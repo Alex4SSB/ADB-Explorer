@@ -621,13 +621,6 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
             </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding ElementName=ShowHiddenCheckBox, Path=IsChecked}" Value="False" />
-                    <Condition Binding="{Binding IsHidden}" Value="True" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="BaseCellStyle" TargetType="DataGridCell">

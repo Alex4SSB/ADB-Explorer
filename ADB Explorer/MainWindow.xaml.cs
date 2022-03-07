@@ -8,7 +8,6 @@ using Microsoft.WindowsAPICodePack.Shell;
 using ModernWpf;
 using ModernWpf.Controls;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -19,6 +18,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -115,8 +115,17 @@ namespace ADB_Explorer
                 OpenDevicesButton.IsEnabled = true;
                 DevicesSplitView.IsPaneOpen = true;
             }
-
+            
             UpperProgressBar.DataContext = fileOperationQueue;
+        }
+
+        private void DirectoryLister_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DirectoryLister.InProgress))
+            {
+                DirectoryLoadingProgressBar.Visible(DirectoryLister.InProgress);
+                UnfinishedBlock.Visible(DirectoryLister.InProgress);
+            }
         }
 
         private void ThemeService_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -430,9 +439,15 @@ namespace ADB_Explorer
 
             DevicesObject.SetOpen(DevicesObject.Current, true);
             CurrentADBDevice = new(DevicesObject.CurrentDevice);
-            DirectoryLister = new(Dispatcher, CurrentADBDevice);
+            InitLister();
             if (init)
                 InitDevice();
+        }
+
+        private void InitLister()
+        {
+            DirectoryLister = new(Dispatcher, CurrentADBDevice);
+            DirectoryLister.PropertyChanged += DirectoryLister_PropertyChanged;
         }
 
         private void LoadSettings()
@@ -1263,8 +1278,7 @@ namespace ADB_Explorer
             {
                 DevicesObject.SetOpen(device);
                 CurrentADBDevice = new(device);
-                DirectoryLister = new(Dispatcher, CurrentADBDevice);
-
+                InitLister();
                 ClearExplorer();
                 InitDevice();
 
@@ -1565,7 +1579,18 @@ namespace ADB_Explorer
 
         private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(UserPrefs.showHiddenItems, ShowHiddenCheckBox.IsChecked);
+            //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
+
+            bool showHidden = ShowHiddenCheckBox.IsChecked == true;
+
+            if (!showHidden)
+            {
+                CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = new(file => !((FileClass)file).IsHidden);
+            }
+            else
+                CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = null;
+
+            Storage.StoreValue(UserPrefs.showHiddenItems, showHidden);
         }
 
         private void ShowExtensionsCheckBox_Click(object sender, RoutedEventArgs e)
@@ -2029,6 +2054,11 @@ namespace ADB_Explorer
             }
 
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+        }
+
+        private void CollectionViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        {
+
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)

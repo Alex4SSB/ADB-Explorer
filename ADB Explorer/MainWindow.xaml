@@ -29,6 +29,10 @@
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
+        <CollectionViewSource
+            x:Key="FileListView"
+            Filter="CollectionViewSource_Filter"
+            Source="{Binding ElementName=MainWin, Path=DirectoryLister.FileList}" />
         <Style
             x:Key="FileOpHeaderResizeStyle"
             BasedOn="{StaticResource FileOpColumnHeaderStyle}"
@@ -704,12 +708,12 @@
                                 IsHitTestVisible="False">
                                 <ui:ProgressBar.Style>
                                     <Style BasedOn="{StaticResource DirectoryLoadingProgressStyle}" TargetType="ui:ProgressBar">
+                                        <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>
-                                        <Setter Property="Visibility" Value="Collapsed" />
                                     </Style>
                                 </ui:ProgressBar.Style>
                             </ui:ProgressBar>
@@ -776,7 +780,7 @@
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
                         IsReadOnly="True"
-                        ItemsSource="{Binding}"
+                        ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
                         KeyboardNavigation.TabNavigation="Once"
                         MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
@@ -1243,14 +1247,13 @@
                         Text=" *">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                        <Setter Property="Cursor" Value="AppStarting" />
-                                    </DataTrigger>
-                                </Style.Triggers>
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Setter Property="Cursor" Value="Arrow" />
+                                <Style.Triggers>
+                                    <Trigger Property="Visibility" Value="Visible">
+                                        <Setter Property="Cursor" Value="AppStarting" />
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
