@@ -336,6 +336,7 @@ namespace ADB_Explorer
                     if (!InitNavigation(PathBox.Text))
                     {
                         DriveViewNav();
+                        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
                         return;
                     }
                 }
@@ -413,6 +414,7 @@ namespace ADB_Explorer
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
+                NavHistory.Reset();
                 ClearDrives();
                 return;
             }
@@ -427,6 +429,7 @@ namespace ADB_Explorer
 
                     Title = Properties.Resources.AppDisplayName;
                     ClearExplorer();
+                    NavHistory.Reset();
                     return;
                 }
 
@@ -621,6 +624,8 @@ namespace ADB_Explorer
 
             RefreshDrives();
             DriveViewNav();
+            NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+
             UpdateAndroidVersion();
 
             if (DevicesObject.CurrentDevice.Drives.Count < 1)
@@ -676,7 +681,9 @@ namespace ADB_Explorer
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             PushMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
-            NavHistory.Reset();
+
+            if (path is null)
+                return true;
 
             return string.IsNullOrEmpty(path)
                 ? NavigateToPath(DEFAULT_PATH)
@@ -957,22 +964,48 @@ namespace ADB_Explorer
             NavigateToPath(ParentPath);
         }
 
+        private void NavigateToLocation(object location, bool bfNavigated = false)
+        {
+            if (location is string path)
+            {
+                if (!ExplorerGrid.Visible())
+                    InitNavigation(null);
+
+                NavigateToPath(path, bfNavigated);
+            }
+            else if (location is NavHistory.SpecialLocation special)
+            {
+                switch (special)
+                {
+                    case NavHistory.SpecialLocation.DriveView:
+                        UnfocusPathBox();
+                        RefreshDrives();
+                        DriveViewNav();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                UpdateNavButtons();
+            }
+        }
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPath(NavHistory.GoBack(), true);
+            NavigateToLocation(NavHistory.GoBack(), true);
         }
 
         private void ForwardButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPath(NavHistory.GoForward(), true);
+            NavigateToLocation(NavHistory.GoForward(), true);
         }
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.XButton1)
-                NavigateToPath(NavHistory.GoBack(), true);
+                NavigateToLocation(NavHistory.GoBack(), true);
             else if (e.ChangedButton == MouseButton.XButton2)
-                NavigateToPath(NavHistory.GoForward(), true);
+                NavigateToLocation(NavHistory.GoForward(), true);
         }
 
         private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
@@ -985,7 +1018,7 @@ namespace ADB_Explorer
             }
             else if (key == Key.Back)
             {
-                NavigateToPath(NavHistory.GoBack(), true);
+                NavigateToLocation(NavHistory.GoBack(), true);
             }
             else
                 return;
@@ -1023,7 +1056,7 @@ namespace ADB_Explorer
             }
             else if (key == Key.Back)
             {
-                NavigateToPath(NavHistory.GoBack(), true);
+                NavigateToLocation(NavHistory.GoBack(), true);
             }
             else
                 return;
@@ -1280,6 +1313,7 @@ namespace ADB_Explorer
                 CurrentADBDevice = new(device);
                 InitLister();
                 ClearExplorer();
+                NavHistory.Reset();
                 InitDevice();
 
                 DevicesSplitView.IsPaneOpen = false;
@@ -1317,6 +1351,7 @@ namespace ADB_Explorer
             {
                 ClearDrives();
                 ClearExplorer();
+                NavHistory.Reset();
                 DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
                 DirectoryLister = null;
@@ -1331,7 +1366,6 @@ namespace ADB_Explorer
             PathStackPanel.Children.Clear();
             CurrentPath = null;
             PathBox.Tag = null;
-            NavHistory.Reset();
             PushMenuButton.IsEnabled =
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
@@ -1513,9 +1547,8 @@ namespace ADB_Explorer
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            UnfocusPathBox();
-            RefreshDrives();
-            DriveViewNav();
+            NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+            NavigateToLocation(NavHistory.SpecialLocation.DriveView);
         }
 
         private void RefreshDrives(bool findMmc = false)
@@ -2008,6 +2041,7 @@ namespace ADB_Explorer
             ClearSelectedDrives();
 
             RepeaterHelper.SetIsSelected(sender as Button, true);
+            RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 1);
         }
 
         private void ClearSelectedDrives()
@@ -2016,6 +2050,8 @@ namespace ADB_Explorer
             {
                 RepeaterHelper.SetIsSelected(drive, false);
             }
+
+            RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 0);
         }
 
         private void CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)

@@ -1215,20 +1215,11 @@
                         <Setter Property="Margin" Value="8,6,4,6" />
                     </Style>
                 </StackPanel.Resources>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
+                <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                     <TextBlock
                         x:Name="ItemsCountBlock"
                         Margin="8,4,0,4"
-                        Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+                        Style="{StaticResource ItemsCountStyle}" />
                     <TextBlock Margin="0,4" Text=" item" />
                     <TextBlock Margin="0,4" Text="s">
                         <TextBlock.Style>
@@ -1272,7 +1263,7 @@
                     <TextBlock
                         x:Name="SelectedItemsBlock"
                         Margin="4,4,0,4"
-                        Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+                        Style="{StaticResource SelectedItemsStyle}" />
                     <TextBlock Margin="0,4" Text=" item" />
                     <TextBlock Margin="0,4" Text="s">
                         <TextBlock.Style>
@@ -1286,17 +1277,10 @@
                         </TextBlock.Style>
                     </TextBlock>
                     <TextBlock Margin="0,4" Text=" selected" />
-                    <TextBlock x:Name="TotalSizeBlock" Margin="6,4,0,4">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <TextBlock
+                        x:Name="TotalSizeBlock"
+                        Margin="6,4,0,4"
+                        Style="{StaticResource TotalSizeStyle}" />
                     <Separator />
                 </StackPanel>
             </StackPanel>
