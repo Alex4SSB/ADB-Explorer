@@ -1002,10 +1002,23 @@ namespace ADB_Explorer
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.XButton1)
-                NavigateToLocation(NavHistory.GoBack(), true);
-            else if (e.ChangedButton == MouseButton.XButton2)
-                NavigateToLocation(NavHistory.GoForward(), true);
+            switch (e.ChangedButton)
+            {
+                case MouseButton.XButton1:
+                    AnimateControl(BackButton);
+                    NavigateToLocation(NavHistory.GoBack(), true);
+                    break;
+                case MouseButton.XButton2:
+                    AnimateControl(ForwardButton);
+                    NavigateToLocation(NavHistory.GoForward(), true);
+                    break;
+            }
+        }
+
+        private void AnimateControl(Control control)
+        {
+            StyleHelper.SetActivateAnimation(control, true);
+            Task.Delay(400).ContinueWith(_ => Dispatcher.Invoke(() => StyleHelper.SetActivateAnimation(control, false)));
         }
 
         private void DataGridRow_KeyDown(object sender, KeyEventArgs e)

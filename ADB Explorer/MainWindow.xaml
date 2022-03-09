@@ -463,7 +463,13 @@
                                     Margin="0,0,-10,-12"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
-                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count}" />
+                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count, NotifyOnTargetUpdated=True}">
+                                    <TextBlock.Triggers>
+                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                            <BeginStoryboard Storyboard="{StaticResource PulsatingBackgroundStoryboard}" />
+                                        </EventTrigger>
+                                    </TextBlock.Triggers>
+                                </TextBlock>
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
@@ -603,14 +609,9 @@
                 <Menu>
                     <MenuItem
                         x:Name="FileOperationsButton"
-                        helpers:StyleHelper.ContentAnimation="Rotate"
                         Click="FileOperationsButton_Click"
+                        Style="{StaticResource FileOpButtonStyle}"
                         ToolTip="File Operations">
-                        <MenuItem.Style>
-                            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                                <Setter Property="helpers:RemoteToggle.IsTargetVisible" Value="False" />
-                            </Style>
-                        </MenuItem.Style>
                         <MenuItem.Header>
                             <Grid>
                                 <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}" />
@@ -620,7 +621,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="SettingsButton"
-                        helpers:StyleHelper.ContentAnimation="Rotate"
+                        helpers:StyleHelper.ContentAnimation="RotateCW"
                         Click="SettingsButton_Click"
                         ToolTip="Settings">
                         <MenuItem.Header>

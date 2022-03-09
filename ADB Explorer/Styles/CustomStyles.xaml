@@ -917,4 +917,25 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="FileOpButtonStyle"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="helpers:RemoteToggle.IsTargetVisible" Value="False" />
+        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCW" />
+        <Style.Triggers>
+            <Trigger Property="helpers:RemoteToggle.IsTargetVisible" Value="False">
+                <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCCW" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Storyboard x:Key="PulsatingBackgroundStoryboard" RepeatBehavior="3x">
+        <ColorAnimation
+            AutoReverse="True"
+            Storyboard.TargetName="OpenDevicesButton"
+            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+            From="#00000000"
+            To="Gray"
+            Duration="00:00:00.15" />
+    </Storyboard>
 </ResourceDictionary>

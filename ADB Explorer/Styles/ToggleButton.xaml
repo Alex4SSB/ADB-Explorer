@@ -38,12 +38,20 @@
                                         </DoubleAnimation.EasingFunction>
                                     </DoubleAnimation>
                                 </Storyboard>
-                                <Storyboard x:Key="RotatingStoryBoard" x:Name="RotatingStoryBoard">
+                                <Storyboard x:Key="CwRotatingStoryBoard">
                                     <DoubleAnimation
                                         Storyboard.TargetName="ContentPresenter"
                                         Storyboard.TargetProperty="RenderTransform.Angle"
                                         From="0"
                                         To="360"
+                                        Duration="00:00:00.2" />
+                                </Storyboard>
+                                <Storyboard x:Key="CCwRotatingStoryBoard">
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="ContentPresenter"
+                                        Storyboard.TargetProperty="RenderTransform.Angle"
+                                        From="360"
+                                        To="0"
                                         Duration="00:00:00.2" />
                                 </Storyboard>
                                 <Storyboard x:Key="LeftMarqueeStoryBoard">
@@ -153,12 +161,23 @@
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
                                         <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
-                                        <Condition Property="helpers:StyleHelper.ContentAnimation" Value="Rotate" />
+                                        <Condition Property="helpers:StyleHelper.ContentAnimation" Value="RotateCW" />
                                     </MultiTrigger.Conditions>
                                     <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource RotatingTransform}" />
                                     <Setter TargetName="ContentPresenter" Property="RenderTransformOrigin" Value="0.5, 0.5" />
                                     <MultiTrigger.EnterActions>
-                                        <BeginStoryboard Storyboard="{StaticResource RotatingStoryBoard}" />
+                                        <BeginStoryboard Storyboard="{StaticResource CwRotatingStoryBoard}" />
+                                    </MultiTrigger.EnterActions>
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+                                        <Condition Property="helpers:StyleHelper.ContentAnimation" Value="RotateCCW" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource RotatingTransform}" />
+                                    <Setter TargetName="ContentPresenter" Property="RenderTransformOrigin" Value="0.5, 0.5" />
+                                    <MultiTrigger.EnterActions>
+                                        <BeginStoryboard Storyboard="{StaticResource CCwRotatingStoryBoard}" />
                                     </MultiTrigger.EnterActions>
                                 </MultiTrigger>
                                 <MultiTrigger>
