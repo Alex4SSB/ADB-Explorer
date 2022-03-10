@@ -12,15 +12,9 @@ namespace ADB_Explorer.Models
 
         public ObservableList<FileOperation> Operations { get; } = new();
 
-        public int CurrentOperationIndex { get; private set; } = -1;
+        public int CurrentOperationIndex { get; private set; } = 0;
 
-        public FileOperation CurrentOperation
-        {
-            get
-            {
-                return (CurrentOperationIndex != -1) ? Operations[CurrentOperationIndex] : null;
-            }
-        }
+        public FileOperation CurrentOperation => (CurrentOperationIndex < TotalCount) ? Operations[CurrentOperationIndex] : null;
 
         private bool isActive = false;
 
@@ -92,13 +86,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public int TotalCount
-        {
-            get
-            {
-                return Operations.Count;
-            }
-        }
+        public int TotalCount => Operations.Count;
 
         private double currOperationLastProgress = 0;
         private double progress = 0;
