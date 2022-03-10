@@ -515,9 +515,7 @@ namespace ADB_Explorer
             FileOpDetailedRadioButton.IsChecked = extendedView;
             FileOpCompactRadioButton.IsChecked = !extendedView;
 
-            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations; // FIXME:
-            PendingOperationsDataGrid.ItemsSource = fileOperationQueue.Operations;
-            CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.Operations;
+            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
         }
 
         private IEnumerable<CheckBox> FileOpContextItems
