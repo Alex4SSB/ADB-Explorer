@@ -247,7 +247,7 @@ namespace ADB_Explorer.Models
             {
                 mutex.WaitOne();
 
-                if (CurrentOperation != null)
+                if ((CurrentOperation != null) && (CurrentOperation.Status != FileOperation.OperationStatus.Waiting))
                 {
                     CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
                     ++CurrentOperationIndex;
