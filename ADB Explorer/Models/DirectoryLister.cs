@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
-using ADB_Explorer.Helpers;
-using System.Windows.Threading;
-using System.Threading;
-using static ADB_Explorer.Models.AdbExplorerConst;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
+using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models
 {

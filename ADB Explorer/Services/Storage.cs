@@ -24,10 +24,12 @@ namespace ADB_Explorer.Services
             Application.Current.Properties[key] = value;
         }
 
-        public static T RetrieveEnum<T>()
+        public static T RetrieveEnum<T>() => Application.Current.Properties[typeof(T).ToString()] switch
         {
-            return Application.Current.Properties[typeof(T).ToString()] is string value ? (T)Enum.Parse(typeof(T), value) : default;
-        }
+            string strVal => (T)Enum.Parse(typeof(T), strVal),
+            long longVal => (T)Enum.ToObject(typeof(T), longVal),
+            _ => default
+        };
 
         public static void StoreEnum(Enum value)
         {

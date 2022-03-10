@@ -17,5 +17,18 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(RepeaterHelper),
                 null);
+
+        public static int GetSelectedItems(UIElement control) =>
+            (int)control.GetValue(SelectedItemsProperty);
+
+        public static void SetSelectedItems(UIElement control, int value) =>
+            control.SetValue(SelectedItemsProperty, value);
+
+        public static readonly DependencyProperty SelectedItemsProperty =
+            DependencyProperty.RegisterAttached(
+                "SelectedItems",
+                typeof(int),
+                typeof(RepeaterHelper),
+                null);
     }
 }

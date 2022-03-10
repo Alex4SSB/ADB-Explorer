@@ -4,14 +4,19 @@ namespace ADB_Explorer.Models
 {
     public static class NavHistory
     {
-        public static List<string> PathHistory = new();
+        public enum SpecialLocation
+        {
+            DriveView,
+        }
+
+        public static List<object> PathHistory { get; set; } = new();
 
         private static int historyIndex = -1;
 
         public static bool BackAvailable { get { return historyIndex > 0; } }
         public static bool ForwardAvailable { get { return historyIndex < PathHistory.Count - 1; } }
 
-        public static string GoBack()
+        public static object GoBack()
         {
             if (!BackAvailable) return null;
 
@@ -20,7 +25,7 @@ namespace ADB_Explorer.Models
             return PathHistory[historyIndex];
         }
 
-        public static string GoForward()
+        public static object GoForward()
         {
             if (!ForwardAvailable) return null;
 
@@ -33,9 +38,9 @@ namespace ADB_Explorer.Models
         /// For any non back / forward navigation
         /// </summary>
         /// <param name="path"></param>
-        public static void Navigate(string path)
+        public static void Navigate(object path)
         {
-            if (PathHistory.Count > 0 && path == PathHistory[historyIndex])
+            if (PathHistory.Count > 0 && PathEquals(path, PathHistory[historyIndex]))
             {
                 return;
             }
@@ -53,6 +58,17 @@ namespace ADB_Explorer.Models
         {
             PathHistory.Clear();
             historyIndex = -1;
+        }
+
+        public static bool PathEquals(object lval, object rval)
+        {
+            if (lval.GetType() != rval.GetType())
+                return false;
+
+            if (lval is string lstr && rval is string rstr)
+                return lstr == rstr;
+
+            return lval == rval;
         }
     }
 }

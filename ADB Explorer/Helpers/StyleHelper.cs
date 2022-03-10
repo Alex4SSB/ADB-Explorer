@@ -9,7 +9,8 @@ namespace ADB_Explorer.Helpers
         {
             None,
             Bounce,
-            Rotate,
+            RotateCW,
+            RotateCCW,
             LeftMarquee,
             RightMarquee,
         }

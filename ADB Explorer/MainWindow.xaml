@@ -29,6 +29,10 @@
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
+        <CollectionViewSource
+            x:Key="FileListView"
+            Filter="CollectionViewSource_Filter"
+            Source="{Binding ElementName=MainWin, Path=DirectoryLister.FileList}" />
         <Style
             x:Key="FileOpHeaderResizeStyle"
             BasedOn="{StaticResource FileOpColumnHeaderStyle}"
@@ -459,7 +463,13 @@
                                     Margin="0,0,-10,-12"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
-                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count}" />
+                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count, NotifyOnTargetUpdated=True}">
+                                    <TextBlock.Triggers>
+                                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                            <BeginStoryboard Storyboard="{StaticResource PulsatingBackgroundStoryboard}" />
+                                        </EventTrigger>
+                                    </TextBlock.Triggers>
+                                </TextBlock>
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
@@ -599,14 +609,9 @@
                 <Menu>
                     <MenuItem
                         x:Name="FileOperationsButton"
-                        helpers:StyleHelper.ContentAnimation="Rotate"
                         Click="FileOperationsButton_Click"
+                        Style="{StaticResource FileOpButtonStyle}"
                         ToolTip="File Operations">
-                        <MenuItem.Style>
-                            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                                <Setter Property="helpers:RemoteToggle.IsTargetVisible" Value="False" />
-                            </Style>
-                        </MenuItem.Style>
                         <MenuItem.Header>
                             <Grid>
                                 <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}" />
@@ -616,7 +621,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="SettingsButton"
-                        helpers:StyleHelper.ContentAnimation="Rotate"
+                        helpers:StyleHelper.ContentAnimation="RotateCW"
                         Click="SettingsButton_Click"
                         ToolTip="Settings">
                         <MenuItem.Header>
@@ -704,12 +709,12 @@
                                 IsHitTestVisible="False">
                                 <ui:ProgressBar.Style>
                                     <Style BasedOn="{StaticResource DirectoryLoadingProgressStyle}" TargetType="ui:ProgressBar">
+                                        <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>
-                                        <Setter Property="Visibility" Value="Collapsed" />
                                     </Style>
                                 </ui:ProgressBar.Style>
                             </ui:ProgressBar>
@@ -770,12 +775,13 @@
                         Background="Transparent"
                         CanUserResizeRows="False"
                         CellStyle="{StaticResource DataGridCellStyle}"
+                        ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                         ContextMenu="{StaticResource RowContextMenu}"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
                         IsReadOnly="True"
-                        ItemsSource="{Binding}"
+                        ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
                         KeyboardNavigation.TabNavigation="Once"
                         MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
@@ -975,6 +981,7 @@
             </Border>
             <Expander
                 Grid.Row="4"
+                Margin="0,0,0,-3"
                 helpers:ExpanderHelper.IsArrowVisible="False"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
                 ExpandDirection="Up">
@@ -1001,6 +1008,7 @@
                         <GridSplitter
                             x:Name="FileOpDetailedSplitter"
                             Height="3"
+                            Margin="0,-2,0,0"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
                             BorderBrush="Gray"
@@ -1028,12 +1036,10 @@
                                             CanUserDeleteRows="False"
                                             CellStyle="{StaticResource DataGridCellStyle}"
                                             ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
+                                            ColumnHeaderStyle="{StaticResource FileOpHeaderResizeStyle}"
                                             FocusVisualStyle="{x:Null}"
                                             HeadersVisibility="Column"
                                             ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
-                                            <DataGrid.Resources>
-                                                <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader" />
-                                            </DataGrid.Resources>
                                             <DataGrid.Columns>
                                                 <DataGridTemplateColumn
                                                     x:Name="OpTypeColumn"
@@ -1210,20 +1216,11 @@
                         <Setter Property="Margin" Value="8,6,4,6" />
                     </Style>
                 </StackPanel.Resources>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="0">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
+                <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                     <TextBlock
                         x:Name="ItemsCountBlock"
                         Margin="8,4,0,4"
-                        Text="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+                        Style="{StaticResource ItemsCountStyle}" />
                     <TextBlock Margin="0,4" Text=" item" />
                     <TextBlock Margin="0,4" Text="s">
                         <TextBlock.Style>
@@ -1242,14 +1239,13 @@
                         Text=" *">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                        <Setter Property="Cursor" Value="AppStarting" />
-                                    </DataTrigger>
-                                </Style.Triggers>
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Setter Property="Cursor" Value="Arrow" />
+                                <Style.Triggers>
+                                    <Trigger Property="Visibility" Value="Visible">
+                                        <Setter Property="Cursor" Value="AppStarting" />
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
@@ -1268,7 +1264,7 @@
                     <TextBlock
                         x:Name="SelectedItemsBlock"
                         Margin="4,4,0,4"
-                        Text="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+                        Style="{StaticResource SelectedItemsStyle}" />
                     <TextBlock Margin="0,4" Text=" item" />
                     <TextBlock Margin="0,4" Text="s">
                         <TextBlock.Style>
@@ -1282,17 +1278,10 @@
                         </TextBlock.Style>
                     </TextBlock>
                     <TextBlock Margin="0,4" Text=" selected" />
-                    <TextBlock x:Name="TotalSizeBlock" Margin="6,4,0,4">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                    <TextBlock
+                        x:Name="TotalSizeBlock"
+                        Margin="6,4,0,4"
+                        Style="{StaticResource TotalSizeStyle}" />
                     <Separator />
                 </StackPanel>
             </StackPanel>
@@ -1837,8 +1826,12 @@
                     <Setter Property="Width" Value="300" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
-                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox" />
-                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
+                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
                 <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                     <Setter Property="Margin" Value="0,6" />
                 </Style>
@@ -1924,7 +1917,7 @@
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
                                                     <ui:FontIcon
-                                                        Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                        Foreground="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}"
                                                         Glyph="&#xEA84;"
                                                         Style="{StaticResource RestartWarningIconStyle}" />
                                                 </Grid>
@@ -1951,7 +1944,7 @@
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
                                                 <ui:FontIcon
-                                                    Foreground="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Background}"
+                                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}"
                                                     Glyph="&#xEA84;"
                                                     Style="{StaticResource RestartWarningIconStyle}" />
                                             </Grid>

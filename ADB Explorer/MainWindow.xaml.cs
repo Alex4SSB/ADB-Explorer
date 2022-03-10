@@ -8,7 +8,6 @@ using Microsoft.WindowsAPICodePack.Shell;
 using ModernWpf;
 using ModernWpf.Controls;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -19,6 +18,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -115,8 +115,17 @@ namespace ADB_Explorer
                 OpenDevicesButton.IsEnabled = true;
                 DevicesSplitView.IsPaneOpen = true;
             }
-
+            
             UpperProgressBar.DataContext = fileOperationQueue;
+        }
+
+        private void DirectoryLister_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(DirectoryLister.InProgress))
+            {
+                DirectoryLoadingProgressBar.Visible(DirectoryLister.InProgress);
+                UnfinishedBlock.Visible(DirectoryLister.InProgress);
+            }
         }
 
         private void ThemeService_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -327,6 +336,7 @@ namespace ADB_Explorer
                     if (!InitNavigation(PathBox.Text))
                     {
                         DriveViewNav();
+                        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
                         return;
                     }
                 }
@@ -404,6 +414,7 @@ namespace ADB_Explorer
             {
                 Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
                 ClearExplorer();
+                NavHistory.Reset();
                 ClearDrives();
                 return;
             }
@@ -418,6 +429,7 @@ namespace ADB_Explorer
 
                     Title = Properties.Resources.AppDisplayName;
                     ClearExplorer();
+                    NavHistory.Reset();
                     return;
                 }
 
@@ -430,9 +442,15 @@ namespace ADB_Explorer
 
             DevicesObject.SetOpen(DevicesObject.Current, true);
             CurrentADBDevice = new(DevicesObject.CurrentDevice);
-            DirectoryLister = new(Dispatcher, CurrentADBDevice);
+            InitLister();
             if (init)
                 InitDevice();
+        }
+
+        private void InitLister()
+        {
+            DirectoryLister = new(Dispatcher, CurrentADBDevice);
+            DirectoryLister.PropertyChanged += DirectoryLister_PropertyChanged;
         }
 
         private void LoadSettings()
@@ -515,7 +533,8 @@ namespace ADB_Explorer
 
         private void InitFileOpColumns()
         {
-            foreach (var item in ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items)
+            var fileOpContext = FindResource("FileOpHeaderContextMenu") as ContextMenu;
+            foreach (var item in fileOpContext.Items)
             {
                 var checkbox = ((MenuItem)item).Header as CheckBox;
                 checkbox.Click += ColumnCheckbox_Click;
@@ -531,6 +550,8 @@ namespace ADB_Explorer
                 column.Visibility = Visible(config.IsVisible);
                 column.DisplayIndex = config.Index;
             }
+
+            EnableContextItems();
         }
 
         private DataGridColumn GetCheckboxColumn(CheckBox checkBox)
@@ -562,6 +583,15 @@ namespace ADB_Explorer
             return FileOpContextItems.Where(cb => cb.Name == $"FileOpContext{ColumnName(column).Split("Column")[0]}CheckBox").First();
         }
 
+        private void EnableContextItems()
+        {
+            var visibleColumns = FileOpContextItems.Count(cb => cb.IsChecked == true);
+            foreach (var checkbox in FileOpContextItems)
+            {
+                checkbox.IsEnabled = visibleColumns > 1 ? true : checkbox.IsChecked == false;
+            }
+        }
+
         private void ColumnCheckbox_Click(object sender, RoutedEventArgs e)
         {
             var checkbox = sender as CheckBox;
@@ -578,6 +608,7 @@ namespace ADB_Explorer
             }
 
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+            EnableContextItems();
         }
 
         private static FileOpColumn CreateColumnConfig(DataGridColumn column) => new FileOpColumn()
@@ -593,6 +624,8 @@ namespace ADB_Explorer
 
             RefreshDrives();
             DriveViewNav();
+            NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+
             UpdateAndroidVersion();
 
             if (DevicesObject.CurrentDevice.Drives.Count < 1)
@@ -648,7 +681,9 @@ namespace ADB_Explorer
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             PushMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
-            NavHistory.Reset();
+
+            if (path is null)
+                return true;
 
             return string.IsNullOrEmpty(path)
                 ? NavigateToPath(DEFAULT_PATH)
@@ -929,22 +964,61 @@ namespace ADB_Explorer
             NavigateToPath(ParentPath);
         }
 
+        private void NavigateToLocation(object location, bool bfNavigated = false)
+        {
+            if (location is string path)
+            {
+                if (!ExplorerGrid.Visible())
+                    InitNavigation(null);
+
+                NavigateToPath(path, bfNavigated);
+            }
+            else if (location is NavHistory.SpecialLocation special)
+            {
+                switch (special)
+                {
+                    case NavHistory.SpecialLocation.DriveView:
+                        UnfocusPathBox();
+                        RefreshDrives();
+                        DriveViewNav();
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                UpdateNavButtons();
+            }
+        }
+
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPath(NavHistory.GoBack(), true);
+            NavigateToLocation(NavHistory.GoBack(), true);
         }
 
         private void ForwardButton_Click(object sender, RoutedEventArgs e)
         {
-            NavigateToPath(NavHistory.GoForward(), true);
+            NavigateToLocation(NavHistory.GoForward(), true);
         }
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.XButton1)
-                NavigateToPath(NavHistory.GoBack(), true);
-            else if (e.ChangedButton == MouseButton.XButton2)
-                NavigateToPath(NavHistory.GoForward(), true);
+            switch (e.ChangedButton)
+            {
+                case MouseButton.XButton1:
+                    AnimateControl(BackButton);
+                    NavigateToLocation(NavHistory.GoBack(), true);
+                    break;
+                case MouseButton.XButton2:
+                    AnimateControl(ForwardButton);
+                    NavigateToLocation(NavHistory.GoForward(), true);
+                    break;
+            }
+        }
+
+        private void AnimateControl(Control control)
+        {
+            StyleHelper.SetActivateAnimation(control, true);
+            Task.Delay(400).ContinueWith(_ => Dispatcher.Invoke(() => StyleHelper.SetActivateAnimation(control, false)));
         }
 
         private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
@@ -957,7 +1031,7 @@ namespace ADB_Explorer
             }
             else if (key == Key.Back)
             {
-                NavigateToPath(NavHistory.GoBack(), true);
+                NavigateToLocation(NavHistory.GoBack(), true);
             }
             else
                 return;
@@ -995,7 +1069,7 @@ namespace ADB_Explorer
             }
             else if (key == Key.Back)
             {
-                NavigateToPath(NavHistory.GoBack(), true);
+                NavigateToLocation(NavHistory.GoBack(), true);
             }
             else
                 return;
@@ -1250,9 +1324,9 @@ namespace ADB_Explorer
             {
                 DevicesObject.SetOpen(device);
                 CurrentADBDevice = new(device);
-                DirectoryLister = new(Dispatcher, CurrentADBDevice);
-
+                InitLister();
                 ClearExplorer();
+                NavHistory.Reset();
                 InitDevice();
 
                 DevicesSplitView.IsPaneOpen = false;
@@ -1290,6 +1364,7 @@ namespace ADB_Explorer
             {
                 ClearDrives();
                 ClearExplorer();
+                NavHistory.Reset();
                 DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
                 DirectoryLister = null;
@@ -1304,7 +1379,6 @@ namespace ADB_Explorer
             PathStackPanel.Children.Clear();
             CurrentPath = null;
             PathBox.Tag = null;
-            NavHistory.Reset();
             PushMenuButton.IsEnabled =
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
@@ -1486,9 +1560,8 @@ namespace ADB_Explorer
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
         {
-            UnfocusPathBox();
-            RefreshDrives();
-            DriveViewNav();
+            NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+            NavigateToLocation(NavHistory.SpecialLocation.DriveView);
         }
 
         private void RefreshDrives(bool findMmc = false)
@@ -1552,7 +1625,18 @@ namespace ADB_Explorer
 
         private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            Storage.StoreValue(UserPrefs.showHiddenItems, ShowHiddenCheckBox.IsChecked);
+            //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
+
+            bool showHidden = ShowHiddenCheckBox.IsChecked == true;
+
+            if (!showHidden)
+            {
+                CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = new(file => !((FileClass)file).IsHidden);
+            }
+            else
+                CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = null;
+
+            Storage.StoreValue(UserPrefs.showHiddenItems, showHidden);
         }
 
         private void ShowExtensionsCheckBox_Click(object sender, RoutedEventArgs e)
@@ -1970,6 +2054,7 @@ namespace ADB_Explorer
             ClearSelectedDrives();
 
             RepeaterHelper.SetIsSelected(sender as Button, true);
+            RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 1);
         }
 
         private void ClearSelectedDrives()
@@ -1978,6 +2063,8 @@ namespace ADB_Explorer
             {
                 RepeaterHelper.SetIsSelected(drive, false);
             }
+
+            RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 0);
         }
 
         private void CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
@@ -2016,6 +2103,11 @@ namespace ADB_Explorer
             }
 
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+        }
+
+        private void CollectionViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        {
+
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
