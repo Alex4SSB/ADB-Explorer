@@ -2,6 +2,7 @@
 using ADB_Explorer.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
@@ -114,22 +115,92 @@ namespace ADB_Explorer.Models
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private Mutex mutex = new Mutex();
+
         public void AddOperation(FileOperation fileOp)
         {
-            Operations.Add(fileOp);
-
-            if (AutoStart)
+            try
             {
-                Start();
+                mutex.WaitOne();
+
+                Operations.Add(fileOp);
+
+                if (AutoStart)
+                {
+                    Start();
+                }
+            } 
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+        }
+
+        public void RemoveOperation(FileOperation fileOp)
+        {
+            try
+            {
+                mutex.WaitOne();
+
+                if (CurrentOperation == fileOp)
+                {
+                    CurrentOperation.Cancel();
+                    return;
+                }
+
+                for (int i = 0; i < Operations.Count; i++)
+                {
+                    if (Operations[i] == fileOp)
+                    {
+                        Operations.RemoveAt(i);
+                        if (i <= CurrentOperationIndex)
+                        {
+                            CurrentOperationIndex--;
+                        }
+
+                        break;
+                    }
+                }
+
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
             }
         }
 
         public void ClearCompleted()
         {
-            while (CurrentOperationIndex > 0)
+            try
             {
-                Operations.RemoveAt(0);
-                --CurrentOperationIndex;
+                mutex.WaitOne();
+
+                while (CurrentOperationIndex > 0)
+                {
+                    Operations.RemoveAt(0);
+                    --CurrentOperationIndex;
+                }
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
+            }
+        }
+
+        public void ClearPending()
+        {
+            try
+            {
+                mutex.WaitOne();
+
+                while (TotalCount > CurrentOperationIndex)
+                {
+                    Operations.RemoveAt(TotalCount - 1);
+                }
+            }
+            finally 
+            {
+                mutex.ReleaseMutex();
             }
         }
 
@@ -166,16 +237,26 @@ namespace ADB_Explorer.Models
         public void Clear()
         {
             Stop();
-            Operations.Clear();
+            ClearCompleted();
+            ClearPending();
         }
 
         private void MoveToCompleted()
         {
-            if (CurrentOperation != null)
+            try
             {
-                CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
-                ++CurrentOperationIndex;
-                UpdateProgress(0);
+                mutex.WaitOne();
+
+                if (CurrentOperation != null)
+                {
+                    CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
+                    ++CurrentOperationIndex;
+                    UpdateProgress(0);
+                }
+            }
+            finally
+            { 
+                mutex.ReleaseMutex();
             }
         }
 
@@ -183,20 +264,21 @@ namespace ADB_Explorer.Models
         {
             MoveToCompleted();
 
-            if (CurrentOperationIndex == TotalCount)
+            try
             {
-                return;
-            }
+                mutex.WaitOne();
 
-            CurrentOperation.PropertyChanged += CurrentOperation_PropertyChanged;
+                if (CurrentOperationIndex == TotalCount)
+                {
+                    return;
+                }
 
-            if (CurrentOperation.Status != FileOperation.OperationStatus.Waiting)
-            {
-                MoveToNextOperation();
-            }
-            else
-            {
+                CurrentOperation.PropertyChanged += CurrentOperation_PropertyChanged;
                 CurrentOperation.Start();
+            }
+            finally
+            {
+                mutex.ReleaseMutex();
             }
         }
 
