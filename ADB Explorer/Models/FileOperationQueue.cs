@@ -193,7 +193,7 @@ namespace ADB_Explorer.Models
             {
                 mutex.WaitOne();
 
-                while (TotalCount > CurrentOperationIndex)
+                while (TotalCount > (CurrentOperationIndex + 1))
                 {
                     Operations.RemoveAt(TotalCount - 1);
                 }
@@ -293,7 +293,7 @@ namespace ADB_Explorer.Models
                 (CurrentOperation.Status != FileOperation.OperationStatus.Waiting) &&
                 (CurrentOperation.Status != FileOperation.OperationStatus.InProgress))
             {
-                if ((CurrentOperationIndex == TotalCount) ||
+                if ((CurrentOperationIndex == (TotalCount - 1)) ||
                     (StopAfterFailure && (CurrentOperation.Status == FileOperation.OperationStatus.Failed)) ||
                     (CurrentOperation.Status == FileOperation.OperationStatus.Canceled))
                 {
