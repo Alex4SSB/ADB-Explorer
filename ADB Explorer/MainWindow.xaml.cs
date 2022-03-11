@@ -837,8 +837,7 @@ namespace ADB_Explorer
             PathButtons.RemoveRange(i, PathButtons.Count - i);
             PathButtons.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
 
-            // StackPanel's margin is 10, while TextBox's margins is 6, thus the offset is 4x2
-            ConsolidateButtons(expectedLength + 8);
+            ConsolidateButtons(expectedLength);
         }
 
         private void ConsolidateButtons(double expectedLength)
@@ -850,10 +849,10 @@ namespace ADB_Explorer
             List<MenuItem> excessButtons = new();
             PathStackPanel.Children.Clear();
 
-            if (excessLength > -10)
+            if (excessLength > 10)
             {
                 int i = 0;
-                while (excessLength >= -10 && PathButtons.Count - excessButtons.Count > 1)
+                while (excessLength >= 10 && PathButtons.Count - excessButtons.Count > 1)
                 {
                     excessButtons.Add(PathButtons[i]);
                     PathButtons[i].ContextMenu = null;
@@ -880,7 +879,13 @@ namespace ADB_Explorer
             var menuItem = new MenuItem()
             {
                 Height = 24,
-                Header = new FontIcon() { Glyph = "\uE712", FontSize = 16, Style = Resources["GlyphFont"] as Style, ContextMenu = Resources["PathButtonsMenu"] as ContextMenu }
+                Header = new FontIcon()
+                {
+                    Glyph = "\uE712",
+                    FontSize = 16,
+                    Style = Resources["GlyphFont"] as Style,
+                    ContextMenu = Resources["PathButtonsMenu"] as ContextMenu
+                }
             };
             ControlHelper.SetCornerRadius(menuItem, new(3));
             return menuItem;
@@ -907,7 +912,7 @@ namespace ADB_Explorer
             {
                 Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1) },
                 Tag = path,
-                Padding = new Thickness(6, 0, 6, 0),
+                Padding = new Thickness(8, 0, 8, 0),
                 Height = 24,
             };
             button.Click += PathButton_Click;
