@@ -1942,7 +1942,10 @@ namespace ADB_Explorer
 
         private void StopFileOperations_Click(object sender, RoutedEventArgs e)
         {
-            fileOperationQueue.Stop();
+            if (fileOperationQueue.IsActive)
+                fileOperationQueue.Stop();
+            else
+                fileOperationQueue.Start();
         }
 
         private void Window_SourceInitialized(object sender, EventArgs e)

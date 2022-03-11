@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Threading;
@@ -12,6 +13,8 @@ namespace ADB_Explorer.Models
         public Dispatcher Dispatcher { get; }
 
         public ObservableList<FileOperation> Operations { get; } = new();
+
+        public bool IncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
 
         public int CurrentOperationIndex { get; private set; } = 0;
 
@@ -119,6 +122,7 @@ namespace ADB_Explorer.Models
 
         public void AddOperation(FileOperation fileOp)
         {
+            NotifyPropertyChanged(nameof(IncompleteOperations));
             try
             {
                 mutex.WaitOne();
@@ -206,6 +210,7 @@ namespace ADB_Explorer.Models
 
         private void UpdateProgress(double? currentProgress = null)
         {
+            NotifyPropertyChanged(nameof(IncompleteOperations));
             if (currentProgress != null)
             {
                 currOperationLastProgress = currentProgress.Value;
@@ -243,6 +248,7 @@ namespace ADB_Explorer.Models
 
         private void MoveToCompleted()
         {
+            NotifyPropertyChanged(nameof(IncompleteOperations));
             try
             {
                 mutex.WaitOne();

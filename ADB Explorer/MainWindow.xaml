@@ -96,21 +96,31 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
-        <Menu x:Key="FileOpStopMenu" x:Shared="False">
-            <Menu.Style>
-                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding ElementName=FileOpRing, Path=Visibility}" Value="Collapsed">
-                            <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                    <Setter Property="IsEnabled" Value="True" />
-                </Style>
-            </Menu.Style>
-            <MenuItem Click="StopFileOperations_Click" ToolTip="Stop">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE71A;" />
-                </MenuItem.Header>
+        <Menu
+            x:Key="FileOpStopMenu"
+            x:Shared="False"
+            Style="{StaticResource StopFileOpMenuStyle}">
+            <MenuItem Click="StopFileOperations_Click">
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                        <Setter Property="Header">
+                            <Setter.Value>
+                                <ui:FontIcon Glyph="&#xE71A;" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="ToolTip" Value="Stop" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsActive, NotifyOnTargetUpdated=True}" Value="False">
+                                <Setter Property="Header">
+                                    <Setter.Value>
+                                        <ui:FontIcon Glyph="&#xE768;" />
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="ToolTip" Value="Resume" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
             </MenuItem>
         </Menu>
         <Menu
@@ -744,6 +754,9 @@
                                 <Trigger Property="Value" Value="0">
                                     <Setter Property="IsIndeterminate" Value="True" />
                                 </Trigger>
+                                <DataTrigger Binding="{Binding Progress}" Value="{x:Null}">
+                                    <Setter Property="IsIndeterminate" Value="True" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </ui:ProgressBar.Style>
