@@ -10,12 +10,12 @@
     <KeyTime x:Key="AnimationDurationKeyTime">00:00:00.2</KeyTime>
 
     <Style x:Key="MenuBorderStyle" TargetType="Border">
-        <Style.Triggers>
+        <!--<Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="CornerRadius" Value="5" />
             </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="CornerRadius" Value="0" />
+        </Style.Triggers>-->
+        <Setter Property="CornerRadius" Value="{Binding RelativeSource={RelativeSource AncestorType=MenuItem, Mode=FindAncestor}, Path=(ui:ControlHelper.CornerRadius)}" />
     </Style>
 
     <ControlTemplate x:Key="{ComponentResourceKey TypeInTargetAssembly={x:Type MenuItem}, ResourceId=TopLevelItemTemplateKey}" TargetType="MenuItem">
@@ -290,6 +290,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MenuFlyoutItemForeground}" />
         <Setter Property="FocusVisualStyle" Value="{DynamicResource {x:Static SystemParameters.FocusVisualStyleKey}}" />
         <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey TypeInTargetAssembly={x:Type MenuItem}, ResourceId=SubmenuItemTemplateKey}}" />
+        <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Style.Triggers>
             <Trigger Property="Role" Value="TopLevelHeader">
                 <Setter Property="Background" Value="{DynamicResource MenuBarItemBackground}" />
@@ -313,6 +314,9 @@
                 <Setter Property="BorderThickness" Value="{DynamicResource MenuFlyoutSubItemRevealBorderThickness}" />
                 <Setter Property="Foreground" Value="{DynamicResource MenuFlyoutSubItemForeground}" />
                 <Setter Property="Template" Value="{DynamicResource {ComponentResourceKey TypeInTargetAssembly={x:Type MenuItem}, ResourceId=SubmenuHeaderTemplateKey}}" />
+            </Trigger>
+            <Trigger Property="helpers:StyleHelper.UseFluentStyles" Value="True">
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
             </Trigger>
         </Style.Triggers>
     </Style>

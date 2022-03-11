@@ -7,6 +7,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Shell;
 using ModernWpf;
 using ModernWpf.Controls;
+using ModernWpf.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -874,11 +875,16 @@ namespace ADB_Explorer
             }
         }
 
-        private MenuItem CreateExcessButton() => new MenuItem()
+        private MenuItem CreateExcessButton()
         {
-            Height = 24,
-            Header = new FontIcon() { Glyph = "\uE712", FontSize = 16, Style = Resources["GlyphFont"] as Style, ContextMenu = Resources["PathButtonsMenu"] as ContextMenu }
-        };
+            var menuItem = new MenuItem()
+            {
+                Height = 24,
+                Header = new FontIcon() { Glyph = "\uE712", FontSize = 16, Style = Resources["GlyphFont"] as Style, ContextMenu = Resources["PathButtonsMenu"] as ContextMenu }
+            };
+            ControlHelper.SetCornerRadius(menuItem, new(3));
+            return menuItem;
+        }
 
         private void AddExcessButton(List<MenuItem> excessButtons = null)
         {
@@ -901,11 +907,12 @@ namespace ADB_Explorer
             {
                 Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1) },
                 Tag = path,
-                Padding = new Thickness(10, 0, 10, 0),
+                Padding = new Thickness(6, 0, 6, 0),
                 Height = 24,
             };
             button.Click += PathButton_Click;
             button.ContextMenuOpening += PathButton_ContextMenuOpening;
+            ControlHelper.SetCornerRadius(button, new(3));
 
             return button;
         }
