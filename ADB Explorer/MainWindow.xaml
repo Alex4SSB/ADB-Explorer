@@ -758,7 +758,7 @@
                 <Grid>
                     <ui:ItemsRepeater
                         x:Name="DrivesItemRepeater"
-                        Margin="10"
+                        Margin="10,10,10,0"
                         ItemTemplate="{StaticResource DriveItemTemplate}"
                         ItemsSource="{Binding}">
                         <ui:ItemsRepeater.Layout>

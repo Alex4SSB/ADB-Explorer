@@ -1387,7 +1387,7 @@ namespace ADB_Explorer
         private void ClearExplorer()
         {
             CurrentPrettyNames.Clear();
-            ExplorerGrid.Items.Refresh();
+            DirectoryLister?.FileList?.Clear();
             PathStackPanel.Children.Clear();
             CurrentPath = null;
             PathBox.Tag = null;
