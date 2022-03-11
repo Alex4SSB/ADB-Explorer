@@ -7,6 +7,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using Microsoft.WindowsAPICodePack.Shell;
 using ModernWpf;
 using ModernWpf.Controls;
+using ModernWpf.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -834,8 +835,7 @@ namespace ADB_Explorer
             PathButtons.RemoveRange(i, PathButtons.Count - i);
             PathButtons.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
 
-            // StackPanel's margin is 10, while TextBox's margins is 6, thus the offset is 4x2
-            ConsolidateButtons(expectedLength + 8);
+            ConsolidateButtons(expectedLength);
         }
 
         private void ConsolidateButtons(double expectedLength)
@@ -847,10 +847,10 @@ namespace ADB_Explorer
             List<MenuItem> excessButtons = new();
             PathStackPanel.Children.Clear();
 
-            if (excessLength > -10)
+            if (excessLength > 10)
             {
                 int i = 0;
-                while (excessLength >= -10 && PathButtons.Count - excessButtons.Count > 1)
+                while (excessLength >= 10 && PathButtons.Count - excessButtons.Count > 1)
                 {
                     excessButtons.Add(PathButtons[i]);
                     PathButtons[i].ContextMenu = null;
@@ -872,11 +872,22 @@ namespace ADB_Explorer
             }
         }
 
-        private MenuItem CreateExcessButton() => new MenuItem()
+        private MenuItem CreateExcessButton()
         {
-            Height = 24,
-            Header = new FontIcon() { Glyph = "\uE712", FontSize = 16, Style = Resources["GlyphFont"] as Style, ContextMenu = Resources["PathButtonsMenu"] as ContextMenu }
-        };
+            var menuItem = new MenuItem()
+            {
+                Height = 24,
+                Header = new FontIcon()
+                {
+                    Glyph = "\uE712",
+                    FontSize = 16,
+                    Style = Resources["GlyphFont"] as Style,
+                    ContextMenu = Resources["PathButtonsMenu"] as ContextMenu
+                }
+            };
+            ControlHelper.SetCornerRadius(menuItem, new(3));
+            return menuItem;
+        }
 
         private void AddExcessButton(List<MenuItem> excessButtons = null)
         {
@@ -899,11 +910,12 @@ namespace ADB_Explorer
             {
                 Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1) },
                 Tag = path,
-                Padding = new Thickness(10, 0, 10, 0),
+                Padding = new Thickness(8, 0, 8, 0),
                 Height = 24,
             };
             button.Click += PathButton_Click;
             button.ContextMenuOpening += PathButton_ContextMenuOpening;
+            ControlHelper.SetCornerRadius(button, new(3));
 
             return button;
         }
@@ -1373,7 +1385,7 @@ namespace ADB_Explorer
         private void ClearExplorer()
         {
             CurrentPrettyNames.Clear();
-            ExplorerGrid.Items.Refresh();
+            DirectoryLister?.FileList?.Clear();
             PathStackPanel.Children.Clear();
             CurrentPath = null;
             PathBox.Tag = null;

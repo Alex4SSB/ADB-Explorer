@@ -729,7 +729,7 @@
                             </ui:ProgressBar>
                             <StackPanel
                                 x:Name="PathStackPanel"
-                                Margin="5,0,0,0"
+                                Margin="4,0,0,0"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal" />
                         </Grid>
@@ -770,7 +770,7 @@
                 <Grid>
                     <ui:ItemsRepeater
                         x:Name="DrivesItemRepeater"
-                        Margin="10"
+                        Margin="10,10,10,0"
                         ItemTemplate="{StaticResource DriveItemTemplate}"
                         ItemsSource="{Binding}">
                         <ui:ItemsRepeater.Layout>
@@ -856,7 +856,7 @@
                                 x:Name="NameColumn"
                                 Width="300"
                                 Header="Name"
-                                SortMemberPath="FileName">
+                                SortMemberPath="FullName">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBlock FontSize="{Binding Source={StaticResource FontSize}}" TextTrimming="CharacterEllipsis">
