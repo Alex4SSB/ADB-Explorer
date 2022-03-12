@@ -271,10 +271,6 @@
         </Style>
     </ResourceDictionary>
     <ContextMenu x:Key="RowContextMenu" Resources="{StaticResource ContextMenuStyles}" />
-    <ContextMenu
-        x:Key="PathButtonsMenu"
-        Name="PathButtonsMenu"
-        Resources="{StaticResource ContextMenuStyles}" />
     <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextMenuStyles}">
         <MenuItem>
             <MenuItem.Header>

@@ -64,38 +64,37 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
-        <MenuItem
-            x:Key="PathMenuHeader"
-            Margin="0,0,0,-5"
-            HorizontalAlignment="Center"
-            Click="PathMenuEdit_Click"
-            IsEnabled="False">
-            <MenuItem.Header>
-                <TextBlock HorizontalAlignment="Center" Text="Path" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem
-            x:Key="PathMenuEdit"
-            Click="PathMenuEdit_Click"
-            Resources="{StaticResource ContextSubMenuStyles}">
-            <MenuItem.Header>
-                <StackPanel>
-                    <ui:FontIcon Glyph="&#xE70F;" />
-                    <TextBlock Text="Edit" />
-                </StackPanel>
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem
-            x:Key="PathMenuCopy"
-            Click="PathMenuCopy_Click"
-            Resources="{StaticResource ContextSubMenuStyles}">
-            <MenuItem.Header>
-                <StackPanel>
-                    <ui:FontIcon Glyph="&#xE8C8;" />
-                    <TextBlock Text="Copy" />
-                </StackPanel>
-            </MenuItem.Header>
-        </MenuItem>
+        <ContextMenu
+            x:Key="PathButtonsMenu"
+            Name="PathButtonsMenu"
+            Resources="{StaticResource ContextMenuStyles}">
+            <MenuItem
+                Margin="0,0,0,-5"
+                HorizontalAlignment="Center"
+                Click="PathMenuEdit_Click"
+                IsEnabled="False">
+                <MenuItem.Header>
+                    <TextBlock HorizontalAlignment="Center" Text="Path" />
+                </MenuItem.Header>
+            </MenuItem>
+            <Separator />
+            <MenuItem Click="PathMenuEdit_Click" Resources="{StaticResource ContextSubMenuStyles}">
+                <MenuItem.Header>
+                    <StackPanel>
+                        <ui:FontIcon Glyph="&#xE70F;" />
+                        <TextBlock Text="Edit" />
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Click="PathMenuCopy_Click" Resources="{StaticResource ContextSubMenuStyles}">
+                <MenuItem.Header>
+                    <StackPanel>
+                        <ui:FontIcon Glyph="&#xE8C8;" />
+                        <TextBlock Text="Copy" />
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
+        </ContextMenu>
         <Menu x:Key="FileOpStopMenu" x:Shared="False">
             <Menu.Style>
                 <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
@@ -695,6 +694,7 @@
                             <TextBox
                                 x:Name="PathBox"
                                 VerticalAlignment="Center"
+                                helpers:TextHelper.AltText=""
                                 GotFocus="PathBox_GotFocus"
                                 IsEnabled="False"
                                 IsReadOnly="True"
@@ -722,7 +722,13 @@
                                 x:Name="PathStackPanel"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
-                                Orientation="Horizontal" />
+                                Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                        <Setter Property="ContextMenu" Value="{StaticResource PathButtonsMenu}" />
+                                    </Style>
+                                </StackPanel.Resources>
+                            </StackPanel>
                         </Grid>
                     </Grid>
                 </StackPanel>

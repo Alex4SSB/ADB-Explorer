@@ -168,7 +168,7 @@ namespace ADB_Explorer
         private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
         {
             MenuItem pullMenu = FindResource("ContextMenuCopyItem") as MenuItem;
-            MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
+            //MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
@@ -189,24 +189,6 @@ namespace ADB_Explorer
                 default:
                     break;
             }
-        }
-
-        private void InitializePathContextMenu(FrameworkElement sender)
-        {
-            if (sender.ContextMenu is null)
-                return;
-
-            MenuItem headerMenu = FindResource("PathMenuHeader") as MenuItem;
-            MenuItem editMenu = FindResource("PathMenuEdit") as MenuItem;
-            MenuItem copyMenu = FindResource("PathMenuCopy") as MenuItem;
-            sender.ContextMenu.Items.Clear();
-
-            sender.ContextMenu.Items.Add(headerMenu);
-            sender.ContextMenu.Items.Add(new Separator());
-            sender.ContextMenu.Items.Add(editMenu);
-            sender.ContextMenu.Items.Add(copyMenu);
-
-            sender.ContextMenu.Visibility = Visible(sender.ContextMenu.HasItems);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -310,7 +292,7 @@ namespace ADB_Explorer
         private void FocusPathBox()
         {
             PathStackPanel.Visibility = Visibility.Collapsed;
-            PathBox.Text = PathBox.Tag?.ToString();
+            PathBox.Text = TextHelper.GetAltText(PathBox);
             PathBox.IsReadOnly = false;
             PathBox.SelectAll();
         }
@@ -646,7 +628,6 @@ namespace ADB_Explorer
             PathBox.IsEnabled = true;
 
             MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
-            button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
             AddPathButton(button);
         }
 
@@ -774,7 +755,7 @@ namespace ADB_Explorer
 
             UpdateNavButtons();
 
-            PathBox.Tag =
+            TextHelper.SetAltText(PathBox, realPath);
             CurrentPath = realPath;
             PopulateButtons(realPath);
             ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
@@ -869,7 +850,6 @@ namespace ADB_Explorer
                 if (PathStackPanel.Children.Count > 0)
                     AddPathArrow();
 
-                item.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
                 AddPathButton(item);
             }
         }
@@ -884,7 +864,6 @@ namespace ADB_Explorer
                     Glyph = "\uE712",
                     FontSize = 16,
                     Style = Resources["GlyphFont"] as Style,
-                    ContextMenu = Resources["PathButtonsMenu"] as ContextMenu
                 }
             };
             ControlHelper.SetCornerRadius(menuItem, new(3));
@@ -899,7 +878,6 @@ namespace ADB_Explorer
             var button = CreateExcessButton();
             button.ItemsSource = excessButtons;
             Menu excessMenu = new() { Height = 24 };
-            excessMenu.ContextMenuOpening += PathButton_ContextMenuOpening;
 
             excessMenu.Items.Add(button);
             PathStackPanel.Children.Add(excessMenu);
@@ -914,17 +892,11 @@ namespace ADB_Explorer
                 Tag = path,
                 Padding = new Thickness(8, 0, 8, 0),
                 Height = 24,
-            };
+        };
             button.Click += PathButton_Click;
-            button.ContextMenuOpening += PathButton_ContextMenuOpening;
             ControlHelper.SetCornerRadius(button, new(3));
 
             return button;
-        }
-
-        private void PathButton_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            InitializePathContextMenu((FrameworkElement)sender);
         }
 
         private void AddPathButton(MenuItem button)
@@ -940,13 +912,11 @@ namespace ADB_Explorer
             Glyph = " \uE970 ",
             FontSize = 8,
             Style = Resources["GlyphFont"] as Style,
-            ContextMenu = Resources["PathButtonsMenu"] as ContextMenu
         };
 
         private void AddPathArrow(bool append = true)
         {
             var arrow = CreatePathArrow();
-            arrow.ContextMenuOpening += PathButton_ContextMenuOpening;
 
             if (append)
                 PathStackPanel.Children.Add(arrow);
@@ -1390,7 +1360,7 @@ namespace ADB_Explorer
             DirectoryLister?.FileList?.Clear();
             PathStackPanel.Children.Clear();
             CurrentPath = null;
-            PathBox.Tag = null;
+            TextHelper.SetAltText(PathBox, "");
             PushMenuButton.IsEnabled =
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
@@ -1502,7 +1472,7 @@ namespace ADB_Explorer
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            PopulateButtons((string)PathBox.Tag);
+            PopulateButtons(TextHelper.GetAltText(PathBox));
             ResizeDetailedView();
         }
 
@@ -1631,8 +1601,7 @@ namespace ADB_Explorer
 
         private void PathMenuCopy_Click(object sender, RoutedEventArgs e)
         {
-            object tag = PathBox.Tag;
-            Clipboard.SetText(tag is null ? "" : (string)tag);
+            Clipboard.SetText(TextHelper.GetAltText(PathBox));
         }
 
         private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
@@ -1808,7 +1777,7 @@ namespace ADB_Explorer
                 }
             }
 
-            if (deletedChars > 0 && textBox.Tag is string prev && prev.Length > output.Length)
+            if (deletedChars > 0 && TextHelper.GetAltText(textBox) is string prev && prev.Length > output.Length)
             {
                 textBox.Text = prev;
                 textBox.CaretIndex = caretIndex - deletedChars;
@@ -1820,7 +1789,7 @@ namespace ADB_Explorer
 
             textBox.Text = output;
 
-            if ($"{textBox.Tag}" != output)
+            if (TextHelper.GetAltText(textBox) != output)
             {
                 caretIndex -= deletedChars;
                 if (separator is not null)
@@ -1831,24 +1800,8 @@ namespace ADB_Explorer
             }
 
             textBox.CaretIndex = caretIndex;
-
-            textBox.Tag = output;
-
+            TextHelper.SetAltText(textBox, output);
             inProgress = false;
-        }
-
-        private static string NumericText(string text)
-        {
-            var output = "";
-            foreach (var c in text)
-            {
-                if (!char.IsDigit(c))
-                    continue;
-
-                output += c;
-            }
-
-            return output;
         }
 
         private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
