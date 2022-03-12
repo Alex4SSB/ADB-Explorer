@@ -32,7 +32,7 @@ namespace ADB_Explorer.Converters
                         if (span.Seconds == 0)
                         {
                             value = $"{Math.Round(span.TotalMilliseconds, span.TotalMilliseconds < 100 ? 2 : 1)}";
-                            resolution = "mS";
+                            resolution = "ms";
                         }
                         else
                         {
