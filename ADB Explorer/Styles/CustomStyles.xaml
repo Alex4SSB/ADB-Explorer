@@ -366,12 +366,16 @@
             <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                        <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
+                        <Setter Property="FontWeight" Value="Regular" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="True">
                                 <Setter Property="Text" Value="{Binding FilePath.FullName}" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
                         </Style.Triggers>
-                        <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
@@ -404,6 +408,9 @@
                 TextTrimming="CharacterEllipsis">
                 <TextBlock.Style>
                     <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
+                        <Setter Property="FontWeight" Value="Regular" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
                                 <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
@@ -417,9 +424,10 @@
                             <DataTrigger Binding="{Binding Status}" Value="Completed">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
                         </Style.Triggers>
-                        <Setter Property="Visibility" Value="Visible" />
-                        <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
@@ -428,16 +436,36 @@
     <DataTemplate x:Key="FileOpSourcePathTemplate">
         <TextBlock
             Margin="4,0"
-            Style="{StaticResource TooltipTextBlockStyle}"
             Text="{Binding FilePath.ParentPath}"
-            TextTrimming="CharacterEllipsis" />
+            TextTrimming="CharacterEllipsis">
+            <TextBlock.Style>
+                <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Regular" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
         <TextBlock
             Margin="4,0"
-            Style="{StaticResource TooltipTextBlockStyle}"
             Text="{Binding TargetPath.FullPath}"
-            TextTrimming="CharacterEllipsis" />
+            TextTrimming="CharacterEllipsis">
+            <TextBlock.Style>
+                <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Regular" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
     </DataTemplate>
     <Style x:Key="CompletedOperationsProgressStyle" TargetType="ui:ProgressBar">
         <Style.Triggers>
@@ -450,6 +478,11 @@
     <DataTemplate x:Key="FileOpProgressTemplate">
         <Grid Margin="4,0">
             <Grid>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontWeight" Value="Bold" />
+                    </Style>
+                </Grid.Resources>
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Setter Property="Visibility" Value="Collapsed" />
