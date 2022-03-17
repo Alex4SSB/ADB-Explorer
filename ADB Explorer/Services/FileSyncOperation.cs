@@ -155,9 +155,24 @@ namespace ADB_Explorer.Services
             operationTask = Task.Run(() => adbMethod(TargetPath.FullPath, FilePath.FullPath, ref waitingProgress, cancelTokenSource.Token), cancelTokenSource.Token);
 
             operationTask.ContinueWith((t) => progressPollTimer.Stop());
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Completed; StatusInfo = new CompletedInfo(t.Result); }, TaskContinuationOptions.OnlyOnRanToCompletion);
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Canceled; StatusInfo = null; }, TaskContinuationOptions.OnlyOnCanceled);
-            operationTask.ContinueWith((t) => { Status = OperationStatus.Failed; StatusInfo = t.Exception.InnerException.Message; }, TaskContinuationOptions.OnlyOnFaulted);
+
+            operationTask.ContinueWith((t) => 
+            {
+                Status = OperationStatus.Completed;
+                StatusInfo = t.Result is not null ? new CompletedInfo(t.Result) : null;
+            }, TaskContinuationOptions.OnlyOnRanToCompletion);
+
+            operationTask.ContinueWith((t) =>
+            {
+                Status = OperationStatus.Canceled;
+                StatusInfo = null;
+            }, TaskContinuationOptions.OnlyOnCanceled);
+
+            operationTask.ContinueWith((t) =>
+            {
+                Status = OperationStatus.Failed;
+                StatusInfo = t.Exception.InnerException.Message;
+            }, TaskContinuationOptions.OnlyOnFaulted);
 
             progressPollTimer.Start();
         }

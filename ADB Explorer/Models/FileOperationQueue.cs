@@ -16,7 +16,18 @@ namespace ADB_Explorer.Models
 
         public bool IncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
 
-        public int CurrentOperationIndex { get; private set; } = 0;
+        private int currentOperationIndex = 0;
+        public int CurrentOperationIndex { 
+            get
+            {
+                return currentOperationIndex;
+            }
+            private set
+            {
+                currentOperationIndex = value;
+                UpdateProgress();
+            } 
+        }
 
         public FileOperation CurrentOperation => (CurrentOperationIndex < TotalCount) ? Operations[CurrentOperationIndex] : null;
 
@@ -122,12 +133,12 @@ namespace ADB_Explorer.Models
 
         public void AddOperation(FileOperation fileOp)
         {
-            NotifyPropertyChanged(nameof(IncompleteOperations));
             try
             {
                 mutex.WaitOne();
 
                 Operations.Add(fileOp);
+                NotifyPropertyChanged(nameof(IncompleteOperations));
 
                 if (AutoStart)
                 {
@@ -210,7 +221,6 @@ namespace ADB_Explorer.Models
 
         private void UpdateProgress(double? currentProgress = null)
         {
-            NotifyPropertyChanged(nameof(IncompleteOperations));
             if (currentProgress != null)
             {
                 currOperationLastProgress = currentProgress.Value;
@@ -248,7 +258,6 @@ namespace ADB_Explorer.Models
 
         private void MoveToCompleted()
         {
-            NotifyPropertyChanged(nameof(IncompleteOperations));
             try
             {
                 mutex.WaitOne();
@@ -259,6 +268,8 @@ namespace ADB_Explorer.Models
                     ++CurrentOperationIndex;
                     UpdateProgress(0);
                 }
+
+                NotifyPropertyChanged(nameof(IncompleteOperations));
             }
             finally
             { 
