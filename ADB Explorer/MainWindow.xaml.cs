@@ -498,9 +498,7 @@ namespace ADB_Explorer
             FileOpDetailedRadioButton.IsChecked = extendedView;
             FileOpCompactRadioButton.IsChecked = !extendedView;
 
-            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.CurrentOperations;
-            PendingOperationsDataGrid.ItemsSource = fileOperationQueue.PendingOperations;
-            CompletedOperationsDataGrid.ItemsSource = fileOperationQueue.CompletedOperations;
+            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
         }
 
         private IEnumerable<CheckBox> FileOpContextItems
@@ -1889,12 +1887,12 @@ namespace ADB_Explorer
 
         private void RemovePending_Click(object sender, RoutedEventArgs e)
         {
-            fileOperationQueue.PendingOperations.Clear();
+            fileOperationQueue.ClearPending();
         }
 
         private void RemoveCompleted_Click(object sender, RoutedEventArgs e)
         {
-            fileOperationQueue.CompletedOperations.Clear();
+            fileOperationQueue.ClearCompleted();
         }
 
         private void OpenDefaultFolder_Click(object sender, RoutedEventArgs e)
@@ -1909,7 +1907,10 @@ namespace ADB_Explorer
 
         private void StopFileOperations_Click(object sender, RoutedEventArgs e)
         {
-            fileOperationQueue.Stop();
+            if (fileOperationQueue.IsActive)
+                fileOperationQueue.Stop();
+            else
+                fileOperationQueue.Start();
         }
 
         private void Window_SourceInitialized(object sender, EventArgs e)
