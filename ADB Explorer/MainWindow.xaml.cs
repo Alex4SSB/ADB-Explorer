@@ -789,7 +789,7 @@ namespace ADB_Explorer
                 tempButtons.Add(button);
                 pathItems.Add(specialPair.Key);
                 path = path[specialPair.Key.Length..].TrimStart('/');
-                expectedLength = PathButtonLength.ButtonLength(button);
+                expectedLength = ControlSize.GetWidth(button);
             }
 
             var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
@@ -799,10 +799,10 @@ namespace ADB_Explorer
                 var dirPath = string.Join('/', pathItems).Replace("//", "/");
                 MenuItem button = CreatePathButton(dirPath, dir);
                 tempButtons.Add(button);
-                expectedLength += PathButtonLength.ButtonLength(button);
+                expectedLength += ControlSize.GetWidth(button);
             }
 
-            expectedLength += (tempButtons.Count - 1) * PathButtonLength.ButtonLength(CreatePathArrow());
+            expectedLength += (tempButtons.Count - 1) * ControlSize.GetWidth(CreatePathArrow());
 
             int i = 0;
             for (; i < PathButtons.Count && i < tempButtons.Count; i++)
@@ -810,7 +810,7 @@ namespace ADB_Explorer
                 var oldB = PathButtons[i];
                 var newB = tempButtons[i];
                 if (oldB.Header.ToString() != newB.Header.ToString() ||
-                    oldB.Tag.ToString() != newB.Tag.ToString())
+                    TextHelper.GetAltObject(oldB).ToString() != TextHelper.GetAltObject(newB).ToString())
                 {
                     break;
                 }
@@ -824,7 +824,7 @@ namespace ADB_Explorer
         private void ConsolidateButtons(double expectedLength)
         {
             if (expectedLength > PathBox.ActualWidth)
-                expectedLength += PathButtonLength.ButtonLength(CreateExcessButton());
+                expectedLength += ControlSize.GetWidth(CreateExcessButton());
 
             double excessLength = expectedLength - PathBox.ActualWidth;
             List<MenuItem> excessButtons = new();
@@ -837,7 +837,7 @@ namespace ADB_Explorer
                 {
                     excessButtons.Add(PathButtons[i]);
                     PathButtons[i].ContextMenu = null;
-                    excessLength -= PathButtonLength.ButtonLength(PathButtons[i]);
+                    excessLength -= ControlSize.GetWidth(PathButtons[i]);
 
                     i++;
                 }
@@ -889,12 +889,12 @@ namespace ADB_Explorer
             MenuItem button = new()
             {
                 Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1) },
-                Tag = path,
                 Padding = new Thickness(8, 0, 8, 0),
                 Height = 24,
         };
             button.Click += PathButton_Click;
             ControlHelper.SetCornerRadius(button, new(3));
+            TextHelper.SetAltObject(button, path);
 
             return button;
         }
@@ -928,9 +928,9 @@ namespace ADB_Explorer
         {
             if (sender is MenuItem item)
             {
-                if (item.Tag is string path and not "")
+                if (TextHelper.GetAltObject(item) is string path and not "")
                     NavigateToPath(path);
-                else if (item.Tag is LogicalDevice)
+                else if (TextHelper.GetAltObject(item) is LogicalDevice)
                     RefreshDrives(true);
             }
         }

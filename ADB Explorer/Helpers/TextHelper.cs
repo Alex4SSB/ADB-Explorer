@@ -17,5 +17,18 @@ namespace ADB_Explorer.Helpers
                 typeof(string),
                 typeof(TextHelper),
                 null);
+
+        public static object GetAltObject(Control control) =>
+            control.GetValue(AltObjectProperty);
+
+        public static void SetAltObject(Control control, object value) =>
+            control.SetValue(AltObjectProperty, value);
+
+        public static readonly DependencyProperty AltObjectProperty =
+            DependencyProperty.RegisterAttached(
+                "AltObject",
+                typeof(object),
+                typeof(TextHelper),
+                null);
     }
 }
