@@ -704,6 +704,7 @@
                             <TextBox
                                 x:Name="PathBox"
                                 VerticalAlignment="Center"
+                                helpers:TextHelper.AltText=""
                                 GotFocus="PathBox_GotFocus"
                                 IsEnabled="False"
                                 IsReadOnly="True"
@@ -731,7 +732,13 @@
                                 x:Name="PathStackPanel"
                                 Margin="4,0,0,0"
                                 VerticalAlignment="Center"
-                                Orientation="Horizontal" />
+                                Orientation="Horizontal">
+                                <StackPanel.Resources>
+                                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                        <Setter Property="ContextMenu" Value="{StaticResource PathButtonsMenu}" />
+                                    </Style>
+                                </StackPanel.Resources>
+                            </StackPanel>
                         </Grid>
                     </Grid>
                 </StackPanel>
