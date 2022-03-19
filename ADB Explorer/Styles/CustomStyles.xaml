@@ -164,10 +164,14 @@
         x:Key="PairingTextBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
         TargetType="TextBox">
+        <Setter Property="IsEnabled" Value="False" />
         <Style.Triggers>
             <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
                 <Setter Property="FontSize" Value="18" />
             </Trigger>
+            <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -817,6 +821,7 @@
         <Setter Property="Padding" Value="6" />
         <Setter Property="ToolTip" Value="Enable Root Access" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="Bounce" />
+        <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
                 <Setter Property="IsChecked" Value="True" />
@@ -824,6 +829,9 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
                 <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

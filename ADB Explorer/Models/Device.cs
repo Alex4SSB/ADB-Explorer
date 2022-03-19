@@ -287,6 +287,7 @@ namespace ADB_Explorer.Models
             set => Set(ref isSelected, value);
         }
         public bool IsMdns { get; protected set; }
+        public abstract string Tooltip { get; }
 
         public string TypeIcon => Device.Type switch
         {
@@ -304,7 +305,7 @@ namespace ADB_Explorer.Models
             DeviceStatus.Unauthorized => "\uEC00",
             _ => throw new NotImplementedException(),
         };
-
+        
         public void SetSelected(ObservableList<UIDevice> devices, bool selectedState = true)
         {
             devices.ForEach(device => device.DeviceSelected =
@@ -540,7 +541,7 @@ namespace ADB_Explorer.Models
 
         public bool AndroidVersionIncompatible => AndroidVersion is not null && AndroidVersion < AdbExplorerConst.MIN_SUPPORTED_ANDROID_VER;
 
-        public string Tooltip
+        public override string Tooltip
         {
             get
             {
@@ -591,13 +592,14 @@ namespace ADB_Explorer.Models
         public ServiceDevice()
         {
             Type = DeviceType.Service;
-            UpdateStatus();
         }
 
-        public ServiceDevice(string id, string ipAddress) : this()
+        public ServiceDevice(string id, string ipAddress, string port = "") : this()
         {
             ID = id;
             IpAddress = ipAddress;
+            PairingPort = port;
+            UpdateStatus();
         }
 
         public enum ServiceType
@@ -643,6 +645,8 @@ namespace ADB_Explorer.Models
                 ((ServiceDevice)Device).PairingCode = uiPairingCode.Replace("-", "");
             }
         }
+
+        public override string Tooltip => $"mDNS Service - {(Device.Status == DeviceStatus.Offline ? "Unable To Pair" : "Ready To Pair")}";
     }
 
     public class LogicalDeviceEqualityComparer : IEqualityComparer<LogicalDevice>

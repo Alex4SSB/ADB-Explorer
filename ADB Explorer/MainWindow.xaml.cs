@@ -1145,6 +1145,7 @@ namespace ADB_Explorer
         private void TestDevices()
         {
             //ConnectTimer.IsEnabled = false;
+            //DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
             //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "offline") });
         }
 
