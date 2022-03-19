@@ -176,6 +176,9 @@
         TargetType="TextBox">
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
     </Style>
+    <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
+    </Style>
     <Style
         x:Key="DeviceButtonStyle"
         BasedOn="{StaticResource ButtonStyle}"
@@ -218,7 +221,10 @@
         </Style.Triggers>
         <Setter Property="IsEnabled" Value="False" />
     </Style>
-    <Style x:Key="DeviceNameTextBlockStyle" TargetType="TextBlock">
+    <Style
+        x:Key="DeviceNameTextBlockStyle"
+        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsOpen}" Value="True">
                 <Setter Property="FontWeight" Value="Bold" />
@@ -227,7 +233,7 @@
                 <Setter Property="Text" Value="[Unauthorized]" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
-                <Setter Property="Text" Value="{Binding ID}" />
+                <Setter Property="Text" Value="{Binding Device.ID}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
@@ -313,9 +319,7 @@
             </MenuItem.Header>
         </MenuItem>
     </ContextMenu>
-    <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
-        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
-    </Style>
+
     <DataTemplate x:Key="StatusIconTemplate">
         <ui:FontIcon>
             <ui:FontIcon.Style>
@@ -990,6 +994,96 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding IncompleteOperations, NotifyOnTargetUpdated=True}" Value="False">
                 <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="BatteryIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Glyph" Value="{Binding Device.Battery.BatteryIcon}" />
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <Grid>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Device.Battery.BatteryState}" Value="Unknown">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text="{Binding Device.Battery.Level}" />
+                        <TextBlock Text="%" />
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Device.Battery.BatteryState}" Value="Charging">
+                                            <Setter Property="Text" Value=", Plugged In" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <TextBlock Text="Battery Status Unknown">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Device.Battery.BatteryState}" Value="Unknown">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="DeviceDetailsBatteryStyle"
+        BasedOn="{StaticResource BatteryIconStyle}"
+        TargetType="ui:FontIcon">
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <ui:SimpleStackPanel Spacing="4">
+                    <TextBlock Text="{Binding Device.Battery.BatteryState}" />
+                    <TextBlock Text="{Binding Device.Battery.BatteryHealth}" />
+                    <TextBlock Text="{Binding Device.Battery.Voltage}" />
+                    <TextBlock Text="{Binding Device.Battery.Temperature}" />
+                </ui:SimpleStackPanel>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="UnsupportedIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding AndroidVersionIncompatible}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="AndroidTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="TextBlock">
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.Battery.Level}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

@@ -79,6 +79,8 @@ namespace ADB_Explorer.Models
 
         public UIDevice SelectedDevice => UIList?.Find(device => device.DeviceSelected);
 
+        public DateTime LastUpdate { get; set; }
+
         public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
 
         public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
@@ -366,6 +368,13 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private Battery battery;
+        public Battery Battery
+        {
+            get => battery;
+            set => Set(ref battery, value);
+        }
+
         private LogicalDevice(string name, string id)
         {
             Name = name;
@@ -474,6 +483,11 @@ namespace ADB_Explorer.Models
                 : ADBService.Unroot(this) ? RootStatus.Disabled : RootStatus.Unchecked;
         }
 
+        public void UpdateBattery()
+        {
+            Battery = new(ADBService.AdbDevice.GetBatteryInfo(this));
+        }
+
         public override string ToString() => Name;
 
         //private DispatcherTimer dispatcherTimer;
@@ -508,6 +522,23 @@ namespace ADB_Explorer.Models
         public bool IsOpen { get; protected set; }
 
         public string Name => ((LogicalDevice)Device).Name;
+
+        public byte? AndroidVersion
+        {
+            get
+            {
+                if (IsOpen)
+                {
+                    var version = Data.CurrentADBDevice.GetAndroidVersion();
+                    if (byte.TryParse(version.Split('.')[0], out byte ver))
+                        return ver;
+                }
+
+                return null;
+            }
+        }
+
+        public bool AndroidVersionIncompatible => AndroidVersion is not null && AndroidVersion < AdbExplorerConst.MIN_SUPPORTED_ANDROID_VER;
 
         public string Tooltip
         {

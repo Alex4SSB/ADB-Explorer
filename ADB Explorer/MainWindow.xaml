@@ -336,6 +336,7 @@
                                 Glyph="&#xE838;"
                                 Style="{StaticResource DeviceOpenIconStyle}"
                                 ToolTip="Open" />
+                            <ui:FontIcon Style="{StaticResource BatteryIconStyle}" />
                         </ui:SimpleStackPanel>
                     </Grid>
                 </Expander.Header>
@@ -1103,100 +1104,114 @@
                     </Grid>
                 </Expander.Content>
             </Expander>
-
-            <StackPanel Grid.Row="3" Orientation="Horizontal">
-                <StackPanel.Resources>
+            <Grid Grid.Row="3">
+                <Grid.Resources>
                     <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
                         <Setter Property="Margin" Value="8,6,4,6" />
                     </Style>
-                </StackPanel.Resources>
-                <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
-                    <TextBlock
-                        x:Name="ItemsCountBlock"
-                        Margin="8,4,0,4"
-                        Style="{StaticResource ItemsCountStyle}" />
-                    <TextBlock Margin="0,4" Text=" item" />
-                    <TextBlock Margin="0,4" Text="s">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <TextBlock
-                        x:Name="UnfinishedBlock"
-                        Margin="0,4"
-                        Text=" *">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Setter Property="Cursor" Value="Arrow" />
-                                <Style.Triggers>
-                                    <Trigger Property="Visibility" Value="Visible">
-                                        <Setter Property="Cursor" Value="AppStarting" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <Separator />
-                </StackPanel>
+                </Grid.Resources>
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
-                                    <Setter Property="Visibility" Value="Hidden" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <TextBlock
-                        x:Name="SelectedItemsBlock"
-                        Margin="4,4,0,4"
-                        Style="{StaticResource SelectedItemsStyle}" />
-                    <TextBlock Margin="0,4" Text=" item" />
-                    <TextBlock Margin="0,4" Text="s">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
+                    <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
+                        <TextBlock
+                            x:Name="ItemsCountBlock"
+                            Margin="8,4,0,4"
+                            Style="{StaticResource ItemsCountStyle}" />
+                        <TextBlock Margin="0,4" Text=" item" />
+                        <TextBlock Margin="0,4" Text="s">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock
+                            x:Name="UnfinishedBlock"
+                            Margin="0,4"
+                            Text=" *">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                    <Style.Triggers>
+                                        <Trigger Property="Visibility" Value="Visible">
+                                            <Setter Property="Cursor" Value="AppStarting" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Separator />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
-                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
+                                        <Setter Property="Visibility" Value="Hidden" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <TextBlock Margin="0,4" Text=" selected" />
-                    <TextBlock
-                        x:Name="TotalSizeBlock"
-                        Margin="6,4,0,4"
-                        Style="{StaticResource TotalSizeStyle}" />
-                    <Separator />
+                        </StackPanel.Style>
+                        <TextBlock
+                            x:Name="SelectedItemsBlock"
+                            Margin="4,4,0,4"
+                            Style="{StaticResource SelectedItemsStyle}" />
+                        <TextBlock Margin="0,4" Text=" item" />
+                        <TextBlock Margin="0,4" Text="s">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <TextBlock Margin="0,4" Text=" selected" />
+                        <TextBlock
+                            x:Name="TotalSizeBlock"
+                            Margin="6,4,0,4"
+                            Style="{StaticResource TotalSizeStyle}" />
+                        <Separator />
+                    </StackPanel>
                 </StackPanel>
-            </StackPanel>
-            <StackPanel
-                Grid.Row="3"
-                Margin="6,0"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Center"
-                Orientation="Horizontal">
-                <ui:FontIcon
-                    x:Name="UnsupportedAndroidIcon"
-                    Margin="0,1,6,0"
-                    Glyph="&#xE7BA;"
-                    Style="{DynamicResource GlyphFont}"
-                    ToolTip="Limited Support"
-                    Visibility="Collapsed" />
-                <TextBlock
-                    x:Name="AndroidVersionBlock"
-                    Margin="0,1,0,0"
-                    Text="" />
-            </StackPanel>
+                <ui:SimpleStackPanel
+                    x:Name="CurrentDeviceDetailsPanel"
+                    Margin="6,1,6,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Device.Battery.Level}" />
+                        <TextBlock Style="{StaticResource DeviceDetailsBatteryPercentStyle}" Text="%" />
+                    </StackPanel>
+                    <ui:FontIcon
+                        x:Name="CurrentDeviceBatteryIcon"
+                        Style="{StaticResource DeviceDetailsBatteryStyle}"
+                        ToolTipService.InitialShowDelay="0"
+                        ToolTipService.Placement="Top"
+                        ToolTipService.ShowDuration="60000" />
+                    <Separator Margin="0,2,0,3" Visibility="{Binding ElementName=AndroidTextBlock, Path=Visibility}" />
+                    <ui:FontIcon
+                        x:Name="UnsupportedAndroidIcon"
+                        Glyph="&#xE7BA;"
+                        Style="{DynamicResource UnsupportedIconStyle}"
+                        ToolTip="Limited Support" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock
+                            x:Name="AndroidTextBlock"
+                            Style="{StaticResource AndroidTextBlockStyle}"
+                            Text="Android " />
+                        <TextBlock x:Name="AndroidVersionBlock" Text="{Binding AndroidVersion}" />
+                    </StackPanel>
+                </ui:SimpleStackPanel>
+            </Grid>
         </Grid>
         <ui:SplitView
             x:Name="FileOperationsSplitView"

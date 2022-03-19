@@ -14,9 +14,7 @@ namespace ADB_Explorer.Services
     {
         private const string GET_PROP = "getprop";
         private const string ANDROID_VERSION = "ro.build.version.release";
-        //private const string PRODUCT_MODEL = "ro.product.model";
-        //private const string HOST_NAME = "net.hostname";
-        //private const string VENDOR = "ro.vendor.config.CID";
+        private const string BATTERY = "dumpsys battery";
 
         private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" }; // first partition
 
@@ -310,6 +308,17 @@ namespace ADB_Explorer.Services
                     return Props[ANDROID_VERSION];
                 else
                     return "";
+            }
+
+            public static Dictionary<string, string> GetBatteryInfo(LogicalDevice device)
+            {
+                if (ExecuteDeviceAdbShellCommand(device.ID, BATTERY, out string stdout, out string stderr) == 0)
+                {
+                    return stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
+                        line => line.Split(':')[0].Trim(),
+                        line => line.Split(':')[1].Trim());
+                }
+                return null;
             }
         }
     }

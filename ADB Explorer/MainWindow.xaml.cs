@@ -607,7 +607,7 @@ namespace ADB_Explorer
             DriveViewNav();
             NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
-            UpdateAndroidVersion();
+            CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
 
             if (DevicesObject.CurrentDevice.Drives.Count < 1)
             {
@@ -627,16 +627,6 @@ namespace ADB_Explorer
 
             MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
             AddPathButton(button);
-        }
-
-        private void UpdateAndroidVersion()
-        {
-            string androidVer = CurrentADBDevice.GetAndroidVersion();
-            AndroidVersionBlock.Text = $"Android {androidVer}";
-
-            sbyte ver = 0;
-            sbyte.TryParse(androidVer.Split('.')[0], out ver);
-            UnsupportedAndroidIcon.Visibility = Visible(ver > 0 && ver < MIN_SUPPORTED_ANDROID_VER);
         }
 
         private void CombinePrettyNames()
@@ -672,7 +662,7 @@ namespace ADB_Explorer
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
         {
-            if (devices is not null && DevicesObject.DevicesChanged(devices))
+            if (devices is not null &&DevicesObject.DevicesChanged(devices))
             {
                 DeviceListSetup(devices);
 
@@ -683,6 +673,21 @@ namespace ADB_Explorer
                         Task.Run(() => item.EnableRoot(true));
                     }
                 }
+            }
+        }
+
+        private void UpdateDevicesBatInfo(bool devicesVisible)
+        {
+            DevicesObject.CurrentDevice?.UpdateBattery();
+
+            if (DateTime.Now - DevicesObject.LastUpdate > BATTERY_UPDATE_INTERVAL || devicesVisible)
+            {
+                foreach (var item in DevicesObject.LogicalDevices.Where(device => device != DevicesObject.CurrentDevice))
+                {
+                    item.UpdateBattery();
+                }
+
+                DevicesObject.LastUpdate = DateTime.Now;
             }
         }
 
@@ -719,6 +724,8 @@ namespace ADB_Explorer
                 {
                     Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
                 }
+
+                UpdateDevicesBatInfo(devicesVisible);
 
                 connectTimerMutex.ReleaseMutex();
             });
