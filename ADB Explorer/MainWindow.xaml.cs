@@ -835,10 +835,10 @@ namespace ADB_Explorer
             List<MenuItem> excessButtons = new();
             PathStackPanel.Children.Clear();
 
-            if (excessLength > 10)
+            if (excessLength > 0)
             {
                 int i = 0;
-                while (excessLength >= 10 && PathButtons.Count - excessButtons.Count > 1)
+                while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
                 {
                     excessButtons.Add(PathButtons[i]);
                     PathButtons[i].ContextMenu = null;
@@ -857,6 +857,13 @@ namespace ADB_Explorer
 
                 AddPathButton(item);
             }
+
+            if (excessLength > 0)
+            {
+                PathButtons[^1].Width = PathButtons[^1].ActualWidth - (ControlSize.GetWidth(PathStackPanel) - PathBox.ActualWidth) - 4;
+            }
+            else
+                PathButtons[^1].Width = double.NaN;
         }
 
         private MenuItem CreateExcessButton()
@@ -893,7 +900,7 @@ namespace ADB_Explorer
         {
             MenuItem button = new()
             {
-                Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1) },
+                Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
                 Padding = new Thickness(8, 0, 8, 0),
                 Height = 24,
         };
