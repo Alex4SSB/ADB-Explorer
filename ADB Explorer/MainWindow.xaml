@@ -40,8 +40,40 @@
             <EventSetter Event="SizeChanged" Handler="DataGridColumnHeader_SizeChanged" />
         </Style>
         <MenuItem
-            x:Key="ContextMenuCopyItem"
-            Click="ContextMenuCopyItem_Click"
+            x:Key="PushFilesMenu"
+            x:Name="PushFilesMenu"
+            x:Shared="False"
+            Click="PushMenuButton_Click">
+            <MenuItem.Header>
+                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                    <ui:FontIcon
+                        Margin="0,0,8,0"
+                        FontSize="20"
+                        Glyph="&#xE8A5;"
+                        Style="{StaticResource DisabledGlyphStyle}" />
+                    <TextBlock VerticalAlignment="Center" Text="Files" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="PushFoldersMenu"
+            x:Name="PushFoldersMenu"
+            x:Shared="False"
+            Click="PushMenuButton_Click">
+            <MenuItem.Header>
+                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
+                    <ui:FontIcon
+                        Margin="0,0,8,0"
+                        FontSize="20"
+                        Glyph="&#xE8B7;"
+                        Style="{StaticResource DisabledGlyphStyle}" />
+                    <TextBlock VerticalAlignment="Center" Text="Folders" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuPullItem"
+            Click="ContextMenuPullItem_Click"
             Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
@@ -56,7 +88,26 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
-        <MenuItem x:Key="ContextMenuDeleteItem" Resources="{StaticResource ContextSubMenuStyles}">
+        <MenuItem x:Key="ContextMenuPushItem" Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <Grid Margin="-3,0,-4,0">
+                        <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                        <ui:FontIcon
+                            Margin="11,0,0,0"
+                            FontSize="12"
+                            Glyph="&#xE973;" />
+                    </Grid>
+                    <TextBlock Text="Push" />
+                </StackPanel>
+            </MenuItem.Header>
+            <StaticResource ResourceKey="PushFilesMenu" />
+            <StaticResource ResourceKey="PushFoldersMenu" />
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuDeleteItem"
+            Click="ContextMenuDeleteItem_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE74D;" />
@@ -514,30 +565,8 @@
                                     Glyph="&#xE973;" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem x:Name="PasteFilesMenu" Click="PushMenuButton_Click">
-                            <MenuItem.Header>
-                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="20"
-                                        Glyph="&#xE8A5;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                    <TextBlock VerticalAlignment="Center" Text="Files" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem x:Name="PasteFoldersMenu" Click="PushMenuButton_Click">
-                            <MenuItem.Header>
-                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="20"
-                                        Glyph="&#xE8B7;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                    <TextBlock VerticalAlignment="Center" Text="Folders" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
+                        <StaticResource ResourceKey="PushFilesMenu" />
+                        <StaticResource ResourceKey="PushFoldersMenu" />
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     <MenuItem
@@ -598,7 +627,11 @@
                             <ui:FontIcon Glyph="&#xE8AC;" />
                         </MenuItem.Header>
                     </MenuItem>
-                    <MenuItem IsEnabled="False" ToolTip="Delete">
+                    <MenuItem
+                        x:Name="DeleteMenuButton"
+                        Click="ContextMenuDeleteItem_Click"
+                        IsEnabled="False"
+                        ToolTip="Delete">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>

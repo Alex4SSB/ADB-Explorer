@@ -167,8 +167,9 @@ namespace ADB_Explorer
 
         private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
         {
-            MenuItem pullMenu = FindResource("ContextMenuCopyItem") as MenuItem;
-            //MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
+            MenuItem pullMenu = FindResource("ContextMenuPullItem") as MenuItem;
+            MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
+            MenuItem pushMenu = FindResource("ContextMenuPushItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
@@ -179,10 +180,14 @@ namespace ADB_Explorer
                         pullMenu.IsEnabled = true;
 
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
-                    //ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+                    
+                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                        ExplorerGrid.ContextMenu.Items.Add(pushMenu);
+
+                    ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                     break;
                 case MenuType.EmptySpace:
-                    //ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+                    ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     break;
                 case MenuType.Header:
                     break;
@@ -351,7 +356,7 @@ namespace ADB_Explorer
                 {
                     case FileType.File:
                         if (PullOnDoubleClickCheckBox.IsChecked == true)
-                            CopyFiles(true);
+                            PullFiles(true);
                         break;
                     case FileType.Folder:
                         NavigateToPath(file.FullPath);
@@ -367,6 +372,8 @@ namespace ADB_Explorer
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
             var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
+
+            DeleteMenuButton.IsEnabled =
             PullMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
                 is FileType.File
                 or FileType.Folder);
@@ -999,14 +1006,24 @@ namespace ADB_Explorer
             switch (e.ChangedButton)
             {
                 case MouseButton.XButton1:
-                    AnimateControl(BackButton);
-                    NavigateToLocation(NavHistory.GoBack(), true);
+                    NavigateBack();
                     break;
                 case MouseButton.XButton2:
-                    AnimateControl(ForwardButton);
-                    NavigateToLocation(NavHistory.GoForward(), true);
+                    NavigateForward();
                     break;
             }
+        }
+
+        private void NavigateForward()
+        {
+            AnimateControl(ForwardButton);
+            NavigateToLocation(NavHistory.GoForward(), true);
+        }
+
+        private void NavigateBack()
+        {
+            AnimateControl(BackButton);
+            NavigateToLocation(NavHistory.GoBack(), true);
         }
 
         private void AnimateControl(Control control)
@@ -1025,7 +1042,11 @@ namespace ADB_Explorer
             }
             else if (key == Key.Back)
             {
-                NavigateToLocation(NavHistory.GoBack(), true);
+                NavigateBack();
+            }
+            else if (key == Key.Delete)
+            {
+                DeleteFiles();
             }
             else
                 return;
@@ -1035,9 +1056,15 @@ namespace ADB_Explorer
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
+            var key = e.Key;
+            if (key == Key.Back)
+            {
+                NavigateBack();
+            }
+
             if (ExplorerGrid.Items.Count < 1) return;
 
-            var key = e.Key;
+            
             if (key == Key.Down)
             {
                 if (ExplorerGrid.SelectedItems.Count == 0)
@@ -1061,10 +1088,6 @@ namespace ADB_Explorer
                 if (ExplorerGrid.SelectedItems.Count == 1)
                     DoubleClick(ExplorerGrid.SelectedItem);
             }
-            else if (key == Key.Back)
-            {
-                NavigateToLocation(NavHistory.GoBack(), true);
-            }
             else
                 return;
 
@@ -1076,7 +1099,7 @@ namespace ADB_Explorer
             
         }
 
-        private void CopyFiles(bool quick = false)
+        private void PullFiles(bool quick = false)
         {
             int itemsCount = ExplorerGrid.SelectedItems.Count;
             ShellObject path;
@@ -1122,14 +1145,20 @@ namespace ADB_Explorer
             }
         }
 
-        private void PasteFiles(bool isFolderPicker)
+        private void PushItems(bool isFolderPicker, bool isContextMenu)
         {
+            FilePath targetPath;
+            if (isContextMenu && ExplorerGrid.SelectedItems.Count == 1)
+                targetPath = (FilePath)ExplorerGrid.SelectedItem;
+            else
+                targetPath = new(CurrentPath);
+
             var dialog = new CommonOpenFileDialog()
             {
                 IsFolderPicker = isFolderPicker,
                 Multiselect = true,
                 DefaultDirectory = DefaultFolderBlock.Text,
-                Title = $"Select {(isFolderPicker ? "folder" : "file")}s to copy"
+                Title = $"Select {(isFolderPicker ? "folder" : "file")}s to push{(targetPath.FullPath == CurrentPath ? "" : $" into {targetPath.FullName}")}"
             };
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -1137,7 +1166,7 @@ namespace ADB_Explorer
 
             foreach (var item in dialog.FilesAsShellObject)
             {
-                fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), new FilePath(CurrentPath)));
+                fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), targetPath));
             }
         }
 
@@ -1166,9 +1195,9 @@ namespace ADB_Explorer
             SetTheme(ApplicationTheme.Dark);
         }
 
-        private void ContextMenuCopyItem_Click(object sender, RoutedEventArgs e)
+        private void ContextMenuPullItem_Click(object sender, RoutedEventArgs e)
         {
-            CopyFiles();
+            PullFiles();
         }
 
         private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1180,15 +1209,13 @@ namespace ADB_Explorer
                 ExplorerGrid.SelectedItems.Clear();
             }
 
+            if (e.OriginalSource is not Border)
+                row.IsSelected = true;
+
             if (e.ChangedButton == MouseButton.Right)
             {
                 InitializeExplorerContextMenu(e.OriginalSource is Border ? MenuType.EmptySpace : MenuType.ExplorerItem, row.DataContext);
             }
-
-            if (e.OriginalSource is Border)
-                return;
-
-            row.IsSelected = true;
         }
 
         private void ChangeDefaultFolderButton_Click(object sender, MouseButtonEventArgs e)
@@ -1378,6 +1405,7 @@ namespace ADB_Explorer
             PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
             PullMenuButton.IsEnabled =
+            DeleteMenuButton.IsEnabled =
             BackButton.IsEnabled =
             ForwardButton.IsEnabled =
             HomeButton.IsEnabled =
@@ -1568,7 +1596,10 @@ namespace ADB_Explorer
         private void PushMenuButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
-            PasteFiles(((MenuItem)sender).Name == nameof(PasteFoldersMenu));
+            var menuItem = (MenuItem)sender;
+
+            // The file context menu does not have a name
+            PushItems(menuItem.Name == "PushFoldersMenu", string.IsNullOrEmpty(((MenuItem)menuItem.Parent).Name));
         }
 
         private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1641,7 +1672,7 @@ namespace ADB_Explorer
         private void PullMenuButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
-            CopyFiles();
+            PullFiles();
         }
 
         private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
@@ -2086,9 +2117,31 @@ namespace ADB_Explorer
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
         }
 
-        private void CollectionViewSource_Filter(object sender, System.Windows.Data.FilterEventArgs e)
+        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
         {
 
+        }
+
+        private void ContextMenuDeleteItem_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteFiles();
+        }
+
+        private void DeleteFiles()
+        {
+            List<FileClass> items = (
+                from FileClass item in ExplorerGrid.SelectedItems
+                select item).ToList();
+
+            try
+            {
+                ShellFileOperation.DeleteItems(CurrentADBDevice, items);
+                DirectoryLister.FileList.RemoveAll(file => items.Contains(file));
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
