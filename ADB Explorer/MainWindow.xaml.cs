@@ -1400,6 +1400,7 @@ namespace ADB_Explorer
             DirectoryLister?.FileList?.Clear();
             PathStackPanel.Children.Clear();
             CurrentPath = null;
+            CurrentDeviceDetailsPanel.DataContext = null;
             TextHelper.SetAltText(PathBox, "");
             PushMenuButton.IsEnabled =
             PathBox.IsEnabled =

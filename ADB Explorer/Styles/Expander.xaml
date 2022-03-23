@@ -31,27 +31,25 @@
     </Storyboard>
 
     <Storyboard x:Key="ExpandingStoryboard">
-        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00"
-                                        Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
-            <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="False"/>
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
+            <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="False" />
         </BooleanAnimationUsingKeyFrames>
         <DoubleAnimation
-            Storyboard.TargetName="ExpandSite"
-            Storyboard.TargetProperty="Tag"
-            To="1"
             BeginTime="00:00:00"
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="(helpers:ExpanderHelper.ExpansionProgress)"
+            To="1"
             Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
     <Storyboard x:Key="CollapsingStoryboard">
         <DoubleAnimation
-            Storyboard.TargetName="ExpandSite"
-            Storyboard.TargetProperty="Tag"
-            To="0"
             BeginTime="00:00:00"
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="(helpers:ExpanderHelper.ExpansionProgress)"
+            To="0"
             Duration="{StaticResource AnimationDuration}" />
-        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.2" 
-                                        Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.2" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
             <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="True" />
         </BooleanAnimationUsingKeyFrames>
     </Storyboard>
@@ -172,7 +170,7 @@
             <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button" />
         </Style.Resources>
         <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
-        <Setter Property="helpers:ExpanderHelper.IsContentCollapsed" Value="True"/>
+        <Setter Property="helpers:ExpanderHelper.IsContentCollapsed" Value="True" />
         <Setter Property="Template">
             <!--  Template copied from ModernWPF to be modified  -->
             <Setter.Value>
@@ -231,14 +229,14 @@
                             ClipToBounds="True"
                             DockPanel.Dock="Bottom"
                             Style="{StaticResource ExpanderContentBorderStyle}">
-                            <StackPanel x:Name="ExpandSite" VerticalAlignment="Top">
-                                <StackPanel.Tag>
-                                    <sys:Double>0.0</sys:Double>
-                                </StackPanel.Tag>
+                            <StackPanel
+                                x:Name="ExpandSite"
+                                VerticalAlignment="Top"
+                                helpers:ExpanderHelper.ExpansionProgress="0.0">
                                 <StackPanel.Margin>
                                     <MultiBinding Converter="{StaticResource marginConverter}">
                                         <Binding ElementName="ExpanderContent" Path="ActualHeight" />
-                                        <Binding Path="Tag" RelativeSource="{RelativeSource Mode=Self}" />
+                                        <Binding Path="(helpers:ExpanderHelper.ExpansionProgress)" RelativeSource="{RelativeSource Mode=Self}" />
                                         <Binding Path="ExpandDirection" RelativeSource="{RelativeSource AncestorType=Expander, Mode=FindAncestor}" />
                                     </MultiBinding>
                                 </StackPanel.Margin>
@@ -249,10 +247,10 @@
                                         </Style>
                                     </StackPanel.Style>
                                     <ContentPresenter
-                                        Margin="0,2"
                                         x:Name="ContentPresenter"
-                                        Tag="False"
+                                        Margin="0,2"
                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        helpers:ExpanderHelper.IsAnimationActive="False"
                                         ContentSource="Content"
                                         Focusable="false" />
                                 </StackPanel>
@@ -278,7 +276,7 @@
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
                         </Trigger>
                         <Trigger SourceName="HeaderSite" Property="IsMouseOver" Value="True">
-                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
                             <Setter TargetName="HeaderUpperBorder" Property="BorderBrush" Value="{DynamicResource ExpanderUpperBorderMouseOver}" />
                             <Setter TargetName="HeaderLowerBorder" Property="BorderBrush" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
                             <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="{DynamicResource ExpanderSideBorderMouseOver}" />
@@ -348,7 +346,7 @@
         <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="True" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
         <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
-        <Setter Property="ExpandDirection" Value="Down"/>
+        <Setter Property="ExpandDirection" Value="Down" />
     </Style>
 
     <Style

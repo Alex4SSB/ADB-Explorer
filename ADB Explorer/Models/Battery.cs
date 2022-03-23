@@ -114,6 +114,9 @@ namespace ADB_Explorer.Models
 
         public Battery(Dictionary<string, string> batteryInfo)
         {
+            if (batteryInfo is null)
+                return;
+
             if (batteryInfo.ContainsKey("AC powered") && batteryInfo["AC powered"] == "true")
                 chargeSource = Source.AC;
 

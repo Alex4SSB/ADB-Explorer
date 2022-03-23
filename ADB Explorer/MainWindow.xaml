@@ -418,6 +418,7 @@
                         <Button
                             Grid.Column="1"
                             Margin="6,0,0,0"
+                            VerticalAlignment="Center"
                             ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
                             Click="PairServiceButton_Click"
                             Content="Pair">
@@ -1566,6 +1567,7 @@
                                             x:Name="ConnectNewDeviceButton"
                                             Grid.Column="1"
                                             Margin="8,0,0,0"
+                                            VerticalAlignment="Stretch"
                                             Click="ConnectNewDeviceButton_Click"
                                             Content="Connect"
                                             IsEnabled="False"
