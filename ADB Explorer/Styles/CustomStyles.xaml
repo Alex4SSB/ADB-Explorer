@@ -270,6 +270,7 @@
         </Style>
         <Style TargetType="StackPanel">
             <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Margin" Value="0,2" />
         </Style>
     </ResourceDictionary>
     <ResourceDictionary x:Key="ContextSubMenuStyles">
@@ -937,6 +938,7 @@
     </Style>
     <Style x:Key="ItemsCountStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="{Binding ElementName=DrivesItemRepeater, Path=ItemsSource.Count}" />
@@ -956,6 +958,7 @@
     </Style>
     <Style x:Key="SelectedItemsStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="{Binding ElementName=DrivesItemRepeater, Path=(helpers:RepeaterHelper.SelectedItems)}" />
@@ -1093,6 +1096,7 @@
     </Style>
     <Style x:Key="AndroidTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -1101,6 +1105,7 @@
     </Style>
     <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Battery.Level}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
