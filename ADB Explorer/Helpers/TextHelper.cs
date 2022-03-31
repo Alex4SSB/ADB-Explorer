@@ -5,10 +5,10 @@ namespace ADB_Explorer.Helpers
 {
     public static class TextHelper
     {
-        public static string GetAltText(Control control) =>
+        public static string GetAltText(UIElement control) =>
             (string)control.GetValue(AltTextProperty);
 
-        public static void SetAltText(Control control, string value) =>
+        public static void SetAltText(UIElement control, string value) =>
             control.SetValue(AltTextProperty, value);
 
         public static readonly DependencyProperty AltTextProperty =
@@ -18,10 +18,10 @@ namespace ADB_Explorer.Helpers
                 typeof(TextHelper),
                 null);
 
-        public static object GetAltObject(Control control) =>
+        public static object GetAltObject(UIElement control) =>
             control.GetValue(AltObjectProperty);
 
-        public static void SetAltObject(Control control, object value) =>
+        public static void SetAltObject(UIElement control, object value) =>
             control.SetValue(AltObjectProperty, value);
 
         public static readonly DependencyProperty AltObjectProperty =

@@ -226,4 +226,6 @@
         </Style.Triggers>
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
     </Style>
+
+    <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox" />
 </ResourceDictionary>

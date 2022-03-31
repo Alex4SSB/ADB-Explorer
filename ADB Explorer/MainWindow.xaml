@@ -1732,6 +1732,7 @@
                     <Setter Property="Width" Value="300" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
+                <Style BasedOn="{StaticResource CategorySeparator}" TargetType="Separator" />
                 <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                 </Style>
@@ -1745,7 +1746,7 @@
                     BorderBrush="Gray"
                     BorderThickness="1,1,0,0"
                     Style="{StaticResource DevicesListStyle}">
-                    <Grid Margin="18,8,0,8">
+                    <Grid Margin="18,8,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition Height="Auto" />
@@ -1819,7 +1820,7 @@
                                                 <TextBlock Text="Force Fluent Styles" />
                                                 <Grid Margin="10,0">
                                                     <Grid.Resources>
-                                                        <Style BasedOn="{StaticResource RestartResuiredIconsStyle}" TargetType="ui:FontIcon" />
+                                                        <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
                                                     </Grid.Resources>
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
@@ -1846,7 +1847,7 @@
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
                                             <Grid Margin="10,0">
                                                 <Grid.Resources>
-                                                    <Style BasedOn="{StaticResource RestartResuiredIconsStyle}" TargetType="ui:FontIcon" />
+                                                    <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
                                                 </Grid.Resources>
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
