@@ -1813,12 +1813,14 @@
                                             Content="Windows Default" />
                                         <CheckBox
                                             x:Name="ForceFluentStylesCheckbox"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
                                             Checked="ForceFluentStylesCheckbox_Checked"
                                             Style="{StaticResource ForceFluentVisibility}"
                                             Unchecked="ForceFluentStylesCheckbox_Checked">
-                                            <StackPanel Orientation="Horizontal">
+                                            <Grid>
                                                 <TextBlock Text="Force Fluent Styles" />
-                                                <Grid Margin="10,0">
+                                                <Grid Margin="10,0" HorizontalAlignment="Right">
                                                     <Grid.Resources>
                                                         <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
                                                     </Grid.Resources>
@@ -1829,7 +1831,7 @@
                                                         Glyph="&#xEA84;"
                                                         Style="{StaticResource RestartWarningIconStyle}" />
                                                 </Grid>
-                                            </StackPanel>
+                                            </Grid>
                                         </CheckBox>
                                     </StackPanel>
                                 </Expander>
@@ -1843,9 +1845,9 @@
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ChangeDefaultFolderButton_Click"
                                             Style="{StaticResource TooltipTextBoxStyle}" />
-                                        <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                        <Grid Margin="0,4,0,0">
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
-                                            <Grid Margin="10,0">
+                                            <Grid Margin="10,0" HorizontalAlignment="Right">
                                                 <Grid.Resources>
                                                     <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
                                                 </Grid.Resources>
@@ -1856,7 +1858,7 @@
                                                     Glyph="&#xEA84;"
                                                     Style="{StaticResource RestartWarningIconStyle}" />
                                             </Grid>
-                                        </StackPanel>
+                                        </Grid>
                                         <TextBox
                                             x:Name="ManualAdbPath"
                                             Margin="0,6"
