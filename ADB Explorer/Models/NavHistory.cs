@@ -34,6 +34,8 @@ namespace ADB_Explorer.Models
             return PathHistory[historyIndex];
         }
 
+        public static object Current => PathHistory[historyIndex];
+
         /// <summary>
         /// For any non back / forward navigation
         /// </summary>

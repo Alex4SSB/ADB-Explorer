@@ -179,6 +179,11 @@
         BasedOn="{StaticResource NumericTextBoxStyle}"
         TargetType="TextBox">
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
+        <Style.Triggers>
+            <Trigger Property="Text" Value="">
+                <Setter Property="ToolTipService.IsEnabled" Value="False" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
@@ -270,6 +275,7 @@
         </Style>
         <Style TargetType="StackPanel">
             <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Margin" Value="0,2" />
         </Style>
     </ResourceDictionary>
     <ResourceDictionary x:Key="ContextSubMenuStyles">
@@ -770,7 +776,7 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="RestartResuiredIconsStyle"
+        x:Key="RestartRequiredIconsStyle"
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
         <Setter Property="FontSize" Value="22" />
@@ -778,7 +784,7 @@
     </Style>
     <Style
         x:Key="RestartWarningIconStyle"
-        BasedOn="{StaticResource RestartResuiredIconsStyle}"
+        BasedOn="{StaticResource RestartRequiredIconsStyle}"
         TargetType="ui:FontIcon">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
@@ -799,7 +805,7 @@
     </Style>
     <Style
         x:Key="RootIconStyle"
-        BasedOn="{StaticResource GlyphFont}"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Root}" Value="Disabled">
@@ -884,6 +890,9 @@
         BasedOn="{StaticResource ButtonStyle}"
         TargetType="Button">
         <Style.Triggers>
+            <Trigger Property="helpers:RepeaterHelper.IsSelected" Value="True">
+                <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+            </Trigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsMouseOver" Value="False" />
@@ -934,6 +943,7 @@
     </Style>
     <Style x:Key="ItemsCountStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="{Binding ElementName=DrivesItemRepeater, Path=ItemsSource.Count}" />
@@ -953,9 +963,13 @@
     </Style>
     <Style x:Key="SelectedItemsStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="{Binding ElementName=DrivesItemRepeater, Path=(helpers:RepeaterHelper.SelectedItems)}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
+                <Setter Property="Text" Value="0" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -1007,7 +1021,7 @@
     </Style>
     <Style
         x:Key="BatteryIconStyle"
-        BasedOn="{StaticResource GlyphFont}"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Setter Property="Glyph" Value="{Binding Device.Battery.BatteryIcon}" />
         <Setter Property="ToolTip">
@@ -1067,6 +1081,12 @@
                 </ui:SimpleStackPanel>
             </Setter.Value>
         </Setter>
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <Trigger Property="DataContext" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="UnsupportedIconStyle"
@@ -1081,6 +1101,7 @@
     </Style>
     <Style x:Key="AndroidTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -1089,6 +1110,7 @@
     </Style>
     <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Battery.Level}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />

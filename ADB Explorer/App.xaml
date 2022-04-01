@@ -58,7 +58,7 @@
             <Color x:Key="DarkAdbTextBoxBorderDisabled">#FF3A3A3A</Color>
             <Color x:Key="LightAdbTextBoxBackgroundFocused">#FFFFFFFF</Color>
             <Color x:Key="DarkAdbTextBoxBackgroundFocused">#FF222222</Color>
-            <Color x:Key="LightAdbTextBoxBackgroundMouseOver">#FFFAFAFA</Color>
+            <Color x:Key="LightAdbTextBoxBackgroundMouseOver">#FFF7F7F7</Color>
             <Color x:Key="DarkAdbTextBoxBackgroundMouseOver">#FF3C3C3C</Color>
             <Color x:Key="LightAdbTextBoxBackgroundUnfocused">#FFFEFEFE</Color>
             <Color x:Key="DarkAdbTextBoxBackgroundUnfocused">#FF373737</Color>
@@ -68,7 +68,7 @@
             <Color x:Key="DarkAdbButtonBackgroundNormal">#FF373737</Color>
             <Color x:Key="DarkAdbButtonBackgroundMouseOver">#FF3C3C3C</Color>
             <Color x:Key="DarkAdbButtonBackgroundPressed">#FF323232</Color>
-            <Color x:Key="DarkAdbButtonBackgroundDisabled">#FF343434</Color>
+            <Color x:Key="DarkAdbButtonBackgroundDisabled">#FF444444</Color>
             <Color x:Key="DarkAdbButtonUpperBorderNormal">#FF3F3F3F</Color>
             <Color x:Key="DarkAdbButtonLowerBorderNormal">#FF3A3A3A</Color>
             <Color x:Key="DarkAdbButtonSideBorderNormal">#FF3A3A3A</Color>
@@ -79,16 +79,16 @@
             <Color x:Key="DarkAdbButtonForegroundPressedOrDisabled">#FFD0D0D0</Color>
 
             <Color x:Key="LightAdbButtonBackgroundNormal">#FFFEFEFE</Color>
-            <Color x:Key="LightAdbButtonBackgroundMouseOver">#FFFAFAFA</Color>
+            <Color x:Key="LightAdbButtonBackgroundMouseOver">#FFF2F2F2</Color>
             <Color x:Key="LightAdbButtonBackgroundPressed">#FFFAFAFA</Color>
-            <Color x:Key="LightAdbButtonBackgroundDisabled">#FFFAFAFA</Color>
+            <Color x:Key="LightAdbButtonBackgroundDisabled">#FFEAEAEA</Color>
             <Color x:Key="LightAdbButtonUpperBorderNormal">#FFECECEC</Color>
             <Color x:Key="LightAdbButtonLowerBorderNormal">#FFD3D3D3</Color>
             <Color x:Key="LightAdbButtonSideBorderNormal">#FFECECEC</Color>
             <Color x:Key="LightAdbButtonUpperBorderMouseOver">#FFECECEC</Color>
             <Color x:Key="LightAdbButtonLowerBorderMouseOver">#FFD3D3D3</Color>
             <Color x:Key="LightAdbButtonSideBorderMouseOver">#FFECECEC</Color>
-            <Color x:Key="LightAdbButtonBorderPressedOrDisabled">#FFECECEC</Color>
+            <Color x:Key="LightAdbButtonBorderPressedOrDisabled">#FFCCCCCC</Color>
             <Color x:Key="LightAdbButtonForegroundPressedOrDisabled">#FF5F5F5F</Color>
 
             <Color x:Key="DarkAdbWindowBackground">#FF2B2B2B</Color>

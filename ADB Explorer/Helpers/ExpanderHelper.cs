@@ -56,5 +56,31 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(ExpanderHelper),
                 null);
+
+        public static bool GetIsAnimationActive(UIElement control) =>
+            (bool)control.GetValue(IsAnimationActiveProperty);
+
+        public static void SetIsAnimationActive(UIElement control, bool value) =>
+            control.SetValue(IsAnimationActiveProperty, value);
+
+        public static readonly DependencyProperty IsAnimationActiveProperty =
+            DependencyProperty.RegisterAttached(
+                "IsAnimationActive",
+                typeof(bool),
+                typeof(ExpanderHelper),
+                null);
+
+        public static double GetExpansionProgress(UIElement control) =>
+            (double)control.GetValue(ExpansionProgressProperty);
+
+        public static void SetExpansionProgress(UIElement control, double value) =>
+            control.SetValue(ExpansionProgressProperty, value);
+
+        public static readonly DependencyProperty ExpansionProgressProperty =
+            DependencyProperty.RegisterAttached(
+                "ExpansionProgress",
+                typeof(double),
+                typeof(ExpanderHelper),
+                null);
     }
 }

@@ -40,8 +40,35 @@
             <EventSetter Event="SizeChanged" Handler="DataGridColumnHeader_SizeChanged" />
         </Style>
         <MenuItem
-            x:Key="ContextMenuCopyItem"
-            Click="ContextMenuCopyItem_Click"
+            x:Key="PushFilesMenu"
+            x:Name="PushFilesMenu"
+            x:Shared="False"
+            Click="PushMenuButton_Click">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon
+                        Margin="0,0,8,0"
+                        HorizontalAlignment="Left"
+                        Glyph="&#xE8A5;" />
+                    <TextBlock VerticalAlignment="Center" Text="Files" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="PushFoldersMenu"
+            x:Name="PushFoldersMenu"
+            x:Shared="False"
+            Click="PushMenuButton_Click">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Margin="0,0,8,0" Glyph="&#xE8B7;" />
+                    <TextBlock VerticalAlignment="Center" Text="Folders" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuPullItem"
+            Click="ContextMenuPullItem_Click"
             Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
@@ -56,7 +83,26 @@
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
-        <MenuItem x:Key="ContextMenuDeleteItem" Resources="{StaticResource ContextSubMenuStyles}">
+        <MenuItem x:Key="ContextMenuPushItem" Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <Grid Margin="-3,0,-4,0">
+                        <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                        <ui:FontIcon
+                            Margin="11,0,0,0"
+                            FontSize="12"
+                            Glyph="&#xE973;" />
+                    </Grid>
+                    <TextBlock Text="Push" />
+                </StackPanel>
+            </MenuItem.Header>
+            <StaticResource ResourceKey="PushFilesMenu" />
+            <StaticResource ResourceKey="PushFoldersMenu" />
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuDeleteItem"
+            Click="ContextMenuDeleteItem_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE74D;" />
@@ -193,6 +239,37 @@
                 </MenuItem.Header>
             </MenuItem>
         </Menu>
+        <ContextMenu
+            x:Key="PathButtonsMenu"
+            Name="PathButtonsMenu"
+            Resources="{StaticResource ContextMenuStyles}">
+            <MenuItem
+                Margin="0,0,0,-5"
+                HorizontalAlignment="Center"
+                Click="PathMenuEdit_Click"
+                IsEnabled="False">
+                <MenuItem.Header>
+                    <TextBlock HorizontalAlignment="Center" Text="Path" />
+                </MenuItem.Header>
+            </MenuItem>
+            <Separator />
+            <MenuItem Click="PathMenuEdit_Click" Resources="{StaticResource ContextSubMenuStyles}">
+                <MenuItem.Header>
+                    <StackPanel>
+                        <ui:FontIcon Glyph="&#xE70F;" />
+                        <TextBlock Text="Edit" />
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
+            <MenuItem Click="PathMenuCopy_Click" Resources="{StaticResource ContextSubMenuStyles}">
+                <MenuItem.Header>
+                    <StackPanel>
+                        <ui:FontIcon Glyph="&#xE8C8;" />
+                        <TextBlock Text="Copy" />
+                    </StackPanel>
+                </MenuItem.Header>
+            </MenuItem>
+        </ContextMenu>
         <ui:Flyout x:Key="PairServiceFlyout">
             <StackPanel>
                 <TextBlock Text="On phone: Switch Wireless debugging off then on" />
@@ -367,6 +444,7 @@
                         <Button
                             Grid.Column="1"
                             Margin="6,0,0,0"
+                            VerticalAlignment="Center"
                             ui:FlyoutService.Flyout="{StaticResource PairServiceFlyout}"
                             Click="PairServiceButton_Click"
                             Content="Pair">
@@ -505,39 +583,29 @@
                         x:Name="PushMenuButton"
                         IsEnabled="False"
                         ToolTip="Push">
+                        <MenuItem.Resources>
+                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                <Setter Property="FontSize" Value="20" />
+                            </Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Orientation" Value="Horizontal" />
+                                <Setter Property="Margin" Value="0,2" />
+                            </Style>
+                        </MenuItem.Resources>
                         <MenuItem.Header>
                             <Grid Margin="-4,0,-6,0">
-                                <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                                <ui:FontIcon
+                                    HorizontalAlignment="Left"
+                                    FontSize="18"
+                                    Glyph="&#xE8EA;" />
                                 <ui:FontIcon
                                     Margin="14,0,0,0"
                                     FontSize="14"
                                     Glyph="&#xE973;" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem x:Name="PasteFilesMenu" Click="PushMenuButton_Click">
-                            <MenuItem.Header>
-                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="20"
-                                        Glyph="&#xE8A5;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                    <TextBlock VerticalAlignment="Center" Text="Files" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem x:Name="PasteFoldersMenu" Click="PushMenuButton_Click">
-                            <MenuItem.Header>
-                                <StackPanel Margin="0,2,0,0" Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="20"
-                                        Glyph="&#xE8B7;"
-                                        Style="{StaticResource DisabledGlyphStyle}" />
-                                    <TextBlock VerticalAlignment="Center" Text="Folders" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
+                        <StaticResource ResourceKey="PushFilesMenu" />
+                        <StaticResource ResourceKey="PushFoldersMenu" />
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     <MenuItem
@@ -598,7 +666,11 @@
                             <ui:FontIcon Glyph="&#xE8AC;" />
                         </MenuItem.Header>
                     </MenuItem>
-                    <MenuItem IsEnabled="False" ToolTip="Delete">
+                    <MenuItem
+                        x:Name="DeleteMenuButton"
+                        Click="ContextMenuDeleteItem_Click"
+                        IsEnabled="False"
+                        ToolTip="Delete">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>
@@ -1112,19 +1184,20 @@
             <Grid Grid.Row="3">
                 <Grid.Resources>
                     <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
-                        <Setter Property="Margin" Value="8,6,4,6" />
+                        <Setter Property="Margin" Value="8,6" />
                     </Style>
+                    <Style x:Key="MarginedTextBlockStyle" TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0,4" />
+                    </Style>
+                    <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock" />
                 </Grid.Resources>
-                <StackPanel Orientation="Horizontal">
+                <StackPanel Margin="8,0" Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
-                        <TextBlock
-                            x:Name="ItemsCountBlock"
-                            Margin="8,4,0,4"
-                            Style="{StaticResource ItemsCountStyle}" />
-                        <TextBlock Margin="0,4" Text=" item" />
-                        <TextBlock Margin="0,4" Text="s">
+                        <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
+                        <TextBlock Text=" item" />
+                        <TextBlock Text="s">
                             <TextBlock.Style>
-                                <Style TargetType="TextBlock">
+                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
                                             <Setter Property="Visibility" Value="Collapsed" />
@@ -1133,12 +1206,9 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock
-                            x:Name="UnfinishedBlock"
-                            Margin="0,4"
-                            Text=" *">
+                        <TextBlock x:Name="UnfinishedBlock" Text=" *">
                             <TextBlock.Style>
-                                <Style TargetType="TextBlock">
+                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Setter Property="Cursor" Value="Arrow" />
                                     <Style.Triggers>
@@ -1161,12 +1231,9 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock
-                            x:Name="SelectedItemsBlock"
-                            Margin="4,4,0,4"
-                            Style="{StaticResource SelectedItemsStyle}" />
-                        <TextBlock Margin="0,4" Text=" item" />
-                        <TextBlock Margin="0,4" Text="s">
+                        <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
+                        <TextBlock Text=" item" />
+                        <TextBlock Text="s">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
@@ -1177,7 +1244,7 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock Margin="0,4" Text=" selected" />
+                        <TextBlock Text=" selected" />
                         <TextBlock
                             x:Name="TotalSizeBlock"
                             Margin="6,4,0,4"
@@ -1187,7 +1254,7 @@
                 </StackPanel>
                 <ui:SimpleStackPanel
                     x:Name="CurrentDeviceDetailsPanel"
-                    Margin="6,1,6,0"
+                    Margin="6,0"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Orientation="Horizontal"
@@ -1202,7 +1269,7 @@
                         ToolTipService.InitialShowDelay="0"
                         ToolTipService.Placement="Top"
                         ToolTipService.ShowDuration="60000" />
-                    <Separator Margin="0,2,0,3" Visibility="{Binding ElementName=AndroidTextBlock, Path=Visibility}" />
+                    <Separator Margin="2,6" Visibility="{Binding ElementName=AndroidTextBlock, Path=Visibility}" />
                     <ui:FontIcon
                         x:Name="UnsupportedAndroidIcon"
                         Glyph="&#xE7BA;"
@@ -1533,6 +1600,7 @@
                                             x:Name="ConnectNewDeviceButton"
                                             Grid.Column="1"
                                             Margin="8,0,0,0"
+                                            VerticalAlignment="Stretch"
                                             Click="ConnectNewDeviceButton_Click"
                                             Content="Connect"
                                             IsEnabled="False"
@@ -1664,22 +1732,21 @@
                     <Setter Property="Width" Value="300" />
                     <Setter Property="HorizontalAlignment" Value="Center" />
                 </Style>
+                <Style BasedOn="{StaticResource CategorySeparator}" TargetType="Separator" />
                 <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                 </Style>
                 <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                 </Style>
-                <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
-                    <Setter Property="Margin" Value="0,6" />
-                </Style>
+                <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander" />
             </ui:SplitView.Resources>
             <ui:SplitView.Pane>
                 <Border
                     BorderBrush="Gray"
                     BorderThickness="1,1,0,0"
                     Style="{StaticResource DevicesListStyle}">
-                    <Grid Margin="18,8,0,8">
+                    <Grid Margin="18,8,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="48" />
                             <RowDefinition Height="Auto" />
@@ -1726,7 +1793,10 @@
                                 Visibility="Collapsed" />
                         </Grid>
                         <ScrollViewer Grid.Row="2" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                            <StackPanel Margin="6,0,24,0" HorizontalAlignment="Left">
+                            <ui:SimpleStackPanel
+                                Margin="6,0,24,0"
+                                HorizontalAlignment="Left"
+                                Spacing="6">
                                 <Expander Header="Theme">
                                     <StackPanel VerticalAlignment="Bottom">
                                         <RadioButton
@@ -1743,14 +1813,16 @@
                                             Content="Windows Default" />
                                         <CheckBox
                                             x:Name="ForceFluentStylesCheckbox"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
                                             Checked="ForceFluentStylesCheckbox_Checked"
                                             Style="{StaticResource ForceFluentVisibility}"
                                             Unchecked="ForceFluentStylesCheckbox_Checked">
-                                            <StackPanel Orientation="Horizontal">
+                                            <Grid>
                                                 <TextBlock Text="Force Fluent Styles" />
-                                                <Grid Margin="10,0">
+                                                <Grid Margin="10,0" HorizontalAlignment="Right">
                                                     <Grid.Resources>
-                                                        <Style BasedOn="{StaticResource RestartResuiredIconsStyle}" TargetType="ui:FontIcon" />
+                                                        <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
                                                     </Grid.Resources>
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
@@ -1759,7 +1831,7 @@
                                                         Glyph="&#xEA84;"
                                                         Style="{StaticResource RestartWarningIconStyle}" />
                                                 </Grid>
-                                            </StackPanel>
+                                            </Grid>
                                         </CheckBox>
                                     </StackPanel>
                                 </Expander>
@@ -1773,11 +1845,11 @@
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ChangeDefaultFolderButton_Click"
                                             Style="{StaticResource TooltipTextBoxStyle}" />
-                                        <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                                        <Grid Margin="0,4,0,0">
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
-                                            <Grid Margin="10,0">
+                                            <Grid Margin="10,0" HorizontalAlignment="Right">
                                                 <Grid.Resources>
-                                                    <Style BasedOn="{StaticResource RestartResuiredIconsStyle}" TargetType="ui:FontIcon" />
+                                                    <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
                                                 </Grid.Resources>
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
@@ -1786,7 +1858,7 @@
                                                     Glyph="&#xEA84;"
                                                     Style="{StaticResource RestartWarningIconStyle}" />
                                             </Grid>
-                                        </StackPanel>
+                                        </Grid>
                                         <TextBox
                                             x:Name="ManualAdbPath"
                                             Margin="0,6"
@@ -1857,7 +1929,7 @@
                                             Content="Detailed" />
                                     </StackPanel>
                                 </Expander>
-                            </StackPanel>
+                            </ui:SimpleStackPanel>
                         </ScrollViewer>
                     </Grid>
                 </Border>
