@@ -905,7 +905,22 @@
     <Style x:Key="DriveUsageBarStyle" TargetType="ui:ProgressBar">
         <Style.Triggers>
             <DataTrigger Binding="{Binding UsageWarning}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+                <Setter Property="Foreground">
+                    <Setter.Value>
+                        <LinearGradientBrush SpreadMethod="Repeat" StartPoint="0,0" EndPoint="0.15,0">
+                            <LinearGradientBrush.RelativeTransform>
+                                <TransformGroup>
+                                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                                    <SkewTransform CenterX="0.5" CenterY="0.5" />
+                                    <RotateTransform Angle="1" CenterX="0.5" CenterY="0.5" />
+                                    <TranslateTransform />
+                                </TransformGroup>
+                            </LinearGradientBrush.RelativeTransform>
+                            <GradientStop Offset="0.4" Color="Transparent" />
+                            <GradientStop Offset="0.4" Color="#FFC50500" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
             </DataTrigger>
         </Style.Triggers>
     </Style>

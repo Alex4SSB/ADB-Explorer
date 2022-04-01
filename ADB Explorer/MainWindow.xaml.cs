@@ -553,7 +553,7 @@ namespace ADB_Explorer
 
         private void DriveViewNav()
         {
-            ClearExplorer();
+            ClearExplorer(false);
             ExplorerGrid.Visibility = Visibility.Collapsed;
             DrivesItemRepeater.Visibility = Visibility.Visible;
             PathBox.IsEnabled = true;
@@ -1295,23 +1295,27 @@ namespace ADB_Explorer
             DeviceListSetup();
         }
 
-        private void ClearExplorer()
+        private void ClearExplorer(bool clearDevice = true)
         {
-            CurrentPrettyNames.Clear();
-            DirectoryLister?.FileList?.Clear();
             PathStackPanel.Children.Clear();
-            CurrentPath = null;
-            CurrentDeviceDetailsPanel.DataContext = null;
-            TextHelper.SetAltText(PathBox, "");
+            DirectoryLister?.FileList?.Clear();
             PushMenuButton.IsEnabled =
-            PathBox.IsEnabled =
             NewMenuButton.IsEnabled =
             PullMenuButton.IsEnabled =
             DeleteMenuButton.IsEnabled =
-            BackButton.IsEnabled =
-            ForwardButton.IsEnabled =
             HomeButton.IsEnabled =
             ParentButton.IsEnabled = false;
+
+            if (clearDevice)
+            {
+                CurrentPrettyNames.Clear();
+                CurrentPath = null;
+                CurrentDeviceDetailsPanel.DataContext = null;
+                TextHelper.SetAltText(PathBox, "");
+                PathBox.IsEnabled =
+                BackButton.IsEnabled =
+                ForwardButton.IsEnabled = false;
+            }
         }
 
         private void ClearDrives()

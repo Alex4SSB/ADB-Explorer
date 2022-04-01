@@ -22,7 +22,7 @@ namespace ADB_Explorer.Services
             {
                 if (adbPath == "")
                 {
-                    adbPath = Settings.ManualAdbPath is string path ? $"\"{path}\"" : "adb";
+                    adbPath = Settings.ManualAdbPath is string path && !string.IsNullOrEmpty(path) ? $"\"{path}\"" : "adb";
                 }
                 return adbPath;
             }
