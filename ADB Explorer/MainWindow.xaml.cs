@@ -141,10 +141,10 @@ namespace ADB_Explorer
 
         private void DirectoryLister_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(DirectoryLister.InProgress))
+            if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
             {
-                DirectoryLoadingProgressBar.Visible(DirectoryLister.InProgress);
-                UnfinishedBlock.Visible(DirectoryLister.InProgress);
+                DirectoryLoadingProgressBar.Visible(DirectoryLister.IsProgressVisible);
+                UnfinishedBlock.Visible(DirectoryLister.IsProgressVisible);
             }
         }
 

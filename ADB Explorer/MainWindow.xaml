@@ -801,7 +801,7 @@
                                     <Style BasedOn="{StaticResource DirectoryLoadingProgressStyle}" TargetType="ui:ProgressBar">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="True">
+                                            <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.IsProgressVisible}" Value="True">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>
