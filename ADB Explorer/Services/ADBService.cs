@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
+using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Services
 {
@@ -21,7 +22,7 @@ namespace ADB_Explorer.Services
             {
                 if (adbPath == "")
                 {
-                    adbPath = Storage.RetrieveValue(UserPrefs.manualAdbPath) is string path ? $"\"{path}\"" : "adb";
+                    adbPath = Settings.ManualAdbPath is string path ? $"\"{path}\"" : "adb";
                 }
                 return adbPath;
             }

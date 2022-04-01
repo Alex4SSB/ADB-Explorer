@@ -25,8 +25,9 @@ namespace ADB_Explorer.Services
         }
 
         public static object RetrieveEnum(Type type) => Application.Current.Properties[type.ToString()];
+        public static object RetrieveEnum(string key) => Application.Current.Properties[key];
 
-        public static T RetrieveEnum<T>() => RetrieveEnum(typeof(T)) switch
+        public static T RetrieveEnum<T>(string key = "") => RetrieveEnum(string.IsNullOrEmpty(key) ? typeof(T).ToString() : key) switch
         {
             string strVal => (T)Enum.Parse(typeof(T), strVal),
             long longVal => (T)Enum.ToObject(typeof(T), longVal),

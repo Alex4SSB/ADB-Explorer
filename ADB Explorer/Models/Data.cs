@@ -1,9 +1,7 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Services;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
-using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Models
 {
@@ -24,7 +22,8 @@ namespace ADB_Explorer.Models
 
         public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
 
-        public static bool UseFluentStyles => IsWin11
-            || Storage.RetrieveBool(UserPrefs.forceFluentStyles) == true;
+        public static bool UseFluentStyles => IsWin11 || Settings.ForceFluentStyles;
+
+        public static AppSettings Settings { get; set; } = new();
     }
 }

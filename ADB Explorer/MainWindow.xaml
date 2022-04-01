@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="MainWin"
@@ -29,6 +30,7 @@
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
+        <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
         <CollectionViewSource
             x:Key="FileListView"
             Filter="CollectionViewSource_Filter"
@@ -226,7 +228,7 @@
             <Menu.Style>
                 <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding ElementName=DefaultFolderBlock, Path=Text}" Value="[not set]">
+                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" Value="">
                             <Setter Property="IsEnabled" Value="False" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -949,7 +951,7 @@
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Text" Value="{Binding FullName}" />
                                                     <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
+                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
                                                             <Setter Property="Text" Value="{Binding NoExtName}" />
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
@@ -1087,7 +1089,7 @@
                         <Style.Triggers>
                             <MultiDataTrigger>
                                 <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding ElementName=FileOpDetailedRadioButton, Path=IsChecked}" Value="True" />
+                                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" Value="True" />
                                     <Condition Binding="{Binding ElementName=FileOperationsButton, Path=(helpers:RemoteToggle.IsTargetVisible)}" Value="True" />
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="IsExpanded" Value="True" />
@@ -1297,7 +1299,7 @@
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding ElementName=FileOpCompactRadioButton, Path=IsChecked}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" Value="False" />
                                 <Condition Binding="{Binding ElementName=FileOperationsButton, Path=(helpers:RemoteToggle.IsTargetVisible)}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="IsPaneOpen" Value="True" />
@@ -1405,7 +1407,7 @@
                                     <Grid.Style>
                                         <Style TargetType="Grid">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=EnableMdnsCheckBox, Path=IsChecked}" Value="True">
+                                                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" Value="True">
                                                     <Setter Property="Visibility" Value="Visible" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -1458,7 +1460,7 @@
                                     <Grid.Style>
                                         <Style TargetType="Grid">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=EnableMdnsCheckBox, Path=IsChecked}" Value="True">
+                                                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -1800,24 +1802,22 @@
                                 <Expander Header="Theme">
                                     <StackPanel VerticalAlignment="Bottom">
                                         <RadioButton
-                                            x:Name="LightThemeRadioButton"
-                                            Checked="LightThemeRadioButton_Checked"
-                                            Content="Light" />
+                                            Content="Light"
+                                            GroupName="AppTheme"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=light}" />
                                         <RadioButton
-                                            x:Name="DarkThemeRadioButton"
-                                            Checked="DarkThemeRadioButton_Checked"
-                                            Content="Dark" />
+                                            Content="Dark"
+                                            GroupName="AppTheme"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=dark}" />
                                         <RadioButton
-                                            x:Name="DefaultThemeRadioButton"
-                                            Checked="DefaultThemeRadioButton_Checked"
-                                            Content="Windows Default" />
+                                            Content="Windows Default"
+                                            GroupName="AppTheme"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=windowsDefault}" />
                                         <CheckBox
-                                            x:Name="ForceFluentStylesCheckbox"
                                             HorizontalAlignment="Stretch"
                                             HorizontalContentAlignment="Stretch"
-                                            Checked="ForceFluentStylesCheckbox_Checked"
-                                            Style="{StaticResource ForceFluentVisibility}"
-                                            Unchecked="ForceFluentStylesCheckbox_Checked">
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ForceFluentStyles}"
+                                            Style="{StaticResource ForceFluentVisibility}">
                                             <Grid>
                                                 <TextBlock Text="Force Fluent Styles" />
                                                 <Grid Margin="10,0" HorizontalAlignment="Right">
@@ -1840,11 +1840,11 @@
                                     <StackPanel>
                                         <TextBlock Margin="4,0" Text="Default Folder" />
                                         <TextBox
-                                            x:Name="DefaultFolderBlock"
                                             Margin="0,6"
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ChangeDefaultFolderButton_Click"
-                                            Style="{StaticResource TooltipTextBoxStyle}" />
+                                            Style="{StaticResource TooltipTextBoxStyle}"
+                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
                                         <Grid Margin="0,4,0,0">
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
                                             <Grid Margin="10,0" HorizontalAlignment="Right">
@@ -1860,73 +1860,69 @@
                                             </Grid>
                                         </Grid>
                                         <TextBox
-                                            x:Name="ManualAdbPath"
                                             Margin="0,6"
                                             ui:ControlHelper.PlaceholderText="Click To Browse"
                                             MouseUp="ManualAdbPath_MouseUp"
-                                            Style="{StaticResource TooltipTextBoxStyle}" />
+                                            Style="{StaticResource TooltipTextBoxStyle}"
+                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
                                 <Expander Header="File Double-Click Behavior">
-                                    <CheckBox
-                                        x:Name="PullOnDoubleClickCheckBox"
-                                        Checked="PullOnDoubleClickCheckBox_Checked"
-                                        Content="Pull To Default Folder" />
+                                    <CheckBox Content="Pull To Default Folder">
+                                        <CheckBox.Style>
+                                            <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=PullOnDoubleClick}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" Value="">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                        <Setter Property="IsChecked" Value="False" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </CheckBox.Style>
+                                    </CheckBox>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
                                 <Expander Header="Connection">
                                     <StackPanel>
-                                        <CheckBox
-                                            x:Name="EnableMdnsCheckBox"
-                                            Checked="EnableMdnsCheckBox_Checked"
-                                            Content="Enable mDNS (experimental)"
-                                            Unchecked="EnableMdnsCheckBox_Checked" />
-                                        <CheckBox
-                                            x:Name="AutoRootCheckBox"
-                                            Checked="AutoRootCheckBox_Checked"
-                                            Content="Automatically Enable Root"
-                                            Unchecked="AutoRootCheckBox_Checked" />
-                                        <CheckBox
-                                            x:Name="RememberIpCheckBox"
-                                            Click="RememberIpCheckBox_Click"
-                                            Content="Remember Last IP" />
-                                        <CheckBox
-                                            x:Name="RememberPortCheckBox"
-                                            Click="RememberPortCheckBox_Click"
-                                            Content="Remember Last Port" />
-                                        <CheckBox
-                                            x:Name="AutoOpenCheckBox"
-                                            Click="AutoOpenCheckBox_Click"
-                                            Content="Automatically Open For Browsing" />
+                                        <CheckBox Content="Enable mDNS (experimental)" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" />
+                                        <CheckBox Content="Automatically Enable Root" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoRoot}" />
+                                        <CheckBox Content="Remember Last IP" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" />
+                                        <CheckBox Content="Remember Last Port">
+                                            <CheckBox.Style>
+                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                    <Setter Property="IsEnabled" Value="True" />
+                                                    <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=RememberPort}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" Value="False">
+                                                            <Setter Property="IsChecked" Value="False" />
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
+                                        <CheckBox Content="Automatically Open For Browsing" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoOpen}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
                                 <Expander Header="Show">
                                     <StackPanel>
-                                        <CheckBox
-                                            x:Name="ShowExtensionsCheckBox"
-                                            Click="ShowExtensionsCheckBox_Click"
-                                            Content="File Name Extensions"
-                                            IsChecked="True" />
-                                        <CheckBox
-                                            x:Name="ShowHiddenCheckBox"
-                                            Click="ShowHiddenCheckBox_Click"
-                                            Content="Hidden Items"
-                                            IsChecked="True" />
+                                        <CheckBox Content="File Name Extensions" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" />
+                                        <CheckBox Content="Hidden Items" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowHiddenItems}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
                                 <Expander Header="File Operations">
                                     <StackPanel>
+                                        <RadioButton Content="Compact" GroupName="FileOpView" />
                                         <RadioButton
-                                            x:Name="FileOpCompactRadioButton"
-                                            Checked="FileOpCompactRadioButton_Checked"
-                                            Content="Compact" />
-                                        <RadioButton
-                                            x:Name="FileOpDetailedRadioButton"
-                                            Checked="FileOpDetailedRadioButton_Checked"
-                                            Content="Detailed" />
+                                            Content="Detailed"
+                                            GroupName="FileOpView"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" />
                                     </StackPanel>
                                 </Expander>
                             </ui:SimpleStackPanel>

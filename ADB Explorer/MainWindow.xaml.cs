@@ -40,7 +40,6 @@ namespace ADB_Explorer
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
         private bool TextBoxChangedMutex;
-        private SolidColorBrush qrForeground, qrBackground;
         private ThemeService themeService = new();
 
         public DirectoryLister DirectoryLister { get; private set; }
@@ -56,9 +55,9 @@ namespace ADB_Explorer
                 GetExplorerContentPresenter();
                 if (ExplorerContentPresenter is null)
                     return 0;
-                
+
                 double height = ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight - HorizontalScrollBarHeight;
-                
+
                 return height;
             }
         }
@@ -108,6 +107,7 @@ namespace ADB_Explorer
             ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
 
+            Settings.PropertyChanged += Settings_PropertyChanged;
             themeService.PropertyChanged += ThemeService_PropertyChanged;
 
             if (CheckAdbVersion())
@@ -116,8 +116,27 @@ namespace ADB_Explorer
                 OpenDevicesButton.IsEnabled = true;
                 DevicesSplitView.IsPaneOpen = true;
             }
-            
+
             UpperProgressBar.DataContext = fileOperationQueue;
+            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
+        }
+
+        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(AppSettings.Theme) or nameof(AppSettings.ForceFluentStyles):
+                    SetTheme(Settings.Theme);
+                    break;
+                case nameof(AppSettings.EnableMdns):
+                    EnableMdns();
+                    break;
+                case nameof(AppSettings.ShowHiddenItems):
+                    FilterHiddenFiles();
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void DirectoryLister_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -180,7 +199,7 @@ namespace ADB_Explorer
                         pullMenu.IsEnabled = true;
 
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
-                    
+
                     if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                         ExplorerGrid.ContextMenu.Items.Add(pushMenu);
 
@@ -211,7 +230,7 @@ namespace ADB_Explorer
         {
             Storage.StoreValue(SystemVals.windowMaximized, WindowState == WindowState.Maximized);
 
-            var detailedVisible = FileOpVisibility() && FileOpDetailedRadioButton.IsChecked == true;
+            var detailedVisible = FileOpVisibility() && Settings.ShowExtendedView;
             Storage.StoreValue(SystemVals.detailedVisible, detailedVisible);
             if (detailedVisible)
                 Storage.StoreValue(SystemVals.detailedHeight, FileOpDetailedGrid.Height);
@@ -219,12 +238,14 @@ namespace ADB_Explorer
 
         private void SetTheme()
         {
-            SetTheme(SettingsTheme() is AppTheme.windowsDefault
+            SetTheme(Settings.Theme is AppTheme.windowsDefault
                 ? themeService.WindowsTheme
                 : ThemeManager.Current.ApplicationTheme.Value);
         }
 
-        private void SetTheme(ApplicationTheme theme)
+        private void SetTheme(AppTheme theme) => SetTheme(AppThemeToActual(theme));
+
+        private static void SetTheme(ApplicationTheme theme)
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
@@ -232,61 +253,11 @@ namespace ADB_Explorer
             {
                 SetResourceColor(theme, key);
             }
-
-            Storage.StoreEnum(SettingsTheme());
-
-            if (EnableMdnsCheckBox.IsChecked == true)
-            {
-                SetQrColors(theme);
-                UpdateQrClass();
-            }
-        }
-
-        private void SettingsTheme(AppTheme theme)
-        {
-            switch (theme)
-            {
-                case AppTheme.light:
-                    LightThemeRadioButton.IsChecked = true;
-                    break;
-                case AppTheme.dark:
-                    DarkThemeRadioButton.IsChecked = true;
-                    break;
-                case AppTheme.windowsDefault:
-                    DefaultThemeRadioButton.IsChecked = true;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
-        private AppTheme SettingsTheme()
-        {
-            if (LightThemeRadioButton.IsChecked == true) return AppTheme.light;
-            else if (DarkThemeRadioButton.IsChecked == true) return AppTheme.dark;
-            else return AppTheme.windowsDefault;
         }
 
         private static void SetResourceColor(ApplicationTheme theme, string resource)
         {
             Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]);
-        }
-
-        private void SetQrColors(ApplicationTheme theme)
-        {
-            switch (theme)
-            {
-                case ApplicationTheme.Light:
-                    qrBackground = QR_BACKGROUND_LIGHT;
-                    qrForeground = QR_FOREGROUND_LIGHT;
-                    break;
-                case ApplicationTheme.Dark:
-                    qrBackground = QR_BACKGROUND_DARK;
-                    qrForeground = QR_FOREGROUND_DARK;
-                    break;
-                default:
-                    break;
-            }
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
@@ -355,7 +326,7 @@ namespace ADB_Explorer
                 switch (file.Type)
                 {
                     case FileType.File:
-                        if (PullOnDoubleClickCheckBox.IsChecked == true)
+                        if (Settings.PullOnDoubleClick)
                             PullFiles(true);
                         break;
                     case FileType.Folder:
@@ -413,7 +384,7 @@ namespace ADB_Explorer
                 if (DevicesObject.DevicesAvailable(true))
                     return;
 
-                if (AutoOpenCheckBox.IsChecked != true)
+                if (!Settings.AutoOpen)
                 {
                     DevicesObject.CloseAll();
 
@@ -447,66 +418,21 @@ namespace ADB_Explorer
         {
             Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
 
-            var appTheme = Storage.RetrieveEnum<AppTheme>();
-            SettingsTheme(appTheme);
-            SetTheme(appTheme switch
-            {
-                AppTheme.light => ApplicationTheme.Light,
-                AppTheme.dark => ApplicationTheme.Dark,
-                AppTheme.windowsDefault => themeService.WindowsTheme,
-                _ => throw new NotImplementedException(),
-            });
+            if (Settings.EnableMdns)
+                QrClass = new();
 
-            if (Storage.RetrieveBool(UserPrefs.forceFluentStyles) is bool forceFluent)
-                ForceFluentStylesCheckbox.IsChecked = forceFluent;
-            
-            if (Storage.RetrieveValue(UserPrefs.manualAdbPath) is string adbPath)
-                ManualAdbPath.Text = adbPath;
+            SetTheme(Settings.Theme);
 
-            if (Storage.RetrieveBool(UserPrefs.enableMdns) is bool enable)
-            {
-                // Intentional invocation of the checked event
-                EnableMdnsCheckBox.IsChecked = enable;
-
-                if (enable)
-                    QrClass = new();
-            }
-
-            if (Storage.RetrieveBool(UserPrefs.autoRoot) is bool autoRoot)
-                AutoRootCheckBox.IsChecked = autoRoot;
-
-            if (Storage.RetrieveValue(UserPrefs.defaultFolder) is string path && !string.IsNullOrEmpty(path))
-                DefaultFolderBlock.Text = path;
-
-            if (Storage.RetrieveBool(UserPrefs.pullOnDoubleClick) is bool copy)
-                PullOnDoubleClickCheckBox.IsChecked = copy;
-
-            if (Storage.RetrieveBool(UserPrefs.rememberIp) is bool remIp)
-                RememberIpCheckBox.IsChecked = remIp;
-
-            RememberPortCheckBox.IsEnabled = (bool)RememberIpCheckBox.IsChecked;
-
-            if (RememberPortCheckBox.IsEnabled
-                    && Storage.RetrieveBool(UserPrefs.rememberPort) is bool remPort)
-            {
-                RememberPortCheckBox.IsChecked = remPort;
-            }
-
-            if (Storage.RetrieveBool(UserPrefs.autoOpen) is bool autoOpen)
-                AutoOpenCheckBox.IsChecked = autoOpen;
-
-            if (Storage.RetrieveBool(UserPrefs.showExtensions) is bool showExt)
-                ShowExtensionsCheckBox.IsChecked = showExt;
-
-            if (Storage.RetrieveBool(UserPrefs.showHiddenItems) is bool showHidden)
-                ShowHiddenCheckBox.IsChecked = showHidden;
-
-            bool extendedView = Storage.RetrieveBool(UserPrefs.showExtendedView) is bool val && val;
-            FileOpDetailedRadioButton.IsChecked = extendedView;
-            FileOpCompactRadioButton.IsChecked = !extendedView;
-
-            CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
+            EnableMdns();
         }
+
+        private ApplicationTheme AppThemeToActual(AppTheme appTheme) => appTheme switch
+        {
+            AppTheme.light => ApplicationTheme.Light,
+            AppTheme.dark => ApplicationTheme.Dark,
+            AppTheme.windowsDefault => themeService.WindowsTheme,
+            _ => throw new NotImplementedException(),
+        };
 
         private IEnumerable<CheckBox> FileOpContextItems
         {
@@ -514,8 +440,8 @@ namespace ADB_Explorer
             {
                 var items = ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items;
                 return from MenuItem item in ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items
-                                let checkbox = item.Header as CheckBox
-                                select checkbox;
+                       let checkbox = item.Header as CheckBox
+                       select checkbox;
             }
         }
 
@@ -669,11 +595,11 @@ namespace ADB_Explorer
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
         {
-            if (devices is not null &&DevicesObject.DevicesChanged(devices))
+            if (devices is not null && DevicesObject.DevicesChanged(devices))
             {
                 DeviceListSetup(devices);
 
-                if (AutoRootCheckBox.IsChecked == true)
+                if (Settings.AutoRoot)
                 {
                     foreach (var item in DevicesObject.LogicalDevices.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
                     {
@@ -704,7 +630,7 @@ namespace ADB_Explorer
             {
                 DevicesObject.UpdateServices(services);
 
-                var qrServices = DevicesObject.ServiceDevices.Where(service => 
+                var qrServices = DevicesObject.ServiceDevices.Where(service =>
                     service.MdnsType == ServiceDevice.ServiceType.QrCode
                     && service.ID == QrClass.ServiceName).ToList();
 
@@ -910,7 +836,7 @@ namespace ADB_Explorer
                 Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
                 Padding = new Thickness(8, 0, 8, 0),
                 Height = 24,
-        };
+            };
             button.Click += PathButton_Click;
             ControlHelper.SetCornerRadius(button, new(3));
             TextHelper.SetAltObject(button, path);
@@ -1064,7 +990,7 @@ namespace ADB_Explorer
 
             if (ExplorerGrid.Items.Count < 1) return;
 
-            
+
             if (key == Key.Down)
             {
                 if (ExplorerGrid.SelectedItems.Count == 0)
@@ -1096,7 +1022,7 @@ namespace ADB_Explorer
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void PullFiles(bool quick = false)
@@ -1106,7 +1032,7 @@ namespace ADB_Explorer
 
             if (quick)
             {
-                path = ShellObject.FromParsingName(DefaultFolderBlock.Text);
+                path = ShellObject.FromParsingName(Settings.DefaultFolder);
             }
             else
             {
@@ -1114,7 +1040,7 @@ namespace ADB_Explorer
                 {
                     IsFolderPicker = true,
                     Multiselect = false,
-                    DefaultDirectory = DefaultFolderBlock.Text,
+                    DefaultDirectory = Settings.DefaultFolder,
                     Title = "Select destination for " + (itemsCount > 1 ? "multiple items" : ExplorerGrid.SelectedItem)
                 };
 
@@ -1157,7 +1083,7 @@ namespace ADB_Explorer
             {
                 IsFolderPicker = isFolderPicker,
                 Multiselect = true,
-                DefaultDirectory = DefaultFolderBlock.Text,
+                DefaultDirectory = Settings.DefaultFolder,
                 Title = $"Select {(isFolderPicker ? "folder" : "file")}s to push{(targetPath.FullPath == CurrentPath ? "" : $" into {targetPath.FullName}")}"
             };
 
@@ -1183,16 +1109,6 @@ namespace ADB_Explorer
             //ConnectTimer.IsEnabled = false;
             //DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
             //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "offline") });
-        }
-
-        private void LightThemeRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            SetTheme(ApplicationTheme.Light);
-        }
-
-        private void DarkThemeRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            SetTheme(ApplicationTheme.Dark);
         }
 
         private void ContextMenuPullItem_Click(object sender, RoutedEventArgs e)
@@ -1225,19 +1141,13 @@ namespace ADB_Explorer
                 IsFolderPicker = true,
                 Multiselect = false
             };
-            if (DefaultFolderBlock.Text != "")
-                dialog.DefaultDirectory = DefaultFolderBlock.Text;
+            if (Settings.DefaultFolder != "")
+                dialog.DefaultDirectory = Settings.DefaultFolder;
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
-                DefaultFolderBlock.Text = dialog.FileName;
-                Storage.StoreValue(UserPrefs.defaultFolder, dialog.FileName);
+                Settings.DefaultFolder = dialog.FileName;
             }
-        }
-
-        private void PullOnDoubleClickCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.pullOnDoubleClick, PullOnDoubleClickCheckBox.IsChecked);
         }
 
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
@@ -1272,11 +1182,11 @@ namespace ADB_Explorer
                 return;
             }
 
-            if (RememberIpCheckBox.IsChecked == true)
-                Storage.StoreValue(UserPrefs.lastIp, NewDeviceIpBox.Text);
+            if (Settings.RememberIp)
+                Settings.LastIp = NewDeviceIpBox.Text;
 
-            if (RememberPortCheckBox.IsChecked == true)
-                Storage.StoreValue(UserPrefs.lastPort, NewDevicePortBox.Text);
+            if (Settings.RememberPort)
+                Settings.LastPort = NewDevicePortBox.Text;
 
             NewDeviceIpBox.Clear();
             NewDevicePortBox.Clear();
@@ -1309,7 +1219,7 @@ namespace ADB_Explorer
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric:true, allowedChars: '.');
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric: true, allowedChars: '.');
             EnableConnectButton();
         }
 
@@ -1318,26 +1228,17 @@ namespace ADB_Explorer
             if (!string.IsNullOrWhiteSpace(NewDeviceIpBox.Text) && !string.IsNullOrWhiteSpace(NewDevicePortBox.Text))
                 return;
 
-            if (RememberIpCheckBox.IsChecked == true
-                && Storage.RetrieveValue(UserPrefs.lastIp) is string lastIp
+            if (Settings.RememberIp
+                && Settings.LastIp is string lastIp
                 && !DevicesObject.UIList.Find(d => d.Device.ID.Split(':')[0] == lastIp))
             {
                 NewDeviceIpBox.Text = lastIp;
-                if (RememberPortCheckBox.IsChecked == true
-                    && Storage.RetrieveValue(UserPrefs.lastPort) is string lastPort)
+                if (Settings.RememberPort
+                    && Settings.LastPort is string lastPort)
                 {
                     NewDevicePortBox.Text = lastPort;
                 }
             }
-        }
-
-        private void RememberIpCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            RememberPortCheckBox.IsEnabled = (bool)RememberIpCheckBox.IsChecked;
-            if (!RememberPortCheckBox.IsEnabled)
-                RememberPortCheckBox.IsChecked = false;
-
-            Storage.StoreValue(UserPrefs.rememberIp, RememberIpCheckBox.IsChecked);
         }
 
         private void OpenDeviceButton_Click(object sender, RoutedEventArgs e)
@@ -1432,35 +1333,14 @@ namespace ADB_Explorer
                 if (ConnectNewDeviceButton.Visible() && ConnectNewDeviceButton.IsEnabled)
                     ConnectNewDevice();
                 else if (PairNewDeviceButton.Visible() && PairNewDeviceButton.IsEnabled)
-                    PairDeviceManual();    
+                    PairDeviceManual();
             }
-                
-        }
 
-        private void RememberPortCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.rememberPort, RememberPortCheckBox.IsChecked);
         }
 
         private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
             ExplorerGrid.ContextMenu.Visibility = Visible(ExplorerGrid.ContextMenu.HasItems);
-        }
-
-        private void SelectDevice(object sender)
-        {
-            if (sender is ModernWpf.Controls.ListViewItem item && item.DataContext is UIDevice device && !device.DeviceSelected)
-            {
-                if (device is UIServiceDevice service && (PasswordConnectionRadioButton.IsChecked == false || string.IsNullOrEmpty(((ServiceDevice)service.Device).PairingPort)))
-                    return;
-
-                DevicesObject.SetSelected(device);
-            }
-        }
-
-        private void AutoOpenCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.autoOpen, AutoOpenCheckBox.IsChecked);
         }
 
         private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1545,7 +1425,7 @@ namespace ADB_Explorer
                 return;
             }
 
-            RemoteToggle.SetIsTargetVisible(FileOperationsButton,!FileOpVisibility());
+            RemoteToggle.SetIsTargetVisible(FileOperationsButton, !FileOpVisibility());
         }
 
         private bool FileOpVisibility()
@@ -1649,25 +1529,13 @@ namespace ADB_Explorer
             Clipboard.SetText(TextHelper.GetAltText(PathBox));
         }
 
-        private void ShowHiddenCheckBox_Click(object sender, RoutedEventArgs e)
+        private void FilterHiddenFiles()
         {
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
-            bool showHidden = ShowHiddenCheckBox.IsChecked == true;
-
-            if (!showHidden)
-            {
-                CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = new(file => !((FileClass)file).IsHidden);
-            }
-            else
-                CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = null;
-
-            Storage.StoreValue(UserPrefs.showHiddenItems, showHidden);
-        }
-
-        private void ShowExtensionsCheckBox_Click(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.showExtensions, ShowExtensionsCheckBox.IsChecked);
+            CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = !Settings.ShowHiddenItems
+                ? (new(file => !((FileClass)file).IsHidden))
+                : null;
         }
 
         private void PullMenuButton_Click(object sender, RoutedEventArgs e)
@@ -1724,16 +1592,6 @@ namespace ADB_Explorer
             ResizeDetailedView();
         }
 
-        private void FileOpDetailedRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.showExtendedView, true);
-        }
-
-        private void FileOpCompactRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.showExtendedView, false);
-        }
-
         private void ConnectionTypeRadioButton_Checked(object sender, RoutedEventArgs e)
         {
             ChangeConnectionType();
@@ -1768,11 +1626,8 @@ namespace ADB_Explorer
 
         private void UpdateQrClass()
         {
-            if (qrBackground == null)
-                SetTheme();
-
-            QrClass.Background = qrBackground;
-            QrClass.Foreground = qrForeground;
+            QrClass.Background = QR_BACKGROUND;
+            QrClass.Foreground = QR_FOREGROUND;
             PairingQrImage.Source = QrClass.Image;
         }
 
@@ -1856,7 +1711,7 @@ namespace ADB_Explorer
 
         private void NewDevicePortBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars:5);
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars: 5);
             EnableConnectButton();
         }
 
@@ -1914,15 +1769,10 @@ namespace ADB_Explorer
             }
         }
 
-        private void EnableMdnsCheckBox_Checked(object sender, RoutedEventArgs e)
+        private void EnableMdns()
         {
-            // Intentionally invoked from InitSettings
-
-            bool isChecked = EnableMdnsCheckBox.IsChecked == true;
-            Storage.StoreValue(UserPrefs.enableMdns, isChecked);
-
-            ADBService.IsMdnsEnabled = isChecked;
-            if (isChecked)
+            ADBService.IsMdnsEnabled = Settings.EnableMdns;
+            if (Settings.EnableMdns)
             {
                 QrClass = new();
             }
@@ -1944,7 +1794,7 @@ namespace ADB_Explorer
 
         private void OpenDefaultFolder_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("explorer.exe", DefaultFolderBlock.Text);
+            Process.Start("explorer.exe", Settings.DefaultFolder);
         }
 
         private void RemovePendingAndCompleted_Click(object sender, RoutedEventArgs e)
@@ -1993,19 +1843,18 @@ namespace ADB_Explorer
                 Filter = "ADB Executable|adb.exe",
             };
 
-            if (ManualAdbPath.Text != "")
+            if (!string.IsNullOrEmpty(Settings.ManualAdbPath))
             {
                 try
                 {
-                    dialog.InitialDirectory = Directory.GetParent(ManualAdbPath.Text).FullName;
+                    dialog.InitialDirectory = Directory.GetParent(Settings.ManualAdbPath).FullName;
                 }
                 catch (Exception) { }
             }
 
             if (dialog.ShowDialog() == true)
             {
-                ManualAdbPath.Text = dialog.FileName;
-                Storage.StoreValue(UserPrefs.manualAdbPath, dialog.FileName);
+                Settings.ManualAdbPath = dialog.FileName;
             }
         }
 
@@ -2019,30 +1868,9 @@ namespace ADB_Explorer
             }
         }
 
-        private void DeviceStyle_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            SelectDevice(sender);
-        }
-
-        private void DefaultThemeRadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            SetTheme(themeService.WindowsTheme);
-        }
-
-        private void ForceFluentStylesCheckbox_Checked(object sender, RoutedEventArgs e)
-        {
-            SetTheme();
-            Storage.StoreValue(UserPrefs.forceFluentStyles, ForceFluentStylesCheckbox.IsChecked);
-        }
-
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
             DevicesObject.UnselectAll();
-        }
-
-        private void AutoRootCheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            Storage.StoreValue(UserPrefs.autoRoot, AutoRootCheckBox.IsChecked);
         }
 
         private void EnableDeviceRootToggle_Click(object sender, RoutedEventArgs e)
