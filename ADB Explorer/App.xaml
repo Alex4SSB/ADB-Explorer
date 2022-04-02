@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="Styles\MenuItem.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
                 <ResourceDictionary Source="Styles\Expander.xaml" />
+                <ResourceDictionary Source="Styles\DataGrid.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->

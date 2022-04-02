@@ -903,6 +903,14 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="DriveUsageBarStyle" TargetType="ui:ProgressBar">
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding UsageP}" />
+                    <TextBlock Text="% Used" />
+                </StackPanel>
+            </Setter.Value>
+        </Setter>
         <Style.Triggers>
             <DataTrigger Binding="{Binding UsageWarning}" Value="True">
                 <Setter Property="Foreground">
@@ -913,7 +921,6 @@
                                     <ScaleTransform CenterX="0.5" CenterY="0.5" />
                                     <SkewTransform CenterX="0.5" CenterY="0.5" />
                                     <RotateTransform Angle="1" CenterX="0.5" CenterY="0.5" />
-                                    <TranslateTransform />
                                 </TransformGroup>
                             </LinearGradientBrush.RelativeTransform>
                             <GradientStop Offset="0.4" Color="Transparent" />

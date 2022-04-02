@@ -855,19 +855,21 @@
                 MouseDown="GridBackgroundBlock_MouseDown"
                 Style="{StaticResource ExplorerViewBackgroundStyle}">
                 <Grid>
-                    <ui:ItemsRepeater
-                        x:Name="DrivesItemRepeater"
-                        Margin="10,10,10,0"
-                        ItemTemplate="{StaticResource DriveItemTemplate}"
-                        ItemsSource="{Binding}">
-                        <ui:ItemsRepeater.Layout>
-                            <ui:UniformGridLayout
-                                MinColumnSpacing="10"
-                                MinItemHeight="60"
-                                MinItemWidth="280"
-                                MinRowSpacing="10" />
-                        </ui:ItemsRepeater.Layout>
-                    </ui:ItemsRepeater>
+                    <ScrollViewer Visibility="{Binding ElementName=DrivesItemRepeater, Path=Visibility}">
+                        <ui:ItemsRepeater
+                            x:Name="DrivesItemRepeater"
+                            Margin="10,10,10,0"
+                            ItemTemplate="{StaticResource DriveItemTemplate}"
+                            ItemsSource="{Binding}">
+                            <ui:ItemsRepeater.Layout>
+                                <ui:UniformGridLayout
+                                    MinColumnSpacing="10"
+                                    MinItemHeight="60"
+                                    MinItemWidth="280"
+                                    MinRowSpacing="10" />
+                            </ui:ItemsRepeater.Layout>
+                        </ui:ItemsRepeater>
+                    </ScrollViewer>
                     <DataGrid
                         x:Name="ExplorerGrid"
                         AutoGenerateColumns="False"
