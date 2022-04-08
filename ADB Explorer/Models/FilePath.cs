@@ -22,9 +22,33 @@ namespace ADB_Explorer.Models
         protected bool IsRegularFile { private get; set; }
         public bool IsDirectory { get; protected set; }
 
-        public string FullPath { get; protected set; }
-        public string ParentPath => FullPath[..(FullPath.LastIndexOf(PathSeparator()) is int index && index > 0 ? index : ^0)];
-        public string FullName { get; protected set; }
+        private string fullPath;
+        public string FullPath
+        {
+            get => fullPath;
+            protected set => Set(ref fullPath, value);
+        }
+
+        public string ParentPath
+        {
+            get
+            {
+                Index index = FullPath.LastIndexOf(PathSeparator());
+                if (index.Value == 0)
+                    index = 1;
+                else if (index.Value < 0)
+                    index = ^0;
+
+                return FullPath[..index];
+            }
+        }
+
+        private string fullName;
+        public string FullName
+        {
+            get => fullName;
+            protected set => Set(ref fullName, value);
+        }
         public string NoExtName
         {
             get
@@ -37,11 +61,11 @@ namespace ADB_Explorer.Models
         }
 
         public readonly AdbDevice Device; // will be left null for PC
-
+        
         public FilePath(ShellObject windowsPath)
         {
             PathType = PathType.Windows;
-            
+
             FullPath = windowsPath.ParsingName;
             FullName = windowsPath.Name;
             IsDirectory = windowsPath is ShellFolder;
@@ -61,6 +85,12 @@ namespace ADB_Explorer.Models
             IsRegularFile = fileType == FileType.File;
 
             Device = device;
+        }
+
+        public void UpdatePath(string androidPath)
+        {
+            FullPath = androidPath;
+            FullName = GetFullName(androidPath);
         }
 
         private string GetFullName(string fullPath) =>

@@ -113,6 +113,17 @@
             </MenuItem.Header>
         </MenuItem>
         <MenuItem
+            x:Key="ContextMenuRenameItem"
+            Click="ContextMenuRenameItem_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE8AC;" />
+                    <TextBlock Text="Rename" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
             x:Key="PathMenuHeader"
             Margin="0,0,0,-5"
             HorizontalAlignment="Center"
@@ -663,7 +674,11 @@
                             <ui:FontIcon Glyph="&#xE77F;" />
                         </MenuItem.Header>
                     </MenuItem>
-                    <MenuItem IsEnabled="False" ToolTip="Rename">
+                    <MenuItem
+                        x:Name="RenameMenuButton"
+                        Click="ContextMenuRenameItem_Click"
+                        IsEnabled="False"
+                        ToolTip="Rename">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE8AC;" />
                         </MenuItem.Header>
@@ -881,7 +896,7 @@
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
-                        IsReadOnly="True"
+                        IsReadOnly="False"
                         ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
                         KeyboardNavigation.TabNavigation="Once"
                         MinRowHeight="21"
@@ -894,7 +909,10 @@
                         SelectionUnit="FullRow"
                         Visibility="Collapsed">
                         <DataGrid.Columns>
-                            <DataGridTemplateColumn x:Name="IconColumn" CanUserResize="False">
+                            <DataGridTemplateColumn
+                                x:Name="IconColumn"
+                                CanUserResize="False"
+                                IsReadOnly="True">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -941,36 +959,55 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn
+                            <DataGridTextColumn
                                 x:Name="NameColumn"
                                 Width="300"
                                 Header="Name"
                                 SortMemberPath="FullName">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock FontSize="{Binding Source={StaticResource FontSize}}" TextTrimming="CharacterEllipsis">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Text" Value="{Binding FullName}" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
-                                                            <Setter Property="Text" Value="{Binding NoExtName}" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
-                                                            <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
+                                <DataGridTextColumn.CellStyle>
+                                    <Style BasedOn="{StaticResource DataGridCellStyle}" TargetType="DataGridCell">
+                                        <EventSetter Event="MouseEnter" Handler="NameColumnCell_MouseEnter" />
+                                        <EventSetter Event="MouseLeave" Handler="NameColumnCell_MouseLeave" />
+                                        <EventSetter Event="PreviewMouseDown" Handler="NameColumnCell_PreviewMouseDown" />
+                                    </Style>
+                                </DataGridTextColumn.CellStyle>
+                                <DataGridTextColumn.EditingElementStyle>
+                                    <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
+                                        <EventSetter Event="Loaded" Handler="NameColumnEdit_Loaded" />
+                                        <EventSetter Event="LostFocus" Handler="NameColumnEdit_LostFocus" />
+                                        <EventSetter Event="KeyDown" Handler="NameColumnEdit_KeyDown" />
+                                        <EventSetter Event="TextChanged" Handler="NameColumnEdit_TextChanged" />
+                                        <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
+                                                <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.EditingElementStyle>
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
+                                        <Setter Property="FontSize" Value="{Binding Source={StaticResource FontSize}}" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
+                                                <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                                                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                             <DataGridTextColumn
                                 x:Name="Date"
                                 Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Date modified"
+                                IsReadOnly="True"
                                 SortMemberPath="ModifiedTime">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -992,6 +1029,7 @@
                                 Width="150"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Type"
+                                IsReadOnly="True"
                                 SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -1011,6 +1049,7 @@
                                 Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Size"
+                                IsReadOnly="True"
                                 SortMemberPath="Size">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -1239,7 +1278,7 @@
                         <TextBlock Text=" item" />
                         <TextBlock Text="s">
                             <TextBlock.Style>
-                                <Style TargetType="TextBlock">
+                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
                                             <Setter Property="Visibility" Value="Collapsed" />

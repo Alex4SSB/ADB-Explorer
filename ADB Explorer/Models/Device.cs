@@ -589,6 +589,8 @@ namespace ADB_Explorer.Models
 
     public class ServiceDevice : Device
     {
+        private string pairingPort;
+
         public ServiceDevice()
         {
             Type = DeviceType.Service;
@@ -620,7 +622,15 @@ namespace ADB_Explorer.Models
         }
 
         public string IpAddress { get; set; }
-        public string PairingPort { get; set; }
+        public string PairingPort
+        {
+            get => pairingPort;
+            set
+            {
+                pairingPort = value;
+                UpdateStatus();
+            }
+        }
         public ServiceType MdnsType { get; set; }
         public string PairingCode { get; set; }
 

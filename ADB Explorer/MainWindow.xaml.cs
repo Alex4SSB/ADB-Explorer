@@ -41,7 +41,8 @@ namespace ADB_Explorer
         private ScrollViewer ExplorerScroller;
         private bool TextBoxChangedMutex;
         private ThemeService themeService = new();
-
+        private int clickCount = 0;
+        private int firstSelectedRow = -1;
         public DirectoryLister DirectoryLister { get; private set; }
 
         public static MDNS MdnsService { get; set; } = new();
@@ -189,21 +190,30 @@ namespace ADB_Explorer
             MenuItem pullMenu = FindResource("ContextMenuPullItem") as MenuItem;
             MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
             MenuItem pushMenu = FindResource("ContextMenuPushItem") as MenuItem;
+            MenuItem renameMenu = FindResource("ContextMenuRenameItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
             {
                 case MenuType.ExplorerItem:
-                    pullMenu.IsEnabled = false;
-                    if (dataContext is FileClass file && file.Type is FileType.File or FileType.Folder)
-                        pullMenu.IsEnabled = true;
-
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
 
-                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
-                        ExplorerGrid.ContextMenu.Items.Add(pushMenu);
+                    if (ExplorerGrid.SelectedItems.Count == 1)
+                    {
+                        if (((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                            ExplorerGrid.ContextMenu.Items.Add(pushMenu);
 
+                        ExplorerGrid.ContextMenu.Items.Add(renameMenu);
+                    }
+                    ExplorerGrid.ContextMenu.Items.Add(new Separator());
                     ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+
+                    bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                                            && dataContext is FileClass file && file.Type is not (FileType.File or FileType.Folder);
+                    foreach (MenuItem item in ExplorerGrid.ContextMenu.Items.OfType<MenuItem>())
+                    {
+                        item.IsEnabled = !irregular;
+                    }
                     break;
                 case MenuType.EmptySpace:
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
@@ -348,6 +358,13 @@ namespace ADB_Explorer
             PullMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
                 is FileType.File
                 or FileType.Folder);
+
+            var renameEnabled = items.Count() == 1 && items.First().Type
+                            is FileType.File
+                            or FileType.Folder;
+
+            RenameMenuButton.IsEnabled = renameEnabled;
+            ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -963,7 +980,10 @@ namespace ADB_Explorer
             var key = e.Key;
             if (key == Key.Enter)
             {
-                if (ExplorerGrid.SelectedItems.Count == 1)
+                if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                    return;
+
+                if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                     DoubleClick(ExplorerGrid.SelectedItem);
             }
             else if (key == Key.Back)
@@ -988,8 +1008,8 @@ namespace ADB_Explorer
                 NavigateBack();
             }
 
-            if (ExplorerGrid.Items.Count < 1) return;
-
+            if (ExplorerGrid.Items.Count < 1)
+                return;
 
             if (key == Key.Down)
             {
@@ -1011,7 +1031,10 @@ namespace ADB_Explorer
             }
             else if (key == Key.Enter)
             {
-                if (ExplorerGrid.SelectedItems.Count == 1)
+                if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                    return;
+
+                if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                     DoubleClick(ExplorerGrid.SelectedItem);
             }
             else
@@ -1219,7 +1242,7 @@ namespace ADB_Explorer
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric: true, allowedChars: '.');
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, specialChars: '.');
             EnableConnectButton();
         }
 
@@ -1303,6 +1326,7 @@ namespace ADB_Explorer
             NewMenuButton.IsEnabled =
             PullMenuButton.IsEnabled =
             DeleteMenuButton.IsEnabled =
+            RenameMenuButton.IsEnabled =
             HomeButton.IsEnabled =
             ParentButton.IsEnabled = false;
 
@@ -1635,12 +1659,21 @@ namespace ADB_Explorer
             PairingQrImage.Source = QrClass.Image;
         }
 
+        /// <summary>
+        /// Provides validation and separation of text in a <see cref="TextBox"/>.
+        /// </summary>
+        /// <param name="textBox">The textbox to be validated</param>
+        /// <param name="inProgress">A boolean mutex lock</param>
+        /// <param name="separator">Text separator. Default is null - no separator</param>
+        /// <param name="maxChars">Maximum allowed characters in the text. Default is -1 - no length validation</param>
+        /// <param name="numeric">Enable numeric validation. Default is <see langword="true"/></param>
+        /// <param name="specialChars">When numeric is enabled - allowed non-numeric chars. Otherwise - forbidden chars</param>
         private static void TextBoxSeparation(TextBox textBox,
                                               ref bool inProgress,
                                               char? separator = null,
                                               int maxChars = -1,
                                               bool numeric = true,
-                                              params char[] allowedChars)
+                                              params char[] specialChars)
         {
             if (inProgress)
                 return;
@@ -1653,20 +1686,18 @@ namespace ADB_Explorer
             var deletedChars = 0;
             var text = textBox.Text;
 
-            if (numeric)
+            foreach (var c in text)
             {
-                foreach (var c in text)
+                if ((numeric && !char.IsDigit(c) && !specialChars.Contains(c))
+                    || (!numeric && specialChars.Contains(c)))
                 {
-                    if (!char.IsDigit(c) && !allowedChars.Contains(c))
-                    {
-                        if (c != separator)
-                            deletedChars++;
+                    if (c != separator)
+                        deletedChars++;
 
-                        continue;
-                    }
-
-                    numbers += c;
+                    continue;
                 }
+
+                numbers += c;
             }
 
             if (separator is null)
@@ -1977,9 +2008,160 @@ namespace ADB_Explorer
             }
         }
 
+        private void RenameFile(string newName)
+        {
+            List<FileClass> items = (
+                from FileClass item in ExplorerGrid.SelectedItems
+                select item).ToList();
+            var file = items.First();
+
+            var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Settings.ShowExtensions ? "" : file.Extension)}";
+
+            try
+            {
+                ShellFileOperation.MoveItems(CurrentADBDevice, items, newPath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Rename Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw;
+            }
+
+            file.UpdatePath(newPath);
+        }
+
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
             FileOpVisibility(false);
+        }
+
+        private void ContextMenuRenameItem_Click(object sender, RoutedEventArgs e)
+        {
+            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            
+            cell.IsEditing = !cell.IsEditing;
+        }
+
+        private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            textBox.Focus();
+        }
+
+        private static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
+        private static string DisplayName(FilePath file) => Settings.ShowExtensions ? file.FullName : file.NoExtName;
+
+        private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
+        {
+            Rename(sender as TextBox);
+        }
+
+        private void Rename(TextBox textBox)
+        {
+            if (textBox.Text != DisplayName(textBox))
+            {
+                try
+                {
+                    RenameFile(textBox.Text);
+                }
+                catch (Exception)
+                { }
+            }
+        }
+
+        private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+                Rename(sender as TextBox);
+            else if (e.Key != Key.Escape)
+                return;
+
+            e.Handled = true;
+
+            if (ExplorerGrid.SelectedCells.Count > 0)
+                CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = false;
+        }
+
+        private void NameColumnCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton != MouseButton.Left)
+                return;
+
+            var cell = sender as DataGridCell;
+            if (cell.IsEditing)
+                return;
+
+            e.Handled = true;
+            clickCount = e.ClickCount;
+
+            if (clickCount > 1)
+            {
+                DoubleClick(cell.DataContext);
+            }
+            else
+            {
+                var row = DataGridRow.GetRowContainingElement(cell);
+                firstSelectedRow = row.GetIndex();
+
+                if (!row.IsSelected)
+                {
+                    ExplorerGrid.SelectedItems.Clear();
+                    row.IsSelected = true;
+                }
+                else
+                {
+                    if (ExplorerGrid.SelectedItems.Count > 1)
+                    {
+                        ExplorerGrid.SelectedItems.Clear();
+                        row.IsSelected = true;
+                        return;
+                    }
+
+                    if (((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
+                        return;
+
+                    var task = Task.Delay(300);
+                    task.ContinueWith(t =>
+                    {
+                        if (clickCount == 1)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                if (e.LeftButton == MouseButtonState.Released && ExplorerGrid.SelectedItems.Count == 1)
+                                    cell.IsEditing = true;
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        private void NameColumnCell_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+                DataGridRow.GetRowContainingElement(sender as DataGridCell).IsSelected = true;
+        }
+
+        private void NameColumnCell_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                var cell = sender as DataGridCell;
+                var row = DataGridRow.GetRowContainingElement(cell);
+                var index = row.GetIndex();
+                var pos = e.GetPosition(cell).Y;
+
+                if (index == firstSelectedRow)
+                    return;
+
+                if ((index > firstSelectedRow && pos < 0) || (index < firstSelectedRow && pos > 0))
+                    row.IsSelected = false;
+            }
+        }
+
+        private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric: false, specialChars: INVALID_ANDROID_CHARS);
         }
     }
 }
