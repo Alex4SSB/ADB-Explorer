@@ -39,7 +39,6 @@ namespace ADB_Explorer
         private Mutex connectTimerMutex = new();
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
-        private bool TextBoxChangedMutex;
         private ThemeService themeService = new();
         private int clickCount = 0;
         private int firstSelectedRow = -1;
@@ -1129,8 +1128,8 @@ namespace ADB_Explorer
 
         private void TestDevices()
         {
-            //ConnectTimer.IsEnabled = false;
-            //DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
+            ConnectTimer.IsEnabled = false;
+            DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
             //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "offline") });
         }
 
@@ -1242,7 +1241,7 @@ namespace ADB_Explorer
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, specialChars: '.');
+            TextBoxSeparation(sender as TextBox, specialChars: '.');
             EnableConnectButton();
         }
 
@@ -1463,7 +1462,7 @@ namespace ADB_Explorer
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
+            TextBoxSeparation(sender as TextBox, '-', 6);
             EnablePairButton();
         }
 
@@ -1663,22 +1662,20 @@ namespace ADB_Explorer
         /// Provides validation and separation of text in a <see cref="TextBox"/>.
         /// </summary>
         /// <param name="textBox">The textbox to be validated</param>
-        /// <param name="inProgress">A boolean mutex lock</param>
         /// <param name="separator">Text separator. Default is null - no separator</param>
         /// <param name="maxChars">Maximum allowed characters in the text. Default is -1 - no length validation</param>
         /// <param name="numeric">Enable numeric validation. Default is <see langword="true"/></param>
         /// <param name="specialChars">When numeric is enabled - allowed non-numeric chars. Otherwise - forbidden chars</param>
         private static void TextBoxSeparation(TextBox textBox,
-                                              ref bool inProgress,
                                               char? separator = null,
                                               int maxChars = -1,
                                               bool numeric = true,
                                               params char[] specialChars)
         {
-            if (inProgress)
+            if (TextHelper.GetAltObject(textBox) is bool and true)
                 return;
             else
-                inProgress = true;
+                TextHelper.SetAltObject(textBox, true);
 
             var caretIndex = textBox.CaretIndex;
             var output = "";
@@ -1716,6 +1713,8 @@ namespace ADB_Explorer
             {
                 textBox.Text = prev;
                 textBox.CaretIndex = caretIndex - deletedChars;
+
+                TextHelper.SetAltObject(textBox, false);
                 return;
             }
 
@@ -1724,29 +1723,26 @@ namespace ADB_Explorer
 
             textBox.Text = output;
 
-            if (TextHelper.GetAltText(textBox) != output)
-            {
-                caretIndex -= deletedChars;
-                if (separator is not null)
-                    caretIndex += output.Count(c => c == separator) - text.Count(c => c == separator);
+            caretIndex -= deletedChars;
+            if (separator is not null)
+                caretIndex += output.Count(c => c == separator) - text.Count(c => c == separator);
 
-                if (caretIndex < 0)
-                    caretIndex = 0;
-            }
+            if (caretIndex < 0)
+                caretIndex = 0;
 
             textBox.CaretIndex = caretIndex;
             TextHelper.SetAltText(textBox, output);
-            inProgress = false;
+            TextHelper.SetAltObject(textBox, false);
         }
 
         private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, '-', 6);
+            TextBoxSeparation(sender as TextBox, '-', 6);
         }
 
         private void NewDevicePortBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars: 5);
+            TextBoxSeparation(sender as TextBox, maxChars: 5);
             EnableConnectButton();
         }
 
@@ -1776,7 +1772,7 @@ namespace ADB_Explorer
 
         private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, maxChars: 5);
+            TextBoxSeparation(sender as TextBox, maxChars: 5);
             EnablePairButton();
         }
 
@@ -2161,7 +2157,12 @@ namespace ADB_Explorer
 
         private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, ref TextBoxChangedMutex, numeric: false, specialChars: INVALID_ANDROID_CHARS);
+            TextBoxSeparation(sender as TextBox, numeric: false, specialChars: INVALID_ANDROID_CHARS);
+        }
+
+        private void PairingCodeTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            (sender as TextBox).SelectAll();
         }
     }
 }
