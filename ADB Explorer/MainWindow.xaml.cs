@@ -354,13 +354,13 @@ namespace ADB_Explorer
             var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
 
             DeleteMenuButton.IsEnabled =
-            PullMenuButton.IsEnabled = items.Any() && items.All(f => f.Type
-                is FileType.File
-                or FileType.Folder);
+            PullMenuButton.IsEnabled = items.Any()
+            && (DevicesObject.CurrentDevice.Root == AbstractDevice.RootStatus.Enabled
+            || items.All(f => f.Type is FileType.File or FileType.Folder));
 
-            var renameEnabled = items.Count() == 1 && items.First().Type
-                            is FileType.File
-                            or FileType.Folder;
+            var renameEnabled = items.Count() == 1 
+                && (DevicesObject.CurrentDevice.Root == AbstractDevice.RootStatus.Enabled
+                || items.First().Type is FileType.File or FileType.Folder);
 
             RenameMenuButton.IsEnabled = renameEnabled;
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
@@ -1023,39 +1023,49 @@ namespace ADB_Explorer
                 NavigateBack();
             }
 
+            bool handle = false;
+            if (NavHistory.Current is string)
+                handle = ExplorerGridKeyNavigation(key);
+
+            if (handle)
+                e.Handled = true;
+        }
+
+        private bool ExplorerGridKeyNavigation(Key key)
+        {
             if (ExplorerGrid.Items.Count < 1)
-                return;
+                return false;
 
-            if (key == Key.Down)
+            switch (key)
             {
-                if (ExplorerGrid.SelectedItems.Count == 0)
-                    ExplorerGrid.SelectedIndex = 0;
-                else
-                    ExplorerGrid.SelectedIndex++;
+                case Key.Down:
+                    if (ExplorerGrid.SelectedItems.Count == 0)
+                        ExplorerGrid.SelectedIndex = 0;
+                    else if (ExplorerGrid.SelectedIndex < ExplorerGrid.Items.Count)
+                        ExplorerGrid.SelectedIndex++;
 
-                ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+                    break;
+                case Key.Up:
+                    if (ExplorerGrid.SelectedItems.Count == 0)
+                        ExplorerGrid.SelectedItem = ExplorerGrid.Items[^1];
+                    else if (ExplorerGrid.SelectedIndex > 0)
+                        ExplorerGrid.SelectedIndex--;
+
+                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+                    break;
+                case Key.Enter:
+                    if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                        return false;
+
+                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                        DoubleClick(ExplorerGrid.SelectedItem);
+                    break;
+                default:
+                    return false;
             }
-            else if (key == Key.Up)
-            {
-                if (ExplorerGrid.SelectedItems.Count == 0)
-                    ExplorerGrid.SelectedItem = ExplorerGrid.Items[^1];
-                else if (ExplorerGrid.SelectedIndex > 0)
-                    ExplorerGrid.SelectedIndex--;
 
-                ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
-            }
-            else if (key == Key.Enter)
-            {
-                if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
-                    return;
-
-                if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
-                    DoubleClick(ExplorerGrid.SelectedItem);
-            }
-            else
-                return;
-
-            e.Handled = true;
+            return true;
         }
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
@@ -2137,7 +2147,8 @@ namespace ADB_Explorer
                         return;
                     }
 
-                    if (((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
+                    if (DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                        && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
                         return;
 
                     var task = Task.Delay(300);
@@ -2187,6 +2198,14 @@ namespace ADB_Explorer
         private void PairingCodeTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             (sender as TextBox).SelectAll();
+        }
+
+        private void Drive_GotFocus(object sender, RoutedEventArgs e)
+        {
+            ClearSelectedDrives();
+
+            RepeaterHelper.SetIsSelected(sender as Button, true);
+            RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 1);
         }
     }
 }

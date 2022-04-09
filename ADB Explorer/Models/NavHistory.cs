@@ -34,7 +34,7 @@ namespace ADB_Explorer.Models
             return PathHistory[historyIndex];
         }
 
-        public static object Current => PathHistory[historyIndex];
+        public static object Current => PathHistory.Count > 0 ? PathHistory[historyIndex] : null;
 
         /// <summary>
         /// For any non back / forward navigation
