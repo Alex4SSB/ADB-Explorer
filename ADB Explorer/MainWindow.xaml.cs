@@ -993,6 +993,22 @@ namespace ADB_Explorer
             {
                 DeleteFiles();
             }
+            else if (key == Key.Up)
+            {
+                if (ExplorerGrid.SelectedIndex > 0)
+                {
+                    ExplorerGrid.SelectedIndex--;
+                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+                }
+            }
+            else if (key == Key.Down)
+            {
+                if (ExplorerGrid.SelectedIndex < ExplorerGrid.Items.Count)
+                {
+                    ExplorerGrid.SelectedIndex++;
+                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+                }
+            }
             else
                 return;
 
@@ -1128,8 +1144,8 @@ namespace ADB_Explorer
 
         private void TestDevices()
         {
-            ConnectTimer.IsEnabled = false;
-            DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
+            //ConnectTimer.IsEnabled = false;
+            //DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
             //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "offline") });
         }
 
@@ -1672,10 +1688,10 @@ namespace ADB_Explorer
                                               bool numeric = true,
                                               params char[] specialChars)
         {
-            if (TextHelper.GetAltObject(textBox) is bool and true)
+            if (TextHelper.GetIsValidating(textBox))
                 return;
             else
-                TextHelper.SetAltObject(textBox, true);
+                TextHelper.SetIsValidating(textBox, true);
 
             var caretIndex = textBox.CaretIndex;
             var output = "";
@@ -1714,7 +1730,7 @@ namespace ADB_Explorer
                 textBox.Text = prev;
                 textBox.CaretIndex = caretIndex - deletedChars;
 
-                TextHelper.SetAltObject(textBox, false);
+                TextHelper.SetIsValidating(textBox, false);
                 return;
             }
 
@@ -1732,7 +1748,7 @@ namespace ADB_Explorer
 
             textBox.CaretIndex = caretIndex;
             TextHelper.SetAltText(textBox, output);
-            TextHelper.SetAltObject(textBox, false);
+            TextHelper.SetIsValidating(textBox, false);
         }
 
         private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -2004,18 +2020,18 @@ namespace ADB_Explorer
             }
         }
 
-        private void RenameFile(string newName)
+        private void RenameFile(string newName, FileClass file)
         {
-            List<FileClass> items = (
-                from FileClass item in ExplorerGrid.SelectedItems
-                select item).ToList();
-            var file = items.First();
-
             var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Settings.ShowExtensions ? "" : file.Extension)}";
+            if (DirectoryLister.FileList.Any(file => file.FullName == newName))
+            {
+                MessageBox.Show($"{newPath} already exists", "Rename conflict", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
 
             try
             {
-                ShellFileOperation.MoveItems(CurrentADBDevice, items, newPath);
+                ShellFileOperation.MoveItems(CurrentADBDevice, new [] { file }, newPath);
             }
             catch (Exception e)
             {
@@ -2038,9 +2054,12 @@ namespace ADB_Explorer
             cell.IsEditing = !cell.IsEditing;
         }
 
+        private static FileClass GetFromCell(DataGridCellInfo cell) => CellConverter.GetDataGridCell(cell).DataContext as FileClass;
+
         private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
+            TextHelper.SetAltObject(textBox, GetFromCell(ExplorerGrid.SelectedCells[1]));
             textBox.Focus();
         }
 
@@ -2058,7 +2077,7 @@ namespace ADB_Explorer
             {
                 try
                 {
-                    RenameFile(textBox.Text);
+                    RenameFile(textBox.Text, TextHelper.GetAltObject(textBox) as FileClass);
                 }
                 catch (Exception)
                 { }
@@ -2067,15 +2086,20 @@ namespace ADB_Explorer
 
         private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
         {
+            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            var textBox = sender as TextBox;
+
             if (e.Key == Key.Enter)
-                Rename(sender as TextBox);
-            else if (e.Key != Key.Escape)
+                e.Handled = true;
+            else if (e.Key == Key.Escape)
+            {
+                textBox.Text = DisplayName(sender as TextBox);
+            }
+            else
                 return;
 
-            e.Handled = true;
-
             if (ExplorerGrid.SelectedCells.Count > 0)
-                CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = false;
+                cell.IsEditing = false;
         }
 
         private void NameColumnCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
