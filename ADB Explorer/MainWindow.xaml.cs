@@ -195,6 +195,7 @@ namespace ADB_Explorer
             MenuItem renameMenu = FindResource("ContextMenuRenameItem") as MenuItem;
             MenuItem cutMenu = FindResource("ContextMenuCutItem") as MenuItem;
             MenuItem pasteMenu = FindResource("ContextMenuPasteItem") as MenuItem;
+            MenuItem newMenu = FindResource("ContextMenuNewItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
@@ -232,6 +233,8 @@ namespace ADB_Explorer
                     break;
                 case MenuType.EmptySpace:
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
+                    ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                    ExplorerGrid.ContextMenu.Items.Add(newMenu);
                     if (PasteEnabled(true))
                     {
                         ExplorerGrid.ContextMenu.Items.Add(new Separator());
@@ -767,6 +770,7 @@ namespace ADB_Explorer
 
             ParentButton.IsEnabled = CurrentPath != ParentPath;
             PasteMenuButton.IsEnabled = PasteEnabled();
+            NewMenuButton.IsEnabled = true;
 
             DirectoryLister.Navigate(realPath);
             return true;
@@ -1410,6 +1414,8 @@ namespace ADB_Explorer
             DeleteMenuButton.IsEnabled =
             RenameMenuButton.IsEnabled =
             HomeButton.IsEnabled =
+            NewMenuButton.IsEnabled =
+            PasteMenuButton.IsEnabled =
             ParentButton.IsEnabled = false;
 
             if (clearDevice)
@@ -2136,11 +2142,30 @@ namespace ADB_Explorer
 
         private void Rename(TextBox textBox)
         {
-            if (textBox.Text != DisplayName(textBox))
+            FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
+            var name = DisplayName(textBox);
+            if (string.IsNullOrEmpty(name))
+            {
+                if (string.IsNullOrEmpty(textBox.Text))
+                {
+                    DirectoryLister.FileList.Remove(file);
+                    return;
+                }
+                try
+                {
+                    CreateNewItem(file, textBox.Text);
+                }
+                catch (Exception e)
+                {
+                    if (e is NotImplementedException)
+                        throw;
+                }
+            }
+            else if (!string.IsNullOrEmpty(textBox.Text) && textBox.Text != name)
             {
                 try
                 {
-                    RenameFile(textBox.Text, TextHelper.GetAltObject(textBox) as FileClass);
+                    RenameFile(textBox.Text, file);
                 }
                 catch (Exception)
                 { }
@@ -2156,7 +2181,15 @@ namespace ADB_Explorer
                 e.Handled = true;
             else if (e.Key == Key.Escape)
             {
-                textBox.Text = DisplayName(sender as TextBox);
+                var name = DisplayName(textBox);
+                if (string.IsNullOrEmpty(name))
+                {
+                    DirectoryLister.FileList.Remove(ExplorerGrid.SelectedItem as FileClass);
+                }
+                else
+                {
+                    textBox.Text = DisplayName(sender as TextBox);
+                }
             }
             else
                 return;
@@ -2303,6 +2336,11 @@ namespace ADB_Explorer
 
             if (targetPath == CurrentPath)
             {
+                foreach (var item in pasteItems)
+                {
+                    item.UpdatePath($"{targetPath}/{item.FullName}");
+                }
+
                 DirectoryLister.FileList.AddRange(pasteItems);
             }
             else if (CutItems[0].ParentPath == CurrentPath)
@@ -2317,6 +2355,60 @@ namespace ADB_Explorer
         private void ContextMenuPasteItem_Click(object sender, RoutedEventArgs e)
         {
             PasteFiles();
+        }
+
+        private void NewItem(bool isFolder)
+        {
+            FileClass newItem = new("", "", isFolder ? FileType.Folder : FileType.File);
+            DirectoryLister.FileList.Insert(0, newItem);
+
+            ExplorerGrid.Focus();
+            ExplorerGrid.ScrollIntoView(newItem);
+            ExplorerGrid.SelectedItem = newItem;
+            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            if (cell is not null)
+                cell.IsEditing = true;
+        }
+
+        private void CreateNewItem(FileClass file, string newName)
+        {
+            file.UpdatePath($"{CurrentPath}/{newName}");
+
+            try
+            {
+                if (file.Type is FileType.Folder)
+                    ShellFileOperation.MakeDir(CurrentADBDevice, file.FullPath);
+                else if (file.Type is FileType.File)
+                    ShellFileOperation.MakeFile(CurrentADBDevice, file.FullPath);
+                else
+                    throw new NotImplementedException();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Create Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DirectoryLister.FileList.Remove(file);
+                throw;
+            }
+
+            file.ModifiedTime = DateTime.Now;
+            if (file.Type is FileType.File)
+                file.Size = 0;
+
+            var index = DirectoryLister.FileList.IndexOf(file);
+            DirectoryLister.FileList.Remove(file);
+            DirectoryLister.FileList.Insert(index, file);
+            ExplorerGrid.Focus();
+            ExplorerGrid.SelectedItem = file;
+        }
+
+        private void NewFolderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            NewItem(true);
+        }
+
+        private void NewFileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            NewItem(false);
         }
     }
 }

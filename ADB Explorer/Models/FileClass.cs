@@ -76,21 +76,23 @@ namespace ADB_Explorer.Models
         {
             if (IsApk)
                 return "Android Application Package";
+
+            if (string.IsNullOrEmpty(fileName))
+                return "File";
+
+            var name = ShellInfoManager.GetShellFileType(fileName);
+
+            if (name.EndsWith("? File"))
             {
-                var name = ShellInfoManager.GetShellFileType(fileName);
-
-                if (name.EndsWith("? File"))
-                {
-                    if (ShortExtension.Length == 1)
-                        ExtensionIsGlyph = true;
-                    else
-                        ExtensionIsFontIcon = true;
-
-                    return $"{ShortExtension} File";
-                }
+                if (ShortExtension.Length == 1)
+                    ExtensionIsGlyph = true;
                 else
-                    return name;
+                    ExtensionIsFontIcon = true;
+
+                return $"{ShortExtension} File";
             }
+            else
+                return name;
         }
 
         private string typeName;

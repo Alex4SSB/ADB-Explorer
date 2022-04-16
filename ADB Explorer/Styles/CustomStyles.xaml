@@ -281,6 +281,20 @@
     <ResourceDictionary x:Key="ContextSubMenuStyles">
         <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
             <Setter Property="FontSize" Value="16" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
+            <Setter Property="Margin" Value="6,0,0,0" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+        </Style>
+    </ResourceDictionary>
+    <ResourceDictionary x:Key="TopMenuStyles">
+        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Margin" Value="0,2" />
         </Style>
         <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
             <Setter Property="Margin" Value="6,0,0,0" />

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Services;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,6 +27,6 @@ namespace ADB_Explorer.Models
 
         public static AppSettings Settings { get; set; } = new();
 
-        public static List<FileClass> CutItems { get; private set; } = new();
+        public static ObservableList<FileClass> CutItems { get; private set; } = new();
     }
 }

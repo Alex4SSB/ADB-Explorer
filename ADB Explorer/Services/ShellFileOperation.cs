@@ -73,6 +73,34 @@ namespace ADB_Explorer.Services
             
         }
 
+        public static void MakeDir(ADBService.AdbDevice device, string fullPath)
+        {
+            var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                                   "mkdir",
+                                                                   out string stdout,
+                                                                   out string stderr,
+                                                                   ADBService.EscapeAdbShellString(fullPath));
+
+            if (exitCode != 0)
+            {
+                throw new Exception(stderr);
+            }
+        }
+
+        public static void MakeFile(ADBService.AdbDevice device, string fullPath)
+        {
+            var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                                   "touch",
+                                                                   out string stdout,
+                                                                   out string stderr,
+                                                                   ADBService.EscapeAdbShellString(fullPath));
+
+            if (exitCode != 0)
+            {
+                throw new Exception(stderr);
+            }
+        }
+
         public static IEnumerable<string> GetEscapedPaths(IEnumerable<FilePath> items) => items.Select(item => ADBService.EscapeAdbShellString(item.FullPath)).ToArray();
     }
 }

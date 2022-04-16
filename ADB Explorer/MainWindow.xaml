@@ -48,10 +48,7 @@
             Click="PushMenuButton_Click">
             <MenuItem.Header>
                 <StackPanel>
-                    <ui:FontIcon
-                        Margin="0,0,8,0"
-                        HorizontalAlignment="Left"
-                        Glyph="&#xE8A5;" />
+                    <ui:FontIcon Glyph="&#xE8A5;" />
                     <TextBlock VerticalAlignment="Center" Text="Files" />
                 </StackPanel>
             </MenuItem.Header>
@@ -63,7 +60,7 @@
             Click="PushMenuButton_Click">
             <MenuItem.Header>
                 <StackPanel>
-                    <ui:FontIcon Margin="0,0,8,0" Glyph="&#xE8B7;" />
+                    <ui:FontIcon Glyph="&#xE8B7;" />
                     <TextBlock VerticalAlignment="Center" Text="Folders" />
                 </StackPanel>
             </MenuItem.Header>
@@ -102,16 +99,24 @@
             <StaticResource ResourceKey="PushFoldersMenu" />
         </MenuItem>
         <MenuItem
-            x:Key="ContextMenuDeleteItem"
+            x:Key="MenuDeleteItem"
             x:Shared="False"
-            Click="ContextMenuDeleteItem_Click"
-            Resources="{StaticResource ContextSubMenuStyles}">
+            Click="ContextMenuDeleteItem_Click">
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE74D;" />
                     <TextBlock Text="Delete" />
                 </StackPanel>
             </MenuItem.Header>
+        </MenuItem>
+        <MenuItem x:Key="ContextMenuDeleteItem" Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE74D;" />
+                    <TextBlock Text="Delete" />
+                </StackPanel>
+            </MenuItem.Header>
+            <StaticResource ResourceKey="MenuDeleteItem" />
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuRenameItem"
@@ -142,9 +147,43 @@
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE77F;" />
-                    <TextBlock Text="Paste" />
+                    <TextBlock Text="Paste " />
+                    <TextBlock Margin="0" Text="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                    <TextBlock Margin="0" Text=" Items" />
                 </StackPanel>
             </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="NewFolderMenuItem"
+            x:Shared="False"
+            Click="NewFolderMenuItem_Click">
+            <MenuItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:FontIcon Glyph="&#xE8F4;" />
+                    <TextBlock Text="Folder" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="NewFileMenuItem"
+            x:Shared="False"
+            Click="NewFileMenuItem_Click">
+            <MenuItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:FontIcon Glyph="&#xE8A5;" />
+                    <TextBlock Text="File" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem x:Key="ContextMenuNewItem" Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:FontIcon Margin="0,0,0,-1" Glyph="&#xECC8;" />
+                    <TextBlock Text="New" />
+                </StackPanel>
+            </MenuItem.Header>
+            <StaticResource ResourceKey="NewFolderMenuItem" />
+            <StaticResource ResourceKey="NewFileMenuItem" />
         </MenuItem>
         <MenuItem
             x:Key="PathMenuHeader"
@@ -620,16 +659,8 @@
                     <MenuItem
                         x:Name="PushMenuButton"
                         IsEnabled="False"
+                        Resources="{StaticResource TopMenuStyles}"
                         ToolTip="Push">
-                        <MenuItem.Resources>
-                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                                <Setter Property="FontSize" Value="20" />
-                            </Style>
-                            <Style TargetType="StackPanel">
-                                <Setter Property="Orientation" Value="Horizontal" />
-                                <Setter Property="Margin" Value="0,2" />
-                            </Style>
-                        </MenuItem.Resources>
                         <MenuItem.Header>
                             <Grid Margin="-4,0,-6,0">
                                 <ui:FontIcon
@@ -646,36 +677,15 @@
                         <StaticResource ResourceKey="PushFoldersMenu" />
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                    <MenuItem
-                        x:Name="NewMenuButton"
-                        Margin="2,0"
-                        IsEnabled="False">
+                    <MenuItem x:Name="NewMenuButton" Resources="{StaticResource TopMenuStyles}">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal">
-                                <ui:FontIcon
-                                    Margin="0,0,8,0"
-                                    FontSize="20"
-                                    Glyph="&#xECC8;"
-                                    Style="{StaticResource DisabledGlyphStyle}" />
-                                <TextBlock VerticalAlignment="Center" Text="New" />
+                                <ui:FontIcon Glyph="&#xECC8;" Style="{StaticResource DisabledGlyphStyle}" />
+                                <TextBlock Text="New" />
                             </StackPanel>
                         </MenuItem.Header>
-                        <MenuItem>
-                            <MenuItem.Header>
-                                <StackPanel Orientation="Horizontal">
-                                    <ui:FontIcon
-                                        Margin="0,0,8,0"
-                                        FontSize="16"
-                                        Glyph="&#xECC8;" />
-                                    <TextBlock Text="New Item" />
-                                </StackPanel>
-                            </MenuItem.Header>
-                        </MenuItem>
-                        <MenuItem>
-                            <MenuItem.Header>
-                                New Folder
-                            </MenuItem.Header>
-                        </MenuItem>
+                        <StaticResource ResourceKey="NewFolderMenuItem" />
+                        <StaticResource ResourceKey="NewFileMenuItem" />
                     </MenuItem>
                     <MenuItem
                         x:Name="CutMenuButton"
@@ -701,7 +711,28 @@
                         IsEnabled="False"
                         ToolTip="Paste">
                         <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE77F;" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:FontIcon Margin="0,1,0,0" Glyph="&#xE77F;" />
+                                <TextBlock Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
@@ -716,20 +747,12 @@
                     <MenuItem
                         x:Name="DeleteMenuButton"
                         IsEnabled="False"
+                        Resources="{StaticResource TopMenuStyles}"
                         ToolTip="Delete">
-                        <MenuItem.Resources>
-                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-                                <Setter Property="FontSize" Value="20" />
-                            </Style>
-                            <Style TargetType="StackPanel">
-                                <Setter Property="Orientation" Value="Horizontal" />
-                                <Setter Property="Margin" Value="0,2" />
-                            </Style>
-                        </MenuItem.Resources>
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>
-                        <StaticResource ResourceKey="ContextMenuDeleteItem" />
+                        <StaticResource ResourceKey="MenuDeleteItem" />
                     </MenuItem>
                 </Menu>
                 <Border Grid.Column="1" MouseDown="Window_MouseDown" />
@@ -1065,12 +1088,14 @@
                                         <Setter Property="Margin" Value="4,0,8,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Opacity" Value="1" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
-                                                <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                                <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                                <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                                <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsCut}" Value="True">
                                                 <Setter Property="Opacity" Value="0.5" />
@@ -1115,9 +1140,11 @@
                                         <Setter Property="Margin" Value="4,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Opacity" Value="1" />
+                                        <Setter Property="Text" Value="{Binding SizeString}" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
-                                                <Setter Property="Text" Value="{Binding SizeString}" />
+                                                <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding IsCut}" Value="True">
                                                 <Setter Property="Opacity" Value="0.5" />
