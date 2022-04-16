@@ -19,14 +19,14 @@ namespace ADB_Explorer.Models
             Remote,
             Emulator,
             Service,
-            Sideload
+            Sideload,
         }
 
         public enum DeviceStatus
         {
             Online,
             Offline,
-            Unauthorized
+            Unauthorized,
         }
 
         public enum RootStatus

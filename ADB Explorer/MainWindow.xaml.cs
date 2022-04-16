@@ -43,7 +43,6 @@ namespace ADB_Explorer
         private int clickCount = 0;
         private int firstSelectedRow = -1;
         public DirectoryLister DirectoryLister { get; private set; }
-
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
@@ -96,6 +95,10 @@ namespace ADB_Explorer
                 return totalSize.ToSize();
             }
         }
+
+        private IEnumerable<FileClass> selectedFiles =>
+                            from FileClass item in ExplorerGrid.SelectedItems
+                            select item;
 
         public MainWindow()
         {
@@ -190,6 +193,8 @@ namespace ADB_Explorer
             MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
             MenuItem pushMenu = FindResource("ContextMenuPushItem") as MenuItem;
             MenuItem renameMenu = FindResource("ContextMenuRenameItem") as MenuItem;
+            MenuItem cutMenu = FindResource("ContextMenuCutItem") as MenuItem;
+            MenuItem pasteMenu = FindResource("ContextMenuPasteItem") as MenuItem;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
@@ -197,18 +202,29 @@ namespace ADB_Explorer
                 case MenuType.ExplorerItem:
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
 
-                    if (ExplorerGrid.SelectedItems.Count == 1)
+                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                     {
-                        if (((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
-                            ExplorerGrid.ContextMenu.Items.Add(pushMenu);
-
-                        ExplorerGrid.ContextMenu.Items.Add(renameMenu);
+                        ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     }
                     ExplorerGrid.ContextMenu.Items.Add(new Separator());
+
+                    if (!ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut))
+                        ExplorerGrid.ContextMenu.Items.Add(cutMenu);
+
+                    if (PasteEnabled())
+                        ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
+
+                    if (ExplorerGrid.SelectedItems.Count == 1)
+                        ExplorerGrid.ContextMenu.Items.Add(renameMenu);
+
+                    if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+
                     ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
 
                     bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
-                                            && dataContext is FileClass file && file.Type is not (FileType.File or FileType.Folder);
+                        && dataContext is FileClass file && file.Type is not (FileType.File or FileType.Folder);
+
                     foreach (MenuItem item in ExplorerGrid.ContextMenu.Items.OfType<MenuItem>())
                     {
                         item.IsEnabled = !irregular;
@@ -216,6 +232,11 @@ namespace ADB_Explorer
                     break;
                 case MenuType.EmptySpace:
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
+                    if (PasteEnabled(true))
+                    {
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                        ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
+                    }
                     break;
                 case MenuType.Header:
                     break;
@@ -358,12 +379,42 @@ namespace ADB_Explorer
             && (DevicesObject.CurrentDevice.Root == AbstractDevice.RootStatus.Enabled
             || items.All(f => f.Type is FileType.File or FileType.Folder));
 
-            var renameEnabled = items.Count() == 1 
+            var renameEnabled = items.Count() == 1
                 && (DevicesObject.CurrentDevice.Root == AbstractDevice.RootStatus.Enabled
                 || items.First().Type is FileType.File or FileType.Folder);
 
             RenameMenuButton.IsEnabled = renameEnabled;
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
+
+            CutMenuButton.IsEnabled = !ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut);
+            PasteMenuButton.IsEnabled = PasteEnabled();
+        }
+
+        private bool PasteEnabled(bool ignoreSelected = false)
+        {
+            if (CutItems.Count < 1)
+                return false;
+
+            if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self)
+                return false;
+
+            var selected = ignoreSelected ? 0 : ExplorerGrid.SelectedItems.Count;
+            switch (selected)
+            {
+                case 0:
+                    return CutItems[0].ParentPath != CurrentPath;
+                case 1:
+                    var item = ExplorerGrid.SelectedItem as FilePath;
+                    if (!item.IsDirectory
+                        || (CutItems.Count == 1 && CutItems[0].FullPath == item.FullPath)
+                        || CutItems[0].ParentPath == item.FullPath)
+                        return false;
+                    break;
+                default:
+                    return false;
+            }
+
+            return true;
         }
 
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -715,6 +766,7 @@ namespace ADB_Explorer
             ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
 
             ParentButton.IsEnabled = CurrentPath != ParentPath;
+            PasteMenuButton.IsEnabled = PasteEnabled();
 
             DirectoryLister.Navigate(realPath);
             return true;
@@ -948,10 +1000,12 @@ namespace ADB_Explorer
             switch (e.ChangedButton)
             {
                 case MouseButton.XButton1:
-                    NavigateBack();
+                    if (NavHistory.BackAvailable)
+                        NavigateBack();
                     break;
                 case MouseButton.XButton2:
-                    NavigateForward();
+                    if (NavHistory.ForwardAvailable)
+                        NavigateForward();
                     break;
             }
         }
@@ -1166,6 +1220,9 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
+                return;
+
             var row = sender as DataGridRow;
 
             if (row.IsSelected == false)
@@ -2015,14 +2072,10 @@ namespace ADB_Explorer
 
         private void DeleteFiles()
         {
-            List<FileClass> items = (
-                from FileClass item in ExplorerGrid.SelectedItems
-                select item).ToList();
-
             try
             {
-                ShellFileOperation.DeleteItems(CurrentADBDevice, items);
-                DirectoryLister.FileList.RemoveAll(file => items.Contains(file));
+                ShellFileOperation.DeleteItems(CurrentADBDevice, selectedFiles);
+                DirectoryLister.FileList.RemoveAll(file => selectedFiles.Contains(file));
             }
             catch (Exception e)
             {
@@ -2041,7 +2094,7 @@ namespace ADB_Explorer
 
             try
             {
-                ShellFileOperation.MoveItems(CurrentADBDevice, new [] { file }, newPath);
+                ShellFileOperation.MoveItems(CurrentADBDevice, new[] { file }, newPath);
             }
             catch (Exception e)
             {
@@ -2060,7 +2113,7 @@ namespace ADB_Explorer
         private void ContextMenuRenameItem_Click(object sender, RoutedEventArgs e)
         {
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-            
+
             cell.IsEditing = !cell.IsEditing;
         }
 
@@ -2151,17 +2204,16 @@ namespace ADB_Explorer
                         && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
                         return;
 
-                    var task = Task.Delay(300);
-                    task.ContinueWith(t =>
+                    Task.Delay(DOUBLE_CLICK_TIMEOUT).ContinueWith(t =>
                     {
-                        if (clickCount == 1)
+                        if (clickCount != 1)
+                            return;
+
+                        Dispatcher.Invoke(() =>
                         {
-                            Dispatcher.Invoke(() =>
-                            {
-                                if (e.LeftButton == MouseButtonState.Released && ExplorerGrid.SelectedItems.Count == 1)
-                                    cell.IsEditing = true;
-                            });
-                        }
+                            if (e.LeftButton == MouseButtonState.Released && ExplorerGrid.SelectedItems.Count == 1)
+                                cell.IsEditing = true;
+                        });
                     });
                 }
             }
@@ -2206,6 +2258,65 @@ namespace ADB_Explorer
 
             RepeaterHelper.SetIsSelected(sender as Button, true);
             RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 1);
+        }
+
+        private void ContextMenuCutItem_Click(object sender, RoutedEventArgs e)
+        {
+            CutFiles(selectedFiles);
+        }
+
+        private void CutFiles(IEnumerable<FileClass> items)
+        {
+            ClearCutFiles();
+
+            foreach (var item in items)
+            {
+                item.IsCut = true;
+            }
+
+            CutItems.AddRange(items);
+
+            CutMenuButton.IsEnabled = false;
+            PasteMenuButton.IsEnabled = PasteEnabled();
+        }
+
+        private static void ClearCutFiles()
+        {
+            CutItems.ForEach(f => f.IsCut = false);
+            CutItems.Clear();
+        }
+
+        private void PasteFiles()
+        {
+            var targetPath = ExplorerGrid.SelectedItems.Count == 1 ? ((FileClass)ExplorerGrid.SelectedItem).FullPath : CurrentPath;
+            var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
+
+            try
+            {
+                ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Move Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                throw;
+            }
+
+            if (targetPath == CurrentPath)
+            {
+                DirectoryLister.FileList.AddRange(pasteItems);
+            }
+            else if (CutItems[0].ParentPath == CurrentPath)
+            {
+                DirectoryLister.FileList.RemoveAll(pasteItems);
+            }
+            
+            ClearCutFiles();
+            PasteMenuButton.IsEnabled = PasteEnabled();
+        }
+
+        private void ContextMenuPasteItem_Click(object sender, RoutedEventArgs e)
+        {
+            PasteFiles();
         }
     }
 }

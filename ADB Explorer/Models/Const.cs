@@ -71,5 +71,7 @@ namespace ADB_Explorer.Models
         public static readonly Version WIN11_VERSION = new(10, 0, 22000);
 
         public static readonly bool DISPLAY_OFFLINE_SERVICES = false;
+
+        public static readonly TimeSpan DOUBLE_CLICK_TIMEOUT = TimeSpan.FromMilliseconds(300);
     }
 }

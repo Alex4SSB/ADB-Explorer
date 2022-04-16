@@ -130,6 +130,8 @@ namespace ADB_Explorer.Models
 
         private void UpdateDirectoryList()
         {
+            var updateCutItems = Data.CutItems.Any() && Data.CutItems[0].ParentPath == CurrentPath;
+
             if ((ReadTask == null) || (currentFileQueue.Count >= MinUpdateThreshold))
             {
                 for (int i = 0; (!InProgress) || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
@@ -140,7 +142,19 @@ namespace ADB_Explorer.Models
                         break;
                     }
 
-                    FileList.Add(FileClass.GenerateAndroidFile(fileStat));
+                    FileClass item = FileClass.GenerateAndroidFile(fileStat);
+                    if (updateCutItems)
+                    {
+                        var cutItem = Data.CutItems.Where(f => f.FullPath == fileStat.FullPath);
+                        if (cutItem.Any())
+                        {
+                            item.IsCut = true;
+                            Data.CutItems.Remove(cutItem.First());
+                            Data.CutItems.Add(item);
+                        }
+                    }
+
+                    FileList.Add(item);
                 }
             }
 

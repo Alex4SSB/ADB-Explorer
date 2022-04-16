@@ -110,6 +110,13 @@ namespace ADB_Explorer.Models
             private set => Set(ref icon, value);
         }
 
+        private bool isCut;
+        public bool IsCut
+        {
+            get => isCut;
+            set => Set(ref isCut, value);
+        }
+
         private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
         private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
         private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));

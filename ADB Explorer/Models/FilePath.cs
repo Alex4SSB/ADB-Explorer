@@ -15,6 +15,14 @@ namespace ADB_Explorer.Models
         Windows,
     }
 
+    public enum RelationType
+    {
+        Ancestor,
+        Descendant,
+        Self,
+        Unrelated,
+    }
+
     public class FilePath : INotifyPropertyChanged
     {
         public PathType PathType { get; protected set; }
@@ -111,6 +119,22 @@ namespace ADB_Explorer.Models
             PathType.Android => '/',
             _ => throw new NotSupportedException(),
         };
+
+        public RelationType Relation(FilePath other) => Relation(other.FullPath);
+
+        public RelationType Relation(string other)
+        {
+            if (other == FullPath)
+                return RelationType.Self;
+
+            if (other.StartsWith(FullPath))
+                return RelationType.Descendant;
+
+            if (FullPath.StartsWith(other))
+                return RelationType.Ancestor;
+
+            return RelationType.Unrelated;
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

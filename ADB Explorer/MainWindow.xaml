@@ -103,6 +103,7 @@
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuDeleteItem"
+            x:Shared="False"
             Click="ContextMenuDeleteItem_Click"
             Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Header>
@@ -120,6 +121,28 @@
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE8AC;" />
                     <TextBlock Text="Rename" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuCutItem"
+            Click="ContextMenuCutItem_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE8C6;" />
+                    <TextBlock Text="Cut" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuPasteItem"
+            Click="ContextMenuPasteItem_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE77F;" />
+                    <TextBlock Text="Paste" />
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
@@ -654,7 +677,11 @@
                             </MenuItem.Header>
                         </MenuItem>
                     </MenuItem>
-                    <MenuItem IsEnabled="False" ToolTip="Cut">
+                    <MenuItem
+                        x:Name="CutMenuButton"
+                        Click="ContextMenuCutItem_Click"
+                        IsEnabled="False"
+                        ToolTip="Cut">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE8C6;" />
                         </MenuItem.Header>
@@ -670,6 +697,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="PasteMenuButton"
+                        Click="ContextMenuPasteItem_Click"
                         IsEnabled="False"
                         ToolTip="Paste">
                         <MenuItem.Header>
@@ -687,12 +715,21 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="DeleteMenuButton"
-                        Click="ContextMenuDeleteItem_Click"
                         IsEnabled="False"
                         ToolTip="Delete">
+                        <MenuItem.Resources>
+                            <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+                                <Setter Property="FontSize" Value="20" />
+                            </Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Orientation" Value="Horizontal" />
+                                <Setter Property="Margin" Value="0,2" />
+                            </Style>
+                        </MenuItem.Resources>
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>
+                        <StaticResource ResourceKey="ContextMenuDeleteItem" />
                     </MenuItem>
                 </Menu>
                 <Border Grid.Column="1" MouseDown="Window_MouseDown" />
@@ -926,12 +963,16 @@
                                                 <Image.Style>
                                                     <Style TargetType="Image">
                                                         <Setter Property="Visibility" Value="Visible" />
+                                                        <Setter Property="Opacity" Value="1" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                                                                 <Setter Property="Visibility" Value="Collapsed" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
                                                                 <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                                <Setter Property="Opacity" Value="0.5" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -944,6 +985,7 @@
                                                 <TextBlock.Style>
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="Visibility" Value="Collapsed" />
+                                                        <Setter Property="Opacity" Value="1" />
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                                                                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
@@ -952,6 +994,9 @@
                                                             <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
                                                                 <Setter Property="Visibility" Value="Visible" />
                                                                 <Setter Property="Margin" Value="-1,-6,0,0" />
+                                                            </DataTrigger>
+                                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                                <Setter Property="Opacity" Value="0.5" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -993,12 +1038,16 @@
                                         <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
                                         <Setter Property="FontSize" Value="{Binding Source={StaticResource FontSize}}" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="Opacity" Value="1" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
                                                 <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                                                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -1015,12 +1064,16 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,8,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="Opacity" Value="1" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Type}" Value="Folder">
                                                 <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -1035,14 +1088,18 @@
                                 SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,0,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="Text" Value="{Binding TypeName}" />
+                                        <Setter Property="Opacity" Value="1" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                                                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
                                             </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                <Setter Property="Opacity" Value="0.5" />
+                                            </DataTrigger>
                                         </Style.Triggers>
-                                        <Setter Property="Margin" Value="4,0,0,0" />
-                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-                                        <Setter Property="Text" Value="{Binding TypeName}" />
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
@@ -1057,9 +1114,13 @@
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="Opacity" Value="1" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Text" Value="{Binding SizeString}" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>

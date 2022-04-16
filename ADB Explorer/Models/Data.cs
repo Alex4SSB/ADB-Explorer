@@ -25,5 +25,7 @@ namespace ADB_Explorer.Models
         public static bool UseFluentStyles => IsWin11 || Settings.ForceFluentStyles;
 
         public static AppSettings Settings { get; set; } = new();
+
+        public static List<FileClass> CutItems { get; private set; } = new();
     }
 }

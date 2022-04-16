@@ -74,6 +74,14 @@ namespace ADB_Explorer.Helpers
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
+        public void RemoveAll(IEnumerable<T> items)
+        {
+            foreach (var item in items)
+            {
+                Remove(item);
+            }
+        }
+
         public void ForEach(Action<T> action)
         {
             suppressOnCollectionChanged = true;

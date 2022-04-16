@@ -63,6 +63,11 @@ namespace ADB_Explorer.Services
                                                                        out string stderr,
                                                                        new[] { ADBService.EscapeAdbShellString(item.FullPath),
                                                                            ADBService.EscapeAdbShellString($"{targetPath}{(targetPath.EndsWith('/') ? "" : "/")}{item.FullName}") });
+
+                    if (exitCode != 0)
+                    {
+                        throw new Exception(stderr);
+                    }
                 }
             }
             
