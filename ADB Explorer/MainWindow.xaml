@@ -963,6 +963,7 @@
                         KeyboardNavigation.TabNavigation="Once"
                         MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
+                        PreviewKeyDown="ExplorerGrid_PreviewKeyDown"
                         PreviewMouseRightButtonDown="ExplorerGrid_PreviewMouseRightButtonDown"
                         RowStyle="{StaticResource RowStyle}"
                         SelectedItem="{Binding SelectedRow, Mode=TwoWay}"

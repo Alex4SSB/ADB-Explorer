@@ -16,11 +16,12 @@ namespace ADB_Explorer.Models
     {
         private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
 
-        public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null) :
+        public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false) :
             base(fileName, path, type, isLink, size, modifiedTime)
         {
             icon = GetIcon();
             typeName = GetTypeName();
+            IsTemp = isTemp;
         }
 
         public static FileClass GenerateAndroidFile(FileStat fileStat)
@@ -118,6 +119,8 @@ namespace ADB_Explorer.Models
             get => isCut;
             set => Set(ref isCut, value);
         }
+
+        public bool IsTemp { get; set; }
 
         private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
         private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));

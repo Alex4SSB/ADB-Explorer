@@ -1080,6 +1080,10 @@ namespace ADB_Explorer
             {
                 NavigateBack();
             }
+            else if (key == Key.Delete)
+            {
+                DeleteFiles();
+            }
 
             bool handle = false;
             if (NavHistory.Current is string)
@@ -2144,7 +2148,7 @@ namespace ADB_Explorer
         {
             FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
             var name = DisplayName(textBox);
-            if (string.IsNullOrEmpty(name))
+            if (file.IsTemp)
             {
                 if (string.IsNullOrEmpty(textBox.Text))
                 {
@@ -2359,15 +2363,40 @@ namespace ADB_Explorer
 
         private void NewItem(bool isFolder)
         {
-            FileClass newItem = new("", "", isFolder ? FileType.Folder : FileType.File);
+            var namePrefix = $"New {(isFolder ? "Folder" : "File")}";
+            var index = ExistingIndexes(namePrefix);
+
+            FileClass newItem = new($"{namePrefix}{index}", CurrentPath, isFolder ? FileType.Folder : FileType.File, isTemp: true);
             DirectoryLister.FileList.Insert(0, newItem);
 
-            ExplorerGrid.Focus();
             ExplorerGrid.ScrollIntoView(newItem);
             ExplorerGrid.SelectedItem = newItem;
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
             if (cell is not null)
                 cell.IsEditing = true;
+        }
+
+        private string ExistingIndexes(string namePrefix)
+        {
+            var existingItems = DirectoryLister.FileList.Where(item => item.FullName.StartsWith(namePrefix));
+            var suffixes = existingItems.Select(item => item.FullName[namePrefix.Length..].Trim());
+            var indexes = (from i in suffixes
+                          where int.TryParse(i, out _)
+                          select int.Parse(i)).ToList();
+            if (suffixes.Any(s => s == ""))
+                indexes.Add(0);
+
+            indexes.Sort();
+            if (!indexes.Any() || indexes[0] != 0)
+                return "";
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                if (indexes[i] > i)
+                    return $" {i}";
+            }
+
+            return $" {indexes.Count}";
         }
 
         private void CreateNewItem(FileClass file, string newName)
@@ -2390,6 +2419,7 @@ namespace ADB_Explorer
                 throw;
             }
 
+            file.IsTemp = false;
             file.ModifiedTime = DateTime.Now;
             if (file.Type is FileType.File)
                 file.Size = 0;
@@ -2397,7 +2427,6 @@ namespace ADB_Explorer
             var index = DirectoryLister.FileList.IndexOf(file);
             DirectoryLister.FileList.Remove(file);
             DirectoryLister.FileList.Insert(index, file);
-            ExplorerGrid.Focus();
             ExplorerGrid.SelectedItem = file;
         }
 
@@ -2409,6 +2438,12 @@ namespace ADB_Explorer
         private void NewFileMenuItem_Click(object sender, RoutedEventArgs e)
         {
             NewItem(false);
+        }
+
+        private void ExplorerGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+                DeleteFiles();
         }
     }
 }
