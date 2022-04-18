@@ -2221,19 +2221,57 @@ namespace ADB_Explorer
             else
             {
                 var row = DataGridRow.GetRowContainingElement(cell);
-                firstSelectedRow = row.GetIndex();
+                var current = row.GetIndex();
+
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                {
+                    ExplorerGrid.SelectedItems.Clear();
+
+                    int firstUnselected = 0, lastUnselected = 0;
+                    if (current < firstSelectedRow)
+                    {
+                        firstUnselected = current;
+                        lastUnselected = firstSelectedRow + 1;
+                    }
+                    else
+                    {
+                        firstUnselected = firstSelectedRow;
+                        lastUnselected = current + 1;
+                    }
+
+                    for (int i = firstUnselected; i < lastUnselected; i++)
+                    {
+                        ExplorerGrid.SelectedItems.Add(ExplorerGrid.Items[i]);
+                    }
+
+                    return;
+                }
 
                 if (!row.IsSelected)
                 {
-                    ExplorerGrid.SelectedItems.Clear();
+                    
+                    if (!Keyboard.IsKeyDown(Key.LeftCtrl) && !Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        firstSelectedRow = row.GetIndex();
+                        ExplorerGrid.SelectedItems.Clear();
+                    }
+
                     row.IsSelected = true;
                 }
                 else
                 {
+                    if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+                    {
+                        row.IsSelected = false;
+                        return;
+                    }
+
                     if (ExplorerGrid.SelectedItems.Count > 1)
                     {
+                        firstSelectedRow = row.GetIndex();
                         ExplorerGrid.SelectedItems.Clear();
                         row.IsSelected = true;
+
                         return;
                     }
 
