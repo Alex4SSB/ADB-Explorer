@@ -689,6 +689,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="CutMenuButton"
+                        helpers:StyleHelper.ContentAnimation="UpMarquee"
                         Click="ContextMenuCutItem_Click"
                         IsEnabled="False"
                         ToolTip="Cut">
@@ -698,6 +699,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="CopyMenuButton"
+                        helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="CopyMenuButton_Click"
                         IsEnabled="False"
                         ToolTip="Copy">
@@ -707,9 +709,28 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="PasteMenuButton"
+                        helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="ContextMenuPasteItem_Click"
-                        IsEnabled="False"
-                        ToolTip="Paste">
+                        IsEnabled="False">
+                        <MenuItem.ToolTip>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Paste " />
+                                <TextBlock Text="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                                <TextBlock Text=" Item" />
+                                <TextBlock Text="s">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" Value="1">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                        </MenuItem.ToolTip>
                         <MenuItem.Header>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -737,6 +758,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="RenameMenuButton"
+                        helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="ContextMenuRenameItem_Click"
                         IsEnabled="False"
                         ToolTip="Rename">

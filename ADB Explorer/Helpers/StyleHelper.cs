@@ -13,6 +13,8 @@ namespace ADB_Explorer.Helpers
             RotateCCW,
             LeftMarquee,
             RightMarquee,
+            UpMarquee,
+            DownMarquee,
         }
 
         public static ContentAnimation GetContentAnimation(Control control) =>

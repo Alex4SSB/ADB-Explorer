@@ -93,6 +93,50 @@
                     </DoubleAnimation.EasingFunction>
                 </DoubleAnimation>
             </Storyboard>
+            <Storyboard x:Key="UpMarqueeStoryBoard">
+                <DoubleAnimation
+                    Storyboard.TargetName="ContentPresenter"
+                    Storyboard.TargetProperty="RenderTransform.Y"
+                    From="0"
+                    To="-30"
+                    Duration="00:00:00.1" />
+                <DoubleAnimation
+                    BeginTime="00:00:00.1"
+                    Storyboard.TargetName="ContentPresenter"
+                    Storyboard.TargetProperty="RenderTransform.Y"
+                    From="30"
+                    To="0"
+                    Duration="00:00:00.1">
+                    <DoubleAnimation.EasingFunction>
+                        <BounceEase
+                            Bounces="2"
+                            Bounciness="4"
+                            EasingMode="EaseOut" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+            </Storyboard>
+            <Storyboard x:Key="DownMarqueeStoryBoard">
+                <DoubleAnimation
+                    Storyboard.TargetName="ContentPresenter"
+                    Storyboard.TargetProperty="RenderTransform.Y"
+                    From="0"
+                    To="30"
+                    Duration="00:00:00.1" />
+                <DoubleAnimation
+                    BeginTime="00:00:00.1"
+                    Storyboard.TargetName="ContentPresenter"
+                    Storyboard.TargetProperty="RenderTransform.Y"
+                    From="-30"
+                    To="0"
+                    Duration="00:00:00.1">
+                    <DoubleAnimation.EasingFunction>
+                        <BounceEase
+                            Bounces="2"
+                            Bounciness="4"
+                            EasingMode="EaseOut" />
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+            </Storyboard>
         </ControlTemplate.Resources>
         <Grid
             x:Name="ContentRoot"
@@ -182,7 +226,28 @@
                     <BeginStoryboard Storyboard="{StaticResource RightMarqueeStoryBoard}" />
                 </MultiTrigger.EnterActions>
             </MultiTrigger>
-
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+                    <Condition Property="helpers:StyleHelper.ContentAnimation" Value="UpMarquee" />
+                    <Condition Property="helpers:StyleHelper.UseFluentStyles" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource BounceTransform}" />
+                <MultiTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource UpMarqueeStoryBoard}" />
+                </MultiTrigger.EnterActions>
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+                    <Condition Property="helpers:StyleHelper.ContentAnimation" Value="DownMarquee" />
+                    <Condition Property="helpers:StyleHelper.UseFluentStyles" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="ContentPresenter" Property="RenderTransform" Value="{StaticResource BounceTransform}" />
+                <MultiTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource DownMarqueeStoryBoard}" />
+                </MultiTrigger.EnterActions>
+            </MultiTrigger>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
                 <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPointerOver}" />
