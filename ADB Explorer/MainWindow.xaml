@@ -677,7 +677,10 @@
                         <StaticResource ResourceKey="PushFoldersMenu" />
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                    <MenuItem x:Name="NewMenuButton" Resources="{StaticResource TopMenuStyles}">
+                    <MenuItem
+                        x:Name="NewMenuButton"
+                        IsEnabled="False"
+                        Resources="{StaticResource TopMenuStyles}">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:FontIcon Glyph="&#xECC8;" Style="{StaticResource DisabledGlyphStyle}" />
@@ -2007,10 +2010,7 @@
                                                 </Grid.Resources>
                                                 <ui:FontIcon Glyph="&#xF83E;" />
                                                 <ui:FontIcon Glyph="&#xF83F;" />
-                                                <ui:FontIcon
-                                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}"
-                                                    Glyph="&#xEA84;"
-                                                    Style="{StaticResource RestartWarningIconStyle}" />
+                                                <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
                                             </Grid>
                                         </Grid>
                                         <TextBox

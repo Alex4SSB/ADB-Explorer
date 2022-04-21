@@ -18,6 +18,7 @@
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
                 <ResourceDictionary Source="Styles\Expander.xaml" />
                 <ResourceDictionary Source="Styles\DataGrid.xaml" />
+                <ResourceDictionary Source="Styles\ContentDialog.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
@@ -37,6 +38,11 @@
 
             <Color x:Key="LightDevicesListBackground">#FFF3F3F3</Color>
             <Color x:Key="DarkDevicesListBackground">#FF202020</Color>
+
+            <Color x:Key="LightContentDialogCommandBackground">#FFF3F3F3</Color>
+            <Color x:Key="LightContentDialogContentBackground">White</Color>
+            <Color x:Key="DarkContentDialogCommandBackground">#FF202020</Color>
+            <Color x:Key="DarkContentDialogContentBackground">#FF2B2B2B</Color>
 
             <Color x:Key="LightDeviceConnectionPanelBackground">#FFFBFBFB</Color>
             <Color x:Key="DarkDeviceConnectionPanelBackground">#FF2B2B2B</Color>
@@ -133,6 +139,8 @@
                 <SolidColorBrush x:Key="AdbButtonForegroundPressedOrDisabled" Color="{DynamicResource LightAdbButtonForegroundPressedOrDisabled}" />
 
                 <SolidColorBrush x:Key="AdbWindowBackground" Color="{DynamicResource LightAdbWindowBackground}" />
+                <SolidColorBrush x:Key="ContentDialogCommandBackground" Color="{DynamicResource LightContentDialogCommandBackground}" />
+                <SolidColorBrush x:Key="ContentDialogContentBackground" Color="{DynamicResource LightContentDialogContentBackground}" />
             </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>

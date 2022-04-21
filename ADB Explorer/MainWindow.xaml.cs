@@ -46,7 +46,7 @@ namespace ADB_Explorer
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
-
+        
         private double ColumnHeaderHeight
         {
             get
@@ -377,19 +377,18 @@ namespace ADB_Explorer
 
             var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
 
-            DeleteMenuButton.IsEnabled =
-            PullMenuButton.IsEnabled = items.Any()
-            && (DevicesObject.CurrentDevice.Root == AbstractDevice.RootStatus.Enabled
-            || items.All(f => f.Type is FileType.File or FileType.Folder));
+            bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                && items.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder));
 
-            var renameEnabled = items.Count() == 1
-                && (DevicesObject.CurrentDevice.Root == AbstractDevice.RootStatus.Enabled
-                || items.First().Type is FileType.File or FileType.Folder);
+            DeleteMenuButton.IsEnabled =
+            PullMenuButton.IsEnabled = items.Any() && !irregular;
+
+            var renameEnabled = items.Count() == 1 && !irregular;
 
             RenameMenuButton.IsEnabled = renameEnabled;
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
 
-            CutMenuButton.IsEnabled = !ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut);
+            CutMenuButton.IsEnabled = !ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut) && !irregular;
             PasteMenuButton.IsEnabled = PasteEnabled();
         }
 
@@ -754,7 +753,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Navigation Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(e.Message, "Navigation Error", DialogService.DialogIcon.Critical);
                 return false;
             }
 
@@ -1170,7 +1169,7 @@ namespace ADB_Explorer
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show(e.Message, "Destination Path Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    DialogService.ShowMessage(e.Message, "Destination Path Error", DialogService.DialogIcon.Critical);
                     return;
                 }
             }
@@ -1290,7 +1289,7 @@ namespace ADB_Explorer
                     ManualPairingCodeBox.Clear();
                 }
                 else
-                    MessageBox.Show(ex.Message, "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    DialogService.ShowMessage(ex.Message, "Connection Error", DialogService.DialogIcon.Critical);
 
                 return;
             }
@@ -1392,7 +1391,7 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Disconnection Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(ex.Message, "Disconnection Error", DialogService.DialogIcon.Critical);
                 return;
             }
 
@@ -1572,7 +1571,7 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(ex.Message, "Pairing Error", DialogService.DialogIcon.Critical);
                 (FindResource("PairServiceFlyout") as Flyout).Hide();
                 return;
             }
@@ -1856,7 +1855,7 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Pairing Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(ex.Message, "Pairing Error", DialogService.DialogIcon.Critical);
                 return false;
             }
 
@@ -2009,7 +2008,7 @@ namespace ADB_Explorer
                 rootTask.ContinueWith((t) => Dispatcher.BeginInvoke(() =>
                 {
                     if (logical.Root is AbstractDevice.RootStatus.Forbidden)
-                        MessageBox.Show("Root access cannot be enabled on selected device.", "Root Access", MessageBoxButton.OK, MessageBoxImage.Error);
+                        DialogService.ShowMessage("Root access cannot be enabled on selected device.", "Root Access", DialogService.DialogIcon.Critical);
                 }));
             }
         }
@@ -2089,7 +2088,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(e.Message, "Delete Error", DialogService.DialogIcon.Critical);
             }
         }
 
@@ -2098,7 +2097,7 @@ namespace ADB_Explorer
             var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Settings.ShowExtensions ? "" : file.Extension)}";
             if (DirectoryLister.FileList.Any(file => file.FullName == newName))
             {
-                MessageBox.Show($"{newPath} already exists", "Rename conflict", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                DialogService.ShowMessage($"{newPath} already exists", "Rename conflict", DialogService.DialogIcon.Exclamation);
                 return;
             }
 
@@ -2108,7 +2107,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Rename Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(e.Message, "Rename Error", DialogService.DialogIcon.Critical);
                 throw;
             }
 
@@ -2361,7 +2360,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Move Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(e.Message, "Move Error", DialogService.DialogIcon.Critical);
                 throw;
             }
 
@@ -2428,7 +2427,7 @@ namespace ADB_Explorer
 
         private void CreateNewItem(FileClass file, string newName)
         {
-            file.UpdatePath($"{CurrentPath}/{newName}");
+            file.UpdatePath($"{CurrentPath}{(CurrentPath == "/" ? "" : "/")}{newName}");
 
             try
             {
@@ -2441,7 +2440,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Create Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                DialogService.ShowMessage(e.Message, "Create Error", DialogService.DialogIcon.Critical);
                 DirectoryLister.FileList.Remove(file);
                 throw;
             }

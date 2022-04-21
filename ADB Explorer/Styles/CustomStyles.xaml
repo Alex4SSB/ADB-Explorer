@@ -800,12 +800,14 @@
         x:Key="RestartWarningIconStyle"
         BasedOn="{StaticResource RestartRequiredIconsStyle}"
         TargetType="ui:FontIcon">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
                 <Setter Property="Margin" Value="4,0,0,0" />
+                <Setter Property="Foreground" Value="{DynamicResource DevicesListBackground}" />
             </DataTrigger>
         </Style.Triggers>
-        <Setter Property="Margin" Value="0" />
     </Style>
     <Style x:Key="QrBackgroundStyle" TargetType="Border">
         <Style.Triggers>
@@ -1150,6 +1152,13 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Battery.Level}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
