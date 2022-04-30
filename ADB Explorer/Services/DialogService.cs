@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ModernWpf.Controls;
 using System;
+using System.Threading.Tasks;
 
 namespace ADB_Explorer.Services
 {
@@ -13,6 +14,7 @@ namespace ADB_Explorer.Services
             Exclamation,
             Informational,
             Tip,
+            Delete,
         }
 
         private static string Icon(DialogIcon icon) => icon switch
@@ -22,6 +24,7 @@ namespace ADB_Explorer.Services
             DialogIcon.Exclamation => "\uE783",
             DialogIcon.Informational => "\uE946",
             DialogIcon.Tip => "\uE82F",
+            DialogIcon.Delete => "\uE74D",
             _ => throw new NotImplementedException(),
         };
 
@@ -35,6 +38,27 @@ namespace ADB_Explorer.Services
             TextHelper.SetAltText(windowDialog, Icon(icon));
 
             windowDialog.ShowAsync();
+        }
+
+        public static async Task<ContentDialogResult> ShowConfirmation(string content,
+                                            string title = "",
+                                            string primaryText = "Yes",
+                                            string cancelText = "Cancel",
+                                            DialogIcon icon = DialogIcon.None)
+        {
+            if (windowDialog.IsVisible)
+            {
+                return ContentDialogResult.None;
+            }
+
+            windowDialog.Content = content;
+            windowDialog.Title = title;
+            windowDialog.PrimaryButtonText = primaryText;
+            windowDialog.DefaultButton = ContentDialogButton.Primary;
+            windowDialog.CloseButtonText = cancelText;
+            TextHelper.SetAltText(windowDialog, Icon(icon));
+
+            return await windowDialog.ShowAsync();
         }
     }
 }

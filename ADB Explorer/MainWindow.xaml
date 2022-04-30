@@ -149,7 +149,19 @@
                     <ui:FontIcon Glyph="&#xE77F;" />
                     <TextBlock Text="Paste " />
                     <TextBlock Margin="0" Text="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" />
-                    <TextBlock Margin="0" Text=" Items" />
+                    <TextBlock Margin="0" Text=" Item" />
+                    <TextBlock Margin="0" Text="s">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" Value="1">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
@@ -780,7 +792,10 @@
                         <StaticResource ResourceKey="MenuDeleteItem" />
                     </MenuItem>
                 </Menu>
-                <Border Grid.Column="1" MouseDown="Window_MouseDown" />
+                <Border
+                    Grid.Column="1"
+                    Background="Transparent"
+                    MouseDown="Window_MouseDown" />
             </Grid>
             <StackPanel
                 Margin="0,0,7,0"
@@ -933,7 +948,7 @@
                     SmallChange="0.0001"
                     Value="{Binding Progress, Mode=OneWay}">
                     <ui:ProgressBar.Style>
-                        <Style TargetType="ui:ProgressBar">
+                        <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
                             <Setter Property="Visibility" Value="Collapsed" />
                             <Setter Property="IsIndeterminate" Value="False" />
                             <Style.Triggers>
@@ -1838,7 +1853,8 @@
                             <ui:ProgressRing
                                 Margin="6,4,0,0"
                                 HorizontalAlignment="Left"
-                                IsActive="True" />
+                                IsActive="True"
+                                Style="{StaticResource FluentProgressRingStyle}" />
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 FontSize="24"
@@ -1983,10 +1999,7 @@
                                                     </Grid.Resources>
                                                     <ui:FontIcon Glyph="&#xF83E;" />
                                                     <ui:FontIcon Glyph="&#xF83F;" />
-                                                    <ui:FontIcon
-                                                        Foreground="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}"
-                                                        Glyph="&#xEA84;"
-                                                        Style="{StaticResource RestartWarningIconStyle}" />
+                                                    <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
                                                 </Grid>
                                             </Grid>
                                         </CheckBox>

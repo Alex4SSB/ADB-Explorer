@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace ADB_Explorer.Helpers
 {
@@ -52,6 +54,19 @@ namespace ADB_Explorer.Helpers
         public static readonly DependencyProperty UseFluentStylesProperty =
             DependencyProperty.RegisterAttached(
                 "UseFluentStyles",
+                typeof(bool),
+                typeof(StyleHelper),
+                null);
+
+        public static bool GetIsUnchecked(ToggleButton control) =>
+            (bool)control.GetValue(IsUncheckedProperty);
+
+        public static void SetIsUnchecked(ToggleButton control, bool value) =>
+            control.SetValue(IsUncheckedProperty, value);
+
+        public static readonly DependencyProperty IsUncheckedProperty =
+            DependencyProperty.RegisterAttached(
+                "IsUnchecked",
                 typeof(bool),
                 typeof(StyleHelper),
                 null);

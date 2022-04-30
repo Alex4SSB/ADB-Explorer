@@ -6,92 +6,36 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
-    <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
+    <converters:DoubleEquals x:Key="DoubleEquals" />
+
+    <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
+        <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
-                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
-    </Style>
-    <Style
-        x:Key="DisabledGlyphStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="Gray" />
-            </Trigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DisabledButtonGlyphStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="FocusVisualRoundedStyle" BasedOn="{StaticResource HighVisibilityFocusVisual}">
-        <Setter Property="Control.Template">
-            <!--  Template copied from ModernWPF to be modified  -->
-            <Setter.Value>
-                <ControlTemplate>
-                    <Border
-                        BorderBrush="{TemplateBinding ui:FocusVisualHelper.FocusVisualPrimaryBrush}"
-                        BorderThickness="{TemplateBinding ui:FocusVisualHelper.FocusVisualPrimaryThickness}"
-                        CornerRadius="5"
-                        SnapsToDevicePixels="True">
-                        <Border
-                            BorderBrush="{TemplateBinding ui:FocusVisualHelper.FocusVisualSecondaryBrush}"
-                            BorderThickness="{TemplateBinding ui:FocusVisualHelper.FocusVisualSecondaryThickness}"
-                            CornerRadius="5" />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-    <Style x:Key="BorderStyle" TargetType="Border">
+    <Style x:Key="FluentProgressRingStyle" TargetType="ui:ProgressRing">
+        <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
-                <Setter Property="CornerRadius" Value="5" />
-                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BorderThickness" Value="0" />
-    </Style>
-    <Style x:Key="DevicesListStyle" TargetType="Border">
-        <Setter Property="Background" Value="{DynamicResource DevicesListBackground}" />
-    </Style>
-    <Style
-        x:Key="DeviceBorderStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
-            </DataTrigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
-            </Trigger>
-        </Style.Triggers>
-        <Setter Property="BorderBrush" Value="Transparent" />
-    </Style>
-    <Style x:Key="DisabledTextBlockStyle" TargetType="TextBlock">
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="Gray" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="DisabledButtonTextBlockStyle" TargetType="TextBlock">
-        <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-            </Trigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -142,7 +86,10 @@
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}" />
     </Style>
-    <Style x:Key="FileOpProgressStyle" TargetType="ui:ProgressBar">
+    <Style
+        x:Key="FileOpProgressStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
         <Style.Triggers>
             <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
                 <Setter Property="IsIndeterminate" Value="True" />
@@ -491,13 +438,15 @@
             </TextBlock.Style>
         </TextBlock>
     </DataTemplate>
-    <Style x:Key="CompletedOperationsProgressStyle" TargetType="ui:ProgressBar">
+    <Style
+        x:Key="CompletedOperationsProgressStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
         <Style.Triggers>
-            <Trigger Property="Value" Value="100">
-                <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
-            </Trigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource DoubleEquals}, ConverterParameter=100, Path=Value}" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+            </DataTrigger>
         </Style.Triggers>
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlErrorTextForegroundBrush}" />
     </Style>
     <DataTemplate x:Key="FileOpProgressTemplate">
         <Grid Margin="4,0">
@@ -528,7 +477,7 @@
                 <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
                 <ui:ProgressBar Grid.Row="1" Value="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}">
                     <ui:ProgressBar.Style>
-                        <Style TargetType="ui:ProgressBar">
+                        <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -708,28 +657,6 @@
         </Setter>
     </Style>
     <Style
-        x:Key="CheckBoxStyle"
-        BasedOn="{StaticResource DefaultCheckBoxStyle}"
-        TargetType="CheckBox">
-        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-6,0" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="RadioButtonStyle"
-        BasedOn="{StaticResource DefaultRadioButtonStyle}"
-        TargetType="RadioButton">
-        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
-                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="DataGridColumnHeaderStyle"
         BasedOn="{StaticResource DefaultDataGridColumnHeaderStyle}"
         TargetType="DataGridColumnHeader">
@@ -870,7 +797,10 @@
         <Setter Property="RenderTransformOrigin" Value="0.5, 0.5" />
         <Setter Property="FontSize" Value="18" />
     </Style>
-    <Style x:Key="OperationsProgressRingStyle" TargetType="ui:ProgressRing">
+    <Style
+        x:Key="OperationsProgressRingStyle"
+        BasedOn="{StaticResource FluentProgressRingStyle}"
+        TargetType="ui:ProgressRing">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False">
@@ -884,7 +814,10 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DirectoryLoadingProgressStyle" TargetType="ui:ProgressBar">
+    <Style
+        x:Key="DirectoryLoadingProgressStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=PathBox, Path=IsFocused}" Value="True">
                 <Setter Property="IsIndeterminate" Value="False" />
@@ -918,7 +851,10 @@
             </MultiTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DriveUsageBarStyle" TargetType="ui:ProgressBar">
+    <Style
+        x:Key="DriveUsageBarStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
         <Setter Property="ToolTip">
             <Setter.Value>
                 <StackPanel Orientation="Horizontal">
@@ -929,21 +865,7 @@
         </Setter>
         <Style.Triggers>
             <DataTrigger Binding="{Binding UsageWarning}" Value="True">
-                <Setter Property="Foreground">
-                    <Setter.Value>
-                        <LinearGradientBrush SpreadMethod="Repeat" StartPoint="0,0" EndPoint="0.15,0">
-                            <LinearGradientBrush.RelativeTransform>
-                                <TransformGroup>
-                                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
-                                    <SkewTransform CenterX="0.5" CenterY="0.5" />
-                                    <RotateTransform Angle="1" CenterX="0.5" CenterY="0.5" />
-                                </TransformGroup>
-                            </LinearGradientBrush.RelativeTransform>
-                            <GradientStop Offset="0.4" Color="Transparent" />
-                            <GradientStop Offset="0.4" Color="#FFC50500" />
-                        </LinearGradientBrush>
-                    </Setter.Value>
-                </Setter>
+                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

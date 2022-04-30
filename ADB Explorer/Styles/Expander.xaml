@@ -5,7 +5,6 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control  -->
     <converters:MarginConverter x:Key="marginConverter" />

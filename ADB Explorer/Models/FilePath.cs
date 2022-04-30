@@ -41,11 +41,14 @@ namespace ADB_Explorer.Models
         {
             get
             {
-                Index index = FullPath.LastIndexOf(PathSeparator());
-                if (index.Value == 0)
+                int originalIndex = FullPath.LastIndexOf(PathSeparator());
+                Index index;
+                if (originalIndex == 0)
                     index = 1;
-                else if (index.Value < 0)
+                else if (originalIndex < 0)
                     index = ^0;
+                else
+                    index = originalIndex;
 
                 return FullPath[..index];
             }

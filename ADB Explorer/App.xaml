@@ -11,6 +11,9 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
+                <ResourceDictionary Source="Styles\BasicStyles.xaml" />
+                <ResourceDictionary Source="Styles\CheckBox.xaml" />
+                <ResourceDictionary Source="Styles\RadioButton.xaml" />
                 <ResourceDictionary Source="Styles\Button.xaml" />
                 <ResourceDictionary Source="Styles\ToggleButton.xaml" />
                 <ResourceDictionary Source="Styles\TextBox.xaml" />
@@ -74,32 +77,48 @@
 
             <Color x:Key="DarkAdbButtonBackgroundNormal">#FF373737</Color>
             <Color x:Key="DarkAdbButtonBackgroundMouseOver">#FF3C3C3C</Color>
-            <Color x:Key="DarkAdbButtonBackgroundPressed">#FF323232</Color>
+            <Color x:Key="DarkAdbButtonBackgroundPressed">#08FFFFFF</Color>
             <Color x:Key="DarkAdbButtonBackgroundDisabled">#FF444444</Color>
-            <Color x:Key="DarkAdbButtonUpperBorderNormal">#FF3F3F3F</Color>
-            <Color x:Key="DarkAdbButtonLowerBorderNormal">#FF3A3A3A</Color>
-            <Color x:Key="DarkAdbButtonSideBorderNormal">#FF3A3A3A</Color>
-            <Color x:Key="DarkAdbButtonUpperBorderMouseOver">#FF3F3F3F</Color>
-            <Color x:Key="DarkAdbButtonLowerBorderMouseOver">#FF3A3A3A</Color>
-            <Color x:Key="DarkAdbButtonSideBorderMouseOver">#FF3A3A3A</Color>
-            <Color x:Key="DarkAdbButtonBorderPressedOrDisabled">#FF3A3A3A</Color>
-            <Color x:Key="DarkAdbButtonForegroundPressedOrDisabled">#FFD0D0D0</Color>
+            <Color x:Key="DarkAdbButtonBorderPressed">#22FFFFFF</Color>
+            <Color x:Key="DarkAdbButtonBorderDisabled">#42FFFFFF</Color>
+            <Color x:Key="DarkAdbButtonForegroundPressedOrDisabled">#2DFFFFFF</Color>
 
-            <Color x:Key="LightAdbButtonBackgroundNormal">#FFFEFEFE</Color>
-            <Color x:Key="LightAdbButtonBackgroundMouseOver">#FFF2F2F2</Color>
+            <Color x:Key="LightAdbButtonBackgroundNormal">#B3FFFFFF</Color>
+            <Color x:Key="LightAdbButtonBackgroundMouseOver">#80F2F2F2</Color>
             <Color x:Key="LightAdbButtonBackgroundPressed">#FFFAFAFA</Color>
             <Color x:Key="LightAdbButtonBackgroundDisabled">#FFEAEAEA</Color>
-            <Color x:Key="LightAdbButtonUpperBorderNormal">#FFECECEC</Color>
-            <Color x:Key="LightAdbButtonLowerBorderNormal">#FFD3D3D3</Color>
-            <Color x:Key="LightAdbButtonSideBorderNormal">#FFECECEC</Color>
-            <Color x:Key="LightAdbButtonUpperBorderMouseOver">#FFECECEC</Color>
-            <Color x:Key="LightAdbButtonLowerBorderMouseOver">#FFD3D3D3</Color>
-            <Color x:Key="LightAdbButtonSideBorderMouseOver">#FFECECEC</Color>
-            <Color x:Key="LightAdbButtonBorderPressedOrDisabled">#FFCCCCCC</Color>
-            <Color x:Key="LightAdbButtonForegroundPressedOrDisabled">#FF5F5F5F</Color>
+            <Color x:Key="LightAdbButtonBorderPressed">#0F000000</Color>
+            <Color x:Key="LightAdbButtonBorderDisabled">#2F000000</Color>
+            <Color x:Key="LightAdbButtonForegroundPressedOrDisabled">#5C000000</Color>
+
+            <Color x:Key="LightFluentButtonBorderGradient1">#29000000</Color>
+            <Color x:Key="LightFluentButtonBorderGradient2">#0F000000</Color>
+
+            <Color x:Key="DarkFluentButtonBorderGradient1">#18FFFFFF</Color>
+            <Color x:Key="DarkFluentButtonBorderGradient2">#12FFFFFF</Color>
+
+            <Color x:Key="LightAccentButtonBackgroundDisabled">#37000000</Color>
+            <Color x:Key="LightFluentAccentButtonBorderGradient1">#66000000</Color>
+            <Color x:Key="LightFluentAccentButtonBorderGradient2">#14FFFFFF</Color>
+
+            <Color x:Key="DarkAccentButtonBackgroundDisabled">#28FFFFFF</Color>
+            <Color x:Key="DarkFluentAccentButtonBorderGradient1">#23000000</Color>
+            <Color x:Key="DarkFluentAccentButtonBorderGradient2">#14FFFFFF</Color>
 
             <Color x:Key="DarkAdbWindowBackground">#FF2B2B2B</Color>
             <Color x:Key="LightAdbWindowBackground">#FFF2F2F2</Color>
+
+            <Color x:Key="DarkCheckboxBackgroundNormal">#19000000</Color>
+            <Color x:Key="DarkCheckboxBorderNormal">#8BFFFFFF</Color>
+            <Color x:Key="DarkCheckboxBackgroundMouseOver">#0BFFFFFF</Color>
+            <Color x:Key="DarkCheckboxBackgroundPressed">#12FFFFFF</Color>
+            <Color x:Key="DarkCheckboxBorderPreseedOrDisabled">#28FFFFFF</Color>
+
+            <Color x:Key="LightCheckboxBackgroundNormal">#06000000</Color>
+            <Color x:Key="LightCheckboxBorderNormal">#72000000</Color>
+            <Color x:Key="LightCheckboxBackgroundMouseOver">#0F000000</Color>
+            <Color x:Key="LightCheckboxBackgroundPressed">#18000000</Color>
+            <Color x:Key="LightCheckboxBorderPreseedOrDisabled">#37000000</Color>
 
             <ResourceDictionary x:Key="DynamicBrushes">
                 <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
@@ -129,14 +148,17 @@
                 <SolidColorBrush x:Key="AdbButtonBackgroundMouseOver" Color="{DynamicResource LightAdbButtonBackgroundMouseOver}" />
                 <SolidColorBrush x:Key="AdbButtonBackgroundPressed" Color="{DynamicResource LightAdbButtonBackgroundPressed}" />
                 <SolidColorBrush x:Key="AdbButtonBackgroundDisabled" Color="{DynamicResource LightAdbButtonBackgroundDisabled}" />
-                <SolidColorBrush x:Key="AdbButtonUpperBorderNormal" Color="{DynamicResource LightAdbButtonUpperBorderNormal}" />
-                <SolidColorBrush x:Key="AdbButtonLowerBorderNormal" Color="{DynamicResource LightAdbButtonLowerBorderNormal}" />
-                <SolidColorBrush x:Key="AdbButtonSideBorderNormal" Color="{DynamicResource LightAdbButtonSideBorderNormal}" />
-                <SolidColorBrush x:Key="AdbButtonUpperBorderMouseOver" Color="{DynamicResource LightAdbButtonUpperBorderMouseOver}" />
-                <SolidColorBrush x:Key="AdbButtonLowerBorderMouseOver" Color="{DynamicResource LightAdbButtonLowerBorderMouseOver}" />
-                <SolidColorBrush x:Key="AdbButtonSideBorderMouseOver" Color="{DynamicResource LightAdbButtonSideBorderMouseOver}" />
-                <SolidColorBrush x:Key="AdbButtonBorderPressedOrDisabled" Color="{DynamicResource LightAdbButtonBorderPressedOrDisabled}" />
+                <SolidColorBrush x:Key="AdbButtonBorderPressed" Color="{DynamicResource LightAdbButtonBorderPressed}" />
+                <SolidColorBrush x:Key="AdbButtonBorderDisabled" Color="{DynamicResource LightAdbButtonBorderDisabled}" />
                 <SolidColorBrush x:Key="AdbButtonForegroundPressedOrDisabled" Color="{DynamicResource LightAdbButtonForegroundPressedOrDisabled}" />
+
+                <SolidColorBrush x:Key="AccentButtonBackgroundDisabled" Color="{DynamicResource LightAccentButtonBackgroundDisabled}" />
+
+                <SolidColorBrush x:Key="CheckboxBackgroundNormal" Color="{DynamicResource LightCheckboxBackgroundNormal}" />
+                <SolidColorBrush x:Key="CheckboxBorderNormal" Color="{DynamicResource LightCheckboxBorderNormal}" />
+                <SolidColorBrush x:Key="CheckboxBackgroundMouseOver" Color="{DynamicResource LightCheckboxBackgroundMouseOver}" />
+                <SolidColorBrush x:Key="CheckboxBackgroundPressed" Color="{DynamicResource LightCheckboxBackgroundPressed}" />
+                <SolidColorBrush x:Key="CheckboxBorderPreseedOrDisabled" Color="{DynamicResource LightCheckboxBorderPreseedOrDisabled}" />
 
                 <SolidColorBrush x:Key="AdbWindowBackground" Color="{DynamicResource LightAdbWindowBackground}" />
                 <SolidColorBrush x:Key="ContentDialogCommandBackground" Color="{DynamicResource LightContentDialogCommandBackground}" />

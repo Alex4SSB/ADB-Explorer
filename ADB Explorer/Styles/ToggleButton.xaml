@@ -10,11 +10,15 @@
         x:Key="ToggleButtonStyle"
         BasedOn="{StaticResource DefaultToggleButtonStyle}"
         TargetType="ToggleButton">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
+        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
-                <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
                 <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="False" />
-                <Setter Property="FocusVisualStyle" Value="{DynamicResource FocusVisualRoundedStyle}" />
+                <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+                <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Template">
                     <!--  Template copied from ModernWPF to be modified  -->
                     <Setter.Value>
@@ -101,7 +105,7 @@
                             </ControlTemplate.Resources>
                             <Border
                                 x:Name="Background"
-                                Background="{DynamicResource AdbButtonBackgroundNormal}"
+                                Background="{TemplateBinding Background}"
                                 CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
                                 SnapsToDevicePixels="True">
                                 <Grid>
@@ -117,23 +121,9 @@
                                             VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                             Focusable="False"
                                             RecognizesAccessKey="True"
-                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                            TextElement.Foreground="{TemplateBinding Foreground}" />
                                     </Border>
-                                    <Border
-                                        x:Name="UpperBorder"
-                                        BorderBrush="{DynamicResource AdbButtonUpperBorderNormal}"
-                                        BorderThickness="0,1,0,0"
-                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                                    <Border
-                                        x:Name="LowerBorder"
-                                        BorderBrush="{DynamicResource AdbButtonLowerBorderNormal}"
-                                        BorderThickness="0,0,0,1"
-                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                                    <Border
-                                        x:Name="SideBorder"
-                                        BorderBrush="{DynamicResource AdbButtonSideBorderNormal}"
-                                        BorderThickness="1,0,1,0"
-                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>
@@ -200,156 +190,100 @@
                                         <BeginStoryboard Storyboard="{StaticResource RightMarqueeStoryBoard}" />
                                     </MultiTrigger.EnterActions>
                                 </MultiTrigger>
-                                <!--  PointerOver  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="False" />
-                                        <Condition Property="IsMouseOver" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonUpperBorderMouseOver}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonLowerBorderMouseOver}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonSideBorderMouseOver}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundPointerOver}" />
-                                </MultiTrigger>
-                                <!--  Pressed  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="False" />
-                                        <Condition Property="IsPressed" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundPressed}" />
-                                </MultiTrigger>
-                                <!--  Disabled  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="False" />
-                                        <Condition Property="IsEnabled" Value="False" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressedOrDisabled}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundDisabled}" />
-                                </MultiTrigger>
-                                <!--  Checked  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="True" />
-                                        <Condition Property="IsMouseOver" Value="False" />
-                                        <Condition Property="IsPressed" Value="False" />
-                                        <Condition Property="IsEnabled" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundChecked}" />
-                                </MultiTrigger>
-                                <!--  CheckedPointerOver  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="True" />
-                                        <Condition Property="IsMouseOver" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPointerOver}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPointerOver}" />
-                                </MultiTrigger>
-                                <!--  CheckedPressed  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="True" />
-                                        <Condition Property="IsPressed" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPressed}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPressed}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPressed}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPressed}" />
-                                </MultiTrigger>
-                                <!--  CheckedDisabled  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="True" />
-                                        <Condition Property="IsEnabled" Value="False" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedDisabled}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedDisabled}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedDisabled}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedDisabled}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedDisabled}" />
-                                </MultiTrigger>
-                                <!--  Indeterminate  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="{x:Null}" />
-                                        <Condition Property="IsMouseOver" Value="False" />
-                                        <Condition Property="IsPressed" Value="False" />
-                                        <Condition Property="IsEnabled" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminate}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminate}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminate}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminate}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminate}" />
-                                </MultiTrigger>
-                                <!--  IndeterminatePointerOver  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="{x:Null}" />
-                                        <Condition Property="IsMouseOver" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminatePointerOver}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePointerOver}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePointerOver}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePointerOver}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminatePointerOver}" />
-                                </MultiTrigger>
-                                <!--  IndeterminatePressed  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="{x:Null}" />
-                                        <Condition Property="IsPressed" Value="True" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminatePressed}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePressed}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePressed}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminatePressed}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminatePressed}" />
-                                </MultiTrigger>
-                                <!--  IndeterminateDisabled  -->
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsChecked" Value="{x:Null}" />
-                                        <Condition Property="IsEnabled" Value="False" />
-                                    </MultiTrigger.Conditions>
-                                    <Setter TargetName="Background" Property="Background" Value="{DynamicResource ToggleButtonBackgroundIndeterminateDisabled}" />
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminateDisabled}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminateDisabled}" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushIndeterminateDisabled}" />
-                                    <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundIndeterminateDisabled}" />
-                                </MultiTrigger>
-                                <!--  Non-fluent  -->
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
-                                    <Setter TargetName="UpperBorder" Property="BorderBrush" Value="Transparent" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="Transparent" />
-                                    <Setter TargetName="SideBorder" Property="BorderBrush" Value="Transparent" />
+
+                                <!--  BACKGROUND, BORDER: Dark Theme, Checked. FOREGROUND: Checked  -->
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+                                    <Setter Property="Foreground" Value="{ui:ThemeResource SystemControlBackgroundAltHighBrush}" />
+                                    <Setter Property="BorderBrush" Value="{StaticResource DarkFluentAccentButtonBorderBrush}" />
+                                </Trigger>
+
+                                <!--  BACKGROUND, BORDER: Light Theme, Checked  -->
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light">
+                                    <Setter Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+                                    <Setter Property="BorderBrush" Value="{StaticResource LightFluentAccentButtonBorderBrush}" />
                                 </DataTrigger>
+
+                                <!--  BORDER: Dark Theme, Unchecked. BACKGROUND, FOREGROUND: Unchecked  -->
+                                <Trigger Property="IsChecked" Value="False">
+                                    <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundNormal}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                    <Setter Property="BorderBrush" Value="{StaticResource DarkFluentButtonBorderBrush}" />
+                                </Trigger>
+
+                                <!--  BORDER: Light Theme, Unchecked  -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="BorderBrush" Value="{StaticResource LightFluentButtonBorderBrush}" />
+                                </MultiDataTrigger>
+
+                                <!--  BACKGORUND: Unchecked, Mouse Over  -->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsChecked" Value="False" />
+                                        <Condition Property="IsMouseOver" Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+                                </MultiTrigger>
+
+                                <!--  BACKGORUND (OPACITY): Checked, Mouse Over  -->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsChecked" Value="True" />
+                                        <Condition Property="IsMouseOver" Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Opacity" Value="{StaticResource AccentButtonBackgroundMouseOverOpacity}" />
+                                </MultiTrigger>
+
+                                <!--  Unchecked, Pressed  -->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsChecked" Value="False" />
+                                        <Condition Property="IsPressed" Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressed}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                                </MultiTrigger>
+
+                                <!--  BACKGORUND (OPACITY), FOREGROUND: Checked, Pressed  -->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsChecked" Value="True" />
+                                        <Condition Property="IsPressed" Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Opacity" Value="{StaticResource AccentButtonBackgroundPressedOpacity}" />
+                                    <Setter Property="Foreground">
+                                        <Setter.Value>
+                                            <SolidColorBrush Opacity="{StaticResource AccentButtonForegroundPressedOrDisabledOpacity}" Color="{ui:ThemeResource SystemAltHighColor}" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </MultiTrigger>
+
+                                <!--  FOREGROUND, BORDER: Disabled. BACKGROUND: Disabled, Unchecked  -->
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AdbButtonBorderDisabled}" />
+                                    <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                                </Trigger>
+
+                                <!--  BACKGROUND: Disabled, Checked  -->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsChecked" Value="True" />
+                                        <Condition Property="IsEnabled" Value="False" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+                                </MultiTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
             </DataTrigger>
         </Style.Triggers>
-        <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
-        <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
     </Style>
 
     <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton" />

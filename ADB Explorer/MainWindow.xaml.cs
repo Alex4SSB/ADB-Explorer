@@ -2079,8 +2079,17 @@ namespace ADB_Explorer
             DeleteFiles();
         }
 
-        private void DeleteFiles()
+        private async void DeleteFiles()
         {
+            var result = await DialogService.ShowConfirmation(
+                $"Are you sure you want to delete {(selectedFiles.Count() == 1 ? DisplayName(selectedFiles.First()) : selectedFiles.Count() + " files")}?",
+                "Confirm Delete",
+                "Delete",
+                icon: DialogService.DialogIcon.Delete);
+
+            if (result is not ContentDialogResult.Primary)
+                return;
+
             try
             {
                 ShellFileOperation.DeleteItems(CurrentADBDevice, selectedFiles);
@@ -2469,7 +2478,10 @@ namespace ADB_Explorer
         private void ExplorerGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete)
+            {
+                e.Handled = true;
                 DeleteFiles();
+            }
         }
     }
 }

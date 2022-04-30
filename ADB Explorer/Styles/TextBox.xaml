@@ -196,10 +196,17 @@
                                 <Trigger Property="IsSelectionActive" Value="true">
                                     <Setter TargetName="PlaceholderTextContentPresenter" Property="Foreground" Value="{DynamicResource TextControlPlaceholderForegroundFocused}" />
                                     <Setter Property="Background" Value="{DynamicResource AdbTextBoxBackgroundFocused}" />
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource SystemAccentColorLight2Brush}" />
                                     <Setter TargetName="LowerBorder" Property="BorderThickness" Value="0,0,0,2" />
                                     <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundFocused}" />
                                 </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelectionActive" Value="true" />
+                                        <Condition Property="ui:ThemeManager.ActualTheme" Value="Light" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+                                </MultiTrigger>
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
                                         <Condition Property="IsSelectionActive" Value="False" />

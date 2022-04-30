@@ -1,0 +1,146 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+
+    <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+    </Style>
+    <Style
+        x:Key="DisabledGlyphStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Gray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DisabledButtonGlyphStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="FocusVisualRoundedStyle" BasedOn="{StaticResource HighVisibilityFocusVisual}">
+        <Setter Property="Control.Template">
+            <!--  Template copied from ModernWPF to be modified  -->
+            <Setter.Value>
+                <ControlTemplate>
+                    <Border
+                        BorderBrush="{TemplateBinding ui:FocusVisualHelper.FocusVisualPrimaryBrush}"
+                        BorderThickness="{TemplateBinding ui:FocusVisualHelper.FocusVisualPrimaryThickness}"
+                        CornerRadius="5"
+                        SnapsToDevicePixels="True">
+                        <Border
+                            BorderBrush="{TemplateBinding ui:FocusVisualHelper.FocusVisualSecondaryBrush}"
+                            BorderThickness="{TemplateBinding ui:FocusVisualHelper.FocusVisualSecondaryThickness}"
+                            CornerRadius="5" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="BorderStyle" TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+                <Setter Property="CornerRadius" Value="5" />
+                <Setter Property="BorderThickness" Value="1" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style x:Key="DevicesListStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource DevicesListBackground}" />
+    </Style>
+    <Style
+        x:Key="DeviceBorderStyle"
+        BasedOn="{StaticResource BorderStyle}"
+        TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style x:Key="DisabledTextBlockStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Gray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DisabledButtonTextBlockStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <LinearGradientBrush x:Key="RedStripedBrush" SpreadMethod="Repeat" StartPoint="0,0" EndPoint="0.15,0">
+        <LinearGradientBrush.RelativeTransform>
+            <TransformGroup>
+                <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                <SkewTransform CenterX="0.5" CenterY="0.5" />
+                <RotateTransform Angle="1" CenterX="0.5" CenterY="0.5" />
+            </TransformGroup>
+        </LinearGradientBrush.RelativeTransform>
+        <GradientStop Offset="0.4" Color="Transparent" />
+        <GradientStop Offset="0.4" Color="#FFC50500" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="LightFluentAccentButtonBorderBrush" ColorInterpolationMode="SRgbLinearInterpolation" MappingMode="Absolute" Opacity="1" SpreadMethod="Pad" EndPoint="0,3">
+        <GradientStopCollection>
+            <GradientStop Offset="0.33" Color="{DynamicResource LightFluentAccentButtonBorderGradient1}" />
+            <GradientStop Offset="1" Color="{DynamicResource LightFluentAccentButtonBorderGradient2}" />
+        </GradientStopCollection>
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform CenterX="0" CenterY="0.5" ScaleX="1" ScaleY="-1" />
+        </LinearGradientBrush.RelativeTransform>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="DarkFluentAccentButtonBorderBrush" ColorInterpolationMode="SRgbLinearInterpolation" MappingMode="Absolute" Opacity="1" SpreadMethod="Pad" EndPoint="0,3">
+        <GradientStopCollection>
+            <GradientStop Offset="0.33" Color="{DynamicResource DarkFluentAccentButtonBorderGradient1}" />
+            <GradientStop Offset="1" Color="{DynamicResource DarkFluentAccentButtonBorderGradient2}" />
+        </GradientStopCollection>
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform CenterX="0" CenterY="0.5" ScaleX="1" ScaleY="-1" />
+        </LinearGradientBrush.RelativeTransform>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="LightFluentButtonBorderBrush" ColorInterpolationMode="SRgbLinearInterpolation" MappingMode="Absolute" Opacity="1" SpreadMethod="Pad" EndPoint="0,3">
+        <GradientStopCollection>
+            <GradientStop Offset="0.33" Color="{DynamicResource LightFluentButtonBorderGradient1}" />
+            <GradientStop Offset="1" Color="{DynamicResource LightFluentButtonBorderGradient2}" />
+        </GradientStopCollection>
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform CenterX="0" CenterY="0.5" ScaleX="1" ScaleY="-1" />
+        </LinearGradientBrush.RelativeTransform>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="DarkFluentButtonBorderBrush" ColorInterpolationMode="SRgbLinearInterpolation" MappingMode="Absolute" Opacity="1" SpreadMethod="Pad" EndPoint="0,3">
+        <GradientStopCollection>
+            <GradientStop Offset="0.33" Color="{DynamicResource DarkFluentButtonBorderGradient1}" />
+            <GradientStop Offset="1" Color="{DynamicResource DarkFluentButtonBorderGradient2}" />
+        </GradientStopCollection>
+        <LinearGradientBrush.RelativeTransform>
+            <ScaleTransform CenterX="0" CenterY="0.5" ScaleX="1" ScaleY="-1" />
+        </LinearGradientBrush.RelativeTransform>
+    </LinearGradientBrush>
+    <sys:Double x:Key="AccentButtonBackgroundMouseOverOpacity">0.9</sys:Double>
+    <sys:Double x:Key="AccentButtonBackgroundPressedOpacity">0.8</sys:Double>
+    <sys:Double x:Key="AccentButtonForegroundPressedOrDisabledOpacity">0.5</sys:Double>
+</ResourceDictionary>
