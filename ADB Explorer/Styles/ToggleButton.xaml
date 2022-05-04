@@ -277,6 +277,7 @@
                                         <Condition Property="IsEnabled" Value="False" />
                                     </MultiTrigger.Conditions>
                                     <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+                                    <Setter Property="BorderBrush" Value="Transparent" />
                                 </MultiTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>

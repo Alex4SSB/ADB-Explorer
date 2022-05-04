@@ -38,15 +38,17 @@ namespace ADB_Explorer.Models
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Equals(storage, value))
             {
-                return;
+                return false;
             }
 
             storage = value;
             OnPropertyChanged(propertyName);
+
+            return true;
         }
 
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -360,10 +362,12 @@ namespace ADB_Explorer.Models
             get => root;
             set
             {
-                Set(ref root, value);
+                if (!Set(ref root, value))
+                    return;
 
                 if (Data.DevicesRoot.ContainsKey(ID))
-                    Data.DevicesRoot[ID] = value;
+                    if (value is not RootStatus.Unchecked)
+                        Data.DevicesRoot[ID] = value;
                 else
                     Data.DevicesRoot.Add(ID, value);
             }
@@ -389,11 +393,14 @@ namespace ADB_Explorer.Models
         {
             var deviceType = GetType(id, status);
             var deviceStatus = GetStatus(status);
+            var rootStatus = deviceType is DeviceType.Sideload
+                ? RootStatus.Enabled
+                : RootStatus.Unchecked;
 
             if (!AdbExplorerConst.DISPLAY_OFFLINE_SERVICES && deviceType is DeviceType.Service && deviceStatus is DeviceStatus.Offline)
                 return null;
 
-            return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus };
+            return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus, Root = rootStatus };
         }
 
         private static DeviceStatus GetStatus(string status)
@@ -553,7 +560,7 @@ namespace ADB_Explorer.Models
                     DeviceType.Remote => "WiFi",
                     DeviceType.Emulator => "Emulator",
                     DeviceType.Service => "mDNS Service",
-                    DeviceType.Sideload => "USB (Sideload)",
+                    DeviceType.Sideload => "USB (Recovery)",
                     _ => throw new NotImplementedException(),
                 };
 

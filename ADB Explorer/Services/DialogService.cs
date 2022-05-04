@@ -34,6 +34,7 @@ namespace ADB_Explorer.Services
         {
             windowDialog.Content = content;
             windowDialog.Title = title;
+            windowDialog.PrimaryButtonText = null;
             windowDialog.CloseButtonText = "Ok";
             TextHelper.SetAltText(windowDialog, Icon(icon));
 

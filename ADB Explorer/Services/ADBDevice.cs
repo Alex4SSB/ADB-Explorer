@@ -320,6 +320,12 @@ namespace ADB_Explorer.Services
                 }
                 return null;
             }
+
+            public static void Reboot(LogicalDevice device, string arg)
+            {
+                if (ExecuteDeviceAdbCommand(device.ID, "reboot", out string stdout, out string stderr, arg) != 0)
+                    throw new Exception(stderr);
+            }
         }
     }
 }

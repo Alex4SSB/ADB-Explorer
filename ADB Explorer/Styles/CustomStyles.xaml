@@ -247,6 +247,18 @@
             <Setter Property="Margin" Value="6,0,0,0" />
         </Style>
     </ResourceDictionary>
+    <ResourceDictionary x:Key="DeviceMenuStyles">
+        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="Margin" Value="0,2" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="6,0,0,0" />
+        </Style>
+    </ResourceDictionary>
     <ContextMenu x:Key="RowContextMenu" Resources="{StaticResource ContextMenuStyles}" />
     <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextMenuStyles}">
         <MenuItem>
@@ -744,7 +756,7 @@
         </Style.Triggers>
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="Background" Value="#FFFBFBFB" />
-        <Setter Property="Margin" Value="0,6,0,0" />
+        <Setter Property="Margin" Value="0,12,0,0" />
     </Style>
     <Style
         x:Key="RootIconStyle"
@@ -762,27 +774,6 @@
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
-    </Style>
-    <Style
-        x:Key="RootToggleStyle"
-        BasedOn="{StaticResource ToggleButtonStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="Padding" Value="6" />
-        <Setter Property="ToolTip" Value="Enable Root Access" />
-        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="Bounce" />
-        <Setter Property="Visibility" Value="Visible" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
-                <Setter Property="IsChecked" Value="True" />
-                <Setter Property="ToolTip" Value="Disable Root Access" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsMdns}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="OperationsIconStyle"
@@ -991,7 +982,7 @@
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Device.Battery.BatteryState}" Value="Unknown">
+                                    <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Unknown">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -1003,7 +994,7 @@
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Device.Battery.BatteryState}" Value="Charging">
+                                        <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Charging">
                                             <Setter Property="Text" Value=", Plugged In" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -1016,7 +1007,7 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Device.Battery.BatteryState}" Value="Unknown">
+                                    <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Unknown">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -1031,6 +1022,15 @@
         x:Key="DeviceDetailsBatteryStyle"
         BasedOn="{StaticResource BatteryIconStyle}"
         TargetType="ui:FontIcon">
+        <Style.Resources>
+            <Style TargetType="TextBlock">
+                <Style.Triggers>
+                    <Trigger Property="Text" Value="">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Style.Resources>
         <Setter Property="ToolTip">
             <Setter.Value>
                 <ui:SimpleStackPanel Spacing="4">
@@ -1081,6 +1081,14 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="RecoveryRootStatusStyle" TargetType="TextBlock">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

@@ -190,7 +190,7 @@ namespace ADB_Explorer
         private void InitializeExplorerContextMenu(MenuType type, object dataContext = null)
         {
             MenuItem pullMenu = FindResource("ContextMenuPullItem") as MenuItem;
-            MenuItem deleteMenu = FindResource("ContextMenuDeleteItem") as MenuItem;
+            MenuItem deleteMenu = FindResource("MenuDeleteItem") as MenuItem;
             MenuItem pushMenu = FindResource("ContextMenuPushItem") as MenuItem;
             MenuItem renameMenu = FindResource("ContextMenuRenameItem") as MenuItem;
             MenuItem cutMenu = FindResource("ContextMenuCutItem") as MenuItem;
@@ -1441,6 +1441,12 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
+            if (TextHelper.GetAltObject(DevicesSplitView) is bool and true)
+            {
+                args.Cancel = true;
+                return;
+            }
+
             PairingExpander.IsExpanded = false;
             DevicesObject.UnselectAll();
         }
@@ -1993,17 +1999,20 @@ namespace ADB_Explorer
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (((MenuItem)(FindResource("DeviceActionsMenu") as Menu).Items[0]).IsSubmenuOpen)
+                return;
+
             DevicesObject.UnselectAll();
         }
 
         private void EnableDeviceRootToggle_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is ToggleButton toggle && toggle.DataContext is UILogicalDevice device && device.Device is LogicalDevice logical)
+            if (sender is MenuItem menu && menu.DataContext is UILogicalDevice device && device.Device is LogicalDevice logical)
             {
-                bool rootToggle = toggle.IsChecked.Value;
+                bool rootEnabled = ((LogicalDevice)device.Device).Root is AbstractDevice.RootStatus.Enabled;
                 var rootTask = Task.Run(() =>
                 {
-                    logical.EnableRoot(rootToggle);
+                    logical.EnableRoot(!rootEnabled);
                 });
                 rootTask.ContinueWith((t) => Dispatcher.BeginInvoke(() =>
                 {
@@ -2081,8 +2090,22 @@ namespace ADB_Explorer
 
         private async void DeleteFiles()
         {
+            string deletedString;
+            if (selectedFiles.Count() == 1)
+                deletedString = DisplayName(selectedFiles.First());
+            else
+            {
+                deletedString = $"{selectedFiles.Count()} ";
+                if (selectedFiles.All(item => item.IsDirectory))
+                    deletedString += "folders";
+                else if (selectedFiles.All(item => !item.IsDirectory))
+                    deletedString += "files";
+                else
+                    deletedString += "items";
+            }
+
             var result = await DialogService.ShowConfirmation(
-                $"Are you sure you want to delete {(selectedFiles.Count() == 1 ? DisplayName(selectedFiles.First()) : selectedFiles.Count() + " files")}?",
+                $"The following will be deleted:\n{deletedString}",
                 "Confirm Delete",
                 "Delete",
                 icon: DialogService.DialogIcon.Delete);
@@ -2212,6 +2235,8 @@ namespace ADB_Explorer
 
         private void NameColumnCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
+            UnfocusPathBox();
+
             if (e.ChangedButton != MouseButton.Left)
                 return;
 
@@ -2482,6 +2507,33 @@ namespace ADB_Explorer
                 e.Handled = true;
                 DeleteFiles();
             }
+        }
+
+        private void RebootMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var menu = sender as MenuItem;
+            var rebootArg = TextHelper.GetAltText(menu);
+            var device = (menu.DataContext as UILogicalDevice).Device as LogicalDevice;
+            try
+            {
+                Task.Run(() => ADBService.AdbDevice.Reboot(device, rebootArg));
+            }
+            catch (Exception ex)
+            {
+                DialogService.ShowMessage(ex.Message, "Reboot Error", DialogService.DialogIcon.Critical);
+                throw;
+            }
+        }
+
+        private void MenuItem_SubmenuOpened(object sender, RoutedEventArgs e)
+        {
+            TextHelper.SetAltObject(DevicesSplitView, true);
+        }
+
+        private void MenuItem_SubmenuClosed(object sender, RoutedEventArgs e)
+        {
+            if (!(sender as MenuItem).IsSubmenuOpen)
+                TextHelper.SetAltObject(DevicesSplitView, false);
         }
     }
 }

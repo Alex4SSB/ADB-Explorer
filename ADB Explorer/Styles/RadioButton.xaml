@@ -18,6 +18,7 @@
         BasedOn="{StaticResource DefaultRadioButtonStyle}"
         TargetType="RadioButton">
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
+        <Setter Property="MinWidth" Value="80" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />

@@ -43,7 +43,7 @@ namespace ADB_Explorer.Models
         }
 
         private Source chargeSource { get; set; } = Source.None;
-        private State batteryState { get; set; } = 0;
+        private State batteryState { get; set; } = State.Unknown;
         public string BatteryState
         {
             get
@@ -57,7 +57,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public ChargingState ChargeState { get; private set; }
+        public ChargingState ChargeState { get; private set; } = ChargingState.Unknown;
         public byte? Level { get; private set; }
         private double? voltage { get; set; }
         public string Voltage
