@@ -46,7 +46,7 @@ namespace ADB_Explorer
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
-        
+
         private double ColumnHeaderHeight
         {
             get
@@ -112,6 +112,7 @@ namespace ADB_Explorer
 
             Settings.PropertyChanged += Settings_PropertyChanged;
             themeService.PropertyChanged += ThemeService_PropertyChanged;
+            CommandLog.CollectionChanged += CommandLog_CollectionChanged;
 
             if (CheckAdbVersion())
             {
@@ -122,6 +123,25 @@ namespace ADB_Explorer
 
             UpperProgressBar.DataContext = fileOperationQueue;
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
+        }
+
+        private void CommandLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems is null)
+                return;
+
+            foreach (Log item in e.NewItems)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    if (PauseAutoScrollButton.IsChecked == false)
+                    {
+                        LogTextBox.Text += $"{item}\n";
+                        LogTextBox.CaretIndex = LogTextBox.Text.Length;
+                        LogTextBox.ScrollToEnd();
+                    }
+                });
+            }
         }
 
         private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -2544,6 +2564,12 @@ namespace ADB_Explorer
         private void CopyPathMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(((FilePath)ExplorerGrid.SelectedItem).FullPath);
+        }
+
+        private void ClearLogButton_Click(object sender, RoutedEventArgs e)
+        {
+            CommandLog.Clear();
+            LogTextBox.Clear();
         }
     }
 }

@@ -64,9 +64,11 @@ namespace ADB_Explorer.Services
         public static Process StartCommandProcess(string file, string cmd, Encoding encoding, params string[] args)
         {
             var cmdProcess = new Process();
+            var arguments = $"{cmd} {string.Join(' ', args)}";
+
             InitProcess(cmdProcess);
             cmdProcess.StartInfo.FileName = file;
-            cmdProcess.StartInfo.Arguments = $"{cmd} {string.Join(' ', args)}";
+            cmdProcess.StartInfo.Arguments = arguments;
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
             cmdProcess.StartInfo.StandardErrorEncoding = encoding;
             
@@ -74,6 +76,9 @@ namespace ADB_Explorer.Services
                 cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
 
             cmdProcess.Start();
+
+            CommandLog.Add(new($"{file} {arguments}"));
+
             return cmdProcess;
         }
         public static int ExecuteCommand(

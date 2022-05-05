@@ -2,10 +2,29 @@
 using ADB_Explorer.Services;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 
 namespace ADB_Explorer.Models
 {
+    public class Log
+    {
+        public string Content { get; set; }
+
+        public DateTime TimeStamp { get; set; }
+
+        public Log(string content, DateTime? timeStamp = null)
+        {
+            Content = content;
+            TimeStamp = timeStamp is null ? DateTime.Now : timeStamp.Value;
+        }
+
+        public override string ToString()
+        {
+            return $"{TimeStamp:HH:mm:ss:fff} ⁞ {Content}";
+        }
+    }
+
     public static class Data
     {
         public static ADBService.AdbDevice CurrentADBDevice { get; set; } = null;
@@ -28,5 +47,7 @@ namespace ADB_Explorer.Models
         public static AppSettings Settings { get; set; } = new();
 
         public static ObservableList<FileClass> CutItems { get; private set; } = new();
+
+        public static ObservableCollection<Log> CommandLog { get; set; } = new();
     }
 }

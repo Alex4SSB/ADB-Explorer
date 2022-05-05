@@ -1307,6 +1307,57 @@
                             </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
+                    <TextBox
+                        x:Name="LogTextBox"
+                        FontFamily="Cascadia Mono, Consolas"
+                        FontSize="18"
+                        Foreground="White"
+                        IsReadOnly="True"
+                        TextWrapping="Wrap">
+                        <TextBox.Style>
+                            <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=CommandLogButton, Path=IsChecked}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <ui:SimpleStackPanel
+                        Margin="6"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Spacing="4"
+                        Visibility="{Binding ElementName=LogTextBox, Path=Visibility}">
+                        <ToggleButton x:Name="PauseAutoScrollButton">
+                            <ToggleButton.Style>
+                                <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
+                                    <Setter Property="ToolTip" Value="Pause Log Updates" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsChecked" Value="True">
+                                            <Setter Property="ToolTip" Value="Log Updates Are Paused" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ToggleButton.Style>
+                            <ui:FontIcon Glyph="&#xE769;" Style="{StaticResource GlyphFont}" />
+                        </ToggleButton>
+                        <Button ToolTip="Clear Command Log" Click="ClearLogButton_Click">
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                                    <Setter Property="IsEnabled" Value="True" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=LogTextBox, Path=Text.Count}" Value="0">
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                            <ui:FontIcon Glyph="&#xE894;" Style="{StaticResource GlyphFont}" />
+                        </Button>
+                    </ui:SimpleStackPanel>
                     <Grid Margin="0,40">
                         <Grid.Style>
                             <Style TargetType="Grid">
@@ -1537,50 +1588,60 @@
                         <Separator />
                     </StackPanel>
                 </StackPanel>
-                <ui:SimpleStackPanel
-                    x:Name="CurrentDeviceDetailsPanel"
+                <StackPanel
                     Margin="6,0"
                     HorizontalAlignment="Right"
-                    VerticalAlignment="Center"
-                    Orientation="Horizontal"
-                    Spacing="6">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Device.Battery.Level}" />
-                        <TextBlock Style="{StaticResource DeviceDetailsBatteryPercentStyle}" Text="%" />
-                    </StackPanel>
-                    <ui:FontIcon
-                        x:Name="CurrentDeviceBatteryIcon"
-                        Style="{StaticResource DeviceDetailsBatteryStyle}"
-                        ToolTipService.InitialShowDelay="0"
-                        ToolTipService.Placement="Top"
-                        ToolTipService.ShowDuration="60000" />
-                    <Separator Margin="2,6" Visibility="{Binding ElementName=AndroidTextBlock, Path=Visibility}" />
-                    <ui:FontIcon
-                        x:Name="UnsupportedAndroidIcon"
-                        Glyph="&#xE7BA;"
-                        Style="{DynamicResource UnsupportedIconStyle}"
-                        ToolTip="Limited Support" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock
-                            x:Name="AndroidTextBlock"
-                            Style="{StaticResource AndroidTextBlockStyle}"
-                            Text="Android " />
-                        <TextBlock x:Name="AndroidVersionBlock" Text="{Binding AndroidVersion}" />
-                        <TextBlock Text=" (Recovery)">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Margin" Value="0,4" />
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-                </ui:SimpleStackPanel>
+                    Orientation="Horizontal">
+                    <ui:SimpleStackPanel
+                        x:Name="CurrentDeviceDetailsPanel"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding Device.Battery.Level}" />
+                            <TextBlock Style="{StaticResource DeviceDetailsBatteryPercentStyle}" Text="%" />
+                        </StackPanel>
+                        <ui:FontIcon
+                            x:Name="CurrentDeviceBatteryIcon"
+                            Style="{StaticResource DeviceDetailsBatteryStyle}"
+                            ToolTipService.InitialShowDelay="0"
+                            ToolTipService.Placement="Top"
+                            ToolTipService.ShowDuration="60000" />
+                        <Separator Margin="2,6" Visibility="{Binding ElementName=AndroidTextBlock, Path=Visibility}" />
+                        <ui:FontIcon
+                            x:Name="UnsupportedAndroidIcon"
+                            Glyph="&#xE7BA;"
+                            Style="{DynamicResource UnsupportedIconStyle}"
+                            ToolTip="Limited Support" />
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock
+                                x:Name="AndroidTextBlock"
+                                Style="{StaticResource AndroidTextBlockStyle}"
+                                Text="Android " />
+                            <TextBlock x:Name="AndroidVersionBlock" Text="{Binding AndroidVersion}" />
+                            <TextBlock Text=" (Recovery)">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="0,4" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </ui:SimpleStackPanel>
+                    <ToggleButton
+                        x:Name="CommandLogButton"
+                        Margin="6,0,-3,0"
+                        Padding="0"
+                        ToolTip="Command Log">
+                        <ui:FontIcon Glyph="&#xE756;" Style="{StaticResource GlyphFont}" />
+                    </ToggleButton>
+                </StackPanel>
             </Grid>
         </Grid>
         <ui:SplitView
