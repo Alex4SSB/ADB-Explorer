@@ -13,7 +13,7 @@
     Title="ADB Explorer"
     Width="800"
     Height="450"
-    MinWidth="530"
+    MinWidth="570"
     MinHeight="400"
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
@@ -252,6 +252,17 @@
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE8C6;" />
                     <TextBlock Text="Cut" />
+                </StackPanel>
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuCopyPathItem"
+            x:Shared="False"
+            Click="CopyPathMenuItem_Click">
+            <MenuItem.Header>
+                <StackPanel>
+                    <ui:FontIcon Glyph="&#xE62F;" />
+                    <TextBlock Text="Copy Item Path" />
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
@@ -880,6 +891,16 @@
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem
+                        x:Name="MoreMenuButton"
+                        IsEnabled="False"
+                        Resources="{StaticResource TopMenuStyles}"
+                        ToolTip="More Options">
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE712;" />
+                        </MenuItem.Header>
+                        <StaticResource ResourceKey="ContextMenuCopyPathItem" />
                     </MenuItem>
                 </Menu>
                 <Border

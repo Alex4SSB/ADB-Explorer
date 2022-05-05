@@ -196,6 +196,8 @@ namespace ADB_Explorer
             MenuItem cutMenu = FindResource("ContextMenuCutItem") as MenuItem;
             MenuItem pasteMenu = FindResource("ContextMenuPasteItem") as MenuItem;
             MenuItem newMenu = FindResource("ContextMenuNewItem") as MenuItem;
+            MenuItem copyPath = FindResource("ContextMenuCopyPathItem") as MenuItem;
+            copyPath.Resources = FindResource("ContextSubMenuStyles") as ResourceDictionary;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
@@ -216,7 +218,10 @@ namespace ADB_Explorer
                         ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
 
                     if (ExplorerGrid.SelectedItems.Count == 1)
+                    {
                         ExplorerGrid.ContextMenu.Items.Add(renameMenu);
+                        ExplorerGrid.ContextMenu.Items.Add(copyPath);
+                    }
 
                     if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
                         ExplorerGrid.ContextMenu.Items.Add(new Separator());
@@ -228,7 +233,8 @@ namespace ADB_Explorer
 
                     foreach (MenuItem item in ExplorerGrid.ContextMenu.Items.OfType<MenuItem>())
                     {
-                        item.IsEnabled = !irregular;
+                        if (!item.Equals(copyPath))
+                            item.IsEnabled = !irregular;
                     }
                     break;
                 case MenuType.EmptySpace:
@@ -333,6 +339,7 @@ namespace ADB_Explorer
                     }
                 }
 
+                e.Handled = true;
                 ExplorerGrid.Focus();
             }
             else if (e.Key == Key.Escape)
@@ -390,6 +397,8 @@ namespace ADB_Explorer
 
             CutMenuButton.IsEnabled = !ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut) && !irregular;
             PasteMenuButton.IsEnabled = PasteEnabled();
+
+            MoreMenuButton.IsEnabled = items.Count() == 1;
         }
 
         private bool PasteEnabled(bool ignoreSelected = false)
@@ -1116,7 +1125,7 @@ namespace ADB_Explorer
                     ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
                     break;
                 case Key.Enter:
-                    if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                    if (ExplorerGrid.SelectedCells.Count < 1 || CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
                         return false;
 
                     if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
@@ -1419,6 +1428,7 @@ namespace ADB_Explorer
             HomeButton.IsEnabled =
             NewMenuButton.IsEnabled =
             PasteMenuButton.IsEnabled =
+            MoreMenuButton.IsEnabled =
             ParentButton.IsEnabled = false;
 
             if (clearDevice)
@@ -2534,6 +2544,11 @@ namespace ADB_Explorer
         {
             if (!(sender as MenuItem).IsSubmenuOpen)
                 TextHelper.SetAltObject(DevicesSplitView, false);
+        }
+
+        private void CopyPathMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(((FilePath)ExplorerGrid.SelectedItem).FullPath);
         }
     }
 }
