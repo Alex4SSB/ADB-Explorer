@@ -260,7 +260,7 @@
         </Style>
     </ResourceDictionary>
     <ContextMenu x:Key="RowContextMenu" Resources="{StaticResource ContextMenuStyles}" />
-    <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextMenuStyles}">
+    <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextSubMenuStyles}">
         <MenuItem>
             <MenuItem.Header>
                 <CheckBox
@@ -302,26 +302,6 @@
             </MenuItem.Header>
         </MenuItem>
     </ContextMenu>
-
-    <DataTemplate x:Key="StatusIconTemplate">
-        <ui:FontIcon>
-            <ui:FontIcon.Style>
-                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Status}" Value="Completed">
-                            <Setter Property="Glyph" Value="&#xF13E;" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Status}" Value="Failed">
-                            <Setter Property="Glyph" Value="&#xF13D;" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding Status}" Value="Canceled">
-                            <Setter Property="Glyph" Value="&#xF13D;" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ui:FontIcon.Style>
-        </ui:FontIcon>
-    </DataTemplate>
     <DataTemplate x:Key="FileOpFileNameTemplate">
         <Grid Margin="4,0,0,0">
             <Grid.RowDefinitions>
@@ -434,16 +414,17 @@
         </TextBlock>
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
-        <TextBlock
-            Margin="4,0"
-            Text="{Binding TargetPath.FullPath}"
-            TextTrimming="CharacterEllipsis">
+        <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
             <TextBlock.Style>
                 <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="FontWeight" Value="Regular" />
+                    <Setter Property="Text" Value="{Binding TargetPath.FullPath}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Status}" Value="InProgress">
                             <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding OperationName}" Value="Delete">
+                            <Setter Property="Text" Value="Permanent Deletion" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -539,6 +520,9 @@
                                 <DataTrigger Binding="{Binding Status}" Value="Completed">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Delete">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
@@ -574,12 +558,38 @@
                                 <DataTrigger Binding="{Binding Status}" Value="Failed">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Delete">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
                     </Grid.Style>
                     <ui:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                        <ui:FontIcon Glyph="&#xE711;" Style="{StaticResource GlyphFont}" />
+                        <ui:FontIcon Glyph="&#xE711;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                        <ui:FontIcon Glyph="&#xF13E;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
                         <TextBlock Text="{Binding Status}" />
                     </ui:SimpleStackPanel>
                 </Grid>
@@ -587,28 +597,50 @@
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="OperationIconTemplate">
-        <Grid Margin="0,0,6,0">
-            <ui:FontIcon
-                HorizontalAlignment="Left"
-                Glyph="&#xE8EA;"
-                ToolTip="{Binding OperationName}" />
-            <ui:FontIcon
-                Margin="14,0,0,0"
-                FontSize="14"
-                ToolTip="{Binding OperationName}">
-                <ui:FontIcon.Style>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+        <Grid Margin="0,0,6,0" ToolTip="{Binding OperationName}">
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding OperationName}" Value="Push">
-                                <Setter Property="Glyph" Value="&#xE973;" />
+                                <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding OperationName}" Value="Pull">
-                                <Setter Property="Glyph" Value="&#xE974;" />
+                                <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </ui:FontIcon.Style>
-            </ui:FontIcon>
+                </Grid.Style>
+                <ui:FontIcon HorizontalAlignment="Left" Glyph="&#xE8EA;" />
+                <ui:FontIcon Margin="14,0,0,0" FontSize="14">
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Push">
+                                    <Setter Property="Glyph" Value="&#xE973;" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Pull">
+                                    <Setter Property="Glyph" Value="&#xE974;" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OperationName}" Value="Delete">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <ui:FontIcon Glyph="&#xE74D;" Style="{StaticResource GlyphFont}" />
+            </Grid>
         </Grid>
     </DataTemplate>
     <Style x:Key="BaseRowStyle" TargetType="DataGridRow">

@@ -1,24 +1,23 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
-using static ADB_Explorer.Models.AdbExplorerConst;
-using static ADB_Explorer.Services.ADBService.AdbDevice;
 
 namespace ADB_Explorer.Services
 {
-    public abstract class FileDeleteOperation : FileOperation
+    public class FileDeleteOperation : FileOperation
     {
         private Task operationTask;
         private CancellationTokenSource cancelTokenSource;
+        private ObservableList<FileClass> fileList;
 
-        public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path) : base(dispatcher, adbDevice, path) {}
+        public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path, ObservableList<FileClass> fileList) : base(dispatcher, adbDevice, path)
+        {
+            OperationName = "Delete";
+            this.fileList = fileList;
+        }
 
         public override void Start()
         {
@@ -29,12 +28,19 @@ namespace ADB_Explorer.Services
 
             Status = OperationStatus.InProgress;
             cancelTokenSource = new CancellationTokenSource();
-            operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbCommandAsync(Device.ID, "rm", cancelTokenSource.Token, new[] { "-rf", FilePath.FullPath }), cancelTokenSource.Token);
+            operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", out _, out _, new[] { "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath) }));
 
             operationTask.ContinueWith((t) => 
             {
-                Status = OperationStatus.Completed;
+                var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
+                Status = operationStatus;
                 StatusInfo = null;
+
+                if (operationStatus is OperationStatus.Completed)
+                {
+                    Dispatcher.Invoke(() => fileList.Remove((FileClass)FilePath));
+                }
+
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             operationTask.ContinueWith((t) =>

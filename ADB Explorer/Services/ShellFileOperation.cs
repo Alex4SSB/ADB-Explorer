@@ -8,25 +8,6 @@ namespace ADB_Explorer.Services
     public static class ShellFileOperation
     {
         /// <summary>
-        /// Batch delete files using a single rm command
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="items"></param>
-        /// <exception cref="Exception"></exception>
-        public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FilePath> items)
-        {
-            var args = new[] { "-rf" }.Concat(GetEscapedPaths(items)).ToArray();
-            var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out string stdout, out string stderr, args);
-            
-            if (exitCode != 0)
-            {
-                throw new Exception(stderr);
-            }
-
-            return;
-        }
-
-        /// <summary>
         /// Moves item(s) or renames an item
         /// </summary>
         /// <param name="device"></param>
@@ -100,7 +81,5 @@ namespace ADB_Explorer.Services
                 throw new Exception(stderr);
             }
         }
-
-        public static IEnumerable<string> GetEscapedPaths(IEnumerable<FilePath> items) => items.Select(item => ADBService.EscapeAdbShellString(item.FullPath)).ToArray();
     }
 }

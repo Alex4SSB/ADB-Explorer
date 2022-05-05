@@ -1438,12 +1438,12 @@
                                         x:Name="SourceColumn"
                                         Width="200"
                                         CellTemplate="{StaticResource FileOpSourcePathTemplate}"
-                                        Header="Source Path" />
+                                        Header="Source" />
                                     <DataGridTemplateColumn
                                         x:Name="DestColumn"
                                         Width="200"
                                         CellTemplate="{StaticResource FileOpTargetPathTemplate}"
-                                        Header="Destination Path" />
+                                        Header="Destination" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Border

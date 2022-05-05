@@ -2123,14 +2123,9 @@ namespace ADB_Explorer
             if (result is not ContentDialogResult.Primary)
                 return;
 
-            try
+            foreach (var item in selectedFiles)
             {
-                ShellFileOperation.DeleteItems(CurrentADBDevice, selectedFiles);
-                DirectoryLister.FileList.RemoveAll(file => selectedFiles.Contains(file));
-            }
-            catch (Exception e)
-            {
-                DialogService.ShowMessage(e.Message, "Delete Error", DialogService.DialogIcon.Critical);
+                fileOperationQueue.AddOperation(new FileDeleteOperation(Dispatcher, CurrentADBDevice, item, DirectoryLister.FileList));
             }
         }
 

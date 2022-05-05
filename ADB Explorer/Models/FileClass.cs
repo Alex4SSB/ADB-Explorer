@@ -81,6 +81,9 @@ namespace ADB_Explorer.Models
             if (string.IsNullOrEmpty(fileName))
                 return "File";
 
+            if (Extension.ToLower() == ".exe")
+                return "Windows Executable";
+
             var name = ShellInfoManager.GetShellFileType(fileName);
 
             if (name.EndsWith("? File"))
