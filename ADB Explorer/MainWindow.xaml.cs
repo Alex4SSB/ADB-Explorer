@@ -157,6 +157,10 @@ namespace ADB_Explorer
                 case nameof(AppSettings.ShowHiddenItems):
                     FilterHiddenFiles();
                     break;
+                case nameof(AppSettings.EnableLog):
+                    if (!Settings.EnableLog)
+                        ClearLogs();
+                    break;
                 default:
                     break;
             }
@@ -709,6 +713,9 @@ namespace ADB_Explorer
 
         private void UpdateDevicesBatInfo(bool devicesVisible)
         {
+            if (!Settings.PollBattery)
+                return;
+
             DevicesObject.CurrentDevice?.UpdateBattery();
 
             if (DateTime.Now - DevicesObject.LastUpdate > BATTERY_UPDATE_INTERVAL || devicesVisible)
@@ -749,17 +756,25 @@ namespace ADB_Explorer
                     return;
                 }
 
-                Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
-
-                if (MdnsService.State == MDNS.MdnsState.Running && devicesVisible)
+                if (Settings.PollDevices)
                 {
-                    Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
+                    RefreshDevices(devicesVisible);
                 }
 
                 UpdateDevicesBatInfo(devicesVisible);
 
                 connectTimerMutex.ReleaseMutex();
             });
+        }
+
+        private void RefreshDevices(bool devicesVisible)
+        {
+            Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
+
+            if (MdnsService.State == MDNS.MdnsState.Running && devicesVisible)
+            {
+                Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
+            }
         }
 
         private static void MdnsCheck()
@@ -2568,8 +2583,18 @@ namespace ADB_Explorer
 
         private void ClearLogButton_Click(object sender, RoutedEventArgs e)
         {
+            ClearLogs();
+        }
+
+        private void ClearLogs()
+        {
             CommandLog.Clear();
             LogTextBox.Clear();
+        }
+
+        private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
+        {
+            RefreshDevices(true);
         }
     }
 }

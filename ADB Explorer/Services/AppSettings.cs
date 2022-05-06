@@ -53,7 +53,7 @@ namespace ADB_Explorer.Services
 
         #endregion
 
-        #region connection
+        #region device
 
         private bool rememberIp;
         public bool RememberIp
@@ -93,13 +93,6 @@ namespace ADB_Explorer.Services
             set => Set(ref autoOpen, value);
         }
 
-        private bool enableMdns;
-        public bool EnableMdns
-        {
-            get => Get(ref enableMdns, false);
-            set => Set(ref enableMdns, value);
-        }
-
         private bool autoRoot;
         /// <summary>
         /// Automatically Try To Open Devices Using Root Privileges
@@ -108,6 +101,60 @@ namespace ADB_Explorer.Services
         {
             get => Get(ref autoRoot, false);
             set => Set(ref autoRoot, value);
+        }
+
+        private bool enableRecycle;
+        /// <summary>
+        /// Enable moving deleted items to a special folder, instead of permanently deleting them
+        /// </summary>
+        public bool EnableRecycle
+        {
+            get => Get(ref enableRecycle, false);
+            set => Set(ref enableRecycle, value);
+        }
+
+        #endregion
+
+        #region adb
+
+        private bool enableMdns;
+        /// <summary>
+        /// Runs ADB server with mDNS enabled, polling for services is enabled in the connection expander
+        /// </summary>
+        public bool EnableMdns
+        {
+            get => Get(ref enableMdns, false);
+            set => Set(ref enableMdns, value);
+        }
+
+        private bool pollDevices;
+        /// <summary>
+        /// <see langword="false"/> - disables polling for both ADB devices and mDNS services. Enables manual refresh button
+        /// </summary>
+        public bool PollDevices
+        {
+            get => Get(ref pollDevices, true);
+            set => Set(ref pollDevices, value);
+        }
+
+        private bool pollBattery;
+        /// <summary>
+        /// Enables battery information for all devices (polling and displaying)
+        /// </summary>
+        public bool PollBattery
+        {
+            get => Get(ref pollBattery, true);
+            set => Set(ref pollBattery, value);
+        }
+
+        private bool enableLog;
+        /// <summary>
+        /// <see langword="false"/> - disables logging of commands and command log button
+        /// </summary>
+        public bool EnableLog
+        {
+            get => Get(ref enableLog, false);
+            set => Set(ref enableLog, value);
         }
 
         #endregion

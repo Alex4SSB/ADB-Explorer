@@ -1344,7 +1344,7 @@
                             </ToggleButton.Style>
                             <ui:FontIcon Glyph="&#xE769;" Style="{StaticResource GlyphFont}" />
                         </ToggleButton>
-                        <Button ToolTip="Clear Command Log" Click="ClearLogButton_Click">
+                        <Button Click="ClearLogButton_Click" ToolTip="Clear Command Log">
                             <Button.Style>
                                 <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
                                     <Setter Property="IsEnabled" Value="True" />
@@ -1597,9 +1597,9 @@
                         VerticalAlignment="Center"
                         Orientation="Horizontal"
                         Spacing="6">
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Style="{StaticResource DeviceDetailsBatteryPercentStyle}">
                             <TextBlock Text="{Binding Device.Battery.Level}" />
-                            <TextBlock Style="{StaticResource DeviceDetailsBatteryPercentStyle}" Text="%" />
+                            <TextBlock Text="%" />
                         </StackPanel>
                         <ui:FontIcon
                             x:Name="CurrentDeviceBatteryIcon"
@@ -1607,7 +1607,21 @@
                             ToolTipService.InitialShowDelay="0"
                             ToolTipService.Placement="Top"
                             ToolTipService.ShowDuration="60000" />
-                        <Separator Margin="2,6" Visibility="{Binding ElementName=AndroidTextBlock, Path=Visibility}" />
+                        <Separator Margin="2,6">
+                            <Separator.Style>
+                                <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
+                                    <Setter Property="Margin" Value="8,6" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=CurrentDeviceBatteryIcon, Path=Visibility}" Value="Collapsed">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding ElementName=AndroidTextBlock, Path=Visibility}" Value="Collapsed">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Separator.Style>
+                        </Separator>
                         <ui:FontIcon
                             x:Name="UnsupportedAndroidIcon"
                             Glyph="&#xE7BA;"
@@ -1639,6 +1653,17 @@
                         Margin="6,0,-3,0"
                         Padding="0"
                         ToolTip="Command Log">
+                        <ToggleButton.Style>
+                            <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
+                                        <Setter Property="IsChecked" Value="False" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
                         <ui:FontIcon Glyph="&#xE756;" Style="{StaticResource GlyphFont}" />
                     </ToggleButton>
                 </StackPanel>
@@ -2048,11 +2073,34 @@
                             </StackPanel>
                         </Expander>
                         <Grid Grid.Row="1" Margin="0,6">
-                            <ui:ProgressRing
-                                Margin="6,4,0,0"
-                                HorizontalAlignment="Left"
-                                IsActive="True"
-                                Style="{StaticResource FluentProgressRingStyle}" />
+                            <Grid Margin="6,4,0,0" HorizontalAlignment="Left">
+                                <ui:ProgressRing IsActive="True">
+                                    <ui:ProgressRing.Style>
+                                        <Style BasedOn="{StaticResource FluentProgressRingStyle}" TargetType="ui:ProgressRing">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:ProgressRing.Style>
+                                </ui:ProgressRing>
+                                <Button Click="RefreshDevicesButton_Click" ToolTip="Refresh Devices">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <ui:FontIcon
+                                        FontSize="15"
+                                        Glyph="&#xE72C;"
+                                        Style="{StaticResource GlyphFont}" />
+                                </Button>
+                            </Grid>
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 FontSize="24"
@@ -2233,26 +2281,17 @@
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="File Double-Click Behavior">
-                                    <CheckBox Content="Pull To Default Folder">
-                                        <CheckBox.Style>
-                                            <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                                                <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=PullOnDoubleClick}" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" Value="">
-                                                        <Setter Property="IsEnabled" Value="False" />
-                                                        <Setter Property="IsChecked" Value="False" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </CheckBox.Style>
-                                    </CheckBox>
-                                </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="Connection">
+                                <Expander Header="ADB">
                                     <StackPanel>
                                         <CheckBox Content="Enable mDNS (experimental)" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" />
+                                        <CheckBox Content="Poll For Devices" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" />
+                                        <CheckBox Content="Poll For Battery Status" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" />
+                                        <CheckBox Content="Enable Command Log" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" />
+                                    </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="Device">
+                                    <StackPanel>
                                         <CheckBox Content="Automatically Enable Root" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoRoot}" />
                                         <CheckBox Content="Remember Last IP" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" />
                                         <CheckBox Content="Remember Last Port">
@@ -2271,17 +2310,35 @@
                                             </CheckBox.Style>
                                         </CheckBox>
                                         <CheckBox Content="Automatically Open For Browsing" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoOpen}" />
+                                        <CheckBox
+                                            Content="Enable Recycle Bin"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}"
+                                            Visibility="Hidden" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="Show">
+                                <Expander Header="File Behavior">
                                     <StackPanel>
-                                        <CheckBox Content="File Name Extensions" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" />
-                                        <CheckBox Content="Hidden Items" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowHiddenItems}" />
+                                        <CheckBox Content="Show File Name Extensions" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" />
+                                        <CheckBox Content="Show Hidden Items" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowHiddenItems}" />
+                                        <CheckBox Content="Pull To Default Folder On Double-Click">
+                                            <CheckBox.Style>
+                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                    <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=PullOnDoubleClick}" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" Value="">
+                                                            <Setter Property="IsEnabled" Value="False" />
+                                                            <Setter Property="IsChecked" Value="False" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="File Operations">
+                                <Expander Header="File Operations View">
                                     <StackPanel>
                                         <RadioButton Content="Compact" GroupName="FileOpView" />
                                         <RadioButton

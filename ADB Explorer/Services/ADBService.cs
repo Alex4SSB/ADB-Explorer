@@ -77,7 +77,8 @@ namespace ADB_Explorer.Services
 
             cmdProcess.Start();
 
-            CommandLog.Add(new($"{file} {arguments}"));
+            if (Settings.EnableLog)
+                CommandLog.Add(new($"{file} {arguments}"));
 
             return cmdProcess;
         }

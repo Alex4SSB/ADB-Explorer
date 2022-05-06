@@ -1049,6 +1049,12 @@
                 </Grid>
             </Setter.Value>
         </Setter>
+        <Setter Property="Visibility" Value="Visible" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DeviceDetailsBatteryStyle"
@@ -1078,6 +1084,9 @@
             <Trigger Property="DataContext" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
             </Trigger>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -1100,11 +1109,13 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="TextBlock">
+    <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Visible" />
-        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Battery.Level}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
