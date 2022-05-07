@@ -16,6 +16,8 @@ namespace ADB_Explorer.Services
         private const string ANDROID_VERSION = "ro.build.version.release";
         private const string BATTERY = "dumpsys battery";
 
+        private static readonly string[] FIND_DIR_COUNT_PARAMS = { "-maxdepth", "0", "-type", "d", @"2>/dev/null", @"|", "wc", "-l" };
+
         private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" }; // first partition
 
         public class AdbDevice : Device
@@ -325,6 +327,14 @@ namespace ADB_Explorer.Services
             {
                 if (ExecuteDeviceAdbCommand(device.ID, "reboot", out string stdout, out string stderr, arg) != 0)
                     throw new Exception(stderr);
+            }
+
+            public ulong CountRecycle()
+            {
+                if (ExecuteDeviceAdbShellCommand(ID, "find", out string stdout, out _, new[] { AdbExplorerConst.RECYCLE_PATH + "/*" }.Concat(FIND_DIR_COUNT_PARAMS).ToArray()) != 0)
+                    return 0;
+
+                return ulong.TryParse(stdout, out var count) ? count : 0;
             }
         }
     }

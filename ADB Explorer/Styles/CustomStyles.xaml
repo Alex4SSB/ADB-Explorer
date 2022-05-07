@@ -426,6 +426,9 @@
                         <DataTrigger Binding="{Binding OperationName}" Value="Delete">
                             <Setter Property="Text" Value="Permanent Deletion" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
+                            <Setter Property="Text" Value="Recycle Bin" />
+                        </DataTrigger>
                     </Style.Triggers>
                 </Style>
             </TextBlock.Style>
@@ -523,6 +526,12 @@
                                 <DataTrigger Binding="{Binding OperationName}" Value="Delete">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Move">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
@@ -559,6 +568,12 @@
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding OperationName}" Value="Delete">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Move">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -636,11 +651,38 @@
                             <DataTrigger Binding="{Binding OperationName}" Value="Delete">
                                 <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
                 <ui:FontIcon Glyph="&#xE74D;" Style="{StaticResource GlyphFont}" />
+                <ui:FontIcon Margin="0,0,-26,-15" Glyph="&#xF143;">
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
             </Grid>
+            <ui:FontIcon Glyph="&#xE8DE;">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OperationName}" Value="Move">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
         </Grid>
     </DataTemplate>
     <Style x:Key="BaseRowStyle" TargetType="DataGridRow">

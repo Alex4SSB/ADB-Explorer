@@ -106,8 +106,8 @@
                                                                 <ColumnDefinition />
                                                             </Grid.ColumnDefinitions>
                                                             <ui:FontIcon
-                                                                Margin="0,0,8,0"
-                                                                VerticalAlignment="Center"
+                                                                Margin="0,8,8,0"
+                                                                VerticalAlignment="Top"
                                                                 FontSize="28"
                                                                 Glyph="{TemplateBinding helpers:TextHelper.AltText}" />
                                                             <ui:ContentPresenterEx

@@ -668,7 +668,7 @@ namespace ADB_Explorer
         {
             foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Type != Models.DriveType.Root))
             {
-                CurrentPrettyNames.TryAdd(drive.Path, drive.Type == Models.DriveType.External
+                CurrentPrettyNames.TryAdd(drive.Path, drive.Type is Models.DriveType.External
                     ? drive.ID : drive.PrettyName);
             }
             foreach (var item in SPECIAL_FOLDERS_PRETTY_NAMES)
@@ -686,6 +686,7 @@ namespace ADB_Explorer
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             PushMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
+            AddDummyRecycledItems(Dispatcher);
 
             if (path is null)
                 return true;
@@ -816,6 +817,7 @@ namespace ADB_Explorer
             NewMenuButton.IsEnabled = true;
 
             DirectoryLister.Navigate(realPath);
+            FilterHiddenFiles();
             return true;
         }
 
@@ -835,7 +837,9 @@ namespace ADB_Explorer
             List<string> pathItems = new();
 
             // On special cases, cut prefix of the path and replace with a pretty button
-            var specialPair = CurrentPrettyNames.FirstOrDefault(kv => path.StartsWith(kv.Key));
+            var pairs = CurrentPrettyNames.Where(kv => path.StartsWith(kv.Key));
+
+            var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.First();
             if (specialPair.Key != null)
             {
                 MenuItem button = CreatePathButton(specialPair);
@@ -1640,7 +1644,14 @@ namespace ADB_Explorer
 
         private void RefreshDrives(bool findMmc = false)
         {
-            DevicesObject.CurrentDevice.SetDrives(CurrentADBDevice.GetDrives(), findMmc);
+            var drives = CurrentADBDevice.GetDrives();
+            if (Settings.EnableRecycle)
+            {
+                AddDummyRecycledItems(Dispatcher);
+                drives.Add(new(path: RECYCLE_PATH));
+            }
+
+            DevicesObject.CurrentDevice.SetDrives(drives, findMmc);
             DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
         }
 
@@ -1704,8 +1715,8 @@ namespace ADB_Explorer
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
             CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = !Settings.ShowHiddenItems
-                ? (new(file => !((FileClass)file).IsHidden))
-                : null;
+                ? (new(file => file is FileClass fileClass && !fileClass.IsHidden && fileClass.FullPath != RECYCLE_PATH))
+                : (new(file => ((FileClass)file).FullPath != RECYCLE_PATH));
         }
 
         private void PullMenuButton_Click(object sender, RoutedEventArgs e)
@@ -2153,14 +2164,19 @@ namespace ADB_Explorer
                 $"The following will be deleted:\n{deletedString}",
                 "Confirm Delete",
                 "Delete",
+                checkBoxText: Settings.EnableRecycle ? "Permanently Delete" : "",
                 icon: DialogService.DialogIcon.Delete);
 
-            if (result is not ContentDialogResult.Primary)
+            if (result.Item1 is not ContentDialogResult.Primary)
                 return;
 
-            foreach (var item in selectedFiles)
+            if (Settings.EnableRecycle && !result.Item2)
             {
-                fileOperationQueue.AddOperation(new FileDeleteOperation(Dispatcher, CurrentADBDevice, item, DirectoryLister.FileList));
+                ShellFileOperation.MoveItems(CurrentADBDevice, selectedFiles, RECYCLE_PATH, CurrentPath, DirectoryLister.FileList, Dispatcher);
+            }
+            else
+            {
+                ShellFileOperation.DeleteItems(CurrentADBDevice, selectedFiles, DirectoryLister.FileList, Dispatcher);
             }
         }
 
@@ -2175,7 +2191,7 @@ namespace ADB_Explorer
 
             try
             {
-                ShellFileOperation.MoveItems(CurrentADBDevice, new[] { file }, newPath);
+                ShellFileOperation.RenameItem(CurrentADBDevice, file, newPath);
             }
             catch (Exception e)
             {
@@ -2275,8 +2291,6 @@ namespace ADB_Explorer
 
         private void NameColumnCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            UnfocusPathBox();
-
             if (e.ChangedButton != MouseButton.Left)
                 return;
 
@@ -2293,6 +2307,7 @@ namespace ADB_Explorer
             }
             else
             {
+                UnfocusPathBox();
                 var row = DataGridRow.GetRowContainingElement(cell);
                 var current = row.GetIndex();
 
@@ -2428,30 +2443,8 @@ namespace ADB_Explorer
             var targetPath = ExplorerGrid.SelectedItems.Count == 1 ? ((FileClass)ExplorerGrid.SelectedItem).FullPath : CurrentPath;
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
 
-            try
-            {
-                ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath);
-            }
-            catch (Exception e)
-            {
-                DialogService.ShowMessage(e.Message, "Move Error", DialogService.DialogIcon.Critical);
-                throw;
-            }
+            ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath, CurrentPath, DirectoryLister.FileList, Dispatcher);
 
-            if (targetPath == CurrentPath)
-            {
-                foreach (var item in pasteItems)
-                {
-                    item.UpdatePath($"{targetPath}/{item.FullName}");
-                }
-
-                DirectoryLister.FileList.AddRange(pasteItems);
-            }
-            else if (CutItems[0].ParentPath == CurrentPath)
-            {
-                DirectoryLister.FileList.RemoveAll(pasteItems);
-            }
-            
             ClearCutFiles();
             PasteMenuButton.IsEnabled = PasteEnabled();
         }

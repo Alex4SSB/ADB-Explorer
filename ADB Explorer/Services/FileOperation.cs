@@ -19,7 +19,17 @@ namespace ADB_Explorer.Services
             Failed
         }
 
-        public string OperationName { get; protected set; }
+        public enum OperationType
+        {
+            Push,
+            Pull,
+            Move,
+            Delete,
+            Recycle,
+            Copy
+        }
+
+        public OperationType OperationName { get; protected set; }
 
         public Dispatcher Dispatcher { get; }
 
@@ -65,6 +75,8 @@ namespace ADB_Explorer.Services
                 NotifyPropertyChanged();
             }
         }
+
+        public FilePath TargetPath { get; set; }
 
         public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath)
         {

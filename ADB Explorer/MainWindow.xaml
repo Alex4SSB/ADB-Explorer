@@ -13,7 +13,7 @@
     Title="ADB Explorer"
     Width="800"
     Height="450"
-    MinWidth="570"
+    MinWidth="605"
     MinHeight="400"
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
@@ -500,62 +500,101 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
                     <ui:FontIcon
+                        Grid.RowSpan="3"
                         Margin="0,0,8,0"
                         FontSize="32"
                         Glyph="{Binding DriveIcon}"
                         Style="{StaticResource DriveIconStyle}" />
-                    <StackPanel Grid.Column="1">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
+                        </StackPanel.Resources>
+                        <TextBlock Text="{Binding PrettyName}" />
                         <StackPanel Orientation="Horizontal">
-                            <StackPanel.Resources>
-                                <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
-                            </StackPanel.Resources>
-                            <TextBlock Text="{Binding PrettyName}" />
-                            <StackPanel Orientation="Horizontal">
-                                <StackPanel.Style>
-                                    <Style TargetType="StackPanel">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Type}" Value="External">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="Emulated">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </StackPanel.Style>
-                                <TextBlock Text=" (" />
-                                <TextBlock
-                                    VerticalAlignment="Center"
-                                    FontFamily="Consolas"
-                                    Text="{Binding ID}" />
-                                <TextBlock Text=")" />
-                            </StackPanel>
-                        </StackPanel>
-                        <StackPanel>
-                            <StackPanel.Resources>
-                                <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock" />
-                            </StackPanel.Resources>
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding UsageP}" Value="-1">
-                                            <Setter Property="Visibility" Value="Hidden" />
+                                        <DataTrigger Binding="{Binding Type}" Value="External">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Type}" Value="Emulated">
+                                            <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <ui:ProgressBar
-                                Margin="0,6"
-                                Style="{StaticResource DriveUsageBarStyle}"
-                                Value="{Binding UsageP, Mode=OneWay}" />
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Available, Mode=OneWay}" />
-                                <TextBlock Text=" free of " />
-                                <TextBlock Text="{Binding Size, Mode=OneWay}" />
-                            </StackPanel>
+                            <TextBlock Text=" (" />
+                            <TextBlock
+                                VerticalAlignment="Center"
+                                FontFamily="Consolas"
+                                Text="{Binding ID}" />
+                            <TextBlock Text=")" />
                         </StackPanel>
+                    </StackPanel>
+                    <ui:ProgressBar
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Margin="0,6"
+                        Value="{Binding UsageP, Mode=OneWay}">
+                        <ui:ProgressBar.Style>
+                            <Style BasedOn="{StaticResource DriveUsageBarStyle}" TargetType="ui:ProgressBar">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:ProgressBar.Style>
+                    </ui:ProgressBar>
+                    <StackPanel
+                        Grid.Row="2"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                        <Setter Property="Visibility" Value="Hidden" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <StackPanel.Resources>
+                            <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock" />
+                        </StackPanel.Resources>
+                        <TextBlock Text="{Binding Available, Mode=OneWay}" />
+                        <TextBlock Text=" free of " />
+                        <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Row="1"
+                        Grid.RowSpan="2"
+                        Grid.Column="1"
+                        Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Type}" Value="Trash">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <StackPanel.Resources>
+                            <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RecycledItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                        <TextBlock Text=" Items" />
                     </StackPanel>
                 </Grid>
             </Button>
@@ -889,7 +928,28 @@
                         Resources="{StaticResource TopMenuStyles}"
                         ToolTip="Delete">
                         <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE74D;" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ui:FontIcon Glyph="&#xE74D;" />
+                                <TextBlock Grid.Column="1" Margin="4,0,0,0">
+                                    <TextBlock.Style>
+                                        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RecycledItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RecycledItems}, Path=Count}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
@@ -2310,10 +2370,7 @@
                                             </CheckBox.Style>
                                         </CheckBox>
                                         <CheckBox Content="Automatically Open For Browsing" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoOpen}" />
-                                        <CheckBox
-                                            Content="Enable Recycle Bin"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}"
-                                            Visibility="Hidden" />
+                                        <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />

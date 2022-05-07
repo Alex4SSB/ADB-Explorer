@@ -11,11 +11,11 @@ namespace ADB_Explorer.Services
     {
         private Task operationTask;
         private CancellationTokenSource cancelTokenSource;
-        private ObservableList<FileClass> fileList;
+        private readonly ObservableList<FileClass> fileList;
 
         public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path, ObservableList<FileClass> fileList) : base(dispatcher, adbDevice, path)
         {
-            OperationName = "Delete";
+            OperationName = OperationType.Delete;
             this.fileList = fileList;
         }
 

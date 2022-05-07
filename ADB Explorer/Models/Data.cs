@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
 {
@@ -49,5 +51,20 @@ namespace ADB_Explorer.Models
         public static ObservableList<FileClass> CutItems { get; private set; } = new();
 
         public static ObservableCollection<Log> CommandLog { get; set; } = new();
+
+        public static ObservableList<FileClass> RecycledItems { get; set; } = new();
+
+        public static void AddDummyRecycledItems(Dispatcher dispatcher)
+        {
+            RecycledItems.Clear();
+            var countTask = Task.Run(() => CurrentADBDevice.CountRecycle());
+            countTask.ContinueWith((t) =>
+            {
+                for (ulong i = 0; i < t.Result; i++)
+                {
+                    dispatcher.Invoke(() => RecycledItems.Add(new("", "", Converters.FileTypeClass.FileType.Unknown)));
+                }
+            });
+        }
     }
 }

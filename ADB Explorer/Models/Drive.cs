@@ -13,7 +13,8 @@ namespace ADB_Explorer.Models
         Expansion,
         External,
         Unknown,
-        Emulated
+        Emulated,
+        Trash,
     }
 
     public class Drive : INotifyPropertyChanged
@@ -49,6 +50,7 @@ namespace ADB_Explorer.Models
             DriveType.External => "\uE88E",
             DriveType.Unknown => "\uE9CE",
             DriveType.Emulated => "\uEDA2",
+            DriveType.Trash => "\uE74D",
             _ => throw new System.NotImplementedException(),
         };
 

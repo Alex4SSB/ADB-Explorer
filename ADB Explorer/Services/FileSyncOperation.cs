@@ -116,11 +116,9 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public FilePath TargetPath { get; }
-
         public FileSyncOperation(
             Dispatcher dispatcher,
-            string operationName,
+            OperationType operationName,
             FileSyncMethod adbMethod,
             ADBService.AdbDevice adbDevice,
             FilePath sourcePath,

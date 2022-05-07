@@ -8,8 +8,11 @@ namespace ADB_Explorer.Models
     public static class AdbExplorerConst
     {
         public static readonly string DEFAULT_PATH = "/sdcard";
+        public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";
+
         public static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
         {
+            { RECYCLE_PATH, "Recycle Bin" },
             { "/sdcard", "Internal Storage" },
             { "/storage/emulated/0", "Internal Storage" },
             { "/storage/self/primary", "Internal Storage" },
@@ -21,7 +24,8 @@ namespace ADB_Explorer.Models
         {
             { "/storage/emulated", DriveType.Internal },
             { "/sdcard", DriveType.Internal },
-            { "/", DriveType.Root }
+            { "/", DriveType.Root },
+            { RECYCLE_PATH, DriveType.Trash }
         };
         public static readonly Dictionary<DriveType, string> DRIVES_PRETTY_NAMES = new()
         {
@@ -30,7 +34,8 @@ namespace ADB_Explorer.Models
             { DriveType.Expansion, "µSD Card" },
             { DriveType.External, "OTG Drive" },
             { DriveType.Unknown, "" }, // "Other Drive"
-            { DriveType.Emulated, "Emulated Drive" }
+            { DriveType.Emulated, "Emulated Drive" },
+            { DriveType.Trash, "Recycle Bin" }
         };
 
         public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);

@@ -2,6 +2,7 @@
 using ModernWpf.Controls;
 using System;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace ADB_Explorer.Services
 {
@@ -41,25 +42,67 @@ namespace ADB_Explorer.Services
             windowDialog.ShowAsync();
         }
 
-        public static async Task<ContentDialogResult> ShowConfirmation(string content,
+        private static TextBlock DialogContentTextBlock;
+        private static CheckBox DialogContentCheckbox;
+        private static bool IsDialogChecked;
+        private static SimpleStackPanel DialogContentStackPanel = new()
+        {
+            Spacing = 10
+        };
+
+        private static void InitContent(string textContent, string checkboxContent = "")
+        {
+            if (DialogContentTextBlock is null)
+                DialogContentTextBlock = new();
+
+            DialogContentTextBlock.Text = textContent;
+
+            if (DialogContentCheckbox is null)
+            {
+                DialogContentCheckbox = new();
+                DialogContentCheckbox.Checked += Checkbox_Checked;
+                DialogContentCheckbox.Unchecked += Checkbox_Checked;
+            }
+
+            DialogContentCheckbox.Visibility = VisibilityHelper.Visible(!string.IsNullOrEmpty(checkboxContent));
+            DialogContentCheckbox.Content = checkboxContent;
+
+            if (DialogContentStackPanel.Children.Count == 0)
+            {
+                DialogContentStackPanel.Children.Add(DialogContentTextBlock);
+                DialogContentStackPanel.Children.Add(DialogContentCheckbox);
+            }
+        }
+
+        public static async Task<(ContentDialogResult, bool)> ShowConfirmation(string content,
                                             string title = "",
                                             string primaryText = "Yes",
                                             string cancelText = "Cancel",
+                                            string checkBoxText = "",
                                             DialogIcon icon = DialogIcon.None)
         {
             if (windowDialog.IsVisible)
             {
-                return ContentDialogResult.None;
+                return (ContentDialogResult.None, false);
             }
 
-            windowDialog.Content = content;
+            InitContent(content, checkBoxText);
+
+            windowDialog.Content = DialogContentStackPanel;
             windowDialog.Title = title;
             windowDialog.PrimaryButtonText = primaryText;
             windowDialog.DefaultButton = ContentDialogButton.Primary;
             windowDialog.CloseButtonText = cancelText;
             TextHelper.SetAltText(windowDialog, Icon(icon));
 
-            return await windowDialog.ShowAsync();
+            var result = await windowDialog.ShowAsync();
+
+            return (result, IsDialogChecked);
+        }
+
+        private static void Checkbox_Checked(object sender, System.Windows.RoutedEventArgs e)
+        {
+            IsDialogChecked = DialogContentCheckbox.IsChecked.Value;
         }
     }
 }
