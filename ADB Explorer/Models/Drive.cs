@@ -36,10 +36,9 @@ namespace ADB_Explorer.Models
             get => type;
             private set
             {
-                type = value;
-                NotifyPropertyChanged();
-                NotifyPropertyChanged(nameof(DriveIcon));
-                NotifyPropertyChanged(nameof(PrettyName));
+                Set(ref type, value);
+                OnPropertyChanged(nameof(DriveIcon));
+                OnPropertyChanged(nameof(PrettyName));
             }
         }
         public string DriveIcon => Type switch
@@ -53,6 +52,13 @@ namespace ADB_Explorer.Models
             DriveType.Trash => "\uE74D",
             _ => throw new System.NotImplementedException(),
         };
+
+        private ulong recycledItemsCount;
+        public ulong RecycledItemsCount
+        {
+            get => recycledItemsCount;
+            set => Set(ref recycledItemsCount, value);
+        }
 
         public Drive(string size = "", string used = "", string available = "", sbyte usageP = -1, string path = "", bool isMMC = false, bool isEmulator = false)
         {
@@ -92,11 +98,6 @@ namespace ADB_Explorer.Models
                   isMMC,
                   isEmulator)
         { }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public void SetMmc()
         {
@@ -145,5 +146,22 @@ namespace ADB_Explorer.Models
         {
             return Path.GetHashCode();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -593,7 +593,7 @@
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
                         </StackPanel.Resources>
-                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RecycledItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                        <TextBlock Text="{Binding RecycledItemsCount}" />
                         <TextBlock Text=" Items" />
                     </StackPanel>
                 </Grid>
@@ -937,9 +937,9 @@
                                 <TextBlock Grid.Column="1" Margin="4,0,0,0">
                                     <TextBlock.Style>
                                         <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RecycledItems}, Path=Count, NotifyOnTargetUpdated=True}" />
+                                            <Setter Property="Text" Value="{Binding RecycledItemsCount}" />
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RecycledItems}, Path=Count}" Value="0">
+                                                <DataTrigger Binding="{Binding RecycledItemsCount}" Value="0">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">

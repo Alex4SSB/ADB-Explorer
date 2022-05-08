@@ -643,6 +643,7 @@ namespace ADB_Explorer
             NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
             CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
+            DeleteMenuButton.DataContext = DevicesObject.CurrentDevice;
 
             if (DevicesObject.CurrentDevice.Drives.Count < 1)
             {
@@ -686,7 +687,7 @@ namespace ADB_Explorer
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             PushMenuButton.IsEnabled = true;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
-            AddDummyRecycledItems(Dispatcher);
+            UpdateRecycledItemsCount();
 
             if (path is null)
                 return true;
@@ -694,6 +695,12 @@ namespace ADB_Explorer
             return string.IsNullOrEmpty(path)
                 ? NavigateToPath(DEFAULT_PATH)
                 : NavigateToPath(path);
+        }
+
+        private void UpdateRecycledItemsCount()
+        {
+            var countTask = Task.Run(() => CurrentADBDevice.CountRecycle());
+            countTask.ContinueWith((t) => Dispatcher.Invoke(() => DevicesObject.CurrentDevice.RecycledItemsCount = t.Result));
         }
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
@@ -836,9 +843,7 @@ namespace ADB_Explorer
             List<MenuItem> tempButtons = new();
             List<string> pathItems = new();
 
-            // On special cases, cut prefix of the path and replace with a pretty button
             var pairs = CurrentPrettyNames.Where(kv => path.StartsWith(kv.Key));
-
             var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.First();
             if (specialPair.Key != null)
             {
@@ -1647,7 +1652,7 @@ namespace ADB_Explorer
             var drives = CurrentADBDevice.GetDrives();
             if (Settings.EnableRecycle)
             {
-                AddDummyRecycledItems(Dispatcher);
+                UpdateRecycledItemsCount();
                 drives.Add(new(path: RECYCLE_PATH));
             }
 
@@ -2172,7 +2177,7 @@ namespace ADB_Explorer
 
             if (Settings.EnableRecycle && !result.Item2)
             {
-                ShellFileOperation.MoveItems(CurrentADBDevice, selectedFiles, RECYCLE_PATH, CurrentPath, DirectoryLister.FileList, Dispatcher);
+                ShellFileOperation.MoveItems(CurrentADBDevice, selectedFiles, RECYCLE_PATH, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
             }
             else
             {
@@ -2443,7 +2448,7 @@ namespace ADB_Explorer
             var targetPath = ExplorerGrid.SelectedItems.Count == 1 ? ((FileClass)ExplorerGrid.SelectedItem).FullPath : CurrentPath;
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
 
-            ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath, CurrentPath, DirectoryLister.FileList, Dispatcher);
+            ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
 
             ClearCutFiles();
             PasteMenuButton.IsEnabled = PasteEnabled();

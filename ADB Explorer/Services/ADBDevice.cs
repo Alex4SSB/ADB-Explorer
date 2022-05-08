@@ -329,9 +329,11 @@ namespace ADB_Explorer.Services
                     throw new Exception(stderr);
             }
 
-            public ulong CountRecycle()
+            public ulong CountRecycle() => CountRecycle(ID);
+
+            public static ulong CountRecycle(string deviceID)
             {
-                if (ExecuteDeviceAdbShellCommand(ID, "find", out string stdout, out _, new[] { AdbExplorerConst.RECYCLE_PATH + "/*" }.Concat(FIND_DIR_COUNT_PARAMS).ToArray()) != 0)
+                if (ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new[] { AdbExplorerConst.RECYCLE_PATH + "/*" }.Concat(FIND_DIR_COUNT_PARAMS).ToArray()) != 0)
                     return 0;
 
                 return ulong.TryParse(stdout, out var count) ? count : 0;

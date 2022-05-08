@@ -15,13 +15,15 @@ namespace ADB_Explorer.Services
         private string targetPath;
         private readonly string currentPath;
         private string recycleName;
+        private LogicalDevice logical;
 
-        public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetPath, string currentPath, ObservableList<FileClass> fileList) : base(dispatcher, adbDevice, filePath)
+        public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetPath, string currentPath, ObservableList<FileClass> fileList, LogicalDevice logical) : base(dispatcher, adbDevice, filePath)
         {
             OperationName = targetPath == AdbExplorerConst.RECYCLE_PATH ? OperationType.Recycle : OperationType.Move;
             this.fileList = fileList;
             this.targetPath = targetPath;
             this.currentPath = currentPath;
+            this.logical = logical;
 
             TargetPath = new(targetPath, fileType: Converters.FileTypeClass.FileType.Folder);
         }
@@ -58,6 +60,12 @@ namespace ADB_Explorer.Services
 
                 if (operationStatus is OperationStatus.Completed)
                 {
+                    ulong recycleCount = 0;
+                    if (OperationName is OperationType.Recycle)
+                    {
+                        recycleCount = Device.CountRecycle();
+                        ShellFileOperation.WriteLine(Device, $"{AdbExplorerConst.RECYCLE_PATH}/.RecycleIndex", ADBService.EscapeAdbShellString($"{recycleName};{FilePath.ParentPath}"));
+                    }
                     Dispatcher.Invoke(() =>
                     {
                         if (targetPath == currentPath)
@@ -69,13 +77,12 @@ namespace ADB_Explorer.Services
                         {
                             fileList.Remove((FileClass)FilePath);
                         }
-                    });
 
-                    if (OperationName is OperationType.Recycle)
-                    {
-                        ShellFileOperation.WriteLine(Device, $"{AdbExplorerConst.RECYCLE_PATH}/.RecycleIndex", ADBService.EscapeAdbShellString($"{recycleName};{FilePath.ParentPath}"));
-                        Data.AddDummyRecycledItems(Dispatcher);
-                    }
+                        if (OperationName is OperationType.Recycle)
+                        {
+                            logical.RecycledItemsCount = recycleCount;
+                        }
+                    });
                 }
 
             }, TaskContinuationOptions.OnlyOnRanToCompletion);

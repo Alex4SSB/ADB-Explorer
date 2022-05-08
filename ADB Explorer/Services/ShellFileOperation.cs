@@ -23,21 +23,21 @@ namespace ADB_Explorer.Services
         /// <param name="items">Original FilePath items</param>
         /// <param name="targetPath">New parent path for single / multiple items, or full path for single file (rename)</param>
         /// <exception cref="Exception"></exception>
-        public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher)
+        public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical)
         {
             foreach (var item in items)
             {
-                Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList));
+                Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
             }
         }
 
         public static void RenameItem(ADBService.AdbDevice device, FilePath item, string targetPath)
         {
             var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                                                   "mv",
-                                                                                   out string stdout,
-                                                                                   out string stderr,
-                                                                                   new[] { ADBService.EscapeAdbShellString(item.FullPath), ADBService.EscapeAdbShellString(targetPath) });
+                                                                   "mv",
+                                                                   out string stdout,
+                                                                   out string stderr,
+                                                                   new[] { ADBService.EscapeAdbShellString(item.FullPath), ADBService.EscapeAdbShellString(targetPath) });
 
             if (exitCode != 0)
             {

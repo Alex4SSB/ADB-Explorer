@@ -53,18 +53,5 @@ namespace ADB_Explorer.Models
         public static ObservableCollection<Log> CommandLog { get; set; } = new();
 
         public static ObservableList<FileClass> RecycledItems { get; set; } = new();
-
-        public static void AddDummyRecycledItems(Dispatcher dispatcher)
-        {
-            RecycledItems.Clear();
-            var countTask = Task.Run(() => CurrentADBDevice.CountRecycle());
-            countTask.ContinueWith((t) =>
-            {
-                for (ulong i = 0; i < t.Result; i++)
-                {
-                    dispatcher.Invoke(() => RecycledItems.Add(new("", "", Converters.FileTypeClass.FileType.Unknown)));
-                }
-            });
-        }
     }
 }

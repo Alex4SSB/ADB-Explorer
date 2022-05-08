@@ -341,6 +341,10 @@ namespace ADB_Explorer.Models
 
                 if (value is not null)
                 {
+                    // Trigger the setter
+                    if (RecycledItemsCount > 0)
+                        RecycledItemsCount = RecycledItemsCount;
+
                     var mmcTask = Task.Run(() => { return GetMmcDrive(); });
                     mmcTask.ContinueWith((t) =>
                     {
@@ -378,6 +382,18 @@ namespace ADB_Explorer.Models
         {
             get => battery;
             set => Set(ref battery, value);
+        }
+
+        private ulong recycledItemsCount;
+        public ulong RecycledItemsCount
+        {
+            get => recycledItemsCount;
+            set
+            {
+                Set(ref recycledItemsCount, value);
+                if (Drives is not null && Drives.Where(drive => drive.Type is DriveType.Trash) is var trash && trash.Any())
+                    trash.First().RecycledItemsCount = value;
+            }
         }
 
         private LogicalDevice(string name, string id)
