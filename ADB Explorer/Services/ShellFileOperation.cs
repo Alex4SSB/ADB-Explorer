@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace ADB_Explorer.Services
@@ -25,10 +26,17 @@ namespace ADB_Explorer.Services
         /// <exception cref="Exception"></exception>
         public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical)
         {
-            foreach (var item in items)
+            var mdTask = Task.Run(() => MakeDir(device, AdbExplorerConst.RECYCLE_PATH));
+            mdTask.ContinueWith((t) =>
             {
-                Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
-            }
+                dispatcher.Invoke(() =>
+                {
+                    foreach (var item in items)
+                    {
+                        Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
+                    }
+                });
+            });
         }
 
         public static void RenameItem(ADBService.AdbDevice device, FilePath item, string targetPath)
@@ -87,6 +95,20 @@ namespace ADB_Explorer.Services
             {
                 throw new Exception(stderr);
             }
+        }
+
+        public static string ReadAllText(ADBService.AdbDevice device, string fullPath)
+        {
+            var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                                    "cat",
+                                                                    out string stdout,
+                                                                    out string stderr,
+                                                                    ADBService.EscapeAdbShellString(fullPath));
+
+            if (exitCode != 0)
+                throw new Exception(stderr);
+
+            return stdout;
         }
     }
 }

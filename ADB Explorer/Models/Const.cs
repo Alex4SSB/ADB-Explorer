@@ -9,6 +9,7 @@ namespace ADB_Explorer.Models
     {
         public static readonly string DEFAULT_PATH = "/sdcard";
         public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";
+        public static readonly string RECYCLE_INDEX_PATH = $"{RECYCLE_PATH}/.RecycleIndex";
 
         public static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
         {
@@ -78,5 +79,7 @@ namespace ADB_Explorer.Models
         public static readonly bool DISPLAY_OFFLINE_SERVICES = false;
 
         public static readonly TimeSpan DOUBLE_CLICK_TIMEOUT = TimeSpan.FromMilliseconds(300);
+
+        public static readonly string ADB_EXPLORER_DATE_FORMAT = "yyyy.MM.dd-HH:mm:ss";
     }
 }

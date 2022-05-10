@@ -52,6 +52,6 @@ namespace ADB_Explorer.Models
 
         public static ObservableCollection<Log> CommandLog { get; set; } = new();
 
-        public static ObservableList<FileClass> RecycledItems { get; set; } = new();
+        public static ObservableList<TrashIndexer> RecycleIndex { get; set; } = new();
     }
 }

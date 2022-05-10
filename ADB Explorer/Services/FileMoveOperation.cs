@@ -15,6 +15,7 @@ namespace ADB_Explorer.Services
         private string targetPath;
         private readonly string currentPath;
         private string recycleName;
+        private DateTime? dateModified;
         private LogicalDevice logical;
 
         public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetPath, string currentPath, ObservableList<FileClass> fileList, LogicalDevice logical) : base(dispatcher, adbDevice, filePath)
@@ -44,12 +45,14 @@ namespace ADB_Explorer.Services
                 {
                     recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
                     targetPath = $"{targetPath}/{recycleName}";
-                    ShellFileOperation.MakeDir(Device, targetPath);
+                    dateModified = ((FileClass)FilePath).ModifiedTime;
                 }
+                else
+                    targetPath = $"{targetPath}{(targetPath.EndsWith('/') ? "" : "/")}{FilePath.FullName}";
 
                 return ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "mv", out _, out _, new[] {
                     ADBService.EscapeAdbShellString(FilePath.FullPath),
-                    ADBService.EscapeAdbShellString($"{targetPath}{(targetPath.EndsWith('/') ? "" : "/")}{FilePath.FullName}") });
+                    ADBService.EscapeAdbShellString(targetPath) });
             });
 
             operationTask.ContinueWith((t) =>
@@ -64,7 +67,8 @@ namespace ADB_Explorer.Services
                     if (OperationName is OperationType.Recycle)
                     {
                         recycleCount = Device.CountRecycle();
-                        ShellFileOperation.WriteLine(Device, $"{AdbExplorerConst.RECYCLE_PATH}/.RecycleIndex", ADBService.EscapeAdbShellString($"{recycleName};{FilePath.ParentPath}"));
+                        var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
+                        ShellFileOperation.WriteLine(Device, AdbExplorerConst.RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
                     }
                     Dispatcher.Invoke(() =>
                     {

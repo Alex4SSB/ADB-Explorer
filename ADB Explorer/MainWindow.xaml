@@ -1415,7 +1415,10 @@
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
-                            <ui:FontIcon Glyph="&#xE894;" Style="{StaticResource GlyphFont}" />
+                            <ui:FontIcon
+                                Margin="1,1,-1,-1"
+                                Glyph="&#xE894;"
+                                Style="{StaticResource GlyphFont}" />
                         </Button>
                     </ui:SimpleStackPanel>
                     <Grid Margin="0,40">

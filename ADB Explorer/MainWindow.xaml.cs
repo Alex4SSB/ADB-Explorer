@@ -824,6 +824,16 @@ namespace ADB_Explorer
             NewMenuButton.IsEnabled = true;
 
             DirectoryLister.Navigate(realPath);
+            if (realPath == RECYCLE_PATH)
+            {
+                Task.Run(() =>
+                {
+                    var text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_PATH);
+                    var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    RecycleIndex.AddRange(lines.Select(l => new TrashIndexer(l)));
+                });
+            }
+
             FilterHiddenFiles();
             return true;
         }
@@ -1719,9 +1729,11 @@ namespace ADB_Explorer
         {
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
+            string[] recycleItems = { RECYCLE_PATH, RECYCLE_INDEX_PATH };
+
             CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = !Settings.ShowHiddenItems
-                ? (new(file => file is FileClass fileClass && !fileClass.IsHidden && fileClass.FullPath != RECYCLE_PATH))
-                : (new(file => ((FileClass)file).FullPath != RECYCLE_PATH));
+                ? (new(file => file is FileClass fileClass && !fileClass.IsHidden && !recycleItems.Contains(fileClass.FullPath)))
+                : (new(file => !recycleItems.Contains(((FileClass)file).FullPath)));
         }
 
         private void PullMenuButton_Click(object sender, RoutedEventArgs e)
