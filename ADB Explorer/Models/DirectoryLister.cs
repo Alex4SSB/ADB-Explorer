@@ -101,11 +101,6 @@ namespace ADB_Explorer.Models
 
         private void ScheduleUpdate()
         {
-            if (ReadTask == null)
-            {
-                return;
-            }
-
             bool manyPendingFilesExist = currentFileQueue.Count >= DIR_LIST_UPDATE_THRESHOLD_MAX;
             bool isListingStarting = FileList.Count < DIR_LIST_START_COUNT;
 
@@ -122,19 +117,19 @@ namespace ADB_Explorer.Models
 
             UpdateTask = Task.Delay(UpdateInterval);
             UpdateTask.ContinueWith(
-                (t) => Dispatcher.BeginInvoke(UpdateDirectoryList), 
+                (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)), 
                 CurrentCancellationToken.Token, 
                 TaskContinuationOptions.OnlyOnRanToCompletion, 
                 TaskScheduler.Default);
         }
 
-        private void UpdateDirectoryList()
+        private void UpdateDirectoryList(bool finish)
         {
             var updateCutItems = Data.CutItems.Any() && Data.CutItems[0].ParentPath == CurrentPath;
 
-            if ((ReadTask == null) || (currentFileQueue.Count >= MinUpdateThreshold))
+            if (finish || (currentFileQueue.Count >= MinUpdateThreshold))
             {
-                for (int i = 0; (!InProgress) || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
+                for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
                 {
                     FileStat fileStat;
                     if (!currentFileQueue.TryDequeue(out fileStat))
@@ -158,7 +153,10 @@ namespace ADB_Explorer.Models
                 }
             }
 
-            ScheduleUpdate();
+            if (!finish)
+            {
+                ScheduleUpdate();
+            }
         }
 
         private void StopDirectoryList()
@@ -182,11 +180,11 @@ namespace ADB_Explorer.Models
                 }
             }
 
-            ReadTask = null;
-            CurrentCancellationToken = null;
+            UpdateDirectoryList(true);
             InProgress = false;
             IsProgressVisible = false;
-            UpdateDirectoryList();
+            ReadTask = null;
+            CurrentCancellationToken = null;
         }
     }
 }
