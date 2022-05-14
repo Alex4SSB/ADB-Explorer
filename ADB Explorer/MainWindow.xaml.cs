@@ -10,9 +10,11 @@ using ModernWpf.Controls;
 using ModernWpf.Controls.Primitives;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +35,7 @@ namespace ADB_Explorer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         private readonly DispatcherTimer ConnectTimer = new();
         private Mutex connectTimerMutex = new();
@@ -46,6 +48,13 @@ namespace ADB_Explorer
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
+
+        private bool isRecycleBin;
+        public bool IsRecycleBin
+        {
+            get => isRecycleBin;
+            set => Set(ref isRecycleBin, value);
+        }
 
         private double ColumnHeaderHeight
         {
@@ -73,6 +82,21 @@ namespace ADB_Explorer
 
         private readonly List<MenuItem> PathButtons = new();
 
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
         private void GetExplorerContentPresenter()
         {
             if (ExplorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
@@ -96,9 +120,7 @@ namespace ADB_Explorer
             }
         }
 
-        private IEnumerable<FileClass> selectedFiles =>
-                            from FileClass item in ExplorerGrid.SelectedItems
-                            select item;
+        private IEnumerable<FileClass> selectedFiles => ExplorerGrid.SelectedItems.Cast<FileClass>();
 
         public MainWindow()
         {
@@ -123,6 +145,15 @@ namespace ADB_Explorer
 
             UpperProgressBar.DataContext = fileOperationQueue;
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
+        }
+
+        private void FileList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (IsRecycleBin)
+            {
+                RestoreMenuButton.IsEnabled = DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+                DeleteMenuButton.IsEnabled = DirectoryLister.FileList.Any(item => item.FullPath != RECYCLE_INDEX_PATH);
+            }
         }
 
         private void CommandLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -221,27 +252,44 @@ namespace ADB_Explorer
             MenuItem pasteMenu = FindResource("ContextMenuPasteItem") as MenuItem;
             MenuItem newMenu = FindResource("ContextMenuNewItem") as MenuItem;
             MenuItem copyPath = FindResource("ContextMenuCopyPathItem") as MenuItem;
+            MenuItem restoreMenu = FindResource("RestoreMenuItem") as MenuItem;
             copyPath.Resources = FindResource("ContextSubMenuStyles") as ResourceDictionary;
             ExplorerGrid.ContextMenu.Items.Clear();
 
             switch (type)
             {
                 case MenuType.ExplorerItem:
+                    TextHelper.SetAltText(deleteMenu, "Delete");
+
+                    if (IsRecycleBin)
+                    {
+                        if (!selectedFiles.All(file => file.IsCut))
+                            ExplorerGrid.ContextMenu.Items.Add(cutMenu);
+
+                        restoreMenu.IsEnabled = selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+                        ExplorerGrid.ContextMenu.Items.Add(restoreMenu);
+                        TextHelper.SetAltText(restoreMenu, "Restore");
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+
+                        ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+                        return;
+                    }
+
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
 
-                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                    if (selectedFiles.Count() == 1 && selectedFiles.First().IsDirectory)
                     {
                         ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     }
                     ExplorerGrid.ContextMenu.Items.Add(new Separator());
 
-                    if (!ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut))
+                    if (!selectedFiles.All(file => file.IsCut))
                         ExplorerGrid.ContextMenu.Items.Add(cutMenu);
 
                     if (PasteEnabled())
                         ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
 
-                    if (ExplorerGrid.SelectedItems.Count == 1)
+                    if (selectedFiles.Count() == 1)
                     {
                         ExplorerGrid.ContextMenu.Items.Add(renameMenu);
                         ExplorerGrid.ContextMenu.Items.Add(copyPath);
@@ -253,7 +301,7 @@ namespace ADB_Explorer
                     ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
 
                     bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
-                        && dataContext is FileClass file && file.Type is not (FileType.File or FileType.Folder);
+                        && selectedFiles.All(file => file.Type is not (FileType.File or FileType.Folder));
 
                     foreach (MenuItem item in ExplorerGrid.ContextMenu.Items.OfType<MenuItem>())
                     {
@@ -262,6 +310,19 @@ namespace ADB_Explorer
                     }
                     break;
                 case MenuType.EmptySpace:
+                    if (IsRecycleBin)
+                    {
+                        restoreMenu.IsEnabled = DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+                        ExplorerGrid.ContextMenu.Items.Add(restoreMenu);
+                        TextHelper.SetAltText(restoreMenu, "Restore All Items");
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+
+                        deleteMenu.IsEnabled = ExplorerGrid.Items.Count > 0;
+                        ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
+                        TextHelper.SetAltText(deleteMenu, "Empty Recycle Bin");
+                        return;
+                    }
+
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     ExplorerGrid.ContextMenu.Items.Add(new Separator());
                     ExplorerGrid.ContextMenu.Items.Add(newMenu);
@@ -331,7 +392,9 @@ namespace ADB_Explorer
         private void FocusPathBox()
         {
             PathStackPanel.Visibility = Visibility.Collapsed;
-            PathBox.Text = TextHelper.GetAltText(PathBox);
+            if (!IsRecycleBin)
+                PathBox.Text = TextHelper.GetAltText(PathBox);
+
             PathBox.IsReadOnly = false;
             PathBox.SelectAll();
         }
@@ -346,11 +409,17 @@ namespace ADB_Explorer
 
         private void PathBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
+            if (e.Key == Key.Escape || (e.Key == Key.Enter && PathBox.Text == ""))
+            {
+                UnfocusPathBox();
+            }
+            else if (e.Key == Key.Enter)
             {
                 if (ExplorerGrid.IsVisible)
                 {
-                    if (NavigateToPath(PathBox.Text))
+                    if (PathBox.Text == "-")
+                        NavigateBack();
+                    else if (NavigateToPath(PathBox.Text))
                         return;
                 }
                 else
@@ -366,10 +435,6 @@ namespace ADB_Explorer
                 e.Handled = true;
                 ExplorerGrid.Focus();
             }
-            else if (e.Key == Key.Escape)
-            {
-                UnfocusPathBox();
-            }
         }
 
         private void PathBox_LostFocus(object sender, RoutedEventArgs e)
@@ -379,13 +444,13 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && ExplorerGrid.SelectedItems.Count == 1)
+            if (e.ChangedButton == MouseButton.Left && selectedFiles.Count() == 1)
                 DoubleClick(ExplorerGrid.SelectedItem);
         }
 
         private void DoubleClick(object source)
         {
-            if (source is FileClass file)
+            if (source is FileClass file && !IsRecycleBin)
             {
                 switch (file.Type)
                 {
@@ -406,34 +471,38 @@ namespace ADB_Explorer
         {
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
-            var items = ExplorerGrid.SelectedItems.Cast<FileClass>();
-
             bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
-                && items.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder));
+                && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder));
 
-            DeleteMenuButton.IsEnabled =
-            PullMenuButton.IsEnabled = items.Any() && !irregular;
+            DeleteMenuButton.IsEnabled = (selectedFiles.Any() && !irregular) || IsRecycleBin;
+            DeleteMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
+            RestoreMenuButton.IsEnabled = IsRecycleBin 
+                && (selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))
+                || (!selectedFiles.Any() && DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))));
+            RestoreMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
 
-            var renameEnabled = items.Count() == 1 && !irregular;
+            PullMenuButton.IsEnabled = !IsRecycleBin && selectedFiles.Any() && !irregular;
+
+            var renameEnabled = !IsRecycleBin && selectedFiles.Count() == 1 && !irregular;
 
             RenameMenuButton.IsEnabled = renameEnabled;
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
 
-            CutMenuButton.IsEnabled = !ExplorerGrid.SelectedItems.Cast<FileClass>().All(file => file.IsCut) && !irregular;
+            CutMenuButton.IsEnabled = !selectedFiles.All(file => file.IsCut) && !irregular;
             PasteMenuButton.IsEnabled = PasteEnabled();
 
-            MoreMenuButton.IsEnabled = items.Count() == 1;
+            MoreMenuButton.IsEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
         }
 
         private bool PasteEnabled(bool ignoreSelected = false)
         {
-            if (CutItems.Count < 1)
+            if (CutItems.Count < 1 || IsRecycleBin)
                 return false;
 
             if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self)
                 return false;
 
-            var selected = ignoreSelected ? 0 : ExplorerGrid.SelectedItems.Count;
+            var selected = ignoreSelected ? 0 : selectedFiles.Count();
             switch (selected)
             {
                 case 0:
@@ -514,6 +583,7 @@ namespace ADB_Explorer
         {
             DirectoryLister = new(Dispatcher, CurrentADBDevice);
             DirectoryLister.PropertyChanged += DirectoryLister_PropertyChanged;
+            DirectoryLister.FileList.CollectionChanged += FileList_CollectionChanged;
         }
 
         private void LoadSettings()
@@ -663,6 +733,7 @@ namespace ADB_Explorer
 
             MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
             AddPathButton(button);
+            TextHelper.SetAltText(PathBox, "");
         }
 
         private void CombinePrettyNames()
@@ -685,9 +756,10 @@ namespace ADB_Explorer
             CombinePrettyNames();
 
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
-            PushMenuButton.IsEnabled = true;
+
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
-            UpdateRecycledItemsCount();
+            if (path != RECYCLE_PATH)
+                UpdateRecycledItemsCount();
 
             if (path is null)
                 return true;
@@ -819,19 +891,39 @@ namespace ADB_Explorer
             PopulateButtons(realPath);
             ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
 
-            ParentButton.IsEnabled = CurrentPath != ParentPath;
+            IsRecycleBin = CurrentPath == RECYCLE_PATH;
+            ParentButton.IsEnabled = CurrentPath != ParentPath && !IsRecycleBin;
             PasteMenuButton.IsEnabled = PasteEnabled();
-            NewMenuButton.IsEnabled = true;
+            PushMenuButton.IsEnabled =
+            NewMenuButton.IsEnabled = !IsRecycleBin;
 
-            DirectoryLister.Navigate(realPath);
             if (realPath == RECYCLE_PATH)
             {
-                Task.Run(() =>
+                var recycleTask = Task.Run(() =>
                 {
                     var text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_PATH);
                     var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     RecycleIndex.AddRange(lines.Select(l => new TrashIndexer(l)));
                 });
+
+                recycleTask.ContinueWith((t) => DirectoryLister.Navigate(realPath));
+
+                Date.Header = "Date Deleted";
+                OriginalPath.Visibility =
+                OriginalDate.Visibility = Visibility.Visible;
+
+                DeleteMenuButton.ToolTip = "Empty Recycle Bin";
+                RestoreMenuButton.ToolTip = "Restore All Items";
+            }
+            else
+            {
+                DirectoryLister.Navigate(realPath);
+
+                Date.Header = "Date Modified";
+                OriginalPath.Visibility =
+                OriginalDate.Visibility = Visibility.Collapsed;
+
+                DeleteMenuButton.ToolTip = "Delete";
             }
 
             FilterHiddenFiles();
@@ -980,6 +1072,9 @@ namespace ADB_Explorer
 
         private void AddPathButton(MenuItem button)
         {
+            if (TextHelper.GetAltObject(button) is string str && str == RECYCLE_PATH)
+                button.ContextMenu = null;
+
             Menu menu = new() { Height = 24 };
             ((Menu)button.Parent)?.Items.Clear();
             menu.Items.Add(button);
@@ -1027,6 +1122,7 @@ namespace ADB_Explorer
 
         private void NavigateToLocation(object location, bool bfNavigated = false)
         {
+            RecycleIndex.Clear();
             if (location is string path)
             {
                 if (!ExplorerGrid.Visible())
@@ -1039,6 +1135,7 @@ namespace ADB_Explorer
                 switch (special)
                 {
                     case NavHistory.SpecialLocation.DriveView:
+                        IsRecycleBin = false;
                         UnfocusPathBox();
                         RefreshDrives();
                         DriveViewNav();
@@ -1102,7 +1199,7 @@ namespace ADB_Explorer
                 if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
                     return;
 
-                if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                if (selectedFiles.Count() == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                     DoubleClick(ExplorerGrid.SelectedItem);
             }
             else if (key == Key.Back)
@@ -1163,7 +1260,7 @@ namespace ADB_Explorer
             switch (key)
             {
                 case Key.Down:
-                    if (ExplorerGrid.SelectedItems.Count == 0)
+                    if (!selectedFiles.Any())
                         ExplorerGrid.SelectedIndex = 0;
                     else if (ExplorerGrid.SelectedIndex < ExplorerGrid.Items.Count)
                         ExplorerGrid.SelectedIndex++;
@@ -1171,7 +1268,7 @@ namespace ADB_Explorer
                     ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
                     break;
                 case Key.Up:
-                    if (ExplorerGrid.SelectedItems.Count == 0)
+                    if (!selectedFiles.Any())
                         ExplorerGrid.SelectedItem = ExplorerGrid.Items[^1];
                     else if (ExplorerGrid.SelectedIndex > 0)
                         ExplorerGrid.SelectedIndex--;
@@ -1182,7 +1279,7 @@ namespace ADB_Explorer
                     if (ExplorerGrid.SelectedCells.Count < 1 || CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
                         return false;
 
-                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                    if (selectedFiles.Count() == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                         DoubleClick(ExplorerGrid.SelectedItem);
                     break;
                 default:
@@ -1199,7 +1296,7 @@ namespace ADB_Explorer
 
         private void PullFiles(bool quick = false)
         {
-            int itemsCount = ExplorerGrid.SelectedItems.Count;
+            int itemsCount = selectedFiles.Count();
             ShellObject path;
 
             if (quick)
@@ -1246,7 +1343,7 @@ namespace ADB_Explorer
         private void PushItems(bool isFolderPicker, bool isContextMenu)
         {
             FilePath targetPath;
-            if (isContextMenu && ExplorerGrid.SelectedItems.Count == 1)
+            if (isContextMenu && selectedFiles.Count() == 1)
                 targetPath = (FilePath)ExplorerGrid.SelectedItem;
             else
                 targetPath = new(CurrentPath);
@@ -1536,7 +1633,7 @@ namespace ADB_Explorer
         {
             var point = e.GetPosition(ExplorerGrid);
             var actualRowWidth = 0.0;
-            foreach (var item in ExplorerGrid.Columns)
+            foreach (var item in ExplorerGrid.Columns.Where(col => col.Visibility == Visibility.Visible))
             {
                 actualRowWidth += item.ActualWidth;
             }
@@ -1546,6 +1643,9 @@ namespace ADB_Explorer
                 || point.X > actualRowWidth
                 || point.X > DataGridContentWidth)
             {
+                if (ExplorerGrid.SelectedItems.Count > 0 && CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                    CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = false;
+
                 ExplorerGrid.SelectedItems.Clear();
 
                 if (point.Y < ColumnHeaderHeight || point.X > DataGridContentWidth)
@@ -1568,7 +1668,7 @@ namespace ADB_Explorer
             {
                 InitializeExplorerContextMenu(MenuType.Header);
             }
-            else if (e.OriginalSource is FrameworkElement element && element.DataContext is FileClass file && ExplorerGrid.SelectedItems.Count > 0)
+            else if (e.OriginalSource is FrameworkElement element && element.DataContext is FileClass file && selectedFiles.Any())
             {
                 InitializeExplorerContextMenu(MenuType.ExplorerItem, file);
             }
@@ -1729,11 +1829,28 @@ namespace ADB_Explorer
         {
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
-            string[] recycleItems = { RECYCLE_PATH, RECYCLE_INDEX_PATH };
-
             CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = !Settings.ShowHiddenItems
-                ? (new(file => file is FileClass fileClass && !fileClass.IsHidden && !recycleItems.Contains(fileClass.FullPath)))
-                : (new(file => !recycleItems.Contains(((FileClass)file).FullPath)));
+                ? (new(HideFiles()))
+                : (new(file => !IsHiddenRecycleItem((FileClass)file)));
+        }
+
+        private static Predicate<object> HideFiles() => file =>
+        {
+            if (file is not FileClass fileClass)
+                return false;
+
+            if (fileClass.IsHidden)
+                return false;
+
+            return !IsHiddenRecycleItem(fileClass);
+        };
+
+        private static bool IsHiddenRecycleItem(FileClass file)
+        {
+            if (file.FullPath == RECYCLE_PATH || file.FullPath == RECYCLE_INDEX_PATH)
+                return true;
+
+            return false;
         }
 
         private void PullMenuButton_Click(object sender, RoutedEventArgs e)
@@ -2163,37 +2280,53 @@ namespace ADB_Explorer
 
         private async void DeleteFiles()
         {
-            string deletedString;
-            if (selectedFiles.Count() == 1)
-                deletedString = DisplayName(selectedFiles.First());
+            IEnumerable<FileClass> itemsToDelete;
+            if (IsRecycleBin && !selectedFiles.Any())
+            {
+                itemsToDelete = DirectoryLister.FileList.Where(f => f.FullPath != RECYCLE_INDEX_PATH);
+            }
             else
             {
-                deletedString = $"{selectedFiles.Count()} ";
-                if (selectedFiles.All(item => item.IsDirectory))
+                itemsToDelete = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                        ? selectedFiles.Where(file => file.Type is FileType.File or FileType.Folder) : selectedFiles;
+            }
+
+            string deletedString;
+            if (itemsToDelete.Count() == 1)
+                deletedString = DisplayName(itemsToDelete.First());
+            else
+            {
+                deletedString = $"{itemsToDelete.Count()} ";
+                if (itemsToDelete.All(item => item.IsDirectory))
                     deletedString += "folders";
-                else if (selectedFiles.All(item => !item.IsDirectory))
+                else if (itemsToDelete.All(item => !item.IsDirectory))
                     deletedString += "files";
                 else
                     deletedString += "items";
             }
 
             var result = await DialogService.ShowConfirmation(
-                $"The following will be deleted:\n{deletedString}",
+                $"The following will be{(IsRecycleBin ? " permanently" : "")} deleted:\n{deletedString}",
                 "Confirm Delete",
                 "Delete",
-                checkBoxText: Settings.EnableRecycle ? "Permanently Delete" : "",
+                checkBoxText: Settings.EnableRecycle && !IsRecycleBin ? "Permanently Delete" : "",
                 icon: DialogService.DialogIcon.Delete);
 
             if (result.Item1 is not ContentDialogResult.Primary)
                 return;
 
-            if (Settings.EnableRecycle && !result.Item2)
+            if (!IsRecycleBin && Settings.EnableRecycle && !result.Item2)
             {
-                ShellFileOperation.MoveItems(CurrentADBDevice, selectedFiles, RECYCLE_PATH, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
+                ShellFileOperation.MoveItems(CurrentADBDevice, itemsToDelete, RECYCLE_PATH, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
             }
             else
             {
-                ShellFileOperation.DeleteItems(CurrentADBDevice, selectedFiles, DirectoryLister.FileList, Dispatcher);
+                ShellFileOperation.DeleteItems(CurrentADBDevice, itemsToDelete, DirectoryLister.FileList, Dispatcher);
+
+                if (isRecycleBin && !selectedFiles.Any() && DirectoryLister.FileList.Any(item => item.FullPath == RECYCLE_INDEX_FILE))
+                {
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirectoryLister.FileList.Where(item => item.FullPath == RECYCLE_INDEX_FILE)));
+                }
             }
         }
 
@@ -2361,7 +2494,7 @@ namespace ADB_Explorer
                 }
                 else
                 {
-                    if (ExplorerGrid.SelectedItems.Count > 1)
+                    if (selectedFiles.Count() > 1)
                     {
                         ExplorerGrid.SelectedItems.Clear();
                         row.IsSelected = true;
@@ -2369,8 +2502,8 @@ namespace ADB_Explorer
                         return;
                     }
 
-                    if (DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
-                        && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder))
+                    if (cell.IsReadOnly || (DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                        && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
                         return;
 
                     Task.Delay(DOUBLE_CLICK_TIMEOUT).ContinueWith(t =>
@@ -2380,7 +2513,7 @@ namespace ADB_Explorer
 
                         Dispatcher.Invoke(() =>
                         {
-                            if (e.LeftButton == MouseButtonState.Released && ExplorerGrid.SelectedItems.Count == 1)
+                            if (e.LeftButton == MouseButtonState.Released && selectedFiles.Count() == 1)
                                 cell.IsEditing = true;
                         });
                     });
@@ -2438,12 +2571,15 @@ namespace ADB_Explorer
         {
             ClearCutFiles();
 
-            foreach (var item in items)
+            var itemsToCut = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                        ? items.Where(file => file.Type is FileType.File or FileType.Folder) : items;
+
+            foreach (var item in itemsToCut)
             {
                 item.IsCut = true;
             }
 
-            CutItems.AddRange(items);
+            CutItems.AddRange(itemsToCut);
 
             CutMenuButton.IsEnabled = false;
             PasteMenuButton.IsEnabled = PasteEnabled();
@@ -2457,7 +2593,7 @@ namespace ADB_Explorer
 
         private void PasteFiles()
         {
-            var targetPath = ExplorerGrid.SelectedItems.Count == 1 ? ((FileClass)ExplorerGrid.SelectedItem).FullPath : CurrentPath;
+            var targetPath = selectedFiles.Count() == 1 ? ((FileClass)ExplorerGrid.SelectedItem).FullPath : CurrentPath;
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
 
             ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
@@ -2491,8 +2627,8 @@ namespace ADB_Explorer
             var existingItems = DirectoryLister.FileList.Where(item => item.FullName.StartsWith(namePrefix));
             var suffixes = existingItems.Select(item => item.FullName[namePrefix.Length..].Trim());
             var indexes = (from i in suffixes
-                          where int.TryParse(i, out _)
-                          select int.Parse(i)).ToList();
+                           where int.TryParse(i, out _)
+                           select int.Parse(i)).ToList();
             if (suffixes.Any(s => s == ""))
                 indexes.Add(0);
 
@@ -2605,6 +2741,13 @@ namespace ADB_Explorer
         private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
         {
             RefreshDevices(true);
+        }
+
+        private void RestoreMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            var restoreItems = (!selectedFiles.Any() ? DirectoryLister.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+
+            ShellFileOperation.MoveItems(CurrentADBDevice, restoreItems, null, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
         }
     }
 }

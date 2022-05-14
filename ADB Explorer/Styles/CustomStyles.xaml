@@ -397,16 +397,17 @@
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
-        <TextBlock
-            Margin="4,0"
-            Text="{Binding FilePath.ParentPath}"
-            TextTrimming="CharacterEllipsis">
+        <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
             <TextBlock.Style>
                 <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="FontWeight" Value="Regular" />
+                    <Setter Property="Text" Value="{Binding FilePath.ParentPath}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Status}" Value="InProgress">
                             <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding FilePath.ParentPath}" Value="{x:Static Member=models:AdbExplorerConst.RECYCLE_PATH}">
+                            <Setter Property="Text" Value="Recycle Bin" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -529,6 +530,9 @@
                                 <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Restore">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding OperationName}" Value="Move">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -561,20 +565,23 @@
                     <Grid.Style>
                         <Style TargetType="Grid">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Status}" Value="Canceled">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Status}" Value="Failed">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
                                 <DataTrigger Binding="{Binding OperationName}" Value="Delete">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Restore">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding OperationName}" Value="Move">
                                     <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="Waiting">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -671,6 +678,18 @@
                     </ui:FontIcon.Style>
                 </ui:FontIcon>
             </Grid>
+            <ui:FontIcon Glyph="&#xE845;">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OperationName}" Value="Restore">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
             <ui:FontIcon Glyph="&#xE8DE;">
                 <ui:FontIcon.Style>
                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
@@ -868,14 +887,41 @@
         TargetType="ui:ProgressRing">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False">
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=UpperProgressBar, Path=IsIndeterminate}" Value="False" />
+                    <Condition Binding="{Binding AnyFailedOperations}" Value="False" />
+                </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding ElementName=UpperProgressBar, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="0">
                 <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="UpperProgressBarStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="IsIndeterminate" Value="False" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsActive}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding AnyFailedOperations}" Value="True">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Foreground" Value="#FFFF99A4" />
+                <Setter Property="ToolTip" Value="Some operations have failed" />
+            </DataTrigger>
+            <Trigger Property="Value" Value="0">
+                <Setter Property="IsIndeterminate" Value="True" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Progress}" Value="{x:Null}">
+                <Setter Property="IsIndeterminate" Value="True" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

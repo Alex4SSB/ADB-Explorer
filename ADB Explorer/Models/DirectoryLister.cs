@@ -154,6 +154,13 @@ namespace ADB_Explorer.Models
                         }
                     }
 
+                    if (CurrentPath == RECYCLE_PATH)
+                    {
+                        var query = Data.RecycleIndex.Where(index => index.RecycleName == item.FullName);
+                        if (query.Any())
+                            item.TrashIndex = query.First();
+                    }
+
                     FileList.Add(item);
                 }
             }

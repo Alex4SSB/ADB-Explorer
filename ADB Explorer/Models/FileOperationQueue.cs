@@ -117,9 +117,12 @@ namespace ADB_Explorer.Models
                 {
                     progress = value;
                     NotifyPropertyChanged();
+                    NotifyPropertyChanged(nameof(AnyFailedOperations));
                 }
             }
         }
+
+        public bool AnyFailedOperations => Operations.Any(op => op.Status is FileOperation.OperationStatus.Failed);
 
         public FileOperationQueue(Dispatcher dispatcher)
         {

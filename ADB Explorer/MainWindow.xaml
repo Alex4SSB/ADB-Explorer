@@ -31,6 +31,7 @@
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
         <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
+        <converters:DoubleEquals x:Key="DoubleEquals" />
         <CollectionViewSource
             x:Key="FileListView"
             Filter="CollectionViewSource_Filter"
@@ -229,7 +230,7 @@
             <MenuItem.Header>
                 <StackPanel>
                     <ui:FontIcon Glyph="&#xE74D;" />
-                    <TextBlock Text="Delete" />
+                    <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=MenuItem, Mode=FindAncestor}, Path=(helpers:TextHelper.AltText)}" />
                 </StackPanel>
             </MenuItem.Header>
         </MenuItem>
@@ -322,6 +323,17 @@
             </MenuItem.Header>
             <StaticResource ResourceKey="NewFolderMenuItem" />
             <StaticResource ResourceKey="NewFileMenuItem" />
+        </MenuItem>
+        <MenuItem
+            x:Key="RestoreMenuItem"
+            Click="RestoreMenuButton_Click"
+            Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Header>
+                <StackPanel Orientation="Horizontal">
+                    <ui:FontIcon Glyph="&#xE845;" />
+                    <TextBlock Text="{Binding RelativeSource={RelativeSource AncestorType=MenuItem, Mode=FindAncestor}, Path=(helpers:TextHelper.AltText)}" />
+                </StackPanel>
+            </MenuItem.Header>
         </MenuItem>
         <MenuItem
             x:Key="PathMenuHeader"
@@ -573,13 +585,12 @@
                         <TextBlock Text=" free of " />
                         <TextBlock Text="{Binding Size, Mode=OneWay}" />
                     </StackPanel>
-                    <StackPanel
+                    <Grid
                         Grid.Row="1"
                         Grid.RowSpan="2"
-                        Grid.Column="1"
-                        Orientation="Horizontal">
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
+                        Grid.Column="1">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Type}" Value="Trash">
@@ -587,15 +598,53 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </StackPanel.Style>
-                        <StackPanel.Resources>
+                        </Grid.Style>
+                        <Grid.Resources>
                             <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
-                        </StackPanel.Resources>
-                        <TextBlock Text="{Binding RecycledItemsCount}" />
-                        <TextBlock Text=" Items" />
-                    </StackPanel>
+                        </Grid.Resources>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RecycledItemsCount}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text="{Binding RecycledItemsCount}" />
+                            <TextBlock Text=" Item" />
+                            <TextBlock Text="s">
+                                <TextBlock.Style>
+                                    <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RecycledItemsCount}" Value="1">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                        <TextBlock Text="Empty">
+                            <TextBlock.Style>
+                                <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RecycledItemsCount}" Value="0">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
                 </Grid>
             </Button>
         </DataTemplate>
@@ -764,6 +813,17 @@
                 </Grid.ColumnDefinitions>
                 <Menu Margin="7,4" VerticalAlignment="Center">
                     <Menu.Resources>
+                        <Style
+                            x:Key="HideInRecycleBinStyle"
+                            BasedOn="{StaticResource AdbMenuItemStyle}"
+                            TargetType="MenuItem">
+                            <Setter Property="Visibility" Value="Visible" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
                         <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                             <Setter Property="FontSize" Value="18" />
                         </Style>
@@ -832,7 +892,8 @@
                     <MenuItem
                         x:Name="NewMenuButton"
                         IsEnabled="False"
-                        Resources="{StaticResource TopMenuStyles}">
+                        Resources="{StaticResource TopMenuStyles}"
+                        Style="{StaticResource HideInRecycleBinStyle}">
                         <MenuItem.Header>
                             <StackPanel Orientation="Horizontal">
                                 <ui:FontIcon Glyph="&#xECC8;" Style="{StaticResource DisabledGlyphStyle}" />
@@ -922,6 +983,24 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
+                        x:Name="RestoreMenuButton"
+                        Click="RestoreMenuButton_Click"
+                        ToolTip="Restore">
+                        <MenuItem.Style>
+                            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.Style>
+                        <MenuItem.Header>
+                            <ui:FontIcon Glyph="&#xE845;" />
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem
                         x:Name="DeleteMenuButton"
                         Click="ContextMenuDeleteItem_Click"
                         IsEnabled="False"
@@ -943,6 +1022,9 @@
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -984,6 +1066,7 @@
                     <MenuItem
                         x:Name="FileOperationsButton"
                         Click="FileOperationsButton_Click"
+                        DataContext="{Binding ElementName=UpperProgressBar, Path=DataContext}"
                         Style="{StaticResource FileOpButtonStyle}"
                         ToolTip="File Operations">
                         <MenuItem.Header>
@@ -1117,25 +1200,8 @@
                     LargeChange="0.001"
                     Maximum="1"
                     SmallChange="0.0001"
-                    Value="{Binding Progress, Mode=OneWay}">
-                    <ui:ProgressBar.Style>
-                        <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Setter Property="IsIndeterminate" Value="False" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                                <Trigger Property="Value" Value="0">
-                                    <Setter Property="IsIndeterminate" Value="True" />
-                                </Trigger>
-                                <DataTrigger Binding="{Binding Progress}" Value="{x:Null}">
-                                    <Setter Property="IsIndeterminate" Value="True" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:ProgressBar.Style>
-                </ui:ProgressBar>
+                    Style="{StaticResource UpperProgressBarStyle}"
+                    Value="{Binding Progress, Mode=OneWay}" />
             </Grid>
             <Border
                 x:Name="GridBackgroundBlock"
@@ -1289,10 +1355,31 @@
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
                             <DataGridTextColumn
+                                x:Name="OriginalPath"
+                                Width="180"
+                                Binding="{Binding TrashIndex.ParentPath}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="Original Location"
+                                IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,8,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="Opacity" Value="1" />
+                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                <Setter Property="Opacity" Value="0.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn
                                 x:Name="Date"
                                 Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Date modified"
+                                Header="Date Modified"
                                 IsReadOnly="True"
                                 SortMemberPath="ModifiedTime">
                                 <DataGridTextColumn.ElementStyle>
@@ -1365,6 +1452,34 @@
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
+                            <DataGridTextColumn
+                                x:Name="OriginalDate"
+                                Width="Auto"
+                                Binding="{Binding TrashIndex.ModifiedTimeString}"
+                                FontSize="{Binding Source={StaticResource FontSize}}"
+                                Header="Date Modified"
+                                IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="4,0,8,0" />
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                        <Setter Property="Opacity" Value="1" />
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="File">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                <Setter Property="Opacity" Value="0.5" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                     <TextBox
@@ -1421,7 +1536,7 @@
                                 Style="{StaticResource GlyphFont}" />
                         </Button>
                     </ui:SimpleStackPanel>
-                    <Grid Margin="0,40">
+                    <Grid Margin="0,40" DataContext="{Binding ElementName=DeleteMenuButton, Path=DataContext}">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -1432,6 +1547,16 @@
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
                                             <Condition Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
+                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True" />
+                                            <Condition Binding="{Binding RecycledItemsCount}" Value="0" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>

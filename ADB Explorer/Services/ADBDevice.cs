@@ -15,10 +15,16 @@ namespace ADB_Explorer.Services
         private const string GET_PROP = "getprop";
         private const string ANDROID_VERSION = "ro.build.version.release";
         private const string BATTERY = "dumpsys battery";
+        
+        /// <summary>
+        /// Exclude the recycle folder, exclude content of sub-folders, include all files (including hidden), exclude the recycle index file, discard errors, count lines
+        /// </summary>
+        private static readonly string[] FIND_RECYCLE_COUNT_PARAMS = { "-maxdepth", "1", "-mindepth", "1", "\\(", "-iname", "\"\\*\"", "!", "-iname", $"\"{AdbExplorerConst.RECYCLE_INDEX_FILE}\"", "\\)", @"2>/dev/null", "|", "wc", "-l" };
 
-        private static readonly string[] FIND_DIR_COUNT_PARAMS = { "-maxdepth", "0", @"2>/dev/null", @"|", "wc", "-l" }; // "-type", "d",
-
-        private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" }; // first partition
+        /// <summary>
+        /// First partition of MMC block device 0 / 1
+        /// </summary>
+        private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" };
 
         public class AdbDevice : Device
         {
@@ -333,7 +339,7 @@ namespace ADB_Explorer.Services
 
             public static ulong CountRecycle(string deviceID)
             {
-                if (ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new[] { AdbExplorerConst.RECYCLE_PATH + "/*" }.Concat(FIND_DIR_COUNT_PARAMS).ToArray()) != 0)
+                if (ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new[] { AdbExplorerConst.RECYCLE_PATH + "/" }.Concat(FIND_RECYCLE_COUNT_PARAMS).ToArray()) != 0)
                     return 0;
 
                 return ulong.TryParse(stdout, out var count) ? count : 0;

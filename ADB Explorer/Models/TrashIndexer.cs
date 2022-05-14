@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace ADB_Explorer.Models
@@ -25,6 +26,25 @@ namespace ADB_Explorer.Models
         {
             get => dateModified;
             set => Set(ref dateModified, value);
+        }
+
+        public string ModifiedTimeString => DateModified?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+
+        public string ParentPath
+        {
+            get
+            {
+                int originalIndex = OriginalPath.LastIndexOf('/');
+                Index index;
+                if (originalIndex == 0)
+                    index = 1;
+                else if (originalIndex < 0)
+                    index = ^0;
+                else
+                    index = originalIndex;
+
+                return OriginalPath[..index];
+            }
         }
 
         public TrashIndexer(string recycleIndex) : this(recycleIndex.Split('|'))

@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -9,6 +10,19 @@ namespace ADB_Explorer.Services
 {
     public static class ShellFileOperation
     {
+        public static void SilentDelete(ADBService.AdbDevice device, FilePath item) => SilentDelete(device, new List<FilePath>() { item });
+
+        public static void SilentDelete(ADBService.AdbDevice device, string fullPath)
+        {
+            ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, "-rf", ADBService.EscapeAdbShellString(fullPath));
+        }
+
+        public static void SilentDelete(ADBService.AdbDevice device, IEnumerable<FilePath> items)
+        {
+            var args = new[] { "-rf" }.Concat(GetEscapedPaths(items)).ToArray();
+            ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, args);
+        }
+
         public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, ObservableList<FileClass> fileList, Dispatcher dispatcher)
         {
             foreach (var item in items)
@@ -17,26 +31,39 @@ namespace ADB_Explorer.Services
             }
         }
 
-        /// <summary>
-        /// Moves item(s) or renames an item
-        /// </summary>
-        /// <param name="device"></param>
-        /// <param name="items">Original FilePath items</param>
-        /// <param name="targetPath">New parent path for single / multiple items, or full path for single file (rename)</param>
-        /// <exception cref="Exception"></exception>
         public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical)
         {
-            var mdTask = Task.Run(() => MakeDir(device, AdbExplorerConst.RECYCLE_PATH));
-            mdTask.ContinueWith((t) =>
+            if (targetPath == AdbExplorerConst.RECYCLE_PATH)
             {
-                dispatcher.Invoke(() =>
+                var mdTask = Task.Run(() => MakeDir(device, AdbExplorerConst.RECYCLE_PATH));
+                mdTask.ContinueWith((t) =>
                 {
-                    foreach (var item in items)
+                    dispatcher.Invoke(() =>
                     {
-                        Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
-                    }
+                        foreach (var item in items)
+                        {
+                            Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
+                        }
+                    });
                 });
-            });
+            }
+            else if (targetPath is null && currentPath == AdbExplorerConst.RECYCLE_PATH)
+            {
+                foreach (var item in items)
+                {
+                    if (item.FullPath == AdbExplorerConst.RECYCLE_INDEX_PATH)
+                        continue;
+
+                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, currentPath, fileList, logical));
+                }
+            }
+            else
+            {
+                foreach (var item in items)
+                {
+                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
+                }
+            }
         }
 
         public static void RenameItem(ADBService.AdbDevice device, FilePath item, string targetPath)
@@ -110,5 +137,7 @@ namespace ADB_Explorer.Services
 
             return stdout;
         }
+
+        public static IEnumerable<string> GetEscapedPaths(IEnumerable<FilePath> items) => items.Select(item => ADBService.EscapeAdbShellString(item.FullPath)).ToArray();
     }
 }

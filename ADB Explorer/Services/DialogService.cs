@@ -66,6 +66,7 @@ namespace ADB_Explorer.Services
 
             DialogContentCheckbox.Visibility = VisibilityHelper.Visible(!string.IsNullOrEmpty(checkboxContent));
             DialogContentCheckbox.Content = checkboxContent;
+            DialogContentCheckbox.IsChecked = false;
 
             if (DialogContentStackPanel.Children.Count == 0)
             {

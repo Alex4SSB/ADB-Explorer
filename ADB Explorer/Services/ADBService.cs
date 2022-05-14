@@ -175,7 +175,7 @@ namespace ADB_Explorer.Services
                     _ => new string(c, 1)
                 }));
 
-            return $"\"{result}\"";
+            return $"\"{(result.StartsWith("\\~") ? result[1..] : result)}\"";
         }
 
         public static string EscapeAdbString(string str)

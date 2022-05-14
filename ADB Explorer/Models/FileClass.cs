@@ -125,6 +125,18 @@ namespace ADB_Explorer.Models
 
         public bool IsTemp { get; set; }
 
+        private TrashIndexer trashIndex;
+        public TrashIndexer TrashIndex
+        {
+            get => trashIndex;
+            set
+            {
+                Set(ref trashIndex, value);
+                if (value is not null)
+                    FullName = value.OriginalPath.Split('/')[^1];
+            }
+        }
+
         private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
         private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
         private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));

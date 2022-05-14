@@ -16,7 +16,7 @@ namespace ADB_Explorer.Services
             InProgress,
             Completed,
             Canceled,
-            Failed
+            Failed,
         }
 
         public enum OperationType
@@ -26,7 +26,8 @@ namespace ADB_Explorer.Services
             Move,
             Delete,
             Recycle,
-            Copy
+            Copy,
+            Restore,
         }
 
         public OperationType OperationName { get; protected set; }

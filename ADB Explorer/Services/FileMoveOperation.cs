@@ -20,7 +20,13 @@ namespace ADB_Explorer.Services
 
         public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetPath, string currentPath, ObservableList<FileClass> fileList, LogicalDevice logical) : base(dispatcher, adbDevice, filePath)
         {
-            OperationName = targetPath == AdbExplorerConst.RECYCLE_PATH ? OperationType.Recycle : OperationType.Move;
+            if (targetPath == AdbExplorerConst.RECYCLE_PATH)
+                OperationName = OperationType.Recycle;
+            else if (((FileClass)filePath).TrashIndex is not null)
+                OperationName = OperationType.Restore;
+            else
+                OperationName = OperationType.Move;
+            
             this.fileList = fileList;
             this.targetPath = targetPath;
             this.currentPath = currentPath;
@@ -64,12 +70,20 @@ namespace ADB_Explorer.Services
                 if (operationStatus is OperationStatus.Completed)
                 {
                     ulong recycleCount = 0;
-                    if (OperationName is OperationType.Recycle)
+                    switch (OperationName)
                     {
-                        recycleCount = Device.CountRecycle();
-                        var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
-                        ShellFileOperation.WriteLine(Device, AdbExplorerConst.RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
+                        case OperationType.Recycle:
+                            recycleCount = Device.CountRecycle();
+                            var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
+                            ShellFileOperation.WriteLine(Device, AdbExplorerConst.RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
+                            break;
+                        case OperationType.Restore:
+                            recycleCount = Device.CountRecycle();
+                            break;
+                        default:
+                            break;
                     }
+
                     Dispatcher.Invoke(() =>
                     {
                         if (targetPath == currentPath)
@@ -82,11 +96,16 @@ namespace ADB_Explorer.Services
                             fileList.Remove((FileClass)FilePath);
                         }
 
-                        if (OperationName is OperationType.Recycle)
+                        if (OperationName is OperationType.Recycle or OperationType.Restore)
                         {
+                            ((FileClass)FilePath).TrashIndex = null;
                             logical.RecycledItemsCount = recycleCount;
                         }
                     });
+                }
+                else if (OperationName is OperationType.Recycle)
+                {
+                    ShellFileOperation.SilentDelete(Device, targetPath);
                 }
 
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
