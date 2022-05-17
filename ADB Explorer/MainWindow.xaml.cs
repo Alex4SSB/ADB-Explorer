@@ -471,7 +471,7 @@ namespace ADB_Explorer
                 {
                     if (PathBox.Text == "-")
                         NavigateBack();
-                    else if (NavigateToPath(PathBox.Text))
+                    else if (NavigateToPath(PathBox.Text.StartsWith(RECYCLE_PATH) ? RECYCLE_PATH : PathBox.Text))
                         return;
                 }
                 else
