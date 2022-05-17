@@ -64,6 +64,11 @@ namespace ADB_Explorer.Models
             DateModified = dateModified;
         }
 
+        public override string ToString()
+        {
+            return $"{RecycleName}|{OriginalPath}|{DateModified}";
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {

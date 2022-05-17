@@ -10,7 +10,12 @@ namespace ADB_Explorer.Models
         public static readonly string DEFAULT_PATH = "/sdcard";
         public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";
         public static readonly string RECYCLE_INDEX_FILE = ".RecycleIndex";
+        public static readonly string RECYCLE_INDEX_BACKUP_FILE = ".RecycleIndex.bak";
         public static readonly string RECYCLE_INDEX_PATH = $"{RECYCLE_PATH}/{RECYCLE_INDEX_FILE}";
+        public static readonly string RECYCLE_INDEX_BACKUP_PATH = $"{RECYCLE_PATH}/{RECYCLE_INDEX_BACKUP_FILE}";
+
+        public static readonly string[] RECYCLE_INDEX_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH };
+        public static readonly string[] RECYCLE_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH, RECYCLE_PATH };
 
         public static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
         {

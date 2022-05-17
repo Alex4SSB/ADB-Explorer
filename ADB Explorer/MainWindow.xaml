@@ -985,6 +985,7 @@
                     <MenuItem
                         x:Name="RestoreMenuButton"
                         Click="RestoreMenuButton_Click"
+                        IsEnabled="False"
                         ToolTip="Restore">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
@@ -1547,16 +1548,7 @@
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
                                             <Condition Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True" />
-                                            <Condition Binding="{Binding RecycledItemsCount}" Value="0" />
+                                            <Condition Binding="{Binding ElementName=MainWin, Path=TrashInProgress}" Value="False" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>

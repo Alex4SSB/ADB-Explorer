@@ -19,7 +19,27 @@ namespace ADB_Explorer.Services
         /// <summary>
         /// Exclude the recycle folder, exclude content of sub-folders, include all files (including hidden), exclude the recycle index file, discard errors, count lines
         /// </summary>
-        private static readonly string[] FIND_RECYCLE_COUNT_PARAMS = { "-maxdepth", "1", "-mindepth", "1", "\\(", "-iname", "\"\\*\"", "!", "-iname", $"\"{AdbExplorerConst.RECYCLE_INDEX_FILE}\"", "\\)", @"2>/dev/null", "|", "wc", "-l" };
+        private static readonly string[] FIND_RECYCLE_COUNT_PARAMS =
+        {
+            "-maxdepth",
+            "1",
+            "-mindepth",
+            "1",
+            "\\(",
+            "-iname",
+            "\"\\*\"",
+            "!",
+            "-iname",
+            $"\"{AdbExplorerConst.RECYCLE_INDEX_FILE}\"",
+            "!",
+            "-iname",
+            $"\"{AdbExplorerConst.RECYCLE_INDEX_BACKUP_FILE}\"",
+            "\\)",
+            @"2>/dev/null",
+            "|",
+            "wc",
+            "-l"
+        };
 
         /// <summary>
         /// First partition of MMC block device 0 / 1

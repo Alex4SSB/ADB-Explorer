@@ -56,6 +56,13 @@ namespace ADB_Explorer
             set => Set(ref isRecycleBin, value);
         }
 
+        private bool trashInProgress;
+        public bool TrashInProgress
+        {
+            get => trashInProgress;
+            set => Set(ref trashInProgress, value);
+        }
+
         private double ColumnHeaderHeight
         {
             get
@@ -147,15 +154,6 @@ namespace ADB_Explorer
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
         }
 
-        private void FileList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (IsRecycleBin)
-            {
-                RestoreMenuButton.IsEnabled = DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-                DeleteMenuButton.IsEnabled = DirectoryLister.FileList.Any(item => item.FullPath != RECYCLE_INDEX_PATH);
-            }
-        }
-
         private void CommandLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems is null)
@@ -204,6 +202,60 @@ namespace ADB_Explorer
                 DirectoryLoadingProgressBar.Visible(DirectoryLister.IsProgressVisible);
                 UnfinishedBlock.Visible(DirectoryLister.IsProgressVisible);
             }
+            else if (e.PropertyName == nameof(DirectoryLister.InProgress) && !DirectoryLister.InProgress)
+            {
+                TrashInProgress = false;
+                if (IsRecycleBin)
+                {
+                    EnableRecycleButtons();
+                    UpdateIndexerFile();
+                }
+            }
+        }
+
+        private void UpdateIndexerFile()
+        {
+            Task.Run(() =>
+            {
+                var validIndexers = DirectoryLister.FileList.Where(file => file.TrashIndex is not null).Select(file => file.TrashIndex);
+                if (!validIndexers.Any())
+                {
+                    ShellFileOperation.SilentDelete(CurrentADBDevice, RECYCLE_INDEX_PATH);
+                    ShellFileOperation.SilentDelete(CurrentADBDevice, RECYCLE_INDEX_BACKUP_PATH);
+                    return;
+                }
+                if (DirectoryLister.FileList.Count(file => RECYCLE_INDEX_PATHS.Contains(file.FullPath)) < 2
+                    && validIndexers.Count() == RecycleIndex.Count
+                    && RecycleIndex.All(indexer => validIndexers.Contains(indexer)))
+                {
+                    return;
+                }
+
+                var outString = string.Join("\r\n", validIndexers.Select(indexer => indexer.ToString()));
+                var oldIndexFile = DirectoryLister.FileList.Where(file => file.FullPath == RECYCLE_INDEX_PATH);
+
+                try
+                {
+                    if (oldIndexFile.Any())
+                        ShellFileOperation.RenameItem(CurrentADBDevice, oldIndexFile.First(), RECYCLE_INDEX_BACKUP_PATH);
+
+                    ShellFileOperation.WriteLine(CurrentADBDevice, RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString(outString));
+
+                    if (!string.IsNullOrEmpty(ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_PATH)) && oldIndexFile.Any())
+                        ShellFileOperation.SilentDelete(CurrentADBDevice, RECYCLE_INDEX_BACKUP_PATH);
+                }
+                catch (Exception)
+                { }
+            });
+        }
+
+        private void EnableRecycleButtons(IEnumerable<FileClass> fileList = null)
+        {
+            if (fileList is null)
+                fileList = DirectoryLister.FileList;
+
+            RestoreMenuButton.IsEnabled = fileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+            DeleteMenuButton.IsEnabled =  fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
         }
 
         private void ThemeService_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -583,7 +635,6 @@ namespace ADB_Explorer
         {
             DirectoryLister = new(Dispatcher, CurrentADBDevice);
             DirectoryLister.PropertyChanged += DirectoryLister_PropertyChanged;
-            DirectoryLister.FileList.CollectionChanged += FileList_CollectionChanged;
         }
 
         private void LoadSettings()
@@ -899,11 +950,31 @@ namespace ADB_Explorer
 
             if (realPath == RECYCLE_PATH)
             {
+                TrashInProgress = true;
                 var recycleTask = Task.Run(() =>
                 {
-                    var text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_PATH);
-                    var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    RecycleIndex.AddRange(lines.Select(l => new TrashIndexer(l)));
+                    string text = "";
+                    try
+                    {
+                        text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_PATH);
+                        if (string.IsNullOrEmpty(text))
+                            throw new Exception();
+                    }
+                    catch (Exception)
+                    {
+                        try
+                        {
+                            text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_BACKUP_PATH);
+                        }
+                        catch (Exception)
+                        { }
+                    }
+                    
+                    if (!string.IsNullOrEmpty(text))
+                    {
+                        var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                        RecycleIndex.AddRange(lines.Select(l => new TrashIndexer(l)));
+                    }
                 });
 
                 recycleTask.ContinueWith((t) => DirectoryLister.Navigate(realPath));
@@ -1847,7 +1918,7 @@ namespace ADB_Explorer
 
         private static bool IsHiddenRecycleItem(FileClass file)
         {
-            if (file.FullPath == RECYCLE_PATH || file.FullPath == RECYCLE_INDEX_PATH)
+            if (RECYCLE_PATHS.Contains(file.FullPath))
                 return true;
 
             return false;
@@ -2283,7 +2354,7 @@ namespace ADB_Explorer
             IEnumerable<FileClass> itemsToDelete;
             if (IsRecycleBin && !selectedFiles.Any())
             {
-                itemsToDelete = DirectoryLister.FileList.Where(f => f.FullPath != RECYCLE_INDEX_PATH);
+                itemsToDelete = DirectoryLister.FileList.Where(f => !RECYCLE_INDEX_PATHS.Contains(f.FullPath));
             }
             else
             {
@@ -2323,9 +2394,13 @@ namespace ADB_Explorer
             {
                 ShellFileOperation.DeleteItems(CurrentADBDevice, itemsToDelete, DirectoryLister.FileList, Dispatcher);
 
-                if (isRecycleBin && !selectedFiles.Any() && DirectoryLister.FileList.Any(item => item.FullPath == RECYCLE_INDEX_FILE))
+                if (IsRecycleBin)
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirectoryLister.FileList.Where(item => item.FullPath == RECYCLE_INDEX_FILE)));
+                    EnableRecycleButtons(DirectoryLister.FileList.Except(itemsToDelete));
+                    if (!selectedFiles.Any() && DirectoryLister.FileList.Any(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
+                    {
+                        _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirectoryLister.FileList.Where(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath))));
+                    }
                 }
             }
         }
@@ -2746,6 +2821,8 @@ namespace ADB_Explorer
         private void RestoreMenuButton_Click(object sender, RoutedEventArgs e)
         {
             var restoreItems = (!selectedFiles.Any() ? DirectoryLister.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+            if (!restoreItems.Any())
+                EnableRecycleButtons();
 
             ShellFileOperation.MoveItems(CurrentADBDevice, restoreItems, null, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
         }

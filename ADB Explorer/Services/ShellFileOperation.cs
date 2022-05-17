@@ -51,7 +51,7 @@ namespace ADB_Explorer.Services
             {
                 foreach (var item in items)
                 {
-                    if (item.FullPath == AdbExplorerConst.RECYCLE_INDEX_PATH)
+                    if (AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath))
                         continue;
 
                     Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, currentPath, fileList, logical));
