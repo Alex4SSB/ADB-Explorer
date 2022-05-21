@@ -38,7 +38,11 @@
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="(helpers:ExpanderHelper.ExpansionProgress)"
             To="1"
-            Duration="{StaticResource AnimationDuration}" />
+            Duration="{StaticResource AnimationDuration}">
+            <DoubleAnimation.EasingFunction>
+                <CircleEase EasingMode="EaseOut" />
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
     </Storyboard>
 
     <Storyboard x:Key="CollapsingStoryboard">
@@ -47,7 +51,11 @@
             Storyboard.TargetName="ExpandSite"
             Storyboard.TargetProperty="(helpers:ExpanderHelper.ExpansionProgress)"
             To="0"
-            Duration="{StaticResource AnimationDuration}" />
+            Duration="{StaticResource AnimationDuration}">
+            <DoubleAnimation.EasingFunction>
+                <CircleEase EasingMode="EaseOut" />
+            </DoubleAnimation.EasingFunction>
+        </DoubleAnimation>
         <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.2" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
             <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="True" />
         </BooleanAnimationUsingKeyFrames>

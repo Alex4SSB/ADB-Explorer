@@ -143,4 +143,92 @@
     <sys:Double x:Key="AccentButtonBackgroundMouseOverOpacity">0.9</sys:Double>
     <sys:Double x:Key="AccentButtonBackgroundPressedOpacity">0.8</sys:Double>
     <sys:Double x:Key="AccentButtonForegroundPressedOrDisabledOpacity">0.5</sys:Double>
+    <ContextMenu x:Key="VScrollBarContextMenu" x:Shared="true">
+        <MenuItem
+            Command="ScrollBar.ScrollHereCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Scroll Here" />
+        <Separator Margin="-8,0" />
+        <MenuItem
+            Command="ScrollBar.ScrollToTopCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Top" />
+        <MenuItem
+            Command="ScrollBar.ScrollToBottomCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Bottom" />
+        <Separator Margin="-8,0" />
+        <MenuItem
+            Command="ScrollBar.PageUpCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Page Up" />
+        <MenuItem
+            Command="ScrollBar.PageDownCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Page Down" />
+        <Separator Margin="-8,0" />
+        <MenuItem
+            Command="ScrollBar.LineUpCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Scroll Up" />
+        <MenuItem
+            Command="ScrollBar.LineDownCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Scroll Down" />
+    </ContextMenu>
+    <ContextMenu x:Key="HScrollBarContextMenu" x:Shared="true">
+        <MenuItem
+            Command="ScrollBar.ScrollHereCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Scroll Here" />
+        <Separator Margin="-8,0" />
+        <MenuItem
+            Command="ScrollBar.ScrollToLeftEndCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Left Edge" />
+        <MenuItem
+            Command="ScrollBar.ScrollToRightEndCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Right Edge" />
+        <Separator Margin="-8,0" />
+        <MenuItem
+            Command="ScrollBar.PageLeftCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Page Left" />
+        <MenuItem
+            Command="ScrollBar.PageRightCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Page Right" />
+        <Separator Margin="-8,0" />
+        <MenuItem
+            Command="ScrollBar.LineLeftCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Scroll Left" />
+        <MenuItem
+            Command="ScrollBar.LineRightCommand"
+            CommandTarget="{Binding Path=PlacementTarget, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"
+            Header="Scroll Right" />
+    </ContextMenu>
+    <Style BasedOn="{StaticResource DefaultScrollBarStyle}" TargetType="ScrollBar">
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter Property="ContextMenu" Value="{StaticResource VScrollBarContextMenu}" />
+            </Trigger>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="ContextMenu" Value="{StaticResource HScrollBarContextMenu}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ScrollViewerStyle"
+        BasedOn="{StaticResource DefaultScrollViewerStyle}"
+        TargetType="ScrollViewer">
+        <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="True" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+                <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />
 </ResourceDictionary>

@@ -308,6 +308,7 @@ namespace ADB_Explorer
             copyPath.Resources = FindResource("ContextSubMenuStyles") as ResourceDictionary;
             ExplorerGrid.ContextMenu.Items.Clear();
 
+            Thickness separatorMargin = new(-8, 0, -8, 0);
             switch (type)
             {
                 case MenuType.ExplorerItem:
@@ -321,7 +322,7 @@ namespace ADB_Explorer
                         restoreMenu.IsEnabled = selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
                         ExplorerGrid.ContextMenu.Items.Add(restoreMenu);
                         TextHelper.SetAltText(restoreMenu, "Restore");
-                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
                         ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                         return;
@@ -333,7 +334,7 @@ namespace ADB_Explorer
                     {
                         ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     }
-                    ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                    ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
                     if (!selectedFiles.All(file => file.IsCut))
                         ExplorerGrid.ContextMenu.Items.Add(cutMenu);
@@ -348,7 +349,7 @@ namespace ADB_Explorer
                     }
 
                     if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
-                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
                     ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
 
@@ -367,7 +368,7 @@ namespace ADB_Explorer
                         restoreMenu.IsEnabled = DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
                         ExplorerGrid.ContextMenu.Items.Add(restoreMenu);
                         TextHelper.SetAltText(restoreMenu, "Restore All Items");
-                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
                         deleteMenu.IsEnabled = ExplorerGrid.Items.Count > 0;
                         ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
@@ -376,11 +377,11 @@ namespace ADB_Explorer
                     }
 
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
-                    ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                    ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
                     ExplorerGrid.ContextMenu.Items.Add(newMenu);
                     if (PasteEnabled(true))
                     {
-                        ExplorerGrid.ContextMenu.Items.Add(new Separator());
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
                         ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
                     }
                     break;
@@ -443,17 +444,18 @@ namespace ADB_Explorer
 
         private void FocusPathBox()
         {
-            PathStackPanel.Visibility = Visibility.Collapsed;
+            PathMenu.Visibility = Visibility.Collapsed;
             if (!IsRecycleBin)
                 PathBox.Text = TextHelper.GetAltText(PathBox);
 
             PathBox.IsReadOnly = false;
+            PathBox.Focus();
             PathBox.SelectAll();
         }
 
         private void UnfocusPathBox()
         {
-            PathStackPanel.Visibility = Visibility.Visible;
+            PathMenu.Visibility = Visibility.Visible;
             PathBox.Clear();
             PathBox.IsReadOnly = true;
             FileOperationsSplitView.Focus();
@@ -496,7 +498,7 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && selectedFiles.Count() == 1)
+            if (e.ChangedButton == MouseButton.Left && selectedFiles.Count() == 1 && !IsInEditMode())
                 DoubleClick(ExplorerGrid.SelectedItem);
         }
 
@@ -528,10 +530,13 @@ namespace ADB_Explorer
 
             DeleteMenuButton.IsEnabled = (selectedFiles.Any() && !irregular) || IsRecycleBin;
             DeleteMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
-            RestoreMenuButton.IsEnabled = IsRecycleBin 
+            DeleteMenuButton.ToolTip += " (Del)";
+
+            RestoreMenuButton.IsEnabled = IsRecycleBin
                 && (selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))
                 || (!selectedFiles.Any() && DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))));
             RestoreMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
+            RestoreMenuButton.ToolTip += " (Ctrl+R)";
 
             PullMenuButton.IsEnabled = !IsRecycleBin && selectedFiles.Any() && !irregular;
 
@@ -544,6 +549,28 @@ namespace ADB_Explorer
             PasteMenuButton.IsEnabled = PasteEnabled();
 
             MoreMenuButton.IsEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
+            SetRowsRadius();
+        }
+
+        private void SetRowsRadius()
+        {
+            if (!UseFluentStyles)
+                return;
+
+            var selectedRows = ExplorerGrid.SelectedCells.Select(cell => DataGridRow.GetRowContainingElement(CellConverter.GetDataGridCell(cell))).Distinct().Where(row => row is not null);
+            foreach (var item in selectedRows)
+            {
+                int topRadius = 0;
+                int bottomRadius = 0;
+
+                if (!selectedRows.Any(row => row.GetIndex() == item.GetIndex() - 1))
+                    topRadius = 2;
+
+                if (!selectedRows.Any(row => row.GetIndex() == item.GetIndex() + 1))
+                    bottomRadius = 2;
+
+                ControlHelper.SetCornerRadius(item, new CornerRadius(topRadius, topRadius, bottomRadius, bottomRadius));
+            }
         }
 
         private bool PasteEnabled(bool ignoreSelected = false)
@@ -640,6 +667,7 @@ namespace ADB_Explorer
         private void LoadSettings()
         {
             Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
+            Application.Current.Resources["SymbolThemeFontFamily"] = new FontFamily(UseFluentStyles ? "Segoe Fluent Icons, Segoe MDL2 Assets" : "Segoe MDL2 Assets");
 
             if (Settings.EnableMdns)
                 QrClass = new();
@@ -983,8 +1011,8 @@ namespace ADB_Explorer
                 OriginalPath.Visibility =
                 OriginalDate.Visibility = Visibility.Visible;
 
-                DeleteMenuButton.ToolTip = "Empty Recycle Bin";
-                RestoreMenuButton.ToolTip = "Restore All Items";
+                DeleteMenuButton.ToolTip = "Empty Recycle Bin (Del)";
+                RestoreMenuButton.ToolTip = "Restore All Items (Ctrl+R)";
             }
             else
             {
@@ -1063,7 +1091,7 @@ namespace ADB_Explorer
 
             double excessLength = expectedLength - PathBox.ActualWidth;
             List<MenuItem> excessButtons = new();
-            PathStackPanel.Children.Clear();
+            PathMenu.Items.Clear();
 
             if (excessLength > 0)
             {
@@ -1072,6 +1100,15 @@ namespace ADB_Explorer
                 {
                     excessButtons.Add(PathButtons[i]);
                     PathButtons[i].ContextMenu = null;
+                    PathButtons[i].Height = double.NaN;
+                    PathButtons[i].Padding = new(10, 4, 10, 4);
+                    
+                    if (UseFluentStyles)
+                    {
+                        PathButtons[i].Margin = new(5, 1, 5, 1);
+                        ControlHelper.SetCornerRadius(PathButtons[i], new(4));
+                    }
+                    
                     excessLength -= ControlSize.GetWidth(PathButtons[i]);
 
                     i++;
@@ -1082,7 +1119,7 @@ namespace ADB_Explorer
 
             foreach (var item in PathButtons.Except(excessButtons))
             {
-                if (PathStackPanel.Children.Count > 0)
+                if (PathMenu.Items.Count > 0)
                     AddPathArrow();
 
                 AddPathButton(item);
@@ -1090,7 +1127,7 @@ namespace ADB_Explorer
 
             if (excessLength > 0)
             {
-                PathButtons[^1].Width = PathButtons[^1].ActualWidth - (ControlSize.GetWidth(PathStackPanel) - PathBox.ActualWidth) - 4;
+                PathButtons[^1].Width = PathButtons[^1].ActualWidth - (ControlSize.GetWidth(PathMenu) - PathBox.ActualWidth) - 4;
             }
             else
                 PathButtons[^1].Width = double.NaN;
@@ -1100,15 +1137,18 @@ namespace ADB_Explorer
         {
             var menuItem = new MenuItem()
             {
+                VerticalAlignment = VerticalAlignment.Center,
                 Height = 24,
+                Padding = new(10, 4, 10, 4),
+                Margin = new(0),
                 Header = new FontIcon()
                 {
                     Glyph = "\uE712",
-                    FontSize = 16,
+                    FontSize = 18,
                     Style = Resources["GlyphFont"] as Style,
                 }
             };
-            ControlHelper.SetCornerRadius(menuItem, new(3));
+            
             return menuItem;
         }
 
@@ -1119,10 +1159,8 @@ namespace ADB_Explorer
 
             var button = CreateExcessButton();
             button.ItemsSource = excessButtons;
-            Menu excessMenu = new() { Height = 24 };
 
-            excessMenu.Items.Add(button);
-            PathStackPanel.Children.Add(excessMenu);
+            PathMenu.Items.Add(button);
         }
 
         private MenuItem CreatePathButton(KeyValuePair<string, string> kv) => CreatePathButton(kv.Key, kv.Value);
@@ -1131,11 +1169,12 @@ namespace ADB_Explorer
             MenuItem button = new()
             {
                 Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
-                Padding = new Thickness(8, 0, 8, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new(0),
+                Padding = new(8, 0, 8, 0),
                 Height = 24,
             };
             button.Click += PathButton_Click;
-            ControlHelper.SetCornerRadius(button, new(3));
             TextHelper.SetAltObject(button, path);
 
             return button;
@@ -1146,17 +1185,32 @@ namespace ADB_Explorer
             if (TextHelper.GetAltObject(button) is string str && str == RECYCLE_PATH)
                 button.ContextMenu = null;
 
-            Menu menu = new() { Height = 24 };
-            ((Menu)button.Parent)?.Items.Clear();
-            menu.Items.Add(button);
-            PathStackPanel.Children.Add(menu);
+            button.Height = 24;
+            button.Padding = new(8, 0, 8, 0);
+            button.Margin = new(0);
+
+            if (UseFluentStyles)
+            {
+                ControlHelper.SetCornerRadius(button, new(3));
+            }
+
+            button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
+            PathMenu.Items.Add(button);
         }
 
-        private FontIcon CreatePathArrow() => new()
+        private MenuItem CreatePathArrow() => new()
         {
-            Glyph = " \uE970 ",
-            FontSize = 8,
-            Style = Resources["GlyphFont"] as Style,
+            VerticalAlignment = VerticalAlignment.Center,
+            Height = 24,
+            Margin = new(0),
+            Padding = new(3, 0, 3, 0),
+            IsEnabled = false,
+            Header = new FontIcon()
+            {
+                Glyph = "\uE970",
+                FontSize = 8,
+                Style = Resources["GlyphFont"] as Style,
+            }
         };
 
         private void AddPathArrow(bool append = true)
@@ -1164,9 +1218,9 @@ namespace ADB_Explorer
             var arrow = CreatePathArrow();
 
             if (append)
-                PathStackPanel.Children.Add(arrow);
+                PathMenu.Items.Add(arrow);
             else
-                PathStackPanel.Children.Insert(0, arrow);
+                PathMenu.Items.Insert(0, arrow);
         }
 
         private void PathButton_Click(object sender, RoutedEventArgs e)
@@ -1267,7 +1321,7 @@ namespace ADB_Explorer
             var key = e.Key;
             if (key == Key.Enter)
             {
-                if (CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                if (IsInEditMode())
                     return;
 
                 if (selectedFiles.Count() == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
@@ -1303,24 +1357,109 @@ namespace ADB_Explorer
             e.Handled = true;
         }
 
+        private bool IsInEditMode() => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing;
+
+        private void IsInEditMode(bool isEditing) => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = isEditing;
+
+        public static Key RealKey(KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.System:
+                    return e.SystemKey;
+
+                case Key.ImeProcessed:
+                    return e.ImeProcessedKey;
+
+                case Key.DeadCharProcessed:
+                    return e.DeadCharProcessedKey;
+
+                default:
+                    return e.Key;
+            }
+        }
+
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            var key = e.Key;
-            if (key == Key.Back)
+
+            var nonShortcuttableKeys = new[] { Key.LeftAlt, Key.RightAlt, Key.LeftCtrl, Key.RightCtrl, Key.LeftShift, Key.RightShift };
+            var actualKey = RealKey(e);
+            bool alt, ctrl, shift;
+
+            if (!e.IsDown || nonShortcuttableKeys.Contains(actualKey))
+                return;
+
+            ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+            alt = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
+            shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+
+            if (actualKey == Key.Back)
             {
                 NavigateBack();
             }
-            else if (key == Key.Delete)
+            else if (actualKey == Key.Delete)
             {
                 DeleteFiles();
             }
+            else if (actualKey == Key.F6)
+            {
+                if (!alt)
+                    FocusPathBox();
+                else if (!IsRecycleBin && ExplorerGrid.Visible())
+                    Clipboard.SetText(CurrentPath);
+            }
+            else if (actualKey == Key.A && ctrl)
+            {
+                if (ExplorerGrid.Items.Count == ExplorerGrid.SelectedItems.Count)
+                    ExplorerGrid.UnselectAll();
+                else
+                    ExplorerGrid.SelectAll();
+            }
+            else if (actualKey == Key.X && ctrl && CutMenuButton.IsEnabled)
+            {
+                CutFiles(selectedFiles);
+            }
+            else if (actualKey == Key.V && ctrl && PasteMenuButton.IsEnabled)
+            {
+                PasteFiles();
+            }
+            else if (actualKey == Key.F2 && RenameMenuButton.IsEnabled)
+            {
+                BeginRename();
+            }
+            else if (actualKey == Key.C && shift && ctrl && MoreMenuButton.IsEnabled)
+            {
+                CopyItemPath();
+            }
+            else if (actualKey == Key.Home && ExplorerGrid.Visible())
+            {
+                AnimateControl(HomeButton);
+                NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+                NavigateToLocation(NavHistory.SpecialLocation.DriveView);
+            }
+            else if (actualKey == Key.C && alt && PullMenuButton.IsEnabled)
+            {
+                PullFiles();
+            }
+            else if (actualKey == Key.R && ctrl && IsRecycleBin && RestoreMenuButton.IsEnabled)
+            {
+                RestoreItems();
+            }
+            else if (actualKey == Key.V && alt && PushMenuButton.IsEnabled)
+            {
+                PushItems(false, true);
+            }
+            else
+            {
+                bool handle = false;
+                if (NavHistory.Current is string)
+                    handle = ExplorerGridKeyNavigation(actualKey);
 
-            bool handle = false;
-            if (NavHistory.Current is string)
-                handle = ExplorerGridKeyNavigation(key);
+                if (handle)
+                    e.Handled = true;
+            }
 
-            if (handle)
-                e.Handled = true;
+            e.Handled = true;
         }
 
         private bool ExplorerGridKeyNavigation(Key key)
@@ -1347,7 +1486,7 @@ namespace ADB_Explorer
                     ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
                     break;
                 case Key.Enter:
-                    if (ExplorerGrid.SelectedCells.Count < 1 || CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
+                    if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode())
                         return false;
 
                     if (selectedFiles.Count() == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
@@ -1640,7 +1779,7 @@ namespace ADB_Explorer
 
         private void ClearExplorer(bool clearDevice = true)
         {
-            PathStackPanel.Children.Clear();
+            PathMenu.Items.Clear();
             DirectoryLister?.FileList?.Clear();
             PushMenuButton.IsEnabled =
             NewMenuButton.IsEnabled =
@@ -1714,8 +1853,8 @@ namespace ADB_Explorer
                 || point.X > actualRowWidth
                 || point.X > DataGridContentWidth)
             {
-                if (ExplorerGrid.SelectedItems.Count > 0 && CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing)
-                    CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = false;
+                if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode())
+                    IsInEditMode(false);
 
                 ExplorerGrid.SelectedItems.Clear();
 
@@ -1732,6 +1871,11 @@ namespace ADB_Explorer
 
             while (DepObject is not null and not DataGridColumnHeader)
             {
+#if DEBUG
+                // This might happen when messing with control templates on the go
+                if (DepObject is System.Windows.Documents.Run)
+                    return;
+#endif
                 DepObject = VisualTreeHelper.GetParent(DepObject);
             }
 
@@ -2434,6 +2578,11 @@ namespace ADB_Explorer
 
         private void ContextMenuRenameItem_Click(object sender, RoutedEventArgs e)
         {
+            BeginRename();
+        }
+
+        private void BeginRename()
+        {
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
 
             cell.IsEditing = !cell.IsEditing;
@@ -2799,6 +2948,11 @@ namespace ADB_Explorer
 
         private void CopyPathMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            CopyItemPath();
+        }
+
+        private void CopyItemPath()
+        {
             Clipboard.SetText(((FilePath)ExplorerGrid.SelectedItem).FullPath);
         }
 
@@ -2820,11 +2974,22 @@ namespace ADB_Explorer
 
         private void RestoreMenuButton_Click(object sender, RoutedEventArgs e)
         {
+            RestoreItems();
+        }
+
+        private void RestoreItems()
+        {
             var restoreItems = (!selectedFiles.Any() ? DirectoryLister.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-            if (!restoreItems.Any())
+            if (!selectedFiles.Any())
                 EnableRecycleButtons();
 
             ShellFileOperation.MoveItems(CurrentADBDevice, restoreItems, null, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
+        }
+
+        private void DataGridRow_Unselected(object sender, RoutedEventArgs e)
+        {
+            if (UseFluentStyles)
+                ControlHelper.SetCornerRadius(e.OriginalSource as DataGridRow, new(2));
         }
     }
 }

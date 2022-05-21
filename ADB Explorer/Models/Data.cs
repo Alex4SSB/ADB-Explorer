@@ -3,7 +3,9 @@ using ADB_Explorer.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -53,5 +55,21 @@ namespace ADB_Explorer.Models
         public static ObservableCollection<Log> CommandLog { get; set; } = new();
 
         public static ObservableList<TrashIndexer> RecycleIndex { get; set; } = new();
+
+
+        public static event PropertyChangedEventHandler PropertyChanged;
+        private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+        private static void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(null, new PropertyChangedEventArgs(propertyName));
     }
 }

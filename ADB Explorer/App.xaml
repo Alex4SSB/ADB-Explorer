@@ -12,6 +12,7 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
                 <ResourceDictionary Source="Styles\BasicStyles.xaml" />
+                <ResourceDictionary Source="Styles\ContextMenu.xaml" />
                 <ResourceDictionary Source="Styles\CheckBox.xaml" />
                 <ResourceDictionary Source="Styles\RadioButton.xaml" />
                 <ResourceDictionary Source="Styles\Button.xaml" />
@@ -25,6 +26,8 @@
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
+
+            <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 
             <Color x:Key="LightControlBackground">White</Color>
             <Color x:Key="DarkControlBackground">#FF202020</Color>

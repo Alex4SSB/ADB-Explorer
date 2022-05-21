@@ -1,0 +1,68 @@
+﻿<!--  Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT License. See LICENSE in the project root for license information.  -->
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+
+    <Thickness x:Key="MenuFlyoutScrollerMargin">0,4,0,4</Thickness>
+
+    <Style
+        x:Key="AdbContextMenuStyle"
+        BasedOn="{StaticResource ContextMenuStyleBase}"
+        TargetType="ContextMenu">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Template">
+            <!--  Template copied from ModernWPF to be modified  -->
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <ui:ThemeShadowChrome
+                        x:Name="Shdw"
+                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
+                        IsShadowEnabled="{TemplateBinding HasDropShadow}"
+                        SnapsToDevicePixels="True">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
+                            <Grid>
+                                <ScrollViewer
+                                    x:Name="ContextMenuScrollViewer"
+                                    MinWidth="{DynamicResource FlyoutThemeMinWidth}"
+                                    Margin="{TemplateBinding Padding}"
+                                    Style="{DynamicResource {ComponentResourceKey ResourceId=MenuScrollViewer,
+                                                                                  TypeInTargetAssembly={x:Type FrameworkElement}}}">
+                                    <ItemsPresenter
+                                        Margin="{StaticResource MenuFlyoutScrollerMargin}"
+                                        KeyboardNavigation.DirectionalNavigation="Cycle"
+                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </ScrollViewer>
+                                <Border
+                                    x:Name="ContextMenuBorder"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                            </Grid>
+                        </Border>
+                    </ui:ThemeShadowChrome>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style BasedOn="{StaticResource AdbContextMenuStyle}" TargetType="ContextMenu">
+        <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style BasedOn="{StaticResource AdbContextMenuStyle}" TargetType="ui:TextContextMenu">
+        <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
