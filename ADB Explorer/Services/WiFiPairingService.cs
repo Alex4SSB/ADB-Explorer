@@ -54,35 +54,26 @@ namespace ADB_Explorer.Services
             var matches = AdbRegEx.MDNS_SERVICE.Matches(services);
             foreach (Match item in matches)
             {
-                var id  = item.Groups["ID"].Value;
+                var id = item.Groups["ID"].Value;
                 var portType = item.Groups["PortType"].Value;
                 var ipAddress = item.Groups["IpAddress"].Value;
                 var port = item.Groups["Port"].Value;
 
-                if (mdnsServices.Find(s => s.IpAddress == ipAddress && s.ID == id) is ServiceDevice existing)
-                {
-                    if (string.IsNullOrEmpty(existing.PairingPort) && portType == "pairing")
-                        existing.PairingPort = port;
-                }
-                else if (ipAddress != LOOPBACK_IP)
-                {
-                    ServiceDevice service = new(id, ipAddress);
-                    
-                    if (portType == "pairing")
-                        service.PairingPort = port;
+                if (ipAddress == LOOPBACK_IP)
+                    continue;
 
-                    service.MdnsType = id.Contains(PAIRING_SERVICE_PREFIX)
-                        ? ServiceDevice.ServiceType.QrCode
-                        : ServiceDevice.ServiceType.PairingCode;
+                ServiceDevice service = portType == "pairing"
+                    ? new PairingService(id, ipAddress, port)
+                    : new ConnectService(id, ipAddress, port);
 
-                    mdnsServices.Add(service);
-                }
+                service.MdnsType = id.Contains(PAIRING_SERVICE_PREFIX)
+                    ? ServiceDevice.ServiceType.QrCode
+                    : ServiceDevice.ServiceType.PairingCode;
+
+                mdnsServices.Add(service);
             }
 
-            if (!DISPLAY_OFFLINE_SERVICES)
-                return mdnsServices.Where(s => !string.IsNullOrEmpty(s.PairingPort));
-            else
-                return mdnsServices;
+            return mdnsServices.Distinct();
         }
     }
 }

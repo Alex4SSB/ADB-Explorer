@@ -418,8 +418,7 @@
         </ContextMenu>
         <ui:Flyout x:Key="PairServiceFlyout">
             <StackPanel>
-                <TextBlock Text="On phone: Switch Wireless debugging off then on" />
-                <TextBlock Margin="0,8" Text="Click the button below to switch to device discovery" />
+                <TextBlock Text="On phone: Switch wireless debugging off then on" />
                 <Grid>
                     <ui:FontIcon
                         Margin="6"
@@ -2251,15 +2250,32 @@
                             <Grid Grid.Row="2">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
+                                <Grid x:Name="DebuggingResetPrompt" Visibility="Collapsed">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <ui:FontIcon
+                                        Margin="0,0,6,0"
+                                        VerticalAlignment="Center"
+                                        Glyph="&#xE946;"
+                                        Style="{StaticResource GlyphFont}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="Switching wireless debugging off and then on may shorten connection time"
+                                        TextWrapping="Wrap" />
+                                </Grid>
                                 <ui:ItemsRepeater
                                     x:Name="DevicesList"
+                                    Grid.Row="1"
                                     DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
                                     ItemTemplate="{StaticResource DeviceDataTemplate}"
                                     ItemsSource="{Binding UIList}" />
                                 <Border
-                                    Grid.Row="1"
+                                    Grid.Row="2"
                                     Background="Transparent"
                                     MouseDown="Border_MouseDown" />
                             </Grid>

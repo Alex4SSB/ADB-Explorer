@@ -63,6 +63,23 @@ namespace ADB_Explorer.Models
             private set => Set(ref uiDevices, value);
         }
 
+        private ObservableList<ConnectService> connectServices = new();
+        public ObservableList<ConnectService> ConnectServices
+        {
+            get => connectServices;
+            private set
+            {
+                Set(ref connectServices, value);
+
+                foreach (var item in LogicalDevices)
+                {
+                    var service = value.Where(srv => srv.ID == item.ID);
+                    if (service.Any() && (item.Service is null || item.Service.Port != service.First().Port))
+                        item.UpdateConnectService(service.First());
+                }
+            }
+        }
+
         public IEnumerable<UILogicalDevice> UILogicalDevices => UIList?.OfType<UILogicalDevice>();
         public IEnumerable<UIServiceDevice> UIServiceDevices => UIList?.OfType<UIServiceDevice>();
         public IEnumerable<LogicalDevice> LogicalDevices => UILogicalDevices.Select(d => d.Device as LogicalDevice);
@@ -91,13 +108,19 @@ namespace ADB_Explorer.Models
 
         public void UnselectAll() => UIDevice.SetSelected(UIList);
 
-        public void UpdateServices(IEnumerable<ServiceDevice> other) => UpdateServices(UIList, other);
+        public void UpdateServices(IEnumerable<ServiceDevice> other)
+        {
+            ConnectServices.Set(other.OfType<ConnectService>());
+            UpdateServices(UIList, other);
+        }
 
         public static void UpdateServices(ObservableList<UIDevice> self, IEnumerable<ServiceDevice> other)
         {
-            self.RemoveAll(thisDevice => thisDevice is UIServiceDevice && !other.Any(otherDevice => otherDevice.ID == thisDevice.Device.ID));
+            var pairing = other.OfType<PairingService>();
 
-            foreach (var item in other)
+            self.RemoveAll(thisDevice => thisDevice is UIServiceDevice && !pairing.Any(otherDevice => otherDevice.ID == thisDevice.Device.ID));
+
+            foreach (var item in pairing)
             {
                 if (self?.Find(thisDevice => thisDevice.Device.ID == item.ID) is UIServiceDevice service)
                 {
@@ -113,9 +136,9 @@ namespace ADB_Explorer.Models
             ConsolidateDevices(self);
         }
 
-        public bool UpdateDevices(IEnumerable<LogicalDevice> other) => UpdateDevices(UIList, other, Current);
+        public bool UpdateDevices(IEnumerable<LogicalDevice> other) => UpdateDevices(UIList, other, ConnectServices);
 
-        public static bool UpdateDevices(ObservableList<UIDevice> self, IEnumerable<LogicalDevice> other, UILogicalDevice current)
+        public static bool UpdateDevices(ObservableList<UIDevice> self, IEnumerable<LogicalDevice> other, ObservableList<ConnectService> services)
         {
             bool isCurrentTypeUpdated = false;
 
@@ -141,7 +164,18 @@ namespace ADB_Explorer.Models
             }
 
             if (self.OfType<UIServiceDevice>().Any())
+            {
+                if (self.OfType<UILogicalDevice>().Any(d => ((LogicalDevice)d.Device).Service is null))
+                {
+                    foreach (var item in self.OfType<UILogicalDevice>().Select(dev => dev.Device as LogicalDevice))
+                    {
+                        var service = services.Where(srv => srv.ID == item.ID);
+                        if (service.Any() && (item.Service is null || item.Service.Port != service.First().Port))
+                            item.UpdateConnectService(service.First());
+                    }
+                }
                 ConsolidateDevices(self);
+            }
 
             return isCurrentTypeUpdated;
         }
@@ -179,14 +213,16 @@ namespace ADB_Explorer.Models
             if (other is null)
                 return false;
 
+            var pairing = other.OfType<PairingService>();
+
             // if the list is empty, we need to update (and remove all items)
-            if (!other.Any())
+            if (!pairing.Any())
                 return ServiceDevices.Any();
 
             // if there's any service whose ID is not found in any logical device,
             // AND an ordering of both new and old lists doesn't match up all IDs
-            return other.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
-                   && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(other.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
+            return pairing.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
+                   && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(pairing.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
         }
 
         public bool DevicesChanged(IEnumerable<LogicalDevice> other)
@@ -202,7 +238,8 @@ namespace ADB_Explorer.Models
         {
             foreach (var device in devices.OfType<UILogicalDevice>().ToList())
             {
-                var services = devices.Where(s => s is UIServiceDevice && s.Device.ID == ((LogicalDevice)device.Device).BaseID).ToList();
+                var logical = device.Device as LogicalDevice;
+                var services = devices.Where(s => s.Device is ServiceDevice service && (service.ID == logical.BaseID || service.IpAddress == logical.IpAddress)).ToList();
                 if (!services.Any())
                     continue;
 
@@ -212,21 +249,21 @@ namespace ADB_Explorer.Models
                     && service.IpAddress == ((ServiceDevice)services.First().Device).IpAddress
                 ).ToList();
 
-                switch (device.Device.Status)
+                switch (logical.Status)
                 {
                     // if logical device is online - remove all related services
                     case DeviceStatus.Online:
-                    {
-                        services.ForEach(s => devices.Remove(s));
-                        qrServices.ForEach(s => devices.Remove(s));
-                        break;
-                    }
+                        {
+                            services.ForEach(s => devices.Remove(s));
+                            qrServices.ForEach(s => devices.Remove(s));
+                            break;
+                        }
                     // if logical device is offline, and we have one of its services - remove the logical device
                     case DeviceStatus.Offline:
-                    {
-                        devices.Remove(device);
-                        break;
-                    }
+                        {
+                            devices.Remove(device);
+                            break;
+                        }
                     default:
                         break;
                 }
@@ -274,7 +311,8 @@ namespace ADB_Explorer.Models
         public override bool Equals(object obj)
         {
             return obj is Device device &&
-                   ID == device.ID;
+                obj.GetType() == GetType() &&
+                ID == device.ID;
         }
     }
 
@@ -296,6 +334,7 @@ namespace ADB_Explorer.Models
             DeviceType.Local => "\uE839",
             DeviceType.Remote => "\uEE77",
             DeviceType.Emulator => "\uE99A",
+            DeviceType.Service when Device is ServiceDevice service && service.MdnsType is ServiceDevice.ServiceType.QrCode => "\uED14",
             DeviceType.Service => "\uEDE4",
             DeviceType.Sideload => "\uED10",
             _ => throw new NotImplementedException(),
@@ -307,7 +346,7 @@ namespace ADB_Explorer.Models
             DeviceStatus.Unauthorized => "\uEC00",
             _ => throw new NotImplementedException(),
         };
-        
+
         public void SetSelected(ObservableList<UIDevice> devices, bool selectedState = true)
         {
             devices.ForEach(device => device.DeviceSelected =
@@ -372,8 +411,8 @@ namespace ADB_Explorer.Models
                 if (Data.DevicesRoot.ContainsKey(ID))
                     if (value is not RootStatus.Unchecked)
                         Data.DevicesRoot[ID] = value;
-                else
-                    Data.DevicesRoot.Add(ID, value);
+                    else
+                        Data.DevicesRoot.Add(ID, value);
             }
         }
 
@@ -396,17 +435,28 @@ namespace ADB_Explorer.Models
             }
         }
 
-        private LogicalDevice(string name, string id)
+        private ConnectService service;
+        public ConnectService Service
+        {
+            get => service;
+            private set => Set(ref service, value);
+        }
+
+        public string IpAddress => service?.IpAddress;
+
+        private LogicalDevice(string name, string id, ConnectService service = null)
         {
             Name = name;
             ID = id;
+            this.service = service;
 
             if (Data.DevicesRoot.ContainsKey(ID))
                 root = Data.DevicesRoot[ID];
         }
 
-        public static LogicalDevice New(string name, string id, string status)
+        public static LogicalDevice New(string name, string id, string status, ObservableList<ConnectService> services = null)
         {
+            ConnectService service = null;
             var deviceType = GetType(id, status);
             var deviceStatus = GetStatus(status);
             var rootStatus = deviceType is DeviceType.Sideload
@@ -416,7 +466,14 @@ namespace ADB_Explorer.Models
             if (!AdbExplorerConst.DISPLAY_OFFLINE_SERVICES && deviceType is DeviceType.Service && deviceStatus is DeviceStatus.Offline)
                 return null;
 
-            return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus, Root = rootStatus };
+            if (deviceType is DeviceType.Service && services is not null)
+            {
+                var srv = services.Where(s => s.ID == id);
+                if (srv.Any())
+                    service = srv.First();
+            }
+
+            return new LogicalDevice(name, id, service) { Type = deviceType, Status = deviceStatus, Root = rootStatus };
         }
 
         private static DeviceStatus GetStatus(string status)
@@ -449,6 +506,11 @@ namespace ADB_Explorer.Models
         {
             Name = other.Name;
             Status = other.Status;
+        }
+
+        public void UpdateConnectService(ConnectService service)
+        {
+            Service = service;
         }
 
         private void DrivesSetBlocking(List<Drive> val)
@@ -610,10 +672,8 @@ namespace ADB_Explorer.Models
         }
     }
 
-    public class ServiceDevice : Device
+    public abstract class ServiceDevice : Device
     {
-        private string pairingPort;
-
         public ServiceDevice()
         {
             Type = DeviceType.Service;
@@ -623,7 +683,7 @@ namespace ADB_Explorer.Models
         {
             ID = id;
             IpAddress = ipAddress;
-            PairingPort = port;
+            Port = port;
             UpdateStatus();
         }
 
@@ -635,29 +695,43 @@ namespace ADB_Explorer.Models
 
         public void UpdateService(ServiceDevice other)
         {
-            PairingPort = other.PairingPort;
+            Port = other.Port;
             UpdateStatus();
         }
 
         private void UpdateStatus()
         {
-            Status = string.IsNullOrEmpty(PairingPort) ? DeviceStatus.Offline : DeviceStatus.Unauthorized;
+            Status = MdnsType is ServiceType.QrCode ? DeviceStatus.Online : DeviceStatus.Unauthorized;
         }
 
         public string IpAddress { get; set; }
-        public string PairingPort
+
+        private string port;
+        public string Port
         {
-            get => pairingPort;
+            get => port;
             set
             {
-                pairingPort = value;
+                port = value;
                 UpdateStatus();
             }
         }
         public ServiceType MdnsType { get; set; }
         public string PairingCode { get; set; }
 
-        public string PairingAddress => $"{IpAddress}:{PairingPort}";
+        public string PairingAddress => $"{IpAddress}:{Port}";
+    }
+
+    public class PairingService : ServiceDevice
+    {
+        public PairingService(string id, string ipAddress, string port) : base(id, ipAddress, port)
+        { }
+    }
+
+    public class ConnectService : ServiceDevice
+    {
+        public ConnectService(string id, string ipAddress, string port) : base(id, ipAddress, port)
+        { }
     }
 
     public class UIServiceDevice : UIDevice
@@ -679,7 +753,7 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public override string Tooltip => $"mDNS Service - {(Device.Status == DeviceStatus.Offline ? "Unable To Pair" : "Ready To Pair")}";
+        public override string Tooltip => $"mDNS Service - {(((ServiceDevice)Device).MdnsType is ServiceDevice.ServiceType.QrCode ? "QR Pairing" : "Ready To Pair")}";
     }
 
     public class LogicalDeviceEqualityComparer : IEqualityComparer<LogicalDevice>
@@ -701,7 +775,7 @@ namespace ADB_Explorer.Models
         {
             // IDs are equal and either both ports have a value, or they're both null
             // We do not update the port since it can change too frequently, and we do not use it anyway
-            return x.ID == y.ID && !(string.IsNullOrEmpty(x.PairingPort) ^ string.IsNullOrEmpty(y.PairingPort));
+            return x.ID == y.ID && !(string.IsNullOrEmpty(x.Port) ^ string.IsNullOrEmpty(y.Port));
         }
 
         public int GetHashCode([DisallowNull] ServiceDevice obj)

@@ -614,9 +614,14 @@ namespace ADB_Explorer
             TestDevices();
         }
 
-        private void DeviceListSetup(IEnumerable<LogicalDevice> devices = null, string selectedAddress = "")
+        private void DeviceListSetup(string selectedAddress = "")
         {
-            var init = !DevicesObject.UpdateDevices(devices is null ? ADBService.GetDevices() : devices);
+            Task.Run(() => ADBService.GetDevices(DevicesObject.ConnectServices)).ContinueWith((t) => DeviceListSetup(t.Result, selectedAddress));
+        }
+
+        private void DeviceListSetup(IEnumerable<LogicalDevice> devices, string selectedAddress = "")
+        {
+            var init = !DevicesObject.UpdateDevices(devices);
 
             if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.CurrentDevice.Status != AbstractDevice.DeviceStatus.Online)
                 ClearDrives();
@@ -860,6 +865,8 @@ namespace ADB_Explorer
             {
                 DeviceListSetup(devices);
 
+                DebuggingResetPrompt.Visible(false);
+
                 if (Settings.AutoRoot)
                 {
                     foreach (var item in DevicesObject.LogicalDevices.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
@@ -896,10 +903,20 @@ namespace ADB_Explorer
 
                 var qrServices = DevicesObject.ServiceDevices.Where(service =>
                     service.MdnsType == ServiceDevice.ServiceType.QrCode
-                    && service.ID == QrClass.ServiceName).ToList();
+                    && service.ID == QrClass.ServiceName);
 
-                if (qrServices.Any() && PairService(qrServices.First()))
-                    PairingExpander.IsExpanded = false;
+                if (qrServices.Any())
+                {
+                    PairService(qrServices.First()).ContinueWith((t) =>
+                    {
+                        if (t.Result)
+                            Dispatcher.Invoke(() =>
+                            {
+                                PairingExpander.IsExpanded = false;
+                                DebuggingResetPrompt.Visible(true);
+                            });
+                    });
+                }
             }
         }
 
@@ -928,7 +945,7 @@ namespace ADB_Explorer
 
         private void RefreshDevices(bool devicesVisible)
         {
-            Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
+            Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices(DevicesObject.ConnectServices)).Wait();
 
             if (MdnsService.State == MDNS.MdnsState.Running && devicesVisible)
             {
@@ -1673,7 +1690,7 @@ namespace ADB_Explorer
             NewDeviceIpBox.Clear();
             NewDevicePortBox.Clear();
             PairingExpander.IsExpanded = false;
-            DeviceListSetup(selectedAddress: deviceAddress);
+            DeviceListSetup(deviceAddress);
         }
 
         private void EnableConnectButton()
@@ -2251,26 +2268,29 @@ namespace ADB_Explorer
 
         private void PairServiceButton_Click(object sender, RoutedEventArgs e)
         {
-            PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+            _ = PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
         }
 
-        private bool PairService(ServiceDevice service)
+        private async Task<bool> PairService(ServiceDevice service)
         {
             var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
                 ? QrClass.Password
                 : service.PairingCode;
 
-            try
+            return await Task.Run(() =>
             {
-                ADBService.PairNetworkDevice(service.ID, code);
-            }
-            catch (Exception ex)
-            {
-                DialogService.ShowMessage(ex.Message, "Pairing Error", DialogService.DialogIcon.Critical);
-                return false;
-            }
+                try
+                {
+                    ADBService.PairNetworkDevice(service.ID, code);
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, "Pairing Error", DialogService.DialogIcon.Critical));
+                    return false;
+                }
 
-            return true;
+                return true;
+            });
         }
 
         private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -2291,7 +2311,7 @@ namespace ADB_Explorer
                 flyout.Hide();
                 PairingExpander.IsExpanded = false;
                 DevicesObject.UnselectAll();
-                DevicesObject.ConsolidateDevices();
+                //DevicesObject.ConsolidateDevices();
             }
         }
 
@@ -2299,7 +2319,7 @@ namespace ADB_Explorer
         {
             if (e.Key == Key.Enter)
             {
-                PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
+                _ = PairService((ServiceDevice)DevicesObject.SelectedDevice.Device);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -195,7 +196,7 @@ namespace ADB_Explorer.Services
             return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
         }
 
-        public static IEnumerable<LogicalDevice> GetDevices()
+        public static IEnumerable<LogicalDevice> GetDevices(ObservableList<ConnectService> services = null)
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
 
@@ -203,7 +204,8 @@ namespace ADB_Explorer.Services
                 m => LogicalDevice.New(
                     name: LogicalDevice.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                     id: m.Groups["id"].Value,
-                    status: m.Groups["status"].Value)
+                    status: m.Groups["status"].Value,
+                    services: services)
                 ).Where(d => d);
         }
 
