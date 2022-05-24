@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ADB_Explorer.Converters
 {
-    public static class SizeConverter
+    public static class UnitConverter
     {
         private static readonly Dictionary<int,string> scale_table = new() { { -3, "n" }, { -2, "u" }, { -1, "m" }, { 0, "" }, { 1, "K" }, { 2, "M" }, { 3, "G" }, { 4, "T" }, { 5, "P" }, { 6, "E" } };
 
@@ -14,12 +14,12 @@ namespace ADB_Explorer.Converters
             return $"{(Math.Round(value, value < 100 ? bigRound : smallRound))}{(scaleSpace ? " " : "")}{scale_table[scale]}B";
         }
 
-        public static string ToTime(this decimal? milli, bool scaleSpace = false)
+        public static string ToTime(this decimal? seconds, bool scaleSpace = false)
         {
-            if (milli is null)
+            if (seconds is null)
                 return "";
 
-            TimeSpan span = TimeSpan.FromSeconds((double)milli);
+            TimeSpan span = TimeSpan.FromSeconds((double)seconds);
             string resolution;
             string value;
 

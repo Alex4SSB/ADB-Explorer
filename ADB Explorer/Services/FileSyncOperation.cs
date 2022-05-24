@@ -61,7 +61,7 @@ namespace ADB_Explorer.Services
                 get
                 {
                     return CurrentFilePercentage.HasValue       ? $"{CurrentFilePercentage.Value}%" :
-                           CurrentFileBytesTransferred.HasValue ? SizeConverter.ToSize(CurrentFileBytesTransferred.Value)
+                           CurrentFileBytesTransferred.HasValue ? UnitConverter.ToSize(CurrentFileBytesTransferred.Value)
                                                                 : string.Empty;
                 }
             }
@@ -95,7 +95,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return AverageRateMBps.HasValue ? $"{SizeConverter.ToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : string.Empty;
+                    return AverageRateMBps.HasValue ? $"{UnitConverter.ToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : string.Empty;
                 }
             }
 
@@ -103,7 +103,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return TotalBytes.HasValue ? SizeConverter.ToSize(TotalBytes.Value) : string.Empty;
+                    return TotalBytes.HasValue ? UnitConverter.ToSize(TotalBytes.Value) : string.Empty;
                 }
             }
 
@@ -111,7 +111,7 @@ namespace ADB_Explorer.Services
             {
                 get
                 {
-                    return TotalSeconds.HasValue ? SizeConverter.ToTime(TotalSeconds.Value) : string.Empty;
+                    return TotalSeconds.HasValue ? UnitConverter.ToTime(TotalSeconds.Value) : string.Empty;
                 }
             }
         }

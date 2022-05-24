@@ -1474,6 +1474,8 @@ namespace ADB_Explorer
 
                 if (handle)
                     e.Handled = true;
+
+                return;
             }
 
             e.Handled = true;
@@ -1718,7 +1720,7 @@ namespace ADB_Explorer
 
         private void NewDeviceIpBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, specialChars: '.');
+            (sender as TextBox).SeparateFormat(separator: '.', maxNumber: Byte.MaxValue, maxSeparators: 3);
             EnableConnectButton();
         }
 
@@ -1956,7 +1958,7 @@ namespace ADB_Explorer
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, '-', 6);
+            (sender as TextBox).SeparateAndLimitDigits('-', 6);
             EnablePairButton();
         }
 
@@ -2178,91 +2180,14 @@ namespace ADB_Explorer
             PairingQrImage.Source = QrClass.Image;
         }
 
-        /// <summary>
-        /// Provides validation and separation of text in a <see cref="TextBox"/>.
-        /// </summary>
-        /// <param name="textBox">The textbox to be validated</param>
-        /// <param name="separator">Text separator. Default is null - no separator</param>
-        /// <param name="maxChars">Maximum allowed characters in the text. Default is -1 - no length validation</param>
-        /// <param name="numeric">Enable numeric validation. Default is <see langword="true"/></param>
-        /// <param name="specialChars">When numeric is enabled - allowed non-numeric chars. Otherwise - forbidden chars</param>
-        private static void TextBoxSeparation(TextBox textBox,
-                                              char? separator = null,
-                                              int maxChars = -1,
-                                              bool numeric = true,
-                                              params char[] specialChars)
-        {
-            if (TextHelper.GetIsValidating(textBox))
-                return;
-            else
-                TextHelper.SetIsValidating(textBox, true);
-
-            var caretIndex = textBox.CaretIndex;
-            var output = "";
-            var numbers = "";
-            var deletedChars = 0;
-            var text = textBox.Text;
-
-            foreach (var c in text)
-            {
-                if ((numeric && !char.IsDigit(c) && !specialChars.Contains(c))
-                    || (!numeric && specialChars.Contains(c)))
-                {
-                    if (c != separator)
-                        deletedChars++;
-
-                    continue;
-                }
-
-                numbers += c;
-            }
-
-            if (separator is null)
-            {
-                output = numbers;
-            }
-            else
-            {
-                for (int i = 0; i < numbers.Length; i++)
-                {
-                    output += $"{(i > 0 ? separator : "")}{numbers[i]}";
-                }
-            }
-
-            if (deletedChars > 0 && TextHelper.GetAltText(textBox) is string prev && prev.Length > output.Length)
-            {
-                textBox.Text = prev;
-                textBox.CaretIndex = caretIndex - deletedChars;
-
-                TextHelper.SetIsValidating(textBox, false);
-                return;
-            }
-
-            if (maxChars > -1)
-                textBox.MaxLength = separator is null ? maxChars : (maxChars * 2) - 1;
-
-            textBox.Text = output;
-
-            caretIndex -= deletedChars;
-            if (separator is not null)
-                caretIndex += output.Count(c => c == separator) - text.Count(c => c == separator);
-
-            if (caretIndex < 0)
-                caretIndex = 0;
-
-            textBox.CaretIndex = caretIndex;
-            TextHelper.SetAltText(textBox, output);
-            TextHelper.SetIsValidating(textBox, false);
-        }
-
         private void PairingCodeTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, '-', 6);
+            (sender as TextBox).SeparateAndLimitDigits('-', 6);
         }
 
         private void NewDevicePortBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, maxChars: 5);
+            (sender as TextBox).LimitNumber(UInt16.MaxValue);
             EnableConnectButton();
         }
 
@@ -2295,7 +2220,7 @@ namespace ADB_Explorer
 
         private void ManualPairingPortBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, maxChars: 5);
+            (sender as TextBox).LimitDigits(5);
             EnablePairButton();
         }
 
@@ -2790,7 +2715,7 @@ namespace ADB_Explorer
 
         private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxSeparation(sender as TextBox, numeric: false, specialChars: INVALID_ANDROID_CHARS);
+            (sender as TextBox).FilterString(INVALID_ANDROID_CHARS);
         }
 
         private void PairingCodeTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
