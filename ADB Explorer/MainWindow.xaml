@@ -47,6 +47,15 @@
             Margin="0,0,4,0"
             x:Shared="False"
             Resources="{StaticResource DeviceMenuStyles}">
+            <Menu.Style>
+                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Menu.Style>
             <MenuItem
                 SubmenuClosed="MenuItem_SubmenuClosed"
                 SubmenuOpened="MenuItem_SubmenuOpened"
@@ -645,9 +654,13 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsMdns}" Value="True">
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsMdns}" Value="True" />
+                                            <Condition Binding="{Binding Device.MdnsType}" Value="1" />
+                                        </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </Style>
@@ -679,7 +692,6 @@
                                         <MultiDataTrigger>
                                             <MultiDataTrigger.Conditions>
                                                 <Condition Binding="{Binding ElementName=PairingCodeTextBox, Path=Text.Length}" Value="11" />
-                                                <Condition Binding="{Binding Device.Status}" Value="Unauthorized" />
                                             </MultiDataTrigger.Conditions>
                                             <Setter Property="IsEnabled" Value="True" />
                                         </MultiDataTrigger>

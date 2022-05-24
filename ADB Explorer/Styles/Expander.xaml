@@ -53,7 +53,7 @@
             To="0"
             Duration="{StaticResource AnimationDuration}">
             <DoubleAnimation.EasingFunction>
-                <CircleEase EasingMode="EaseOut" />
+                <CircleEase EasingMode="EaseInOut" />
             </DoubleAnimation.EasingFunction>
         </DoubleAnimation>
         <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.2" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">

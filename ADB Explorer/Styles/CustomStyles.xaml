@@ -111,14 +111,10 @@
         x:Key="PairingTextBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
         TargetType="TextBox">
-        <Setter Property="IsEnabled" Value="False" />
         <Style.Triggers>
             <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
                 <Setter Property="FontSize" Value="18" />
             </Trigger>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
-                <Setter Property="IsEnabled" Value="True" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
