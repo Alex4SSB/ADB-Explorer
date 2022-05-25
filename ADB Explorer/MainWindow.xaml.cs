@@ -528,7 +528,7 @@ namespace ADB_Explorer
         {
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
-            bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+            bool irregular = DevicesObject.CurrentDevice?.Root != AbstractDevice.RootStatus.Enabled
                 && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder));
 
             DeleteMenuButton.IsEnabled = (selectedFiles.Any() && !irregular) || IsRecycleBin;

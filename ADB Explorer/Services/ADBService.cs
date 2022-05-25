@@ -282,6 +282,11 @@ namespace ADB_Explorer.Services
                 ExecuteAdbCommand("start-server", out _, out _);
         }
 
+        public static bool KillAdbProcess()
+        {
+            return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, "/im", "\"adb.exe\"") == 0;
+        }
+
         public static bool Root(Device device)
         {
             ExecuteDeviceAdbCommand(device.ID, "root", out string stdout, out string stderr);

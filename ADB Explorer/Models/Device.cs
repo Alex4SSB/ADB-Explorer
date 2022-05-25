@@ -116,11 +116,20 @@ namespace ADB_Explorer.Models
 
         public void UpdateServices(IEnumerable<ServiceDevice> other)
         {
-            var connect = other.OfType<ConnectService>();
-            if (connect is not null && connect.Any())
-                ConnectServices.Set(connect);
-
+            AddConnectServices(other.OfType<ConnectService>());
             UpdateServices(UIList, other);
+        }
+
+        public void AddConnectServices(IEnumerable<ConnectService> services)
+        {
+            foreach (var item in services)
+            {
+                var prev = ConnectServices.Where(srv => srv.ID == item.ID);
+                if (prev.Any())
+                    prev.First().IpAddress = item.IpAddress;
+                else
+                    ConnectServices.Add(item);
+            }
         }
 
         public static void UpdateServices(ObservableList<UIDevice> self, IEnumerable<ServiceDevice> other)
@@ -223,11 +232,7 @@ namespace ADB_Explorer.Models
                 return false;
 
             var pairing = other.OfType<PairingService>();
-            var connect = other.OfType<ConnectService>();
-            if (connect.Any())
-            {
-                ConnectServices.Set(connect);
-            }
+            AddConnectServices(other.OfType<ConnectService>());
 
             // if the list is empty, we need to update (and remove all items)
             if (!pairing.Any())
