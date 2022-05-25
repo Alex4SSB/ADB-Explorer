@@ -104,6 +104,9 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
             </MultiDataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsExpandEnabled)}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
@@ -268,6 +271,7 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsExpanded" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
                             </MultiTrigger.Conditions>
                             <MultiTrigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource ExpandingStoryboard}" />
@@ -354,6 +358,7 @@
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
         <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
         <Setter Property="ExpandDirection" Value="Down" />
+        <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
     </Style>
 
     <Style
@@ -368,8 +373,13 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
             </MultiDataTrigger>
+            <DataTrigger Binding="{Binding Device.MdnsType}" Value="QrCode">
+                <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
+            </DataTrigger>
         </Style.Triggers>
         <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="False" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
+        <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
+        <Setter Property="IsExpanded" Value="{Binding DeviceSelected, Mode=TwoWay}" />
     </Style>
 </ResourceDictionary>

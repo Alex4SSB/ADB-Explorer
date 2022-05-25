@@ -49,9 +49,13 @@
             Resources="{StaticResource DeviceMenuStyles}">
             <Menu.Style>
                 <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                    <Setter Property="IsEnabled" Value="False"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsMdns}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Device.Status}" Value="Online">
+                            <Setter Property="IsEnabled" Value="True"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -608,10 +612,7 @@
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
         </Style>
         <DataTemplate x:Key="DeviceDataTemplate" DataType="Device">
-            <Expander
-                x:Name="DeviceExpander"
-                IsExpanded="{Binding DeviceSelected, Mode=TwoWay}"
-                Style="{StaticResource DeviceExpanderStyle}">
+            <Expander x:Name="DeviceExpander" Style="{StaticResource DeviceExpanderStyle}">
                 <Expander.Header>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -657,7 +658,7 @@
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding IsMdns}" Value="True" />
-                                            <Condition Binding="{Binding Device.MdnsType}" Value="1" />
+                                            <Condition Binding="{Binding Device.MdnsType}" Value="QrCode" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>

@@ -82,5 +82,18 @@ namespace ADB_Explorer.Helpers
                 typeof(double),
                 typeof(ExpanderHelper),
                 null);
+
+        public static bool GetIsExpandEnabled(UIElement control) =>
+            (bool)control.GetValue(IsExpandEnabledProperty);
+
+        public static void SetIsExpandEnabled(UIElement control, bool value) =>
+            control.SetValue(IsExpandEnabledProperty, value);
+
+        public static readonly DependencyProperty IsExpandEnabledProperty =
+            DependencyProperty.RegisterAttached(
+                "IsExpandEnabled",
+                typeof(bool),
+                typeof(ExpanderHelper),
+                null);
     }
 }

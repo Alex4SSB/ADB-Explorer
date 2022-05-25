@@ -152,6 +152,9 @@ namespace ADB_Explorer
 
             UpperProgressBar.DataContext = fileOperationQueue;
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
+
+            TestCurrentOperation();
+            TestDevices();
         }
 
         private void CommandLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -609,9 +612,6 @@ namespace ADB_Explorer
         {
             LoadSettings();
             InitFileOpColumns();
-
-            TestCurrentOperation();
-            TestDevices();
         }
 
         private void DeviceListSetup(string selectedAddress = "")
@@ -1605,7 +1605,7 @@ namespace ADB_Explorer
         private void TestDevices()
         {
             //ConnectTimer.IsEnabled = false;
-            //DevicesObject.UpdateServices(new List<ServiceDevice>() { new("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") });
+            //DevicesObject.UpdateServices(new List<ServiceDevice>() { new PairingService("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") { MdnsType = ServiceDevice.ServiceType.QrCode } });
             //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "offline") });
         }
 
