@@ -70,13 +70,7 @@ namespace ADB_Explorer.Models
             private set
             {
                 Set(ref connectServices, value);
-
-                foreach (var item in LogicalDevices)
-                {
-                    var service = value.Where(srv => srv.ID == item.ID);
-                    if (service.Any() && (item.Service is null || item.Service.Port != service.First().Port))
-                        item.UpdateConnectService(service.First());
-                }
+                UpdateConnectServices();
             }
         }
 
@@ -100,6 +94,18 @@ namespace ADB_Explorer.Models
 
         public DateTime LastUpdate { get; set; }
 
+        public void UpdateConnectServices()
+        {
+            foreach (var item in LogicalDevices)
+            {
+                var service = ConnectServices.Where(srv => srv.ID == item.BaseID);
+                if (service.Any() && (item.Service is null || item.Service.Port != service.First().Port))
+                    item.UpdateConnectService(service.First());
+            }
+
+            ConsolidateDevices();
+        }
+
         public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
 
         public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
@@ -110,7 +116,10 @@ namespace ADB_Explorer.Models
 
         public void UpdateServices(IEnumerable<ServiceDevice> other)
         {
-            ConnectServices.Set(other.OfType<ConnectService>());
+            var connect = other.OfType<ConnectService>();
+            if (connect is not null && connect.Any())
+                ConnectServices.Set(connect);
+
             UpdateServices(UIList, other);
         }
 
@@ -214,6 +223,11 @@ namespace ADB_Explorer.Models
                 return false;
 
             var pairing = other.OfType<PairingService>();
+            var connect = other.OfType<ConnectService>();
+            if (connect.Any())
+            {
+                ConnectServices.Set(connect);
+            }
 
             // if the list is empty, we need to update (and remove all items)
             if (!pairing.Any())
@@ -221,7 +235,7 @@ namespace ADB_Explorer.Models
 
             // if there's any service whose ID is not found in any logical device,
             // AND an ordering of both new and old lists doesn't match up all IDs
-            return pairing.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID))
+            return pairing.Any(service => !LogicalDevices.Any(device => device.Status == DeviceStatus.Online && device.BaseID == service.ID || device.IpAddress == service.IpAddress))
                    && !ServiceDevices.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(pairing.OrderBy(otherDevice => otherDevice.ID), new ServiceDeviceEqualityComparer());
         }
 
@@ -273,7 +287,7 @@ namespace ADB_Explorer.Models
             devices.RemoveAll(s => s is UIServiceDevice
                 && s.Device is ServiceDevice serv
                 && serv.MdnsType == ServiceDevice.ServiceType.PairingCode
-                && !devices.OfType<UILogicalDevice>().Any(l => ((LogicalDevice)l.Device).BaseID == serv.ID)
+                && !devices.OfType<UILogicalDevice>().Any(l => ((LogicalDevice)l.Device).BaseID == serv.ID || ((LogicalDevice)l.Device).IpAddress == serv.IpAddress)
                 && devices.Any(q => q is UIServiceDevice && q.Device is ServiceDevice qr
                     && qr.IpAddress == serv.IpAddress
                     && qr.MdnsType == ServiceDevice.ServiceType.QrCode));

@@ -949,6 +949,13 @@ namespace ADB_Explorer
 
             if (MdnsService.State == MDNS.MdnsState.Running && devicesVisible)
             {
+                Dispatcher.Invoke(() =>
+                {
+                    if (DevicesObject.LogicalDevices.Any(device => device.Service is null) && DevicesObject.ConnectServices.Any())
+                    {
+                        DevicesObject.UpdateConnectServices();
+                    }
+                });
                 Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
             }
         }
