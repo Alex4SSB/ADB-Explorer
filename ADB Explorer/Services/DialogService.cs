@@ -3,6 +3,7 @@ using ModernWpf.Controls;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services
 {
@@ -31,8 +32,16 @@ namespace ADB_Explorer.Services
 
         private static readonly ContentDialog windowDialog = new();
 
-        public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None)
+        public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true)
         {
+            if (censorContent)
+            {
+                foreach (var item in AdbExplorerConst.RECYCLE_PATHS)
+                {
+                    content = content.Replace(item, "Recycle Bin");
+                }
+            }
+
             windowDialog.Content = content;
             windowDialog.Title = title;
             windowDialog.PrimaryButtonText = null;
@@ -80,11 +89,20 @@ namespace ADB_Explorer.Services
                                             string primaryText = "Yes",
                                             string cancelText = "Cancel",
                                             string checkBoxText = "",
-                                            DialogIcon icon = DialogIcon.None)
+                                            DialogIcon icon = DialogIcon.None,
+                                            bool censorContent = true)
         {
             if (windowDialog.IsVisible)
             {
                 return (ContentDialogResult.None, false);
+            }
+
+            if (censorContent)
+            {
+                foreach (var item in AdbExplorerConst.RECYCLE_PATHS)
+                {
+                    content = content.Replace(item, "Recycle Bin");
+                }
             }
 
             InitContent(content, checkBoxText);

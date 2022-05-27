@@ -824,6 +824,7 @@ namespace ADB_Explorer
             PathBox.IsEnabled = true;
 
             MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
+            button.Click += HomeButton_Click;
             AddPathButton(button);
             TextHelper.SetAltText(PathBox, "");
         }
@@ -843,22 +844,24 @@ namespace ADB_Explorer
 
         private bool InitNavigation(string path = "")
         {
-            DrivesItemRepeater.Visibility = Visibility.Collapsed;
-            ExplorerGrid.Visibility = Visibility.Visible;
-            CombinePrettyNames();
-
-            ExplorerGrid.ItemsSource = DirectoryLister.FileList;
-
-            HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
-            if (path != RECYCLE_PATH)
-                UpdateRecycledItemsCount();
-
             if (path is null)
                 return true;
 
-            return string.IsNullOrEmpty(path)
-                ? NavigateToPath(DEFAULT_PATH)
-                : NavigateToPath(path);
+            CombinePrettyNames();
+
+            if (path != RECYCLE_PATH)
+                UpdateRecycledItemsCount();
+
+            var realPath = FolderExists(string.IsNullOrEmpty(path) ? DEFAULT_PATH : path);
+            if (realPath is null)
+                return false;
+
+            DrivesItemRepeater.Visibility = Visibility.Collapsed;
+            ExplorerGrid.Visibility = Visibility.Visible;
+            ExplorerGrid.ItemsSource = DirectoryLister.FileList;
+            HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
+
+            return _navigateToPath(realPath);
         }
 
         private void UpdateRecycledItemsCount()
@@ -983,25 +986,31 @@ namespace ADB_Explorer
             });
         }
 
-        public bool NavigateToPath(string path, bool bfNavigated = false)
+        public string FolderExists(string path)
         {
-            ExplorerGrid.Focus();
-            if (path is null) return false;
-
-            string realPath;
             try
             {
-                realPath = CurrentADBDevice.TranslateDevicePath(path);
+                return CurrentADBDevice.TranslateDevicePath(path);
             }
             catch (Exception e)
             {
-                DialogService.ShowMessage(e.Message, "Navigation Error", DialogService.DialogIcon.Critical);
-                return false;
+                if (path != RECYCLE_PATH)
+                    DialogService.ShowMessage(e.Message, "Navigation Error", DialogService.DialogIcon.Critical);
+
+                return null;
             }
+        }
 
-            if (!bfNavigated)
-                NavHistory.Navigate(realPath);
+        public bool NavigateToPath(string path, bool bfNavigated = false)
+        {
+            if (path is null) return false;
+            var realPath = FolderExists(path);
+            return realPath is null ? false : _navigateToPath(realPath, bfNavigated);
+        }
 
+        private bool _navigateToPath(string realPath, bool bfNavigated = false)
+        {
+            ExplorerGrid.Focus();
             UpdateNavButtons();
 
             TextHelper.SetAltText(PathBox, realPath);

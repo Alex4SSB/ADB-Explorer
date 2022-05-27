@@ -64,13 +64,10 @@ namespace ADB_Explorer.Models
 
         public static bool PathEquals(object lval, object rval)
         {
-            if (lval.GetType() != rval.GetType())
-                return false;
-
             if (lval is string lstr && rval is string rstr)
                 return lstr == rstr;
 
-            return lval == rval;
+            return lval.GetType() == rval.GetType();
         }
     }
 }
