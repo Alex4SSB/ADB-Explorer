@@ -37,6 +37,7 @@ namespace ADB_Explorer
     /// </summary>
     public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        private readonly DispatcherTimer ServerWatchdogTimer = new();
         private readonly DispatcherTimer ConnectTimer = new();
         private Mutex connectTimerMutex = new();
         private ItemsPresenter ExplorerContentPresenter;
@@ -89,6 +90,9 @@ namespace ADB_Explorer
 
         private readonly List<MenuItem> PathButtons = new();
 
+        public string TimeFromLastResponse => $"{DateTime.Now.Subtract(LastServerResponse).TotalSeconds:0}";
+
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
@@ -113,19 +117,7 @@ namespace ADB_Explorer
             }
         }
 
-        private string SelectedFilesTotalSize
-        {
-            get
-            {
-                var files = ExplorerGrid.SelectedItems.OfType<FileClass>().ToList();
-                if (files.Any(i => i.Type != FileType.File)) return "0";
-
-                ulong totalSize = 0;
-                files.ForEach(f => totalSize += f.Size.GetValueOrDefault(0));
-
-                return totalSize.ToSize();
-            }
-        }
+        private string SelectedFilesTotalSize => FileClass.TotalSize(selectedFiles) is ulong size and > 0 ? size.ToSize() : "";
 
         private IEnumerable<FileClass> selectedFiles => ExplorerGrid.SelectedItems.Cast<FileClass>();
 
@@ -138,6 +130,9 @@ namespace ADB_Explorer
 
             ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
+
+            ServerWatchdogTimer.Interval = RESPONSE_TIMER_INTERVAL;
+            ServerWatchdogTimer.Tick += ServerWatchdogTimer_Tick;
 
             Settings.PropertyChanged += Settings_PropertyChanged;
             themeService.PropertyChanged += ThemeService_PropertyChanged;
@@ -155,6 +150,18 @@ namespace ADB_Explorer
 
             TestCurrentOperation();
             TestDevices();
+        }
+
+        private void ServerWatchdogTimer_Tick(object sender, EventArgs e)
+        {
+            if (DateTime.Now.Subtract(LastServerResponse) > SERVER_RESPONSE_TIMEOUT)
+            {
+                OnPropertyChanged(nameof(TimeFromLastResponse));
+                ServerUnresponsiveNotice.Visible(true);
+            }
+            else
+                ServerUnresponsiveNotice.Visible(false);
+
         }
 
         private void CommandLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -403,6 +410,7 @@ namespace ADB_Explorer
             }
 
             ConnectTimer.Stop();
+            ServerWatchdogTimer.Stop();
             StoreClosingValues();
         }
 
@@ -861,6 +869,8 @@ namespace ADB_Explorer
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
         {
+            LastServerResponse = DateTime.Now;
+
             if (devices is not null && DevicesObject.DevicesChanged(devices))
             {
                 DeviceListSetup(devices);
@@ -897,6 +907,8 @@ namespace ADB_Explorer
 
         private void ListServices(IEnumerable<ServiceDevice> services)
         {
+            LastServerResponse = DateTime.Now;
+
             if (services is not null && DevicesObject.ServicesChanged(services))
             {
                 DevicesObject.UpdateServices(services);
@@ -909,6 +921,8 @@ namespace ADB_Explorer
                 {
                     PairService(qrServices.First()).ContinueWith((t) =>
                     {
+                        LastServerResponse = DateTime.Now;
+
                         if (t.Result)
                             Dispatcher.Invoke(() =>
                             {
@@ -922,6 +936,7 @@ namespace ADB_Explorer
 
         private void ConnectTimer_Tick(object sender, EventArgs e)
         {
+            ServerWatchdogTimer.Start();
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             var devicesVisible = DevicesSplitView.IsPaneOpen;
 
@@ -1122,10 +1137,17 @@ namespace ADB_Explorer
                 int i = 0;
                 while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
                 {
+                    var path = TextHelper.GetAltObject(PathButtons[i]).ToString();
+                    var drives = DevicesObject.CurrentDevice.Drives.Where(drive => drive.Path == path);
+                    var icon = "\uE8B7";
+                    if (drives.Any())
+                        icon = drives.First().DriveIcon;
+
                     excessButtons.Add(PathButtons[i]);
                     PathButtons[i].ContextMenu = null;
                     PathButtons[i].Height = double.NaN;
                     PathButtons[i].Padding = new(10, 4, 10, 4);
+                    PathButtons[i].Icon = new FontIcon() { Glyph = icon, Style = FindResource("GlyphFont") as Style };
                     
                     if (UseFluentStyles)
                     {
@@ -1169,7 +1191,7 @@ namespace ADB_Explorer
                 {
                     Glyph = "\uE712",
                     FontSize = 18,
-                    Style = Resources["GlyphFont"] as Style,
+                    Style = FindResource("GlyphFont") as Style,
                 }
             };
             
@@ -1233,7 +1255,7 @@ namespace ADB_Explorer
             {
                 Glyph = "\uE970",
                 FontSize = 8,
-                Style = Resources["GlyphFont"] as Style,
+                Style = FindResource("GlyphFont") as Style,
             }
         };
 
@@ -1604,9 +1626,9 @@ namespace ADB_Explorer
         private void TestCurrentOperation()
         {
             //fileOperationQueue.Clear();
-            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "Shalom.exe"));
-            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "Shalom.exe"));
-            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Shalom"));
+            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "File.exe"));
+            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "File.exe"));
+            //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Folder"));
         }
 
         private void TestDevices()

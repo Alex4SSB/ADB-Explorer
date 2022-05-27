@@ -58,6 +58,8 @@ namespace ADB_Explorer.Models
         public static readonly TimeSpan CONNECT_TIMER_INIT = TimeSpan.FromMilliseconds(50);
         public static readonly TimeSpan DRIVE_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(2000);
         public static readonly TimeSpan BATTERY_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(8000);
+        public static readonly TimeSpan RESPONSE_TIMER_INTERVAL = TimeSpan.FromMilliseconds(1000);
+        public static readonly TimeSpan SERVER_RESPONSE_TIMEOUT = TimeSpan.FromMilliseconds(5000);
 
         public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
         public static readonly double MAX_PANE_HEIGHT_RATIO = 0.4;

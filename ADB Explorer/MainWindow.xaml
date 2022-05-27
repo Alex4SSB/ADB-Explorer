@@ -49,13 +49,13 @@
             Resources="{StaticResource DeviceMenuStyles}">
             <Menu.Style>
                 <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                    <Setter Property="IsEnabled" Value="False"/>
+                    <Setter Property="IsEnabled" Value="False" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsMdns}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding Device.Status}" Value="Online">
-                            <Setter Property="IsEnabled" Value="True"/>
+                            <Setter Property="IsEnabled" Value="True" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -1436,7 +1436,7 @@
                     </DataGrid>
                     <TextBox
                         x:Name="LogTextBox"
-                        FontFamily="Cascadia Mono, Consolas"
+                        FontFamily="{StaticResource ConsoleFont}"
                         FontSize="18"
                         Foreground="White"
                         IsReadOnly="True"
@@ -1802,6 +1802,7 @@
         </Grid>
         <ui:SplitView
             x:Name="FileOperationsSplitView"
+            d:IsHidden="True"
             FocusVisualStyle="{x:Null}"
             OpenPaneLength="300"
             PaneClosing="FileOperationsSplitView_PaneClosing"
@@ -1890,6 +1891,7 @@
         </ui:SplitView>
         <ui:SplitView
             x:Name="DevicesSplitView"
+            d:IsHidden="True"
             FocusVisualStyle="{x:Null}"
             PaneClosing="DevicesSplitView_PaneClosing"
             PaneOpening="DevicesSplitView_PaneOpening"
@@ -2264,9 +2266,69 @@
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Grid x:Name="DebuggingResetPrompt" Visibility="Collapsed">
+                                <Border
+                                    x:Name="ServerUnresponsiveNotice"
+                                    Padding="4"
+                                    Background="{DynamicResource NoticeBorderBackground}"
+                                    BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
+                                    BorderThickness="1"
+                                    Style="{StaticResource BorderStyle}"
+                                    Visibility="Collapsed">
+                                    <StackPanel Margin="2,0">
+                                        <ui:SimpleStackPanel Orientation="Horizontal" Spacing="8">
+                                            <ui:FontIcon
+                                                FontSize="24"
+                                                Glyph="&#xEBE8;"
+                                                Style="{StaticResource GlyphFont}" />
+                                            <StackPanel>
+                                                <TextBlock Text="ADB Server Unresponsive" />
+                                                <StackPanel
+                                                    Margin="0,4"
+                                                    Orientation="Horizontal"
+                                                    ToolTip="Time from last server response">
+                                                    <ui:FontIcon
+                                                        Margin="0,0,4,0"
+                                                        Glyph="&#xE823;"
+                                                        Style="{StaticResource GlyphFont}" />
+                                                    <TextBlock Text="{Binding ElementName=MainWin, Path=TimeFromLastResponse}" />
+                                                    <TextBlock Text="s" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </ui:SimpleStackPanel>
+                                        <ui:SimpleStackPanel
+                                            Margin="0,4"
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal"
+                                            Spacing="10">
+                                            <Button Content="Kill" Style="{StaticResource AccentButtonStyle}">
+                                                <Button.ToolTip>
+                                                    <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="adb kill-server" />
+                                                </Button.ToolTip>
+                                            </Button>
+                                            <Button Style="{StaticResource AccentButtonStyle}">
+                                                <Button.Content>
+                                                    <ui:SimpleStackPanel Orientation="Horizontal" Spacing="2">
+                                                        <ui:FontIcon
+                                                            Margin="0,0,0,-1"
+                                                            Glyph="&#xECAD;"
+                                                            Style="{StaticResource GlyphFont}" />
+                                                        <TextBlock Text="Kill With Fire" />
+                                                    </ui:SimpleStackPanel>
+                                                </Button.Content>
+                                                <Button.ToolTip>
+                                                    <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="taskkill /f /im &quot;adb.exe&quot;" />
+                                                </Button.ToolTip>
+                                            </Button>
+                                        </ui:SimpleStackPanel>
+                                    </StackPanel>
+                                </Border>
+                                <Grid
+                                    x:Name="DebuggingResetPrompt"
+                                    Grid.Row="1"
+                                    Visibility="Collapsed">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition />
@@ -2283,12 +2345,12 @@
                                 </Grid>
                                 <ui:ItemsRepeater
                                     x:Name="DevicesList"
-                                    Grid.Row="1"
+                                    Grid.Row="2"
                                     DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
                                     ItemTemplate="{StaticResource DeviceDataTemplate}"
                                     ItemsSource="{Binding UIList}" />
                                 <Border
-                                    Grid.Row="2"
+                                    Grid.Row="3"
                                     Background="Transparent"
                                     MouseDown="Border_MouseDown" />
                             </Grid>
@@ -2299,6 +2361,7 @@
         </ui:SplitView>
         <ui:SplitView
             x:Name="SettingsSplitView"
+            d:IsHidden="True"
             FocusVisualStyle="{x:Null}"
             OpenPaneLength="350"
             PanePlacement="Right">

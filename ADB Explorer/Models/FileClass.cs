@@ -1,8 +1,10 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -195,6 +197,14 @@ namespace ADB_Explorer.Models
             }
 
             return icon;
+        }
+
+        public static ulong TotalSize(IEnumerable<FileClass> files)
+        {
+            if (files.Any(i => i.Type != FileType.File))
+                return 0;
+            
+            return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
         }
 
         protected override void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

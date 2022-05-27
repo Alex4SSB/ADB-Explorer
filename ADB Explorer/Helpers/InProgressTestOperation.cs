@@ -41,7 +41,7 @@ namespace ADB_Explorer.Helpers
         {
             return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
             {
-                CurrentFile = "Moshe.txt",
+                CurrentFile = "Subfile.txt",
                 TotalPercentage = 40,
                 CurrentFilePercentage = 60,
                 CurrentFileBytesTransferred = null

@@ -7,7 +7,7 @@
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
     <converters:DoubleEquals x:Key="DoubleEquals" />
-
+    <FontFamily x:Key="ConsoleFont">Cascadia Mono, Consolas</FontFamily>
     <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>

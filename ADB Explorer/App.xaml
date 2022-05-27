@@ -123,6 +123,9 @@
             <Color x:Key="LightCheckboxBackgroundPressed">#18000000</Color>
             <Color x:Key="LightCheckboxBorderPreseedOrDisabled">#37000000</Color>
 
+            <Color x:Key="DarkNoticeBorderBackground">#FF433519</Color>
+            <Color x:Key="LightNoticeBorderBackground">#FFFFF4CE</Color>
+
             <ResourceDictionary x:Key="DynamicBrushes">
                 <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
                 <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
@@ -166,6 +169,8 @@
                 <SolidColorBrush x:Key="AdbWindowBackground" Color="{DynamicResource LightAdbWindowBackground}" />
                 <SolidColorBrush x:Key="ContentDialogCommandBackground" Color="{DynamicResource LightContentDialogCommandBackground}" />
                 <SolidColorBrush x:Key="ContentDialogContentBackground" Color="{DynamicResource LightContentDialogContentBackground}" />
+
+                <SolidColorBrush x:Key="NoticeBorderBackground" Color="{DynamicResource LightNoticeBorderBackground}" />
             </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>

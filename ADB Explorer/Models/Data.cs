@@ -56,6 +56,16 @@ namespace ADB_Explorer.Models
 
         public static ObservableList<TrashIndexer> RecycleIndex { get; set; } = new();
 
+        private static DateTime lastServerResponse = DateTime.Now;
+        public static DateTime LastServerResponse
+        {
+            get => lastServerResponse;
+            set
+            {
+                Set(ref lastServerResponse, value);
+            }
+        }
+
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
