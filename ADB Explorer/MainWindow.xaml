@@ -1822,7 +1822,10 @@
                 </Style>
             </ui:SplitView.Style>
             <ui:SplitView.Pane>
-                <Border BorderBrush="Gray" BorderThickness="1,1,0,0">
+                <Border
+                    BorderBrush="Gray"
+                    BorderThickness="1,1,0,0"
+                    Style="{StaticResource DevicesListStyle}">
                     <Grid>
                         <Grid Margin="8">
                             <Grid.RowDefinitions>
@@ -1845,8 +1848,7 @@
                             <Border
                                 Grid.Row="1"
                                 Margin="0,0,0,6"
-                                BorderBrush="Gray"
-                                BorderThickness="1">
+                                BorderBrush="Gray">
                                 <WrapPanel FlowDirection="LeftToRight" Orientation="Horizontal">
                                     <WrapPanel.Resources>
                                         <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
@@ -2007,7 +2009,7 @@
                                             </StackPanel>
                                         </StackPanel>
                                     </Grid>
-                                    <Grid>
+                                    <Grid Margin="0,4,0,0">
                                         <Grid.Style>
                                             <Style TargetType="Grid">
                                                 <Style.Triggers>
@@ -2027,7 +2029,7 @@
                                             Grid.Column="1"
                                             Margin="6,0,0,0"
                                             FontSize="13"
-                                            Text="mDNS can be enabled in the settings"
+                                            Text="Enable mDNS in the settings"
                                             TextWrapping="Wrap" />
                                     </Grid>
                                     <Grid x:Name="MdnsPairingGrid">
@@ -2555,13 +2557,14 @@
                                     </StackPanel>
                                 </Expander>
                                 <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="File Operations View">
+                                <Expander Header="File Operations View" Visibility="Hidden">
                                     <StackPanel>
                                         <RadioButton Content="Compact" GroupName="FileOpView" />
                                         <RadioButton
                                             Content="Detailed"
                                             GroupName="FileOpView"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" />
+                                            IsChecked="True" />
+                                        <!--  IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}"  -->
                                     </StackPanel>
                                 </Expander>
                             </ui:SimpleStackPanel>

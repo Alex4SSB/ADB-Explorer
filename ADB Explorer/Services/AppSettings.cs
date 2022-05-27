@@ -165,8 +165,8 @@ namespace ADB_Explorer.Services
         /// </summary>
         public bool ShowExtendedView
         {
-            get => Get(ref showExtendedView, true);
-            set => Set(ref showExtendedView, value);
+            get => true; // Get(ref showExtendedView, true);
+            //set => Set(ref showExtendedView, value);
         }
 
         #region theme

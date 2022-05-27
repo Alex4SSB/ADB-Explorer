@@ -84,7 +84,7 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="MenuStyle" TargetType="Menu">
-        <Setter Property="Background" Value="{DynamicResource SystemControlPageBackgroundChromeMediumLowBrush}" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style
         x:Key="FileOpProgressStyle"
