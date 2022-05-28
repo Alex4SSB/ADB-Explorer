@@ -47,6 +47,8 @@ namespace ADB_Explorer.Models
         private int MinUpdateThreshold { get; set; }
         private Task ReadTask { get; set; }
         private CancellationTokenSource CurrentCancellationToken { get; set; }
+        private Func<FileClass, FileClass> FileManipulator { get; }
+
         private ConcurrentQueue<FileStat> currentFileQueue;
 
         protected void OnPropertyChanged(string propertyName)
@@ -60,11 +62,12 @@ namespace ADB_Explorer.Models
             return true;
         }
 
-        public DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice)
+        public DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null)
         {
             Dispatcher = dispatcher;
             FileList = new();
             Device = adbDevice;
+            FileManipulator = fileManipulator;
         }
 
         public void Navigate(string path)
@@ -125,8 +128,6 @@ namespace ADB_Explorer.Models
 
         private void UpdateDirectoryList(bool finish)
         {
-            var updateCutItems = Data.CutItems.Any() && Data.CutItems[0].ParentPath == CurrentPath;
-
             if (finish || (currentFileQueue.Count >= MinUpdateThreshold))
             {
                 for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
@@ -138,22 +139,10 @@ namespace ADB_Explorer.Models
                     }
 
                     FileClass item = FileClass.GenerateAndroidFile(fileStat);
-                    if (updateCutItems)
-                    {
-                        var cutItem = Data.CutItems.Where(f => f.FullPath == fileStat.FullPath);
-                        if (cutItem.Any())
-                        {
-                            item.IsCut = true;
-                            Data.CutItems.Remove(cutItem.First());
-                            Data.CutItems.Add(item);
-                        }
-                    }
 
-                    if (CurrentPath == RECYCLE_PATH)
+                    if (FileManipulator != null)
                     {
-                        var query = Data.RecycleIndex.Where(index => index.RecycleName == item.FullName);
-                        if (query.Any())
-                            item.TrashIndex = query.First();
+                        item = FileManipulator(item);
                     }
 
                     FileList.Add(item);

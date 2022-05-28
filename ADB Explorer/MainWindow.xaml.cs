@@ -673,8 +673,31 @@ namespace ADB_Explorer
 
         private void InitLister()
         {
-            DirectoryLister = new(Dispatcher, CurrentADBDevice);
+            DirectoryLister = new(Dispatcher, CurrentADBDevice, ListerFileManipulator);
             DirectoryLister.PropertyChanged += DirectoryLister_PropertyChanged;
+        }
+
+        private FileClass ListerFileManipulator(FileClass item)
+        {
+            if (Data.CutItems.Any() && (Data.CutItems[0].ParentPath == DirectoryLister.CurrentPath))
+            {
+                var cutItem = Data.CutItems.Where(f => f.FullPath == item.FullPath);
+                if (cutItem.Any())
+                {
+                    item.IsCut = true;
+                    Data.CutItems.Remove(cutItem.First());
+                    Data.CutItems.Add(item);
+                }
+            }
+
+            if (CurrentPath == RECYCLE_PATH)
+            {
+                var query = Data.RecycleIndex.Where(index => index.RecycleName == item.FullName);
+                if (query.Any())
+                    item.TrashIndex = query.First();
+            }
+
+            return item;
         }
 
         private void LoadSettings()
