@@ -1095,7 +1095,7 @@
         <Setter Property="IsEnabled" Value="True" />
         <Setter Property="DataContext" Value="{Binding ElementName=UpperProgressBar, Path=DataContext}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IncompleteOperations, NotifyOnTargetUpdated=True}" Value="False">
+            <DataTrigger Binding="{Binding HasIncompleteOperations, NotifyOnTargetUpdated=True}" Value="False">
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>

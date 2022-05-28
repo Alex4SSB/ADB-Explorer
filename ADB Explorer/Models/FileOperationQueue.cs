@@ -14,7 +14,7 @@ namespace ADB_Explorer.Models
 
         public ObservableList<FileOperation> Operations { get; } = new();
 
-        public bool IncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
+        public bool HasIncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
 
         private int currentOperationIndex = 0;
         public int CurrentOperationIndex { 
@@ -141,7 +141,7 @@ namespace ADB_Explorer.Models
                 mutex.WaitOne();
 
                 Operations.Add(fileOp);
-                NotifyPropertyChanged(nameof(IncompleteOperations));
+                NotifyPropertyChanged(nameof(HasIncompleteOperations));
 
                 if (AutoStart)
                 {
@@ -272,7 +272,7 @@ namespace ADB_Explorer.Models
                     UpdateProgress(0);
                 }
 
-                NotifyPropertyChanged(nameof(IncompleteOperations));
+                NotifyPropertyChanged(nameof(HasIncompleteOperations));
             }
             finally
             { 
