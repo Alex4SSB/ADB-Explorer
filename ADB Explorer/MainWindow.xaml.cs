@@ -152,6 +152,18 @@ namespace ADB_Explorer
             TestDevices();
         }
 
+        private static void CheckForUpdates(Dispatcher dispatcher)
+        {
+            var version = Task.Run(() => Network.LatestAppRelease());
+            version.ContinueWith((t) =>
+            {
+                if (t.Result is null || t.Result <= AppVersion)
+                    return;
+
+                dispatcher.Invoke(() => DialogService.ShowMessage($"A new {Properties.Resources.AppDisplayName}, version {t.Result}, is available", "New App Version", DialogService.DialogIcon.Informational));
+            });
+        }
+
         private void ServerWatchdogTimer_Tick(object sender, EventArgs e)
         {
             if (DateTime.Now.Subtract(LastServerResponse) > SERVER_RESPONSE_TIMEOUT)
@@ -620,6 +632,9 @@ namespace ADB_Explorer
         {
             LoadSettings();
             InitFileOpColumns();
+
+            if (Settings.CheckForUpdates)
+                CheckForUpdates(Dispatcher);
         }
 
         private void DeviceListSetup(string selectedAddress = "")

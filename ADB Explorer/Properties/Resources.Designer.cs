@@ -78,5 +78,14 @@ namespace ADB_Explorer.Properties {
                 return ResourceManager.GetString("AppDisplayName", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0.7.0.
+        /// </summary>
+        public static string AppVersion {
+            get {
+                return ResourceManager.GetString("AppVersion", resourceCulture);
+            }
+        }
     }
 }

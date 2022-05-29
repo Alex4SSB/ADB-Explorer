@@ -169,6 +169,20 @@ namespace ADB_Explorer.Services
             //set => Set(ref showExtendedView, value);
         }
 
+        #region about
+
+        private bool checkForUpdates;
+        /// <summary>
+        /// GET releases on GitHub repo on each launch
+        /// </summary>
+        public bool CheckForUpdates
+        {
+            get => Get(ref checkForUpdates, true);
+            set => Set(ref checkForUpdates, value);
+        }
+
+        #endregion
+
         #region theme
 
         private bool forceFluentStyles;

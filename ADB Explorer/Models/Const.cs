@@ -7,6 +7,9 @@ namespace ADB_Explorer.Models
 {
     public static class AdbExplorerConst
     {
+        
+        public static readonly Uri REPO_RELEASES_URL = new("https://api.github.com/repos/Alex4SSB/ADB-Explorer/releases");
+
         public static readonly string DEFAULT_PATH = "/sdcard";
         public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";
         public static readonly string RECYCLE_INDEX_FILE = ".RecycleIndex";
