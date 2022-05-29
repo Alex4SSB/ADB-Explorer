@@ -6,8 +6,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 
 namespace ADB_Explorer.Models
 {
@@ -66,6 +64,7 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public static Version AppVersion => new(Properties.Resources.AppVersion);
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
