@@ -39,6 +39,34 @@ namespace ADB_Explorer.Models
             );
         }
 
+        public static FileClass FromWindowsPath(FilePath androidTargetPath, FilePath windowsFilePath)
+        {
+            bool isDir = false;
+            ulong? fileSize = null;
+            DateTime? modifiedTime = null;
+            try
+            {
+                isDir = System.IO.Directory.Exists(windowsFilePath.FullPath);
+                if (!isDir)
+                {
+                    var fileInfo = new System.IO.FileInfo(windowsFilePath.FullPath);
+                    fileSize = (ulong)fileInfo.Length;
+                    modifiedTime = fileInfo.LastWriteTime;
+                }
+                
+            }
+            catch (Exception) {}
+
+            return new FileClass
+            (
+                fileName: windowsFilePath.FullName,
+                path: androidTargetPath.FullPath + '/' + windowsFilePath.FullName,
+                type: isDir ? FileType.Folder : FileType.File,
+                size: fileSize,
+                modifiedTime: modifiedTime
+            );
+        }
+
         private bool? isApk = null;
         public bool IsApk
         {

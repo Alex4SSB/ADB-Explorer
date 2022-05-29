@@ -1651,7 +1651,23 @@ namespace ADB_Explorer
 
             foreach (var item in dialog.FilesAsShellObject)
             {
-                fileOperationQueue.AddOperation(new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), targetPath));
+                var pushOpeartion = new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), targetPath);
+                pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
+                fileOperationQueue.AddOperation(pushOpeartion);
+            }
+        }
+
+        private void PushOpeartion_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var pushOperation = sender as FilePushOperation;
+            
+            // If operation completed now and current path is where the new file was pushed to and it is not shown yet
+            if ((e.PropertyName == "Status") &&
+                (pushOperation.Status == FileOperation.OperationStatus.Completed) &&
+                (pushOperation.TargetPath.FullPath == CurrentPath) &&
+                (!DirectoryLister.FileList.Where(f => f.FullName == pushOperation.FilePath.FullName).Any()))
+            {
+                DirectoryLister.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath));
             }
         }
 
