@@ -880,7 +880,7 @@ namespace ADB_Explorer
             }
         }
 
-        private bool InitNavigation(string path = "")
+        private bool InitNavigation(string path = "", bool bfNavigated = false)
         {
             if (path is null)
                 return true;
@@ -899,7 +899,7 @@ namespace ADB_Explorer
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
 
-            return _navigateToPath(realPath);
+            return _navigateToPath(realPath, bfNavigated);
         }
 
         private void UpdateRecycledItemsCount()
@@ -1048,6 +1048,9 @@ namespace ADB_Explorer
 
         private bool _navigateToPath(string realPath, bool bfNavigated = false)
         {
+            if (!bfNavigated)
+                NavHistory.Navigate(realPath);
+
             ExplorerGrid.Focus();
             UpdateNavButtons();
 
@@ -1344,9 +1347,9 @@ namespace ADB_Explorer
             if (location is string path)
             {
                 if (!ExplorerGrid.Visible())
-                    InitNavigation(null);
-
-                NavigateToPath(path, bfNavigated);
+                    InitNavigation(path, bfNavigated);
+                else
+                    NavigateToPath(path, bfNavigated);
             }
             else if (location is NavHistory.SpecialLocation special)
             {
