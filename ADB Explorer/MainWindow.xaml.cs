@@ -23,6 +23,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using static ADB_Explorer.Converters.FileTypeClass;
@@ -195,11 +196,11 @@ namespace ADB_Explorer
             }
         }
 
-        private void Settings_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
             {
-                case nameof(AppSettings.Theme) or nameof(AppSettings.ForceFluentStyles):
+                case nameof(AppSettings.Theme):
                     SetTheme(Settings.Theme);
                     break;
                 case nameof(AppSettings.EnableMdns):
@@ -212,12 +213,15 @@ namespace ADB_Explorer
                     if (!Settings.EnableLog)
                         ClearLogs();
                     break;
+                case nameof(AppSettings.SwRender):
+                    SetRenderMode();
+                    break;
                 default:
                     break;
             }
         }
 
-        private void DirectoryLister_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
             {
@@ -280,7 +284,7 @@ namespace ADB_Explorer
             DeleteMenuButton.IsEnabled =  fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
         }
 
-        private void ThemeService_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void ThemeService_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             Dispatcher.Invoke(() =>
             {
@@ -414,7 +418,7 @@ namespace ADB_Explorer
             }
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (DirectoryLister is not null)
             {
@@ -724,8 +728,17 @@ namespace ADB_Explorer
                 QrClass = new();
 
             SetTheme(Settings.Theme);
+            SetRenderMode();
 
             EnableMdns();
+        }
+
+        private static void SetRenderMode()
+        {
+            if (Settings.SwRender)
+                RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+            else if (RenderOptions.ProcessRenderMode == RenderMode.SoftwareOnly)
+                RenderOptions.ProcessRenderMode = RenderMode.Default;
         }
 
         private ApplicationTheme AppThemeToActual(AppTheme appTheme) => appTheme switch

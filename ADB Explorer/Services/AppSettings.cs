@@ -183,7 +183,7 @@ namespace ADB_Explorer.Services
 
         #endregion
 
-        #region theme
+        #region graphics
 
         private bool forceFluentStyles;
         /// <summary>
@@ -194,6 +194,20 @@ namespace ADB_Explorer.Services
             get => Get(ref forceFluentStyles, false);
             set => Set(ref forceFluentStyles, value);
         }
+
+        private bool swRender;
+        /// <summary>
+        /// Disables HW acceleration
+        /// </summary>
+        public bool SwRender
+        {
+            get => Get(ref swRender, false);
+            set => Set(ref swRender, value);
+        }
+
+        #endregion
+
+        #region theme
 
         private AppTheme appTheme;
         public AppTheme Theme

@@ -1199,6 +1199,7 @@
                         SelectionChanged="ExplorerGrid_SelectionChanged"
                         SelectionMode="Extended"
                         SelectionUnit="FullRow"
+                        Style="{StaticResource ExplorerGridStyle}"
                         Visibility="Collapsed">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn
@@ -2440,69 +2441,6 @@
                                 Margin="6,0,24,0"
                                 HorizontalAlignment="Left"
                                 Spacing="6">
-                                <Expander Header="Theme">
-                                    <StackPanel VerticalAlignment="Bottom">
-                                        <RadioButton
-                                            Content="Light"
-                                            GroupName="AppTheme"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=light}" />
-                                        <RadioButton
-                                            Content="Dark"
-                                            GroupName="AppTheme"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=dark}" />
-                                        <RadioButton
-                                            Content="Windows Default"
-                                            GroupName="AppTheme"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=windowsDefault}" />
-                                        <CheckBox
-                                            HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Stretch"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ForceFluentStyles}"
-                                            Style="{StaticResource ForceFluentVisibility}">
-                                            <Grid>
-                                                <TextBlock Text="Force Fluent Styles" />
-                                                <Grid Margin="10,0" HorizontalAlignment="Right">
-                                                    <Grid.Resources>
-                                                        <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
-                                                    </Grid.Resources>
-                                                    <ui:FontIcon Glyph="&#xF83E;" />
-                                                    <ui:FontIcon Glyph="&#xF83F;" />
-                                                    <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
-                                                </Grid>
-                                            </Grid>
-                                        </CheckBox>
-                                    </StackPanel>
-                                </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander x:Name="WorkingDirectoriesExpander" Header="Working Directories">
-                                    <StackPanel>
-                                        <TextBlock Margin="4,0" Text="Default Folder" />
-                                        <TextBox
-                                            Margin="0,6"
-                                            ui:ControlHelper.PlaceholderText="Click To Browse"
-                                            MouseUp="ChangeDefaultFolderButton_Click"
-                                            Style="{StaticResource TooltipTextBoxStyle}"
-                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
-                                        <Grid Margin="0,4,0,0">
-                                            <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
-                                            <Grid Margin="10,0" HorizontalAlignment="Right">
-                                                <Grid.Resources>
-                                                    <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
-                                                </Grid.Resources>
-                                                <ui:FontIcon Glyph="&#xF83E;" />
-                                                <ui:FontIcon Glyph="&#xF83F;" />
-                                                <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
-                                            </Grid>
-                                        </Grid>
-                                        <TextBox
-                                            Margin="0,6"
-                                            ui:ControlHelper.PlaceholderText="Click To Browse"
-                                            MouseUp="ManualAdbPath_MouseUp"
-                                            Style="{StaticResource TooltipTextBoxStyle}"
-                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
-                                    </StackPanel>
-                                </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
                                 <Expander Header="ADB">
                                     <StackPanel>
                                         <CheckBox Content="Enable mDNS (experimental)" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" />
@@ -2554,6 +2492,78 @@
                                                 </Style>
                                             </CheckBox.Style>
                                         </CheckBox>
+                                    </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander x:Name="WorkingDirectoriesExpander" Header="Working Directories">
+                                    <StackPanel>
+                                        <TextBlock Margin="4,0" Text="Default Folder" />
+                                        <TextBox
+                                            Margin="0,6"
+                                            ui:ControlHelper.PlaceholderText="Click To Browse"
+                                            MouseUp="ChangeDefaultFolderButton_Click"
+                                            Style="{StaticResource TooltipTextBoxStyle}"
+                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
+                                        <Grid Margin="0,4,0,0">
+                                            <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
+                                            <Grid Margin="10,0" HorizontalAlignment="Right">
+                                                <Grid.Resources>
+                                                    <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
+                                                </Grid.Resources>
+                                                <ui:FontIcon Glyph="&#xF83E;" />
+                                                <ui:FontIcon Glyph="&#xF83F;" />
+                                                <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
+                                            </Grid>
+                                        </Grid>
+                                        <TextBox
+                                            Margin="0,6"
+                                            ui:ControlHelper.PlaceholderText="Click To Browse"
+                                            MouseUp="ManualAdbPath_MouseUp"
+                                            Style="{StaticResource TooltipTextBoxStyle}"
+                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
+                                    </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="Theme">
+                                    <StackPanel VerticalAlignment="Bottom">
+                                        <RadioButton
+                                            Content="Light"
+                                            GroupName="AppTheme"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=light}" />
+                                        <RadioButton
+                                            Content="Dark"
+                                            GroupName="AppTheme"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=dark}" />
+                                        <RadioButton
+                                            Content="Windows Default"
+                                            GroupName="AppTheme"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=windowsDefault}" />
+                                    </StackPanel>
+                                </Expander>
+                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Expander Header="Graphics">
+                                    <StackPanel>
+                                        <CheckBox
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ForceFluentStyles}"
+                                            Style="{StaticResource ForceFluentVisibility}">
+                                            <Grid>
+                                                <TextBlock Text="Force Fluent Styles" />
+                                                <Grid Margin="10,0" HorizontalAlignment="Right">
+                                                    <Grid.Resources>
+                                                        <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
+                                                    </Grid.Resources>
+                                                    <ui:FontIcon Glyph="&#xF83E;" />
+                                                    <ui:FontIcon Glyph="&#xF83F;" />
+                                                    <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
+                                                </Grid>
+                                            </Grid>
+                                        </CheckBox>
+                                        <CheckBox
+                                            Content="Use Software Acceleration"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}"
+                                            ToolTip="Disables hardware acceleration" />
                                     </StackPanel>
                                 </Expander>
                                 <!--<Separator Style="{StaticResource CategorySeparator}" />
