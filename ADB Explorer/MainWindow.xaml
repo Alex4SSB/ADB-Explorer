@@ -2306,21 +2306,12 @@
                                             HorizontalAlignment="Center"
                                             Orientation="Horizontal"
                                             Spacing="10">
-                                            <Button Content="Kill" Style="{StaticResource AccentButtonStyle}">
+                                            <Button Content="Kill Server" Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="adb kill-server" />
                                                 </Button.ToolTip>
                                             </Button>
-                                            <Button Style="{StaticResource AccentButtonStyle}">
-                                                <Button.Content>
-                                                    <ui:SimpleStackPanel Orientation="Horizontal" Spacing="2">
-                                                        <ui:FontIcon
-                                                            Margin="0,0,0,-1"
-                                                            Glyph="&#xECAD;"
-                                                            Style="{StaticResource GlyphFont}" />
-                                                        <TextBlock Text="Kill With Fire" />
-                                                    </ui:SimpleStackPanel>
-                                                </Button.Content>
+                                            <Button Content="Kill Process" Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="taskkill /f /im &quot;adb.exe&quot;" />
                                                 </Button.ToolTip>
@@ -2560,10 +2551,7 @@
                                                 </Grid>
                                             </Grid>
                                         </CheckBox>
-                                        <CheckBox
-                                            Content="Use Software Acceleration"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}"
-                                            ToolTip="Disables hardware acceleration" />
+                                        <CheckBox Content="Disable Hardware Acceleration" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}" />
                                     </StackPanel>
                                 </Expander>
                                 <!--<Separator Style="{StaticResource CategorySeparator}" />

@@ -216,6 +216,10 @@ namespace ADB_Explorer
                 case nameof(AppSettings.SwRender):
                     SetRenderMode();
                     break;
+                case nameof(AppSettings.EnableRecycle):
+                    if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
+                        RefreshDrives(true);
+                    break;
                 default:
                     break;
             }
@@ -857,12 +861,6 @@ namespace ADB_Explorer
 
             CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
             DeleteMenuButton.DataContext = DevicesObject.CurrentDevice;
-
-            if (DevicesObject.CurrentDevice.Drives.Count < 1)
-            {
-                // Shouldn't actually happen
-                InitNavigation();
-            }
 
             TestCurrentOperation();
         }
@@ -2101,15 +2099,31 @@ namespace ADB_Explorer
 
         private void RefreshDrives(bool findMmc = false)
         {
-            var drives = CurrentADBDevice.GetDrives();
-            if (Settings.EnableRecycle)
-            {
-                UpdateRecycledItemsCount();
-                drives.Add(new(path: RECYCLE_PATH));
-            }
+            if (!findMmc && DevicesObject.CurrentDevice.Drives?.Count > 0 && !ExplorerGrid.Visible())
+                findMmc = true;
 
-            DevicesObject.CurrentDevice.SetDrives(drives, findMmc);
-            DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
+            var dispatcher = Dispatcher;
+            var driveTask = Task.Run(() =>
+            {
+                var drives = CurrentADBDevice.GetDrives();
+                
+                if (Settings.EnableRecycle)
+                {
+                    UpdateRecycledItemsCount();
+                    if (!string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)))
+                        drives.Add(new(path: RECYCLE_PATH));
+                }
+
+                return drives;
+            });
+            driveTask.ContinueWith((t) =>
+            {
+                dispatcher.Invoke(() =>
+                {
+                    DevicesObject.CurrentDevice.SetDrives(t.Result, findMmc);
+                    DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
+                });
+            });
         }
 
         private void PushMenuButton_Click(object sender, RoutedEventArgs e)
