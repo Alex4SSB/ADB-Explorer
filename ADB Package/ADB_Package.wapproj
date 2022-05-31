@@ -57,12 +57,13 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <EntryPointProjectUniqueName>..\ADB Explorer\ADB Explorer.csproj</EntryPointProjectUniqueName>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>1523ACD93DC5030ED0715313987E34478C56E7D3</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>8FC5BB4C18EF02ACB2A6829D6B29B1641D016D6A</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <GenerateTemporaryStoreCertificate>True</GenerateTemporaryStoreCertificate>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <AppxBundle>Always</AppxBundle>
@@ -150,8 +151,8 @@
     <Content Include="Images\Wide310x150Logo.scale-150.png" />
     <Content Include="Images\Wide310x150Logo.scale-200.png" />
     <Content Include="Images\Wide310x150Logo.scale-400.png" />
-    <Content Include="Strings\en-us\Resources.resw" />
     <None Include="Package.StoreAssociation.xml" />
+    <Content Include="Strings\en-us\Resources.resw" />
     <PRIResource Include="Strings\en-us\Resources.resw">
       <SubType>Designer</SubType>
     </PRIResource>

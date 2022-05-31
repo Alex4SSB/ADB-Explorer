@@ -337,7 +337,7 @@
                         <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
                         <Setter Property="FontWeight" Value="Regular" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="True">
+                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
                                 <Setter Property="Text" Value="{Binding FilePath.FullName}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding Status}" Value="InProgress">
@@ -529,6 +529,9 @@
                                 <DataTrigger Binding="{Binding Status}" Value="Completed">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding StatusInfo.FileCountCompletedString}" Value="0 of 0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                                 <DataTrigger Binding="{Binding OperationName}" Value="Delete">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
@@ -582,18 +585,25 @@
                                 <DataTrigger Binding="{Binding OperationName}" Value="Move">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Status}" Value="Waiting">
-                                    <Setter Property="Visibility" Value="Collapsed" />
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Status}" Value="Completed" />
+                                        <Condition Binding="{Binding StatusInfo.FileCountCompletedString}" Value="0 of 0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </MultiDataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="Failed">
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                                    <Setter Property="Visibility" Value="Collapsed" />
+                                <DataTrigger Binding="{Binding Status}" Value="Canceled">
+                                    <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
                     </Grid.Style>
                     <ui:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                        <ui:FontIcon Glyph="&#xE711;">
+                        <ui:FontIcon Glyph="&#xF13D;">
                             <ui:FontIcon.Style>
                                 <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                                     <Setter Property="Visibility" Value="Visible" />
