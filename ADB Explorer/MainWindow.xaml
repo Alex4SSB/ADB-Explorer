@@ -2440,9 +2440,12 @@
                                         <CheckBox Content="Enable Command Log" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" />
                                     </StackPanel>
                                 </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Separator />
                                 <Expander Header="Device">
                                     <StackPanel>
+                                        <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
+                                        <CheckBox Content="Poll For Drives" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDrives}" />
+                                        <Separator Style="{x:Null}" />
                                         <CheckBox Content="Automatically Enable Root" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoRoot}" />
                                         <CheckBox Content="Remember Last IP" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" />
                                         <CheckBox Content="Remember Last Port">
@@ -2461,10 +2464,9 @@
                                             </CheckBox.Style>
                                         </CheckBox>
                                         <CheckBox Content="Automatically Open For Browsing" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoOpen}" />
-                                        <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
                                     </StackPanel>
                                 </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Separator />
                                 <Expander Header="File Behavior">
                                     <StackPanel>
                                         <CheckBox Content="Show File Name Extensions" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" />
@@ -2485,7 +2487,7 @@
                                         </CheckBox>
                                     </StackPanel>
                                 </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Separator />
                                 <Expander x:Name="WorkingDirectoriesExpander" Header="Working Directories">
                                     <StackPanel>
                                         <TextBlock Margin="4,0" Text="Default Folder" />
@@ -2514,7 +2516,7 @@
                                             Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
                                     </StackPanel>
                                 </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Separator />
                                 <Expander Header="Theme">
                                     <StackPanel VerticalAlignment="Bottom">
                                         <RadioButton
@@ -2531,7 +2533,7 @@
                                             IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=windowsDefault}" />
                                     </StackPanel>
                                 </Expander>
-                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Separator />
                                 <Expander Header="Graphics">
                                     <StackPanel>
                                         <CheckBox
@@ -2564,7 +2566,7 @@
                                             IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" />
                                     </StackPanel>
                                 </Expander>-->
-                                <Separator Style="{StaticResource CategorySeparator}" />
+                                <Separator />
                                 <Expander Header="About">
                                     <StackPanel>
                                         <CheckBox

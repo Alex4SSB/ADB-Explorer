@@ -147,6 +147,13 @@ namespace ADB_Explorer.Services
             set => Set(ref pollBattery, value);
         }
 
+        private bool pollDrives;
+        public bool PollDrives
+        {
+            get => Get(ref pollDrives, true);
+            set => Set(ref pollDrives, value);
+        }
+
         private bool enableLog;
         /// <summary>
         /// <see langword="false"/> - disables logging of commands and command log button

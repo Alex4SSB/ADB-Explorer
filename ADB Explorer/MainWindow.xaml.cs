@@ -941,9 +941,6 @@ namespace ADB_Explorer
 
         private void UpdateDevicesBatInfo(bool devicesVisible)
         {
-            if (!Settings.PollBattery)
-                return;
-
             DevicesObject.CurrentDevice?.UpdateBattery();
 
             if (DateTime.Now - DevicesObject.LastUpdate > BATTERY_UPDATE_INTERVAL || devicesVisible)
@@ -991,6 +988,7 @@ namespace ADB_Explorer
             ServerWatchdogTimer.Start();
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
             var devicesVisible = DevicesSplitView.IsPaneOpen;
+            var driveView = NavHistory.Current is NavHistory.SpecialLocation.DriveView;
 
             Task.Run(() =>
             {
@@ -1004,7 +1002,20 @@ namespace ADB_Explorer
                     RefreshDevices(devicesVisible);
                 }
 
-                UpdateDevicesBatInfo(devicesVisible);
+                if (Settings.PollBattery)
+                {
+                    UpdateDevicesBatInfo(devicesVisible);
+                }
+
+                if (driveView && Settings.PollDrives)
+                {
+                    try
+                    {
+                        Dispatcher.Invoke(() => RefreshDrives(true));
+                    }
+                    catch (Exception)
+                    { }
+                }
 
                 connectTimerMutex.ReleaseMutex();
             });
@@ -2132,7 +2143,7 @@ namespace ADB_Explorer
             {
                 dispatcher.Invoke(() =>
                 {
-                    DevicesObject.CurrentDevice.SetDrives(t.Result, asyncClasify);
+                    DevicesObject.CurrentDevice.SetDrives(t.Result, dispatcher, asyncClasify);
                     DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
                 });
             });

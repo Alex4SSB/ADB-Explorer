@@ -517,7 +517,7 @@ namespace ADB_Explorer.Models
         /// </summary>
         /// <param name="value">The new drives to be assigned</param>
         /// <param name="asyncClasify">true to update only after fully acquiring all information</param>
-        internal void SetDrives(IEnumerable<Drive> value, bool asyncClasify = false)
+        internal void SetDrives(IEnumerable<Drive> value, Dispatcher dispatcher, bool asyncClasify = false)
         {
             if (asyncClasify)
             {
@@ -528,7 +528,7 @@ namespace ADB_Explorer.Models
                 });
                 asyncTask.ContinueWith((t) =>
                 {
-                    App.Current.Dispatcher.BeginInvoke(() =>
+                    dispatcher.BeginInvoke(() =>
                     {
                         _setDrives(value);
                     });
@@ -541,7 +541,7 @@ namespace ADB_Explorer.Models
                 var mmcTask = Task.Run(() => { return GetMmcDrive(value, ID); });
                 mmcTask.ContinueWith((t) =>
                 {
-                    App.Current.Dispatcher.BeginInvoke(() =>
+                    dispatcher.BeginInvoke(() =>
                     {
                         t.Result?.SetMmc();
                         SetExternalDrives(ref value);
@@ -620,32 +620,6 @@ namespace ADB_Explorer.Models
         }
 
         public override string ToString() => Name;
-
-        //private DispatcherTimer dispatcherTimer;
-
-        //public void StartRefresh()
-        //{
-        //    dispatcherTimer = new()
-        //    {
-        //        Interval = AdbExplorerConst.DRIVE_UPDATE_INTERVAL
-        //    };
-        //    dispatcherTimer.Tick += DispatcherTimer_Tick;
-
-        //    dispatcherTimer.Start();
-        //}
-
-        //public void StopRefresh()
-        //{
-        //    dispatcherTimer.Stop();
-        //    dispatcherTimer = null;
-        //}
-
-        //private void DispatcherTimer_Tick(object sender, EventArgs e)
-        //{
-        //    var prev = Drives;
-
-
-        //}
     }
 
     public class UILogicalDevice : UIDevice
