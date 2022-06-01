@@ -1,5 +1,8 @@
 ﻿using ADB_Explorer.Converters;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -163,5 +166,23 @@ namespace ADB_Explorer.Models
         }
 
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        public class DriveEqualityComparer : IEqualityComparer<Drive>
+        {
+            public bool Equals(Drive x, Drive y)
+            {
+                if (x.ID != y.ID) return false;
+                if (x.Size != y.Size) return false;
+                if (x.Used != y.Used) return false;
+                if (y.type is not DriveType.Unknown && x.Type != y.Type) return false;
+
+                return true;
+            }
+
+            public int GetHashCode([DisallowNull] Drive obj)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

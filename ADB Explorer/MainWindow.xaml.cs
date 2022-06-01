@@ -2097,10 +2097,24 @@ namespace ADB_Explorer
             NavigateToLocation(NavHistory.SpecialLocation.DriveView);
         }
 
-        private void RefreshDrives(bool findMmc = false)
+        private void RefreshDrives(bool asyncClasify = false)
         {
-            if (!findMmc && DevicesObject.CurrentDevice.Drives?.Count > 0 && !ExplorerGrid.Visible())
-                findMmc = true;
+            if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !ExplorerGrid.Visible())
+                asyncClasify = true;
+
+            if (!Settings.EnableRecycle)
+                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Trash);
+            else if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash))
+            {
+                var trashTask = Task.Run(() => string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)));
+                trashTask.ContinueWith((t) =>
+                {
+                    if (!t.Result)
+                    {
+                        App.Current.Dispatcher.Invoke(() => DevicesObject.CurrentDevice.Drives.Add(new(path: RECYCLE_PATH)));
+                    }
+                });
+            }
 
             var dispatcher = Dispatcher;
             var driveTask = Task.Run(() =>
@@ -2110,8 +2124,6 @@ namespace ADB_Explorer
                 if (Settings.EnableRecycle)
                 {
                     UpdateRecycledItemsCount();
-                    if (!string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)))
-                        drives.Add(new(path: RECYCLE_PATH));
                 }
 
                 return drives;
@@ -2120,7 +2132,7 @@ namespace ADB_Explorer
             {
                 dispatcher.Invoke(() =>
                 {
-                    DevicesObject.CurrentDevice.SetDrives(t.Result, findMmc);
+                    DevicesObject.CurrentDevice.SetDrives(t.Result, asyncClasify);
                     DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
                 });
             });
