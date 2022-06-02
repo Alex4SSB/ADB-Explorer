@@ -40,8 +40,6 @@ namespace ADB_Explorer.Models
 
         public static Dictionary<string, string> CurrentPrettyNames { get; set; } = new();
 
-        public static Dictionary<string, AbstractDevice.RootStatus> DevicesRoot { get; set; } = new();
-
         public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
 
         public static bool UseFluentStyles => IsWin11 || Settings.ForceFluentStyles;

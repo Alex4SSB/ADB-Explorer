@@ -402,17 +402,7 @@ namespace ADB_Explorer.Models
         public RootStatus Root
         {
             get => root;
-            set
-            {
-                if (!Set(ref root, value))
-                    return;
-
-                if (Data.DevicesRoot.ContainsKey(ID))
-                    if (value is not RootStatus.Unchecked)
-                        Data.DevicesRoot[ID] = value;
-                    else
-                        Data.DevicesRoot.Add(ID, value);
-            }
+            set => Set(ref root, value);
         }
 
         private Battery battery;
@@ -448,9 +438,6 @@ namespace ADB_Explorer.Models
             Name = name;
             ID = id;
             this.service = service;
-
-            if (Data.DevicesRoot.ContainsKey(ID))
-                root = Data.DevicesRoot[ID];
         }
 
         public static LogicalDevice New(string name, string id, string status, ObservableList<ConnectService> services = null)

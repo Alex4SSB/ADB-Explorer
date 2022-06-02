@@ -298,5 +298,13 @@ namespace ADB_Explorer.Services
             ExecuteDeviceAdbCommand(device.ID, "unroot", out string stdout, out string stderr);
             return stdout.Contains("restarting adbd as non root");
         }
+
+        public static bool WhoAmI(LogicalDevice device)
+        {
+            if (ExecuteDeviceAdbShellCommand(device.ID, "whoami", out string stdout, out _) != 0)
+                return false;
+
+            return stdout.Trim() == "root";
+        }
     }
 }

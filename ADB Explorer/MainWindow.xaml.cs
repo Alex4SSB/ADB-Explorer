@@ -939,6 +939,15 @@ namespace ADB_Explorer
             }
         }
 
+        private void UpdateDevicesRootAccess()
+        {
+            foreach (var device in DevicesObject.LogicalDevices.Where(d => d.Root is AbstractDevice.RootStatus.Unchecked))
+            {
+                bool root = ADBService.WhoAmI(device);
+                Dispatcher.Invoke(() => device.Root = root ? AbstractDevice.RootStatus.Enabled : AbstractDevice.RootStatus.Unchecked);
+            }
+        }
+
         private void UpdateDevicesBatInfo(bool devicesVisible)
         {
             DevicesObject.CurrentDevice?.UpdateBattery();
@@ -1016,6 +1025,9 @@ namespace ADB_Explorer
                     catch (Exception)
                     { }
                 }
+
+                if (devicesVisible)
+                    UpdateDevicesRootAccess();
 
                 connectTimerMutex.ReleaseMutex();
             });
