@@ -493,7 +493,8 @@
                             <TextBlock Text=" (" />
                             <TextBlock
                                 VerticalAlignment="Center"
-                                FontFamily="Consolas"
+                                FontFamily="{StaticResource ConsoleFont}"
+                                FontWeight="Regular"
                                 Text="{Binding ID}" />
                             <TextBlock Text=")" />
                         </StackPanel>

@@ -523,7 +523,7 @@ namespace ADB_Explorer.Models
             {
                 var asyncTask = Task.Run(() =>
                 { 
-                    GetMmcDrive(value, ID).SetMmc();
+                    GetMmcDrive(value, ID)?.SetMmc();
                     SetExternalDrives(ref value);
                 });
                 asyncTask.ContinueWith((t) =>

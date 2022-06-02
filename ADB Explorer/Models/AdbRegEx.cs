@@ -23,7 +23,7 @@ namespace ADB_Explorer.Models
             new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]");
 
         public static readonly Regex EMULATED_ONLY =
-            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/storage\/[\w-]+?)[\r\n]",
+            new(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage|mnt\/media_rw)\/[\w-]+?)[\r\n]",
                 RegexOptions.Multiline);
 
         public static readonly Regex MMC_BLOCK_DEVICE_NODE =

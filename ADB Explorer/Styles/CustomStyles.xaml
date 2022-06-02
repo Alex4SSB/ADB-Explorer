@@ -105,7 +105,7 @@
                 <Setter Property="FontFamily" Value="Segoe UI" />
             </Trigger>
         </Style.Triggers>
-        <Setter Property="FontFamily" Value="Consolas" />
+        <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
     </Style>
     <Style
         x:Key="PairingTextBoxStyle"

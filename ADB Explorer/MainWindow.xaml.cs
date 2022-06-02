@@ -2110,6 +2110,9 @@ namespace ADB_Explorer
 
         private void RefreshDrives(bool asyncClasify = false)
         {
+            if (DevicesObject.CurrentDevice is null)
+                return;
+
             if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !ExplorerGrid.Visible())
                 asyncClasify = true;
 

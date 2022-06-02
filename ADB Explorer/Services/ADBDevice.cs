@@ -277,7 +277,7 @@ namespace ADB_Explorer.Services
                 else if (intStorage.Any())
                     drives.Add(intStorage.First());
 
-                var extStorage = ReadDrives(AdbRegEx.EMULATED_ONLY, "|", "grep", "/storage/");
+                var extStorage = ReadDrives(AdbRegEx.EMULATED_ONLY, "|", "grep", "-E", "'/mnt/media_rw/|/data/'");
                 if (extStorage is null)
                     return drives;
                 else
