@@ -2005,7 +2005,7 @@
                                                         IsChecked="True"
                                                         ToolTip="6 Digit Code"
                                                         Unchecked="ConnectionTypeRadioButton_Checked">
-                                                        <ui:FontIcon Glyph="&#xE192;" Style="{StaticResource GlyphFont}" />
+                                                        <ui:PathIcon Height="20" Data="{StaticResource PasswordIcon}" />
                                                     </RadioButton>
                                                 </Grid>
                                             </StackPanel>
