@@ -192,7 +192,7 @@ namespace ADB_Explorer.Services
 
         #region graphics
 
-        public static bool IsWin11 => false;// Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
+        public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
 
         public bool UseFluentStyles => IsWin11 || ForceFluentStyles;
 
