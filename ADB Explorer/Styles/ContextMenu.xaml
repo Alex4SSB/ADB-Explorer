@@ -50,7 +50,7 @@
     <Style BasedOn="{StaticResource AdbContextMenuStyle}" TargetType="ContextMenu">
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
             </DataTrigger>
         </Style.Triggers>
@@ -59,7 +59,7 @@
     <Style BasedOn="{StaticResource AdbContextMenuStyle}" TargetType="ui:TextContextMenu">
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
             </DataTrigger>
         </Style.Triggers>

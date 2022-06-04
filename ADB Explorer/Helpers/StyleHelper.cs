@@ -69,5 +69,18 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(StyleHelper),
                 null);
+
+        public static bool GetBeginAnimation(Control control) =>
+            (bool)control.GetValue(BeginAnimationProperty);
+
+        public static void SetBeginAnimation(Control control, bool value) =>
+            control.SetValue(BeginAnimationProperty, value);
+
+        public static readonly DependencyProperty BeginAnimationProperty =
+            DependencyProperty.RegisterAttached(
+                "BeginAnimation",
+                typeof(bool),
+                typeof(StyleHelper),
+                null);
     }
 }

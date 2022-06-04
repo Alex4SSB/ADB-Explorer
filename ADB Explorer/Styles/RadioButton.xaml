@@ -20,7 +20,7 @@
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-5,0,0,0" />
         <Setter Property="MinWidth" Value="80" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
                 <Setter Property="Template">
                     <!--  Template copied from ModernWPF to be modified  -->
@@ -109,6 +109,23 @@
                                         Storyboard.TargetProperty="Height"
                                         From="{StaticResource PressedSize}"
                                         Duration="{StaticResource AnimationDuration}" />
+                                </Storyboard>
+                                <Storyboard x:Key="EnterUncheckedPressedImmediate">
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="PressedCheckGlyph"
+                                        Storyboard.TargetProperty="Opacity"
+                                        To="1"
+                                        Duration="0" />
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="PressedCheckGlyph"
+                                        Storyboard.TargetProperty="Width"
+                                        To="{StaticResource PressedSize}"
+                                        Duration="0" />
+                                    <DoubleAnimation
+                                        Storyboard.TargetName="PressedCheckGlyph"
+                                        Storyboard.TargetProperty="Height"
+                                        To="{StaticResource PressedSize}"
+                                        Duration="0" />
                                 </Storyboard>
                             </ControlTemplate.Resources>
                             <Border
@@ -207,17 +224,31 @@
                                     <Setter TargetName="CheckOuterEllipse" Property="Opacity" Value="1" />
                                 </Trigger>
 
-                                <Trigger Property="IsMouseOver" Value="True">
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
                                     <Setter TargetName="ContentPresenter" Property="Foreground" Value="{DynamicResource RadioButtonForegroundPointerOver}" />
                                     <Setter TargetName="OuterEllipse" Property="Stroke" Value="{DynamicResource CheckboxBorderNormal}" />
                                     <Setter TargetName="OuterEllipse" Property="Fill" Value="{DynamicResource CheckboxBackgroundMouseOver}" />
-                                    <Trigger.EnterActions>
+                                    <MultiDataTrigger.EnterActions>
                                         <BeginStoryboard Storyboard="{StaticResource EnterCheckedMouseOverStoryboard}" />
-                                    </Trigger.EnterActions>
-                                    <Trigger.ExitActions>
+                                    </MultiDataTrigger.EnterActions>
+                                    <MultiDataTrigger.ExitActions>
                                         <BeginStoryboard Storyboard="{StaticResource ExitCheckedMouseOverStoryboard}" />
-                                    </Trigger.ExitActions>
-                                </Trigger>
+                                    </MultiDataTrigger.ExitActions>
+                                </MultiDataTrigger>
+
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="ContentPresenter" Property="Foreground" Value="{DynamicResource RadioButtonForegroundPointerOver}" />
+                                    <Setter TargetName="OuterEllipse" Property="Stroke" Value="{DynamicResource CheckboxBorderNormal}" />
+                                    <Setter TargetName="OuterEllipse" Property="Fill" Value="{DynamicResource CheckboxBackgroundMouseOver}" />
+                                </MultiDataTrigger>
 
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
@@ -227,17 +258,31 @@
                                     <Setter TargetName="CheckOuterEllipse" Property="Opacity" Value="{StaticResource AccentButtonBackgroundMouseOverOpacity}" />
                                 </MultiTrigger>
 
-                                <Trigger Property="IsPressed" Value="True">
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsPressed}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
                                     <Setter TargetName="ContentPresenter" Property="Foreground" Value="{DynamicResource RadioButtonForegroundPressed}" />
                                     <Setter TargetName="OuterEllipse" Property="Stroke" Value="{DynamicResource CheckboxBorderPreseedOrDisabled}" />
                                     <Setter TargetName="OuterEllipse" Property="Fill" Value="{DynamicResource CheckboxBackgroundPressed}" />
-                                    <Trigger.EnterActions>
+                                    <MultiDataTrigger.EnterActions>
                                         <BeginStoryboard Storyboard="{StaticResource EnterCheckedPressedStoryboard}" />
-                                    </Trigger.EnterActions>
-                                    <Trigger.ExitActions>
+                                    </MultiDataTrigger.EnterActions>
+                                    <MultiDataTrigger.ExitActions>
                                         <BeginStoryboard Storyboard="{StaticResource ExitCheckedPressedStoryboard}" />
-                                    </Trigger.ExitActions>
-                                </Trigger>
+                                    </MultiDataTrigger.ExitActions>
+                                </MultiDataTrigger>
+
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsPressed}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="ContentPresenter" Property="Foreground" Value="{DynamicResource RadioButtonForegroundPressed}" />
+                                    <Setter TargetName="OuterEllipse" Property="Stroke" Value="{DynamicResource CheckboxBorderPreseedOrDisabled}" />
+                                    <Setter TargetName="OuterEllipse" Property="Fill" Value="{DynamicResource CheckboxBackgroundPressed}" />
+                                </MultiDataTrigger>
 
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
@@ -247,18 +292,33 @@
                                     <Setter TargetName="CheckOuterEllipse" Property="Opacity" Value="{StaticResource AccentButtonBackgroundPressedOpacity}" />
                                 </MultiTrigger>
 
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsPressed" Value="True" />
-                                        <Condition Property="IsChecked" Value="False" />
-                                    </MultiTrigger.Conditions>
-                                    <MultiTrigger.EnterActions>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsPressed}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.EnterActions>
                                         <BeginStoryboard Storyboard="{StaticResource EnterUncheckedPressedStoryboard}" />
-                                    </MultiTrigger.EnterActions>
-                                    <MultiTrigger.ExitActions>
+                                    </MultiDataTrigger.EnterActions>
+                                    <MultiDataTrigger.ExitActions>
                                         <BeginStoryboard Storyboard="{StaticResource ExitUncheckedPressedStoryboard}" />
-                                    </MultiTrigger.ExitActions>
-                                </MultiTrigger>
+                                    </MultiDataTrigger.ExitActions>
+                                </MultiDataTrigger>
+
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsPressed}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.EnterActions>
+                                        <BeginStoryboard x:Name="EnterUncheckedPressedImmediate" Storyboard="{StaticResource EnterUncheckedPressedImmediate}" />
+                                    </MultiDataTrigger.EnterActions>
+                                    <MultiDataTrigger.ExitActions>
+                                        <RemoveStoryboard BeginStoryboardName="EnterUncheckedPressedImmediate" />
+                                    </MultiDataTrigger.ExitActions>
+                                </MultiDataTrigger>
 
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Setter TargetName="ContentPresenter" Property="Foreground" Value="{DynamicResource RadioButtonForegroundDisabled}" />

@@ -192,6 +192,10 @@ namespace ADB_Explorer.Services
 
         #region graphics
 
+        public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
+
+        public bool UseFluentStyles => IsWin11 || ForceFluentStyles;
+
         private bool forceFluentStyles;
         /// <summary>
         /// Use Fluent [Windows 11] Styles In Windows 10
@@ -199,7 +203,11 @@ namespace ADB_Explorer.Services
         public bool ForceFluentStyles
         {
             get => Get(ref forceFluentStyles, false);
-            set => Set(ref forceFluentStyles, value);
+            set
+            {
+                Set(ref forceFluentStyles, value);
+                OnPropertyChanged(nameof(UseFluentStyles));
+            }
         }
 
         private bool swRender;
@@ -210,6 +218,43 @@ namespace ADB_Explorer.Services
         {
             get => Get(ref swRender, false);
             set => Set(ref swRender, value);
+        }
+
+        private bool isAnimated = true;
+        /// <summary>
+        /// This setting is not updated at runtime as long as we are unable to combine it with different enter and exit storyboards. <br />
+        /// The issue is the inability to separate the change of this setting from the change of the original triggers.
+        /// </summary>
+        public bool IsAnimated
+        {
+            get => isAnimated;
+            set
+            {
+                isAnimated = value;
+                OnPropertyChanged(nameof(isAnimated));
+            }
+        }
+
+        private bool disableAnimation;
+        /// <summary>
+        /// Disables all visual animations
+        /// </summary>
+        public bool DisableAnimation
+        {
+            get
+            {
+                var value = Get(ref disableAnimation, false);
+
+                if (!WindowLoaded)
+                    IsAnimated = !disableAnimation;
+
+                return value;
+            }
+            set
+            {
+                Set(ref disableAnimation, value);
+                
+            }
         }
 
         #endregion
@@ -224,6 +269,8 @@ namespace ADB_Explorer.Services
         }
 
         #endregion theme
+
+        public bool WindowLoaded { get; set; } = false;
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null, bool saveToDisk = true)

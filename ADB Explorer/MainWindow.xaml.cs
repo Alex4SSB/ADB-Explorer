@@ -151,6 +151,8 @@ namespace ADB_Explorer
 
             TestCurrentOperation();
             TestDevices();
+
+            Settings.WindowLoaded = true;
         }
 
         private static void CheckForUpdates(Dispatcher dispatcher)
@@ -200,6 +202,11 @@ namespace ADB_Explorer
         {
             switch (e.PropertyName)
             {
+                case nameof(AppSettings.ForceFluentStyles):
+                    SetSymbolFont();
+                    SetRowsRadius();
+                    PopulateButtons(CurrentPath);
+                    break;
                 case nameof(AppSettings.Theme):
                     SetTheme(Settings.Theme);
                     break;
@@ -585,8 +592,7 @@ namespace ADB_Explorer
 
         private void SetRowsRadius()
         {
-            if (!UseFluentStyles)
-                return;
+            var radius = Settings.UseFluentStyles ? 2 : 0;
 
             var selectedRows = ExplorerGrid.SelectedCells.Select(cell => DataGridRow.GetRowContainingElement(CellConverter.GetDataGridCell(cell))).Distinct().Where(row => row is not null);
             foreach (var item in selectedRows)
@@ -595,10 +601,10 @@ namespace ADB_Explorer
                 int bottomRadius = 0;
 
                 if (!selectedRows.Any(row => row.GetIndex() == item.GetIndex() - 1))
-                    topRadius = 2;
+                    topRadius = radius;
 
                 if (!selectedRows.Any(row => row.GetIndex() == item.GetIndex() + 1))
-                    bottomRadius = 2;
+                    bottomRadius = radius;
 
                 ControlHelper.SetCornerRadius(item, new CornerRadius(topRadius, topRadius, bottomRadius, bottomRadius));
             }
@@ -702,20 +708,20 @@ namespace ADB_Explorer
 
         private FileClass ListerFileManipulator(FileClass item)
         {
-            if (Data.CutItems.Any() && (Data.CutItems[0].ParentPath == DirectoryLister.CurrentPath))
+            if (CutItems.Any() && (CutItems[0].ParentPath == DirectoryLister.CurrentPath))
             {
-                var cutItem = Data.CutItems.Where(f => f.FullPath == item.FullPath);
+                var cutItem = CutItems.Where(f => f.FullPath == item.FullPath);
                 if (cutItem.Any())
                 {
                     item.IsCut = true;
-                    Data.CutItems.Remove(cutItem.First());
-                    Data.CutItems.Add(item);
+                    CutItems.Remove(cutItem.First());
+                    CutItems.Add(item);
                 }
             }
 
             if (CurrentPath == RECYCLE_PATH)
             {
-                var query = Data.RecycleIndex.Where(index => index.RecycleName == item.FullName);
+                var query = RecycleIndex.Where(index => index.RecycleName == item.FullName);
                 if (query.Any())
                     item.TrashIndex = query.First();
             }
@@ -726,7 +732,7 @@ namespace ADB_Explorer
         private void LoadSettings()
         {
             Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
-            Application.Current.Resources["SymbolThemeFontFamily"] = new FontFamily(UseFluentStyles ? "Segoe Fluent Icons, Segoe MDL2 Assets" : "Segoe MDL2 Assets");
+            SetSymbolFont();
 
             if (Settings.EnableMdns)
                 QrClass = new();
@@ -735,6 +741,11 @@ namespace ADB_Explorer
             SetRenderMode();
 
             EnableMdns();
+        }
+
+        private void SetSymbolFont()
+        {
+            Application.Current.Resources["SymbolThemeFontFamily"] = new FontFamily(Settings.UseFluentStyles ? "Segoe Fluent Icons, Segoe MDL2 Assets" : "Segoe MDL2 Assets");
         }
 
         private static void SetRenderMode()
@@ -1232,13 +1243,10 @@ namespace ADB_Explorer
                     PathButtons[i].Height = double.NaN;
                     PathButtons[i].Padding = new(10, 4, 10, 4);
                     PathButtons[i].Icon = new FontIcon() { Glyph = icon, Style = FindResource("GlyphFont") as Style };
-                    
-                    if (UseFluentStyles)
-                    {
-                        PathButtons[i].Margin = new(5, 1, 5, 1);
-                        ControlHelper.SetCornerRadius(PathButtons[i], new(4));
-                    }
-                    
+
+                    PathButtons[i].Margin = Settings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
+                    ControlHelper.SetCornerRadius(PathButtons[i], new(Settings.UseFluentStyles ? 4 : 0));
+
                     excessLength -= ControlSize.GetWidth(PathButtons[i]);
 
                     i++;
@@ -1319,10 +1327,7 @@ namespace ADB_Explorer
             button.Padding = new(8, 0, 8, 0);
             button.Margin = new(0);
 
-            if (UseFluentStyles)
-            {
-                ControlHelper.SetCornerRadius(button, new(3));
-            }
+            ControlHelper.SetCornerRadius(button, new(Settings.UseFluentStyles ? 3 : 0));
 
             button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
             PathMenu.Items.Add(button);
@@ -2222,6 +2227,9 @@ namespace ADB_Explorer
         private void FilterHiddenFiles()
         {
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
+            
+            if (!ExplorerGrid.Visible())
+                return;
 
             CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = !Settings.ShowHiddenItems
                 ? (new(HideFiles()))
@@ -3093,8 +3101,13 @@ namespace ADB_Explorer
 
         private void DataGridRow_Unselected(object sender, RoutedEventArgs e)
         {
-            if (UseFluentStyles)
-                ControlHelper.SetCornerRadius(e.OriginalSource as DataGridRow, new(2));
+            ControlHelper.SetCornerRadius(e.OriginalSource as DataGridRow, new(Settings.UseFluentStyles ? 2 : 0));
+        }
+
+        private void RestartButton_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Process.GetCurrentProcess().MainModule.FileName);
+            Application.Current.Shutdown();
         }
     }
 }

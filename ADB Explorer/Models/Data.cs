@@ -40,10 +40,6 @@ namespace ADB_Explorer.Models
 
         public static Dictionary<string, string> CurrentPrettyNames { get; set; } = new();
 
-        public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
-
-        public static bool UseFluentStyles => IsWin11 || Settings.ForceFluentStyles;
-
         public static AppSettings Settings { get; set; } = new();
 
         public static ObservableList<FileClass> CutItems { get; private set; } = new();
@@ -63,6 +59,7 @@ namespace ADB_Explorer.Models
         }
 
         public static Version AppVersion => new(Properties.Resources.AppVersion);
+
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

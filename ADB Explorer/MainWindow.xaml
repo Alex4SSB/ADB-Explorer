@@ -785,6 +785,15 @@
                         Click="OpenDevicesButton_Click"
                         IsEnabled="False"
                         ToolTip="Devices">
+                        <MenuItem.Style>
+                            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.Style>
                         <MenuItem.Header>
                             <Grid>
                                 <ui:FontIcon Glyph="&#xE8CC;" />
@@ -799,6 +808,31 @@
                                         </EventTrigger>
                                     </TextBlock.Triggers>
                                 </TextBlock>
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    <MenuItem
+                        helpers:StyleHelper.ContentAnimation="Bounce"
+                        Click="OpenDevicesButton_Click"
+                        IsEnabled="{Binding ElementName=OpenDevicesButton, Path=IsEnabled}"
+                        ToolTip="Devices">
+                        <MenuItem.Style>
+                            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </MenuItem.Style>
+                        <MenuItem.Header>
+                            <Grid>
+                                <ui:FontIcon Glyph="&#xE8CC;" />
+                                <TextBlock
+                                    Margin="0,0,-10,-12"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count, NotifyOnTargetUpdated=True}" />
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
@@ -1901,7 +1935,7 @@
             PaneOpening="DevicesSplitView_PaneOpening"
             PanePlacement="Left">
             <ui:SplitView.Style>
-                <Style TargetType="ui:SplitView">
+                <Style BasedOn="{StaticResource SplitViewStyle}" TargetType="ui:SplitView">
                     <Setter Property="OpenPaneLength" Value="236" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding ElementName=DeviceListScrollViewer, Path=ScrollableHeight}" Value="0">
@@ -2500,14 +2534,9 @@
                                             Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
                                         <Grid Margin="0,4,0,0">
                                             <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
-                                            <Grid Margin="10,0" HorizontalAlignment="Right">
-                                                <Grid.Resources>
-                                                    <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
-                                                </Grid.Resources>
-                                                <ui:FontIcon Glyph="&#xF83E;" />
-                                                <ui:FontIcon Glyph="&#xF83F;" />
-                                                <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
-                                            </Grid>
+                                            <Button Click="RestartButton_Click" Style="{StaticResource RestartAppButtonStyle}">
+                                                <ui:FontIcon />
+                                            </Button>
                                         </Grid>
                                         <TextBox
                                             Margin="0,6"
@@ -2538,23 +2567,21 @@
                                 <Expander Header="Graphics">
                                     <StackPanel>
                                         <CheckBox
-                                            HorizontalAlignment="Stretch"
-                                            HorizontalContentAlignment="Stretch"
+                                            Content="Force Fluent Styles"
                                             IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ForceFluentStyles}"
-                                            Style="{StaticResource ForceFluentVisibility}">
+                                            Style="{StaticResource ForceFluentVisibility}" />
+                                        <CheckBox Content="Disable Hardware Acceleration" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}" />
+                                        <CheckBox
+                                            HorizontalContentAlignment="Stretch"
+                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=DisableAnimation}"
+                                            ToolTip="Does not affect progress bars and rings">
                                             <Grid>
-                                                <TextBlock Text="Force Fluent Styles" />
-                                                <Grid Margin="10,0" HorizontalAlignment="Right">
-                                                    <Grid.Resources>
-                                                        <Style BasedOn="{StaticResource RestartRequiredIconsStyle}" TargetType="ui:FontIcon" />
-                                                    </Grid.Resources>
-                                                    <ui:FontIcon Glyph="&#xF83E;" />
-                                                    <ui:FontIcon Glyph="&#xF83F;" />
-                                                    <ui:FontIcon Glyph="&#xEA84;" Style="{StaticResource RestartWarningIconStyle}" />
-                                                </Grid>
+                                                <TextBlock Text="Disable Animations" />
+                                                <Button Click="RestartButton_Click" Style="{StaticResource RestartAppButtonStyle}">
+                                                    <ui:FontIcon />
+                                                </Button>
                                             </Grid>
                                         </CheckBox>
-                                        <CheckBox Content="Disable Hardware Acceleration" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}" />
                                     </StackPanel>
                                 </Expander>
                                 <!--<Separator Style="{StaticResource CategorySeparator}" />

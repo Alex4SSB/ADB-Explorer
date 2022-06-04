@@ -5,11 +5,14 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+
     <!--  https://www.codeproject.com/Articles/248112/Templating-WPF-Expander-Control  -->
+
     <converters:MarginConverter x:Key="marginConverter" />
-    <converters:HeightConverter x:Key="heightConverter" />
     <Duration x:Key="AnimationDuration">00:00:00.2</Duration>
+    <sys:TimeSpan x:Key="AnimationKeytime">00:00:00.2</sys:TimeSpan>
 
     <Storyboard x:Key="RotateTo180DegreesStoryboard">
         <DoubleAnimation
@@ -24,9 +27,17 @@
         <DoubleAnimation
             Storyboard.TargetName="ArrowRotateTransform"
             Storyboard.TargetProperty="Angle"
-            From="180"
             To="360"
             Duration="{StaticResource AnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateImmediate">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="0"
+            To="180"
+            Duration="0" />
     </Storyboard>
 
     <Storyboard x:Key="ExpandingStoryboard">
@@ -56,9 +67,20 @@
                 <CircleEase EasingMode="EaseInOut" />
             </DoubleAnimation.EasingFunction>
         </DoubleAnimation>
-        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.2" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
+        <BooleanAnimationUsingKeyFrames BeginTime="{StaticResource AnimationKeytime}" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
             <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="True" />
         </BooleanAnimationUsingKeyFrames>
+    </Storyboard>
+
+    <Storyboard x:Key="ExpandingImmediate">
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00" Storyboard.TargetProperty="(helpers:ExpanderHelper.IsContentCollapsed)">
+            <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="False" />
+        </BooleanAnimationUsingKeyFrames>
+        <DoubleAnimation
+            Storyboard.TargetName="ExpandSite"
+            Storyboard.TargetProperty="(helpers:ExpanderHelper.ExpansionProgress)"
+            To="1"
+            Duration="0" />
     </Storyboard>
 
     <Style
@@ -66,7 +88,7 @@
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
@@ -79,7 +101,7 @@
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
@@ -92,14 +114,14 @@
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="0,0,5,5" />
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.IsListItem)}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
@@ -145,14 +167,30 @@
             </Grid>
         </Border>
         <ControlTemplate.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Trigger.EnterActions>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.EnterActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo180DegreesStoryboard}" />
-                </Trigger.EnterActions>
-                <Trigger.ExitActions>
+                </MultiDataTrigger.EnterActions>
+                <MultiDataTrigger.ExitActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo0DegreesStoryboard}" />
-                </Trigger.ExitActions>
-            </Trigger>
+                </MultiDataTrigger.ExitActions>
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.EnterActions>
+                    <BeginStoryboard Name="RotateImmediate" Storyboard="{StaticResource RotateImmediate}" />
+                </MultiDataTrigger.EnterActions>
+                <MultiDataTrigger.ExitActions>
+                    <RemoveStoryboard BeginStoryboardName="RotateImmediate" />
+                </MultiDataTrigger.ExitActions>
+            </MultiDataTrigger>
             <Trigger Property="IsMouseOver" Value="true">
                 <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
                 <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
@@ -268,18 +306,32 @@
                         </Border>
                     </DockPanel>
                     <ControlTemplate.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsExpanded" Value="True" />
-                                <Condition Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <MultiTrigger.EnterActions>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsExpandEnabled)}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource ExpandingStoryboard}" />
-                            </MultiTrigger.EnterActions>
-                            <MultiTrigger.ExitActions>
+                            </MultiDataTrigger.EnterActions>
+                            <MultiDataTrigger.ExitActions>
                                 <BeginStoryboard Storyboard="{StaticResource CollapsingStoryboard}" />
-                            </MultiTrigger.ExitActions>
-                        </MultiTrigger>
+                            </MultiDataTrigger.ExitActions>
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsExpandEnabled)}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.EnterActions>
+                                <BeginStoryboard x:Name="ExpandingImmediate" Storyboard="{StaticResource ExpandingImmediate}" />
+                            </MultiDataTrigger.EnterActions>
+                            <MultiDataTrigger.ExitActions>
+                                <RemoveStoryboard BeginStoryboardName="ExpandingImmediate" />
+                            </MultiDataTrigger.ExitActions>
+                        </MultiDataTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
                         </Trigger>
@@ -294,13 +346,13 @@
                         </Trigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Margin" Value="1,1,1,0" />
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
                                 <Condition Binding="{Binding ElementName=ContentBorder, Path=Visibility}" Value="Visible" />
                             </MultiDataTrigger.Conditions>
@@ -308,14 +360,14 @@
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
                                 <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
                         </MultiDataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
                                 <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsListItem)}" Value="True" />
                             </MultiDataTrigger.Conditions>
@@ -347,7 +399,7 @@
         BasedOn="{StaticResource ExpanderStyle}"
         TargetType="Expander">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
@@ -368,7 +420,7 @@
         <Style.Triggers>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsExpanded}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />

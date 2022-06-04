@@ -5,7 +5,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
-    <KeyTime x:Key="AnimationDurationKeyTime">00:00:00.2</KeyTime>
+    <Duration x:Key="AnimationDuration">0:0:0.2</Duration>
     <Style
         x:Key="CheckBoxStyle"
         BasedOn="{StaticResource DefaultCheckBoxStyle}"
@@ -13,14 +13,14 @@
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-6,0" />
         <Setter Property="helpers:StyleHelper.IsUnchecked" Value="False" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="4" />
             </DataTrigger>
             <Trigger Property="IsChecked" Value="False">
                 <Setter Property="helpers:StyleHelper.IsUnchecked" Value="True" />
             </Trigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Template">
                     <!--  Template copied from ModernWPF to be modified  -->
                     <Setter.Value>
@@ -33,14 +33,14 @@
                                         Storyboard.TargetProperty="Offset"
                                         From="0.0"
                                         To="1.0"
-                                        Duration="0:0:0.2" />
+                                        Duration="{StaticResource AnimationDuration}" />
                                     <DoubleAnimation
                                         BeginTime="0:0:0"
                                         Storyboard.TargetName="GradientStop2"
                                         Storyboard.TargetProperty="Offset"
                                         From="0.0"
                                         To="1.0"
-                                        Duration="0:0:0.2" />
+                                        Duration="{StaticResource AnimationDuration}" />
                                 </Storyboard>
                                 <Storyboard x:Key="UncheckStoryboard">
                                     <DoubleAnimation
@@ -49,14 +49,46 @@
                                         Storyboard.TargetProperty="Offset"
                                         From="0.0"
                                         To="1.0"
-                                        Duration="0:0:0.2" />
+                                        Duration="{StaticResource AnimationDuration}" />
                                     <DoubleAnimation
                                         BeginTime="0:0:0"
                                         Storyboard.TargetName="UncheckGradientStop2"
                                         Storyboard.TargetProperty="Offset"
                                         From="0.0"
                                         To="1.0"
-                                        Duration="0:0:0.2" />
+                                        Duration="{StaticResource AnimationDuration}" />
+                                </Storyboard>
+                                <Storyboard x:Key="RightRevealImmediate">
+                                    <DoubleAnimation
+                                        BeginTime="0:0:0"
+                                        Storyboard.TargetName="GradientStop1"
+                                        Storyboard.TargetProperty="Offset"
+                                        From="0.0"
+                                        To="1.0"
+                                        Duration="0" />
+                                    <DoubleAnimation
+                                        BeginTime="0:0:0"
+                                        Storyboard.TargetName="GradientStop2"
+                                        Storyboard.TargetProperty="Offset"
+                                        From="0.0"
+                                        To="1.0"
+                                        Duration="0" />
+                                </Storyboard>
+                                <Storyboard x:Key="UncheckImmediate">
+                                    <DoubleAnimation
+                                        BeginTime="0:0:0"
+                                        Storyboard.TargetName="UncheckGradientStop1"
+                                        Storyboard.TargetProperty="Offset"
+                                        From="0.0"
+                                        To="1.0"
+                                        Duration="0" />
+                                    <DoubleAnimation
+                                        BeginTime="0:0:0"
+                                        Storyboard.TargetName="UncheckGradientStop2"
+                                        Storyboard.TargetProperty="Offset"
+                                        From="0.0"
+                                        To="1.0"
+                                        Duration="0" />
                                 </Storyboard>
                             </ControlTemplate.Resources>
                             <Border Background="Transparent">
@@ -131,17 +163,32 @@
                                     <Setter Property="BorderThickness" Value="1" />
                                 </Trigger>
 
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsThreeState" Value="False" />
-                                        <Condition Property="IsChecked" Value="False" />
-                                    </MultiTrigger.Conditions>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsThreeState}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
                                     <Setter TargetName="UncheckGlyph" Property="Visibility" Value="Visible" />
                                     <Setter TargetName="CheckGlyph" Property="Visibility" Value="Collapsed" />
-                                    <MultiTrigger.EnterActions>
+                                    <MultiDataTrigger.EnterActions>
+                                        <RemoveStoryboard BeginStoryboardName="RightRevealImmediate" />
                                         <BeginStoryboard Storyboard="{StaticResource UncheckStoryboard}" />
-                                    </MultiTrigger.EnterActions>
-                                </MultiTrigger>
+                                    </MultiDataTrigger.EnterActions>
+                                </MultiDataTrigger>
+
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsThreeState}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter TargetName="UncheckGlyph" Property="Visibility" Value="Visible" />
+                                    <Setter TargetName="CheckGlyph" Property="Visibility" Value="Collapsed" />
+                                    <MultiDataTrigger.EnterActions>
+                                        <BeginStoryboard x:Name="UncheckImmediate" Storyboard="{StaticResource UncheckImmediate}" />
+                                    </MultiDataTrigger.EnterActions>
+                                </MultiDataTrigger>
 
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
@@ -161,16 +208,36 @@
                                     <Setter TargetName="UncheckGlyph" Property="Glyph" Value="&#xE73C;" />
                                 </Trigger>
 
-                                <!--  RECTANGLE, GLYPH: Dark Theme, Checked  -->
-                                <Trigger Property="helpers:StyleHelper.IsUnchecked" Value="False">
+                                <!--  RECTANGLE, GLYPH: Dark Theme, Checked, Animated  -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.IsUnchecked)}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
                                     <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
                                     <Setter Property="BorderThickness" Value="0" />
                                     <Setter TargetName="UncheckGlyph" Property="Visibility" Value="Collapsed" />
                                     <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
-                                    <Trigger.EnterActions>
+                                    <MultiDataTrigger.EnterActions>
+                                        <RemoveStoryboard BeginStoryboardName="UncheckImmediate" />
                                         <BeginStoryboard Storyboard="{StaticResource RightRevealStoryboard}" />
-                                    </Trigger.EnterActions>
-                                </Trigger>
+                                    </MultiDataTrigger.EnterActions>
+                                </MultiDataTrigger>
+
+                                <!--  RECTANGLE, GLYPH: Dark Theme, Checked, Non-Animated  -->
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False" />
+                                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.IsUnchecked)}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+                                    <Setter Property="BorderThickness" Value="0" />
+                                    <Setter TargetName="UncheckGlyph" Property="Visibility" Value="Collapsed" />
+                                    <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
+                                    <MultiDataTrigger.EnterActions>
+                                        <BeginStoryboard x:Name="RightRevealImmediate" Storyboard="{StaticResource RightRevealImmediate}" />
+                                    </MultiDataTrigger.EnterActions>
+                                </MultiDataTrigger>
 
                                 <!--  RECTANGLE: Light Theme, Checked  -->
                                 <MultiDataTrigger>

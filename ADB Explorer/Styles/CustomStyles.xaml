@@ -12,12 +12,12 @@
     <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
@@ -27,12 +27,12 @@
     <Style x:Key="FluentProgressRingStyle" TargetType="ui:ProgressRing">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
@@ -250,7 +250,7 @@
             <Setter Property="Height" Value="30" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                     <Setter Property="Height" Value="32" />
                 </DataTrigger>
             </Style.Triggers>
@@ -259,7 +259,7 @@
             <Setter Property="Height" Value="30" />
             <Setter Property="VerticalAlignment" Value="Center" />
             <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                     <Setter Property="Height" Value="32" />
                 </DataTrigger>
             </Style.Triggers>
@@ -762,7 +762,7 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
             </MultiDataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="2" />
                 <Setter Property="Margin" Value="3,0,0,0" />
             </DataTrigger>
@@ -800,7 +800,7 @@
     </Style>
     <Style x:Key="SeparatorStyle" TargetType="Separator">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Height" Value="0" />
                 <Setter Property="Margin" Value="0" />
             </DataTrigger>
@@ -809,7 +809,7 @@
     <Style x:Key="ExpanderSeparatorStyle" TargetType="Separator">
         <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBorder}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="Height" Value="0" />
             </DataTrigger>
         </Style.Triggers>
@@ -837,34 +837,29 @@
         BasedOn="{StaticResource CheckBoxStyle}"
         TargetType="CheckBox">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.IsWin11}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsWin11}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="RestartRequiredIconsStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Setter Property="FontSize" Value="22" />
-        <Setter Property="ToolTip" Value="App Restart Required" />
-    </Style>
-    <Style
-        x:Key="RestartWarningIconStyle"
-        BasedOn="{StaticResource RestartRequiredIconsStyle}"
-        TargetType="ui:FontIcon">
-        <Setter Property="Margin" Value="0" />
-        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=Background}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
-                <Setter Property="Margin" Value="4,0,0,0" />
-                <Setter Property="Foreground" Value="{DynamicResource DevicesListBackground}" />
-            </DataTrigger>
-        </Style.Triggers>
+        x:Key="RestartAppButtonStyle"
+        BasedOn="{StaticResource AccentButtonStyle}"
+        TargetType="Button">
+        <Style.Resources>
+            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Glyph" Value="&#xE72C;" />
+            </Style>
+        </Style.Resources>
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Margin" Value="0,0,4,0" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="ToolTip" Value="Restart app for changes to take effect" />
     </Style>
     <Style x:Key="QrBackgroundStyle" TargetType="Border">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="0,0,5,5" />
             </DataTrigger>
         </Style.Triggers>
@@ -958,7 +953,7 @@
                 <Setter Property="CornerRadius" Value="4" />
                 <Setter Property="Margin" Value="0" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="CornerRadius" Value="0" />
             </DataTrigger>
         </Style.Triggers>
@@ -1231,7 +1226,7 @@
     </Style>
     <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
             </DataTrigger>
         </Style.Triggers>

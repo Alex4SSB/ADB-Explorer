@@ -163,13 +163,20 @@
             <EventTrigger RoutedEvent="MenuItem.Click">
                 <BeginStoryboard>
                     <Storyboard>
-                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(helpers:StyleHelper.ActivateAnimation)">
+                        <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="(helpers:StyleHelper.BeginAnimation)">
                             <DiscreteBooleanKeyFrame KeyTime="00:00:00" Value="True" />
                             <DiscreteBooleanKeyFrame KeyTime="{StaticResource AnimationDurationKeyTime}" Value="False" />
                         </BooleanAnimationUsingKeyFrames>
                     </Storyboard>
                 </BeginStoryboard>
             </EventTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.BeginAnimation)}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+            </MultiDataTrigger>
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
@@ -586,7 +593,9 @@
         BasedOn="{StaticResource DefaultMenuItemStyle}"
         TargetType="MenuItem">
         <Setter Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackground}" />
-        <Setter Property="helpers:StyleHelper.UseFluentStyles" Value="{Binding Source={x:Static Member=models:Data.UseFluentStyles}}" />
+        <Setter Property="helpers:StyleHelper.UseFluentStyles" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" />
+        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
+        <Setter Property="helpers:StyleHelper.BeginAnimation" Value="False" />
         <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource MenuFlyoutItemRevealBorderThickness}" />
         <Setter Property="Foreground" Value="{DynamicResource MenuFlyoutItemForeground}" />

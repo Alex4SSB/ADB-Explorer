@@ -12,6 +12,8 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
                 <ResourceDictionary Source="Styles\BasicStyles.xaml" />
+                <ResourceDictionary Source="Styles\ScrollBar.xaml" />
+                <ResourceDictionary Source="Styles\ScrollViewer.xaml" />
                 <ResourceDictionary Source="Styles\ContextMenu.xaml" />
                 <ResourceDictionary Source="Styles\CheckBox.xaml" />
                 <ResourceDictionary Source="Styles\RadioButton.xaml" />
@@ -23,6 +25,7 @@
                 <ResourceDictionary Source="Styles\Expander.xaml" />
                 <ResourceDictionary Source="Styles\DataGrid.xaml" />
                 <ResourceDictionary Source="Styles\ContentDialog.xaml" />
+                <ResourceDictionary Source="Styles\SplitView.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
