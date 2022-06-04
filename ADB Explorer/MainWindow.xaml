@@ -2039,7 +2039,30 @@
                                                         IsChecked="True"
                                                         ToolTip="6 Digit Code"
                                                         Unchecked="ConnectionTypeRadioButton_Checked">
-                                                        <ui:PathIcon Height="20" Data="{StaticResource PasswordIcon}" />
+                                                        <Grid>
+                                                            <ui:FontIcon Glyph="&#xE192;">
+                                                                <ui:FontIcon.Style>
+                                                                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </ui:FontIcon.Style>
+                                                            </ui:FontIcon>
+                                                            <ui:PathIcon Height="20" Data="{StaticResource PasswordIcon}">
+                                                                <ui:PathIcon.Style>
+                                                                    <Style TargetType="ui:PathIcon">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </ui:PathIcon.Style>
+                                                            </ui:PathIcon>
+                                                        </Grid>
                                                     </RadioButton>
                                                 </Grid>
                                             </StackPanel>
