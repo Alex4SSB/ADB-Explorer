@@ -12,27 +12,35 @@ namespace ADB_Explorer.Services
         private Task operationTask;
         private CancellationTokenSource cancelTokenSource;
         private readonly ObservableList<FileClass> fileList;
-        private string targetPath;
+        private string targetParent;
+        private string targetName;
+        private string fullTargetPath;
         private readonly string currentPath;
         private string recycleName;
         private DateTime? dateModified;
         private LogicalDevice logical;
 
-        public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetPath, string currentPath, ObservableList<FileClass> fileList, LogicalDevice logical) : base(dispatcher, adbDevice, filePath)
+        public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, LogicalDevice logical, bool isCopy = false) : base(dispatcher, adbDevice, filePath)
         {
-            if (targetPath == AdbExplorerConst.RECYCLE_PATH)
+            if (isCopy)
+                OperationName = OperationType.Copy;
+            else if (targetParent == AdbExplorerConst.RECYCLE_PATH)
                 OperationName = OperationType.Recycle;
             else if (((FileClass)filePath).TrashIndex is not null)
                 OperationName = OperationType.Restore;
             else
                 OperationName = OperationType.Move;
-            
+
+            TargetPath = new(targetParent, fileType: Converters.FileTypeClass.FileType.Folder);
+
+            if (!targetParent.EndsWith('/'))
+                targetParent += '/';
+
             this.fileList = fileList;
-            this.targetPath = targetPath;
+            this.targetParent = targetParent;
+            this.targetName = targetName;
             this.currentPath = currentPath;
             this.logical = logical;
-
-            TargetPath = new(targetPath, fileType: Converters.FileTypeClass.FileType.Folder);
         }
 
         public override void Start()
@@ -50,15 +58,17 @@ namespace ADB_Explorer.Services
                 if (OperationName is OperationType.Recycle)
                 {
                     recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
-                    targetPath = $"{targetPath}/{recycleName}";
+                    fullTargetPath = $"{targetParent}{recycleName}";
                     dateModified = ((FileClass)FilePath).ModifiedTime;
                 }
                 else
-                    targetPath = $"{targetPath}{(targetPath.EndsWith('/') ? "" : "/")}{FilePath.FullName}";
+                    fullTargetPath = $"{targetParent}{targetName}";
 
-                return ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "mv", out _, out _, new[] {
+                var command = OperationName is OperationType.Copy ? "cp" : "mv";
+
+                return ADBService.ExecuteDeviceAdbShellCommand(Device.ID, command, out _, out _, new[] {
                     ADBService.EscapeAdbShellString(FilePath.FullPath),
-                    ADBService.EscapeAdbShellString(targetPath) });
+                    ADBService.EscapeAdbShellString(fullTargetPath) });
             });
 
             operationTask.ContinueWith((t) =>
@@ -86,18 +96,31 @@ namespace ADB_Explorer.Services
 
                     Dispatcher.Invoke(() =>
                     {
-                        if (targetPath == currentPath)
+                        if (TargetPath.FullPath == currentPath)
                         {
-                            FilePath.UpdatePath($"{targetPath}/{FilePath.FullName}");
-                            fileList.Add((FileClass)FilePath);
+                            if (OperationName is OperationType.Copy)
+                            {
+                                FileClass newFile = new((FileClass)FilePath);
+                                newFile.UpdatePath(fullTargetPath);
+                                fileList.Add(newFile);
+                            }
+                            else
+                            {
+                                FilePath.UpdatePath(fullTargetPath);
+                                fileList.Add((FileClass)FilePath);
+                            }
                         }
-                        else if (FilePath.ParentPath == currentPath)
+                        else if (FilePath.ParentPath == currentPath && OperationName is not OperationType.Copy)
                         {
                             fileList.Remove((FileClass)FilePath);
                         }
 
                         if (OperationName is OperationType.Recycle or OperationType.Restore)
                         {
+                            ((FileClass)FilePath).CutState = FileClass.CutType.None;
+                            if (Data.CutItems.Contains((FileClass)FilePath))
+                                Data.CutItems.Remove((FileClass)FilePath);
+
                             ((FileClass)FilePath).TrashIndex = null;
                             logical.RecycledItemsCount = recycleCount;
                         }
@@ -105,7 +128,7 @@ namespace ADB_Explorer.Services
                 }
                 else if (OperationName is OperationType.Recycle)
                 {
-                    ShellFileOperation.SilentDelete(Device, targetPath);
+                    ShellFileOperation.SilentDelete(Device, fullTargetPath);
                 }
 
             }, TaskContinuationOptions.OnlyOnRanToCompletion);

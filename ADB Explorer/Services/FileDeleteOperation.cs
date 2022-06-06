@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -38,7 +39,13 @@ namespace ADB_Explorer.Services
 
                 if (operationStatus is OperationStatus.Completed)
                 {
-                    Dispatcher.Invoke(() => fileList.Remove((FileClass)FilePath));
+                    Dispatcher.Invoke(() =>
+                    {
+                        ((FileClass)FilePath).CutState = FileClass.CutType.None;
+                        Data.CutItems.Remove((FileClass)FilePath);
+
+                        fileList.Remove((FileClass)FilePath);
+                    });
                 }
 
             }, TaskContinuationOptions.OnlyOnRanToCompletion);

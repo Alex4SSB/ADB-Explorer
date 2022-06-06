@@ -338,6 +338,7 @@ namespace ADB_Explorer
             MenuItem pushMenu = FindResource("ContextMenuPushItem") as MenuItem;
             MenuItem renameMenu = FindResource("ContextMenuRenameItem") as MenuItem;
             MenuItem cutMenu = FindResource("ContextMenuCutItem") as MenuItem;
+            MenuItem copyMenu = FindResource("ContextMenuCopyItem") as MenuItem;
             MenuItem pasteMenu = FindResource("ContextMenuPasteItem") as MenuItem;
             MenuItem newMenu = FindResource("ContextMenuNewItem") as MenuItem;
             MenuItem copyPath = FindResource("ContextMenuCopyPathItem") as MenuItem;
@@ -353,7 +354,7 @@ namespace ADB_Explorer
 
                     if (IsRecycleBin)
                     {
-                        if (!selectedFiles.All(file => file.IsCut))
+                        if (!selectedFiles.All(file => file.CutState is FileClass.CutType.Cut))
                             ExplorerGrid.ContextMenu.Items.Add(cutMenu);
 
                         restoreMenu.IsEnabled = selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
@@ -373,10 +374,13 @@ namespace ADB_Explorer
                     }
                     ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
-                    if (!selectedFiles.All(file => file.IsCut))
+                    if (!selectedFiles.All(file => file.CutState is FileClass.CutType.Cut))
                         ExplorerGrid.ContextMenu.Items.Add(cutMenu);
 
-                    if (PasteEnabled())
+                    if (!selectedFiles.All(file => file.CutState is FileClass.CutType.Copy))
+                        ExplorerGrid.ContextMenu.Items.Add(copyMenu);
+
+                    if (PasteEnabled(isContextMenu: true))
                         ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
 
                     if (selectedFiles.Count() == 1)
@@ -583,7 +587,9 @@ namespace ADB_Explorer
             RenameMenuButton.IsEnabled = renameEnabled;
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
 
-            CutMenuButton.IsEnabled = !selectedFiles.All(file => file.IsCut) && !irregular;
+            CutMenuButton.IsEnabled = !selectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && !irregular;
+            
+            CopyMenuButton.IsEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
             PasteMenuButton.IsEnabled = PasteEnabled();
 
             MoreMenuButton.IsEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
@@ -610,24 +616,27 @@ namespace ADB_Explorer
             }
         }
 
-        private bool PasteEnabled(bool ignoreSelected = false)
+        private bool PasteEnabled(bool ignoreSelected = false, bool isContextMenu = false)
         {
             if (CutItems.Count < 1 || IsRecycleBin)
                 return false;
 
-            if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self)
+            if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self && CutItems[0].CutState is FileClass.CutType.Cut)
                 return false;
 
             var selected = ignoreSelected ? 0 : selectedFiles.Count();
             switch (selected)
             {
                 case 0:
-                    return CutItems[0].ParentPath != CurrentPath;
+                    return !(CutItems[0].ParentPath == CurrentPath && CutItems[0].CutState is FileClass.CutType.Cut);
                 case 1:
+                    if (!isContextMenu && CutItems[0].CutState is FileClass.CutType.Copy)
+                        return true;
+
                     var item = ExplorerGrid.SelectedItem as FilePath;
                     if (!item.IsDirectory
                         || (CutItems.Count == 1 && CutItems[0].FullPath == item.FullPath)
-                        || CutItems[0].ParentPath == item.FullPath)
+                        || (CutItems[0].ParentPath == item.FullPath))
                         return false;
                     break;
                 default:
@@ -713,7 +722,7 @@ namespace ADB_Explorer
                 var cutItem = CutItems.Where(f => f.FullPath == item.FullPath);
                 if (cutItem.Any())
                 {
-                    item.IsCut = true;
+                    item.CutState = cutItem.First().CutState;
                     CutItems.Remove(cutItem.First());
                     CutItems.Add(item);
                 }
@@ -1554,6 +1563,10 @@ namespace ADB_Explorer
             {
                 CutFiles(selectedFiles);
             }
+            else if (actualKey == Key.C && ctrl && CopyMenuButton.IsEnabled)
+            {
+                CutFiles(selectedFiles, true);
+            }
             else if (actualKey == Key.V && ctrl && PasteMenuButton.IsEnabled)
             {
                 PasteFiles();
@@ -1638,7 +1651,7 @@ namespace ADB_Explorer
 
         private void CopyMenuButton_Click(object sender, RoutedEventArgs e)
         {
-
+            CutFiles(selectedFiles, true);
         }
 
         private void PullFiles(bool quick = false)
@@ -2904,7 +2917,7 @@ namespace ADB_Explorer
             CutFiles(selectedFiles);
         }
 
-        private void CutFiles(IEnumerable<FileClass> items)
+        private void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
         {
             ClearCutFiles();
 
@@ -2913,29 +2926,49 @@ namespace ADB_Explorer
 
             foreach (var item in itemsToCut)
             {
-                item.IsCut = true;
+                item.CutState = isCopy ? FileClass.CutType.Copy : FileClass.CutType.Cut;
             }
 
             CutItems.AddRange(itemsToCut);
 
-            CutMenuButton.IsEnabled = false;
+            CopyMenuButton.IsEnabled = !isCopy;
+            CutMenuButton.IsEnabled = isCopy;
+
             PasteMenuButton.IsEnabled = PasteEnabled();
         }
 
         private static void ClearCutFiles()
         {
-            CutItems.ForEach(f => f.IsCut = false);
+            CutItems.ForEach(f => f.CutState = FileClass.CutType.None);
             CutItems.Clear();
         }
 
         private void PasteFiles()
         {
-            var targetPath = selectedFiles.Count() == 1 ? ((FileClass)ExplorerGrid.SelectedItem).FullPath : CurrentPath;
+            var targetPath = "";
+            bool isCopy = CutItems[0].CutState is FileClass.CutType.Copy;
+
+            if (selectedFiles.Count() != 1 || isCopy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
+            {
+                targetPath = CurrentPath;
+            }
+            else
+                targetPath = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
+
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
 
-            ShellFileOperation.MoveItems(CurrentADBDevice, pasteItems, targetPath, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
+            ShellFileOperation.MoveItems(device: CurrentADBDevice,
+                                         items: pasteItems,
+                                         targetPath: targetPath,
+                                         currentPath: CurrentPath,
+                                         fileList: DirectoryLister.FileList,
+                                         dispatcher: Dispatcher,
+                                         logical: DevicesObject.CurrentDevice,
+                                         isCopy: isCopy);
 
-            ClearCutFiles();
+            if (!isCopy)
+                ClearCutFiles();
+
             PasteMenuButton.IsEnabled = PasteEnabled();
         }
 
@@ -2947,7 +2980,7 @@ namespace ADB_Explorer
         private void NewItem(bool isFolder)
         {
             var namePrefix = $"New {(isFolder ? "Folder" : "File")}";
-            var index = ExistingIndexes(namePrefix);
+            var index = FileClass.ExistingIndexes(DirectoryLister.FileList, namePrefix);
 
             FileClass newItem = new($"{namePrefix}{index}", CurrentPath, isFolder ? FileType.Folder : FileType.File, isTemp: true);
             DirectoryLister.FileList.Insert(0, newItem);
@@ -2957,29 +2990,6 @@ namespace ADB_Explorer
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
             if (cell is not null)
                 cell.IsEditing = true;
-        }
-
-        private string ExistingIndexes(string namePrefix)
-        {
-            var existingItems = DirectoryLister.FileList.Where(item => item.FullName.StartsWith(namePrefix));
-            var suffixes = existingItems.Select(item => item.FullName[namePrefix.Length..].Trim());
-            var indexes = (from i in suffixes
-                           where int.TryParse(i, out _)
-                           select int.Parse(i)).ToList();
-            if (suffixes.Any(s => s == ""))
-                indexes.Add(0);
-
-            indexes.Sort();
-            if (!indexes.Any() || indexes[0] != 0)
-                return "";
-
-            for (int i = 0; i < indexes.Count; i++)
-            {
-                if (indexes[i] > i)
-                    return $" {i}";
-            }
-
-            return $" {indexes.Count}";
         }
 
         private void CreateNewItem(FileClass file, string newName)

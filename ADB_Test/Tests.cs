@@ -1,5 +1,6 @@
 using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
@@ -110,6 +111,23 @@ namespace ADB_Test
             text = "0" + text;
             TextHelper.TextBoxValidation(ref caretIndex, ref text, ref altText, ref maxLength, specialChars: '.', maxNumber: 255);
             Assert.AreEqual("005.", text);
+        }
+
+        [TestMethod]
+        public void ExistingIndexesTest()
+        {
+            string[] names = { "", "1" };
+            string[] names1 = { "", "2" };
+
+            Assert.AreEqual("", FileClass.ExistingIndexes(names[..0])); // empty array
+            Assert.AreEqual(" 1", FileClass.ExistingIndexes(new [] { "" }));
+            Assert.AreEqual(" 2", FileClass.ExistingIndexes(names));
+            Assert.AreEqual(" 1", FileClass.ExistingIndexes(names1));
+
+            Assert.AreEqual("", FileClass.ExistingIndexes(names[..0], true));
+            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(new[] { "" }, true));
+            Assert.AreEqual(" - Copy 2", FileClass.ExistingIndexes(names, true));
+            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(names1, true));
         }
     }
 }

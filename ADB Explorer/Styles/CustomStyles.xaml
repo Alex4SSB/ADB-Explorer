@@ -545,6 +545,9 @@
                                 <DataTrigger Binding="{Binding OperationName}" Value="Move">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Copy">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Style>
@@ -586,6 +589,9 @@
                                 <DataTrigger Binding="{Binding OperationName}" Value="Move">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
+                                <DataTrigger Binding="{Binding OperationName}" Value="Copy">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
                                 <MultiDataTrigger>
                                     <MultiDataTrigger.Conditions>
                                         <Condition Binding="{Binding Status}" Value="Completed" />
@@ -598,6 +604,9 @@
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Status}" Value="Canceled">
                                     <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -712,6 +721,18 @@
                         <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding OperationName}" Value="Move">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+            <ui:FontIcon Glyph="&#xE8C8;">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OperationName}" Value="Copy">
                                 <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>

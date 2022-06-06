@@ -248,6 +248,16 @@
             </MenuItem.Icon>
         </MenuItem>
         <MenuItem
+            x:Key="ContextMenuCopyItem"
+            Click="CopyMenuButton_Click"
+            Header="Copy"
+            InputGestureText="Ctrl+C"
+            Resources="{StaticResource ContextSubMenuStyles}">
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE8C8;" />
+            </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
             x:Key="ContextMenuCopyPathItem"
             x:Shared="False"
             Click="CopyPathMenuItem_Click"
@@ -902,7 +912,7 @@
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="CopyMenuButton_Click"
                         IsEnabled="False"
-                        ToolTip="Copy">
+                        ToolTip="Copy (Ctrl+C)">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE8C8;" />
                         </MenuItem.Header>
@@ -1260,7 +1270,7 @@
                                                             <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
                                                                 <Setter Property="Visibility" Value="Collapsed" />
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                                 <Setter Property="Opacity" Value="0.5" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -1284,7 +1294,7 @@
                                                                 <Setter Property="Visibility" Value="Visible" />
                                                                 <Setter Property="Margin" Value="-1,-6,0,0" />
                                                             </DataTrigger>
-                                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                                 <Setter Property="Opacity" Value="0.5" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -1335,7 +1345,7 @@
                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                                                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                 <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1356,7 +1366,7 @@
                                         <Setter Property="Opacity" Value="1" />
                                         <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                 <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1384,7 +1394,7 @@
                                             <DataTrigger Binding="{Binding Type}" Value="Folder">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                 <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1408,7 +1418,7 @@
                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                                                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                 <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1433,7 +1443,7 @@
                                             <DataTrigger Binding="{Binding Type}" Value="File">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                 <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -1461,7 +1471,7 @@
                                             <DataTrigger Binding="{Binding Type}" Value="Folder">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding IsCut}" Value="True">
+                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
                                                 <Setter Property="Opacity" Value="0.5" />
                                             </DataTrigger>
                                         </Style.Triggers>

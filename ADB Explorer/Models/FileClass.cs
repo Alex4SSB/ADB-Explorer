@@ -16,6 +16,13 @@ namespace ADB_Explorer.Models
 {
     public class FileClass : FileStat
     {
+        public enum CutType
+        {
+            None,
+            Cut,
+            Copy,
+        }
+
         private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
 
         public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false) :
@@ -25,6 +32,9 @@ namespace ADB_Explorer.Models
             typeName = GetTypeName();
             IsTemp = isTemp;
         }
+
+        public FileClass(FileClass other) : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
+        { }
 
         public static FileClass GenerateAndroidFile(FileStat fileStat)
         {
@@ -88,7 +98,7 @@ namespace ADB_Explorer.Models
         {
             get
             {
-                if (Type is not FileType.File)
+                if (Type is not FileType.File || (IsHidden && FullName.Count(c => c == '.') == 1))
                     return "";
 
                 if (string.IsNullOrEmpty(extension))
@@ -113,6 +123,9 @@ namespace ADB_Explorer.Models
 
             if (Extension.ToLower() == ".exe")
                 return "Windows Executable";
+
+            if (IsHidden && FullName.Count(c => c == '.') == 1)
+                return "File";
 
             var name = ShellInfoManager.GetShellFileType(fileName);
 
@@ -146,11 +159,11 @@ namespace ADB_Explorer.Models
             private set => Set(ref icon, value);
         }
 
-        private bool isCut;
-        public bool IsCut
+        private CutType cutState = CutType.None;
+        public CutType CutState
         {
-            get => isCut;
-            set => Set(ref isCut, value);
+            get => cutState;
+            set => Set(ref cutState, value);
         }
 
         public bool IsTemp { get; set; }
@@ -233,6 +246,48 @@ namespace ADB_Explorer.Models
                 return 0;
             
             return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
+        }
+
+        public static string ExistingIndexes(ObservableList<FileClass> fileList, string namePrefix, bool isCopy = false)
+        {
+            var existingItems = fileList.Where(item => item.NoExtName.StartsWith(namePrefix));
+            var suffixes = existingItems.Select(item => item.NoExtName[namePrefix.Length..].Trim());
+
+            if (isCopy)
+            {
+                suffixes = suffixes.Select(item => item.Replace("- Copy", "").Trim());
+            }
+
+            return ExistingIndexes(suffixes, isCopy);
+        }
+
+        public static string ExistingIndexes(IEnumerable<string> suffixes, bool isCopy = false)
+        {
+            var copySuffix = isCopy ? " - Copy" : "";
+
+            var indexes = (from i in suffixes
+                           where int.TryParse(i, out _)
+                           select int.Parse(i)).ToList();
+            if (suffixes.Any(s => s == ""))
+                indexes.Add(0);
+
+            indexes.Sort();
+            if (!indexes.Any() || indexes[0] != 0)
+                return "";
+
+            var result = "";
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                if (indexes[i] > i)
+                {
+                    result = $"{copySuffix} {i}";
+                    break;
+                }
+            }
+            if (result == "")
+                result = $"{copySuffix} {indexes.Count}";
+
+            return result;
         }
 
         protected override void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

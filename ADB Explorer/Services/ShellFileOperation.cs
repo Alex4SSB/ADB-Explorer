@@ -31,9 +31,9 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical)
+        public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical, bool isCopy = false)
         {
-            if (targetPath == AdbExplorerConst.RECYCLE_PATH)
+            if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
             {
                 var mdTask = Task.Run(() => MakeDir(device, AdbExplorerConst.RECYCLE_PATH));
                 mdTask.ContinueWith((t) =>
@@ -42,26 +42,31 @@ namespace ADB_Explorer.Services
                     {
                         foreach (var item in items)
                         {
-                            Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
+                            Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, item.FullName, currentPath, fileList, logical));
                         }
                     });
                 });
             }
-            else if (targetPath is null && currentPath == AdbExplorerConst.RECYCLE_PATH)
+            else if (targetPath is null && currentPath == AdbExplorerConst.RECYCLE_PATH) // Restore
             {
                 foreach (var item in items)
                 {
                     if (AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath))
                         continue;
 
-                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, currentPath, fileList, logical));
+                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList, logical));
                 }
             }
             else
             {
                 foreach (var item in items)
                 {
-                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, currentPath, fileList, logical));
+                    var targetName = item.FullName;
+                    if (item.ParentPath == targetPath)
+                    {
+                        targetName = $"{((FileClass)item).NoExtName}{FileClass.ExistingIndexes(fileList, ((FileClass)item).NoExtName, isCopy)}{((FileClass)item).Extension}";
+                    }
+                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, logical, isCopy));
                 }
             }
         }
