@@ -2943,7 +2943,7 @@ namespace ADB_Explorer
             CutItems.Clear();
         }
 
-        private void PasteFiles()
+        private async void PasteFiles()
         {
             var targetPath = "";
             bool isCopy = CutItems[0].CutState is FileClass.CutType.Copy;
@@ -2953,7 +2953,18 @@ namespace ADB_Explorer
                 targetPath = CurrentPath;
             }
             else
+            {
+                var result = await DialogService.ShowConfirmation(
+                    $"Any conflicts will be overwritten",
+                    "Missing beta feature",
+                    primaryText: "Ok",
+                    icon: DialogService.DialogIcon.Exclamation);
+
+                if (result.Item1 is ContentDialogResult.None)
+                    return;
+
                 targetPath = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
+            }
 
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
 
@@ -3100,8 +3111,17 @@ namespace ADB_Explorer
             RestoreItems();
         }
 
-        private void RestoreItems()
+        private async void RestoreItems()
         {
+            var result = await DialogService.ShowConfirmation(
+                    $"Any conflicts will be overwritten",
+                    "Missing beta feature",
+                    primaryText: "Ok",
+                    icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 is ContentDialogResult.None)
+                return;
+
             var restoreItems = (!selectedFiles.Any() ? DirectoryLister.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
             if (!selectedFiles.Any())
                 EnableRecycleButtons();
@@ -3118,6 +3138,50 @@ namespace ADB_Explorer
         {
             Process.Start(Process.GetCurrentProcess().MainModule.FileName);
             Application.Current.Shutdown();
+        }
+
+        private void AndroidRobotLicense_Click(object sender, RoutedEventArgs e)
+        {
+            HyperlinkButton ccLink = new()
+            {
+                Content = "Creative Commons",
+                ToolTip = "https://creativecommons.org/licenses/by-sa/3.0/",
+                NavigateUri = new("https://creativecommons.org/licenses/by-sa/3.0/"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+            };
+            HyperlinkButton apacheLink = new()
+            {
+                Content = "Apache",
+                ToolTip = "https://www.apache.org/licenses/LICENSE-2.0",
+                NavigateUri = new("https://www.apache.org/licenses/LICENSE-2.0"),
+                HorizontalAlignment = HorizontalAlignment.Center,
+            };
+            apacheLink.SetValue(Grid.ColumnProperty, 1);
+
+            SimpleStackPanel stack = new()
+            {
+                Spacing = 8,
+                Children =
+                {
+                    new TextBlock()
+                    {
+                        TextWrapping = TextWrapping.Wrap,
+                        Text = "The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License."
+                    },
+                    new TextBlock()
+                    {
+                        TextWrapping = TextWrapping.Wrap,
+                        Text = "The APK icon is licensed under the Apache License, Version 2.0."
+                    },
+                    new Grid()
+                    {
+                        ColumnDefinitions = { new(), new() },
+                        Children = { ccLink, apacheLink }
+                    }
+                }
+            };
+
+            DialogService.ShowDialog(stack, "The Android Robot Icon(s)", DialogService.DialogIcon.Informational);
         }
     }
 }

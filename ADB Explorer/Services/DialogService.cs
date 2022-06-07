@@ -42,6 +42,11 @@ namespace ADB_Explorer.Services
                 }
             }
 
+            ShowDialog(content, title, icon);
+        }
+
+        public static void ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None)
+        {
             windowDialog.Content = content;
             windowDialog.Title = title;
             windowDialog.PrimaryButtonText = null;

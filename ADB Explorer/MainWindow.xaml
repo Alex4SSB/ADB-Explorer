@@ -7,6 +7,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:properties="clr-namespace:ADB_Explorer.Properties"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="MainWin"
@@ -2470,34 +2471,48 @@
                         <Grid
                             x:Name="MissingAdbGrid"
                             Grid.Row="1"
-                            Margin="30,0,40,8"
-                            HorizontalAlignment="Center"
+                            Margin="-8,0,10,10"
                             Visibility="Collapsed">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <ui:FontIcon
-                                Margin="8,2,8,0"
-                                Glyph="&#xEA39;"
-                                Style="{StaticResource GlyphFont}" />
-                            <TextBlock
-                                x:Name="MissingAdbTextblock"
-                                Grid.Column="1"
-                                FontWeight="Bold"
-                                Text="Could not find ADB in the environment PATH"
-                                TextWrapping="Wrap" />
-                            <TextBlock
-                                x:Name="AdbVersionTooLowTextblock"
-                                Grid.Column="1"
-                                FontWeight="Bold"
-                                Text="ADB version too low"
-                                TextWrapping="Wrap"
-                                Visibility="Collapsed" />
+                            <Border
+                                Background="{DynamicResource NoticeBorderBackground}"
+                                BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
+                                BorderThickness="1"
+                                Style="{StaticResource BorderStyle}">
+                                <StackPanel Margin="4,8">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <ui:FontIcon
+                                            Margin="8,2,8,0"
+                                            Glyph="&#xEA39;"
+                                            Style="{StaticResource GlyphFont}" />
+                                        <TextBlock
+                                            x:Name="MissingAdbTextblock"
+                                            Grid.Column="1"
+                                            FontWeight="Bold"
+                                            Text="Could not find ADB in the environment PATH"
+                                            TextWrapping="Wrap" />
+                                        <TextBlock
+                                            x:Name="AdbVersionTooLowTextblock"
+                                            Grid.Column="1"
+                                            FontWeight="Bold"
+                                            Text="ADB version too low"
+                                            TextWrapping="Wrap"
+                                            Visibility="Collapsed" />
+                                    </Grid>
+                                    <ui:HyperlinkButton
+                                        Margin="8,0"
+                                        Content="Download Android SDK Platform-Tools"
+                                        NavigateUri="https://developer.android.com/studio/releases/platform-tools"
+                                        ToolTip="https://developer.android.com/studio/releases/platform-tools" />
+                                </StackPanel>
+                            </Border>
                         </Grid>
                         <ScrollViewer Grid.Row="2" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                             <ui:SimpleStackPanel
-                                Margin="6,0,24,0"
+                                Margin="6,0,24,6"
                                 HorizontalAlignment="Left"
                                 Spacing="6">
                                 <Expander Header="ADB">
@@ -2630,10 +2645,51 @@
                                 <Separator />
                                 <Expander Header="About">
                                     <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontSize="18" Text="ADB Explorer" />
+                                            <TextBlock
+                                                Margin="10,0,0,1"
+                                                VerticalAlignment="Bottom"
+                                                Text="v" />
+                                            <TextBlock
+                                                Margin="2,0,0,1"
+                                                VerticalAlignment="Bottom"
+                                                Text="{x:Static properties:Resources.AppVersion}" />
+                                        </StackPanel>
+                                        <ui:SimpleStackPanel Orientation="Horizontal" Spacing="20">
+                                            <ui:HyperlinkButton
+                                                Content="GitHub repository"
+                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer"
+                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer" />
+                                            <ui:HyperlinkButton
+                                                Content="Privacy Policy"
+                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
+                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
+                                        </ui:SimpleStackPanel>
                                         <CheckBox
                                             Content="Check For Updates"
                                             IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}"
                                             ToolTip="Checks for updates each time the app is launched" />
+                                        <TextBlock
+                                            Margin="0,16,0,0"
+                                            FontWeight="Bold"
+                                            Text="Attributions &amp; Third Party Licenses:" />
+                                        <ui:HyperlinkButton
+                                            Content="ModernWPF"
+                                            NavigateUri="https://github.com/Kinnara/ModernWpf"
+                                            ToolTip="https://github.com/Kinnara/ModernWpf" />
+                                        <ui:HyperlinkButton
+                                            Content="Fluent UI System Icons"
+                                            NavigateUri="https://github.com/microsoft/fluentui-system-icons/blob/master/LICENSE"
+                                            ToolTip="https://github.com/microsoft/fluentui-system-icons/blob/master/LICENSE" />
+                                        <ui:HyperlinkButton
+                                            Content="Icons8"
+                                            NavigateUri="https://icons8.com"
+                                            ToolTip="https://icons8.com" />
+                                        <ui:HyperlinkButton
+                                            Click="AndroidRobotLicense_Click"
+                                            Content="The Android Robot Icon(s)"
+                                            ToolTip="See terms" />
                                     </StackPanel>
                                 </Expander>
                             </ui:SimpleStackPanel>

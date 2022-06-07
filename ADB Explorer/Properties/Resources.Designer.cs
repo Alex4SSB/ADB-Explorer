@@ -63,6 +63,16 @@ namespace ADB_Explorer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
+        public static System.Drawing.Icon adb_explorer_icon_v4_icons8_combined {
+            get {
+                object obj = ResourceManager.GetObject("adb_explorer_icon_v4_icons8_combined", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
         public static System.Drawing.Icon APK_icon {
             get {
                 object obj = ResourceManager.GetObject("APK_icon", resourceCulture);
@@ -80,7 +90,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.7.0.
+        ///   Looks up a localized string similar to 0.7.0.0.
         /// </summary>
         public static string AppVersion {
             get {

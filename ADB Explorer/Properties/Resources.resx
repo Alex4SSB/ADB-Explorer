@@ -118,6 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="adb_explorer_icon_v4_icons8_combined" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\adb_explorer_icon_v4_icons8_combined.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="APK_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\APK_format_icon_2014-2019_.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -125,6 +128,6 @@
     <value>ADB Explorer</value>
   </data>
   <data name="AppVersion" xml:space="preserve">
-    <value>0.7.0</value>
+    <value>0.7.0.0</value>
   </data>
 </root>
