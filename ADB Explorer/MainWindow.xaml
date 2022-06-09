@@ -2472,7 +2472,7 @@
                             x:Name="MissingAdbGrid"
                             Grid.Row="1"
                             Margin="-8,0,10,10"
-                            Visibility="Collapsed">
+                            Visibility="Visible">
                             <Border
                                 Background="{DynamicResource NoticeBorderBackground}"
                                 BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
@@ -2504,9 +2504,9 @@
                                     </Grid>
                                     <ui:HyperlinkButton
                                         Margin="8,0"
-                                        Content="Download Android SDK Platform-Tools"
-                                        NavigateUri="https://developer.android.com/studio/releases/platform-tools"
-                                        ToolTip="https://developer.android.com/studio/releases/platform-tools" />
+                                        Content="Learn More About ADB"
+                                        NavigateUri="https://developer.android.com/studio/command-line/adb"
+                                        ToolTip="https://developer.android.com/studio/command-line/adb" />
                                 </StackPanel>
                             </Border>
                         </Grid>
