@@ -17,6 +17,7 @@ namespace ADB_Explorer.Models
         public static readonly string RECYCLE_INDEX_PATH = $"{RECYCLE_PATH}/{RECYCLE_INDEX_FILE}";
         public static readonly string RECYCLE_INDEX_BACKUP_PATH = $"{RECYCLE_PATH}/{RECYCLE_INDEX_BACKUP_FILE}";
 
+        public static readonly string[] RECYCLE_INDEXES = { RECYCLE_INDEX_FILE, RECYCLE_INDEX_BACKUP_FILE };
         public static readonly string[] RECYCLE_INDEX_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH };
         public static readonly string[] RECYCLE_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH, RECYCLE_PATH };
 

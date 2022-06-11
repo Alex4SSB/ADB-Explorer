@@ -15,31 +15,6 @@ namespace ADB_Explorer.Services
         private const string GET_PROP = "getprop";
         private const string ANDROID_VERSION = "ro.build.version.release";
         private const string BATTERY = "dumpsys battery";
-        
-        /// <summary>
-        /// Exclude the recycle folder, exclude content of sub-folders, include all files (including hidden), exclude the recycle index file, discard errors, count lines
-        /// </summary>
-        private static readonly string[] FIND_RECYCLE_COUNT_PARAMS =
-        {
-            "-maxdepth",
-            "1",
-            "-mindepth",
-            "1",
-            "\\(",
-            "-iname",
-            "\"\\*\"",
-            "!",
-            "-iname",
-            $"\"{AdbExplorerConst.RECYCLE_INDEX_FILE}\"",
-            "!",
-            "-iname",
-            $"\"{AdbExplorerConst.RECYCLE_INDEX_BACKUP_FILE}\"",
-            "\\)",
-            @"2>/dev/null",
-            "|",
-            "wc",
-            "-l"
-        };
 
         /// <summary>
         /// First partition of MMC block device 0 / 1
@@ -355,15 +330,7 @@ namespace ADB_Explorer.Services
                     throw new Exception(stderr);
             }
 
-            public ulong CountRecycle() => CountRecycle(ID);
-
-            public static ulong CountRecycle(string deviceID)
-            {
-                if (ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new[] { AdbExplorerConst.RECYCLE_PATH + "/" }.Concat(FIND_RECYCLE_COUNT_PARAMS).ToArray()) != 0)
-                    return 0;
-
-                return ulong.TryParse(stdout, out var count) ? count : 0;
-            }
+            public ulong CountRecycle() => ADBService.CountRecycle(ID);
         }
     }
 }

@@ -32,6 +32,12 @@ namespace ADB_Explorer.Services
         private const string GET_DEVICES = "devices";
         private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
 
+        // find /sdcard/.Trash-AdbExplorer/ -maxdepth 1 -mindepth 1 \( -iname "\*" ! -iname ".RecycleIndex" ! -iname ".RecycleIndex.bak" \) 2>/dev/null | wc -l
+        // Exclude the recycle folder, exclude content of sub-folders, include all files (including hidden), exclude the recycle index file, discard errors, count lines
+        private static readonly string[] FIND_COUNT_PARAMS_1 = { "-maxdepth", "1", "-mindepth", "1", "\\(" };
+        private static readonly string[] FIND_COUNT_PARAMS_2 = { "\\)", @"2>/dev/null" };
+        private static readonly string[] FIND_COUNT_PARAMS_3 = { "|", "wc", "-l" };
+
         public static bool IsMdnsEnabled { get; set; }
 
         public class ProcessFailedException : Exception
@@ -305,6 +311,66 @@ namespace ADB_Explorer.Services
                 return false;
 
             return stdout.Trim() == "root";
+        }
+
+        public static ulong CountFiles(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
+        {
+            string[] args = PrepFindArgs(path, includeNames, excludeNames, true);
+
+            ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, args);
+
+            return ulong.TryParse(stdout, out var count) ? count : 0;
+        }
+
+        public static string[] FindFiles(string deviceID, IEnumerable<string> paths)
+        {
+            ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
+
+            return stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
+        private static string[] PrepFindArgs(string path, IEnumerable<string> includeNames, IEnumerable<string> excludeNames, bool countOnly)
+        {
+            if (includeNames is not null && excludeNames is not null)
+                throw new ArgumentException("Valid combinations include:\n• includeNames = null, excludeNames = null\n• includeNames != null, excludeNames = null\n• includeNames = null, excludeNames != null");
+
+            if (!path.EndsWith('/'))
+                path += "/";
+
+            string[] args = { EscapeAdbShellString(path) };
+            args = args.Concat(FIND_COUNT_PARAMS_1).ToArray();
+
+            if (includeNames is not null)
+            {
+                for (int i = 0; i < includeNames.Count(); i++)
+                {
+                    if (i > 0)
+                        args = args.Append("-o").ToArray();
+
+                    args = args.Concat(new[] { "-iname", EscapeAdbShellString(includeNames.ElementAt(i)) }).ToArray();
+                }
+            }
+            else
+                args = args.Concat(new[] { "-iname", "\"\\*\"" }).ToArray();
+
+            if (excludeNames is not null)
+            {
+                foreach (var item in excludeNames)
+                {
+                    args = args.Concat(new[] { "!", "-iname", EscapeAdbShellString(item) }).ToArray();
+                }
+            }
+
+            args = args.Concat(FIND_COUNT_PARAMS_2).ToArray();
+            if (countOnly)
+                args = args.Concat(FIND_COUNT_PARAMS_3).ToArray();
+
+            return args;
+        }
+
+        public static ulong CountRecycle(string deviceID)
+        {
+            return CountFiles(deviceID, RECYCLE_PATH, excludeNames: RECYCLE_INDEXES);
         }
     }
 }

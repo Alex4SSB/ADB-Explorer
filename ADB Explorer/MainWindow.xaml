@@ -1547,6 +1547,7 @@
                                             <Condition Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
                                             <Condition Binding="{Binding ElementName=MainWin, Path=TrashInProgress}" Value="False" />
+                                            <Condition Binding="{Binding ElementName=LogTextBox, Path=Visibility}" Value="Collapsed" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>

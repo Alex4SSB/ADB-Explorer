@@ -1144,7 +1144,11 @@ namespace ADB_Explorer
                     if (!string.IsNullOrEmpty(text))
                     {
                         var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                        RecycleIndex.AddRange(lines.Select(l => new TrashIndexer(l)));
+                        foreach (var item in lines)
+                        {
+                            if (!RecycleIndex.Any(indexer => indexer.ToString() == item))
+                                RecycleIndex.Add(new TrashIndexer(item));
+                        }
                     }
                 });
 
@@ -2943,44 +2947,94 @@ namespace ADB_Explorer
             CutItems.Clear();
         }
 
-        private async void PasteFiles()
+        private static void ClearCutFiles(IEnumerable<FileClass> items)
         {
-            var targetPath = "";
+            foreach (var item in items)
+            {
+                item.CutState = FileClass.CutType.None;
+            }
+            CutItems.RemoveAll(items.ToList());
+        }
+
+        private void PasteFiles()
+        {
             bool isCopy = CutItems[0].CutState is FileClass.CutType.Copy;
-
-            if (selectedFiles.Count() != 1 || isCopy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
-            {
-                targetPath = CurrentPath;
-            }
-            else
-            {
-                var result = await DialogService.ShowConfirmation(
-                    $"Any conflicts will be overwritten",
-                    "Missing beta feature",
-                    primaryText: "Ok",
-                    icon: DialogService.DialogIcon.Exclamation);
-
-                if (result.Item1 is ContentDialogResult.None)
-                    return;
-
-                targetPath = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
-            }
+            var targetPath = selectedFiles.Count() != 1 || (isCopy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
+                    ? CurrentPath
+                    : ((FileClass)ExplorerGrid.SelectedItem).FullPath;
 
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
+            bool merge = false;
+            string[] existingItems = Array.Empty<string>();
 
-            ShellFileOperation.MoveItems(device: CurrentADBDevice,
-                                         items: pasteItems,
-                                         targetPath: targetPath,
-                                         currentPath: CurrentPath,
-                                         fileList: DirectoryLister.FileList,
-                                         dispatcher: Dispatcher,
-                                         logical: DevicesObject.CurrentDevice,
-                                         isCopy: isCopy);
+            var pasteTask = Task.Run(() =>
+            {
+                if (targetPath == CurrentPath)
+                    return;
 
-            if (!isCopy)
-                ClearCutFiles();
+                if (!targetPath.EndsWith('/'))
+                    targetPath += "/";
 
-            PasteMenuButton.IsEnabled = PasteEnabled();
+                existingItems = ADBService.FindFiles(CurrentADBDevice.ID, pasteItems.Select(file => $"{targetPath}{file.FullName}"));
+                if (existingItems?.Any() is true)
+                {
+                    existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
+
+                    if (pasteItems.Any(item => item.IsDirectory && existingItems.Contains(item.FullName)))
+                        merge = true;
+                }
+            });
+
+            pasteTask.ContinueWith((t) =>
+            {
+                App.Current.Dispatcher.BeginInvoke(async () =>
+                {
+                    string primaryText = "";
+                    if (merge)
+                    {
+                        if (pasteItems.All(item => item.IsDirectory))
+                            primaryText = "Merge";
+                        else
+                            primaryText = "Merge or Replace";
+                    }
+                    else
+                        primaryText = "Replace";
+
+                    if (existingItems.Length is int count and > 0)
+                    {
+                        var result = await DialogService.ShowConfirmation(
+                            $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")} in {((FileClass)ExplorerGrid.SelectedItem).FullName}",
+                            "Paste Conflicts",
+                            primaryText: primaryText,
+                            secondaryText: count == pasteItems.Count() ? "" : "Skip",
+                            cancelText: "Cancel",
+                            icon: DialogService.DialogIcon.Exclamation);
+
+                        if (result.Item1 is ContentDialogResult.None)
+                        {
+                            return;
+                        }
+                        else if (result.Item1 is ContentDialogResult.Secondary)
+                        {
+                            pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
+                        }
+                    }
+
+                    ShellFileOperation.MoveItems(device: CurrentADBDevice,
+                                             items: pasteItems,
+                                             targetPath: targetPath,
+                                             currentPath: CurrentPath,
+                                             fileList: DirectoryLister.FileList,
+                                             dispatcher: Dispatcher,
+                                             logical: DevicesObject.CurrentDevice,
+                                             isCopy: isCopy);
+
+                    if (!isCopy)
+                        ClearCutFiles(pasteItems);
+
+                    PasteMenuButton.IsEnabled = PasteEnabled();
+                });
+            });
         }
 
         private void ContextMenuPasteItem_Click(object sender, RoutedEventArgs e)
@@ -3111,22 +3165,78 @@ namespace ADB_Explorer
             RestoreItems();
         }
 
-        private async void RestoreItems()
+        private void RestoreItems()
         {
-            var result = await DialogService.ShowConfirmation(
-                    $"Any conflicts will be overwritten",
-                    "Missing beta feature",
-                    primaryText: "Ok",
-                    icon: DialogService.DialogIcon.Exclamation);
-
-            if (result.Item1 is ContentDialogResult.None)
-                return;
-
             var restoreItems = (!selectedFiles.Any() ? DirectoryLister.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-            if (!selectedFiles.Any())
-                EnableRecycleButtons();
+            string[] existingItems = Array.Empty<string>();
+            List<FileClass> existingFiles = new();
+            bool merge = false;
 
-            ShellFileOperation.MoveItems(CurrentADBDevice, restoreItems, null, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
+            var restoreTask = Task.Run(() =>
+            {
+                existingItems = ADBService.FindFiles(CurrentADBDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
+                if (existingItems?.Any() is true)
+                {
+                    if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
+                        merge = true;
+
+                    existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
+                }
+
+                foreach (var item in restoreItems)
+                {
+                    if (existingItems.Contains(item.FullName))
+                        return;
+
+                    if (restoreItems.Count(file => file.FullName == item.FullName && file.TrashIndex.OriginalPath == item.TrashIndex.OriginalPath) > 1)
+                    {
+                        existingItems = existingItems.Append(item.FullName).ToArray();
+                        existingFiles.Add(item);
+                        if (item.IsDirectory)
+                            merge = true;
+                    }
+                }
+            });
+
+            restoreTask.ContinueWith((t) =>
+            {
+                App.Current.Dispatcher.BeginInvoke(async () =>
+                {
+                    if (existingItems.Length is int count and > 0)
+                    {
+                        var result = await DialogService.ShowConfirmation(
+                            $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")}",
+                            "Restore Conflicts",
+                            primaryText: $"{(merge ? "Merge or ": "")}Replace",
+                            secondaryText: count == restoreItems.Count() ? "" : "Skip",
+                            cancelText: "Cancel",
+                            icon: DialogService.DialogIcon.Exclamation);
+
+                        if (result.Item1 is ContentDialogResult.None)
+                        {
+                            return;
+                        }
+                        else if (result.Item1 is ContentDialogResult.Secondary)
+                        {
+                            if (existingFiles.Count() != count)
+                                restoreItems = restoreItems.Where(item => !existingItems.Contains(item.FullName));
+                            else
+                                restoreItems = restoreItems.Except(existingFiles);
+                        }
+                    }
+
+                    ShellFileOperation.MoveItems(device: CurrentADBDevice,
+                                             items: restoreItems,
+                                             targetPath: null,
+                                             currentPath: CurrentPath,
+                                             fileList: DirectoryLister.FileList,
+                                             dispatcher: Dispatcher,
+                                             logical: DevicesObject.CurrentDevice);
+
+                    if (!selectedFiles.Any())
+                        EnableRecycleButtons();
+                });
+            });
         }
 
         private void DataGridRow_Unselected(object sender, RoutedEventArgs e)

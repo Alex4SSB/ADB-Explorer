@@ -92,6 +92,7 @@ namespace ADB_Explorer.Services
         public static async Task<(ContentDialogResult, bool)> ShowConfirmation(string content,
                                             string title = "",
                                             string primaryText = "Yes",
+                                            string secondaryText = "",
                                             string cancelText = "Cancel",
                                             string checkBoxText = "",
                                             DialogIcon icon = DialogIcon.None,
@@ -116,6 +117,7 @@ namespace ADB_Explorer.Services
             windowDialog.Title = title;
             windowDialog.PrimaryButtonText = primaryText;
             windowDialog.DefaultButton = ContentDialogButton.Primary;
+            windowDialog.SecondaryButtonText = secondaryText;
             windowDialog.CloseButtonText = cancelText;
             TextHelper.SetAltText(windowDialog, Icon(icon));
 

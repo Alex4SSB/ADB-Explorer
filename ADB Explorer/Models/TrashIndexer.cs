@@ -66,7 +66,7 @@ namespace ADB_Explorer.Models
 
         public override string ToString()
         {
-            return $"{RecycleName}|{OriginalPath}|{DateModified}";
+            return $"{RecycleName}|{OriginalPath}|{DateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT)}";
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
