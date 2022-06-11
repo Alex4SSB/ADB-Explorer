@@ -5,16 +5,23 @@ namespace ADB_Explorer.Helpers
 {
     public static class ExpanderHelper
     {
-        public static bool GetIsArrowVisible(Control control) =>
-            (bool)control.GetValue(IsArrowVisibleProperty);
+        public enum ExpandArrow
+        {
+            None,
+            CW,
+            CCW
+        }
 
-        public static void SetIsArrowVisible(Control control, bool value) =>
-            control.SetValue(IsArrowVisibleProperty, value);
+        public static ExpandArrow GetExpanderArrow(Control control) =>
+            (ExpandArrow)control.GetValue(ExpanderArrowProperty);
 
-        public static readonly DependencyProperty IsArrowVisibleProperty =
+        public static void SetExpanderArrow(Control control, ExpandArrow value) =>
+            control.SetValue(ExpanderArrowProperty, value);
+
+        public static readonly DependencyProperty ExpanderArrowProperty =
             DependencyProperty.RegisterAttached(
-                "IsArrowVisible",
-                typeof(bool),
+                "ExpanderArrow",
+                typeof(ExpandArrow),
                 typeof(ExpanderHelper),
                 null);
 

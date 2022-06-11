@@ -18,8 +18,8 @@
         <DoubleAnimation
             Storyboard.TargetName="ArrowRotateTransform"
             Storyboard.TargetProperty="Angle"
-            From="0"
-            To="180"
+            From="1"
+            To="179"
             Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
@@ -27,7 +27,26 @@
         <DoubleAnimation
             Storyboard.TargetName="ArrowRotateTransform"
             Storyboard.TargetProperty="Angle"
-            To="360"
+            From="181"
+            To="359"
+            Duration="{StaticResource AnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo180CcwStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="359"
+            To="181"
+            Duration="{StaticResource AnimationDuration}" />
+    </Storyboard>
+
+    <Storyboard x:Key="RotateTo0CcwStoryboard">
+        <DoubleAnimation
+            Storyboard.TargetName="ArrowRotateTransform"
+            Storyboard.TargetProperty="Angle"
+            From="179"
+            To="1"
             Duration="{StaticResource AnimationDuration}" />
     </Storyboard>
 
@@ -171,12 +190,26 @@
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="CW" />
                 </MultiDataTrigger.Conditions>
                 <MultiDataTrigger.EnterActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo180DegreesStoryboard}" />
                 </MultiDataTrigger.EnterActions>
                 <MultiDataTrigger.ExitActions>
                     <BeginStoryboard Storyboard="{StaticResource RotateTo0DegreesStoryboard}" />
+                </MultiDataTrigger.ExitActions>
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="CCW" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo180CcwStoryboard}" />
+                </MultiDataTrigger.EnterActions>
+                <MultiDataTrigger.ExitActions>
+                    <BeginStoryboard Storyboard="{StaticResource RotateTo0CcwStoryboard}" />
                 </MultiDataTrigger.ExitActions>
             </MultiDataTrigger>
             <MultiDataTrigger>
@@ -203,7 +236,7 @@
                 <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
                 <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
             </Trigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.IsArrowVisible)}" Value="False">
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Expander, Mode=FindAncestor}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="None">
                 <Setter TargetName="arrow" Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </ControlTemplate.Triggers>
@@ -373,7 +406,7 @@
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
                         </MultiDataTrigger>
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsArrowVisible)}" Value="False">
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.ExpanderArrow)}" Value="None">
                             <Setter TargetName="DockPanel" Property="Margin" Value="0,1" />
                         </DataTrigger>
                         <Trigger Property="helpers:ExpanderHelper.IsContentCollapsed" Value="True">
@@ -406,7 +439,7 @@
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="True" />
+        <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CW" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
         <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
         <Setter Property="ExpandDirection" Value="Down" />
@@ -429,7 +462,7 @@
                 <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>
-        <Setter Property="helpers:ExpanderHelper.IsArrowVisible" Value="False" />
+        <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="None" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
         <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
         <Setter Property="IsExpanded" Value="{Binding DeviceSelected, Mode=TwoWay}" />

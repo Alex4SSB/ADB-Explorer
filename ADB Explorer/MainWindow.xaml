@@ -1593,7 +1593,7 @@
             <Expander
                 Grid.Row="4"
                 Margin="0,0,0,-3"
-                helpers:ExpanderHelper.IsArrowVisible="False"
+                helpers:ExpanderHelper.ExpanderArrow="None"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
                 ExpandDirection="Up">
                 <Expander.Style>
@@ -2443,7 +2443,9 @@
                 <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                 </Style>
-                <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander" />
+                <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
+                    <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CCW" />
+                </Style>
             </ui:SplitView.Resources>
             <ui:SplitView.Pane>
                 <Border
@@ -2472,7 +2474,7 @@
                             x:Name="MissingAdbGrid"
                             Grid.Row="1"
                             Margin="-8,0,10,10"
-                            Visibility="Visible">
+                            Visibility="Collapsed">
                             <Border
                                 Background="{DynamicResource NoticeBorderBackground}"
                                 BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
