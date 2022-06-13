@@ -2075,7 +2075,7 @@ namespace ADB_Explorer
 
         private void EnableSplitViewAnimation()
         {
-            bool enableAnimation = Settings.IsAnimated && SettingsSplitView.ActualHeight < SPLITVIEW_HEIGHT_ANIMATED;
+            bool enableAnimation = Settings.IsAnimated && WindowState is not WindowState.Maximized;
             StyleHelper.SetActivateAnimation(SettingsSplitView, enableAnimation);
             StyleHelper.SetActivateAnimation(DevicesSplitView, enableAnimation);
         }

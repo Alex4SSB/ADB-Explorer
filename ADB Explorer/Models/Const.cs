@@ -69,7 +69,6 @@ namespace ADB_Explorer.Models
         public static readonly double MAX_PANE_HEIGHT_RATIO = 0.4;
         public static readonly int MIN_PANE_HEIGHT = 150;
         public static readonly double MIN_PANE_HEIGHT_RATIO = 0.15;
-        public static readonly int SPLITVIEW_HEIGHT_ANIMATED = 1300;
 
         public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM" };
 
