@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
 
@@ -13,6 +14,7 @@
     <!--  Template copied from ModernWPF to be modified  -->
 
     <Style x:Key="SplitViewStyle" TargetType="ui:SplitView">
+        <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="OpenPaneLength" Value="{DynamicResource SplitViewOpenPaneThemeLength}" />
@@ -20,6 +22,9 @@
         <Setter Property="PaneBackground" Value="{DynamicResource SystemControlPageBackgroundChromeLowBrush}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="False">
+                <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="False" />
+            </DataTrigger>
+            <Trigger Property="helpers:StyleHelper.ActivateAnimation" Value="False">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ui:SplitView">
@@ -782,7 +787,7 @@
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
-            </DataTrigger>
+            </Trigger>
         </Style.Triggers>
     </Style>
 

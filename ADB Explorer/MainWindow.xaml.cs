@@ -2070,6 +2070,14 @@ namespace ADB_Explorer
         {
             PopulateButtons(TextHelper.GetAltText(PathBox));
             ResizeDetailedView();
+            EnableSplitViewAnimation();
+        }
+
+        private void EnableSplitViewAnimation()
+        {
+            bool enableAnimation = Settings.IsAnimated && SettingsSplitView.ActualHeight < SPLITVIEW_HEIGHT_ANIMATED;
+            StyleHelper.SetActivateAnimation(SettingsSplitView, enableAnimation);
+            StyleHelper.SetActivateAnimation(DevicesSplitView, enableAnimation);
         }
 
         private void ResizeDetailedView()
