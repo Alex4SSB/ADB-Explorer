@@ -2626,15 +2626,23 @@
                                             IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ForceFluentStyles}"
                                             Style="{StaticResource ForceFluentVisibility}" />
                                         <CheckBox Content="Disable Hardware Acceleration" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}" />
-                                        <CheckBox
-                                            HorizontalContentAlignment="Stretch"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=DisableAnimation}"
-                                            ToolTip="Does not affect progress bars and rings">
+                                        <CheckBox HorizontalContentAlignment="Stretch" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=DisableAnimation}">
                                             <Grid>
                                                 <TextBlock Text="Disable Animations" />
-                                                <Button Click="RestartButton_Click" Style="{StaticResource RestartAppButtonStyle}">
-                                                    <ui:FontIcon />
-                                                </Button>
+                                                <ui:SimpleStackPanel
+                                                    HorizontalAlignment="Right"
+                                                    Orientation="Horizontal"
+                                                    Spacing="4">
+                                                    <ui:SimpleStackPanel.Resources>
+                                                        <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="Button" />
+                                                    </ui:SimpleStackPanel.Resources>
+                                                    <Button Click="DisableAnimationInfo_Click" ToolTip="More Info">
+                                                        <ui:FontIcon Glyph="&#xE82F;" />
+                                                    </Button>
+                                                    <Button Click="RestartButton_Click" ToolTip="Restart app for changes to take effect">
+                                                        <ui:FontIcon Glyph="&#xE72C;" />
+                                                    </Button>
+                                                </ui:SimpleStackPanel>
                                             </Grid>
                                         </CheckBox>
                                     </StackPanel>

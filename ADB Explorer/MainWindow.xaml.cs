@@ -3301,5 +3301,11 @@ namespace ADB_Explorer
 
             DialogService.ShowDialog(stack, "The Android Robot Icon(s)", DialogService.DialogIcon.Informational);
         }
+
+        private void DisableAnimationInfo_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsSplitView.IsPaneOpen = false;
+            DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
+        }
     }
 }

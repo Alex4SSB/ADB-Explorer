@@ -120,7 +120,7 @@ namespace ADB_Explorer.Services
             windowDialog.SecondaryButtonText = secondaryText;
             windowDialog.CloseButtonText = cancelText;
             TextHelper.SetAltText(windowDialog, Icon(icon));
-
+            
             var result = await windowDialog.ShowAsync();
 
             return (result, IsDialogChecked);
@@ -129,6 +129,12 @@ namespace ADB_Explorer.Services
         private static void Checkbox_Checked(object sender, System.Windows.RoutedEventArgs e)
         {
             IsDialogChecked = DialogContentCheckbox.IsChecked.Value;
+        }
+
+        public static bool IsOpen
+        {
+            get => windowDialog.IsVisible;
+            set => windowDialog.Hide();
         }
     }
 }
