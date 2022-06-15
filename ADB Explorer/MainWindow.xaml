@@ -1337,7 +1337,7 @@
                                     </Style>
                                 </DataGridTextColumn.EditingElementStyle>
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
                                         <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
                                         <Setter Property="FontSize" Value="{Binding Source={StaticResource FontSize}}" />
@@ -1365,7 +1365,7 @@
                                 Header="Original Location"
                                 IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,8,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Opacity" Value="1" />
@@ -1386,7 +1386,7 @@
                                 IsReadOnly="True"
                                 SortMemberPath="ModifiedTime">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,8,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Opacity" Value="1" />
@@ -1414,7 +1414,7 @@
                                 IsReadOnly="True"
                                 SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0,0,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Text" Value="{Binding TypeName}" />
@@ -1438,7 +1438,7 @@
                                 IsReadOnly="True"
                                 SortMemberPath="Size">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                                         <Setter Property="Margin" Value="4,0" />
                                         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
                                         <Setter Property="Opacity" Value="1" />
