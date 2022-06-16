@@ -15,11 +15,15 @@ namespace ADB_Explorer.Services
         private const string GET_PROP = "getprop";
         private const string ANDROID_VERSION = "ro.build.version.release";
         private const string BATTERY = "dumpsys battery";
+        private const string MMC_PROP = "vold.microsd.uuid";
+        private const string OTG_PROP = "vold.otgstorage.uuid";
 
         /// <summary>
         /// First partition of MMC block device 0 / 1
         /// </summary>
         private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" };
+
+        private static readonly string[] EMULATED_DRIVES_GREP = { "|", "grep", "-E", "'/mnt/media_rw/|/storage/'" };
 
         public class AdbDevice : Device
         {
@@ -252,7 +256,7 @@ namespace ADB_Explorer.Services
                 else if (intStorage.Any())
                     drives.Add(intStorage.First());
 
-                var extStorage = ReadDrives(AdbRegEx.EMULATED_ONLY, "|", "grep", "-E", "'/mnt/media_rw/|/data/'");
+                var extStorage = ReadDrives(AdbRegEx.EMULATED_ONLY, EMULATED_DRIVES_GREP);
                 if (extStorage is null)
                     return drives;
                 else
@@ -304,6 +308,9 @@ namespace ADB_Explorer.Services
                     return props;
                 }
             }
+
+            public string MmcProp => Props.ContainsKey(MMC_PROP) ? Props[MMC_PROP] : null;
+            public string OtgProp => Props.ContainsKey(OTG_PROP) ? Props[OTG_PROP] : null;
 
             public string GetAndroidVersion()
             {

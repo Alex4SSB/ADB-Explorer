@@ -563,7 +563,21 @@ namespace ADB_Explorer.Models
 
         public static Drive GetMmcDrive(IEnumerable<Drive> drives, string deviceID)
         {
+            if (Data.CurrentADBDevice.MmcProp is string mmcId)
+            {
+                var mmcDrive = drives.Where(d => d.ID == mmcId);
+                if (mmcDrive.Any())
+                {
+                    var mmc = mmcDrive.First();
+                    mmc.SetMmc();
+                    return mmc;
+                }
+            }
+            else if (Data.CurrentADBDevice.OtgProp is not null)
+                return null;
+
             var externalDrives = drives.Where(d => d.Type == DriveType.Unknown);
+
             switch (externalDrives.Count())
             {
                 case > 1:
