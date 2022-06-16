@@ -186,6 +186,9 @@ namespace ADB_Explorer
 
             foreach (Log item in e.NewItems)
             {
+                if (Dispatcher.HasShutdownStarted)
+                    return;
+
                 Dispatcher.Invoke(() =>
                 {
                     if (PauseAutoScrollButton.IsChecked == false)
@@ -2260,9 +2263,16 @@ namespace ADB_Explorer
             if (!ExplorerGrid.Visible())
                 return;
 
-            CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Filter = !Settings.ShowHiddenItems
-                ? (new(HideFiles()))
-                : (new(file => !IsHiddenRecycleItem((FileClass)file)));
+            var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
+
+            collectionView.Filter = !Settings.ShowHiddenItems
+                ? (new(global::ADB_Explorer.MainWindow.HideFiles()))
+                : (new(file => !global::ADB_Explorer.MainWindow.IsHiddenRecycleItem((global::ADB_Explorer.Models.FileClass)file)));
+
+            ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
+            collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new("IsDirectory", ListSortDirection.Descending));
+            collectionView.SortDescriptions.Add(new("FullName", ListSortDirection.Ascending));
         }
 
         private static Predicate<object> HideFiles() => file =>
@@ -3310,6 +3320,24 @@ namespace ADB_Explorer
         {
             SettingsSplitView.IsPaneOpen = false;
             DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
+        }
+
+        private ListSortDirection Invert(ListSortDirection? value)
+        {
+            return value is ListSortDirection and ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+        }
+
+        private void ExplorerGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
+            var sortDirection = Invert(e.Column.SortDirection);
+            e.Column.SortDirection = sortDirection;
+
+            collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new("IsDirectory", Invert(sortDirection)));
+            collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
+
+            e.Handled = true;
         }
     }
 }

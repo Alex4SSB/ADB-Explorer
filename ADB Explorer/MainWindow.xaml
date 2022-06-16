@@ -1234,6 +1234,7 @@
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
+                        Sorting="ExplorerGrid_Sorting"
                         IsReadOnly="False"
                         ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
                         KeyboardNavigation.TabNavigation="Once"
