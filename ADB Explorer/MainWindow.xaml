@@ -542,9 +542,6 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <StackPanel.Resources>
-                            <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock" />
-                        </StackPanel.Resources>
                         <TextBlock Text="{Binding Available, Mode=OneWay}" />
                         <TextBlock Text=" free of " />
                         <TextBlock Text="{Binding Size, Mode=OneWay}" />
@@ -564,7 +561,7 @@
                             </Style>
                         </Grid.Style>
                         <Grid.Resources>
-                            <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
+                            <Style TargetType="TextBlock">
                                 <Setter Property="VerticalAlignment" Value="Center" />
                             </Style>
                         </Grid.Resources>
@@ -583,7 +580,7 @@
                             <TextBlock Text=" Item" />
                             <TextBlock Text="s">
                                 <TextBlock.Style>
-                                    <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
+                                    <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center" />
                                         <Setter Property="Visibility" Value="Visible" />
                                         <Style.Triggers>
@@ -597,7 +594,7 @@
                         </StackPanel>
                         <TextBlock Text="Empty">
                             <TextBlock.Style>
-                                <Style BasedOn="{StaticResource DriveTextBlockStyle}" TargetType="TextBlock">
+                                <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>

@@ -229,8 +229,9 @@
                 <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="true">
-                <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                <Setter TargetName="Content" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter TargetName="arrow" Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:StyleHelper.PressedForeground)}" />
+                <Setter TargetName="Content" Property="TextElement.Foreground" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:StyleHelper.PressedForeground)}" />
+                <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:StyleHelper.PressedForeground)}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="false">
                 <Setter TargetName="arrow" Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
@@ -444,6 +445,7 @@
         <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
         <Setter Property="ExpandDirection" Value="Down" />
         <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
+        <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />
     </Style>
 
     <Style

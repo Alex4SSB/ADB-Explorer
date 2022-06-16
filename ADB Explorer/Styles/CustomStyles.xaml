@@ -49,7 +49,7 @@
                 <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -212,7 +212,7 @@
                 <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Text" Value="{Binding Name}" />
@@ -993,7 +993,7 @@
     </Style>
     <Style
         x:Key="DriveItemStyle"
-        BasedOn="{StaticResource ButtonStyle}"
+        BasedOn="{StaticResource DriveButtonStyle}"
         TargetType="Button">
         <Style.Triggers>
             <Trigger Property="helpers:RepeaterHelper.IsSelected" Value="True">
@@ -1034,28 +1034,9 @@
             <DataTrigger Binding="{Binding Type}" Value="Unknown">
                 <Setter Property="Visibility" Value="Hidden" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DriveTextBlockStyle" TargetType="TextBlock">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="DriveNameTextBlockStyle"
-        BasedOn="{StaticResource DriveTextBlockStyle}"
-        TargetType="TextBlock">
+    <Style x:Key="DriveNameTextBlockStyle" TargetType="TextBlock">
         <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <Style x:Key="ItemsCountStyle" TargetType="TextBlock">

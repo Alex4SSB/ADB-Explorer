@@ -7,13 +7,14 @@
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <KeyTime x:Key="AnimationDurationKeyTime">00:00:00.2</KeyTime>
     <Style
-        x:Key="ButtonStyle"
+        x:Key="BaseButtonStyle"
         BasedOn="{StaticResource DefaultButtonStyle}"
         TargetType="Button">
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
         <Setter Property="Foreground" Value="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}" />
+
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
@@ -284,7 +285,7 @@
                                 <Trigger Property="IsPressed" Value="True">
                                     <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
                                     <Setter Property="BorderBrush" Value="{DynamicResource AdbButtonBorderPressed}" />
-                                    <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                                    <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.PressedForeground)}" />
                                 </Trigger>
 
                                 <!--  Disabled  -->
@@ -376,5 +377,20 @@
         </Style.Triggers>
     </Style>
 
+    <Style
+        x:Key="DriveButtonStyle"
+        BasedOn="{StaticResource BaseButtonStyle}"
+        TargetType="Button">
+        <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />
+    </Style>
+
+    <Style
+        x:Key="ButtonStyle"
+        BasedOn="{StaticResource BaseButtonStyle}"
+        TargetType="Button">
+        <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+    </Style>
+
     <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button" />
+
 </ResourceDictionary>

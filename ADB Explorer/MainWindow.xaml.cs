@@ -936,7 +936,11 @@ namespace ADB_Explorer
         private void UpdateRecycledItemsCount()
         {
             var countTask = Task.Run(() => CurrentADBDevice.CountRecycle());
-            countTask.ContinueWith((t) => Dispatcher.Invoke(() => DevicesObject.CurrentDevice.RecycledItemsCount = t.Result));
+            countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
+            {
+                if (!t.IsCanceled)
+                    DevicesObject.CurrentDevice.RecycledItemsCount = t.Result;
+            }));
         }
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
@@ -2165,7 +2169,7 @@ namespace ADB_Explorer
                 var trashTask = Task.Run(() => string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)));
                 trashTask.ContinueWith((t) =>
                 {
-                    if (!t.Result)
+                    if (!t.IsCanceled && !t.Result)
                     {
                         App.Current.Dispatcher.Invoke(() => DevicesObject.CurrentDevice.Drives.Add(new(path: RECYCLE_PATH)));
                     }

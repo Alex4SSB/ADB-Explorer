@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 
 namespace ADB_Explorer.Helpers
 {
@@ -80,6 +81,19 @@ namespace ADB_Explorer.Helpers
             DependencyProperty.RegisterAttached(
                 "BeginAnimation",
                 typeof(bool),
+                typeof(StyleHelper),
+                null);
+
+        public static Brush GetPressedForeground(Control control) =>
+            (Brush)control.GetValue(PressedForegroundProperty);
+
+        public static void SetPressedForeground(Control control, Brush value) =>
+            control.SetValue(PressedForegroundProperty, value);
+
+        public static readonly DependencyProperty PressedForegroundProperty =
+            DependencyProperty.RegisterAttached(
+                "PressedForeground",
+                typeof(Brush),
                 typeof(StyleHelper),
                 null);
     }

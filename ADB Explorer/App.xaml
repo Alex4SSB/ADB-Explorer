@@ -88,6 +88,7 @@
             <Color x:Key="DarkAdbButtonBorderPressed">#22FFFFFF</Color>
             <Color x:Key="DarkAdbButtonBorderDisabled">#42FFFFFF</Color>
             <Color x:Key="DarkAdbButtonForegroundPressedOrDisabled">#2DFFFFFF</Color>
+            <Color x:Key="DarkDriveForegroundPressed">#90FFFFFF</Color>
 
             <Color x:Key="LightAdbButtonBackgroundNormal">#B3FFFFFF</Color>
             <Color x:Key="LightAdbButtonBackgroundMouseOver">#80F2F2F2</Color>
@@ -96,6 +97,7 @@
             <Color x:Key="LightAdbButtonBorderPressed">#0F000000</Color>
             <Color x:Key="LightAdbButtonBorderDisabled">#2F000000</Color>
             <Color x:Key="LightAdbButtonForegroundPressedOrDisabled">#5C000000</Color>
+            <Color x:Key="LightDriveForegroundPressed">#C0000000</Color>
 
             <Color x:Key="LightFluentButtonBorderGradient1">#29000000</Color>
             <Color x:Key="LightFluentButtonBorderGradient2">#0F000000</Color>
@@ -161,6 +163,7 @@
                 <SolidColorBrush x:Key="AdbButtonBorderDisabled" Color="{DynamicResource LightAdbButtonBorderDisabled}" />
                 <SolidColorBrush x:Key="AdbButtonForegroundPressedOrDisabled" Color="{DynamicResource LightAdbButtonForegroundPressedOrDisabled}" />
 
+                <SolidColorBrush x:Key="DriveForegroundPressed" Color="{DynamicResource LightDriveForegroundPressed}" />
                 <SolidColorBrush x:Key="AccentButtonBackgroundDisabled" Color="{DynamicResource LightAccentButtonBackgroundDisabled}" />
 
                 <SolidColorBrush x:Key="CheckboxBackgroundNormal" Color="{DynamicResource LightCheckboxBackgroundNormal}" />
