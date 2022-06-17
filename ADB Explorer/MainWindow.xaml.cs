@@ -659,7 +659,7 @@ namespace ADB_Explorer
             LoadSettings();
             InitFileOpColumns();
 
-            if (Settings.CheckForUpdates)
+            if (Settings.CheckForUpdates is true)
                 CheckForUpdates(Dispatcher);
         }
 
@@ -2266,8 +2266,8 @@ namespace ADB_Explorer
             var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
 
             collectionView.Filter = !Settings.ShowHiddenItems
-                ? (new(global::ADB_Explorer.MainWindow.HideFiles()))
-                : (new(file => !global::ADB_Explorer.MainWindow.IsHiddenRecycleItem((global::ADB_Explorer.Models.FileClass)file)));
+                ? (new(HideFiles()))
+                : (new(file => !IsHiddenRecycleItem((FileClass)file)));
 
             ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
             collectionView.SortDescriptions.Clear();

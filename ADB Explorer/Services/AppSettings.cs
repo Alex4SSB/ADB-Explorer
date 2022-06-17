@@ -178,13 +178,19 @@ namespace ADB_Explorer.Services
 
         #region about
 
-        private bool checkForUpdates;
+        private bool? checkForUpdates;
         /// <summary>
         /// GET releases on GitHub repo on each launch
         /// </summary>
-        public bool CheckForUpdates
+        public bool? CheckForUpdates
         {
-            get => Get(ref checkForUpdates, true);
+            get
+            {
+                if (Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32")
+                    return null;
+
+                return Get(ref checkForUpdates, true);
+            }
             set => Set(ref checkForUpdates, value);
         }
 
@@ -299,6 +305,7 @@ namespace ADB_Explorer.Services
                     bool => Storage.RetrieveBool(propertyName),
                     string => Storage.RetrieveValue(propertyName),
                     null when typeof(T) == typeof(string) => Storage.RetrieveValue(propertyName),
+                    null when typeof(T) == typeof(bool?) => Storage.RetrieveBool(propertyName),
                     _ => throw new NotImplementedException(),
                 };
 

@@ -1234,7 +1234,6 @@
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
-                        Sorting="ExplorerGrid_Sorting"
                         IsReadOnly="False"
                         ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
                         KeyboardNavigation.TabNavigation="Once"
@@ -1247,6 +1246,7 @@
                         SelectionChanged="ExplorerGrid_SelectionChanged"
                         SelectionMode="Extended"
                         SelectionUnit="FullRow"
+                        Sorting="ExplorerGrid_Sorting"
                         Style="{StaticResource ExplorerGridStyle}"
                         Visibility="Collapsed">
                         <DataGrid.Columns>
@@ -2682,7 +2682,18 @@
                                         <CheckBox
                                             Content="Check For Updates"
                                             IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}"
-                                            ToolTip="Checks for updates each time the app is launched" />
+                                            ToolTip="Checks for updates each time the app is launched">
+                                            <CheckBox.Style>
+                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" Value="{x:Null}">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </CheckBox.Style>
+                                        </CheckBox>
                                         <TextBlock
                                             Margin="0,16,0,0"
                                             FontWeight="Bold"
