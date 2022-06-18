@@ -127,7 +127,7 @@ namespace ADB_Explorer
             InitializeComponent();
 
             fileOperationQueue = new(this.Dispatcher);
-            LaunchSequence();
+            Task launchTask = Task.Run(() => LaunchSequence());
 
             ConnectTimer.Interval = CONNECT_TIMER_INIT;
             ConnectTimer.Tick += ConnectTimer_Tick;
@@ -139,20 +139,43 @@ namespace ADB_Explorer
             themeService.PropertyChanged += ThemeService_PropertyChanged;
             CommandLog.CollectionChanged += CommandLog_CollectionChanged;
 
-            if (CheckAdbVersion())
+            Task<bool> versionTask = Task.Run(() => CheckAdbVersion());
+                
+            versionTask.ContinueWith((t) =>
             {
-                ConnectTimer.Start();
-                OpenDevicesButton.IsEnabled = true;
-                DevicesSplitView.IsPaneOpen = true;
-            }
+                if (!t.IsCanceled && t.Result)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        ConnectTimer.Start();
+                        OpenDevicesButton.IsEnabled = true;
+                        DevicesSplitView.IsPaneOpen = true;
+                    });
+                }
+            });
 
             UpperProgressBar.DataContext = fileOperationQueue;
             CurrentOperationDataGrid.ItemsSource = fileOperationQueue.Operations;
 
+#if DEBUG
             TestCurrentOperation();
             TestDevices();
+#endif
+            if (Settings.EnableSplash)
+                new DispatcherTimer() { Interval = SPLASH_DISPLAY_TIME, IsEnabled = true }.Tick += SplashTimer_Tick;
+            else
+                SplashScreen.Visible(false);
 
-            Settings.WindowLoaded = true;
+            Task.Run(() =>
+            {
+                Task.WaitAll(launchTask, versionTask);
+                Settings.WindowLoaded = true;
+            });
+        }
+
+        private void SplashTimer_Tick(object sender, EventArgs e)
+        {
+            SplashScreen.Visible(false);
         }
 
         private static void CheckForUpdates(Dispatcher dispatcher)
@@ -277,7 +300,7 @@ namespace ADB_Explorer
                 try
                 {
                     if (oldIndexFile.Any())
-                        ShellFileOperation.RenameItem(CurrentADBDevice, oldIndexFile.First(), RECYCLE_INDEX_BACKUP_PATH);
+                        ShellFileOperation.MoveItem(CurrentADBDevice, oldIndexFile.First(), RECYCLE_INDEX_BACKUP_PATH);
 
                     ShellFileOperation.WriteLine(CurrentADBDevice, RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString(outString));
 
@@ -308,28 +331,33 @@ namespace ADB_Explorer
 
         private bool CheckAdbVersion()
         {
-            int exitCode = 1;
-            string stdout = "";
-            try
-            {
-                exitCode = ADBService.ExecuteCommand("adb", "version", out stdout, out _, Encoding.UTF8);
-            }
-            catch (Exception) { }
+            Version version = null;
 
-            if (exitCode == 0)
+            if (string.IsNullOrEmpty(Settings.ManualAdbPath))
             {
-                string version = AdbRegEx.ADB_VERSION.Match(stdout).Groups["version"]?.Value;
-                if (new Version(version) < MIN_ADB_VERSION)
+                version = ADBService.VerifyAdbVersion("adb");
+                if (version >= MIN_ADB_VERSION)
+                    return true;
+            }
+            else
+            {
+                version = ADBService.VerifyAdbVersion(Settings.ManualAdbPath);
+                if (version >= MIN_ADB_VERSION)
+                    return true;
+            }
+
+            Dispatcher.Invoke(() =>
+            {
+                if (version is not null)
                 {
                     MissingAdbTextblock.Visibility = Visibility.Collapsed;
                     AdbVersionTooLowTextblock.Visibility = Visibility.Visible;
                 }
-                else
-                    return true;
-            }
-            SettingsSplitView.IsPaneOpen = true;
-            WorkingDirectoriesExpander.IsExpanded = true;
-            MissingAdbGrid.Visibility = Visibility.Visible;
+
+                SettingsSplitView.IsPaneOpen = true;
+                WorkingDirectoriesExpander.IsExpanded = true;
+                MissingAdbGrid.Visibility = Visibility.Visible;
+            });
 
             return false;
         }
@@ -467,7 +495,7 @@ namespace ADB_Explorer
 
         private void SetTheme(AppTheme theme) => SetTheme(AppThemeToActual(theme));
 
-        private static void SetTheme(ApplicationTheme theme)
+        private void SetTheme(ApplicationTheme theme) => Dispatcher.Invoke(() =>
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
@@ -475,7 +503,7 @@ namespace ADB_Explorer
             {
                 SetResourceColor(theme, key);
             }
-        }
+        });
 
         private static void SetResourceColor(ApplicationTheme theme, string resource)
         {
@@ -743,8 +771,11 @@ namespace ADB_Explorer
 
         private void LoadSettings()
         {
-            Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
-            SetSymbolFont();
+            Dispatcher.Invoke(() =>
+            {
+                Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
+                SetSymbolFont();
+            });
 
             if (Settings.EnableMdns)
                 QrClass = new();
@@ -760,13 +791,13 @@ namespace ADB_Explorer
             Application.Current.Resources["SymbolThemeFontFamily"] = new FontFamily(Settings.UseFluentStyles ? "Segoe Fluent Icons, Segoe MDL2 Assets" : "Segoe MDL2 Assets");
         }
 
-        private static void SetRenderMode()
+        private void SetRenderMode() => Dispatcher.Invoke(() =>
         {
             if (Settings.SwRender)
                 RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
             else if (RenderOptions.ProcessRenderMode == RenderMode.SoftwareOnly)
                 RenderOptions.ProcessRenderMode = RenderMode.Default;
-        }
+        });
 
         private ApplicationTheme AppThemeToActual(AppTheme appTheme) => appTheme switch
         {
@@ -787,7 +818,7 @@ namespace ADB_Explorer
             }
         }
 
-        private void InitFileOpColumns()
+        private void InitFileOpColumns() => Dispatcher.Invoke(() =>
         {
             var fileOpContext = FindResource("FileOpHeaderContextMenu") as ContextMenu;
             foreach (var item in fileOpContext.Items)
@@ -808,7 +839,7 @@ namespace ADB_Explorer
             }
 
             EnableContextItems();
-        }
+        });
 
         private DataGridColumn GetCheckboxColumn(CheckBox checkBox)
         {
@@ -2455,7 +2486,7 @@ namespace ADB_Explorer
             }
         }
 
-        private void EnableMdns()
+        private void EnableMdns() => Dispatcher.Invoke(() =>
         {
             ADBService.IsMdnsEnabled = Settings.EnableMdns;
             if (Settings.EnableMdns)
@@ -2466,7 +2497,7 @@ namespace ADB_Explorer
             {
                 ManualConnectionRadioButton.IsChecked = true;
             }
-        }
+        });
 
         private void RemovePending_Click(object sender, RoutedEventArgs e)
         {
@@ -2712,7 +2743,7 @@ namespace ADB_Explorer
 
             try
             {
-                ShellFileOperation.RenameItem(CurrentADBDevice, file, newPath);
+                ShellFileOperation.MoveItem(CurrentADBDevice, file, newPath);
             }
             catch (Exception e)
             {

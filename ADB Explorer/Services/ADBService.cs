@@ -372,5 +372,25 @@ namespace ADB_Explorer.Services
         {
             return CountFiles(deviceID, RECYCLE_PATH, excludeNames: RECYCLE_INDEXES);
         }
+
+        public static Version VerifyAdbVersion(string adbPath)
+        {
+            if (string.IsNullOrEmpty(adbPath))
+                return null;
+
+            int exitCode = 1;
+            string stdout = "";
+            try
+            {
+                exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8);
+            }
+            catch (Exception) { }
+
+            if (exitCode != 0)
+                return null;
+
+            string version = ADB_VERSION.Match(stdout).Groups["version"]?.Value;
+            return string.IsNullOrEmpty(version) ? null : new Version(version);
+        }
     }
 }

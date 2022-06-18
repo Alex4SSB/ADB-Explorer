@@ -31,6 +31,20 @@ namespace ADB_Explorer.Services
             }
         }
 
+        public static bool MoveItem(ADBService.AdbDevice device, FilePath item, string targetPath) => MoveItem(device, item.FullPath, targetPath);
+
+        public static bool MoveItem(ADBService.AdbDevice device, string fullPath, string targetPath, bool throwOnError = true)
+        {
+            var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mv", out string stdout, out string stderr, new[] { ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath) });
+
+            if (exitCode != 0 && throwOnError)
+            {
+                throw new Exception(stderr);
+            }
+
+            return exitCode == 0;
+        }
+
         public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical, bool isCopy = false)
         {
             if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
@@ -69,22 +83,6 @@ namespace ADB_Explorer.Services
                     Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, logical, isCopy));
                 }
             }
-        }
-
-        public static void RenameItem(ADBService.AdbDevice device, FilePath item, string targetPath)
-        {
-            var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                                   "mv",
-                                                                   out string stdout,
-                                                                   out string stderr,
-                                                                   new[] { ADBService.EscapeAdbShellString(item.FullPath), ADBService.EscapeAdbShellString(targetPath) });
-
-            if (exitCode != 0)
-            {
-                throw new Exception(stderr);
-            }
-
-            return;
         }
 
         public static void MakeDir(ADBService.AdbDevice device, string fullPath)

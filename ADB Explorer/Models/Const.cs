@@ -53,6 +53,7 @@ namespace ADB_Explorer.Models
         public static readonly int DIR_LIST_START_COUNT = 100;
         public static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
         public static readonly TimeSpan DIR_LIST_UPDATE_START_INTERVAL = TimeSpan.FromMilliseconds(100);
+        public static readonly TimeSpan SPLASH_DISPLAY_TIME = TimeSpan.FromMilliseconds(2000);
         public static readonly int DIR_LIST_UPDATE_THRESHOLD_MIN = 100;
         public static readonly int DIR_LIST_UPDATE_START_THRESHOLD_MIN = 10;
         public static readonly int DIR_LIST_UPDATE_THRESHOLD_MAX = 500;

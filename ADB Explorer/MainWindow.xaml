@@ -2053,30 +2053,11 @@
                                                         IsChecked="True"
                                                         ToolTip="6 Digit Code"
                                                         Unchecked="ConnectionTypeRadioButton_Checked">
-                                                        <Grid>
-                                                            <ui:FontIcon Glyph="&#xE192;">
-                                                                <ui:FontIcon.Style>
-                                                                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </ui:FontIcon.Style>
-                                                            </ui:FontIcon>
-                                                            <ui:PathIcon Height="20" Data="{StaticResource PasswordIcon}">
-                                                                <ui:PathIcon.Style>
-                                                                    <Style TargetType="ui:PathIcon">
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
-                                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </ui:PathIcon.Style>
-                                                            </ui:PathIcon>
-                                                        </Grid>
+                                                        <ui:FontIcon
+                                                            Margin="0,-4,0,0"
+                                                            FontSize="30"
+                                                            Glyph="&#xE1E1;"
+                                                            Style="{StaticResource GlyphFont}" />
                                                     </RadioButton>
                                                 </Grid>
                                             </StackPanel>
@@ -2643,6 +2624,7 @@
                                                 </ui:SimpleStackPanel>
                                             </Grid>
                                         </CheckBox>
+                                        <CheckBox Content="Display Splash Screen" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableSplash}" />
                                     </StackPanel>
                                 </Expander>
                                 <!--<Separator Style="{StaticResource CategorySeparator}" />
@@ -2703,10 +2685,6 @@
                                             NavigateUri="https://github.com/Kinnara/ModernWpf"
                                             ToolTip="https://github.com/Kinnara/ModernWpf" />
                                         <ui:HyperlinkButton
-                                            Content="Fluent UI System Icons"
-                                            NavigateUri="https://github.com/microsoft/fluentui-system-icons/blob/master/LICENSE"
-                                            ToolTip="https://github.com/microsoft/fluentui-system-icons/blob/master/LICENSE" />
-                                        <ui:HyperlinkButton
                                             Content="Icons8"
                                             NavigateUri="https://icons8.com"
                                             ToolTip="https://icons8.com" />
@@ -2722,5 +2700,32 @@
                 </Border>
             </ui:SplitView.Pane>
         </ui:SplitView>
+        <Border
+            x:Name="SplashScreen"
+            Margin="0,-50,0,0"
+            Background="#FF80C9E4">
+            <Grid>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Width="150">
+                        <Image.Source>
+                            <BitmapImage DecodePixelWidth="256" UriSource="adb_explorer_icon_v4_icons8_inverted.png" />
+                        </Image.Source>
+                    </Image>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontSize="40"
+                        Foreground="Black"
+                        Text="ADB Explorer" />
+                </StackPanel>
+                <TextBlock
+                    Margin="6,4"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    FontFamily="{StaticResource ConsoleFont}"
+                    FontSize="14"
+                    Foreground="Black"
+                    Text="{x:Static properties:Resources.AppVersion}" />
+            </Grid>
+        </Border>
     </Grid>
 </Window>

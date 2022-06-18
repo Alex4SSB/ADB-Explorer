@@ -263,6 +263,13 @@ namespace ADB_Explorer.Services
             }
         }
 
+        private bool enableSplash;
+        public bool EnableSplash
+        {
+            get => Get(ref enableSplash, true);
+            set => Set(ref enableSplash, value);
+        }
+
         #endregion
 
         #region theme
