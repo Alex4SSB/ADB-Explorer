@@ -18,6 +18,7 @@ namespace ADB_Explorer.Models
         Unknown,
         Emulated,
         Trash,
+        Temp,
     }
 
     public class Drive : INotifyPropertyChanged
@@ -30,7 +31,7 @@ namespace ADB_Explorer.Models
         public sbyte UsageP { get; private set; }
         public string Path { get; private set; }
         public string ID => Path[(Path.LastIndexOf('/') + 1)..];
-        public string PrettyName => DRIVES_PRETTY_NAMES[Type];
+        public string DisplayName => DRIVE_DISPLAY_NAMES[Type];
         public bool UsageWarning => UsageP >= usageWarningTh;
 
         private DriveType type;
@@ -41,7 +42,7 @@ namespace ADB_Explorer.Models
             {
                 Set(ref type, value);
                 OnPropertyChanged(nameof(DriveIcon));
-                OnPropertyChanged(nameof(PrettyName));
+                OnPropertyChanged(nameof(DisplayName));
             }
         }
         public string DriveIcon => Type switch
@@ -53,14 +54,15 @@ namespace ADB_Explorer.Models
             DriveType.Unknown => "\uE9CE",
             DriveType.Emulated => "\uEDA2",
             DriveType.Trash => "\uE74D",
+            DriveType.Temp => "\uE912",
             _ => throw new System.NotImplementedException(),
         };
 
-        private ulong recycledItemsCount;
-        public ulong RecycledItemsCount
+        private ulong itemsCount;
+        public ulong ItemsCount
         {
-            get => recycledItemsCount;
-            set => Set(ref recycledItemsCount, value);
+            get => itemsCount;
+            set => Set(ref itemsCount, value);
         }
 
         public Drive(string size = "", string used = "", string available = "", sbyte usageP = -1, string path = "", bool isMMC = false, bool isEmulator = false)

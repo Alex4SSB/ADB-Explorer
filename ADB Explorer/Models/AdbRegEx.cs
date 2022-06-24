@@ -34,5 +34,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex ADB_VERSION =
             new(@"^Version[\t ]*(?<version>[\d.]+)", RegexOptions.Multiline);
+
+        public static readonly Regex PACKAGE_NAME =
+            new(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])");
     }
 }

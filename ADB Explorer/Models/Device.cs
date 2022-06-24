@@ -412,18 +412,6 @@ namespace ADB_Explorer.Models
             set => Set(ref battery, value);
         }
 
-        private ulong recycledItemsCount;
-        public ulong RecycledItemsCount
-        {
-            get => recycledItemsCount;
-            set
-            {
-                Set(ref recycledItemsCount, value);
-                if (Drives is not null && Drives.Where(drive => drive.Type is DriveType.Trash) is var trash && trash.Any())
-                    trash.First().RecycledItemsCount = value;
-            }
-        }
-
         private ConnectService service;
         public ConnectService Service
         {
@@ -535,26 +523,27 @@ namespace ADB_Explorer.Models
                     });
                 });
             }
-
-            if (RecycledItemsCount > 0)
-                OnPropertyChanged(nameof(RecycledItemsCount));
         }
 
         private void _setDrives(IEnumerable<Drive> drives)
         {
-            if (!DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash)))
+            if (!DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp)))
                 return;
 
             var trash = Drives.Where(d => d.Type is DriveType.Trash);
             if (trash.Any())
-                Drives.Set(drives.Append(trash.First()));
-            else
-                Drives.Set(drives);
+                drives = drives.Append(trash.First());
+
+            var temp = Drives.Where(d => d.Type is DriveType.Temp);
+            if (temp.Any())
+                drives = drives.Append(temp.First());
+
+            Drives.Set(drives);
         }
 
         public bool DrivesChanged(IEnumerable<Drive> other)
         {
-            var self = Drives.Where(d => d.Type is not DriveType.Trash);
+            var self = Drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp);
 
             return other is not null
                 && !self.OrderBy(thisDrive => thisDrive.ID).SequenceEqual(

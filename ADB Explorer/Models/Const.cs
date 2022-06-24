@@ -11,6 +11,7 @@ namespace ADB_Explorer.Models
         public static readonly Uri REPO_RELEASES_URL = new("https://api.github.com/repos/Alex4SSB/ADB-Explorer/releases");
 
         public static readonly string DEFAULT_PATH = "/sdcard";
+        public static readonly string TEMP_PATH = "/data/local/tmp";
         public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";
         public static readonly string RECYCLE_INDEX_FILE = ".RecycleIndex";
         public static readonly string RECYCLE_INDEX_BACKUP_FILE = ".RecycleIndex.bak";
@@ -21,7 +22,7 @@ namespace ADB_Explorer.Models
         public static readonly string[] RECYCLE_INDEX_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH };
         public static readonly string[] RECYCLE_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH, RECYCLE_PATH };
 
-        public static readonly Dictionary<string, string> SPECIAL_FOLDERS_PRETTY_NAMES = new()
+        public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
         {
             { RECYCLE_PATH, "Recycle Bin" },
             { "/sdcard", "Internal Storage" },
@@ -36,9 +37,10 @@ namespace ADB_Explorer.Models
             { "/storage/emulated", DriveType.Internal },
             { "/sdcard", DriveType.Internal },
             { "/", DriveType.Root },
-            { RECYCLE_PATH, DriveType.Trash }
+            { RECYCLE_PATH, DriveType.Trash },
+            { TEMP_PATH, DriveType.Temp },
         };
-        public static readonly Dictionary<DriveType, string> DRIVES_PRETTY_NAMES = new()
+        public static readonly Dictionary<DriveType, string> DRIVE_DISPLAY_NAMES = new()
         {
             { DriveType.Root, "Root" },
             { DriveType.Internal, "Internal Storage" },
@@ -46,7 +48,8 @@ namespace ADB_Explorer.Models
             { DriveType.External, "OTG Drive" },
             { DriveType.Unknown, "" }, // "Other Drive"
             { DriveType.Emulated, "Emulated Drive" },
-            { DriveType.Trash, "Recycle Bin" }
+            { DriveType.Trash, "Recycle Bin" },
+            { DriveType.Temp, "Temp" },
         };
 
         public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
@@ -71,7 +74,8 @@ namespace ADB_Explorer.Models
         public static readonly int MIN_PANE_HEIGHT = 150;
         public static readonly double MIN_PANE_HEIGHT_RATIO = 0.15;
 
-        public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM" };
+        public static readonly string[] APK_NAMES = { ".APK", ".XAPK", ".APKS", ".APKM", ".APEX" };
+        public static readonly string[] INSTALL_APK = { ".APK", ".APEX" };
 
         public static readonly UnicodeCategory[] UNICODE_ICONS = { UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned };
 

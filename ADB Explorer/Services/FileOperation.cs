@@ -2,14 +2,13 @@
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace ADB_Explorer.Services
 {
     public abstract class FileOperation : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public enum OperationStatus
         {
             Waiting,
@@ -28,9 +27,22 @@ namespace ADB_Explorer.Services
             Recycle,
             Copy,
             Restore,
+            Install,
         }
 
-        public OperationType OperationName { get; protected set; }
+        private OperationType operationType;
+        public OperationType OperationName
+        {
+            get => operationType;
+            protected set
+            {
+                Set(ref operationType, value);
+
+                OpIcon = new(value);
+                OnPropertyChanged(nameof(CompletedStatsVisible));
+                OnPropertyChanged(nameof(FinishedIconVisible));
+            }
+        }
 
         public Dispatcher Dispatcher { get; }
 
@@ -40,10 +52,7 @@ namespace ADB_Explorer.Services
         private OperationStatus status;
         public OperationStatus Status
         {
-            get
-            {
-                return status;
-            }
+            get => status;
             protected set
             {
                 if (Dispatcher != null && !Dispatcher.CheckAccess())
@@ -52,18 +61,24 @@ namespace ADB_Explorer.Services
                     return;
                 }
 
-                status = value;
-                NotifyPropertyChanged();
+                Set(ref status, value);
+                OnPropertyChanged(nameof(CompletedStatsVisible));
+                OnPropertyChanged(nameof(FinishedIconVisible));
             }
         }
+
+        public bool CompletedStatsVisible => Status is OperationStatus.Completed
+                                             && OperationName is OperationType.Push or OperationType.Pull;
+
+        public bool FinishedIconVisible => OperationName is not OperationType.Push and not OperationType.Pull
+                                           && Status is not OperationStatus.InProgress and not OperationStatus.Waiting;
+
+        public OperationIcon OpIcon { get; private set; }
 
         private object statusInfo;
         public object StatusInfo
         {
-            get
-            {
-                return statusInfo;
-            }
+            get => statusInfo;
             protected set
             {
                 if (Dispatcher != null && !Dispatcher.CheckAccess())
@@ -72,8 +87,7 @@ namespace ADB_Explorer.Services
                     return;
                 }
 
-                statusInfo = value;
-                NotifyPropertyChanged();
+                Set(ref statusInfo, value);
             }
         }
 
@@ -90,9 +104,71 @@ namespace ADB_Explorer.Services
         public abstract void Start();
         public abstract void Cancel();
 
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (Equals(storage, value))
+            {
+                return;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+        }
+
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public class OperationIcon
+    {
+        public string PrimaryIcon { get; }
+        public string SecondaryIcon { get; }
+        public Thickness SecondaryMargin { get; }
+        public double SecondarySize { get; }
+        public HorizontalAlignment PrimaryAlignment { get; }
+
+        public OperationIcon(FileOperation.OperationType operation)
+        {
+            PrimaryIcon = operation switch
+            {
+                FileOperation.OperationType.Pull or FileOperation.OperationType.Push => "\uE8EA",
+                FileOperation.OperationType.Move => "\uE8DE",
+                FileOperation.OperationType.Recycle or FileOperation.OperationType.Delete => "\uE74D",
+                FileOperation.OperationType.Copy => "\uE8C8",
+                FileOperation.OperationType.Restore => "\uE845",
+                FileOperation.OperationType.Install => "\uE7B8",
+                _ => throw new System.NotImplementedException(),
+            };
+
+            SecondaryIcon = operation switch
+            {
+                FileOperation.OperationType.Recycle => "\uF143",
+                FileOperation.OperationType.Push => "\uE973",
+                FileOperation.OperationType.Pull => "\uE974",
+                _ => "",
+            };
+
+            SecondaryMargin = operation switch
+            {
+                FileOperation.OperationType.Pull or FileOperation.OperationType.Push => new(14, 0, 0, 0),
+                FileOperation.OperationType.Recycle => new(0, 0, -26, -15),
+                FileOperation.OperationType.Install => new(0, 0, -28, -18),
+                _ => new(0, 0, 0, 0),
+            };
+
+            SecondarySize = operation switch
+            {
+                FileOperation.OperationType.Pull or FileOperation.OperationType.Push => 14,
+                FileOperation.OperationType.Install => 10,
+                _ => 20,
+            };
+
+            PrimaryAlignment = operation switch
+            {
+                FileOperation.OperationType.Pull or FileOperation.OperationType.Push => HorizontalAlignment.Left,
+                _ => HorizontalAlignment.Center,
+            };
         }
     }
 }

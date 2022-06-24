@@ -38,7 +38,7 @@ namespace ADB_Explorer.Models
 
         public static FileOperationQueue fileOperationQueue { get; set; }
 
-        public static Dictionary<string, string> CurrentPrettyNames { get; set; } = new();
+        public static Dictionary<string, string> CurrentDisplayNames { get; set; } = new();
 
         public static AppSettings Settings { get; set; } = new();
 
@@ -60,6 +60,7 @@ namespace ADB_Explorer.Models
 
         public static Version AppVersion => new(Properties.Resources.AppVersion);
 
+        public static FileActionsEnable FileActions { get; set; } = new();
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

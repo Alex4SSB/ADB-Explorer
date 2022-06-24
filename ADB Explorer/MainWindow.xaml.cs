@@ -25,6 +25,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Shell;
 using System.Windows.Threading;
 using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Helpers.VisibilityHelper;
@@ -138,6 +139,7 @@ namespace ADB_Explorer
             Settings.PropertyChanged += Settings_PropertyChanged;
             themeService.PropertyChanged += ThemeService_PropertyChanged;
             CommandLog.CollectionChanged += CommandLog_CollectionChanged;
+            fileOperationQueue.PropertyChanged += FileOperationQueue_PropertyChanged;
 
             Task<bool> versionTask = Task.Run(() => CheckAdbVersion());
                 
@@ -171,6 +173,24 @@ namespace ADB_Explorer
                 Task.WaitAll(launchTask, versionTask);
                 Settings.WindowLoaded = true;
             });
+        }
+
+        private void FileOperationQueue_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(FileOperationQueue.IsActive) or nameof(FileOperationQueue.AnyFailedOperations) or nameof(fileOperationQueue.Progress))
+            {
+                if (fileOperationQueue.AnyFailedOperations)
+                    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
+                else if (fileOperationQueue.IsActive)
+                {
+                    if (fileOperationQueue.Progress == 0)
+                        TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
+                    else
+                        TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
+                }
+                else
+                    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+            }
         }
 
         private void SplashTimer_Tick(object sender, EventArgs e)
@@ -373,6 +393,7 @@ namespace ADB_Explorer
             MenuItem pasteMenu = FindResource("ContextMenuPasteItem") as MenuItem;
             MenuItem newMenu = FindResource("ContextMenuNewItem") as MenuItem;
             MenuItem copyPath = FindResource("ContextMenuCopyPathItem") as MenuItem;
+            MenuItem packageActions = FindResource("PackageActionsItem") as MenuItem;
             MenuItem restoreMenu = FindResource("RestoreMenuItem") as MenuItem;
             copyPath.Resources = FindResource("ContextSubMenuStyles") as ResourceDictionary;
             ExplorerGrid.ContextMenu.Items.Clear();
@@ -423,6 +444,12 @@ namespace ADB_Explorer
                     if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
                         ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
+                    if (selectedFiles.All(file => file.IsInstallApk))
+                        ExplorerGrid.ContextMenu.Items.Add(packageActions);
+
+                    if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
+                        ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
+
                     ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
 
                     bool irregular = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
@@ -430,8 +457,7 @@ namespace ADB_Explorer
 
                     foreach (MenuItem item in ExplorerGrid.ContextMenu.Items.OfType<MenuItem>())
                     {
-                        if (!item.Equals(copyPath))
-                            item.IsEnabled = !irregular;
+                        item.IsEnabled = !irregular || item.Equals(copyPath);
                     }
                     break;
                 case MenuType.EmptySpace:
@@ -623,7 +649,9 @@ namespace ADB_Explorer
             CopyMenuButton.IsEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
             PasteMenuButton.IsEnabled = PasteEnabled();
 
-            MoreMenuButton.IsEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
+            FileActions.PackageActionsEnabled = selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
+            FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
+            MoreMenuButton.IsEnabled = selectedFiles.Any() && !IsRecycleBin;
             SetRowsRadius();
         }
 
@@ -932,16 +960,16 @@ namespace ADB_Explorer
             TextHelper.SetAltText(PathBox, "");
         }
 
-        private void CombinePrettyNames()
+        private void CombineDisplayNames()
         {
             foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Type != Models.DriveType.Root))
             {
-                CurrentPrettyNames.TryAdd(drive.Path, drive.Type is Models.DriveType.External
-                    ? drive.ID : drive.PrettyName);
+                CurrentDisplayNames.TryAdd(drive.Path, drive.Type is Models.DriveType.External
+                    ? drive.ID : drive.DisplayName);
             }
-            foreach (var item in SPECIAL_FOLDERS_PRETTY_NAMES)
+            foreach (var item in SPECIAL_FOLDERS_DISPLAY_NAMES)
             {
-                CurrentPrettyNames.TryAdd(item.Key, item.Value);
+                CurrentDisplayNames.TryAdd(item.Key, item.Value);
             }
         }
 
@@ -950,10 +978,7 @@ namespace ADB_Explorer
             if (path is null)
                 return true;
 
-            CombinePrettyNames();
-
-            if (path != RECYCLE_PATH)
-                UpdateRecycledItemsCount();
+            CombineDisplayNames();
 
             var realPath = FolderExists(string.IsNullOrEmpty(path) ? DEFAULT_PATH : path);
             if (realPath is null)
@@ -969,11 +994,21 @@ namespace ADB_Explorer
 
         private void UpdateRecycledItemsCount()
         {
-            var countTask = Task.Run(() => CurrentADBDevice.CountRecycle());
+            var countTask = Task.Run(() => ADBService.CountRecycle(DevicesObject.CurrentDevice.ID));
             countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
             {
                 if (!t.IsCanceled)
-                    DevicesObject.CurrentDevice.RecycledItemsCount = t.Result;
+                    DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Trash).ItemsCount = t.Result;
+            }));
+        }
+
+        private void UpdatePackageCount()
+        {
+            var countTask = Task.Run(() => ADBService.CountPackages(DevicesObject.CurrentDevice.ID));
+            countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
+            {
+                if (!t.IsCanceled)
+                    DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Temp).ItemsCount = t.Result;
             }));
         }
 
@@ -1156,6 +1191,7 @@ namespace ADB_Explorer
             PasteMenuButton.IsEnabled = PasteEnabled();
             PushMenuButton.IsEnabled =
             NewMenuButton.IsEnabled = !IsRecycleBin;
+            FileActions.InstallPackageEnabled = CurrentPath == TEMP_PATH;
 
             if (realPath == RECYCLE_PATH)
             {
@@ -1229,7 +1265,7 @@ namespace ADB_Explorer
             List<MenuItem> tempButtons = new();
             List<string> pathItems = new();
 
-            var pairs = CurrentPrettyNames.Where(kv => path.StartsWith(kv.Key));
+            var pairs = CurrentDisplayNames.Where(kv => path.StartsWith(kv.Key));
             var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.First();
             if (specialPair.Key != null)
             {
@@ -1617,7 +1653,7 @@ namespace ADB_Explorer
             {
                 BeginRename();
             }
-            else if (actualKey == Key.C && shift && ctrl && MoreMenuButton.IsEnabled)
+            else if (actualKey == Key.C && shift && ctrl && FileActions.CopyPathEnabled)
             {
                 CopyItemPath();
             }
@@ -1639,6 +1675,20 @@ namespace ADB_Explorer
             {
                 PushItems(false, true);
             }
+            else if (actualKey == Key.F10 && shift && FileActions.InstallUninstallEnabled)
+            {
+                InstallPackages();
+            }
+            else if (actualKey == Key.F11 && shift && FileActions.InstallUninstallEnabled)
+            {
+                UninstallPackages();
+            }
+            else if (actualKey == Key.F12 && shift && FileActions.CopyToTempEnabled)
+            {
+                CopyToTemp();
+            }
+            else if (actualKey == Key.F10)
+            { }
             else
             {
                 bool handle = false;
@@ -2002,7 +2052,7 @@ namespace ADB_Explorer
 
             if (clearDevice)
             {
-                CurrentPrettyNames.Clear();
+                CurrentDisplayNames.Clear();
                 CurrentPath = null;
                 CurrentDeviceDetailsPanel.DataContext = null;
                 TextHelper.SetAltText(PathBox, "");
@@ -2210,15 +2260,19 @@ namespace ADB_Explorer
                 });
             }
 
+            if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
+                DevicesObject.CurrentDevice.Drives.Add(new(path: TEMP_PATH));
+
             var dispatcher = Dispatcher;
             var driveTask = Task.Run(() =>
             {
                 var drives = CurrentADBDevice.GetDrives();
                 
                 if (Settings.EnableRecycle)
-                {
                     UpdateRecycledItemsCount();
-                }
+
+                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
+                    UpdatePackageCount();
 
                 return drives;
             });
@@ -3017,71 +3071,11 @@ namespace ADB_Explorer
                     : ((FileClass)ExplorerGrid.SelectedItem).FullPath;
 
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
-            bool merge = false;
-            string[] existingItems = Array.Empty<string>();
-
-            var pasteTask = Task.Run(() =>
+            var moveTask = Task.Run(() => ShellFileOperation.MoveItems(isCopy, targetPath, pasteItems, selectedFiles.First(), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath));
+            moveTask.ContinueWith((t) =>
             {
-                if (targetPath == CurrentPath)
-                    return;
-
-                if (!targetPath.EndsWith('/'))
-                    targetPath += "/";
-
-                existingItems = ADBService.FindFiles(CurrentADBDevice.ID, pasteItems.Select(file => $"{targetPath}{file.FullName}"));
-                if (existingItems?.Any() is true)
+                Dispatcher.Invoke(() =>
                 {
-                    existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
-
-                    if (pasteItems.Any(item => item.IsDirectory && existingItems.Contains(item.FullName)))
-                        merge = true;
-                }
-            });
-
-            pasteTask.ContinueWith((t) =>
-            {
-                App.Current.Dispatcher.BeginInvoke(async () =>
-                {
-                    string primaryText = "";
-                    if (merge)
-                    {
-                        if (pasteItems.All(item => item.IsDirectory))
-                            primaryText = "Merge";
-                        else
-                            primaryText = "Merge or Replace";
-                    }
-                    else
-                        primaryText = "Replace";
-
-                    if (existingItems.Length is int count and > 0)
-                    {
-                        var result = await DialogService.ShowConfirmation(
-                            $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")} in {((FileClass)ExplorerGrid.SelectedItem).FullName}",
-                            "Paste Conflicts",
-                            primaryText: primaryText,
-                            secondaryText: count == pasteItems.Count() ? "" : "Skip",
-                            cancelText: "Cancel",
-                            icon: DialogService.DialogIcon.Exclamation);
-
-                        if (result.Item1 is ContentDialogResult.None)
-                        {
-                            return;
-                        }
-                        else if (result.Item1 is ContentDialogResult.Secondary)
-                        {
-                            pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
-                        }
-                    }
-
-                    ShellFileOperation.MoveItems(device: CurrentADBDevice,
-                                             items: pasteItems,
-                                             targetPath: targetPath,
-                                             currentPath: CurrentPath,
-                                             fileList: DirectoryLister.FileList,
-                                             dispatcher: Dispatcher,
-                                             logical: DevicesObject.CurrentDevice,
-                                             isCopy: isCopy);
-
                     if (!isCopy)
                         ClearCutFiles(pasteItems);
 
@@ -3283,8 +3277,7 @@ namespace ADB_Explorer
                                              targetPath: null,
                                              currentPath: CurrentPath,
                                              fileList: DirectoryLister.FileList,
-                                             dispatcher: Dispatcher,
-                                             logical: DevicesObject.CurrentDevice);
+                                             dispatcher: Dispatcher);
 
                     if (!selectedFiles.Any())
                         EnableRecycleButtons();
@@ -3369,6 +3362,48 @@ namespace ADB_Explorer
             collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
 
             e.Handled = true;
+        }
+
+        private void InstallPackage_Click(object sender, RoutedEventArgs e)
+        {
+            InstallPackages();
+        }
+
+        private void UninstallPackage_Click(object sender, RoutedEventArgs e)
+        {
+            UninstallPackages();
+        }
+
+        private void InstallPackages()
+        {
+            var packages = selectedFiles;
+
+            Task.Run(() =>
+            {
+                ShellFileOperation.InstallPackages(CurrentADBDevice, packages, Dispatcher);
+            });
+        }
+
+        private void UninstallPackages()
+        {
+            var files = selectedFiles;
+            
+            var packageTask = Task.Run(() => from item in files select ShellFileOperation.GetPackageName(CurrentADBDevice, item.FullPath));
+            packageTask.ContinueWith((t) =>
+            {
+                if (!t.IsCanceled)
+                    Dispatcher.Invoke(() => ShellFileOperation.UninstallPackages(CurrentADBDevice, t.Result, Dispatcher));
+            });
+        }
+
+        private void CopyToTemp_Click(object sender, RoutedEventArgs e)
+        {
+            CopyToTemp();
+        }
+
+        private void CopyToTemp()
+        {
+            _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, selectedFiles.First(), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
         }
     }
 }

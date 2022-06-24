@@ -91,6 +91,8 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public bool IsInstallApk => Array.IndexOf(AdbExplorerConst.INSTALL_APK, Extension.ToUpper()) > -1;
+
         public bool IsHidden => FullName.StartsWith('.');
 
         private string extension;

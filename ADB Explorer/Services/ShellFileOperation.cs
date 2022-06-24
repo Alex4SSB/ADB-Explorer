@@ -1,8 +1,9 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ModernWpf.Controls;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 
@@ -45,7 +46,7 @@ namespace ADB_Explorer.Services
             return exitCode == 0;
         }
 
-        public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, LogicalDevice logical, bool isCopy = false)
+        public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, bool isCopy = false)
         {
             if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
             {
@@ -56,7 +57,7 @@ namespace ADB_Explorer.Services
                     {
                         foreach (var item in items)
                         {
-                            Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, item.FullName, currentPath, fileList, logical));
+                            Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, item.FullName, currentPath, fileList));
                         }
                     });
                 });
@@ -68,7 +69,7 @@ namespace ADB_Explorer.Services
                     if (AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath))
                         continue;
 
-                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList, logical));
+                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList));
                 }
             }
             else
@@ -80,7 +81,7 @@ namespace ADB_Explorer.Services
                     {
                         targetName = $"{((FileClass)item).NoExtName}{FileClass.ExistingIndexes(fileList, ((FileClass)item).NoExtName, isCopy)}{((FileClass)item).Extension}";
                     }
-                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, logical, isCopy));
+                    Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, isCopy));
                 }
             }
         }
@@ -142,5 +143,107 @@ namespace ADB_Explorer.Services
         }
 
         public static IEnumerable<string> GetEscapedPaths(IEnumerable<FilePath> items) => items.Select(item => ADBService.EscapeAdbShellString(item.FullPath)).ToArray();
+
+        public static async Task MoveItems(bool isCopy, string targetPath, IEnumerable<FileClass> pasteItems, FileClass selectedItem, ObservableList<FileClass> fileList, Dispatcher dispatcher, ADBService.AdbDevice device, string currentPath)
+        {
+            bool merge = false;
+            string[] existingItems = Array.Empty<string>();
+            string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : selectedItem.FullName;
+
+            var moveTask = Task.Run(() =>
+            {
+                if (targetPath == currentPath)
+                    return;
+
+                if (!targetPath.EndsWith('/'))
+                    targetPath += "/";
+
+                existingItems = ADBService.FindFiles(device.ID, pasteItems.Select(file => $"{targetPath}{file.FullName}"));
+                if (existingItems?.Any() is true)
+                {
+                    existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
+
+                    if (pasteItems.Any(item => item.IsDirectory && existingItems.Contains(item.FullName)))
+                        merge = true;
+                }
+            });
+
+            await moveTask.ContinueWith((t) =>
+            {
+                App.Current.Dispatcher.BeginInvoke(async () =>
+                {
+                    string primaryText = "";
+                    if (merge)
+                    {
+                        if (pasteItems.All(item => item.IsDirectory))
+                            primaryText = "Merge";
+                        else
+                            primaryText = "Merge or Replace";
+                    }
+                    else
+                        primaryText = "Replace";
+
+                    if (existingItems.Length is int count and > 0)
+                    {
+                        var result = await DialogService.ShowConfirmation(
+                            $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")} in {destination}",
+                            "Paste Conflicts",
+                            primaryText: primaryText,
+                            secondaryText: count == pasteItems.Count() ? "" : "Skip",
+                            cancelText: "Cancel",
+                            icon: DialogService.DialogIcon.Exclamation);
+
+                        if (result.Item1 is ContentDialogResult.None)
+                        {
+                            return;
+                        }
+                        else if (result.Item1 is ContentDialogResult.Secondary)
+                        {
+                            pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
+                        }
+                    }
+
+                    MoveItems(device: device,
+                              items: pasteItems,
+                              targetPath: targetPath,
+                              currentPath: currentPath,
+                              fileList: fileList,
+                              dispatcher: dispatcher,
+                              isCopy: isCopy);
+                });
+            });
+        }
+
+        public static string GetPackageName(ADBService.AdbDevice device, string fullPath)
+        {
+            ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                    "pm",
+                                                    out string stdout,
+                                                    out string stderr,
+                                                    "install",
+                                                    "-R",
+                                                    "--pkg",
+                                                    "''",
+                                                    ADBService.EscapeAdbShellString(fullPath));
+
+            var match = AdbRegEx.PACKAGE_NAME.Match(stdout);
+            return match.Success ? match.Groups["package"].Value : fullPath[..fullPath.LastIndexOf('.')][(fullPath.LastIndexOf('/') + 1)..];
+        }
+
+        public static void InstallPackages(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
+        {
+            foreach (var item in items)
+            {
+                dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, item)));
+            }
+        }
+
+        public static void UninstallPackages(ADBService.AdbDevice device, IEnumerable<string> packages, Dispatcher dispatcher)
+        {
+            foreach (var item in packages)
+            {
+                Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, packageName: item));
+            }
+        }
     }
 }

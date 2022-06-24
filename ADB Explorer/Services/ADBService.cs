@@ -373,6 +373,11 @@ namespace ADB_Explorer.Services
             return CountFiles(deviceID, RECYCLE_PATH, excludeNames: RECYCLE_INDEXES);
         }
 
+        public static ulong CountPackages(string deviceID)
+        {
+            return CountFiles(deviceID, TEMP_PATH, includeNames: INSTALL_APK.Select(name => "*" + name));
+        }
+
         public static Version VerifyAdbVersion(string adbPath)
         {
             if (string.IsNullOrEmpty(adbPath))

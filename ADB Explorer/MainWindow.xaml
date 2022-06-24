@@ -30,7 +30,6 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
-        <converters:VisibilityToStateConverter x:Key="VisibilityToStateConverter" />
         <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
         <converters:DoubleEquals x:Key="DoubleEquals" />
         <CollectionViewSource
@@ -268,9 +267,92 @@
             Click="CopyPathMenuItem_Click"
             Header="Copy Item Path"
             InputGestureText="Shift+Ctrl+C">
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Setter Property="IsEnabled" Value="False" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="True">
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE62F;" />
             </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
+            x:Key="PackageActionsItem"
+            x:Shared="False"
+            Header="Package">
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Setter Property="IsEnabled" Value="False" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="True">
+                            <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE7B8;" />
+            </MenuItem.Icon>
+            <MenuItem
+                Click="InstallPackage_Click"
+                Header="Install"
+                InputGestureText="Shift+F10">
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                        <Setter Property="IsEnabled" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=InstallPackageEnabled}" Value="True">
+                                <Setter Property="IsEnabled" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+                <MenuItem.Icon>
+                    <ui:FontIcon Glyph="&#xE896;" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <MenuItem
+                Click="UninstallPackage_Click"
+                Header="Uninstall"
+                InputGestureText="Shift+F11">
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                        <Setter Property="IsEnabled" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=InstallPackageEnabled}" Value="True">
+                                <Setter Property="IsEnabled" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+                <MenuItem.Icon>
+                    <ui:FontIcon Glyph="&#xECC9;" />
+                </MenuItem.Icon>
+            </MenuItem>
+            <Separator />
+            <MenuItem
+                Click="CopyToTemp_Click"
+                Header="Copy To Temp"
+                InputGestureText="Shift+F12">
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                        <Setter Property="IsEnabled" Value="False" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=InstallPackageEnabled}" Value="False">
+                                <Setter Property="IsEnabled" Value="True" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+                <MenuItem.Icon>
+                    <ui:FontIcon Glyph="&#xF413;" />
+                </MenuItem.Icon>
+            </MenuItem>
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuPasteItem"
@@ -490,7 +572,7 @@
                         <StackPanel.Resources>
                             <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
                         </StackPanel.Resources>
-                        <TextBlock Text="{Binding PrettyName}" />
+                        <TextBlock Text="{Binding DisplayName}" />
                         <StackPanel Orientation="Horizontal">
                             <StackPanel.Style>
                                 <Style TargetType="StackPanel">
@@ -557,6 +639,9 @@
                                     <DataTrigger Binding="{Binding Type}" Value="Trash">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="Temp">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
@@ -570,21 +655,35 @@
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Visible" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding RecycledItemsCount}" Value="0">
+                                        <DataTrigger Binding="{Binding ItemsCount}" Value="0">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <TextBlock Text="{Binding RecycledItemsCount}" />
-                            <TextBlock Text=" Item" />
+                            <TextBlock Text="{Binding ItemsCount}" />
+                            <TextBlock>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="VerticalAlignment" Value="Center" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Type}" Value="Trash">
+                                                <Setter Property="Text" Value=" Item" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Temp">
+                                                <Setter Property="Text" Value=" Package" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
                             <TextBlock Text="s">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center" />
                                         <Setter Property="Visibility" Value="Visible" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding RecycledItemsCount}" Value="1">
+                                            <DataTrigger Binding="{Binding ItemsCount}" Value="1">
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -598,7 +697,7 @@
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding RecycledItemsCount}" Value="0">
+                                        <DataTrigger Binding="{Binding ItemsCount}" Value="0">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -606,6 +705,10 @@
                             </TextBlock.Style>
                         </TextBlock>
                     </Grid>
+                    <Border
+                        Grid.RowSpan="3"
+                        Grid.ColumnSpan="2"
+                        Style="{StaticResource SpecialDriveAccent}" />
                 </Grid>
             </Button>
         </DataTemplate>
@@ -754,10 +857,7 @@
         </DataTemplate>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo
-            x:Name="TaskBarInfo"
-            ProgressState="{Binding ElementName=UpperProgressBar, Path=Visibility, Converter={StaticResource VisibilityToStateConverter}}"
-            ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
+        <TaskbarItemInfo x:Name="TaskBarInfo" ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
     </Window.TaskbarItemInfo>
     <Grid>
         <Grid>
@@ -1005,31 +1105,7 @@
                         Resources="{StaticResource TopMenuStyles}"
                         ToolTip="Delete (Del)">
                         <MenuItem.Header>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <ui:FontIcon Glyph="&#xE74D;" />
-                                <TextBlock Grid.Column="1" Margin="4,0,0,0">
-                                    <TextBlock.Style>
-                                        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding RecycledItemsCount}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding RecycledItemsCount}" Value="0">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </Grid>
+                            <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
@@ -1041,6 +1117,7 @@
                             <ui:FontIcon Glyph="&#xE712;" />
                         </MenuItem.Header>
                         <StaticResource ResourceKey="ContextMenuCopyPathItem" />
+                        <StaticResource ResourceKey="PackageActionsItem" />
                     </MenuItem>
                 </Menu>
                 <Border

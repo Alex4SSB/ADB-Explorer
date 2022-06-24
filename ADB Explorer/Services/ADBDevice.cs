@@ -336,8 +336,6 @@ namespace ADB_Explorer.Services
                 if (ExecuteDeviceAdbCommand(device.ID, "reboot", out string stdout, out string stderr, arg) != 0)
                     throw new Exception(stderr);
             }
-
-            public ulong CountRecycle() => ADBService.CountRecycle(ID);
         }
     }
 }

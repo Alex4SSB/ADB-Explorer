@@ -18,9 +18,8 @@ namespace ADB_Explorer.Services
         private readonly string currentPath;
         private string recycleName;
         private DateTime? dateModified;
-        private LogicalDevice logical;
 
-        public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, LogicalDevice logical, bool isCopy = false) : base(dispatcher, adbDevice, filePath)
+        public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false) : base(dispatcher, adbDevice, filePath)
         {
             if (isCopy)
                 OperationName = OperationType.Copy;
@@ -40,7 +39,6 @@ namespace ADB_Explorer.Services
             this.targetParent = targetParent;
             this.targetName = targetName;
             this.currentPath = currentPath;
-            this.logical = logical;
         }
 
         public override void Start()
@@ -79,16 +77,11 @@ namespace ADB_Explorer.Services
 
                 if (operationStatus is OperationStatus.Completed)
                 {
-                    ulong recycleCount = 0;
                     switch (OperationName)
                     {
                         case OperationType.Recycle:
-                            recycleCount = Device.CountRecycle();
                             var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
                             ShellFileOperation.WriteLine(Device, AdbExplorerConst.RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
-                            break;
-                        case OperationType.Restore:
-                            recycleCount = Device.CountRecycle();
                             break;
                         default:
                             break;
@@ -122,7 +115,6 @@ namespace ADB_Explorer.Services
                                 Data.CutItems.Remove((FileClass)FilePath);
 
                             ((FileClass)FilePath).TrashIndex = null;
-                            logical.RecycledItemsCount = recycleCount;
                         }
                     });
                 }
