@@ -269,7 +269,7 @@ namespace ADB_Explorer
                 case nameof(AppSettings.SwRender):
                     SetRenderMode();
                     break;
-                case nameof(AppSettings.EnableRecycle):
+                case nameof(AppSettings.EnableRecycle) or nameof(AppSettings.EnableApk):
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                         RefreshDrives(true);
                     break;
@@ -444,7 +444,7 @@ namespace ADB_Explorer
                     if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
                         ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
-                    if (selectedFiles.All(file => file.IsInstallApk))
+                    if (Settings.EnableApk && selectedFiles.All(file => file.IsInstallApk))
                         ExplorerGrid.ContextMenu.Items.Add(packageActions);
 
                     if (ExplorerGrid.ContextMenu.Items[^1] is not Separator)
@@ -649,7 +649,7 @@ namespace ADB_Explorer
             CopyMenuButton.IsEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
             PasteMenuButton.IsEnabled = PasteEnabled();
 
-            FileActions.PackageActionsEnabled = selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
+            FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
             FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
             MoreMenuButton.IsEnabled = selectedFiles.Any() && !IsRecycleBin;
             SetRowsRadius();
@@ -2260,7 +2260,9 @@ namespace ADB_Explorer
                 });
             }
 
-            if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
+            if (!Settings.EnableApk)
+                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Temp);
+            else if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
                 DevicesObject.CurrentDevice.Drives.Add(new(path: TEMP_PATH));
 
             var dispatcher = Dispatcher;

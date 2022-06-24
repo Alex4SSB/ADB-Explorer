@@ -288,9 +288,13 @@
             <MenuItem.Style>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                     <Setter Property="IsEnabled" Value="False" />
+                    <Setter Property="Visibility" Value="Collapsed"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="True">
                             <Setter Property="IsEnabled" Value="True" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" Value="True">
+                            <Setter Property="Visibility" Value="Visible"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -2589,9 +2593,6 @@
                                 <Separator />
                                 <Expander Header="Device">
                                     <StackPanel>
-                                        <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
-                                        <CheckBox Content="Poll For Drives" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDrives}" />
-                                        <Separator Style="{x:Null}" />
                                         <CheckBox Content="Automatically Enable Root" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoRoot}" />
                                         <CheckBox Content="Remember Last IP" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" />
                                         <CheckBox Content="Remember Last Port">
@@ -2610,6 +2611,14 @@
                                             </CheckBox.Style>
                                         </CheckBox>
                                         <CheckBox Content="Automatically Open For Browsing" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoOpen}" />
+                                    </StackPanel>
+                                </Expander>
+                                <Separator />
+                                <Expander Header="Drives &amp; Features">
+                                    <StackPanel>
+                                        <CheckBox Content="Poll For Drives" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDrives}" />
+                                        <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
+                                        <CheckBox Content="Enable APK handling" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}"/>
                                     </StackPanel>
                                 </Expander>
                                 <Separator />
@@ -2780,6 +2789,7 @@
         <Border
             x:Name="SplashScreen"
             Margin="0,-50,0,0"
+            d:Visibility="Collapsed"
             Background="#FF80C9E4">
             <Grid>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

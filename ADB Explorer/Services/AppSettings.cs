@@ -103,6 +103,17 @@ namespace ADB_Explorer.Services
             set => Set(ref autoRoot, value);
         }
 
+        #endregion
+
+        #region Drives & Features
+
+        private bool pollDrives;
+        public bool PollDrives
+        {
+            get => Get(ref pollDrives, true);
+            set => Set(ref pollDrives, value);
+        }
+
         private bool enableRecycle;
         /// <summary>
         /// Enable moving deleted items to a special folder, instead of permanently deleting them
@@ -111,6 +122,13 @@ namespace ADB_Explorer.Services
         {
             get => Get(ref enableRecycle, false);
             set => Set(ref enableRecycle, value);
+        }
+
+        private bool enableApk;
+        public bool EnableApk
+        {
+            get => Get(ref enableApk, false);
+            set => Set(ref enableApk, value);
         }
 
         #endregion
@@ -145,13 +163,6 @@ namespace ADB_Explorer.Services
         {
             get => Get(ref pollBattery, true);
             set => Set(ref pollBattery, value);
-        }
-
-        private bool pollDrives;
-        public bool PollDrives
-        {
-            get => Get(ref pollDrives, true);
-            set => Set(ref pollDrives, value);
         }
 
         private bool enableLog;
