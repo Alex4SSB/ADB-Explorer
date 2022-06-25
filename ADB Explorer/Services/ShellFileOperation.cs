@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using Microsoft.WindowsAPICodePack.Shell;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
@@ -219,7 +220,7 @@ namespace ADB_Explorer.Services
             ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                     "pm",
                                                     out string stdout,
-                                                    out string stderr,
+                                                    out _,
                                                     "install",
                                                     "-R",
                                                     "--pkg",
@@ -238,12 +239,58 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static void UninstallPackages(ADBService.AdbDevice device, IEnumerable<string> packages, Dispatcher dispatcher)
+        public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellObject> items, Dispatcher dispatcher, bool isPackagePath = false)
+        {
+            foreach (var item in items)
+            {
+                dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, new(item), pushPackage: true, isPackagePath: isPackagePath)));
+            }
+        }
+
+        public static void UninstallPackages(ADBService.AdbDevice device, IEnumerable<string> packages, Dispatcher dispatcher, ObservableList<Package> packageList)
         {
             foreach (var item in packages)
             {
-                Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, packageName: item));
+                dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, packageName: item, packageList: packageList)));
             }
+        }
+
+        public static ObservableList<Package> GetPackages(ADBService.AdbDevice device, bool includeSystem = true)
+        {
+            // More package-specific info can be acquired using dumpsys package [package_name]
+
+            ObservableList<Package> packages = new();
+            string stdout = "";
+
+            if (includeSystem)
+            {
+                var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                    "pm",
+                                                    out stdout,
+                                                    out _,
+                                                    "list",
+                                                    "packages",
+                                                    "-s",
+                                                    "-U",
+                                                    "--show-versioncode");
+
+                if (systemExitCode == 0)
+                    packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
+            }
+
+            var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                    "pm",
+                                                    out stdout,
+                                                    out _,
+                                                    "list",
+                                                    "packages",
+                                                    "-3",
+                                                    "-U",
+                                                    "--show-versioncode");
+            if (userExitCode == 0)
+                packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
+
+            return packages;
         }
     }
 }

@@ -10,6 +10,7 @@
         x:Key="BaseButtonStyle"
         BasedOn="{StaticResource DefaultButtonStyle}"
         TargetType="Button">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
@@ -311,6 +312,7 @@
         <Setter Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
         <Setter Property="Foreground" Value="{ui:ThemeResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">

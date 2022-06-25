@@ -37,5 +37,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex PACKAGE_NAME =
             new(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])");
+
+        public static readonly Regex PACKAGE_LISTING =
+            new(@"(?:package:)(?<package>[\w.]+)(?: versionCode:(?<version>[\d]+))*(?: uid:(?<uid>[\d]+))*");
     }
 }

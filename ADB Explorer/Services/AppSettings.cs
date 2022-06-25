@@ -28,7 +28,7 @@ namespace ADB_Explorer.Services
 
         #endregion
 
-        #region explorer
+        #region File Behavior
 
         private bool pullOnDoubleClick;
         public bool PullOnDoubleClick
@@ -42,6 +42,13 @@ namespace ADB_Explorer.Services
         {
             get => Get(ref showExtensions, true);
             set => Set(ref showExtensions, value);
+        }
+
+        private bool showSystemPackages;
+        public bool ShowSystemPackages
+        {
+            get => Get(ref showSystemPackages, true);
+            set => Set(ref showSystemPackages, value);
         }
 
         private bool showHiddenItems;

@@ -222,12 +222,6 @@ namespace ADB_Explorer.Services
                 };
             }
 
-            public bool IsDirectory(string path)
-            {
-                int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, EscapeAdbShellString(path));
-                return ((exitCode == 0) || ((exitCode != 0) && stderr.Contains("permission denied", StringComparison.OrdinalIgnoreCase)));
-            }
-
             public string TranslateDevicePath(string path)
             {
                 int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, EscapeAdbShellString(path), "&&", "pwd");

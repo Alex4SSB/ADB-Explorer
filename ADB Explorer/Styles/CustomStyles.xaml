@@ -43,6 +43,7 @@
         x:Key="DeviceHeaderIcon"
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
@@ -128,6 +129,7 @@
         x:Key="TooltipTextBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
         TargetType="TextBox">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
         <Style.Resources>
             <Style BasedOn="{StaticResource TrimmedTextTooltipStyle}" TargetType="ToolTip" />
@@ -135,6 +137,7 @@
     </Style>
     <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
         <Style.Resources>
             <Style BasedOn="{StaticResource TrimmedTextTooltipStyle}" TargetType="ToolTip" />
@@ -627,6 +630,7 @@
         <Grid Margin="0,0,6,0">
             <Grid.Style>
                 <Style TargetType="Grid">
+                    <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
                     <Setter Property="ToolTip" Value="{Binding OperationName}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding OperationName}" Value="Install">
@@ -805,6 +809,7 @@
                 <Setter Property="Glyph" Value="&#xE72C;" />
             </Style>
         </Style.Resources>
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="HorizontalAlignment" Value="Right" />
@@ -877,6 +882,7 @@
         TargetType="ui:ProgressBar">
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="IsIndeterminate" Value="False" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsActive}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
@@ -935,6 +941,7 @@
         x:Key="DriveUsageBarStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ui:ProgressBar">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ToolTip">
             <Setter.Value>
                 <StackPanel Orientation="Horizontal">
@@ -1117,6 +1124,7 @@
                 </ui:SimpleStackPanel>
             </Setter.Value>
         </Setter>
+
         <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
             <Trigger Property="DataContext" Value="{x:Null}">
@@ -1159,6 +1167,7 @@
         </Style.Triggers>
     </Style>
     <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
@@ -1185,6 +1194,10 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding Type}" Value="Temp">
                 <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="Package">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="BorderBrush" Value="ForestGreen" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="4" />

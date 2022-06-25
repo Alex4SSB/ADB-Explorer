@@ -22,6 +22,8 @@ namespace ADB_Explorer.Models
         public static readonly string[] RECYCLE_INDEX_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH };
         public static readonly string[] RECYCLE_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH, RECYCLE_PATH };
 
+        public static readonly string PACKAGE_PATH = "[PACKAGE_DRIVE]";
+
         public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
         {
             { RECYCLE_PATH, "Recycle Bin" },
@@ -39,6 +41,7 @@ namespace ADB_Explorer.Models
             { "/", DriveType.Root },
             { RECYCLE_PATH, DriveType.Trash },
             { TEMP_PATH, DriveType.Temp },
+            { PACKAGE_PATH, DriveType.Package },
         };
         public static readonly Dictionary<DriveType, string> DRIVE_DISPLAY_NAMES = new()
         {
@@ -50,6 +53,7 @@ namespace ADB_Explorer.Models
             { DriveType.Emulated, "Emulated Drive" },
             { DriveType.Trash, "Recycle Bin" },
             { DriveType.Temp, "Temp" },
+            { DriveType.Package, "Installed Apps" },
         };
 
         public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);

@@ -12,6 +12,9 @@ namespace ADB_Explorer.Services
     {
         private Task operationTask;
         private CancellationTokenSource cancelTokenSource;
+        private readonly ObservableList<Package> packageList;
+        private bool pushPackage;
+        private bool isPackagePath;
 
         private string packageName;
         public string PackageName
@@ -20,10 +23,19 @@ namespace ADB_Explorer.Services
             set => Set(ref packageName, value);
         }
 
-        public PackageInstallOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path = null, string packageName = null) : base(dispatcher, adbDevice, path)
+        public PackageInstallOperation(Dispatcher dispatcher,
+                                       ADBService.AdbDevice adbDevice,
+                                       FilePath path = null,
+                                       string packageName = null,
+                                       ObservableList<Package> packageList = null,
+                                       bool pushPackage = false,
+                                       bool isPackagePath = false) : base(dispatcher, adbDevice, path)
         {
             OperationName = OperationType.Install;
             PackageName = packageName;
+            this.packageList = packageList;
+            this.pushPackage = pushPackage;
+            this.isPackagePath = isPackagePath;
         }
 
         public override void Start()
@@ -36,11 +48,14 @@ namespace ADB_Explorer.Services
             Status = OperationStatus.InProgress;
             cancelTokenSource = new CancellationTokenSource();
             var args = new string[2];
+            
+            // install (pm / adb)
             if (string.IsNullOrEmpty(PackageName))
             {
                 args[0] = "install";
                 args[1] = FilePath.FullPath;
             }
+            // uninstall
             else
             {
                 args[0] = "uninstall";
@@ -48,13 +63,29 @@ namespace ADB_Explorer.Services
             }
 
             args[1] = ADBService.EscapeAdbShellString(args[1]);
-            operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out _, out _, args));
+            operationTask = Task.Run(() =>
+            {
+                return pushPackage
+                    ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out _, out _, args[1])
+                    : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out _, out _, args);
+            });
 
             operationTask.ContinueWith((t) =>
             {
                 var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
                 Status = operationStatus;
                 StatusInfo = null;
+
+                if (operationStatus is OperationStatus.Completed)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (packageList is not null)
+                            packageList.RemoveAll(pkg => pkg.Name == packageName);
+                        else if (pushPackage && isPackagePath)
+                            Data.RefreshPackages = true;
+                    });
+                }
             }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
             operationTask.ContinueWith((t) =>

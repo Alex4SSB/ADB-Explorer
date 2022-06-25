@@ -527,7 +527,7 @@ namespace ADB_Explorer.Models
 
         private void _setDrives(IEnumerable<Drive> drives)
         {
-            if (!DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp)))
+            if (!DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp and not DriveType.Package)))
                 return;
 
             var trash = Drives.Where(d => d.Type is DriveType.Trash);
@@ -537,6 +537,10 @@ namespace ADB_Explorer.Models
             var temp = Drives.Where(d => d.Type is DriveType.Temp);
             if (temp.Any())
                 drives = drives.Append(temp.First());
+
+            var apk = Drives.Where(d => d.Type is DriveType.Package);
+            if (apk.Any())
+                drives = drives.Append(apk.First());
 
             Drives.Set(drives);
         }

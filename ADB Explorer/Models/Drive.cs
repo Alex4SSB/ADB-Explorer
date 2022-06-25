@@ -19,6 +19,7 @@ namespace ADB_Explorer.Models
         Emulated,
         Trash,
         Temp,
+        Package,
     }
 
     public class Drive : INotifyPropertyChanged
@@ -55,6 +56,7 @@ namespace ADB_Explorer.Models
             DriveType.Emulated => "\uEDA2",
             DriveType.Trash => "\uE74D",
             DriveType.Temp => "\uE912",
+            DriveType.Package => "\uE7B8",
             _ => throw new System.NotImplementedException(),
         };
 

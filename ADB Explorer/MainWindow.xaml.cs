@@ -56,7 +56,11 @@ namespace ADB_Explorer
         public bool IsRecycleBin
         {
             get => isRecycleBin;
-            set => Set(ref isRecycleBin, value);
+            set
+            {
+                Set(ref isRecycleBin, value);
+                FileActions.NewMenuVisible = !value && CurrentPath != PACKAGE_PATH;
+            }
         }
 
         private bool trashInProgress;
@@ -119,9 +123,11 @@ namespace ADB_Explorer
             }
         }
 
-        private string SelectedFilesTotalSize => FileClass.TotalSize(selectedFiles) is ulong size and > 0 ? size.ToSize() : "";
+        private string SelectedFilesTotalSize => (selectedFiles is not null && FileClass.TotalSize(selectedFiles) is ulong size and > 0) ? size.ToSize() : "";
 
-        private IEnumerable<FileClass> selectedFiles => ExplorerGrid.SelectedItems.Cast<FileClass>();
+        private IEnumerable<FileClass> selectedFiles => CurrentPath == PACKAGE_PATH ? null : ExplorerGrid.SelectedItems.Cast<FileClass>();
+
+        private IEnumerable<Package> selectedPackages => CurrentPath == PACKAGE_PATH ? ExplorerGrid.SelectedItems.Cast<Package>() : null;
 
         public MainWindow()
         {
@@ -259,7 +265,7 @@ namespace ADB_Explorer
                 case nameof(AppSettings.EnableMdns):
                     EnableMdns();
                     break;
-                case nameof(AppSettings.ShowHiddenItems):
+                case nameof(AppSettings.ShowHiddenItems) or nameof(AppSettings.ShowSystemPackages):
                     FilterHiddenFiles();
                     break;
                 case nameof(AppSettings.EnableLog):
@@ -270,6 +276,8 @@ namespace ADB_Explorer
                     SetRenderMode();
                     break;
                 case nameof(AppSettings.EnableRecycle) or nameof(AppSettings.EnableApk):
+                    FileActions.PushPackageEnabled = Settings.EnableApk;
+
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                         RefreshDrives(true);
                     break;
@@ -417,6 +425,13 @@ namespace ADB_Explorer
                         ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
                         return;
                     }
+                    else if (CurrentPath == PACKAGE_PATH)
+                    {
+                        FileActions.CopyPathEnabled = true;
+                        ExplorerGrid.ContextMenu.Items.Add(copyPath);
+                        ExplorerGrid.ContextMenu.Items.Add(FindResource("UninstallMenuItem"));
+                        return;
+                    }
 
                     ExplorerGrid.ContextMenu.Items.Add(pullMenu);
 
@@ -473,6 +488,8 @@ namespace ADB_Explorer
                         TextHelper.SetAltText(deleteMenu, "Empty Recycle Bin");
                         return;
                     }
+                    else if (CurrentPath == PACKAGE_PATH)
+                        return;
 
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
@@ -544,7 +561,7 @@ namespace ADB_Explorer
         private void FocusPathBox()
         {
             PathMenu.Visibility = Visibility.Collapsed;
-            if (!IsRecycleBin)
+            if (!IsRecycleBin && CurrentPath != PACKAGE_PATH)
                 PathBox.Text = TextHelper.GetAltText(PathBox);
 
             PathBox.IsReadOnly = false;
@@ -622,6 +639,15 @@ namespace ADB_Explorer
 
         private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            SetRowsRadius();
+            if (CurrentPath == PACKAGE_PATH)
+            {
+                MoreMenuButton.IsEnabled =
+                FileActions.CopyPathEnabled =
+                FileActions.UninstallPackageEnabled = selectedPackages.Any();
+                return;
+            }
+
             TotalSizeBlock.Text = SelectedFilesTotalSize;
 
             bool irregular = DevicesObject.CurrentDevice?.Root != AbstractDevice.RootStatus.Enabled
@@ -652,7 +678,7 @@ namespace ADB_Explorer
             FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
             FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
             MoreMenuButton.IsEnabled = selectedFiles.Any() && !IsRecycleBin;
-            SetRowsRadius();
+            
         }
 
         private void SetRowsRadius()
@@ -986,7 +1012,6 @@ namespace ADB_Explorer
 
             DrivesItemRepeater.Visibility = Visibility.Collapsed;
             ExplorerGrid.Visibility = Visibility.Visible;
-            ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
 
             return _navigateToPath(realPath, bfNavigated);
@@ -1122,6 +1147,12 @@ namespace ADB_Explorer
                 if (devicesVisible)
                     UpdateDevicesRootAccess();
 
+                if (CurrentPath == PACKAGE_PATH && RefreshPackages)
+                {
+                    Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
+                    RefreshPackages = false;
+                }
+
                 connectTimerMutex.ReleaseMutex();
             });
         }
@@ -1151,8 +1182,11 @@ namespace ADB_Explorer
             });
         }
 
-        public string FolderExists(string path)
+        public static string FolderExists(string path)
         {
+            if (path == PACKAGE_PATH)
+                return path;
+
             try
             {
                 return CurrentADBDevice.TranslateDevicePath(path);
@@ -1187,11 +1221,29 @@ namespace ADB_Explorer
             ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
 
             IsRecycleBin = CurrentPath == RECYCLE_PATH;
-            ParentButton.IsEnabled = CurrentPath != ParentPath && !IsRecycleBin;
+            ParentButton.IsEnabled = CurrentPath != ParentPath && !IsRecycleBin && realPath != PACKAGE_PATH;
             PasteMenuButton.IsEnabled = PasteEnabled();
-            PushMenuButton.IsEnabled =
-            NewMenuButton.IsEnabled = !IsRecycleBin;
+            FileActions.PushPackageEnabled = Settings.EnableApk;
             FileActions.InstallPackageEnabled = CurrentPath == TEMP_PATH;
+            FileActions.UninstallPackageEnabled = CurrentPath == TEMP_PATH;
+            FileActions.UninstallVisible = realPath == PACKAGE_PATH;
+            FileActions.NewMenuVisible =
+            FileActions.PushFilesFoldersEnabled =
+            NewMenuButton.IsEnabled = !IsRecycleBin && realPath != PACKAGE_PATH;
+
+            OriginalPath.Visibility =
+            OriginalDate.Visibility = Visible(realPath == RECYCLE_PATH);
+
+            PackageName.Visibility =
+            PackageType.Visibility =
+            PackageUid.Visibility =
+            PackageVersion.Visibility = Visible(realPath == PACKAGE_PATH);
+
+            IconColumn.Visibility =
+            NameColumn.Visibility = 
+            DateColumn.Visibility =
+            TypeColumn.Visibility =
+            SizeColumn.Visibility = Visible(realPath != PACKAGE_PATH);
 
             if (realPath == RECYCLE_PATH)
             {
@@ -1228,24 +1280,37 @@ namespace ADB_Explorer
 
                 recycleTask.ContinueWith((t) => DirectoryLister.Navigate(realPath));
 
-                Date.Header = "Date Deleted";
-                OriginalPath.Visibility =
-                OriginalDate.Visibility = Visibility.Visible;
-
+                DateColumn.Header = "Date Deleted";
                 DeleteMenuButton.ToolTip = "Empty Recycle Bin (Del)";
                 RestoreMenuButton.ToolTip = "Restore All Items (Ctrl+R)";
+            }
+            else if (realPath == PACKAGE_PATH)
+            {
+                var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages));
+                packageTask.ContinueWith((t) =>
+                {
+                    if (t.IsCanceled)
+                        return;
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        Packages = t.Result;
+                        ExplorerGrid.ItemsSource = Packages;
+                        FilterHiddenFiles();
+                    });
+                });
+
+                return true;
             }
             else
             {
                 DirectoryLister.Navigate(realPath);
 
-                Date.Header = "Date Modified";
-                OriginalPath.Visibility =
-                OriginalDate.Visibility = Visibility.Collapsed;
-
+                DateColumn.Header = "Date Modified";
                 DeleteMenuButton.ToolTip = "Delete";
             }
 
+            ExplorerGrid.ItemsSource = DirectoryLister.FileList;
             FilterHiddenFiles();
             return true;
         }
@@ -1417,6 +1482,7 @@ namespace ADB_Explorer
             ControlHelper.SetCornerRadius(button, new(Settings.UseFluentStyles ? 3 : 0));
 
             button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
+
             PathMenu.Items.Add(button);
         }
 
@@ -1553,7 +1619,7 @@ namespace ADB_Explorer
             {
                 NavigateBack();
             }
-            else if (key == Key.Delete)
+            else if (key == Key.Delete && DeleteMenuButton.IsEnabled)
             {
                 DeleteFiles();
             }
@@ -1579,7 +1645,7 @@ namespace ADB_Explorer
             e.Handled = true;
         }
 
-        private bool IsInEditMode() => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing;
+        private bool IsInEditMode() => CurrentPath == PACKAGE_PATH ? false : CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing;
 
         private void IsInEditMode(bool isEditing) => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = isEditing;
 
@@ -1619,7 +1685,7 @@ namespace ADB_Explorer
             {
                 NavigateBack();
             }
-            else if (actualKey == Key.Delete)
+            else if (actualKey == Key.Delete && DeleteMenuButton.IsEnabled)
             {
                 DeleteFiles();
             }
@@ -1671,7 +1737,7 @@ namespace ADB_Explorer
             {
                 RestoreItems();
             }
-            else if (actualKey == Key.V && alt && PushMenuButton.IsEnabled)
+            else if (actualKey == Key.V && alt && FileActions.PushFilesFoldersEnabled)
             {
                 PushItems(false, true);
             }
@@ -1679,13 +1745,17 @@ namespace ADB_Explorer
             {
                 InstallPackages();
             }
-            else if (actualKey == Key.F11 && shift && FileActions.InstallUninstallEnabled)
+            else if (actualKey == Key.F11 && shift && FileActions.UninstallPackageEnabled)
             {
                 UninstallPackages();
             }
             else if (actualKey == Key.F12 && shift && FileActions.CopyToTempEnabled)
             {
                 CopyToTemp();
+            }
+            else if (actualKey == Key.I && alt && FileActions.PushPackageEnabled)
+            {
+                PushPackages();
             }
             else if (actualKey == Key.F10)
             { }
@@ -2039,8 +2109,8 @@ namespace ADB_Explorer
         {
             PathMenu.Items.Clear();
             DirectoryLister?.FileList?.Clear();
-            PushMenuButton.IsEnabled =
-            NewMenuButton.IsEnabled =
+            FileActions.PushFilesFoldersEnabled =
+            FileActions.PushPackageEnabled =
             PullMenuButton.IsEnabled =
             DeleteMenuButton.IsEnabled =
             RenameMenuButton.IsEnabled =
@@ -2048,7 +2118,10 @@ namespace ADB_Explorer
             NewMenuButton.IsEnabled =
             PasteMenuButton.IsEnabled =
             MoreMenuButton.IsEnabled =
+            FileActions.UninstallVisible =
             ParentButton.IsEnabled = false;
+
+            FileActions.NewMenuVisible = true;
 
             if (clearDevice)
             {
@@ -2261,9 +2334,15 @@ namespace ADB_Explorer
             }
 
             if (!Settings.EnableApk)
-                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Temp);
-            else if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
-                DevicesObject.CurrentDevice.Drives.Add(new(path: TEMP_PATH));
+                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Temp or Models.DriveType.Package);
+            else
+            {
+                if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
+                    DevicesObject.CurrentDevice.Drives.Add(new(path: TEMP_PATH));
+
+                if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Package))
+                    DevicesObject.CurrentDevice.Drives.Add(new(path: PACKAGE_PATH));
+            }
 
             var dispatcher = Dispatcher;
             var driveTask = Task.Run(() =>
@@ -2340,7 +2419,10 @@ namespace ADB_Explorer
 
         private void PathMenuCopy_Click(object sender, RoutedEventArgs e)
         {
-            Clipboard.SetText(TextHelper.GetAltText(PathBox));
+            var text = TextHelper.GetAltText(PathBox);
+
+            if (text != RECYCLE_PATH && text != PACKAGE_PATH)
+                Clipboard.SetText(text);
         }
 
         private void FilterHiddenFiles()
@@ -2352,14 +2434,27 @@ namespace ADB_Explorer
 
             var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
 
-            collectionView.Filter = !Settings.ShowHiddenItems
+            if (CurrentPath == PACKAGE_PATH)
+            {
+                collectionView.Filter = Settings.ShowSystemPackages
+                    ? new(pkg => true)
+                    : new(pkg => ((Package)pkg).Type is Package.PackageType.User);
+
+                ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
+                collectionView.SortDescriptions.Clear();
+                collectionView.SortDescriptions.Add(new("Type", ListSortDirection.Descending));
+            }
+            else
+            {
+                collectionView.Filter = !Settings.ShowHiddenItems
                 ? (new(HideFiles()))
                 : (new(file => !IsHiddenRecycleItem((FileClass)file)));
 
-            ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
-            collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new("IsDirectory", ListSortDirection.Descending));
-            collectionView.SortDescriptions.Add(new("FullName", ListSortDirection.Ascending));
+                ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
+                collectionView.SortDescriptions.Clear();
+                collectionView.SortDescriptions.Add(new("IsDirectory", ListSortDirection.Descending));
+                collectionView.SortDescriptions.Add(new("FullName", ListSortDirection.Ascending));
+            }
         }
 
         private static Predicate<object> HideFiles() => file =>
@@ -2957,7 +3052,7 @@ namespace ADB_Explorer
                 }
                 else
                 {
-                    if (selectedFiles.Count() > 1)
+                    if (selectedFiles is null || selectedFiles.Count() > 1)
                     {
                         ExplorerGrid.SelectedItems.Clear();
                         row.IsSelected = true;
@@ -3152,7 +3247,8 @@ namespace ADB_Explorer
             if (e.Key == Key.Delete)
             {
                 e.Handled = true;
-                DeleteFiles();
+                if (DeleteMenuButton.IsEnabled)
+                    DeleteFiles();
             }
         }
 
@@ -3190,7 +3286,8 @@ namespace ADB_Explorer
 
         private void CopyItemPath()
         {
-            Clipboard.SetText(((FilePath)ExplorerGrid.SelectedItem).FullPath);
+            var path = CurrentPath == PACKAGE_PATH ? ((Package)ExplorerGrid.SelectedItem).Name : ((FilePath)ExplorerGrid.SelectedItem).FullPath;
+            Clipboard.SetText(path);
         }
 
         private void ClearLogButton_Click(object sender, RoutedEventArgs e)
@@ -3355,6 +3452,9 @@ namespace ADB_Explorer
 
         private void ExplorerGrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
+            if (CurrentPath == PACKAGE_PATH)
+                return;
+
             var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
             var sortDirection = Invert(e.Column.SortDirection);
             e.Column.SortDirection = sortDirection;
@@ -3388,13 +3488,20 @@ namespace ADB_Explorer
 
         private void UninstallPackages()
         {
+            var pkgs = selectedPackages;
             var files = selectedFiles;
-            
-            var packageTask = Task.Run(() => from item in files select ShellFileOperation.GetPackageName(CurrentADBDevice, item.FullPath));
+
+            var packageTask = Task.Run(() =>
+            {
+                if (CurrentPath == PACKAGE_PATH)
+                    return pkgs.Select(pkg => pkg.Name);
+                else
+                    return from item in files select ShellFileOperation.GetPackageName(CurrentADBDevice, item.FullPath);
+            });
             packageTask.ContinueWith((t) =>
             {
                 if (!t.IsCanceled)
-                    Dispatcher.Invoke(() => ShellFileOperation.UninstallPackages(CurrentADBDevice, t.Result, Dispatcher));
+                    ShellFileOperation.UninstallPackages(CurrentADBDevice, t.Result, Dispatcher, Packages);
             });
         }
 
@@ -3406,6 +3513,28 @@ namespace ADB_Explorer
         private void CopyToTemp()
         {
             _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, selectedFiles.First(), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
+        }
+
+        private void PushPackages()
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = false,
+                Multiselect = true,
+                DefaultDirectory = Settings.DefaultFolder,
+                Title = $"Select packages to install"
+            };
+            dialog.Filters.Add(new("Android Package", string.Join(';', INSTALL_APK.Select(name => name[1..]))));
+
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            Task.Run(() => ShellFileOperation.PushPackages(CurrentADBDevice, dialog.FilesAsShellObject, Dispatcher, CurrentPath == PACKAGE_PATH));
+        }
+
+        private void PushPackagesMenu_Click(object sender, RoutedEventArgs e)
+        {
+            PushPackages();
         }
     }
 }
