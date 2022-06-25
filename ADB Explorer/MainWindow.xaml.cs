@@ -542,15 +542,22 @@ namespace ADB_Explorer
         {
             ThemeManager.Current.ApplicationTheme = theme;
 
-            foreach (string key in ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys)
+            Task.Run(() =>
             {
-                SetResourceColor(theme, key);
-            }
+                var keys = ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys;
+                string[] brushes = new string[keys.Count];
+                keys.CopyTo(brushes, 0);
+
+                Parallel.ForEach(brushes, (brush) =>
+                {
+                    SetResourceColor(theme, brush);
+                });
+            });
         });
 
-        private static void SetResourceColor(ApplicationTheme theme, string resource)
+        private void SetResourceColor(ApplicationTheme theme, string resource)
         {
-            Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]);
+            Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
         }
 
         private void PathBox_GotFocus(object sender, RoutedEventArgs e)
