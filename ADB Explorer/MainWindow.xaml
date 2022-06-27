@@ -2268,29 +2268,6 @@
                                             </StackPanel>
                                         </StackPanel>
                                     </Grid>
-                                    <Grid Margin="0,4,0,0">
-                                        <Grid.Style>
-                                            <Style TargetType="Grid">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </Style>
-                                        </Grid.Style>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <ui:FontIcon Glyph="&#xE946;" />
-                                        <TextBlock
-                                            Grid.Column="1"
-                                            Margin="6,0,0,0"
-                                            FontSize="13"
-                                            Text="Enable mDNS in the settings"
-                                            TextWrapping="Wrap" />
-                                    </Grid>
                                     <Grid x:Name="MdnsPairingGrid">
                                         <Grid.Style>
                                             <Style TargetType="Grid">
@@ -2782,25 +2759,69 @@
                                 <Separator />
                                 <Expander x:Name="WorkingDirectoriesExpander" Header="Working Directories">
                                     <StackPanel>
-                                        <TextBlock Margin="4,0" Text="Default Folder" />
-                                        <TextBox
-                                            Margin="0,6"
-                                            ui:ControlHelper.PlaceholderText="Click To Browse"
-                                            MouseUp="ChangeDefaultFolderButton_Click"
-                                            Style="{StaticResource TooltipTextBoxStyle}"
-                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
-                                        <Grid Margin="0,4,0,0">
-                                            <TextBlock Margin="4,0,0,0" Text="Override ADB Path" />
-                                            <Button Click="RestartButton_Click" Style="{StaticResource RestartAppButtonStyle}">
+                                        <Grid Margin="0,6">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Margin="4,0,0,4"
+                                                Text="Default Folder" />
+                                            <Button
+                                                Grid.Row="1"
+                                                Click="DefaultFolderSetButton_Click"
+                                                Margin="0,0,6,0"
+                                                ToolTip="Change">
+                                                <ui:FontIcon Glyph="&#xE70F;" />
+                                            </Button>
+                                            <TextBox
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                ui:ControlHelper.PlaceholderText="- not set -"
+                                                IsReadOnly="True"
+                                                Style="{StaticResource TooltipTextBoxStyle}"
+                                                Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
+                                        </Grid>
+                                        <Grid Margin="0,6">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Margin="4,0,0,6"
+                                                Text="Override ADB Path" />
+                                            <Button
+                                                Grid.Column="1"
+                                                Margin="0,0,0,6"
+                                                Click="RestartButton_Click"
+                                                Style="{StaticResource RestartAppButtonStyle}">
                                                 <ui:FontIcon />
                                             </Button>
+                                            <Button
+                                                Grid.Row="1"
+                                                Margin="0,0,6,0"
+                                                Click="OverrideAdbPathSetButton_Click"
+                                                ToolTip="Change">
+                                                <ui:FontIcon Glyph="&#xE70F;" />
+                                            </Button>
+                                            <TextBox
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                ui:ControlHelper.PlaceholderText="- not set -"
+                                                IsReadOnly="True"
+                                                Style="{StaticResource TooltipTextBoxStyle}"
+                                                Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
                                         </Grid>
-                                        <TextBox
-                                            Margin="0,6"
-                                            ui:ControlHelper.PlaceholderText="Click To Browse"
-                                            MouseUp="ManualAdbPath_MouseUp"
-                                            Style="{StaticResource TooltipTextBoxStyle}"
-                                            Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator />

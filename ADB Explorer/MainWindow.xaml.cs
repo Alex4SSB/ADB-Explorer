@@ -1957,22 +1957,6 @@ namespace ADB_Explorer
             }
         }
 
-        private void ChangeDefaultFolderButton_Click(object sender, MouseButtonEventArgs e)
-        {
-            var dialog = new CommonOpenFileDialog()
-            {
-                IsFolderPicker = true,
-                Multiselect = false
-            };
-            if (Settings.DefaultFolder != "")
-                dialog.DefaultDirectory = Settings.DefaultFolder;
-
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                Settings.DefaultFolder = dialog.FileName;
-            }
-        }
-
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
@@ -2713,30 +2697,6 @@ namespace ADB_Explorer
             ADBService.KillAdbServer();
             MdnsService.State = MDNS.MdnsState.Disabled;
             ChangeConnectionType();
-        }
-
-        private void ManualAdbPath_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            var dialog = new OpenFileDialog()
-            {
-                Multiselect = false,
-                Title = "Select ADB Executable",
-                Filter = "ADB Executable|adb.exe",
-            };
-
-            if (!string.IsNullOrEmpty(Settings.ManualAdbPath))
-            {
-                try
-                {
-                    dialog.InitialDirectory = Directory.GetParent(Settings.ManualAdbPath).FullName;
-                }
-                catch (Exception) { }
-            }
-
-            if (dialog.ShowDialog() == true)
-            {
-                Settings.ManualAdbPath = dialog.FileName;
-            }
         }
 
         private void PairingExpander_Expanded(object sender, RoutedEventArgs e)
@@ -3548,6 +3508,64 @@ namespace ADB_Explorer
         private void PushPackagesMenu_Click(object sender, RoutedEventArgs e)
         {
             PushPackages();
+        }
+
+        private void DefaultFolderSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new CommonOpenFileDialog()
+            {
+                IsFolderPicker = true,
+                Multiselect = false
+            };
+            if (Settings.DefaultFolder != "")
+                dialog.DefaultDirectory = Settings.DefaultFolder;
+
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                Settings.DefaultFolder = dialog.FileName;
+            }
+        }
+
+        private void OverrideAdbPathSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog()
+            {
+                Multiselect = false,
+                Title = "Select ADB Executable",
+                Filter = "ADB Executable|adb.exe",
+            };
+
+            if (!string.IsNullOrEmpty(Settings.ManualAdbPath))
+            {
+                try
+                {
+                    dialog.InitialDirectory = Directory.GetParent(Settings.ManualAdbPath).FullName;
+                }
+                catch (Exception) { }
+            }
+
+            if (dialog.ShowDialog() == true)
+            {
+                string message = "";
+                var version = ADBService.VerifyAdbVersion(dialog.FileName);
+                if (version is null)
+                {
+                    message = "Could not get ADB version from provided path.";
+                }
+                else if (version < MIN_ADB_VERSION)
+                {
+                    message = "ADB version from provided path is too low.";
+                }
+                
+                if (message != "")
+                {
+                    SettingsSplitView.IsPaneOpen = false;
+                    DialogService.ShowMessage(message, "Fail to override ADB", DialogService.DialogIcon.Exclamation);
+                    return;
+                }
+
+                Settings.ManualAdbPath = dialog.FileName;
+            }
         }
     }
 }
