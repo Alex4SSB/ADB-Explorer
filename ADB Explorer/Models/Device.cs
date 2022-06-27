@@ -547,7 +547,7 @@ namespace ADB_Explorer.Models
 
         public bool DrivesChanged(IEnumerable<Drive> other)
         {
-            var self = Drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp);
+            var self = Drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp and not DriveType.Package);
 
             return other is not null
                 && !self.OrderBy(thisDrive => thisDrive.ID).SequenceEqual(

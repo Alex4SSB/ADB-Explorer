@@ -43,7 +43,7 @@ namespace ADB_Explorer.Services
 
         public static bool? RetrieveBool(string key)
         {
-            return Application.Current.Properties[key] switch
+            return Application.Current?.Properties[key] switch
             {
                 string value when !string.IsNullOrEmpty(value) => bool.Parse(value),
                 bool val => val,

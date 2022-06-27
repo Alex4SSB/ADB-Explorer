@@ -41,6 +41,7 @@ namespace ADB_Explorer
     {
         private readonly DispatcherTimer ServerWatchdogTimer = new();
         private readonly DispatcherTimer ConnectTimer = new();
+        private readonly DispatcherTimer SplashTimer = new();
         private Mutex connectTimerMutex = new();
         private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
@@ -170,7 +171,11 @@ namespace ADB_Explorer
             TestDevices();
 #endif
             if (Settings.EnableSplash)
-                new DispatcherTimer() { Interval = SPLASH_DISPLAY_TIME, IsEnabled = true }.Tick += SplashTimer_Tick;
+            {
+                SplashTimer.Tick += SplashTimer_Tick;
+                SplashTimer.Interval = SPLASH_DISPLAY_TIME;
+                SplashTimer.Start();
+            }
             else
                 SplashScreen.Visible(false);
 
@@ -202,6 +207,7 @@ namespace ADB_Explorer
         private void SplashTimer_Tick(object sender, EventArgs e)
         {
             SplashScreen.Visible(false);
+            SplashTimer.Stop();
         }
 
         private static void CheckForUpdates(Dispatcher dispatcher)
