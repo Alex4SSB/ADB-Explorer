@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
@@ -23,6 +24,13 @@ namespace ADB_Explorer
             try
             {
                 using IsolatedStorageFileStream stream = new(filename, FileMode.Open, storage);
+
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
+                    var path = stream.GetType().GetField("_fullPath", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(stream).ToString();
+                    Process.Start("explorer.exe", path[..path.LastIndexOf('\\')]);
+                }
+
                 using StreamReader reader = new(stream);
                 // Restore each application-scope property individually
                 while (!reader.EndOfStream)

@@ -1140,6 +1140,7 @@
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
         <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersionIncompatible}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />

@@ -2774,8 +2774,8 @@
                                                 Text="Default Folder" />
                                             <Button
                                                 Grid.Row="1"
-                                                Click="DefaultFolderSetButton_Click"
                                                 Margin="0,0,6,0"
+                                                Click="DefaultFolderSetButton_Click"
                                                 ToolTip="Change">
                                                 <ui:FontIcon Glyph="&#xE70F;" />
                                             </Button>
