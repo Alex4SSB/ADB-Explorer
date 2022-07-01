@@ -66,6 +66,13 @@ namespace ADB_Explorer
         {
             // Persist application-scope property to isolated storage
             IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
+
+            if (Models.Data.Settings.ResetAppSettings)
+            {
+                storage.DeleteFile(filename);
+                return;
+            }
+
             using IsolatedStorageFileStream stream = new(filename, FileMode.Create, storage);
             using StreamWriter writer = new(stream);
             // Persist each application-scope property individually

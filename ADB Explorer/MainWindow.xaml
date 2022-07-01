@@ -2618,28 +2618,52 @@
                     BorderBrush="Gray"
                     BorderThickness="1,1,0,0"
                     Style="{StaticResource DevicesListStyle}">
-                    <Grid Margin="18,8,0,0">
+                    <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="48" />
+                            <RowDefinition Height="52" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Menu Margin="0,0,8,0" HorizontalAlignment="Right">
                             <MenuItem Click="PaneCollapse_Click" ToolTip="Hide">
                                 <MenuItem.Header>
-                                    <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
+                                    <ui:FontIcon
+                                        Margin="0,0,0,-2"
+                                        Glyph="&#xE761;"
+                                        Style="{DynamicResource GlyphFont}" />
                                 </MenuItem.Header>
                             </MenuItem>
                         </Menu>
+                        <Button
+                            Margin="10"
+                            Background="#FFC42727"
+                            Click="ResetSettingsButton_Click"
+                            Style="{StaticResource AccentButtonStyle}"
+                            ToolTip="Reset App Settings">
+                            <Grid>
+                                <Grid.Resources>
+                                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon" />
+                                </Grid.Resources>
+                                <ui:FontIcon
+                                    Margin="10,0,-4,2"
+                                    FontSize="16"
+                                    Glyph="&#xE7A7;" />
+                                <ui:FontIcon
+                                    Margin="-2,4,10,-2"
+                                    FontSize="16"
+                                    Glyph="&#xE713;" />
+                            </Grid>
+                        </Button>
                         <TextBlock
-                            Margin="0,0,9,0"
+                            Margin="0,0,0,2"
                             HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
                             FontSize="24"
                             Text="Settings" />
                         <Grid
                             x:Name="MissingAdbGrid"
                             Grid.Row="1"
-                            Margin="-8,0,10,10"
+                            Margin="10,0,10,10"
                             Visibility="Collapsed">
                             <Border
                                 Background="{DynamicResource NoticeBorderBackground}"
@@ -2678,7 +2702,10 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
-                        <ScrollViewer Grid.Row="2" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                        <ScrollViewer
+                            Grid.Row="2"
+                            Margin="18,0,0,0"
+                            PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                             <ui:SimpleStackPanel
                                 Margin="6,0,24,6"
                                 HorizontalAlignment="Left"
@@ -2920,6 +2947,18 @@
                                                 </Style>
                                             </CheckBox.Style>
                                         </CheckBox>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <ui:FontIcon Glyph="&#xE946;" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                Margin="6,0,0,0"
+                                                Text="Launch app while holding L-Ctrl to open app settings location."
+                                                TextWrapping="Wrap" />
+                                        </Grid>
                                         <TextBlock
                                             Margin="0,16,0,0"
                                             FontWeight="Bold"

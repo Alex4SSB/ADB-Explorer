@@ -303,6 +303,9 @@ namespace ADB_Explorer.Services
 
         public bool WindowLoaded { get; set; } = false;
 
+        public bool ResetAppSettings { get; set; } = false;
+
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null, bool saveToDisk = true)
         {

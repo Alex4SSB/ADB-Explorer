@@ -3567,5 +3567,21 @@ namespace ADB_Explorer
                 Settings.ManualAdbPath = dialog.FileName;
             }
         }
+
+        private async void ResetSettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsSplitView.IsPaneOpen = false;
+            var result = await DialogService.ShowConfirmation(
+                            "All app settings will be reset upon closing the app.\nThis cannot be undone. Are you sure?",
+                            "Reset App Settings",
+                            primaryText: "Confirm",
+                            cancelText: "Cancel",
+                            icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 == ContentDialogResult.None)
+                return;
+
+            Settings.ResetAppSettings = true;
+        }
     }
 }
