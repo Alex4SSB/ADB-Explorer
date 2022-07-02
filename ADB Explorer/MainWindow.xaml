@@ -2636,7 +2636,6 @@
                         </Menu>
                         <Button
                             Margin="10"
-                            Background="#FFC42727"
                             Click="ResetSettingsButton_Click"
                             Style="{StaticResource AccentButtonStyle}"
                             ToolTip="Reset App Settings">

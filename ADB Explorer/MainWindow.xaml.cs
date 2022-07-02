@@ -630,7 +630,7 @@ namespace ADB_Explorer
 
         private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (e.ChangedButton == MouseButton.Left && selectedFiles.Count() == 1 && !IsInEditMode())
+            if (e.ChangedButton == MouseButton.Left && CurrentPath != PACKAGE_PATH && selectedFiles.Count() == 1 && !IsInEditMode())
                 DoubleClick(ExplorerGrid.SelectedItem);
         }
 
@@ -2350,9 +2350,10 @@ namespace ADB_Explorer
             if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !ExplorerGrid.Visible())
                 asyncClasify = true;
 
-            if (!Settings.EnableRecycle)
+            var trashExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash);
+            if (!Settings.EnableRecycle && trashExists)
                 DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Trash);
-            else if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash))
+            else if (Settings.EnableRecycle && !trashExists)
             {
                 var trashTask = Task.Run(() => string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)));
                 trashTask.ContinueWith((t) =>
@@ -2364,14 +2365,16 @@ namespace ADB_Explorer
                 });
             }
 
-            if (!Settings.EnableApk)
+            var tempExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp);
+            var pkgExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Package);
+            if (!Settings.EnableApk && (tempExists || pkgExists))
                 DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Temp or Models.DriveType.Package);
-            else
+            else if (Settings.EnableApk)
             {
-                if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
+                if (!tempExists)
                     DevicesObject.CurrentDevice.Drives.Add(new(path: TEMP_PATH));
 
-                if (!DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Package))
+                if (!pkgExists)
                     DevicesObject.CurrentDevice.Drives.Add(new(path: PACKAGE_PATH));
             }
 
@@ -2393,7 +2396,8 @@ namespace ADB_Explorer
                 dispatcher.Invoke(() =>
                 {
                     DevicesObject.CurrentDevice.SetDrives(t.Result, dispatcher, asyncClasify);
-                    DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
+                    if (DrivesItemRepeater.ItemsSource is null)
+                        DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice.Drives;
                 });
             });
         }
