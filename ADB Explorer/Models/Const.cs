@@ -74,6 +74,7 @@ namespace ADB_Explorer.Models
         public static readonly TimeSpan SERVER_RESPONSE_TIMEOUT = TimeSpan.FromMilliseconds(13000);
 
         public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
+        public static readonly sbyte MIN_PKG_UID_ANDROID_VER = 9;
         public static readonly double MAX_PANE_HEIGHT_RATIO = 0.4;
         public static readonly int MIN_PANE_HEIGHT = 150;
         public static readonly double MIN_PANE_HEIGHT_RATIO = 0.15;

@@ -149,7 +149,7 @@ namespace ADB_Explorer
             fileOperationQueue.PropertyChanged += FileOperationQueue_PropertyChanged;
 
             Task<bool> versionTask = Task.Run(() => CheckAdbVersion());
-                
+
             versionTask.ContinueWith((t) =>
             {
                 if (!t.IsCanceled && t.Result)
@@ -355,7 +355,7 @@ namespace ADB_Explorer
                 fileList = DirectoryLister.FileList;
 
             RestoreMenuButton.IsEnabled = fileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-            DeleteMenuButton.IsEnabled =  fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
+            DeleteMenuButton.IsEnabled = fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
         }
 
         private void ThemeService_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -687,14 +687,14 @@ namespace ADB_Explorer
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
 
             CutMenuButton.IsEnabled = !selectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && !irregular;
-            
+
             CopyMenuButton.IsEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
             PasteMenuButton.IsEnabled = PasteEnabled();
 
             FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
             FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
             MoreMenuButton.IsEnabled = selectedFiles.Any() && !IsRecycleBin;
-            
+
         }
 
         private void SetRowsRadius()
@@ -792,6 +792,7 @@ namespace ADB_Explorer
 
                     Title = Properties.Resources.AppDisplayName;
                     ClearExplorer();
+                    ExplorerGrid.Visible(false);
                     NavHistory.Reset();
                     return;
                 }
@@ -1055,7 +1056,7 @@ namespace ADB_Explorer
             var countTask = Task.Run(() => ADBService.CountRecycle(DevicesObject.CurrentDevice.ID));
             countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
             {
-                if (!t.IsCanceled)
+                if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
                     DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Trash).ItemsCount = t.Result;
             }));
         }
@@ -1065,7 +1066,7 @@ namespace ADB_Explorer
             var countTask = Task.Run(() => ADBService.CountPackages(DevicesObject.CurrentDevice.ID));
             countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
             {
-                if (!t.IsCanceled)
+                if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
                     DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Temp).ItemsCount = t.Result;
             }));
         }
@@ -1273,7 +1274,7 @@ namespace ADB_Explorer
             PackageVersion.Visibility = Visible(realPath == PACKAGE_PATH);
 
             IconColumn.Visibility =
-            NameColumn.Visibility = 
+            NameColumn.Visibility =
             DateColumn.Visibility =
             TypeColumn.Visibility =
             SizeColumn.Visibility = Visible(realPath != PACKAGE_PATH);
@@ -1299,7 +1300,7 @@ namespace ADB_Explorer
                         catch (Exception)
                         { }
                     }
-                    
+
                     if (!string.IsNullOrEmpty(text))
                     {
                         var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
@@ -1319,7 +1320,8 @@ namespace ADB_Explorer
             }
             else if (realPath == PACKAGE_PATH)
             {
-                var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages));
+                var version = DevicesObject.Current.AndroidVersion;
+                var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
                 packageTask.ContinueWith((t) =>
                 {
                     if (t.IsCanceled)
@@ -1471,7 +1473,7 @@ namespace ADB_Explorer
                     Style = FindResource("GlyphFont") as Style,
                 }
             };
-            
+
             return menuItem;
         }
 
@@ -1678,7 +1680,18 @@ namespace ADB_Explorer
             e.Handled = true;
         }
 
-        private bool IsInEditMode() => CurrentPath == PACKAGE_PATH ? false : CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing;
+        private bool IsInEditMode()
+        {
+            if (CurrentPath == PACKAGE_PATH)
+                return false;
+
+            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            return cell switch
+            {
+                null => false,
+                _ => cell.IsEditing
+            };
+        }
 
         private void IsInEditMode(bool isEditing) => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = isEditing;
 
@@ -2115,6 +2128,7 @@ namespace ADB_Explorer
                 ClearDrives();
                 ClearExplorer();
                 NavHistory.Reset();
+                ExplorerGrid.Visible(false);
                 DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
                 DirectoryLister = null;
@@ -2366,7 +2380,7 @@ namespace ADB_Explorer
             {
                 var drives = CurrentADBDevice.GetDrives();
                 
-                if (Settings.EnableRecycle)
+                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash))
                     UpdateRecycledItemsCount();
 
                 if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))

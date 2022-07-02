@@ -255,38 +255,27 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public static ObservableList<Package> GetPackages(ADBService.AdbDevice device, bool includeSystem = true)
+        public static ObservableList<Package> GetPackages(ADBService.AdbDevice device, bool includeSystem = true, bool optionalParams = true)
         {
             // More package-specific info can be acquired using dumpsys package [package_name]
 
             ObservableList<Package> packages = new();
             string stdout = "";
+            string[] args = { "list", "packages", "-s" };
+            if (optionalParams)
+                args = args.Concat(new[] { "-U", "--show-versioncode" }).ToArray();
 
             if (includeSystem)
             {
-                var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                    "pm",
-                                                    out stdout,
-                                                    out _,
-                                                    "list",
-                                                    "packages",
-                                                    "-s",
-                                                    "-U",
-                                                    "--show-versioncode");
+                var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, args);
 
                 if (systemExitCode == 0)
                     packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
             }
 
-            var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                    "pm",
-                                                    out stdout,
-                                                    out _,
-                                                    "list",
-                                                    "packages",
-                                                    "-3",
-                                                    "-U",
-                                                    "--show-versioncode");
+            args[2] = "-3";
+            var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, args);
+
             if (userExitCode == 0)
                 packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
 

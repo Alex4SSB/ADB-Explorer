@@ -527,7 +527,7 @@ namespace ADB_Explorer.Models
 
         private void _setDrives(IEnumerable<Drive> drives)
         {
-            if (!DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp and not DriveType.Package)))
+            if (drives is null || !DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp and not DriveType.Package)))
                 return;
 
             var trash = Drives.Where(d => d.Type is DriveType.Trash);
@@ -556,6 +556,9 @@ namespace ADB_Explorer.Models
 
         public static Drive GetMmcDrive(IEnumerable<Drive> drives, string deviceID)
         {
+            if (drives is null)
+                return null;
+
             if (Data.CurrentADBDevice.MmcProp is string mmcId)
             {
                 var mmcDrive = drives.Where(d => d.ID == mmcId);
@@ -586,6 +589,9 @@ namespace ADB_Explorer.Models
 
         public static void SetExternalDrives(ref IEnumerable<Drive> drives)
         {
+            if (drives is null)
+                return;
+
             foreach (var item in drives.Where(d => d.Type == DriveType.Unknown))
             {
                 item.SetOtg();
