@@ -271,8 +271,14 @@ namespace ADB_Explorer
                 case nameof(AppSettings.EnableMdns):
                     EnableMdns();
                     break;
-                case nameof(AppSettings.ShowHiddenItems) or nameof(AppSettings.ShowSystemPackages):
+                case nameof(AppSettings.ShowHiddenItems):
                     FilterHiddenFiles();
+                    break;
+                case nameof(AppSettings.ShowSystemPackages):
+                    if (ExplorerGrid.Visible())
+                        FilterHiddenFiles();
+                    else
+                        UpdatePackages();
                     break;
                 case nameof(AppSettings.EnableLog):
                     if (!Settings.EnableLog)
@@ -1061,7 +1067,7 @@ namespace ADB_Explorer
             }));
         }
 
-        private void UpdatePackageCount()
+        private void UpdateInstallersCount()
         {
             var countTask = Task.Run(() => ADBService.CountPackages(DevicesObject.CurrentDevice.ID));
             countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
@@ -1069,6 +1075,33 @@ namespace ADB_Explorer
                 if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
                     DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Temp).ItemsCount = t.Result;
             }));
+        }
+
+        private void UpdatePackages(bool updateExplorer = false)
+        {
+            var version = DevicesObject.Current.AndroidVersion;
+            var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
+            if (updateExplorer)
+            {
+                ExplorerGrid.ItemsSource = Packages;
+                FilterHiddenFiles();
+            }
+
+            packageTask.ContinueWith((t) =>
+            {
+                if (t.IsCanceled)
+                    return;
+
+                Dispatcher.Invoke(() =>
+                {
+                    Packages = t.Result;
+                    
+                    if (!updateExplorer && DevicesObject.CurrentDevice is not null)
+                    {
+                        DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Package).ItemsCount = (ulong)Packages.Count;
+                    }
+                });
+            });
         }
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
@@ -1320,20 +1353,7 @@ namespace ADB_Explorer
             }
             else if (realPath == PACKAGE_PATH)
             {
-                var version = DevicesObject.Current.AndroidVersion;
-                var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
-                packageTask.ContinueWith((t) =>
-                {
-                    if (t.IsCanceled)
-                        return;
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        Packages = t.Result;
-                        ExplorerGrid.ItemsSource = Packages;
-                        FilterHiddenFiles();
-                    });
-                });
+                UpdatePackages(true);
 
                 return true;
             }
@@ -2387,7 +2407,10 @@ namespace ADB_Explorer
                     UpdateRecycledItemsCount();
 
                 if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
-                    UpdatePackageCount();
+                    UpdateInstallersCount();
+
+                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Package))
+                    UpdatePackages();
 
                 return drives;
             });

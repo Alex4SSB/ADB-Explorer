@@ -673,6 +673,9 @@
                                     <DataTrigger Binding="{Binding Type}" Value="Temp">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="Package">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
@@ -702,6 +705,9 @@
                                                 <Setter Property="Text" Value=" Item" />
                                             </DataTrigger>
                                             <DataTrigger Binding="{Binding Type}" Value="Temp">
+                                                <Setter Property="Text" Value=" APK Installer" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Type}" Value="Package">
                                                 <Setter Property="Text" Value=" Package" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -2643,12 +2649,8 @@
                                 <StackPanel.Resources>
                                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon" />
                                 </StackPanel.Resources>
-                                <ui:FontIcon
-                                    FontSize="16"
-                                    Glyph="&#xE713;" />
-                                <ui:FontIcon
-                                    FontSize="16"
-                                    Glyph="&#xE7A7;" />
+                                <ui:FontIcon FontSize="16" Glyph="&#xE713;" />
+                                <ui:FontIcon FontSize="16" Glyph="&#xE7A7;" />
                             </StackPanel>
                         </Button>
                         <TextBlock
