@@ -793,7 +793,7 @@
                                 Glyph="&#xE838;"
                                 Style="{StaticResource DeviceOpenIconStyle}"
                                 ToolTip="Currently Browsing" />
-                            <ui:FontIcon Margin="0,1,0,0" Style="{StaticResource BatteryIconStyle}" />
+                            <ui:FontIcon Style="{StaticResource BatteryIconStyle}" />
                         </ui:SimpleStackPanel>
                     </Grid>
                 </Expander.Header>
@@ -2639,19 +2639,17 @@
                             Click="ResetSettingsButton_Click"
                             Style="{StaticResource AccentButtonStyle}"
                             ToolTip="Reset App Settings">
-                            <Grid>
-                                <Grid.Resources>
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel.Resources>
                                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon" />
-                                </Grid.Resources>
+                                </StackPanel.Resources>
                                 <ui:FontIcon
-                                    Margin="10,0,-4,2"
-                                    FontSize="16"
-                                    Glyph="&#xE7A7;" />
-                                <ui:FontIcon
-                                    Margin="-2,4,10,-2"
                                     FontSize="16"
                                     Glyph="&#xE713;" />
-                            </Grid>
+                                <ui:FontIcon
+                                    FontSize="16"
+                                    Glyph="&#xE7A7;" />
+                            </StackPanel>
                         </Button>
                         <TextBlock
                             Margin="0,0,0,2"

@@ -100,9 +100,9 @@ namespace ADB_Explorer.Models
             get
             {
                 if (ChargeState == ChargingState.Unknown || Level is null)
-                    return "\uEC02";
+                    return "\uF608";
 
-                var level = 0xEBA0;
+                var level = 0xF5F2;
                 if (ChargeState == ChargingState.Charging)
                     level += 11;
 
