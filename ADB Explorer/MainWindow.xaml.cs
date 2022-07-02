@@ -282,6 +282,9 @@ namespace ADB_Explorer
                     SetRenderMode();
                     break;
                 case nameof(AppSettings.EnableRecycle) or nameof(AppSettings.EnableApk):
+                    if (DevicesObject.CurrentDevice is null)
+                        return;
+
                     FileActions.PushPackageEnabled = Settings.EnableApk;
 
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
@@ -976,14 +979,31 @@ namespace ADB_Explorer
         {
             Title = $"{Properties.Resources.AppDisplayName} - {DevicesObject.Current.Name}";
 
+            SetAndroidVersion();
             RefreshDrives();
             DriveViewNav();
             NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
             CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
             DeleteMenuButton.DataContext = DevicesObject.CurrentDevice;
+            FileActions.PushPackageEnabled = Settings.EnableApk;
 
             TestCurrentOperation();
+        }
+
+        private void SetAndroidVersion()
+        {
+            var versionTask = Task.Run(async () => await CurrentADBDevice.GetAndroidVersion());
+            versionTask.ContinueWith((t) =>
+            {
+                if (t.IsCanceled)
+                    return;
+
+                Dispatcher.Invoke(() =>
+                {
+                    DevicesObject.Current.SetAndroidVersion(t.Result);
+                });
+            });
         }
 
         private void DriveViewNav()

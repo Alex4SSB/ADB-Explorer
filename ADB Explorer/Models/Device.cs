@@ -622,19 +622,11 @@ namespace ADB_Explorer.Models
 
         public string Name => ((LogicalDevice)Device).Name;
 
+        private byte? androidVersion = null;
         public byte? AndroidVersion
         {
-            get
-            {
-                if (IsOpen)
-                {
-                    var version = Data.CurrentADBDevice.GetAndroidVersion();
-                    if (byte.TryParse(version.Split('.')[0], out byte ver))
-                        return ver;
-                }
-
-                return null;
-            }
+            get => androidVersion;
+            private set => Set(ref androidVersion, value);
         }
 
         public bool AndroidVersionIncompatible => AndroidVersion is not null && AndroidVersion < AdbExplorerConst.MIN_SUPPORTED_ANDROID_VER;
@@ -682,6 +674,15 @@ namespace ADB_Explorer.Models
         public static void SetOpen(List<UILogicalDevice> list)
         {
             list.ForEach((device) => device.IsOpen = false);
+        }
+
+        public void SetAndroidVersion(string version)
+        {
+            if (!IsOpen)
+                return;
+
+            if (byte.TryParse(version.Split('.')[0], out byte ver))
+                AndroidVersion = ver;
         }
     }
 

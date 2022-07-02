@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer.Services
@@ -306,13 +307,13 @@ namespace ADB_Explorer.Services
             public string MmcProp => Props.ContainsKey(MMC_PROP) ? Props[MMC_PROP] : null;
             public string OtgProp => Props.ContainsKey(OTG_PROP) ? Props[OTG_PROP] : null;
 
-            public string GetAndroidVersion()
+            public Task<string> GetAndroidVersion() => Task.Run(() =>
             {
                 if (Props.ContainsKey(ANDROID_VERSION))
                     return Props[ANDROID_VERSION];
                 else
                     return "";
-            }
+            });
 
             public static Dictionary<string, string> GetBatteryInfo(LogicalDevice device)
             {
