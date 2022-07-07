@@ -145,11 +145,18 @@ namespace ADB_Explorer.Services
 
         public static IEnumerable<string> GetEscapedPaths(IEnumerable<FilePath> items) => items.Select(item => ADBService.EscapeAdbShellString(item.FullPath)).ToArray();
 
-        public static async Task MoveItems(bool isCopy, string targetPath, IEnumerable<FileClass> pasteItems, FileClass selectedItem, ObservableList<FileClass> fileList, Dispatcher dispatcher, ADBService.AdbDevice device, string currentPath)
+        public static async Task MoveItems(bool isCopy,
+                                           string targetPath,
+                                           IEnumerable<FileClass> pasteItems,
+                                           string targetName,
+                                           ObservableList<FileClass> fileList,
+                                           Dispatcher dispatcher,
+                                           ADBService.AdbDevice device,
+                                           string currentPath)
         {
             bool merge = false;
             string[] existingItems = Array.Empty<string>();
-            string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : selectedItem.FullName;
+            string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : targetName;
 
             var moveTask = Task.Run(() =>
             {

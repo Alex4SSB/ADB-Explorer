@@ -360,8 +360,8 @@ namespace ADB_Explorer
             if (fileList is null)
                 fileList = DirectoryLister.FileList;
 
-            RestoreMenuButton.IsEnabled = fileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-            DeleteMenuButton.IsEnabled = fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
+            FileActions.RestoreEnabled = fileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+            FileActions.DeleteEnabled = fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
         }
 
         private void ThemeService_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -462,7 +462,7 @@ namespace ADB_Explorer
                     if (!selectedFiles.All(file => file.CutState is FileClass.CutType.Copy))
                         ExplorerGrid.ContextMenu.Items.Add(copyMenu);
 
-                    if (PasteEnabled(isContextMenu: true))
+                    if (IsPasteEnabled(isContextMenu: true))
                         ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
 
                     if (selectedFiles.Count() == 1)
@@ -500,7 +500,7 @@ namespace ADB_Explorer
 
                         deleteMenu.IsEnabled = ExplorerGrid.Items.Count > 0;
                         ExplorerGrid.ContextMenu.Items.Add(deleteMenu);
-                        TextHelper.SetAltText(deleteMenu, "Empty Recycle Bin");
+                        FileActions.DeleteAction = "Empty Recycle Bin";
                         return;
                     }
                     else if (CurrentPath == PACKAGE_PATH)
@@ -509,7 +509,7 @@ namespace ADB_Explorer
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
                     ExplorerGrid.ContextMenu.Items.Add(newMenu);
-                    if (PasteEnabled(true))
+                    if (IsPasteEnabled(true))
                     {
                         ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
                         ExplorerGrid.ContextMenu.Items.Add(pasteMenu);
@@ -664,7 +664,6 @@ namespace ADB_Explorer
             SetRowsRadius();
             if (CurrentPath == PACKAGE_PATH)
             {
-                MoreMenuButton.IsEnabled =
                 FileActions.CopyPathEnabled =
                 FileActions.UninstallPackageEnabled = selectedPackages.Any();
                 return;
@@ -675,11 +674,10 @@ namespace ADB_Explorer
             bool irregular = DevicesObject.CurrentDevice?.Root != AbstractDevice.RootStatus.Enabled
                 && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder));
 
-            DeleteMenuButton.IsEnabled = (selectedFiles.Any() && !irregular) || IsRecycleBin;
-            DeleteMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
-            DeleteMenuButton.ToolTip += " (Del)";
+            FileActions.DeleteEnabled = (selectedFiles.Any() && !irregular) || IsRecycleBin;
+            FileActions.DeleteAction = IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
 
-            RestoreMenuButton.IsEnabled = IsRecycleBin
+            FileActions.RestoreEnabled = IsRecycleBin
                 && (selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))
                 || (!selectedFiles.Any() && DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))));
             RestoreMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
@@ -689,18 +687,16 @@ namespace ADB_Explorer
 
             var renameEnabled = !IsRecycleBin && selectedFiles.Count() == 1 && !irregular;
 
-            RenameMenuButton.IsEnabled = renameEnabled;
+            FileActions.RenameEnabled = renameEnabled;
             ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
 
-            CutMenuButton.IsEnabled = !selectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && !irregular;
+            FileActions.CutEnabled = !selectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && !irregular;
 
             CopyMenuButton.IsEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
-            PasteMenuButton.IsEnabled = PasteEnabled();
+            FileActions.PasteEnabled = IsPasteEnabled();
 
-            FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
+            FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
             FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !IsRecycleBin;
-            MoreMenuButton.IsEnabled = selectedFiles.Any() && !IsRecycleBin;
-
         }
 
         private void SetRowsRadius()
@@ -723,7 +719,7 @@ namespace ADB_Explorer
             }
         }
 
-        private bool PasteEnabled(bool ignoreSelected = false, bool isContextMenu = false)
+        private bool IsPasteEnabled(bool ignoreSelected = false, bool isContextMenu = false)
         {
             if (CutItems.Count < 1 || IsRecycleBin)
                 return false;
@@ -1289,7 +1285,7 @@ namespace ADB_Explorer
 
             IsRecycleBin = CurrentPath == RECYCLE_PATH;
             ParentButton.IsEnabled = CurrentPath != ParentPath && !IsRecycleBin && realPath != PACKAGE_PATH;
-            PasteMenuButton.IsEnabled = PasteEnabled();
+            FileActions.PasteEnabled = IsPasteEnabled();
             FileActions.PushPackageEnabled = Settings.EnableApk;
             FileActions.InstallPackageEnabled = CurrentPath == TEMP_PATH;
             FileActions.UninstallPackageEnabled = CurrentPath == TEMP_PATH;
@@ -1348,7 +1344,7 @@ namespace ADB_Explorer
                 recycleTask.ContinueWith((t) => DirectoryLister.Navigate(realPath));
 
                 DateColumn.Header = "Date Deleted";
-                DeleteMenuButton.ToolTip = "Empty Recycle Bin (Del)";
+                FileActions.DeleteAction = "Empty Recycle Bin";
                 RestoreMenuButton.ToolTip = "Restore All Items (Ctrl+R)";
             }
             else if (realPath == PACKAGE_PATH)
@@ -1362,7 +1358,7 @@ namespace ADB_Explorer
                 DirectoryLister.Navigate(realPath);
 
                 DateColumn.Header = "Date Modified";
-                DeleteMenuButton.ToolTip = "Delete";
+                FileActions.DeleteAction = "Delete";
             }
 
             ExplorerGrid.ItemsSource = DirectoryLister.FileList;
@@ -1674,7 +1670,7 @@ namespace ADB_Explorer
             {
                 NavigateBack();
             }
-            else if (key == Key.Delete && DeleteMenuButton.IsEnabled)
+            else if (key == Key.Delete && FileActions.DeleteEnabled)
             {
                 DeleteFiles();
             }
@@ -1751,7 +1747,7 @@ namespace ADB_Explorer
             {
                 NavigateBack();
             }
-            else if (actualKey == Key.Delete && DeleteMenuButton.IsEnabled)
+            else if (actualKey == Key.Delete && FileActions.DeleteEnabled)
             {
                 DeleteFiles();
             }
@@ -1769,7 +1765,7 @@ namespace ADB_Explorer
                 else
                     ExplorerGrid.SelectAll();
             }
-            else if (actualKey == Key.X && ctrl && CutMenuButton.IsEnabled)
+            else if (actualKey == Key.X && ctrl && FileActions.CutEnabled)
             {
                 CutFiles(selectedFiles);
             }
@@ -1777,11 +1773,11 @@ namespace ADB_Explorer
             {
                 CutFiles(selectedFiles, true);
             }
-            else if (actualKey == Key.V && ctrl && PasteMenuButton.IsEnabled)
+            else if (actualKey == Key.V && ctrl && FileActions.PasteEnabled)
             {
                 PasteFiles();
             }
-            else if (actualKey == Key.F2 && RenameMenuButton.IsEnabled)
+            else if (actualKey == Key.F2 && FileActions.RenameEnabled)
             {
                 BeginRename();
             }
@@ -1799,7 +1795,7 @@ namespace ADB_Explorer
             {
                 PullFiles();
             }
-            else if (actualKey == Key.R && ctrl && IsRecycleBin && RestoreMenuButton.IsEnabled)
+            else if (actualKey == Key.R && ctrl && IsRecycleBin && FileActions.RestoreEnabled)
             {
                 RestoreItems();
             }
@@ -2163,13 +2159,13 @@ namespace ADB_Explorer
             FileActions.PushFilesFoldersEnabled =
             FileActions.PushPackageEnabled =
             PullMenuButton.IsEnabled =
-            DeleteMenuButton.IsEnabled =
-            RenameMenuButton.IsEnabled =
+            FileActions.DeleteEnabled =
+            FileActions.RenameEnabled =
             HomeButton.IsEnabled =
             NewMenuButton.IsEnabled =
-            PasteMenuButton.IsEnabled =
-            MoreMenuButton.IsEnabled =
+            FileActions.PasteEnabled =
             FileActions.UninstallVisible =
+            FileActions.CutEnabled =
             ParentButton.IsEnabled = false;
 
             FileActions.NewMenuVisible = true;
@@ -3174,9 +3170,9 @@ namespace ADB_Explorer
             CutItems.AddRange(itemsToCut);
 
             CopyMenuButton.IsEnabled = !isCopy;
-            CutMenuButton.IsEnabled = isCopy;
+            FileActions.CutEnabled = isCopy;
 
-            PasteMenuButton.IsEnabled = PasteEnabled();
+            FileActions.PasteEnabled = IsPasteEnabled();
         }
 
         private static void ClearCutFiles()
@@ -3197,12 +3193,30 @@ namespace ADB_Explorer
         private void PasteFiles()
         {
             bool isCopy = CutItems[0].CutState is FileClass.CutType.Copy;
-            var targetPath = selectedFiles.Count() != 1 || (isCopy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
-                    ? CurrentPath
-                    : ((FileClass)ExplorerGrid.SelectedItem).FullPath;
+            var firstSelectedFile = selectedFiles.Any() ? selectedFiles.First() : null;
+            var targetName = "";
+            var targetPath = "";
+
+            if (selectedFiles.Count() != 1 || (isCopy && CutItems[0].Relation(firstSelectedFile) is RelationType.Self))
+            {
+                targetPath = CurrentPath;
+                targetName = CurrentPath[CurrentPath.LastIndexOf('/')..];
+            }
+            else
+            {
+                targetPath = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
+                targetName = DisplayName((FilePath)ExplorerGrid.SelectedItem);
+            }
 
             var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
-            var moveTask = Task.Run(() => ShellFileOperation.MoveItems(isCopy, targetPath, pasteItems, selectedFiles.First(), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath));
+            var moveTask = Task.Run(() => ShellFileOperation.MoveItems(isCopy,
+                                                                       targetPath,
+                                                                       pasteItems,
+                                                                       targetName,
+                                                                       DirectoryLister.FileList,
+                                                                       Dispatcher,
+                                                                       CurrentADBDevice,
+                                                                       CurrentPath));
             moveTask.ContinueWith((t) =>
             {
                 Dispatcher.Invoke(() =>
@@ -3210,7 +3224,7 @@ namespace ADB_Explorer
                     if (!isCopy)
                         ClearCutFiles(pasteItems);
 
-                    PasteMenuButton.IsEnabled = PasteEnabled();
+                    FileActions.PasteEnabled = IsPasteEnabled();
                 });
             });
         }
@@ -3281,7 +3295,7 @@ namespace ADB_Explorer
             if (e.Key == Key.Delete)
             {
                 e.Handled = true;
-                if (DeleteMenuButton.IsEnabled)
+                if (FileActions.DeleteEnabled)
                     DeleteFiles();
             }
         }
@@ -3546,7 +3560,7 @@ namespace ADB_Explorer
 
         private void CopyToTemp()
         {
-            _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, selectedFiles.First(), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
+            _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, DisplayName(selectedFiles.First()), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
         }
 
         private void PushPackages()

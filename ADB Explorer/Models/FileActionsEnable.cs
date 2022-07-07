@@ -40,7 +40,11 @@ namespace ADB_Explorer.Models
         public bool CopyPathEnabled
         {
             get => copyPathEnabled;
-            set => Set(ref copyPathEnabled, value);
+            set
+            {
+                Set(ref copyPathEnabled, value);
+                OnPropertyChanged(nameof(MoreEnabled));
+            }
         }
 
         private bool packageActionsEnabled;
@@ -52,6 +56,7 @@ namespace ADB_Explorer.Models
                 Set(ref packageActionsEnabled, value);
                 OnPropertyChanged(nameof(InstallUninstallEnabled));
                 OnPropertyChanged(nameof(CopyToTempEnabled));
+                OnPropertyChanged(nameof(MoreEnabled));
             }
         }
 
@@ -81,10 +86,65 @@ namespace ADB_Explorer.Models
             set => Set(ref uninstallVisible, value);
         }
 
+        private bool cutEnabled;
+        public bool CutEnabled
+        {
+            get => cutEnabled;
+            set => Set(ref cutEnabled, value);
+        }
+
+        private bool copyEnabled;
+        public bool CopyEnabled
+        {
+            get => copyEnabled;
+            set => Set(ref copyEnabled, value);
+        }
+
+        private bool pasteEnabled;
+        public bool PasteEnabled
+        {
+            get => pasteEnabled;
+            set => Set(ref pasteEnabled, value);
+        }
+
+        private bool renameEnabled;
+        public bool RenameEnabled
+        {
+            get => renameEnabled;
+            set => Set(ref renameEnabled, value);
+        }
+
+        private bool restoreEnabled;
+        public bool RestoreEnabled
+        {
+            get => restoreEnabled;
+            set => Set(ref restoreEnabled, value);
+        }
+
+        private bool deleteEnabled;
+        public bool DeleteEnabled
+        {
+            get => deleteEnabled;
+            set => Set(ref deleteEnabled, value);
+        }
+
+        private string deleteAction;
+        public string DeleteAction
+        {
+            get => deleteAction;
+            set
+            {
+                Set(ref deleteAction, value);
+                OnPropertyChanged(nameof(MenuDeleteTooltip));
+            }
+        }
+
         public bool InstallUninstallEnabled => PackageActionsEnabled && InstallPackageEnabled;
         public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
         public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
         public bool PushPackageVisible => PushPackageEnabled && Data.Settings.EnableApk;
+        public bool MoreEnabled => PackageActionsEnabled || CopyPathEnabled;
+        public string MenuDeleteTooltip => $"{DeleteAction} (Del)";
 
 
         public event PropertyChangedEventHandler PropertyChanged;

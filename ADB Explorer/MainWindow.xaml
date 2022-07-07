@@ -248,7 +248,7 @@
             x:Key="MenuDeleteItem"
             x:Shared="False"
             Click="ContextMenuDeleteItem_Click"
-            Header="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:TextHelper.AltText)}"
+            Header="{Binding Source={x:Static Member=models:Data.FileActions}, Path=DeleteAction}"
             InputGestureText="Del"
             Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Icon>
@@ -290,17 +290,8 @@
             x:Shared="False"
             Click="CopyPathMenuItem_Click"
             Header="Copy Item Path"
-            InputGestureText="Shift+Ctrl+C">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Setter Property="IsEnabled" Value="False" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="True">
-                            <Setter Property="IsEnabled" Value="True" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </MenuItem.Style>
+            InputGestureText="Shift+Ctrl+C"
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}">
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE62F;" />
             </MenuItem.Icon>
@@ -310,17 +301,8 @@
             x:Shared="False"
             Click="UninstallPackage_Click"
             Header="Uninstall"
-            InputGestureText="Shift+F11">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Setter Property="IsEnabled" Value="False" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="True">
-                            <Setter Property="IsEnabled" Value="True" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </MenuItem.Style>
+            InputGestureText="Shift+F11"
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}">
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE25B;" />
             </MenuItem.Icon>
@@ -328,15 +310,12 @@
         <MenuItem
             x:Key="PackageActionsItem"
             x:Shared="False"
-            Header="Package">
+            Header="Package"
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}">
             <MenuItem.Style>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Setter Property="IsEnabled" Value="False" />
                     <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="True">
-                            <Setter Property="IsEnabled" Value="True" />
-                        </DataTrigger>
                         <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" Value="True">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
@@ -349,17 +328,8 @@
             <MenuItem
                 Click="InstallPackage_Click"
                 Header="Install"
-                InputGestureText="Shift+F10">
-                <MenuItem.Style>
-                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                        <Setter Property="IsEnabled" Value="False" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=InstallPackageEnabled}" Value="True">
-                                <Setter Property="IsEnabled" Value="True" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </MenuItem.Style>
+                InputGestureText="Shift+F10"
+                IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=InstallPackageEnabled}">
                 <MenuItem.Icon>
                     <ui:FontIcon Glyph="&#xE896;" />
                 </MenuItem.Icon>
@@ -369,17 +339,8 @@
             <MenuItem
                 Click="CopyToTemp_Click"
                 Header="Copy To Temp"
-                InputGestureText="Shift+F12">
-                <MenuItem.Style>
-                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                        <Setter Property="IsEnabled" Value="False" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=InstallPackageEnabled}" Value="False">
-                                <Setter Property="IsEnabled" Value="True" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </MenuItem.Style>
+                InputGestureText="Shift+F12"
+                IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyToTempEnabled}">
                 <MenuItem.Icon>
                     <ui:FontIcon Glyph="&#xF413;" />
                 </MenuItem.Icon>
@@ -1039,7 +1000,7 @@
                         x:Name="CutMenuButton"
                         helpers:StyleHelper.ContentAnimation="UpMarquee"
                         Click="ContextMenuCutItem_Click"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}"
                         ToolTip="Cut (Ctrl+X)">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE8C6;" />
@@ -1049,7 +1010,7 @@
                         x:Name="CopyMenuButton"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="CopyMenuButton_Click"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}"
                         ToolTip="Copy (Ctrl+C)">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE8C8;" />
@@ -1059,7 +1020,7 @@
                         x:Name="PasteMenuButton"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="ContextMenuPasteItem_Click"
-                        IsEnabled="False">
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PasteEnabled}">
                         <MenuItem.ToolTip>
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Paste " />
@@ -1109,7 +1070,7 @@
                         x:Name="RenameMenuButton"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="ContextMenuRenameItem_Click"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}"
                         ToolTip="Rename (F2)">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE8AC;" />
@@ -1117,8 +1078,9 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="RestoreMenuButton"
+                        d:Visibility="Visible"
                         Click="RestoreMenuButton_Click"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}"
                         ToolTip="Restore (Ctrl+R)">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
@@ -1137,27 +1099,25 @@
                     <MenuItem
                         x:Name="DeleteMenuButton"
                         Click="ContextMenuDeleteItem_Click"
-                        IsEnabled="False"
-                        ToolTip="Delete (Del)">
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=DeleteEnabled}"
+                        ToolTip="{Binding Source={x:Static Member=models:Data.FileActions}, Path=MenuDeleteTooltip}">
                         <MenuItem.Header>
                             <ui:FontIcon Glyph="&#xE74D;" />
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
                         x:Name="UninstallPackageMenu"
+                        d:Visibility="Visible"
                         helpers:StyleHelper.ContentAnimation="DownMarquee"
                         Click="UninstallPackage_Click"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}"
                         ToolTip="Uninstall (Shift+F11)">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                                 <Setter Property="Visibility" Value="Collapsed" />
-                                <Setter Property="IsEnabled" Value="False" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallVisible}" Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="True">
-                                        <Setter Property="IsEnabled" Value="True" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -1168,7 +1128,7 @@
                     </MenuItem>
                     <MenuItem
                         x:Name="MoreMenuButton"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=MoreEnabled}"
                         Resources="{StaticResource TopMenuStyles}"
                         ToolTip="More Options">
                         <MenuItem.Header>
