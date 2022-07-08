@@ -289,7 +289,7 @@
             x:Key="ContextMenuCopyPathItem"
             x:Shared="False"
             Click="CopyPathMenuItem_Click"
-            Header="Copy Item Path"
+            Header="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathAction}"
             InputGestureText="Shift+Ctrl+C"
             IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}">
             <MenuItem.Icon>
@@ -405,7 +405,7 @@
         <MenuItem
             x:Key="RestoreMenuItem"
             Click="RestoreMenuButton_Click"
-            Header="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:TextHelper.AltText)}"
+            Header="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreAction}"
             InputGestureText="Ctrl+R"
             Resources="{StaticResource ContextSubMenuStyles}">
             <MenuItem.Icon>
@@ -1081,7 +1081,7 @@
                         d:Visibility="Visible"
                         Click="RestoreMenuButton_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}"
-                        ToolTip="Restore (Ctrl+R)">
+                        ToolTip="{Binding Source={x:Static Member=models:Data.FileActions}, Path=MenuRestoreTooltip}">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                                 <Setter Property="Visibility" Value="Collapsed" />

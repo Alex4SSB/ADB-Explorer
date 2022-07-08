@@ -231,4 +231,7 @@
         </Style.Triggers>
     </Style>
     <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />
+    <Style TargetType="ui:HyperlinkButton">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+    </Style>
 </ResourceDictionary>

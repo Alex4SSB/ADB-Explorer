@@ -418,6 +418,7 @@ namespace ADB_Explorer
             MenuItem copyPath = FindResource("ContextMenuCopyPathItem") as MenuItem;
             MenuItem packageActions = FindResource("PackageActionsItem") as MenuItem;
             MenuItem restoreMenu = FindResource("RestoreMenuItem") as MenuItem;
+            MenuItem pushPackages = FindResource("PushPackagesMenu") as MenuItem;
             copyPath.Resources = FindResource("ContextSubMenuStyles") as ResourceDictionary;
             ExplorerGrid.ContextMenu.Items.Clear();
 
@@ -442,8 +443,9 @@ namespace ADB_Explorer
                     }
                     else if (CurrentPath == PACKAGE_PATH)
                     {
-                        FileActions.CopyPathEnabled = true;
-                        ExplorerGrid.ContextMenu.Items.Add(copyPath);
+                        FileActions.CopyPathEnabled = selectedPackages.Count() == 1;
+                        if (FileActions.CopyPathEnabled)
+                            ExplorerGrid.ContextMenu.Items.Add(copyPath);
                         ExplorerGrid.ContextMenu.Items.Add(FindResource("UninstallMenuItem"));
                         return;
                     }
@@ -495,7 +497,7 @@ namespace ADB_Explorer
                     {
                         restoreMenu.IsEnabled = DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
                         ExplorerGrid.ContextMenu.Items.Add(restoreMenu);
-                        TextHelper.SetAltText(restoreMenu, "Restore All Items");
+                        FileActions.RestoreAction = "Restore All Items";
                         ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
 
                         deleteMenu.IsEnabled = ExplorerGrid.Items.Count > 0;
@@ -504,7 +506,10 @@ namespace ADB_Explorer
                         return;
                     }
                     else if (CurrentPath == PACKAGE_PATH)
+                    {
+                        ExplorerGrid.ContextMenu.Items.Add(pushPackages);
                         return;
+                    }
 
                     ExplorerGrid.ContextMenu.Items.Add(pushMenu);
                     ExplorerGrid.ContextMenu.Items.Add(new Separator() { Margin = separatorMargin });
@@ -664,7 +669,7 @@ namespace ADB_Explorer
             SetRowsRadius();
             if (CurrentPath == PACKAGE_PATH)
             {
-                FileActions.CopyPathEnabled =
+                FileActions.CopyPathEnabled = selectedPackages.Count() == 1;
                 FileActions.UninstallPackageEnabled = selectedPackages.Any();
                 return;
             }
@@ -680,8 +685,7 @@ namespace ADB_Explorer
             FileActions.RestoreEnabled = IsRecycleBin
                 && (selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))
                 || (!selectedFiles.Any() && DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))));
-            RestoreMenuButton.ToolTip = IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
-            RestoreMenuButton.ToolTip += " (Ctrl+R)";
+            FileActions.RestoreAction = IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
 
             PullMenuButton.IsEnabled = !IsRecycleBin && selectedFiles.Any() && !irregular;
 
@@ -836,7 +840,10 @@ namespace ADB_Explorer
             {
                 var query = RecycleIndex.Where(index => index.RecycleName == item.FullName);
                 if (query.Any())
+                {
                     item.TrashIndex = query.First();
+                    item.UpdateIcon();
+                }
             }
 
             return item;
@@ -982,8 +989,9 @@ namespace ADB_Explorer
         {
             Title = $"{Properties.Resources.AppDisplayName} - {DevicesObject.Current.Name}";
 
+            DrivesItemRepeater.ItemsSource = null;
             SetAndroidVersion();
-            RefreshDrives();
+            RefreshDrives(true);
             DriveViewNav();
             NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
@@ -1308,6 +1316,8 @@ namespace ADB_Explorer
             TypeColumn.Visibility =
             SizeColumn.Visibility = Visible(realPath != PACKAGE_PATH);
 
+            FileActions.CopyPathAction = realPath == PACKAGE_PATH ? "Copy Package Name" : "Copy Item Path";
+
             if (realPath == RECYCLE_PATH)
             {
                 TrashInProgress = true;
@@ -1345,7 +1355,7 @@ namespace ADB_Explorer
 
                 DateColumn.Header = "Date Deleted";
                 FileActions.DeleteAction = "Empty Recycle Bin";
-                RestoreMenuButton.ToolTip = "Restore All Items (Ctrl+R)";
+                FileActions.RestoreAction = "Restore All Items";
             }
             else if (realPath == PACKAGE_PATH)
             {

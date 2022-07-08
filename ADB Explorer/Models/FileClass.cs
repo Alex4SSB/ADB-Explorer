@@ -202,6 +202,8 @@ namespace ADB_Explorer.Models
             };
         }
 
+        public void UpdateIcon() => Icon = GetIcon();
+
         private string GetTypeName()
         {
             return Type switch

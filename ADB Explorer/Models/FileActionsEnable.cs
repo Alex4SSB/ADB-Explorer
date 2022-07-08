@@ -139,12 +139,34 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private string restoreAction;
+        public string RestoreAction
+        {
+            get => restoreAction;
+            set
+            {
+                Set(ref restoreAction, value);
+                OnPropertyChanged(nameof(MenuRestoreTooltip));
+            }
+        }
+
+        private string copyPathAction;
+        public string CopyPathAction
+        {
+            get => copyPathAction;
+            set
+            {
+                Set(ref copyPathAction, value);
+            }
+        }
+
         public bool InstallUninstallEnabled => PackageActionsEnabled && InstallPackageEnabled;
         public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
         public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
         public bool PushPackageVisible => PushPackageEnabled && Data.Settings.EnableApk;
         public bool MoreEnabled => PackageActionsEnabled || CopyPathEnabled;
         public string MenuDeleteTooltip => $"{DeleteAction} (Del)";
+        public string MenuRestoreTooltip => $"{RestoreAction} (Ctrl+R)";
 
 
         public event PropertyChangedEventHandler PropertyChanged;
