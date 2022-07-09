@@ -939,7 +939,7 @@
                     <MenuItem
                         x:Name="PullMenuButton"
                         Click="PullMenuButton_Click"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PullEnabled}"
                         ToolTip="Pull (Alt+C)">
                         <MenuItem.Header>
                             <Grid Margin="-4,0,-6,0">
@@ -975,7 +975,7 @@
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     <MenuItem
                         x:Name="NewMenuButton"
-                        IsEnabled="False"
+                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NewEnabled}"
                         Resources="{StaticResource TopMenuStyles}">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
@@ -1936,7 +1936,8 @@
                         <TextBlock
                             x:Name="TotalSizeBlock"
                             Margin="6,4,0,4"
-                            Style="{StaticResource TotalSizeStyle}" />
+                            Style="{StaticResource TotalSizeStyle}"
+                            Text="{Binding ElementName=MainWin, Path=SelectedFilesTotalSize}" />
                         <Separator />
                     </StackPanel>
                 </StackPanel>

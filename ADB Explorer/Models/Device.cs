@@ -426,6 +426,7 @@ namespace ADB_Explorer.Models
             Name = name;
             ID = id;
             this.service = service;
+            Battery = new Battery();
         }
 
         public static LogicalDevice New(string name, string id, string status, ObservableList<ConnectService> services = null)
@@ -503,6 +504,9 @@ namespace ADB_Explorer.Models
                 });
                 asyncTask.ContinueWith((t) =>
                 {
+                    if (t.IsCanceled)
+                        return;
+
                     dispatcher.BeginInvoke(() =>
                     {
                         _setDrives(value);
@@ -516,6 +520,9 @@ namespace ADB_Explorer.Models
                 var mmcTask = Task.Run(() => { return GetMmcDrive(value, ID); });
                 mmcTask.ContinueWith((t) =>
                 {
+                    if (t.IsCanceled)
+                        return;
+
                     dispatcher.BeginInvoke(() =>
                     {
                         t.Result?.SetMmc();
@@ -616,7 +623,7 @@ namespace ADB_Explorer.Models
 
         public void UpdateBattery()
         {
-            Battery = new(ADBService.AdbDevice.GetBatteryInfo(this));
+            Battery.Update(ADBService.AdbDevice.GetBatteryInfo(this));
         }
 
         public override string ToString() => Name;

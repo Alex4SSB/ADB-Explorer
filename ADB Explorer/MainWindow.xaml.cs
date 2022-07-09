@@ -124,7 +124,7 @@ namespace ADB_Explorer
             }
         }
 
-        private string SelectedFilesTotalSize => (selectedFiles is not null && FileClass.TotalSize(selectedFiles) is ulong size and > 0) ? size.ToSize() : "";
+        public string SelectedFilesTotalSize => (selectedFiles is not null && FileClass.TotalSize(selectedFiles) is ulong size and > 0) ? size.ToSize() : "";
 
         private IEnumerable<FileClass> selectedFiles => CurrentPath == PACKAGE_PATH ? null : ExplorerGrid.SelectedItems.Cast<FileClass>();
 
@@ -674,7 +674,7 @@ namespace ADB_Explorer
                 return;
             }
 
-            TotalSizeBlock.Text = SelectedFilesTotalSize;
+            OnPropertyChanged(nameof(SelectedFilesTotalSize));
 
             bool irregular = DevicesObject.CurrentDevice?.Root != AbstractDevice.RootStatus.Enabled
                 && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder));
@@ -687,16 +687,14 @@ namespace ADB_Explorer
                 || (!selectedFiles.Any() && DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))));
             FileActions.RestoreAction = IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
 
-            PullMenuButton.IsEnabled = !IsRecycleBin && selectedFiles.Any() && !irregular;
+            FileActions.PullEnabled = !IsRecycleBin && selectedFiles.Any() && !irregular;
 
-            var renameEnabled = !IsRecycleBin && selectedFiles.Count() == 1 && !irregular;
-
-            FileActions.RenameEnabled = renameEnabled;
-            ExplorerGrid.Columns[1].IsReadOnly = !renameEnabled;
+            FileActions.RenameEnabled = !IsRecycleBin && selectedFiles.Count() == 1 && !irregular;
+            ExplorerGrid.Columns[1].IsReadOnly = !FileActions.RenameEnabled;
 
             FileActions.CutEnabled = !selectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && !irregular;
 
-            CopyMenuButton.IsEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
+            FileActions.CopyEnabled = !IsRecycleBin && !irregular && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
             FileActions.PasteEnabled = IsPasteEnabled();
 
             FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk) && !IsRecycleBin;
@@ -1300,7 +1298,7 @@ namespace ADB_Explorer
             FileActions.UninstallVisible = realPath == PACKAGE_PATH;
             FileActions.NewMenuVisible =
             FileActions.PushFilesFoldersEnabled =
-            NewMenuButton.IsEnabled = !IsRecycleBin && realPath != PACKAGE_PATH;
+            FileActions.NewEnabled = !IsRecycleBin && realPath != PACKAGE_PATH;
 
             OriginalPath.Visibility =
             OriginalDate.Visibility = Visible(realPath == RECYCLE_PATH);
@@ -1779,7 +1777,7 @@ namespace ADB_Explorer
             {
                 CutFiles(selectedFiles);
             }
-            else if (actualKey == Key.C && ctrl && CopyMenuButton.IsEnabled)
+            else if (actualKey == Key.C && ctrl && FileActions.CopyEnabled)
             {
                 CutFiles(selectedFiles, true);
             }
@@ -1801,7 +1799,7 @@ namespace ADB_Explorer
                 NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
                 NavigateToLocation(NavHistory.SpecialLocation.DriveView);
             }
-            else if (actualKey == Key.C && alt && PullMenuButton.IsEnabled)
+            else if (actualKey == Key.C && alt && FileActions.PullEnabled)
             {
                 PullFiles();
             }
@@ -2168,11 +2166,11 @@ namespace ADB_Explorer
             DirectoryLister?.FileList?.Clear();
             FileActions.PushFilesFoldersEnabled =
             FileActions.PushPackageEnabled =
-            PullMenuButton.IsEnabled =
+            FileActions.PullEnabled =
             FileActions.DeleteEnabled =
             FileActions.RenameEnabled =
             HomeButton.IsEnabled =
-            NewMenuButton.IsEnabled =
+            FileActions.NewEnabled =
             FileActions.PasteEnabled =
             FileActions.UninstallVisible =
             FileActions.CutEnabled =
@@ -2422,6 +2420,9 @@ namespace ADB_Explorer
             });
             driveTask.ContinueWith((t) =>
             {
+                if (t.IsCanceled)
+                    return;
+
                 dispatcher.Invoke(() =>
                 {
                     DevicesObject.CurrentDevice.SetDrives(t.Result, dispatcher, asyncClasify);
@@ -3179,7 +3180,7 @@ namespace ADB_Explorer
 
             CutItems.AddRange(itemsToCut);
 
-            CopyMenuButton.IsEnabled = !isCopy;
+            FileActions.CopyEnabled = !isCopy;
             FileActions.CutEnabled = isCopy;
 
             FileActions.PasteEnabled = IsPasteEnabled();

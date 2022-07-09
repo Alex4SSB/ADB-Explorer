@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ADB_Explorer.Converters;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -71,6 +72,27 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private long? chargeCounter = null;
+        private long? prevChargeCounter = null;
+        private DateTime? chargeUpdate = null;
+        private DateTime? prevChargeUpdate = null;
+
+        public string CurrentConsumption
+        {
+            get
+            {
+                if (chargeCounter is null || prevChargeCounter is null || prevChargeUpdate is null)
+                    return "";
+
+                var currentDiff = chargeCounter.Value - prevChargeCounter.Value;
+                var timeDiff = DateTime.Now - prevChargeUpdate.Value;
+                var perHourConsumption = currentDiff / timeDiff.TotalHours;
+                var positive = perHourConsumption > 0;
+
+                return $"Power Balance: {(positive ? "+" : "")}{(perHourConsumption / 1000000).ToSize()}Ah";
+            }
+        }
+
         private double? temperature { get; set; }
         public string Temperature
         {
@@ -112,7 +134,11 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public Battery(Dictionary<string, string> batteryInfo)
+        public Battery()
+        {
+        }
+
+        public void Update(Dictionary<string, string> batteryInfo)
         {
             if (batteryInfo is null)
                 return;
@@ -143,6 +169,8 @@ namespace ADB_Explorer.Models
                     > 5 when chargeSource == Source.None => ChargingState.Discharging,
                     > 5 => ChargingState.Charging,
                 };
+
+                OnPropertyChanged(nameof(BatteryIcon));
             }
 
             if (batteryInfo.ContainsKey("level"))
@@ -176,6 +204,20 @@ namespace ADB_Explorer.Models
                 else
                     batteryHealth = (Health)health;
             }
+
+            if (batteryInfo.ContainsKey("Charge counter")
+                && long.TryParse(batteryInfo["Charge counter"], out long charge))
+            {
+                if (chargeCounter != charge || prevChargeUpdate is null)
+                {
+                    prevChargeUpdate = chargeUpdate;
+                    chargeUpdate = DateTime.Now;
+                    prevChargeCounter = chargeCounter;
+                    chargeCounter = charge;
+                }
+            }
+
+            OnPropertyChanged(nameof(CurrentConsumption));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

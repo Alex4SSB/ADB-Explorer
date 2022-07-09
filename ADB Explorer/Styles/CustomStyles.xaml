@@ -1120,6 +1120,7 @@
                     <TextBlock Text="{Binding Device.Battery.BatteryState}" />
                     <TextBlock Text="{Binding Device.Battery.BatteryHealth}" />
                     <TextBlock Text="{Binding Device.Battery.Voltage}" />
+                    <TextBlock Text="{Binding Device.Battery.CurrentConsumption}" />
                     <TextBlock Text="{Binding Device.Battery.Temperature}" />
                 </ui:SimpleStackPanel>
             </Setter.Value>

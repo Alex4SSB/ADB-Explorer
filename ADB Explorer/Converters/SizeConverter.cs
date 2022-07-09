@@ -14,6 +14,13 @@ namespace ADB_Explorer.Converters
             return $"{(Math.Round(value, value < 100 ? bigRound : smallRound))}{(scaleSpace ? " " : "")}{scale_table[scale]}B";
         }
 
+        public static string ToSize(this double source, bool scaleSpace = false, int bigRound = 1, int smallRound = 0)
+        {
+            int scale = (source == 0) ? 0 : Convert.ToInt32(Math.Floor(Math.Round(Math.Log(Math.Abs(source), 1000), 2)));
+            double value = source / Math.Pow(1000, scale);
+            return $"{(Math.Round(value, value < 100 ? bigRound : smallRound))}{(scaleSpace ? " " : "")}{scale_table[scale]}";
+        }
+
         public static string ToTime(this decimal? seconds, bool scaleSpace = false)
         {
             if (seconds is null)

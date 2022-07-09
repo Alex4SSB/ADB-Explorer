@@ -7,6 +7,9 @@ namespace ADB_Explorer.Models
 {
     public class FileActionsEnable : INotifyPropertyChanged
     {
+
+        #region booleans
+
         private bool newMenuVisible;
         public bool NewMenuVisible
         {
@@ -128,6 +131,24 @@ namespace ADB_Explorer.Models
             set => Set(ref deleteEnabled, value);
         }
 
+        private bool newEnabled;
+        public bool NewEnabled
+        {
+            get => newEnabled;
+            set => Set(ref newEnabled, value);
+        }
+
+        private bool pullEnabled;
+        public bool PullEnabled
+        {
+            get => pullEnabled;
+            set => Set(ref pullEnabled, value);
+        }
+
+        #endregion
+
+        #region strings
+
         private string deleteAction;
         public string DeleteAction
         {
@@ -160,6 +181,10 @@ namespace ADB_Explorer.Models
             }
         }
 
+        #endregion
+
+        #region read only
+
         public bool InstallUninstallEnabled => PackageActionsEnabled && InstallPackageEnabled;
         public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
         public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
@@ -168,10 +193,11 @@ namespace ADB_Explorer.Models
         public string MenuDeleteTooltip => $"{DeleteAction} (Del)";
         public string MenuRestoreTooltip => $"{RestoreAction} (Ctrl+R)";
 
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Equals(storage, value))
             {
