@@ -43,40 +43,82 @@ namespace ADB_Explorer.Models
             Wireless,
         }
 
-        private Source chargeSource { get; set; } = Source.None;
-        private State batteryState { get; set; } = State.Unknown;
-        public string BatteryState
+        private Source chargeSource = Source.None;
+        public Source ChargeSource
         {
-            get
+            get => chargeSource;
+            set
             {
-                if (batteryState == 0)
-                    return "";
-                else if (byte.TryParse(batteryState.ToString(), out _))
-                    return $"Status: {(chargeSource == Source.None ? "Discharging" : $"Charging ({chargeSource})")}";
-                else
-                    return $"Status: {batteryState.ToString().Replace('_', ' ')}{(chargeSource == Source.None ? "" : $" ({chargeSource})")}";
+                if (Set(ref chargeSource, value))
+                    OnPropertyChanged(nameof(BatteryStateString));
             }
         }
 
-        public ChargingState ChargeState { get; private set; } = ChargingState.Unknown;
-        public byte? Level { get; private set; }
-        private double? voltage { get; set; }
-        public string Voltage
+        private State batteryState = State.Unknown;
+        public State BatteryState
+        {
+            get => batteryState;
+            set
+            {
+                if (Set(ref batteryState, value))
+                    OnPropertyChanged(nameof(BatteryStateString));
+            }
+        }
+        public string BatteryStateString
         {
             get
             {
-                if (voltage is null)
+                if (BatteryState == 0)
                     return "";
+                else if (byte.TryParse(BatteryState.ToString(), out _))
+                    return $"Status: {(ChargeSource == Source.None ? "Discharging" : $"Charging ({ChargeSource})")}";
                 else
-                    return $"Voltage: {voltage}v";
+                    return $"Status: {BatteryState.ToString().Replace('_', ' ')}{(ChargeSource == Source.None ? "" : $" ({ChargeSource})")}";
             }
         }
+
+        private ChargingState chargeState = ChargingState.Unknown;
+        public ChargingState ChargeState
+        {
+            get => chargeState;
+            set
+            {
+                if (Set(ref chargeState, value))
+                    OnPropertyChanged(nameof(BatteryIcon));
+            }
+        }
+
+        private byte? level;
+        public byte? Level
+        {
+            get => level;
+            set
+            {
+                if (Set(ref level, value))
+                    OnPropertyChanged(nameof(BatteryIcon));
+            }
+        }
+
+        private double? voltage;
+        public double? Voltage
+        {
+            get => voltage;
+            set
+            {
+                if (Set(ref voltage, value))
+                    OnPropertyChanged(nameof(VoltageString));
+            }
+        }
+        public string VoltageString => Voltage switch
+        {
+            null => "",
+            _ => $"Voltage: {Voltage}v"
+        };
 
         private long? chargeCounter = null;
         private long? prevChargeCounter = null;
         private DateTime? chargeUpdate = null;
         private DateTime? prevChargeUpdate = null;
-
         public string CurrentConsumption
         {
             get
@@ -93,29 +135,37 @@ namespace ADB_Explorer.Models
             }
         }
 
-        private double? temperature { get; set; }
-        public string Temperature
+        private double? temperature;
+        public double? Temperature
         {
-            get
+            get => temperature;
+            set
             {
-                if (temperature is null)
-                    return "";
-                else
-                    return $"Temperature: {temperature}°C";
+                if (Set(ref temperature, value))
+                    OnPropertyChanged(nameof(TemperatureString));
             }
         }
+        public string TemperatureString => Temperature switch
+        {
+            null => "",
+            _ => $"Temperature: {Temperature}°C"
+        };
 
-        private Health batteryHealth { get; set; } = 0;
-        public string BatteryHealth
+        private Health batteryHealth = 0;
+        public Health BatteryHealth
         {
-            get
+            get => batteryHealth;
+            set
             {
-                if (batteryHealth == 0)
-                    return "";
-                else
-                    return $"Health: {batteryHealth.ToString().Replace('_', ' ')}";
+                if (Set(ref batteryHealth, value))
+                    OnPropertyChanged(nameof(BatteryHealthString));
             }
         }
+        public string BatteryHealthString => batteryHealth switch
+        {
+            0 => "",
+            _ => $"Health: {BatteryHealth.ToString().Replace('_', ' ')}"
+        };
 
         public string BatteryIcon
         {
@@ -144,65 +194,56 @@ namespace ADB_Explorer.Models
                 return;
 
             if (batteryInfo.ContainsKey("AC powered") && batteryInfo["AC powered"] == "true")
-                chargeSource = Source.AC;
+                ChargeSource = Source.AC;
 
             if (batteryInfo.ContainsKey("USB powered") && batteryInfo["USB powered"] == "true")
-                chargeSource = Source.USB;
+                ChargeSource = Source.USB;
 
             if (batteryInfo.ContainsKey("Wireless powered") && batteryInfo["Wireless powered"] == "true")
-                chargeSource = Source.Wireless;
+                ChargeSource = Source.Wireless;
 
             if (batteryInfo.ContainsKey("status"))
             {
-                if (!byte.TryParse(batteryInfo["status"], out byte status))
-                    batteryState = State.Unknown;
-                else
-                {
-                    batteryState = (State)status;
-                }
+                BatteryState = !byte.TryParse(batteryInfo["status"], out byte status)
+                    ? State.Unknown
+                    : (State)status;
 
                 ChargeState = status switch
                 {
                     <= 1 => ChargingState.Unknown,
                     3 or 4 => ChargingState.Discharging,
                     2 or 5 => ChargingState.Charging,
-                    > 5 when chargeSource == Source.None => ChargingState.Discharging,
+                    > 5 when ChargeSource == Source.None => ChargingState.Discharging,
                     > 5 => ChargingState.Charging,
                 };
-
-                OnPropertyChanged(nameof(BatteryIcon));
             }
 
             if (batteryInfo.ContainsKey("level"))
             {
-                if (!byte.TryParse(batteryInfo["level"], out byte level))
-                    Level = null;
-                else
-                    Level = level;
+                Level = !byte.TryParse(batteryInfo["level"], out byte level)
+                    ? null
+                    : level;
             }
 
             if (batteryInfo.ContainsKey("voltage"))
             {
-                if (!int.TryParse(batteryInfo["voltage"], out int volt))
-                    voltage = -1;
-                else
-                    voltage = volt / 1000.0;
+                Voltage = !int.TryParse(batteryInfo["voltage"], out int volt)
+                    ? -1.0
+                    : volt / 1000.0;
             }
 
             if (batteryInfo.ContainsKey("temperature"))
             {
-                if (!int.TryParse(batteryInfo["temperature"], out int temp))
-                    temperature = -1;
-                else
-                    temperature = temp / 10;
+                Temperature = !int.TryParse(batteryInfo["temperature"], out int temp)
+                    ? -1.0
+                    : temp / 10;
             }
 
             if (batteryInfo.ContainsKey("health"))
             {
-                if (!Enum.TryParse(typeof(Health), batteryInfo["health"], out object health))
-                    batteryHealth = Health.Unknown;
-                else
-                    batteryHealth = (Health)health;
+                BatteryHealth = !Enum.TryParse(typeof(Health), batteryInfo["health"], out object health)
+                    ? Health.Unknown
+                    : (Health)health;
             }
 
             if (batteryInfo.ContainsKey("Charge counter")
@@ -221,15 +262,15 @@ namespace ADB_Explorer.Models
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Equals(storage, value))
-            {
-                return;
-            }
+                return false;
 
             storage = value;
             OnPropertyChanged(propertyName);
+
+            return true;
         }
 
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

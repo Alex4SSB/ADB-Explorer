@@ -276,7 +276,6 @@
             </Style.Triggers>
         </Style>
     </ResourceDictionary>
-    <ContextMenu x:Key="RowContextMenu" Resources="{StaticResource ContextMenuStyles}" />
     <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextSubMenuStyles}">
         <MenuItem>
             <MenuItem.Header>
@@ -678,7 +677,6 @@
         </Grid>
     </DataTemplate>
     <Style x:Key="BaseRowStyle" TargetType="DataGridRow">
-        <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
         <Setter Property="Visibility" Value="Visible" />
         <Setter Property="Template">
@@ -1118,10 +1116,10 @@
             <Setter.Value>
                 <ui:SimpleStackPanel Spacing="4">
                     <TextBlock Text="{Binding Device.Battery.BatteryState}" />
-                    <TextBlock Text="{Binding Device.Battery.BatteryHealth}" />
-                    <TextBlock Text="{Binding Device.Battery.Voltage}" />
+                    <TextBlock Text="{Binding Device.Battery.BatteryHealthString}" />
+                    <TextBlock Text="{Binding Device.Battery.VoltageString}" />
                     <TextBlock Text="{Binding Device.Battery.CurrentConsumption}" />
-                    <TextBlock Text="{Binding Device.Battery.Temperature}" />
+                    <TextBlock Text="{Binding Device.Battery.TemperatureString}" />
                 </ui:SimpleStackPanel>
             </Setter.Value>
         </Setter>
@@ -1205,6 +1203,83 @@
                 <Setter Property="CornerRadius" Value="4" />
                 <Setter Property="BorderThickness" Value="0,0,0,2" />
             </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="ContextMenuSeparatorStyle" TargetType="Separator">
+        <Setter Property="Margin" Value="-18,4,12,4" />
+        <Setter Property="Background" Value="{DynamicResource SeparatorForeground}" />
+    </Style>
+    <Style
+        x:Key="Separator1Style"
+        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
+        TargetType="Separator">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PullEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="Separator2Style"
+        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
+        TargetType="Separator">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextNewEnabled}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPasteEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="Separator3Style"
+        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
+        TargetType="Separator">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="Separator4Style"
+        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
+        TargetType="Separator">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPasteEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=DeleteEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushPackagesEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

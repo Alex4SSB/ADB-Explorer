@@ -200,11 +200,17 @@
             IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PushPackageEnabled}">
             <MenuItem.Style>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PushPackageVisible}" Value="True">
-                            <Setter Property="Visibility" Value="Visible" />
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PushPackageVisible}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushPackagesEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </MenuItem.Style>
@@ -227,6 +233,15 @@
                         Glyph="&#xE974;" />
                 </Grid>
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PullEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuPushItem"
@@ -243,6 +258,15 @@
             </MenuItem.Icon>
             <StaticResource ResourceKey="PushFoldersMenu" />
             <StaticResource ResourceKey="PushFilesMenu" />
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="MenuDeleteItem"
@@ -254,6 +278,15 @@
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE74D;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=DeleteEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuRenameItem"
@@ -264,6 +297,15 @@
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE8AC;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuCutItem"
@@ -274,6 +316,15 @@
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE8C6;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuCopyItem"
@@ -284,6 +335,15 @@
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE8C8;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="ContextMenuCopyPathItem"
@@ -295,30 +355,69 @@
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE62F;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="UninstallMenuItem"
             x:Shared="False"
             Click="UninstallPackage_Click"
             Header="Uninstall"
-            InputGestureText="Shift+F11"
-            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}">
+            InputGestureText="Shift+F11">
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE25B;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:TextHelper.AltObject)}" Value="Submenu">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:TextHelper.AltObject)}" Value="Submenu" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SubmenuUninstallEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="IsEnabled" Value="False" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="PackageActionsItem"
+            helpers:TextHelper.AltObject="Submenu"
             x:Shared="False"
             Header="Package"
             IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}">
             <MenuItem.Style>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" Value="True">
-                            <Setter Property="Visibility" Value="Visible" />
-                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </MenuItem.Style>
@@ -373,6 +472,16 @@
                     </TextBlock>
                 </StackPanel>
             </MenuItem.Header>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ContextPasteEnabled}" Value="True">
+                            <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="NewFolderMenuItem"
@@ -401,6 +510,15 @@
             </MenuItem.Icon>
             <StaticResource ResourceKey="NewFolderMenuItem" />
             <StaticResource ResourceKey="NewFileMenuItem" />
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextNewEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="RestoreMenuItem"
@@ -411,6 +529,15 @@
             <MenuItem.Icon>
                 <ui:FontIcon Glyph="&#xE845;" />
             </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
         </MenuItem>
         <MenuItem
             x:Key="PathMenuEdit"
@@ -432,6 +559,42 @@
                 <ui:FontIcon Glyph="&#xE8C8;" />
             </MenuItem.Icon>
         </MenuItem>
+        <ContextMenu
+            x:Key="RowContextMenu"
+            helpers:TextHelper.AltObject="Context"
+            Resources="{StaticResource ContextMenuStyles}">
+            <StaticResource ResourceKey="ContextMenuPullItem" />
+            <StaticResource ResourceKey="ContextMenuPushItem" />
+            <Separator Style="{StaticResource Separator1Style}" />
+            <StaticResource ResourceKey="ContextMenuNewItem" />
+            <Separator Style="{StaticResource Separator2Style}" />
+            <StaticResource ResourceKey="ContextMenuCutItem" />
+            <StaticResource ResourceKey="ContextMenuCopyItem" />
+            <StaticResource ResourceKey="ContextMenuPasteItem" />
+            <StaticResource ResourceKey="ContextMenuRenameItem" />
+            <StaticResource ResourceKey="ContextMenuCopyPathItem" />
+            <StaticResource ResourceKey="UninstallMenuItem" />
+            <StaticResource ResourceKey="RestoreMenuItem" />
+            <Separator Style="{StaticResource Separator3Style}" />
+            <StaticResource ResourceKey="PackageActionsItem" />
+            <Separator Style="{StaticResource Separator4Style}" />
+            <StaticResource ResourceKey="MenuDeleteItem" />
+            <StaticResource ResourceKey="PushPackagesMenu" />
+            <MenuItem
+                Header="Recycle Bin Is Empty"
+                Icon="-"
+                IsEnabled="False">
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EmptyTrash}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
+            </MenuItem>
+        </ContextMenu>
         <Menu
             x:Key="FileOpStopMenu"
             x:Shared="False"
@@ -720,6 +883,7 @@
             x:Key="RowStyle"
             BasedOn="{StaticResource BaseRowStyle}"
             TargetType="DataGridRow">
+            <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
             <EventSetter Event="Unselected" Handler="DataGridRow_Unselected" />
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
@@ -1231,7 +1395,7 @@
                                 x:Name="ParentButton"
                                 helpers:StyleHelper.ContentAnimation="Bounce"
                                 Click="ParentButton_Click"
-                                IsEnabled="False"
+                                IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ParentEnabled}"
                                 ToolTip="Up">
                                 <MenuItem.Header>
                                     <ui:FontIcon Glyph="&#xE197;" />
@@ -1326,6 +1490,7 @@
                         CellStyle="{StaticResource DataGridCellStyle}"
                         ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
                         ContextMenu="{StaticResource RowContextMenu}"
+                        ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
@@ -1335,7 +1500,6 @@
                         MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
                         PreviewKeyDown="ExplorerGrid_PreviewKeyDown"
-                        PreviewMouseRightButtonDown="ExplorerGrid_PreviewMouseRightButtonDown"
                         RowStyle="{StaticResource RowStyle}"
                         SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                         SelectionChanged="ExplorerGrid_SelectionChanged"
@@ -1407,6 +1571,7 @@
                                 x:Name="NameColumn"
                                 Width="300"
                                 Header="Name"
+                                IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
                                 SortMemberPath="FullName">
                                 <DataGridTextColumn.CellStyle>
                                     <Style BasedOn="{StaticResource DataGridCellStyle}" TargetType="DataGridCell">

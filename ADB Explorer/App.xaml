@@ -131,6 +131,9 @@
             <Color x:Key="DarkNoticeBorderBackground">#FF433519</Color>
             <Color x:Key="LightNoticeBorderBackground">#FFFFF4CE</Color>
 
+            <Color x:Key="DarkSeparatorForeground">#FF808080</Color>
+            <Color x:Key="LightSeparatorForeground">#FF919191</Color>
+
             <ResourceDictionary x:Key="DynamicBrushes">
                 <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
                 <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
@@ -177,6 +180,8 @@
                 <SolidColorBrush x:Key="ContentDialogContentBackground" Color="{DynamicResource LightContentDialogContentBackground}" />
 
                 <SolidColorBrush x:Key="NoticeBorderBackground" Color="{DynamicResource LightNoticeBorderBackground}" />
+
+                <SolidColorBrush x:Key="SeparatorForeground" Color="{DynamicResource LightSeparatorForeground}" />
             </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>
