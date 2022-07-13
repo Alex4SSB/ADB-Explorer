@@ -3385,10 +3385,25 @@ namespace ADB_Explorer
             });
         }
 
-        private void UninstallPackages()
+        private async void UninstallPackages()
         {
             var pkgs = selectedPackages;
             var files = selectedFiles;
+
+            var uniString = "";
+            if (FileActions.IsAppDrive)
+                uniString = $"{selectedPackages.Count()} package{(selectedPackages.Count() > 1 ? "s" : "")}";
+            else
+                uniString = $"{selectedFiles.Count()} APK{(selectedFiles.Count() > 1 ? "s" : "")}";
+
+            var result = await DialogService.ShowConfirmation(
+                $"The following will be removed:\n{uniString}",
+                "Confirm Uninstall",
+                "Uninstall",
+            icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 is not ContentDialogResult.Primary)
+                return;
 
             var packageTask = Task.Run(() =>
             {
@@ -3397,7 +3412,7 @@ namespace ADB_Explorer
                 else
                     return from item in files select ShellFileOperation.GetPackageName(CurrentADBDevice, item.FullPath);
             });
-            packageTask.ContinueWith((t) =>
+            _ = packageTask.ContinueWith((t) =>
             {
                 if (!t.IsCanceled)
                     ShellFileOperation.UninstallPackages(CurrentADBDevice, t.Result, Dispatcher, Packages);
