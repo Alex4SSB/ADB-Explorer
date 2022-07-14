@@ -68,7 +68,7 @@ namespace ADB_Explorer
                 if (ExplorerContentPresenter is null)
                     return 0;
 
-                double height = ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight - HorizontalScrollBarHeight;
+                double height = ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight;
 
                 return height;
             }
@@ -81,8 +81,6 @@ namespace ADB_Explorer
                 return ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
             }
         }
-        private double HorizontalScrollBarHeight => ExplorerScroller.ComputedHorizontalScrollBarVisibility == Visibility.Visible
-                    ? SystemParameters.HorizontalScrollBarHeight : 0;
 
         private readonly List<MenuItem> PathButtons = new();
 
@@ -2100,6 +2098,10 @@ namespace ADB_Explorer
 
         private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
         {
+            var point = Mouse.GetPosition(ExplorerGrid);
+            if (point.Y < ColumnHeaderHeight)
+                e.Handled = true;
+
             TextHelper.SetAltText(ExplorerGrid.ContextMenu, "Open");
             UpdateFileActions();
         }
@@ -2113,7 +2115,8 @@ namespace ADB_Explorer
                 actualRowWidth += item.ActualWidth;
             }
 
-            if (point.Y > ExplorerGrid.Items.Count * ExplorerGrid.MinRowHeight
+            if (point.Y > (ExplorerGrid.Items.Count * ExplorerGrid.MinRowHeight + ColumnHeaderHeight)
+                || point.Y > (ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight % ExplorerGrid.MinRowHeight)
                 || point.Y < ColumnHeaderHeight
                 || point.X > actualRowWidth
                 || point.X > DataGridContentWidth)
