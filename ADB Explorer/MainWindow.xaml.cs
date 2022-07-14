@@ -136,6 +136,7 @@ namespace ADB_Explorer
             themeService.PropertyChanged += ThemeService_PropertyChanged;
             CommandLog.CollectionChanged += CommandLog_CollectionChanged;
             fileOperationQueue.PropertyChanged += FileOperationQueue_PropertyChanged;
+            FileActions.PropertyChanged += FileActions_PropertyChanged;
 
             Task<bool> versionTask = Task.Run(() => CheckAdbVersion());
 
@@ -173,6 +174,18 @@ namespace ADB_Explorer
                 Task.WaitAll(launchTask, versionTask);
                 Settings.WindowLoaded = true;
             });
+        }
+
+        private void FileActions_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(FileActions.RefreshPackages) && FileActions.RefreshPackages)
+            {
+                if (FileActions.IsAppDrive)
+                {
+                    Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
+                    FileActions.RefreshPackages = false;
+                }
+            }
         }
 
         private void FileOperationQueue_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -963,11 +976,6 @@ namespace ADB_Explorer
         {
             var version = DevicesObject.Current.AndroidVersion;
             var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
-            if (updateExplorer)
-            {
-                ExplorerGrid.ItemsSource = Packages;
-                FilterHiddenFiles();
-            }
 
             packageTask.ContinueWith((t) =>
             {
@@ -977,7 +985,12 @@ namespace ADB_Explorer
                 Dispatcher.Invoke(() =>
                 {
                     Packages = t.Result;
-                    
+                    if (updateExplorer)
+                    {
+                        ExplorerGrid.ItemsSource = Packages;
+                        FilterHiddenFiles();
+                    }
+
                     if (!updateExplorer && DevicesObject.CurrentDevice is not null)
                     {
                         DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Package).ItemsCount = (ulong)Packages.Count;
@@ -1095,12 +1108,6 @@ namespace ADB_Explorer
 
                 if (devicesVisible)
                     UpdateDevicesRootAccess();
-
-                if (FileActions.IsAppDrive && RefreshPackages)
-                {
-                    Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
-                    RefreshPackages = false;
-                }
 
                 connectTimerMutex.ReleaseMutex();
             });

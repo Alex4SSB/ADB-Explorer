@@ -83,7 +83,7 @@ namespace ADB_Explorer.Services
                         if (packageList is not null)
                             packageList.RemoveAll(pkg => pkg.Name == packageName);
                         else if (pushPackage && isPackagePath)
-                            Data.RefreshPackages = true;
+                            Data.FileActions.RefreshPackages = true;
                     });
                 }
             }, TaskContinuationOptions.OnlyOnRanToCompletion);

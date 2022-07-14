@@ -248,6 +248,13 @@ namespace ADB_Explorer.Models
             set => Set(ref parentEnabled, value);
         }
 
+        private bool refreshPackages = false;
+        public bool RefreshPackages
+        {
+            get => refreshPackages;
+            set => Set(ref refreshPackages, value);
+        }
+
         #endregion
 
         #region strings

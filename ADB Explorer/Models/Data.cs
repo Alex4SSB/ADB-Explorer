@@ -64,7 +64,6 @@ namespace ADB_Explorer.Models
 
         public static FileActionsEnable FileActions { get; set; } = new();
 
-        public static bool RefreshPackages { get; set; } = false;
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
