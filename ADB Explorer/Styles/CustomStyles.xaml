@@ -144,6 +144,41 @@
         </Style.Resources>
     </Style>
     <Style
+        x:Key="ExplorerGridCellStyle"
+        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Margin" Value="4,0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="Opacity" Value="1" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
+                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding CutState}" Value="Cut">
+                <Setter Property="Opacity" Value="0.5" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding CutState}" Value="Copy">
+                <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding CutState}" Value="Copy" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding CutState}" Value="Copy" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
         x:Key="DeviceButtonStyle"
         BasedOn="{StaticResource ButtonStyle}"
         TargetType="Button">
