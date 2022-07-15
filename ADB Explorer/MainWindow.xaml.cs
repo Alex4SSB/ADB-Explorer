@@ -544,7 +544,20 @@ namespace ADB_Explorer
 
         private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (TextHelper.GetAltText(ExplorerGrid.ContextMenu) is string and "Open")
+            if (!SelectionHelper.GetSelectionInProgress(ExplorerGrid))
+            {
+                if (ExplorerGrid.SelectedItems.Count == 1)
+                {
+                    SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                    SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                }
+                else if (ExplorerGrid.SelectedItems.Count > 1 && e.AddedItems.Count == 1)
+                {
+                    SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.Items.IndexOf(e.AddedItems[0]));
+                }
+            }
+
+            if (SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
                 return;
 
             UpdateFileActions();
@@ -1562,7 +1575,7 @@ namespace ADB_Explorer
                 if (IsInEditMode())
                     return;
 
-                if (selectedFiles.Count() == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                if (ExplorerGrid.SelectedItems.Count == 1 && ExplorerGrid.SelectedItem is FilePath file && file.IsDirectory)
                     DoubleClick(ExplorerGrid.SelectedItem);
             }
             else if (key == Key.Back)
@@ -1573,21 +1586,12 @@ namespace ADB_Explorer
             {
                 DeleteFiles();
             }
-            else if (key == Key.Up)
+            else if (key is Key.Up or Key.Down)
             {
-                if (ExplorerGrid.SelectedIndex > 0)
-                {
-                    ExplorerGrid.SelectedIndex--;
-                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
-                }
-            }
-            else if (key == Key.Down)
-            {
-                if (ExplorerGrid.SelectedIndex < ExplorerGrid.Items.Count)
-                {
-                    ExplorerGrid.SelectedIndex++;
-                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
-                }
+                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                    ExplorerGrid.MultiSelect(key);
+                else
+                    ExplorerGrid.SingleSelect(key);
             }
             else
                 return;
@@ -1732,27 +1736,17 @@ namespace ADB_Explorer
 
             switch (key)
             {
-                case Key.Down:
-                    if (!selectedFiles.Any())
-                        ExplorerGrid.SelectedIndex = 0;
-                    else if (ExplorerGrid.SelectedIndex < ExplorerGrid.Items.Count)
-                        ExplorerGrid.SelectedIndex++;
-
-                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
-                    break;
-                case Key.Up:
-                    if (!selectedFiles.Any())
-                        ExplorerGrid.SelectedItem = ExplorerGrid.Items[^1];
-                    else if (ExplorerGrid.SelectedIndex > 0)
-                        ExplorerGrid.SelectedIndex--;
-
-                    ExplorerGrid.ScrollIntoView(ExplorerGrid.SelectedItem);
+                case Key.Down or Key.Up:
+                    if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                        ExplorerGrid.MultiSelect(key);
+                    else
+                        ExplorerGrid.SingleSelect(key);
                     break;
                 case Key.Enter:
                     if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode())
                         return false;
 
-                    if (selectedFiles.Count() == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                    if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                         DoubleClick(ExplorerGrid.SelectedItem);
                     break;
                 default:
@@ -1883,11 +1877,16 @@ namespace ADB_Explorer
 
             if (row.IsSelected == false)
             {
-                ExplorerGrid.SelectedItems.Clear();
+                ExplorerGrid.UnselectAll();
             }
 
             if (e.OriginalSource is not Border)
+            {
                 row.IsSelected = true;
+
+                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, row.GetIndex());
+                SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, row.GetIndex());
+            }
         }
 
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
@@ -2102,7 +2101,7 @@ namespace ADB_Explorer
             if (point.Y < ColumnHeaderHeight)
                 e.Handled = true;
 
-            TextHelper.SetAltText(ExplorerGrid.ContextMenu, "Open");
+            SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, true);
             UpdateFileActions();
         }
 
@@ -2110,6 +2109,8 @@ namespace ADB_Explorer
         {
             var point = e.GetPosition(ExplorerGrid);
             var actualRowWidth = 0.0;
+            int selectionIndex;
+
             foreach (var item in ExplorerGrid.Columns.Where(col => col.Visibility == Visibility.Visible))
             {
                 actualRowWidth += item.ActualWidth;
@@ -2124,8 +2125,15 @@ namespace ADB_Explorer
                 if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode())
                     IsInEditMode(false);
 
-                ExplorerGrid.SelectedItems.Clear();
+                ExplorerGrid.UnselectAll();
+
+                selectionIndex = -1;
             }
+            else
+                selectionIndex = ExplorerGrid.SelectedIndex;
+
+            SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, selectionIndex);
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, selectionIndex);
         }
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
@@ -3537,7 +3545,7 @@ namespace ADB_Explorer
 
         private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
         {
-            TextHelper.SetAltText(ExplorerGrid.ContextMenu, "Closed");
+            SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
         }
     }
 }

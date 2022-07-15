@@ -206,7 +206,7 @@
                         </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushPackagesEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -360,7 +360,7 @@
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -383,17 +383,17 @@
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </MultiDataTrigger>
-                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:TextHelper.AltObject)}" Value="Submenu">
+                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:SelectionHelper.MenuType)}" Value="Submenu">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:TextHelper.AltObject)}" Value="Submenu" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:SelectionHelper.MenuType)}" Value="Submenu" />
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SubmenuUninstallEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="IsEnabled" Value="False" />
@@ -404,7 +404,7 @@
         </MenuItem>
         <MenuItem
             x:Key="PackageActionsItem"
-            helpers:TextHelper.AltObject="Submenu"
+            helpers:SelectionHelper.MenuType="Submenu"
             x:Shared="False"
             Header="Package"
             IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}">
@@ -413,7 +413,7 @@
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:TextHelper.AltObject)}" Value="Context" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Collapsed" />
@@ -561,7 +561,7 @@
         </MenuItem>
         <ContextMenu
             x:Key="RowContextMenu"
-            helpers:TextHelper.AltObject="Context"
+            helpers:SelectionHelper.MenuType="Context"
             Resources="{StaticResource ContextMenuStyles}">
             <StaticResource ResourceKey="ContextMenuPullItem" />
             <StaticResource ResourceKey="ContextMenuPushItem" />
@@ -1484,6 +1484,9 @@
                     </ScrollViewer>
                     <DataGrid
                         x:Name="ExplorerGrid"
+                        helpers:SelectionHelper.CurrentSelectedIndex="-1"
+                        helpers:SelectionHelper.FirstSelectedIndex="-1"
+                        helpers:SelectionHelper.SelectionInProgress="False"
                         AutoGenerateColumns="False"
                         Background="Transparent"
                         CanUserResizeRows="False"
