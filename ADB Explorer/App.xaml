@@ -11,178 +11,28 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
+                <ResourceDictionary Source="Styles\Colors.xaml" />
                 <ResourceDictionary Source="Styles\BasicStyles.xaml" />
-                <ResourceDictionary Source="Styles\ScrollBar.xaml" />
-                <ResourceDictionary Source="Styles\ScrollViewer.xaml" />
-                <ResourceDictionary Source="Styles\ContextMenu.xaml" />
-                <ResourceDictionary Source="Styles\CheckBox.xaml" />
-                <ResourceDictionary Source="Styles\RadioButton.xaml" />
-                <ResourceDictionary Source="Styles\Button.xaml" />
-                <ResourceDictionary Source="Styles\ToggleButton.xaml" />
-                <ResourceDictionary Source="Styles\TextBox.xaml" />
-                <ResourceDictionary Source="Styles\MenuItem.xaml" />
+                <ResourceDictionary Source="Styles\Controls\ScrollBar.xaml" />
+                <ResourceDictionary Source="Styles\Controls\ScrollViewer.xaml" />
+                <ResourceDictionary Source="Styles\Controls\ContextMenu.xaml" />
+                <ResourceDictionary Source="Styles\Controls\CheckBox.xaml" />
+                <ResourceDictionary Source="Styles\Controls\RadioButton.xaml" />
+                <ResourceDictionary Source="Styles\Controls\Button.xaml" />
+                <ResourceDictionary Source="Styles\Controls\ToggleButton.xaml" />
+                <ResourceDictionary Source="Styles\Controls\TextBox.xaml" />
+                <ResourceDictionary Source="Styles\Controls\MenuItem.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
-                <ResourceDictionary Source="Styles\Expander.xaml" />
-                <ResourceDictionary Source="Styles\DataGrid.xaml" />
-                <ResourceDictionary Source="Styles\ContentDialog.xaml" />
-                <ResourceDictionary Source="Styles\SplitView.xaml" />
+                <ResourceDictionary Source="Styles\Controls\Expander.xaml" />
+                <ResourceDictionary Source="Styles\Controls\DataGrid.xaml" />
+                <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
+                <ResourceDictionary Source="Styles\Controls\SplitView.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
 
             <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
 
-            <Color x:Key="LightControlBackground">White</Color>
-            <Color x:Key="DarkControlBackground">#FF202020</Color>
-            <Color x:Key="LightMouseOverBackground">#FFE5F3FF</Color>
-            <Color x:Key="DarkMouseOverBackground">#FF4D4D4D</Color>
-            <Color x:Key="LightSelectedBackground">#FFCCE8FF</Color>
-            <Color x:Key="DarkSelectedBackground">#FF777777</Color>
-            <Color x:Key="LightSelectedInactiveBackground">#FFD9D9D9</Color>
-            <Color x:Key="DarkSelectedInactiveBackground">#FF333333</Color>
-            <Color x:Key="LightSelectedMouseOverInactiveBackground">#FFCCE8FF</Color>
-            <Color x:Key="DarkSelectedMouseOverInactiveBackground">#FF777777</Color>
-            <Color x:Key="LightDeviceMouseOverBackground">#FFC9C9C9</Color>
-            <Color x:Key="DarkDeviceMouseOverBackground">#FF4D4D4D</Color>
-
-            <Color x:Key="LightDevicesListBackground">#FFF3F3F3</Color>
-            <Color x:Key="DarkDevicesListBackground">#FF202020</Color>
-
-            <Color x:Key="LightContentDialogCommandBackground">#FFF3F3F3</Color>
-            <Color x:Key="LightContentDialogContentBackground">White</Color>
-            <Color x:Key="DarkContentDialogCommandBackground">#FF202020</Color>
-            <Color x:Key="DarkContentDialogContentBackground">#FF2B2B2B</Color>
-
-            <Color x:Key="LightDeviceConnectionPanelBackground">#FFFBFBFB</Color>
-            <Color x:Key="DarkDeviceConnectionPanelBackground">#FF2B2B2B</Color>
-            <Color x:Key="LightDeviceConnectionPanelBorder">#FFE5E5E5</Color>
-            <Color x:Key="DarkDeviceConnectionPanelBorder">#FF1D1D1D</Color>
-            <Color x:Key="LightExpanderBorderExpanded">#FFFBFBFB</Color>
-            <Color x:Key="DarkExpanderBorderExpanded">#FF2D2D2D</Color>
-            <Color x:Key="LightExpanderUpperBorderMouseOver">#FFE5E5E5</Color>
-            <Color x:Key="DarkExpanderUpperBorderMouseOver">#FF353535</Color>
-            <Color x:Key="LightExpanderSideBorderMouseOver">#FFE5E5E5</Color>
-            <Color x:Key="DarkExpanderSideBorderMouseOver">#FF303030</Color>
-            <Color x:Key="LightExpanderLowerBorderMouseOver">#FFCCCCCC</Color>
-            <Color x:Key="DarkExpanderLowerBorderMouseOver">#FF303030</Color>
-
-            <Color x:Key="LightAdbTextBoxUpperBorder">#FFECECEC</Color>
-            <Color x:Key="DarkAdbTextBoxUpperBorder">#FF3A3A3A</Color>
-            <Color x:Key="LightAdbTextBoxLowerBorder">#FF8B8B8B</Color>
-            <Color x:Key="DarkAdbTextBoxLowerBorder">#FF9F9F9F</Color>
-            <Color x:Key="LightAdbTextBoxBorderDisabled">#FFF0F0F0</Color>
-            <Color x:Key="DarkAdbTextBoxBorderDisabled">#FF3A3A3A</Color>
-            <Color x:Key="LightAdbTextBoxBackgroundFocused">#FFFFFFFF</Color>
-            <Color x:Key="DarkAdbTextBoxBackgroundFocused">#FF222222</Color>
-            <Color x:Key="LightAdbTextBoxBackgroundMouseOver">#FFF7F7F7</Color>
-            <Color x:Key="DarkAdbTextBoxBackgroundMouseOver">#FF3C3C3C</Color>
-            <Color x:Key="LightAdbTextBoxBackgroundUnfocused">#FFFEFEFE</Color>
-            <Color x:Key="DarkAdbTextBoxBackgroundUnfocused">#FF373737</Color>
-            <Color x:Key="LightAdbTextBoxBackgroundDisabled">#FFFDFDFD</Color>
-            <Color x:Key="DarkAdbTextBoxBackgroundDisabled">#FF343434</Color>
-
-            <Color x:Key="DarkAdbButtonBackgroundNormal">#FF373737</Color>
-            <Color x:Key="DarkAdbButtonBackgroundMouseOver">#FF3C3C3C</Color>
-            <Color x:Key="DarkAdbButtonBackgroundPressed">#08FFFFFF</Color>
-            <Color x:Key="DarkAdbButtonBackgroundDisabled">#FF444444</Color>
-            <Color x:Key="DarkAdbButtonBorderPressed">#22FFFFFF</Color>
-            <Color x:Key="DarkAdbButtonBorderDisabled">#42FFFFFF</Color>
-            <Color x:Key="DarkAdbButtonForegroundPressedOrDisabled">#2DFFFFFF</Color>
-            <Color x:Key="DarkDriveForegroundPressed">#90FFFFFF</Color>
-
-            <Color x:Key="LightAdbButtonBackgroundNormal">#B3FFFFFF</Color>
-            <Color x:Key="LightAdbButtonBackgroundMouseOver">#80F2F2F2</Color>
-            <Color x:Key="LightAdbButtonBackgroundPressed">#FFFAFAFA</Color>
-            <Color x:Key="LightAdbButtonBackgroundDisabled">#FFEAEAEA</Color>
-            <Color x:Key="LightAdbButtonBorderPressed">#0F000000</Color>
-            <Color x:Key="LightAdbButtonBorderDisabled">#2F000000</Color>
-            <Color x:Key="LightAdbButtonForegroundPressedOrDisabled">#5C000000</Color>
-            <Color x:Key="LightDriveForegroundPressed">#C0000000</Color>
-
-            <Color x:Key="LightFluentButtonBorderGradient1">#29000000</Color>
-            <Color x:Key="LightFluentButtonBorderGradient2">#0F000000</Color>
-
-            <Color x:Key="DarkFluentButtonBorderGradient1">#18FFFFFF</Color>
-            <Color x:Key="DarkFluentButtonBorderGradient2">#12FFFFFF</Color>
-
-            <Color x:Key="LightAccentButtonBackgroundDisabled">#37000000</Color>
-            <Color x:Key="LightFluentAccentButtonBorderGradient1">#66000000</Color>
-            <Color x:Key="LightFluentAccentButtonBorderGradient2">#14FFFFFF</Color>
-
-            <Color x:Key="DarkAccentButtonBackgroundDisabled">#28FFFFFF</Color>
-            <Color x:Key="DarkFluentAccentButtonBorderGradient1">#23000000</Color>
-            <Color x:Key="DarkFluentAccentButtonBorderGradient2">#14FFFFFF</Color>
-
-            <Color x:Key="DarkAdbWindowBackground">#FF2B2B2B</Color>
-            <Color x:Key="LightAdbWindowBackground">#FFF2F2F2</Color>
-
-            <Color x:Key="DarkCheckboxBackgroundNormal">#19000000</Color>
-            <Color x:Key="DarkCheckboxBorderNormal">#8BFFFFFF</Color>
-            <Color x:Key="DarkCheckboxBackgroundMouseOver">#0BFFFFFF</Color>
-            <Color x:Key="DarkCheckboxBackgroundPressed">#12FFFFFF</Color>
-            <Color x:Key="DarkCheckboxBorderPreseedOrDisabled">#28FFFFFF</Color>
-
-            <Color x:Key="LightCheckboxBackgroundNormal">#06000000</Color>
-            <Color x:Key="LightCheckboxBorderNormal">#72000000</Color>
-            <Color x:Key="LightCheckboxBackgroundMouseOver">#0F000000</Color>
-            <Color x:Key="LightCheckboxBackgroundPressed">#18000000</Color>
-            <Color x:Key="LightCheckboxBorderPreseedOrDisabled">#37000000</Color>
-
-            <Color x:Key="DarkNoticeBorderBackground">#FF433519</Color>
-            <Color x:Key="LightNoticeBorderBackground">#FFFFF4CE</Color>
-
-            <Color x:Key="DarkSeparatorForeground">#FF808080</Color>
-            <Color x:Key="LightSeparatorForeground">#FF919191</Color>
-
-            <ResourceDictionary x:Key="DynamicBrushes">
-                <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
-                <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
-                <SolidColorBrush x:Key="SelectedBackground" Color="{DynamicResource LightSelectedBackground}" />
-                <SolidColorBrush x:Key="SelectedInactiveBackground" Color="{DynamicResource LightSelectedInactiveBackground}" />
-                <SolidColorBrush x:Key="SelectedMouseOverInactiveBackground" Color="{DynamicResource LightSelectedMouseOverInactiveBackground}" />
-                <SolidColorBrush x:Key="DeviceMouseOverBackground" Color="{DynamicResource LightDeviceMouseOverBackground}" />
-
-                <SolidColorBrush x:Key="DevicesListBackground" Color="{DynamicResource LightDevicesListBackground}" />
-                <SolidColorBrush x:Key="DeviceConnectionPanelBackground" Color="{DynamicResource LightDeviceConnectionPanelBackground}" />
-                <SolidColorBrush x:Key="DeviceConnectionPanelBorder" Color="{DynamicResource LightDeviceConnectionPanelBorder}" />
-                <SolidColorBrush x:Key="ExpanderBorderExpanded" Color="{DynamicResource LightExpanderBorderExpanded}" />
-                <SolidColorBrush x:Key="ExpanderUpperBorderMouseOver" Color="{DynamicResource LightExpanderUpperBorderMouseOver}" />
-                <SolidColorBrush x:Key="ExpanderLowerBorderMouseOver" Color="{DynamicResource LightExpanderLowerBorderMouseOver}" />
-                <SolidColorBrush x:Key="ExpanderSideBorderMouseOver" Color="{DynamicResource LightExpanderSideBorderMouseOver}" />
-
-                <SolidColorBrush x:Key="AdbTextBoxUpperBorder" Color="{DynamicResource LightTextBoxUpperBorder}" />
-                <SolidColorBrush x:Key="AdbTextBoxLowerBorder" Color="{DynamicResource LightTextBoxLowerBorder}" />
-                <SolidColorBrush x:Key="AdbTextBoxBorderDisabled" Color="{DynamicResource LightTextBoxBorderDisabled}" />
-                <SolidColorBrush x:Key="AdbTextBoxBackgroundFocused" Color="{DynamicResource LightTextBoxBackgroundFocused}" />
-                <SolidColorBrush x:Key="AdbTextBoxBackgroundUnfocused" Color="{DynamicResource LightTextBoxBackgroundUnfocused}" />
-                <SolidColorBrush x:Key="AdbTextBoxBackgroundMouseOver" Color="{DynamicResource LightTextBoxBackgroundMouseOver}" />
-                <SolidColorBrush x:Key="AdbTextBoxBackgroundDisabled" Color="{DynamicResource LightTextBoxBackgroundDisabled}" />
-
-                <SolidColorBrush x:Key="AdbButtonBackgroundNormal" Color="{DynamicResource LightAdbButtonBackgroundNormal}" />
-                <SolidColorBrush x:Key="AdbButtonBackgroundMouseOver" Color="{DynamicResource LightAdbButtonBackgroundMouseOver}" />
-                <SolidColorBrush x:Key="AdbButtonBackgroundPressed" Color="{DynamicResource LightAdbButtonBackgroundPressed}" />
-                <SolidColorBrush x:Key="AdbButtonBackgroundDisabled" Color="{DynamicResource LightAdbButtonBackgroundDisabled}" />
-                <SolidColorBrush x:Key="AdbButtonBorderPressed" Color="{DynamicResource LightAdbButtonBorderPressed}" />
-                <SolidColorBrush x:Key="AdbButtonBorderDisabled" Color="{DynamicResource LightAdbButtonBorderDisabled}" />
-                <SolidColorBrush x:Key="AdbButtonForegroundPressedOrDisabled" Color="{DynamicResource LightAdbButtonForegroundPressedOrDisabled}" />
-
-                <SolidColorBrush x:Key="DriveForegroundPressed" Color="{DynamicResource LightDriveForegroundPressed}" />
-                <SolidColorBrush x:Key="AccentButtonBackgroundDisabled" Color="{DynamicResource LightAccentButtonBackgroundDisabled}" />
-
-                <SolidColorBrush x:Key="CheckboxBackgroundNormal" Color="{DynamicResource LightCheckboxBackgroundNormal}" />
-                <SolidColorBrush x:Key="CheckboxBorderNormal" Color="{DynamicResource LightCheckboxBorderNormal}" />
-                <SolidColorBrush x:Key="CheckboxBackgroundMouseOver" Color="{DynamicResource LightCheckboxBackgroundMouseOver}" />
-                <SolidColorBrush x:Key="CheckboxBackgroundPressed" Color="{DynamicResource LightCheckboxBackgroundPressed}" />
-                <SolidColorBrush x:Key="CheckboxBorderPreseedOrDisabled" Color="{DynamicResource LightCheckboxBorderPreseedOrDisabled}" />
-
-                <SolidColorBrush x:Key="AdbWindowBackground" Color="{DynamicResource LightAdbWindowBackground}" />
-                <SolidColorBrush x:Key="ContentDialogCommandBackground" Color="{DynamicResource LightContentDialogCommandBackground}" />
-                <SolidColorBrush x:Key="ContentDialogContentBackground" Color="{DynamicResource LightContentDialogContentBackground}" />
-
-                <SolidColorBrush x:Key="NoticeBorderBackground" Color="{DynamicResource LightNoticeBorderBackground}" />
-
-                <SolidColorBrush x:Key="SeparatorForeground" Color="{DynamicResource LightSeparatorForeground}" />
-            </ResourceDictionary>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -53,13 +53,6 @@ namespace ADB_Explorer
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
 
-        private bool trashInProgress;
-        public bool TrashInProgress
-        {
-            get => trashInProgress;
-            set => Set(ref trashInProgress, value);
-        }
-
         private double ColumnHeaderHeight
         {
             get
@@ -310,9 +303,9 @@ namespace ADB_Explorer
             }
             else if (e.PropertyName == nameof(DirectoryLister.InProgress) && !DirectoryLister.InProgress)
             {
-                TrashInProgress = false;
                 if (FileActions.IsRecycleBin)
                 {
+                    FileActions.CustomListingInProgress = false;
                     EnableRecycleButtons();
                     UpdateIndexerFile();
                 }
@@ -398,7 +391,7 @@ namespace ADB_Explorer
                 }
 
                 SettingsSplitView.IsPaneOpen = true;
-                WorkingDirectoriesExpander.IsExpanded = true;
+                //WorkingDirectoriesExpander.IsExpanded = true;
                 MissingAdbGrid.Visibility = Visibility.Visible;
             });
 
@@ -766,6 +759,13 @@ namespace ADB_Explorer
             SetRenderMode();
 
             EnableMdns();
+
+            UISettings.Init();
+            Dispatcher.Invoke(() =>
+            {
+                SettingsList.ItemsSource = UISettings.SettingsList;
+                SortedSettings.ItemsSource = UISettings.SortSettings;
+            });
         }
 
         private void SetSymbolFont()
@@ -985,6 +985,8 @@ namespace ADB_Explorer
 
         private void UpdatePackages(bool updateExplorer = false)
         {
+            FileActions.CustomListingInProgress = true;
+
             var version = DevicesObject.Current.AndroidVersion;
             var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
 
@@ -1006,6 +1008,8 @@ namespace ADB_Explorer
                     {
                         DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Package).ItemsCount = (ulong)Packages.Count;
                     }
+
+                    FileActions.CustomListingInProgress = false;
                 });
             });
         }
@@ -1222,7 +1226,7 @@ namespace ADB_Explorer
 
             if (FileActions.IsRecycleBin)
             {
-                TrashInProgress = true;
+                FileActions.CustomListingInProgress = true;
                 var recycleTask = Task.Run(() =>
                 {
                     string text = "";
@@ -2357,6 +2361,8 @@ namespace ADB_Explorer
                 return;
 
             var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
+            if (collectionView is null)
+                return;
 
             if (FileActions.IsAppDrive)
             {

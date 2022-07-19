@@ -1796,7 +1796,7 @@
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
                                             <Condition Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
-                                            <Condition Binding="{Binding ElementName=MainWin, Path=TrashInProgress}" Value="False" />
+                                            <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=CustomListingInProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=LogTextBox, Path=Visibility}" Value="Collapsed" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
@@ -1804,45 +1804,55 @@
                                 </Style.Triggers>
                             </Style>
                         </Grid.Style>
-                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
-                            <StackPanel.Style>
-                                <Style TargetType="StackPanel">
+                        <Grid>
+                            <Grid.Style>
+                                <Style TargetType="Grid">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallVisible}" Value="True">
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
-                                    <Setter Property="Visibility" Value="Visible" />
                                 </Style>
-                            </StackPanel.Style>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="This folder " />
-                                <TextBlock FontStyle="Italic" Text="looks" />
-                                <TextBlock Text=" empty" />
+                            </Grid.Style>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="This folder " />
+                                    <TextBlock FontStyle="Italic" Text="looks" />
+                                    <TextBlock Text=" empty" />
+                                </StackPanel>
+                                <TextBlock
+                                    HorizontalAlignment="Center"
+                                    FontSize="10"
+                                    Text="... to the naked eye" />
                             </StackPanel>
                             <TextBlock
                                 HorizontalAlignment="Center"
-                                FontSize="10"
-                                Text="... to the naked eye" />
-                        </StackPanel>
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="This folder is empty.">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                                VerticalAlignment="Top"
+                                Text="This folder is empty.">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
                         <TextBlock
                             HorizontalAlignment="Center"
                             VerticalAlignment="Top"
@@ -1851,7 +1861,7 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallVisible}" Value="True">
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -2767,7 +2777,80 @@
                                 Margin="6,0,24,6"
                                 HorizontalAlignment="Left"
                                 Spacing="6">
-                                <Expander Header="ADB">
+                                <ToggleButton
+                                    x:Name="SettingsToggle"
+                                    Margin="0,0,0,4"
+                                    HorizontalAlignment="Stretch">
+                                    <ToggleButton.Style>
+                                        <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
+                                            <Setter Property="Content" Value="Sorted" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter Property="Content" Value="Grouped" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ToggleButton.Style>
+                                </ToggleButton>
+                                <ui:ItemsRepeater x:Name="SettingsList">
+                                    <ui:ItemsRepeater.Style>
+                                        <Style TargetType="ui:ItemsRepeater">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:ItemsRepeater.Style>
+                                    <ui:ItemsRepeater.Layout>
+                                        <ui:StackLayout Spacing="10" />
+                                    </ui:ItemsRepeater.Layout>
+                                    <ui:ItemsRepeater.ItemTemplate>
+                                        <DataTemplate DataType="AbstractGroup">
+                                            <Expander Header="{Binding Name}">
+                                                <ListView ItemTemplateSelector="{StaticResource SettingsTemplateSelector}" ItemsSource="{Binding Children}">
+                                                    <ListView.ItemContainerStyle>
+                                                        <Style TargetType="ListViewItem">
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="ListViewItem">
+                                                                        <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}">
+                                                                            <ContentPresenter />
+                                                                        </Grid>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </ListView.ItemContainerStyle>
+                                                    <!--<ui:ItemsRepeater.ItemTemplate >
+                                                        <DataTemplate DataType="AbstractSetting">
+                                                            <CheckBox Content="{Binding Description}" IsChecked="{Binding Value, Mode=TwoWay}" />
+                                                        </DataTemplate>
+                                                    </ui:ItemsRepeater.ItemTemplate>-->
+                                                </ListView>
+                                            </Expander>
+                                        </DataTemplate>
+                                    </ui:ItemsRepeater.ItemTemplate>
+                                </ui:ItemsRepeater>
+                                <ui:ItemsRepeater x:Name="SortedSettings">
+                                    <ui:ItemsRepeater.Style>
+                                        <Style TargetType="ui:ItemsRepeater">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ui:ItemsRepeater.Style>
+                                    <ui:ItemsRepeater.ItemTemplate>
+                                        <DataTemplate DataType="AbstractSetting">
+                                            <CheckBox Content="{Binding Description}" IsChecked="{Binding Value, Mode=TwoWay}" />
+                                        </DataTemplate>
+                                    </ui:ItemsRepeater.ItemTemplate>
+                                </ui:ItemsRepeater>
+                                <!--<Expander Header="ADB">
                                     <StackPanel>
                                         <CheckBox Content="Enable mDNS (experimental)" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" />
                                         <CheckBox Content="Poll For Devices" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" />
@@ -2803,7 +2886,7 @@
                                     <StackPanel>
                                         <CheckBox Content="Poll For Drives" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDrives}" />
                                         <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
-                                        <CheckBox Content="Enable APK handling" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" />
+                                        <CheckBox Content="Enable APK Handling" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" />
                                     </StackPanel>
                                 </Expander>
                                 <Separator />
@@ -2907,7 +2990,7 @@
                                                 Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
                                         </Grid>
                                     </StackPanel>
-                                </Expander>
+                                </Expander>-->
                                 <Separator />
                                 <Expander Header="Theme">
                                     <StackPanel VerticalAlignment="Bottom">

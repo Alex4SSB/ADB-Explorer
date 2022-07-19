@@ -255,6 +255,13 @@ namespace ADB_Explorer.Models
             set => Set(ref refreshPackages, value);
         }
 
+        private bool customListingInProgress;
+        public bool CustomListingInProgress
+        {
+            get => customListingInProgress;
+            set => Set(ref customListingInProgress, value);
+        }
+
         #endregion
 
         #region strings

@@ -4,6 +4,7 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
     <converters:DoubleEquals x:Key="DoubleEquals" />
@@ -845,7 +846,6 @@
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="Margin" Value="0,0,4,0" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="ToolTip" Value="Restart app for changes to take effect" />
     </Style>
     <Style x:Key="QrBackgroundStyle" TargetType="Border">
@@ -1317,4 +1317,93 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel FlowDirection="RightToLeft" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <DataTemplate x:Key="ResetButtonTemplate" DataType="services:ResetButton">
+        <Button Command="{Binding Command}" Style="{StaticResource RestartAppButtonStyle}">
+            <ui:FontIcon />
+        </Button>
+    </DataTemplate>
+    <DataTemplate x:Key="AnimationTipButtonTemplate" DataType="services:ResetButton">
+        <Button
+            Command="{Binding Command}"
+            Style="{StaticResource RestartAppButtonStyle}"
+            ToolTip="More Info">
+            <ui:FontIcon Glyph="&#xE82F;" />
+        </Button>
+    </DataTemplate>
+    <helpers:ActionButtonTemplateSelector
+        x:Key="ActionButtonTemplateSelector"
+        AnimationTipSettingTemplate="{StaticResource AnimationTipButtonTemplate}"
+        ResetSettingTemplate="{StaticResource ResetButtonTemplate}" />
+    <DataTemplate x:Key="BoolSettingTemplate" DataType="services:BoolSetting">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <CheckBox
+                Content="{Binding Description}"
+                IsChecked="{Binding Value, Mode=TwoWay}"
+                IsEnabled="{Binding IsEnabled}"
+                Visibility="{Binding Visibility}" />
+            <ItemsControl
+                Grid.Column="1"
+                ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
+                ItemsSource="{Binding Commands}"
+                Style="{StaticResource RightHorizontalItemsControlStyle}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="StringSettingTemplate" DataType="services:StringSetting">
+        <Grid Margin="0,6" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="1" Margin="4,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Description}" />
+                <ItemsControl
+                    Grid.Column="1"
+                    ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
+                    ItemsSource="{Binding Commands}"
+                    Style="{StaticResource RightHorizontalItemsControlStyle}" />
+            </Grid>
+            <Button
+                Grid.Row="1"
+                Margin="0,0,6,0"
+                Command="{Binding SetButton.Command}"
+                ToolTip="Change">
+                <ui:FontIcon Glyph="&#xE70F;" />
+            </Button>
+            <TextBox
+                Grid.Row="1"
+                Grid.Column="1"
+                HorizontalAlignment="Stretch"
+                ui:ControlHelper.PlaceholderText="- not set -"
+                IsReadOnly="True"
+                Style="{StaticResource TooltipTextBoxStyle}"
+                Text="{Binding Value}" />
+        </Grid>
+    </DataTemplate>
+    <helpers:SettingsTemplateSelector
+        x:Key="SettingsTemplateSelector"
+        BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+        StringSettingTemplate="{StaticResource StringSettingTemplate}" />
 </ResourceDictionary>
