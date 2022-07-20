@@ -289,6 +289,13 @@ namespace ADB_Explorer
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                         RefreshDrives(true);
                     break;
+                case nameof(AppSettings.HideSettingsPane):
+                    if (Settings.HideSettingsPane)
+                    {
+                        SettingsSplitView.IsPaneOpen = false;
+                        Settings.HideSettingsPane = false;
+                    }
+                    break;
                 default:
                     break;
             }

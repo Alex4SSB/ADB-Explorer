@@ -23,7 +23,7 @@ namespace ADB_Explorer.Services
             }
         }
 
-        public bool EnableDoubleClickPull => string.IsNullOrEmpty(DefaultFolder);
+        public bool EnableDoubleClickPull => !string.IsNullOrEmpty(DefaultFolder);
 
         private string manualAdbPath;
         public string ManualAdbPath
@@ -311,6 +311,13 @@ namespace ADB_Explorer.Services
         public bool WindowLoaded { get; set; } = false;
 
         public bool ResetAppSettings { get; set; } = false;
+
+        private bool hideSettingsPane = false;
+        public bool HideSettingsPane
+        {
+            get => hideSettingsPane;
+            set => Set(ref hideSettingsPane, value);
+        }
 
 
         public event PropertyChangedEventHandler PropertyChanged;

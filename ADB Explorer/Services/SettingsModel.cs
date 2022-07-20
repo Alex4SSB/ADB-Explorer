@@ -18,9 +18,12 @@ namespace ADB_Explorer.Services
 {
     public static class UISettings
     {
-        public static ObservableList<SettingsGroup> SettingsList { get; set; }
+        public static ObservableList<AbstractGroup> SettingsList { get; set; }
 
-        public static IEnumerable<AbstractSetting> SortSettings => SettingsList.SelectMany(group => group.Children).OrderBy(sett => sett.Description);
+        public static IEnumerable<AbstractSetting> SortSettings => SettingsList.OfType<SettingsGroup>()
+            .SelectMany(group => group.Children)
+            .Where(set => set.Visibility is Visibility.Visible)
+            .OrderBy(sett => sett.Description);
 
         public static void Init()
         {
@@ -39,6 +42,7 @@ namespace ADB_Explorer.Services
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), "Poll For Battery Status", "ADB"),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), "Enable Command Log", "ADB"),
                 }),
+                new SettingsSeparator(),
                 new SettingsGroup("Device", new()
                 {
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoRoot)), "Automatically Enable Root", "Device"),
@@ -46,12 +50,14 @@ namespace ADB_Explorer.Services
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.RememberPort)), "Remember Last Port", "Device", enableProp: appSettings.GetProperty(nameof(Settings.RememberIp))),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoOpen)), "Automatically Open For Browsing", "Device"),
                 }),
+                new SettingsSeparator(),
                 new SettingsGroup("Drives & Features", new()
                 {
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDrives)), "Poll For Drives", "Drives & Features"),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableRecycle)), "Enable Recycle Bin", "Drives & Features"),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableApk)), "Enable APK Handling", "Drives & Features"),
                 }),
+                new SettingsSeparator(),
                 new SettingsGroup("File Behavior", new()
                 {
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), "Show File Name Extensions", "File Behavior"),
@@ -59,11 +65,13 @@ namespace ADB_Explorer.Services
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowSystemPackages)), "Show System Apps", "File Behavior", visibleProp: appSettings.GetProperty(nameof(Settings.EnableApk))),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.PullOnDoubleClick)), "Pull To Default Folder On Double-Click", "File Behavior", enableProp: appSettings.GetProperty(nameof(Settings.EnableDoubleClickPull))),
                 }),
+                new SettingsSeparator(),
                 new SettingsGroup("Working Directories", new()
                 {
                     new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)), "Default Folder", defPathCommand, "Working Directories"),
                     new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)), "Override ADB Path", adbPathCommand, "Working Directories", commands: resetCommand),
                 }),
+                new SettingsSeparator(),
                 //new EnumGroup("Theme", new()
                 //{
                 //    //new Setting<Models.AppTheme>(appSettings.GetProperty(nameof(Settings.Theme)), ""),
@@ -79,18 +87,8 @@ namespace ADB_Explorer.Services
         }
     }
 
-    public class SettingsGroup : INotifyPropertyChanged
+    public abstract class AbstractGroup : INotifyPropertyChanged
     {
-        public string Name { get; set; }
-
-        public List<AbstractSetting> Children { get; set; }
-
-        public SettingsGroup(string name, List<AbstractSetting> children)
-        {
-            Name = name;
-            Children = children;    
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -105,6 +103,24 @@ namespace ADB_Explorer.Services
         }
 
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public class SettingsGroup : AbstractGroup
+    {
+        public string Name { get; set; }
+
+        public List<AbstractSetting> Children { get; set; }
+
+        public SettingsGroup(string name, List<AbstractSetting> children)
+        {
+            Name = name;
+            Children = children;    
+        }
+    }
+
+    public class SettingsSeparator : AbstractGroup
+    {
+
     }
 
     //public class BoolGroup : SettingsGroup
@@ -275,6 +291,7 @@ namespace ADB_Explorer.Services
     {
         public static void Action()
         {
+            Settings.HideSettingsPane = true;
             DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
         }
 
@@ -339,7 +356,7 @@ namespace ADB_Explorer.Services
 
                 if (message != "")
                 {
-                    //SettingsSplitView.IsPaneOpen = false;
+                    Settings.HideSettingsPane = true;
                     DialogService.ShowMessage(message, "Fail to override ADB", DialogService.DialogIcon.Exclamation);
                     return;
                 }

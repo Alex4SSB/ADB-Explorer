@@ -2792,64 +2792,8 @@
                                         </Style>
                                     </ToggleButton.Style>
                                 </ToggleButton>
-                                <ui:ItemsRepeater x:Name="SettingsList">
-                                    <ui:ItemsRepeater.Style>
-                                        <Style TargetType="ui:ItemsRepeater">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:ItemsRepeater.Style>
-                                    <ui:ItemsRepeater.Layout>
-                                        <ui:StackLayout Spacing="10" />
-                                    </ui:ItemsRepeater.Layout>
-                                    <ui:ItemsRepeater.ItemTemplate>
-                                        <DataTemplate DataType="AbstractGroup">
-                                            <Expander Header="{Binding Name}">
-                                                <ListView ItemTemplateSelector="{StaticResource SettingsTemplateSelector}" ItemsSource="{Binding Children}">
-                                                    <ListView.ItemContainerStyle>
-                                                        <Style TargetType="ListViewItem">
-                                                            <Setter Property="Template">
-                                                                <Setter.Value>
-                                                                    <ControlTemplate TargetType="ListViewItem">
-                                                                        <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}">
-                                                                            <ContentPresenter />
-                                                                        </Grid>
-                                                                    </ControlTemplate>
-                                                                </Setter.Value>
-                                                            </Setter>
-                                                        </Style>
-                                                    </ListView.ItemContainerStyle>
-                                                    <!--<ui:ItemsRepeater.ItemTemplate >
-                                                        <DataTemplate DataType="AbstractSetting">
-                                                            <CheckBox Content="{Binding Description}" IsChecked="{Binding Value, Mode=TwoWay}" />
-                                                        </DataTemplate>
-                                                    </ui:ItemsRepeater.ItemTemplate>-->
-                                                </ListView>
-                                            </Expander>
-                                        </DataTemplate>
-                                    </ui:ItemsRepeater.ItemTemplate>
-                                </ui:ItemsRepeater>
-                                <ui:ItemsRepeater x:Name="SortedSettings">
-                                    <ui:ItemsRepeater.Style>
-                                        <Style TargetType="ui:ItemsRepeater">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="False">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ui:ItemsRepeater.Style>
-                                    <ui:ItemsRepeater.ItemTemplate>
-                                        <DataTemplate DataType="AbstractSetting">
-                                            <CheckBox Content="{Binding Description}" IsChecked="{Binding Value, Mode=TwoWay}" />
-                                        </DataTemplate>
-                                    </ui:ItemsRepeater.ItemTemplate>
-                                </ui:ItemsRepeater>
+                                <ListView x:Name="SettingsList" Style="{StaticResource GroupSettingsRepeater}" />
+                                <ListView x:Name="SortedSettings" Style="{StaticResource SortedSettingsRepeater}" />
                                 <!--<Expander Header="ADB">
                                     <StackPanel>
                                         <CheckBox Content="Enable mDNS (experimental)" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" />

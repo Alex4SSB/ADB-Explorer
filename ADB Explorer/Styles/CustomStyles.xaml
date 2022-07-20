@@ -1351,11 +1351,46 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <CheckBox
-                Content="{Binding Description}"
-                IsChecked="{Binding Value, Mode=TwoWay}"
-                IsEnabled="{Binding IsEnabled}"
-                Visibility="{Binding Visibility}" />
+            <CheckBox IsEnabled="{Binding IsEnabled}" Visibility="{Binding Visibility}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="{Binding Description}" />
+                    <StackPanel
+                        Grid.Row="1"
+                        Margin="0,-2,0,-10"
+                        Opacity="0.7"
+                        Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=CheckBox}, Path=IsMouseOver}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=IsMouseOver}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock FontSize="10" Text="→ " />
+                        <TextBlock FontSize="10" Text="{Binding GroupName}" />
+                    </StackPanel>
+                </Grid>
+                <CheckBox.Style>
+                    <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                        <Setter Property="IsChecked" Value="False" />
+                        <Style.Triggers>
+                            <Trigger Property="IsEnabled" Value="True">
+                                <Setter Property="IsChecked" Value="{Binding Value, Mode=TwoWay}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </CheckBox.Style>
+            </CheckBox>
             <ItemsControl
                 Grid.Column="1"
                 ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
@@ -1369,41 +1404,128 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Grid Grid.Column="1" Margin="4,0,0,4">
+            <Grid Grid.Column="1" Margin="28,0,0,4">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Description}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Description}" />
+
+                </StackPanel>
                 <ItemsControl
                     Grid.Column="1"
                     ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
                     ItemsSource="{Binding Commands}"
                     Style="{StaticResource RightHorizontalItemsControlStyle}" />
             </Grid>
-            <Button
-                Grid.Row="1"
-                Margin="0,0,6,0"
-                Command="{Binding SetButton.Command}"
-                ToolTip="Change">
-                <ui:FontIcon Glyph="&#xE70F;" />
-            </Button>
-            <TextBox
-                Grid.Row="1"
-                Grid.Column="1"
-                HorizontalAlignment="Stretch"
-                ui:ControlHelper.PlaceholderText="- not set -"
-                IsReadOnly="True"
-                Style="{StaticResource TooltipTextBoxStyle}"
-                Text="{Binding Value}" />
+            <Grid Grid.Row="1">
+                <TextBox
+                    HorizontalAlignment="Stretch"
+                    VerticalContentAlignment="Center"
+                    ui:ControlHelper.PlaceholderText="- not set -"
+                    IsReadOnly="True"
+                    Style="{StaticResource TooltipTextBoxStyle}"
+                    Text="{Binding Value}" />
+                <Button
+                    Margin="3,0"
+                    Padding="4"
+                    VerticalAlignment="Center"
+                    Command="{Binding SetButton.Command}"
+                    ToolTip="Change">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=IsMouseOver}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <ui:FontIcon FontSize="16" Glyph="&#xE70F;" />
+                </Button>
+                <StackPanel
+                    Margin="28,0,0,-12"
+                    VerticalAlignment="Bottom"
+                    Opacity="0.7"
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=IsMouseOver}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=IsMouseOver}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock FontSize="10" Text="→ " />
+                    <TextBlock FontSize="10" Text="{Binding GroupName}" />
+                </StackPanel>
+            </Grid>
         </Grid>
     </DataTemplate>
     <helpers:SettingsTemplateSelector
         x:Key="SettingsTemplateSelector"
         BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
         StringSettingTemplate="{StaticResource StringSettingTemplate}" />
+    <Style x:Key="StretchListViewItem" TargetType="ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}">
+                        <ContentPresenter />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="SettingsGroupContainer"
+        BasedOn="{StaticResource StretchListViewItem}"
+        TargetType="ListViewItem">
+        <Setter Property="Margin" Value="0,3" />
+    </Style>
+    <Style
+        x:Key="SortedSettingsRepeater"
+        BasedOn="{StaticResource DefaultListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource SettingsTemplateSelector}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource StretchListViewItem}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <DataTemplate x:Key="SettingsExpanderTemplate" DataType="services:SettingsGroup">
+        <Expander Header="{Binding Name}">
+            <ListView
+                ItemContainerStyle="{StaticResource StretchListViewItem}"
+                ItemTemplateSelector="{StaticResource SettingsTemplateSelector}"
+                ItemsSource="{Binding Children}" />
+        </Expander>
+    </DataTemplate>
+    <DataTemplate x:Key="SettingsSeparatorTemplate" DataType="services:SettingsSeparator">
+        <Separator />
+    </DataTemplate>
+    <helpers:SettingsGroupTemplateSelector
+        x:Key="SettingsGroupTemplateSelector"
+        SettingsGroupTemplate="{StaticResource SettingsExpanderTemplate}"
+        SettingsSeparatorTemplate="{StaticResource SettingsSeparatorTemplate}" />
+    <Style
+        x:Key="GroupSettingsRepeater"
+        BasedOn="{StaticResource DefaultListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsGroupContainer}" />
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource SettingsGroupTemplateSelector}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
