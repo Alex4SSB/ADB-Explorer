@@ -319,6 +319,27 @@ namespace ADB_Explorer.Services
             set => Set(ref hideSettingsPane, value);
         }
 
+        private bool sortedView = false;
+        public bool SortedView
+        {
+            get => sortedView;
+            set => Set(ref sortedView, value);
+        }
+
+        private bool groupsExpanded = false;
+        public bool GroupsExpanded
+        {
+            get => groupsExpanded;
+            set => Set(ref groupsExpanded, value);
+        }
+
+        private string searchText = "";
+        public string SearchText
+        {
+            get => searchText;
+            set => Set(ref searchText, value);
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null, bool saveToDisk = true)

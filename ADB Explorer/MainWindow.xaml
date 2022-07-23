@@ -8,6 +8,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="MainWin"
@@ -32,10 +33,8 @@
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
         <converters:DoubleEquals x:Key="DoubleEquals" />
-        <CollectionViewSource
-            x:Key="FileListView"
-            Filter="CollectionViewSource_Filter"
-            Source="{Binding ElementName=MainWin, Path=DirectoryLister.FileList}" />
+        <CollectionViewSource x:Key="FileListView" Source="{Binding ElementName=MainWin, Path=DirectoryLister.FileList}" />
+        <CollectionViewSource x:Key="SortedSettingsView" Source="{Binding Source={x:Static Member=services:UISettings.SortSettings}}" />
         <Style
             x:Key="FileOpHeaderResizeStyle"
             BasedOn="{StaticResource FileOpColumnHeaderStyle}"
@@ -2769,300 +2768,149 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
-                        <ScrollViewer
-                            Grid.Row="2"
-                            Margin="18,0,0,0"
-                            PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
-                            <ui:SimpleStackPanel
-                                Margin="6,0,24,6"
-                                HorizontalAlignment="Left"
-                                Spacing="6">
+                        <Grid Grid.Row="2" Margin="18,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid Margin="6,0,24,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
                                 <ToggleButton
                                     x:Name="SettingsToggle"
-                                    Margin="0,0,0,4"
-                                    HorizontalAlignment="Stretch">
-                                    <ToggleButton.Style>
-                                        <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
-                                            <Setter Property="Content" Value="Sorted" />
+                                    Margin="0,0,6,0"
+                                    Style="{StaticResource SortedSettingsButtonStyle}" />
+                                <ToggleButton Grid.Column="1" Style="{StaticResource ExpandGroupsButtonStyle}" />
+                                <Grid Grid.Column="1">
+                                    <Grid.Style>
+                                        <Style TargetType="Grid">
                                             <Style.Triggers>
-                                                <Trigger Property="IsChecked" Value="True">
-                                                    <Setter Property="Content" Value="Grouped" />
-                                                </Trigger>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
-                                    </ToggleButton.Style>
-                                </ToggleButton>
-                                <ListView x:Name="SettingsList" Style="{StaticResource GroupSettingsRepeater}" />
-                                <ListView x:Name="SortedSettings" Style="{StaticResource SortedSettingsRepeater}" />
-                                <!--<Expander Header="ADB">
-                                    <StackPanel>
-                                        <CheckBox Content="Enable mDNS (experimental)" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" />
-                                        <CheckBox Content="Poll For Devices" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" />
-                                        <CheckBox Content="Poll For Battery Status" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" />
-                                        <CheckBox Content="Enable Command Log" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" />
-                                    </StackPanel>
-                                </Expander>
-                                <Separator />
-                                <Expander Header="Device">
-                                    <StackPanel>
-                                        <CheckBox Content="Automatically Enable Root" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoRoot}" />
-                                        <CheckBox Content="Remember Last IP" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" />
-                                        <CheckBox Content="Remember Last Port">
-                                            <CheckBox.Style>
-                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                    <Setter Property="IsEnabled" Value="True" />
-                                                    <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=RememberPort}" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=RememberIp}" Value="False">
-                                                            <Setter Property="IsChecked" Value="False" />
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </CheckBox.Style>
-                                        </CheckBox>
-                                        <CheckBox Content="Automatically Open For Browsing" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=AutoOpen}" />
-                                    </StackPanel>
-                                </Expander>
-                                <Separator />
-                                <Expander Header="Drives &amp; Features">
-                                    <StackPanel>
-                                        <CheckBox Content="Poll For Drives" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=PollDrives}" />
-                                        <CheckBox Content="Enable Recycle Bin" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableRecycle}" />
-                                        <CheckBox Content="Enable APK Handling" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" />
-                                    </StackPanel>
-                                </Expander>
-                                <Separator />
-                                <Expander Header="File Behavior">
-                                    <StackPanel>
-                                        <CheckBox Content="Show File Name Extensions" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" />
-                                        <CheckBox Content="Show Hidden Items" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowHiddenItems}" />
-                                        <CheckBox Content="Show System Apps">
-                                            <CheckBox.Style>
-                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                    <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=ShowSystemPackages}" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableApk}" Value="False">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </CheckBox.Style>
-                                        </CheckBox>
-                                        <CheckBox Content="Pull To Default Folder On Double-Click">
-                                            <CheckBox.Style>
-                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                    <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=PullOnDoubleClick}" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" Value="">
-                                                            <Setter Property="IsEnabled" Value="False" />
-                                                            <Setter Property="IsChecked" Value="False" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </CheckBox.Style>
-                                        </CheckBox>
-                                    </StackPanel>
-                                </Expander>
-                                <Separator />
-                                <Expander x:Name="WorkingDirectoriesExpander" Header="Working Directories">
-                                    <StackPanel>
-                                        <Grid Margin="0,6">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                Grid.Column="1"
-                                                Margin="4,0,0,4"
-                                                Text="Default Folder" />
-                                            <Button
-                                                Grid.Row="1"
-                                                Margin="0,0,6,0"
-                                                Click="DefaultFolderSetButton_Click"
-                                                ToolTip="Change">
-                                                <ui:FontIcon Glyph="&#xE70F;" />
-                                            </Button>
-                                            <TextBox
-                                                Grid.Row="1"
-                                                Grid.Column="1"
-                                                ui:ControlHelper.PlaceholderText="- not set -"
-                                                IsReadOnly="True"
-                                                Style="{StaticResource TooltipTextBoxStyle}"
-                                                Text="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" />
-                                        </Grid>
-                                        <Grid Margin="0,6">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
-                                                Grid.Column="1"
-                                                Margin="4,0,0,6"
-                                                Text="Override ADB Path" />
-                                            <Button
-                                                Grid.Column="1"
-                                                Margin="0,0,0,6"
-                                                Click="RestartButton_Click"
-                                                Style="{StaticResource RestartAppButtonStyle}">
-                                                <ui:FontIcon />
-                                            </Button>
-                                            <Button
-                                                Grid.Row="1"
-                                                Margin="0,0,6,0"
-                                                Click="OverrideAdbPathSetButton_Click"
-                                                ToolTip="Change">
-                                                <ui:FontIcon Glyph="&#xE70F;" />
-                                            </Button>
-                                            <TextBox
-                                                Grid.Row="1"
-                                                Grid.Column="1"
-                                                ui:ControlHelper.PlaceholderText="- not set -"
-                                                IsReadOnly="True"
-                                                Style="{StaticResource TooltipTextBoxStyle}"
-                                                Text="{Binding Source={x:Static models:Data.Settings}, Path=ManualAdbPath}" />
-                                        </Grid>
-                                    </StackPanel>
-                                </Expander>-->
-                                <Separator />
-                                <Expander Header="Theme">
-                                    <StackPanel VerticalAlignment="Bottom">
-                                        <RadioButton
-                                            Content="Light"
-                                            GroupName="AppTheme"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=light}" />
-                                        <RadioButton
-                                            Content="Dark"
-                                            GroupName="AppTheme"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=dark}" />
-                                        <RadioButton
-                                            Content="Windows Default"
-                                            GroupName="AppTheme"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=Theme, Converter={StaticResource ThemeConverter}, ConverterParameter=windowsDefault}" />
-                                    </StackPanel>
-                                </Expander>
-                                <Separator />
-                                <Expander Header="Graphics">
-                                    <StackPanel>
-                                        <CheckBox
-                                            Content="Force Fluent Styles"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ForceFluentStyles}"
-                                            Style="{StaticResource ForceFluentVisibility}" />
-                                        <CheckBox Content="Disable Hardware Acceleration" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=SwRender}" />
-                                        <CheckBox HorizontalContentAlignment="Stretch" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=DisableAnimation}">
+                                    </Grid.Style>
+                                    <TextBox
+                                        x:Name="SettingsSearchBox"
+                                        Height="31"
+                                        MinHeight="31"
+                                        Padding="30,5,6,6"
+                                        ui:ControlHelper.PlaceholderText="Search Settings"
+                                        Text="{Binding Source={x:Static Member=models:Data.Settings}, Path=SearchText, Mode=TwoWay}"
+                                        TextChanged="SettingsSearchBox_TextChanged" />
+                                    <ui:FontIcon
+                                        Margin="6,0,0,0"
+                                        HorizontalAlignment="Left"
+                                        Glyph="&#xE721;"
+                                        IsHitTestVisible="False" />
+                                </Grid>
+                                <Separator
+                                    Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    Margin="0,8,0,4"
+                                    Style="{x:Null}" />
+                            </Grid>
+                            <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                                <ui:SimpleStackPanel
+                                    Margin="6,0,24,10"
+                                    HorizontalAlignment="Left"
+                                    Spacing="6">
+                                    <ListView
+                                        x:Name="SettingsList"
+                                        Margin="0,0,0,-3"
+                                        Style="{StaticResource GroupSettingsListView}" />
+                                    <ListView
+                                        x:Name="SortedSettings"
+                                        Margin="0,2,0,-3"
+                                        Style="{StaticResource SortedSettingsListView}" />
+                                    <Separator />
+                                    <Expander x:Name="SettingsAboutExpander" Header="About">
+                                        <Expander.Style>
+                                            <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Expander.Style>
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontSize="18" Text="ADB Explorer" />
+                                                <TextBlock
+                                                    Margin="10,0,0,1"
+                                                    VerticalAlignment="Bottom"
+                                                    Text="v" />
+                                                <TextBlock
+                                                    Margin="2,0,0,1"
+                                                    VerticalAlignment="Bottom"
+                                                    Text="{x:Static app_prop:Resources.AppVersion}" />
+                                            </StackPanel>
+                                            <ui:SimpleStackPanel Orientation="Horizontal" Spacing="20">
+                                                <ui:HyperlinkButton
+                                                    Content="GitHub repository"
+                                                    NavigateUri="https://github.com/Alex4SSB/ADB-Explorer"
+                                                    ToolTip="https://github.com/Alex4SSB/ADB-Explorer" />
+                                                <ui:HyperlinkButton
+                                                    Content="Privacy Policy"
+                                                    NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
+                                                    ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
+                                            </ui:SimpleStackPanel>
+                                            <CheckBox
+                                                Content="Check For Updates"
+                                                IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}"
+                                                ToolTip="Checks for updates each time the app is launched">
+                                                <CheckBox.Style>
+                                                    <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
+                                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" Value="{x:Null}">
+                                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </CheckBox.Style>
+                                            </CheckBox>
                                             <Grid>
-                                                <TextBlock Text="Disable Animations" />
-                                                <ui:SimpleStackPanel
-                                                    HorizontalAlignment="Right"
-                                                    Orientation="Horizontal"
-                                                    Spacing="4">
-                                                    <ui:SimpleStackPanel.Resources>
-                                                        <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="Button" />
-                                                    </ui:SimpleStackPanel.Resources>
-                                                    <Button Click="DisableAnimationInfo_Click" ToolTip="More Info">
-                                                        <ui:FontIcon Glyph="&#xE82F;" />
-                                                    </Button>
-                                                    <Button Click="RestartButton_Click" ToolTip="Restart app for changes to take effect">
-                                                        <ui:FontIcon Glyph="&#xE72C;" />
-                                                    </Button>
-                                                </ui:SimpleStackPanel>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition />
+                                                </Grid.ColumnDefinitions>
+                                                <ui:FontIcon Glyph="&#xE946;" />
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Margin="6,0,0,0"
+                                                    Text="Launch app while holding L-Ctrl to open app settings location."
+                                                    TextWrapping="Wrap" />
                                             </Grid>
-                                        </CheckBox>
-                                        <CheckBox Content="Display Splash Screen" IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=EnableSplash}" />
-                                    </StackPanel>
-                                </Expander>
-                                <!--<Separator Style="{StaticResource CategorySeparator}" />
-                                <Expander Header="File Operations View" Visibility="Hidden">
-                                    <StackPanel>
-                                        <RadioButton Content="Compact" GroupName="FileOpView" />
-                                        <RadioButton
-                                            Content="Detailed"
-                                            GroupName="FileOpView"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" />
-                                    </StackPanel>
-                                </Expander>-->
-                                <Separator />
-                                <Expander Header="About">
-                                    <StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontSize="18" Text="ADB Explorer" />
                                             <TextBlock
-                                                Margin="10,0,0,1"
-                                                VerticalAlignment="Bottom"
-                                                Text="v" />
-                                            <TextBlock
-                                                Margin="2,0,0,1"
-                                                VerticalAlignment="Bottom"
-                                                Text="{x:Static app_prop:Resources.AppVersion}" />
+                                                Margin="0,16,0,0"
+                                                FontWeight="Bold"
+                                                Text="Attributions &amp; Third Party Licenses:" />
+                                            <ui:HyperlinkButton
+                                                Content="ModernWPF"
+                                                NavigateUri="https://github.com/Kinnara/ModernWpf"
+                                                ToolTip="https://github.com/Kinnara/ModernWpf" />
+                                            <ui:HyperlinkButton
+                                                Content="Icons8"
+                                                NavigateUri="https://icons8.com"
+                                                ToolTip="https://icons8.com" />
+                                            <ui:HyperlinkButton
+                                                Click="AndroidRobotLicense_Click"
+                                                Content="The Android Robot Icon(s)"
+                                                ToolTip="See terms" />
                                         </StackPanel>
-                                        <ui:SimpleStackPanel Orientation="Horizontal" Spacing="20">
-                                            <ui:HyperlinkButton
-                                                Content="GitHub repository"
-                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer"
-                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer" />
-                                            <ui:HyperlinkButton
-                                                Content="Privacy Policy"
-                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
-                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
-                                        </ui:SimpleStackPanel>
-                                        <CheckBox
-                                            Content="Check For Updates"
-                                            IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}"
-                                            ToolTip="Checks for updates each time the app is launched">
-                                            <CheckBox.Style>
-                                                <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                                                    <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" Value="{x:Null}">
-                                                            <Setter Property="Visibility" Value="Collapsed" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </CheckBox.Style>
-                                        </CheckBox>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <ui:FontIcon Glyph="&#xE946;" />
-                                            <TextBlock
-                                                Grid.Column="1"
-                                                Margin="6,0,0,0"
-                                                Text="Launch app while holding L-Ctrl to open app settings location."
-                                                TextWrapping="Wrap" />
-                                        </Grid>
-                                        <TextBlock
-                                            Margin="0,16,0,0"
-                                            FontWeight="Bold"
-                                            Text="Attributions &amp; Third Party Licenses:" />
-                                        <ui:HyperlinkButton
-                                            Content="ModernWPF"
-                                            NavigateUri="https://github.com/Kinnara/ModernWpf"
-                                            ToolTip="https://github.com/Kinnara/ModernWpf" />
-                                        <ui:HyperlinkButton
-                                            Content="Icons8"
-                                            NavigateUri="https://icons8.com"
-                                            ToolTip="https://icons8.com" />
-                                        <ui:HyperlinkButton
-                                            Click="AndroidRobotLicense_Click"
-                                            Content="The Android Robot Icon(s)"
-                                            ToolTip="See terms" />
-                                    </StackPanel>
-                                </Expander>
-                            </ui:SimpleStackPanel>
-                        </ScrollViewer>
+                                    </Expander>
+                                </ui:SimpleStackPanel>
+                            </ScrollViewer>
+                        </Grid>
                     </Grid>
                 </Border>
             </ui:SplitView.Pane>

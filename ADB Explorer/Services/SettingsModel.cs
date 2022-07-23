@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
@@ -20,7 +21,9 @@ namespace ADB_Explorer.Services
     {
         public static ObservableList<AbstractGroup> SettingsList { get; set; }
 
-        public static IEnumerable<AbstractSetting> SortSettings => SettingsList.OfType<SettingsGroup>()
+        public static IEnumerable<AbstractGroup> GroupedSettings => SettingsList.Where(group => group is not Ungrouped);
+
+        public static IEnumerable<AbstractSetting> SortSettings => SettingsList.Where(group => group is not SettingsSeparator)
             .SelectMany(group => group.Children)
             .Where(set => set.Visibility is Visibility.Visible)
             .OrderBy(sett => sett.Description);
@@ -72,10 +75,11 @@ namespace ADB_Explorer.Services
                     new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)), "Override ADB Path", adbPathCommand, "Working Directories", commands: resetCommand),
                 }),
                 new SettingsSeparator(),
-                //new EnumGroup("Theme", new()
-                //{
-                //    //new Setting<Models.AppTheme>(appSettings.GetProperty(nameof(Settings.Theme)), ""),
-                //}),
+                new SettingsGroup("Theme", new()
+                {
+                    new EnumSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() { { AppTheme.light, "Light" }, { AppTheme.dark, "Dark" }, { AppTheme.windowsDefault, "Windows Default" } }),
+                }),
+                new SettingsSeparator(),
                 new SettingsGroup("Graphics", new()
                 {
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: appSettings.GetProperty(nameof(Settings.HideForceFluent))),
@@ -83,12 +87,17 @@ namespace ADB_Explorer.Services
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)), "Disable Animations", "Graphics", null, null, resetCommand, tipCommand),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableSplash)), "Display Splash Screen", "Graphics"),
                 }),
+                new Ungrouped(new()
+                {
+                    new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), "Check For Updates", "About"),
+                }),
             };
         }
     }
 
     public abstract class AbstractGroup : INotifyPropertyChanged
     {
+        public List<AbstractSetting> Children { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -107,14 +116,27 @@ namespace ADB_Explorer.Services
 
     public class SettingsGroup : AbstractGroup
     {
-        public string Name { get; set; }
+        private bool isExpanded = false;
+        public bool IsExpanded
+        {
+            get => isExpanded;
+            set => Set(ref isExpanded, value);
+        }
 
-        public List<AbstractSetting> Children { get; set; }
+        public string Name { get; set; }
 
         public SettingsGroup(string name, List<AbstractSetting> children)
         {
             Name = name;
-            Children = children;    
+            Children = children;
+
+            Settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AppSettings.GroupsExpanded))
+                IsExpanded = Settings.GroupsExpanded;
         }
     }
 
@@ -123,35 +145,13 @@ namespace ADB_Explorer.Services
 
     }
 
-    //public class BoolGroup : SettingsGroup
-    //{
-    //    public List<AbstractSetting<bool>> Children { get; set; }
-
-    //    public BoolGroup(string name, List<AbstractSetting<bool>> children) : base(name)
-    //    {
-    //        Children = children;
-    //    }
-    //}
-
-    //public class StringGroup : SettingsGroup
-    //{
-    //    public List<AbstractSetting<string>> Children { get; set; }
-
-    //    public StringGroup(string name, List<AbstractSetting<string>> children) : base(name)
-    //    {
-    //        Children = children;
-    //    }
-    //}
-
-    //public class EnumGroup : SettingsGroup
-    //{
-    //    public List<AbstractSetting<Enum>> Children { get; set; }
-
-    //    public EnumGroup(string name, List<AbstractSetting<Enum>> children) : base(name)
-    //    {
-    //        Children = children;
-    //    }
-    //}
+    public class Ungrouped : AbstractGroup
+    {
+        public Ungrouped(List<AbstractSetting> children)
+        {
+            Children = children;
+        }
+    }
 
     public abstract class AbstractSetting : INotifyPropertyChanged
     {
@@ -191,6 +191,16 @@ namespace ADB_Explorer.Services
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+        protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
@@ -256,18 +266,60 @@ namespace ADB_Explorer.Services
         }
     }
 
-    //public class EnumSetting : AbstractSetting
-    //{
-    //    public Enum Value
-    //    {
-    //        get => (Enum)valueProp.GetValue(Settings);
-    //        set => valueProp.SetValue(Settings, value);
-    //    }
+    public class EnumSetting : AbstractSetting
+    {
+        private bool isExpanded = false;
+        public bool IsExpanded
+        {
+            get => isExpanded;
+            set => Set(ref isExpanded, value);
+        }
 
-    //    public EnumSetting(PropertyInfo valueProp, string description, string groupName = null, bool showResetButton = false, PropertyInfo enableProp = null, PropertyInfo visibleProp = null)
-    //        : base(valueProp, description, groupName, showResetButton, enableProp, visibleProp)
-    //    { }
-    //}
+        public List<EnumRadioButton> Buttons { get; } = new();
+
+        public EnumSetting(PropertyInfo valueProp, string description, Dictionary<AppTheme, string> enumNames, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
+            : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+        {
+            Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
+        }
+
+        protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AppSettings.SearchText))
+            {
+                IsExpanded = !string.IsNullOrEmpty(Settings.SearchText) && Buttons.Any(button => button.Name.ToLower().Contains(Settings.SearchText.ToLower()));
+            }
+        }
+    }
+
+    public class EnumRadioButton
+    {
+        private readonly PropertyInfo sourceProp;
+        public Enum Value
+        {
+            get => (Enum)sourceProp.GetValue(Settings);
+            set => sourceProp.SetValue(Settings, value);
+        }
+        public Enum ButtonIndex { get; set; }
+        public string Name { get; set; }
+        public bool IsChecked
+        {
+            get => Value.Equals(ButtonIndex);
+            set
+            {
+                if (value)
+                    Value = ButtonIndex;
+            }
+        }
+        public string Group => sourceProp.Name;
+
+        public EnumRadioButton(Enum buttonIndex, string name, PropertyInfo sourceProp)
+        {
+            ButtonIndex = buttonIndex;
+            Name = name;
+            this.sourceProp = sourceProp;
+        }
+    }
 
     public abstract class SettingButton
     {

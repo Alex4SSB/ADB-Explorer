@@ -7,6 +7,7 @@
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
+    <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
     <converters:DoubleEquals x:Key="DoubleEquals" />
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
     <FontFamily x:Key="ConsoleFont">Cascadia Mono, Consolas</FontFamily>
@@ -1328,6 +1329,18 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="StretchListViewItem" TargetType="ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}">
+                        <ContentPresenter />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <DataTemplate x:Key="ResetButtonTemplate" DataType="services:ResetButton">
         <Button Command="{Binding Command}" Style="{StaticResource RestartAppButtonStyle}">
             <ui:FontIcon />
@@ -1399,22 +1412,45 @@
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="StringSettingTemplate" DataType="services:StringSetting">
-        <Grid Margin="0,6" HorizontalAlignment="Stretch">
+        <Grid Margin="0,6,0,10" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <Grid Grid.Column="1" Margin="28,0,0,4">
+            <Grid Grid.Column="1" Margin="0,0,0,4">
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="28" />
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Description}" />
-
-                </StackPanel>
+                <Grid Width="20" HorizontalAlignment="Left">
+                    <TextBlock
+                        Margin="0,-5,0,-10"
+                        HorizontalAlignment="Center"
+                        FontSize="20"
+                        Text="•">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                                        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                            <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+                <TextBlock Grid.Column="1" Text="{Binding Description}" />
                 <ItemsControl
-                    Grid.Column="1"
+                    Grid.Column="2"
                     ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
                     ItemsSource="{Binding Commands}"
                     Style="{StaticResource RightHorizontalItemsControlStyle}" />
@@ -1467,22 +1503,39 @@
             </Grid>
         </Grid>
     </DataTemplate>
+    <DataTemplate x:Key="EnumRadioButtonTemplate" DataType="services:EnumRadioButton">
+        <RadioButton
+            Content="{Binding Name}"
+            GroupName="{Binding Group}"
+            IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+    </DataTemplate>
+    <DataTemplate x:Key="GropuedEnumSettingTemplate" DataType="services:EnumSetting">
+        <ListView
+            ItemContainerStyle="{StaticResource StretchListViewItem}"
+            ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
+            ItemsSource="{Binding Buttons}" />
+    </DataTemplate>
+    <DataTemplate x:Key="SortedEnumSettingTemplate" DataType="services:EnumSetting">
+        <Expander
+            Margin="0,4,0,0"
+            Header="{Binding Description}"
+            IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <ListView
+                ItemContainerStyle="{StaticResource StretchListViewItem}"
+                ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
+                ItemsSource="{Binding Buttons}" />
+        </Expander>
+    </DataTemplate>
     <helpers:SettingsTemplateSelector
-        x:Key="SettingsTemplateSelector"
+        x:Key="GroupedSettingsTemplateSelector"
         BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+        EnumSettingTemplate="{StaticResource GropuedEnumSettingTemplate}"
         StringSettingTemplate="{StaticResource StringSettingTemplate}" />
-    <Style x:Key="StretchListViewItem" TargetType="ListViewItem">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ListViewItem">
-                    <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}">
-                        <ContentPresenter />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+    <helpers:SettingsTemplateSelector
+        x:Key="SortedSettingsTemplateSelector"
+        BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+        EnumSettingTemplate="{StaticResource SortedEnumSettingTemplate}"
+        StringSettingTemplate="{StaticResource StringSettingTemplate}" />
     <Style
         x:Key="SettingsGroupContainer"
         BasedOn="{StaticResource StretchListViewItem}"
@@ -1490,22 +1543,29 @@
         <Setter Property="Margin" Value="0,3" />
     </Style>
     <Style
-        x:Key="SortedSettingsRepeater"
+        x:Key="SortedListViewItem"
+        BasedOn="{StaticResource StretchListViewItem}"
+        TargetType="ListViewItem">
+        <Setter Property="Margin" Value="0,-4,0,4" />
+    </Style>
+    <Style
+        x:Key="SortedSettingsListView"
         BasedOn="{StaticResource DefaultListViewStyle}"
         TargetType="ListView">
-        <Setter Property="ItemTemplateSelector" Value="{StaticResource SettingsTemplateSelector}" />
-        <Setter Property="ItemContainerStyle" Value="{StaticResource StretchListViewItem}" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource SortedSettingsTemplateSelector}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource SortedListViewItem}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
     <DataTemplate x:Key="SettingsExpanderTemplate" DataType="services:SettingsGroup">
-        <Expander Header="{Binding Name}">
+        <Expander Header="{Binding Name}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
             <ListView
                 ItemContainerStyle="{StaticResource StretchListViewItem}"
-                ItemTemplateSelector="{StaticResource SettingsTemplateSelector}"
+                ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
                 ItemsSource="{Binding Children}" />
         </Expander>
     </DataTemplate>
@@ -1517,13 +1577,56 @@
         SettingsGroupTemplate="{StaticResource SettingsExpanderTemplate}"
         SettingsSeparatorTemplate="{StaticResource SettingsSeparatorTemplate}" />
     <Style
-        x:Key="GroupSettingsRepeater"
+        x:Key="GroupSettingsListView"
         BasedOn="{StaticResource DefaultListViewStyle}"
         TargetType="ListView">
         <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsGroupContainer}" />
         <Setter Property="ItemTemplateSelector" Value="{StaticResource SettingsGroupTemplateSelector}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=SettingsToggle, Path=IsChecked}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="SettingsToggleStyle"
+        BasedOn="{StaticResource ToggleButtonStyle}"
+        TargetType="ToggleButton">
+        <Setter Property="TextElement.FontSize" Value="20" />
+        <Setter Property="TextElement.FontFamily" Value="Segoe MDL2 Assets" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                <Setter Property="TextElement.FontFamily" Value="{StaticResource SymbolThemeFontFamily}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="SortedSettingsButtonStyle"
+        BasedOn="{StaticResource SettingsToggleStyle}"
+        TargetType="ToggleButton">
+        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView, Mode=TwoWay}" />
+        <Setter Property="ToolTip" Value="Grouped View" />
+        <Setter Property="Content" Value="&#xF168;" />
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Content" Value="&#xE71D;" />
+                <Setter Property="ToolTip" Value="Sorted View" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ExpandGroupsButtonStyle"
+        BasedOn="{StaticResource SettingsToggleStyle}"
+        TargetType="ToggleButton">
+        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=GroupsExpanded, Mode=TwoWay}" />
+        <Setter Property="ToolTip" Value="Groups Collapsed" />
+        <Setter Property="Content" Value="&#xE16A;" />
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Content" Value="&#xE169;" />
+                <Setter Property="ToolTip" Value="Groups Expanded" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>

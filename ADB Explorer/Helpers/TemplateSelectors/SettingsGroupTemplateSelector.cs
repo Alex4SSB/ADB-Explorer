@@ -16,6 +16,7 @@ namespace ADB_Explorer.Helpers
             {
                 SettingsGroup => SettingsGroupTemplate,
                 SettingsSeparator => SettingsSeparatorTemplate,
+                Ungrouped => null,
                 _ => throw new NotImplementedException(),
             };
         }

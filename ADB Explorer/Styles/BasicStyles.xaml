@@ -4,7 +4,6 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
-
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">

@@ -268,6 +268,9 @@ namespace ADB_Explorer
                     FilterHiddenFiles();
                     break;
                 case nameof(AppSettings.ShowSystemPackages):
+                    if (DevicesObject.CurrentDevice is null)
+                        return;
+
                     if (ExplorerGrid.Visible())
                         FilterHiddenFiles();
                     else
@@ -295,6 +298,9 @@ namespace ADB_Explorer
                         SettingsSplitView.IsPaneOpen = false;
                         Settings.HideSettingsPane = false;
                     }
+                    break;
+                case nameof(AppSettings.GroupsExpanded):
+                    SettingsAboutExpander.IsExpanded = Settings.GroupsExpanded;
                     break;
                 default:
                     break;
@@ -770,7 +776,7 @@ namespace ADB_Explorer
             UISettings.Init();
             Dispatcher.Invoke(() =>
             {
-                SettingsList.ItemsSource = UISettings.SettingsList;
+                SettingsList.ItemsSource = UISettings.GroupedSettings;
                 SortedSettings.ItemsSource = UISettings.SortSettings;
             });
         }
@@ -2161,6 +2167,9 @@ namespace ADB_Explorer
 
         private void EnableSplitViewAnimation()
         {
+            // Read value to force IsAnimated to update
+            _ = Settings.DisableAnimation;
+
             bool enableAnimation = Settings.IsAnimated && (MonitorInfo.IsPrimaryMonitor(this) is bool and true || WindowState is not WindowState.Maximized);
             StyleHelper.SetActivateAnimation(SettingsSplitView, enableAnimation);
             StyleHelper.SetActivateAnimation(DevicesSplitView, enableAnimation);
@@ -2728,11 +2737,6 @@ namespace ADB_Explorer
             }
 
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
-        }
-
-        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
-        {
-
         }
 
         private void ContextMenuDeleteItem_Click(object sender, RoutedEventArgs e)
@@ -3559,6 +3563,22 @@ namespace ADB_Explorer
         private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
         {
             SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+        }
+
+        private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Settings.SearchText = SettingsSearchBox.Text;
+            FilterSettings();
+        }
+
+        private void FilterSettings()
+        {
+            var collectionView = CollectionViewSource.GetDefaultView(SortedSettings.ItemsSource);
+            if (collectionView is null)
+                return;
+
+            collectionView.Filter = new(sett => ((AbstractSetting)sett).Description.ToLower().Contains(SettingsSearchBox.Text.ToLower())
+                || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.ToLower().Contains(SettingsSearchBox.Text.ToLower()))));
         }
     }
 }
