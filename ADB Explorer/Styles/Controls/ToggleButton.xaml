@@ -11,6 +11,7 @@
         BasedOn="{StaticResource DefaultToggleButtonStyle}"
         TargetType="ToggleButton">
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="0" />
         <Style.Triggers>

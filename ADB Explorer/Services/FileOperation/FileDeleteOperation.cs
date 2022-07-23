@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -31,7 +30,7 @@ namespace ADB_Explorer.Services
             cancelTokenSource = new CancellationTokenSource();
             operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", out _, out _, new[] { "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath) }));
 
-            operationTask.ContinueWith((t) => 
+            operationTask.ContinueWith((t) =>
             {
                 var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
                 Status = operationStatus;

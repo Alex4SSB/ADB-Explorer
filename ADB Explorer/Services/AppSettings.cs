@@ -16,8 +16,14 @@ namespace ADB_Explorer.Services
         public string DefaultFolder
         {
             get => Get(ref defaultFolder, "");
-            set => Set(ref defaultFolder, value);
+            set
+            {
+                if (Set(ref defaultFolder, value))
+                    OnPropertyChanged(nameof(EnableDoubleClickPull));
+            }
         }
+
+        public bool EnableDoubleClickPull => !string.IsNullOrEmpty(DefaultFolder);
 
         private string manualAdbPath;
         public string ManualAdbPath
@@ -217,6 +223,7 @@ namespace ADB_Explorer.Services
         #region graphics
 
         public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
+        public bool HideForceFluent => !IsWin11;
 
         public bool UseFluentStyles => IsWin11 || ForceFluentStyles;
 
@@ -229,8 +236,8 @@ namespace ADB_Explorer.Services
             get => Get(ref forceFluentStyles, false);
             set
             {
-                Set(ref forceFluentStyles, value);
-                OnPropertyChanged(nameof(UseFluentStyles));
+                if (Set(ref forceFluentStyles, value))
+                    OnPropertyChanged(nameof(UseFluentStyles));
             }
         }
 
@@ -305,13 +312,41 @@ namespace ADB_Explorer.Services
 
         public bool ResetAppSettings { get; set; } = false;
 
+        private bool hideSettingsPane = false;
+        public bool HideSettingsPane
+        {
+            get => hideSettingsPane;
+            set => Set(ref hideSettingsPane, value);
+        }
+
+        private bool sortedView = false;
+        public bool SortedView
+        {
+            get => sortedView;
+            set => Set(ref sortedView, value);
+        }
+
+        private bool groupsExpanded = false;
+        public bool GroupsExpanded
+        {
+            get => groupsExpanded;
+            set => Set(ref groupsExpanded, value);
+        }
+
+        private string searchText = "";
+        public string SearchText
+        {
+            get => searchText;
+            set => Set(ref searchText, value);
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null, bool saveToDisk = true)
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null, bool saveToDisk = true)
         {
             if (Equals(storage, value))
             {
-                return;
+                return false;
             }
 
             storage = value;
@@ -321,6 +356,8 @@ namespace ADB_Explorer.Services
             }
 
             OnPropertyChanged(propertyName);
+
+            return true;
         }
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         protected virtual T Get<T>(ref T storage, T defaultValue, [CallerMemberName] string propertyName = null)

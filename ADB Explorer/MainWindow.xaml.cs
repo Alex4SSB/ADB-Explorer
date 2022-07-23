@@ -53,13 +53,6 @@ namespace ADB_Explorer
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
 
-        private bool trashInProgress;
-        public bool TrashInProgress
-        {
-            get => trashInProgress;
-            set => Set(ref trashInProgress, value);
-        }
-
         private double ColumnHeaderHeight
         {
             get
@@ -275,6 +268,9 @@ namespace ADB_Explorer
                     FilterHiddenFiles();
                     break;
                 case nameof(AppSettings.ShowSystemPackages):
+                    if (DevicesObject.CurrentDevice is null)
+                        return;
+
                     if (ExplorerGrid.Visible())
                         FilterHiddenFiles();
                     else
@@ -296,6 +292,16 @@ namespace ADB_Explorer
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                         RefreshDrives(true);
                     break;
+                case nameof(AppSettings.HideSettingsPane):
+                    if (Settings.HideSettingsPane)
+                    {
+                        SettingsSplitView.IsPaneOpen = false;
+                        Settings.HideSettingsPane = false;
+                    }
+                    break;
+                case nameof(AppSettings.GroupsExpanded):
+                    SettingsAboutExpander.IsExpanded = Settings.GroupsExpanded;
+                    break;
                 default:
                     break;
             }
@@ -310,9 +316,9 @@ namespace ADB_Explorer
             }
             else if (e.PropertyName == nameof(DirectoryLister.InProgress) && !DirectoryLister.InProgress)
             {
-                TrashInProgress = false;
                 if (FileActions.IsRecycleBin)
                 {
+                    FileActions.CustomListingInProgress = false;
                     EnableRecycleButtons();
                     UpdateIndexerFile();
                 }
@@ -398,7 +404,7 @@ namespace ADB_Explorer
                 }
 
                 SettingsSplitView.IsPaneOpen = true;
-                WorkingDirectoriesExpander.IsExpanded = true;
+                //WorkingDirectoriesExpander.IsExpanded = true;
                 MissingAdbGrid.Visibility = Visibility.Visible;
             });
 
@@ -766,6 +772,13 @@ namespace ADB_Explorer
             SetRenderMode();
 
             EnableMdns();
+
+            UISettings.Init();
+            Dispatcher.Invoke(() =>
+            {
+                SettingsList.ItemsSource = UISettings.GroupedSettings;
+                SortedSettings.ItemsSource = UISettings.SortSettings;
+            });
         }
 
         private void SetSymbolFont()
@@ -985,6 +998,8 @@ namespace ADB_Explorer
 
         private void UpdatePackages(bool updateExplorer = false)
         {
+            FileActions.CustomListingInProgress = true;
+
             var version = DevicesObject.Current.AndroidVersion;
             var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
 
@@ -1006,6 +1021,8 @@ namespace ADB_Explorer
                     {
                         DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Package).ItemsCount = (ulong)Packages.Count;
                     }
+
+                    FileActions.CustomListingInProgress = false;
                 });
             });
         }
@@ -1222,7 +1239,7 @@ namespace ADB_Explorer
 
             if (FileActions.IsRecycleBin)
             {
-                TrashInProgress = true;
+                FileActions.CustomListingInProgress = true;
                 var recycleTask = Task.Run(() =>
                 {
                     string text = "";
@@ -2150,6 +2167,9 @@ namespace ADB_Explorer
 
         private void EnableSplitViewAnimation()
         {
+            // Read value to force IsAnimated to update
+            _ = Settings.DisableAnimation;
+
             bool enableAnimation = Settings.IsAnimated && (MonitorInfo.IsPrimaryMonitor(this) is bool and true || WindowState is not WindowState.Maximized);
             StyleHelper.SetActivateAnimation(SettingsSplitView, enableAnimation);
             StyleHelper.SetActivateAnimation(DevicesSplitView, enableAnimation);
@@ -2357,6 +2377,8 @@ namespace ADB_Explorer
                 return;
 
             var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
+            if (collectionView is null)
+                return;
 
             if (FileActions.IsAppDrive)
             {
@@ -2715,11 +2737,6 @@ namespace ADB_Explorer
             }
 
             Storage.StoreValue(checkbox.Name, checkbox.DataContext);
-        }
-
-        private void CollectionViewSource_Filter(object sender, FilterEventArgs e)
-        {
-
         }
 
         private void ContextMenuDeleteItem_Click(object sender, RoutedEventArgs e)
@@ -3546,6 +3563,22 @@ namespace ADB_Explorer
         private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
         {
             SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+        }
+
+        private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Settings.SearchText = SettingsSearchBox.Text;
+            FilterSettings();
+        }
+
+        private void FilterSettings()
+        {
+            var collectionView = CollectionViewSource.GetDefaultView(SortedSettings.ItemsSource);
+            if (collectionView is null)
+                return;
+
+            collectionView.Filter = new(sett => ((AbstractSetting)sett).Description.ToLower().Contains(SettingsSearchBox.Text.ToLower())
+                || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.ToLower().Contains(SettingsSearchBox.Text.ToLower()))));
         }
     }
 }
