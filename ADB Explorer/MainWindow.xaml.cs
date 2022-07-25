@@ -2678,7 +2678,10 @@ namespace ADB_Explorer
                 rootTask.ContinueWith((t) => Dispatcher.BeginInvoke(() =>
                 {
                     if (logical.Root is AbstractDevice.RootStatus.Forbidden)
+                    {
+                        DevicesSplitView.IsPaneOpen = false;
                         DialogService.ShowMessage("Root access cannot be enabled on selected device.", "Root Access", DialogService.DialogIcon.Critical);
+                    }
                 }));
             }
         }

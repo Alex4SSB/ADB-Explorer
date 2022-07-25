@@ -71,8 +71,8 @@ namespace ADB_Explorer.Services
                 new SettingsSeparator(),
                 new SettingsGroup("Working Directories", new()
                 {
-                    new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)), "Default Folder", defPathCommand, "Working Directories"),
-                    new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)), "Override ADB Path", adbPathCommand, "Working Directories", commands: resetCommand),
+                    new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)), "Default Folder", "Working Directories", null, null, defPathCommand, new ClearTextSettingCommand(appSettings.GetProperty(nameof(Settings.DefaultFolder)))),
+                    new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)), "Override ADB Path", "Working Directories", null, null, adbPathCommand, new ClearTextSettingCommand(appSettings.GetProperty(nameof(Settings.ManualAdbPath))), resetCommand),
                 }),
                 new SettingsSeparator(),
                 new SettingsGroup("Theme", new()
@@ -235,18 +235,16 @@ namespace ADB_Explorer.Services
 
     public class StringSetting : AbstractSetting
     {
-        public SettingButton SetButton { get; set; }
-
         public string Value
         {
             get => (string)valueProp.GetValue(Settings);
             set => valueProp.SetValue(Settings, value);
         }
 
-        public StringSetting(PropertyInfo valueProp, string description, SettingButton setButton, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
+        public StringSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
             : base(valueProp, description, groupName, enableProp, visibleProp, commands)
         {
-            SetButton = setButton;
+
         }
 
         protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -321,10 +319,23 @@ namespace ADB_Explorer.Services
         }
     }
 
-    public abstract class SettingButton
+    public abstract class SettingButton : INotifyPropertyChanged
     {
         public virtual bool IsEnabled { get; } = true;
 
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     public class ResetCommand : SettingButton
@@ -345,6 +356,36 @@ namespace ADB_Explorer.Services
         {
             Settings.HideSettingsPane = true;
             DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
+        }
+
+        private ICommand command;
+        public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
+    }
+
+    public class ClearTextSettingCommand : SettingButton
+    {
+        private readonly PropertyInfo sourceProp;
+
+        public override bool IsEnabled => sourceProp.GetValue(Settings) is string str && !string.IsNullOrEmpty(str);
+
+        public ClearTextSettingCommand(PropertyInfo sourceProp)
+        {
+            this.sourceProp = sourceProp;
+
+            Settings.PropertyChanged += Settings_PropertyChanged;
+        }
+
+        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == sourceProp.Name)
+            {
+                OnPropertyChanged(nameof(IsEnabled));
+            }
+        }
+
+        public void Action()
+        {
+            sourceProp.SetValue(Settings, "");
         }
 
         private ICommand command;

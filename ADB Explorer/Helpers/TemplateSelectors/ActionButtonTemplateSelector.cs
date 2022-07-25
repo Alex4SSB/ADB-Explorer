@@ -9,6 +9,8 @@ namespace ADB_Explorer.Helpers
     {
         public DataTemplate ResetSettingTemplate { get; set; }
         public DataTemplate AnimationTipSettingTemplate { get; set; }
+        public DataTemplate ClearTextSettingTemplate { get; set; }
+        public DataTemplate ChangeSettingTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -16,6 +18,8 @@ namespace ADB_Explorer.Helpers
             {
                 ResetCommand => ResetSettingTemplate,
                 ShowAnimationTipCommand => AnimationTipSettingTemplate,
+                ClearTextSettingCommand => ClearTextSettingTemplate,
+                ChangeDefaultPathCommand or ChangeAdbPathCommand => ChangeSettingTemplate,
                 _ => throw new NotImplementedException(),
             };
         }

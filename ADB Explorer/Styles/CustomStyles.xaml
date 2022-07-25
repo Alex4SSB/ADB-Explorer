@@ -1354,9 +1354,27 @@
             <ui:FontIcon Glyph="&#xE82F;" />
         </Button>
     </DataTemplate>
+    <DataTemplate x:Key="ClearTextButtonTemplate" DataType="services:ResetButton">
+        <Button
+            Command="{Binding Command}"
+            Style="{StaticResource RestartAppButtonStyle}"
+            ToolTip="Clear">
+            <ui:FontIcon Glyph="&#xE711;" />
+        </Button>
+    </DataTemplate>
+    <DataTemplate x:Key="ChangeTextButtonTemplate" DataType="services:ResetButton">
+        <Button
+            Command="{Binding Command}"
+            Style="{StaticResource RestartAppButtonStyle}"
+            ToolTip="Change">
+            <ui:FontIcon Glyph="&#xE70F;" />
+        </Button>
+    </DataTemplate>
     <helpers:ActionButtonTemplateSelector
         x:Key="ActionButtonTemplateSelector"
         AnimationTipSettingTemplate="{StaticResource AnimationTipButtonTemplate}"
+        ChangeSettingTemplate="{StaticResource ChangeTextButtonTemplate}"
+        ClearTextSettingTemplate="{StaticResource ClearTextButtonTemplate}"
         ResetSettingTemplate="{StaticResource ResetButtonTemplate}" />
     <DataTemplate x:Key="BoolSettingTemplate" DataType="services:BoolSetting">
         <Grid>
@@ -1459,27 +1477,10 @@
                 <TextBox
                     HorizontalAlignment="Stretch"
                     VerticalContentAlignment="Center"
-                    ui:ControlHelper.PlaceholderText="- not set -"
+                    ui:ControlHelper.PlaceholderText="[not set]"
                     IsReadOnly="True"
                     Style="{StaticResource TooltipTextBoxStyle}"
                     Text="{Binding Value}" />
-                <Button
-                    Margin="3,0"
-                    Padding="4"
-                    VerticalAlignment="Center"
-                    Command="{Binding SetButton.Command}"
-                    ToolTip="Change">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=IsMouseOver}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <ui:FontIcon FontSize="16" Glyph="&#xE70F;" />
-                </Button>
                 <StackPanel
                     Margin="28,0,0,-12"
                     VerticalAlignment="Bottom"
@@ -1605,12 +1606,12 @@
         BasedOn="{StaticResource SettingsToggleStyle}"
         TargetType="ToggleButton">
         <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Grouped View" />
-        <Setter Property="Content" Value="&#xF168;" />
+        <Setter Property="ToolTip" Value="Search View" />
+        <Setter Property="Content" Value="&#xE721;" />
         <Style.Triggers>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="&#xE71D;" />
-                <Setter Property="ToolTip" Value="Sorted View" />
+                <Setter Property="Content" Value="&#xE711;" />
+                <Setter Property="ToolTip" Value="Exit Search" />
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -1619,12 +1620,12 @@
         BasedOn="{StaticResource SettingsToggleStyle}"
         TargetType="ToggleButton">
         <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=GroupsExpanded, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Groups Collapsed" />
-        <Setter Property="Content" Value="&#xE16A;" />
+        <Setter Property="ToolTip" Value="Expand All" />
+        <Setter Property="Content" Value="&#xE169;" />
         <Style.Triggers>
             <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="&#xE169;" />
-                <Setter Property="ToolTip" Value="Groups Expanded" />
+                <Setter Property="Content" Value="&#xE16A;" />
+                <Setter Property="ToolTip" Value="Collapse All" />
             </Trigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
