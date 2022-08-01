@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Models;
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Threading;
@@ -28,6 +27,7 @@ namespace ADB_Explorer.Services
             Copy,
             Restore,
             Install,
+            Update,
         }
 
         private OperationType operationType;
@@ -138,6 +138,7 @@ namespace ADB_Explorer.Services
                 FileOperation.OperationType.Copy => "\uE8C8",
                 FileOperation.OperationType.Restore => "\uE845",
                 FileOperation.OperationType.Install => "\uE7B8",
+                FileOperation.OperationType.Update => "\uE787",
                 _ => throw new System.NotImplementedException(),
             };
 
@@ -167,7 +168,7 @@ namespace ADB_Explorer.Services
             PrimaryAlignment = operation switch
             {
                 FileOperation.OperationType.Pull or FileOperation.OperationType.Push => HorizontalAlignment.Left,
-                _ => HorizontalAlignment.Center,
+                _ => HorizontalAlignment.Right,
             };
         }
     }

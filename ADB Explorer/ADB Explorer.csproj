@@ -59,5 +59,11 @@
   <ItemGroup>
     <Resource Include="adb_explorer_icon_v4_icons8_inverted.png" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="adb_explorer_icon_v4_icons8_combined.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 
 </Project>

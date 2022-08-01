@@ -141,15 +141,17 @@ namespace ADB_Explorer.Models
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Equals(storage, value))
             {
-                return;
+                return false;
             }
 
             storage = value;
             OnPropertyChanged(propertyName);
+
+            return true;
         }
 
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -63,6 +63,8 @@ namespace ADB_Explorer.Services
                     fullTargetPath = $"{targetParent}{targetName}";
 
                 var command = OperationName is OperationType.Copy ? "cp" : "mv";
+                if (OperationName is OperationType.Copy)
+                    dateModified = DateTime.Now;
 
                 return ADBService.ExecuteDeviceAdbShellCommand(Device.ID, command, out _, out _, new[] {
                     ADBService.EscapeAdbShellString(FilePath.FullPath),
@@ -95,6 +97,7 @@ namespace ADB_Explorer.Services
                             {
                                 FileClass newFile = new((FileClass)FilePath);
                                 newFile.UpdatePath(fullTargetPath);
+                                newFile.ModifiedTime = dateModified;
                                 fileList.Add(newFile);
                             }
                             else

@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -118,9 +119,12 @@ namespace ADB_Explorer.Models
                     progress = value;
                     NotifyPropertyChanged();
                     NotifyPropertyChanged(nameof(AnyFailedOperations));
+                    NotifyPropertyChanged(nameof(StringProgress));
                 }
             }
         }
+
+        public string StringProgress => $"{Operations.Count(op => op.Status is FileOperation.OperationStatus.Completed)} / {TotalCount}";
 
         public bool AnyFailedOperations => Operations.Any(op => op.Status is FileOperation.OperationStatus.Failed);
 

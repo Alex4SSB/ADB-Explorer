@@ -101,6 +101,7 @@ namespace ADB_Explorer.Models
         public static readonly bool DISPLAY_OFFLINE_SERVICES = false;
 
         public static readonly TimeSpan DOUBLE_CLICK_TIMEOUT = TimeSpan.FromMilliseconds(300);
+        public static readonly TimeSpan SELECTION_CHANGED_DELAY = TimeSpan.FromMilliseconds(150);
 
         public static readonly string ADB_EXPLORER_DATE_FORMAT = "yyyy.MM.dd-HH:mm:ss";
     }

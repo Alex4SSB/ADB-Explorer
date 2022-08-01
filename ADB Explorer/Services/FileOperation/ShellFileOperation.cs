@@ -288,5 +288,38 @@ namespace ADB_Explorer.Services
 
             return packages;
         }
+
+        public static void ChangeDateFromName(ADBService.AdbDevice device, IEnumerable<FilePath> items, ObservableList<FileClass> fileList, Dispatcher dispatcher)
+        {
+            foreach (var item in items)
+            {
+                var match = AdbRegEx.FILE_NAME_DATE.Match(item.FullName);
+                if (!match.Success)
+                    continue;
+
+                DateTime nameDate = DateTime.MinValue;
+                var date = match.Groups["Date"].Value;
+                var time = match.Groups["Time"].Value;
+                var dateTime = match.Groups["DnT"].Value;
+
+                if (DateOnly.TryParseExact(date, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateOnly res))
+                {
+                    nameDate = res.ToDateTime(TimeOnly.MinValue);
+                    if (TimeOnly.TryParseExact(time, "HHmmss", null, System.Globalization.DateTimeStyles.None, out TimeOnly timeRes))
+                        nameDate = res.ToDateTime(timeRes);
+                }
+                else if (DateTime.TryParseExact(dateTime, "yyyy-MM-dd-HH-mm-ss", null, System.Globalization.DateTimeStyles.None, out DateTime dntRes))
+                {
+                    nameDate = dntRes;
+                }
+                else
+                    continue;
+
+                if (((FileClass)item).ModifiedTime is DateTime modified && modified > nameDate)
+                {
+                    dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new FileChangeModifiedOperation(dispatcher, device, item, fileList, nameDate)));
+                }
+            }
+        }
     }
 }

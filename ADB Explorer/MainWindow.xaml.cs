@@ -564,9 +564,11 @@ namespace ADB_Explorer
             }
 
             if (SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
-                return;
-
-            UpdateFileActions();
+            {
+                Task.Run(() => Task.Delay(SELECTION_CHANGED_DELAY)).ContinueWith((t) => Dispatcher.Invoke(() => UpdateFileActions()));
+            }
+            else
+                UpdateFileActions();
         }
 
         private void UpdateFileActions()
@@ -585,12 +587,17 @@ namespace ADB_Explorer
             FileActions.IsRegularItem = !(selectedFiles.Any() && DevicesObject.CurrentDevice?.Root != AbstractDevice.RootStatus.Enabled
                 && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder)));
 
-            FileActions.DeleteEnabled = (selectedFiles.Any() && FileActions.IsRegularItem) || FileActions.IsRecycleBin;
-            FileActions.DeleteAction = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
+            if (FileActions.IsRecycleBin)
+            {
+                EnableRecycleButtons(selectedFiles.Any() ? selectedFiles : DirectoryLister.FileList);
+            }
+            else
+            {
+                FileActions.DeleteEnabled = selectedFiles.Any() && FileActions.IsRegularItem;
+                FileActions.RestoreEnabled = false;
+            }
 
-            FileActions.RestoreEnabled = FileActions.IsRecycleBin
-                && (selectedFiles.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))
-                || (!selectedFiles.Any() && DirectoryLister.FileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath))));
+            FileActions.DeleteAction = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
             FileActions.RestoreAction = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
 
             FileActions.PullEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && FileActions.IsRegularItem;
@@ -608,7 +615,9 @@ namespace ADB_Explorer
             FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !FileActions.IsRecycleBin;
 
             FileActions.ContextNewEnabled = !selectedFiles.Any() && !FileActions.IsRecycleBin;
-            FileActions.SubmenuUninstallEnabled = CurrentPath == TEMP_PATH && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk);
+            FileActions.SubmenuUninstallEnabled = FileActions.IsTemp && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk);
+
+            FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && selectedFiles.All(file => file.Type is FileType.File);
         }
 
         private void SetRowsRadius()
@@ -645,7 +654,7 @@ namespace ADB_Explorer
                 case 0:
                     return !(CutItems[0].ParentPath == CurrentPath && CutItems[0].CutState is FileClass.CutType.Cut);
                 case 1:
-                    if (!isContextMenu && CutItems[0].CutState is FileClass.CutType.Copy)
+                    if (!isContextMenu && CutItems[0].CutState is FileClass.CutType.Copy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
                         return true;
 
                     var item = ExplorerGrid.SelectedItem as FilePath;
@@ -971,6 +980,7 @@ namespace ADB_Explorer
 
             DrivesItemRepeater.Visibility = Visibility.Collapsed;
             ExplorerGrid.Visibility = Visibility.Visible;
+            FileActions.IsExplorerView = true;
             HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
 
             return _navigateToPath(realPath, bfNavigated);
@@ -1516,6 +1526,8 @@ namespace ADB_Explorer
         private void NavigateToLocation(object location, bool bfNavigated = false)
         {
             RecycleIndex.Clear();
+            SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+
             if (location is string path)
             {
                 if (!ExplorerGrid.Visible())
@@ -1728,6 +1740,10 @@ namespace ADB_Explorer
             else if (actualKey == Key.I && alt && FileActions.PushPackageEnabled)
             {
                 PushPackages();
+            }
+            else if (actualKey == Key.U && ctrl && FileActions.UpdateModifiedEnabled)
+            {
+                UpdatedModifiedDates();
             }
             else if (actualKey == Key.F10)
             { }
@@ -2067,9 +2083,13 @@ namespace ADB_Explorer
             FileActions.PasteEnabled =
             FileActions.UninstallVisible =
             FileActions.CutEnabled =
+            FileActions.CopyEnabled =
             FileActions.IsExplorerView =
+            FileActions.PackageActionsEnabled =
+            FileActions.CopyPathEnabled =
+            FileActions.UpdateModifiedEnabled =
             FileActions.ParentEnabled = false;
-
+            
             if (clearDevice)
             {
                 CurrentDisplayNames.Clear();
@@ -3582,6 +3602,17 @@ namespace ADB_Explorer
 
             collectionView.Filter = new(sett => ((AbstractSetting)sett).Description.ToLower().Contains(SettingsSearchBox.Text.ToLower())
                 || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.ToLower().Contains(SettingsSearchBox.Text.ToLower()))));
+        }
+
+        private void ModifiedFromName_Click(object sender, RoutedEventArgs e)
+        {
+            UpdatedModifiedDates();
+        }
+
+        private void UpdatedModifiedDates()
+        {
+            var items = selectedFiles;
+            Task.Run(() => ShellFileOperation.ChangeDateFromName(CurrentADBDevice, items, DirectoryLister.FileList, Dispatcher));
         }
     }
 }

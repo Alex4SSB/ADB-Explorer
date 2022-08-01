@@ -558,6 +558,30 @@
                 <ui:FontIcon Glyph="&#xE8C8;" />
             </MenuItem.Icon>
         </MenuItem>
+        <MenuItem
+            x:Key="UpdateModifiedMenu"
+            x:Shared="False"
+            Click="ModifiedFromName_Click"
+            Header="Update Time Modified"
+            InputGestureText="Ctrl+U"
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UpdateModifiedEnabled}">
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE787;" />
+            </MenuItem.Icon>
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UpdateModifiedEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
+        </MenuItem>
         <ContextMenu
             x:Key="RowContextMenu"
             helpers:SelectionHelper.MenuType="Context"
@@ -572,6 +596,7 @@
             <StaticResource ResourceKey="ContextMenuPasteItem" />
             <StaticResource ResourceKey="ContextMenuRenameItem" />
             <StaticResource ResourceKey="ContextMenuCopyPathItem" />
+            <StaticResource ResourceKey="UpdateModifiedMenu" />
             <StaticResource ResourceKey="UninstallMenuItem" />
             <StaticResource ResourceKey="RestoreMenuItem" />
             <Separator Style="{StaticResource Separator3Style}" />
@@ -1142,10 +1167,9 @@
                         Resources="{StaticResource TopMenuStyles}">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                                <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NewMenuVisible}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NewMenuVisible}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -1249,7 +1273,7 @@
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=MainWin, Path=IsRecycleBin}" Value="True">
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="True">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -1298,6 +1322,8 @@
                             <ui:FontIcon Glyph="&#xE712;" />
                         </MenuItem.Header>
                         <StaticResource ResourceKey="ContextMenuCopyPathItem" />
+                        <StaticResource ResourceKey="UpdateModifiedMenu" />
+                        <Separator />
                         <StaticResource ResourceKey="PackageActionsItem" />
                     </MenuItem>
                 </Menu>
@@ -1323,8 +1349,14 @@
                         x:Name="FileOperationsButton"
                         Click="FileOperationsButton_Click"
                         DataContext="{Binding ElementName=UpperProgressBar, Path=DataContext}"
-                        Style="{StaticResource FileOpButtonStyle}"
-                        ToolTip="File Operations">
+                        Style="{StaticResource FileOpButtonStyle}">
+                        <MenuItem.ToolTip>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="File Operations (" />
+                                <TextBlock Text="{Binding Operations.Count}" />
+                                <TextBlock Text=")" />
+                            </StackPanel>
+                        </MenuItem.ToolTip>
                         <MenuItem.Header>
                             <Grid>
                                 <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}" />

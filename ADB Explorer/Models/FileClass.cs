@@ -26,11 +26,12 @@ namespace ADB_Explorer.Models
         private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
 
         public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false) :
-            base(fileName, path, type, isLink, size, modifiedTime)
+            base(fileName, path, type, isLink, size)
         {
             icon = GetIcon();
             typeName = GetTypeName();
             IsTemp = isTemp;
+            ModifiedTime = modifiedTime;
         }
 
         public FileClass(FileClass other) : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
@@ -151,6 +152,16 @@ namespace ADB_Explorer.Models
             private set => Set(ref typeName, value);
         }
 
+        private DateTime? modifiedTime;
+        public override DateTime? ModifiedTime
+        {
+            get => modifiedTime;
+            set
+            {
+                if (Set(ref modifiedTime, value))
+                    OnPropertyChanged(nameof(ModifiedTimeString));
+            }
+        }
         public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
         public string SizeString => Size?.ToSize();
 
@@ -294,7 +305,7 @@ namespace ADB_Explorer.Models
             return result;
         }
 
-        protected override void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (propertyName == "FileName" || propertyName == "Type" || propertyName == "IsLink")
             {
@@ -302,7 +313,7 @@ namespace ADB_Explorer.Models
                 TypeName = GetTypeName();
             }
 
-            base.Set(ref storage, value, propertyName);
+            return base.Set(ref storage, value, propertyName);
         }
     }
 }

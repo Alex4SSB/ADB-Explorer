@@ -34,7 +34,7 @@ namespace ADB_Explorer.Models
         }
 
         private DateTime? modifiedTime;
-        public DateTime? ModifiedTime
+        public virtual DateTime? ModifiedTime
         {
             get => modifiedTime;
             set => Set(ref modifiedTime, value);

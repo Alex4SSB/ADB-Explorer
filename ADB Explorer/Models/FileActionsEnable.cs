@@ -262,6 +262,17 @@ namespace ADB_Explorer.Models
             set => Set(ref customListingInProgress, value);
         }
 
+        private bool updateModifiedEnabled;
+        public bool UpdateModifiedEnabled
+        {
+            get => updateModifiedEnabled;
+            set
+            {
+                if (Set(ref updateModifiedEnabled, value))
+                    OnPropertyChanged(nameof(MoreEnabled));
+            }
+        }
+
         #endregion
 
         #region strings
@@ -303,7 +314,7 @@ namespace ADB_Explorer.Models
         public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
         public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
         public bool PushPackageVisible => PushPackageEnabled && Data.Settings.EnableApk;
-        public bool MoreEnabled => PackageActionsEnabled || CopyPathEnabled;
+        public bool MoreEnabled => PackageActionsEnabled || CopyPathEnabled || UpdateModifiedEnabled;
         public string MenuDeleteTooltip => $"{DeleteAction} (Del)";
         public string MenuRestoreTooltip => $"{RestoreAction} (Ctrl+R)";
         public bool NameReadOnly => !RenameEnabled;

@@ -917,6 +917,7 @@
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="IsIndeterminate" Value="False" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Setter Property="ToolTip" Value="{Binding StringProgress}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsActive}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />

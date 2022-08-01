@@ -40,5 +40,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex PACKAGE_LISTING =
             new(@"(?:package:)(?<package>[\w.]+)(?: versionCode:(?<version>[\d]+))*(?: uid:(?<uid>[\d]+))*");
+
+        public static readonly Regex FILE_NAME_DATE =
+            new(@"(?:(?<!\d)(?<Date>\d{8})[^\d](?:(?<=[-_])(?<Time>\d{6}))?[^\d])|(?:(?<!\d)(?<DnT>\d{4}(?:[-_]\d{2}){5})[^\d])");
     }
 }
