@@ -10,7 +10,7 @@
     <img src="https://img.shields.io/badge/x64_Installer-Download-purple.svg?style=flat-round" alt="Preview link" />
 </a>
 <a style="text-decoration:none" href="https://github.com/Alex4SSB/ADB-Explorer/releases/download/v0.7.5/ADB_Explorer_0.7.5_x64_self-contained_installer.rar">
-    <img src="https://img.shields.io/badge/x64_Self-Contained_Installer-Download-purple.svg?style=flat-round" alt="Preview link" />
+    <img src="https://img.shields.io/badge/x64_Self_Contained_Installer-Download-purple.svg?style=flat-round" alt="Preview link" />
 </a>
 
 An interface to ADB that allows browsing and transferring of files with ease, in a modern and fluent Windows app, built in WPF.
