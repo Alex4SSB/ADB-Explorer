@@ -2,8 +2,206 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+
+    <Style
+        x:Key="AdbDataGridColumnHeaderStyle"
+        BasedOn="{StaticResource DefaultDataGridColumnHeaderStyle}"
+        TargetType="DataGridColumnHeader">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Setter Property="helpers:DataGridHelper.IsFilteringEnabled" Value="True" />
+        <Setter Property="Template">
+            <!--  Template copied from ModernWPF to be modified  -->
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridColumnHeader">
+                    <Grid x:Name="ColumnHeaderRoot">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Rectangle
+                            x:Name="BackgroundRectangle"
+                            Grid.ColumnSpan="2"
+                            Fill="{TemplateBinding Background}"
+                            Stretch="Fill" />
+
+                        <ui:FontIcon
+                            x:Name="SortIcon"
+                            Grid.ColumnSpan="2"
+                            VerticalAlignment="Top"
+                            FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                            FontSize="12"
+                            Foreground="{DynamicResource DataGridColumnHeaderForegroundBrush}"
+                            Glyph="&#xE70E;" />
+
+                        <Grid
+                            Margin="{TemplateBinding Padding}"
+                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+
+                            <ContentPresenter
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                RecognizesAccessKey="True"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                <ContentPresenter.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+                                    </Style>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                        </Grid>
+
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Rectangle
+                                x:Name="VerticalSeparator"
+                                Grid.Column="1"
+                                Width="1"
+                                VerticalAlignment="Stretch"
+                                Fill="{TemplateBinding SeparatorBrush}"
+                                Visibility="{TemplateBinding SeparatorVisibility}" />
+                            <MenuItem
+                                Margin="0"
+                                Padding="4,0"
+                                ui:ControlHelper.CornerRadius="0"
+                                BorderBrush="{DynamicResource MenuFlyoutPresenterBorderBrush}"
+                                BorderThickness="1,0,0,0">
+                                <MenuItem.Header>
+                                    <ui:FontIcon
+                                        FontSize="10"
+                                        Glyph="&#xE70D;"
+                                        Style="{StaticResource GlyphFont}" />
+                                </MenuItem.Header>
+                                <MenuItem.Style>
+                                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridColumnHeader, Mode=FindAncestor}, Path=IsMouseOver}" Value="False">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridColumnHeader, Mode=FindAncestor}, Path=Content}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridColumnHeader, Mode=FindAncestor}, Path=(helpers:DataGridHelper.IsFilteringEnabled)}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </MenuItem.Style>
+                            </MenuItem>
+                        </Grid>
+
+                        <Grid
+                            x:Name="FocusVisual"
+                            IsHitTestVisible="False"
+                            Opacity="0">
+                            <Rectangle
+                                x:Name="FocusVisualPrimary"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Fill="Transparent"
+                                IsHitTestVisible="False"
+                                Stroke="{DynamicResource DataGridCellFocusVisualPrimaryBrush}"
+                                StrokeThickness="2" />
+                            <Rectangle
+                                x:Name="FocusVisualSecondary"
+                                Margin="2"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Fill="Transparent"
+                                IsHitTestVisible="False"
+                                Stroke="{DynamicResource DataGridCellFocusVisualSecondaryBrush}"
+                                StrokeThickness="1" />
+                        </Grid>
+
+                        <Thumb
+                            x:Name="PART_LeftHeaderGripper"
+                            Grid.ColumnSpan="2"
+                            HorizontalAlignment="Left"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                        <Thumb
+                            x:Name="PART_RightHeaderGripper"
+                            Grid.ColumnSpan="2"
+                            HorizontalAlignment="Right"
+                            Style="{StaticResource ColumnHeaderGripperStyle}" />
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="FocusStates">
+                                <VisualState x:Name="Unfocused" />
+                                <VisualState x:Name="Focused">
+                                    <Storyboard>
+                                        <DoubleAnimation
+                                            Storyboard.TargetName="FocusVisual"
+                                            Storyboard.TargetProperty="Opacity"
+                                            To="1"
+                                            Duration="0" />
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                            <VisualStateGroup x:Name="SortStates">
+                                <VisualState x:Name="Unsorted" />
+                                <VisualState x:Name="SortAscending">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SortIcon" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                                <VisualState x:Name="SortDescending">
+                                    <Storyboard>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SortIcon" Storyboard.TargetProperty="Visibility">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="SortIcon" Storyboard.TargetProperty="Glyph">
+                                            <DiscreteObjectKeyFrame KeyTime="0" Value="&#xE70D;" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="BackgroundRectangle" Property="Fill" Value="{DynamicResource DataGridColumnHeaderHoveredBackgroundBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="BackgroundRectangle" Property="Fill" Value="{DynamicResource DataGridColumnHeaderPressedBackgroundBrush}" />
+                        </Trigger>
+                        <Trigger Property="SortDirection" Value="{x:Null}">
+                            <Setter TargetName="SortIcon" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="SortDirection" Value="{x:Null}">
+                <Setter Property="Padding" Value="12,0" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style
+        x:Key="DataGridColumnHeaderStyle"
+        BasedOn="{StaticResource AdbDataGridColumnHeaderStyle}"
+        TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+    </Style>
+
+    <Style
+        x:Key="FileOpColumnHeaderStyle"
+        BasedOn="{StaticResource DataGridColumnHeaderStyle}"
+        TargetType="DataGridColumnHeader">
+        <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
+    </Style>
 
     <Style
         x:Key="DataGridStyle"
@@ -73,7 +271,7 @@
 
                                         <ScrollBar
                                             x:Name="PART_VerticalScrollBar"
-                                            Grid.Row="1"
+                                            Grid.RowSpan="2"
                                             Grid.Column="2"
                                             Margin="-16,0,0,0"
                                             Maximum="{TemplateBinding ScrollableHeight}"
@@ -129,7 +327,7 @@
 
     <Style
         x:Key="ExplorerGridStyle"
-        BasedOn="{StaticResource DefaultDataGridStyle}"
+        BasedOn="{StaticResource DataGridStyle}"
         TargetType="DataGrid">
         <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="True" />
         <Setter Property="Template">
@@ -194,7 +392,7 @@
 
                                         <ScrollBar
                                             x:Name="PART_VerticalScrollBar"
-                                            Grid.Row="1"
+                                            Grid.RowSpan="2"
                                             Grid.Column="2"
                                             Margin="-16,0,0,0"
                                             Maximum="{TemplateBinding ScrollableHeight}"

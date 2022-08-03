@@ -1545,8 +1545,15 @@
                         <DataGrid.Columns>
                             <DataGridTemplateColumn
                                 x:Name="IconColumn"
+                                MaxWidth="24"
                                 CanUserResize="False"
                                 IsReadOnly="True">
+                                <DataGridTemplateColumn.HeaderStyle>
+                                    <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
+                                        <Setter Property="ToolTip" Value="Icon" />
+                                        <Setter Property="helpers:DataGridHelper.IsFilteringEnabled" Value="False" />
+                                    </Style>
+                                </DataGridTemplateColumn.HeaderStyle>
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Grid>
@@ -1958,11 +1965,17 @@
                                         Width="30"
                                         CanUserResize="False"
                                         CellTemplate="{StaticResource OperationIconTemplate}">
+                                        <DataGridTemplateColumn.HeaderStyle>
+                                            <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
+                                                <Setter Property="ToolTip" Value="Operation" />
+                                                <Setter Property="helpers:DataGridHelper.IsFilteringEnabled" Value="False" />
+                                            </Style>
+                                        </DataGridTemplateColumn.HeaderStyle>
                                         <DataGridTemplateColumn.Header>
                                             <ui:FontIcon
                                                 Margin="-7,0"
                                                 Glyph="&#xE8AF;"
-                                                ToolTip="Operation" />
+                                                Style="{StaticResource GlyphFont}" />
                                         </DataGridTemplateColumn.Header>
                                     </DataGridTemplateColumn>
                                     <DataGridTemplateColumn

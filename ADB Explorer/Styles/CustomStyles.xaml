@@ -774,19 +774,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style
-        x:Key="DataGridColumnHeaderStyle"
-        BasedOn="{StaticResource DefaultDataGridColumnHeaderStyle}"
-        TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
-    </Style>
-    <Style
-        x:Key="FileOpColumnHeaderStyle"
-        BasedOn="{StaticResource DataGridColumnHeaderStyle}"
-        TargetType="DataGridColumnHeader">
-        <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
-    </Style>
     <Style x:Key="ExplorerViewBackgroundStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
     </Style>
