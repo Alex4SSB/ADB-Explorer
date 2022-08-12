@@ -64,6 +64,8 @@ namespace ADB_Explorer.Models
 
         public static FileActionsEnable FileActions { get; set; } = new();
 
+        public static DirectoryLister DirList { get; set; }
+
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

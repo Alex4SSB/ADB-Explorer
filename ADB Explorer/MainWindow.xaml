@@ -1068,6 +1068,7 @@
                     </Menu.Resources>
                     <MenuItem
                         x:Name="OpenDevicesButton"
+                        d:IsEnabled="True"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="OpenDevicesButton_Click"
                         IsEnabled="False"
@@ -1088,6 +1089,7 @@
                                     Margin="0,0,-10,-12"
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
+                                    d:Text="1"
                                     Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count, NotifyOnTargetUpdated=True}">
                                     <TextBlock.Triggers>
                                         <EventTrigger RoutedEvent="Binding.TargetUpdated">
@@ -1235,7 +1237,10 @@
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <ui:FontIcon Margin="0,1,0,0" Glyph="&#xE77F;" />
-                                <TextBlock Grid.Column="1" Margin="4,0,0,0">
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="4,0,0,0"
+                                    d:Visibility="Visible">
                                     <TextBlock.Style>
                                         <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
                                             <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count, NotifyOnTargetUpdated=True}" />
@@ -1547,66 +1552,13 @@
                                 x:Name="IconColumn"
                                 MaxWidth="24"
                                 CanUserResize="False"
+                                CellTemplate="{StaticResource FileIconTemplate}"
                                 IsReadOnly="True">
                                 <DataGridTemplateColumn.HeaderStyle>
                                     <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
                                         <Setter Property="ToolTip" Value="Icon" />
-                                        <Setter Property="helpers:DataGridHelper.IsFilteringEnabled" Value="False" />
                                     </Style>
                                 </DataGridTemplateColumn.HeaderStyle>
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Image
-                                                Width="16"
-                                                Margin="0,1,0,0"
-                                                RenderOptions.BitmapScalingMode="HighQuality"
-                                                Source="{Binding Icon}">
-                                                <Image.Style>
-                                                    <Style TargetType="Image">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                        <Setter Property="Opacity" Value="1" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
-                                                                <Setter Property="Opacity" Value="0.5" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </Image.Style>
-                                            </Image>
-                                            <TextBlock
-                                                HorizontalAlignment="Center"
-                                                FontSize="16"
-                                                Text="{Binding ShortExtension}">
-                                                <TextBlock.Style>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                        <Setter Property="Opacity" Value="1" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
-                                                                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
-                                                                <Setter Property="Visibility" Value="Visible" />
-                                                                <Setter Property="Margin" Value="-1,-6,0,0" />
-                                                            </DataTrigger>
-                                                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
-                                                                <Setter Property="Opacity" Value="0.5" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </TextBlock.Style>
-                                            </TextBlock>
-                                        </Grid>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 x:Name="NameColumn"
@@ -1966,9 +1918,8 @@
                                         CanUserResize="False"
                                         CellTemplate="{StaticResource OperationIconTemplate}">
                                         <DataGridTemplateColumn.HeaderStyle>
-                                            <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
+                                            <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader">
                                                 <Setter Property="ToolTip" Value="Operation" />
-                                                <Setter Property="helpers:DataGridHelper.IsFilteringEnabled" Value="False" />
                                             </Style>
                                         </DataGridTemplateColumn.HeaderStyle>
                                         <DataGridTemplateColumn.Header>
@@ -2628,10 +2579,7 @@
                                 <Border
                                     x:Name="ServerUnresponsiveNotice"
                                     Padding="4"
-                                    Background="{DynamicResource NoticeBorderBackground}"
-                                    BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
-                                    BorderThickness="1"
-                                    Style="{StaticResource BorderStyle}"
+                                    Style="{StaticResource UnresponsiveServerBorderStyle}"
                                     Visibility="Collapsed">
                                     <StackPanel Margin="2,0">
                                         <ui:SimpleStackPanel Orientation="Horizontal" Spacing="8">

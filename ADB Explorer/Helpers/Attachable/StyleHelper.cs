@@ -96,5 +96,18 @@ namespace ADB_Explorer.Helpers
                 typeof(Brush),
                 typeof(StyleHelper),
                 null);
+
+        public static bool GetIsMouseSelectionVisible(MenuItem control) =>
+            (bool)control.GetValue(IsMouseSelectionVisibleProperty);
+
+        public static void SetIsMouseSelectionVisible(MenuItem control, bool value) =>
+            control.SetValue(IsMouseSelectionVisibleProperty, value);
+
+        public static readonly DependencyProperty IsMouseSelectionVisibleProperty =
+            DependencyProperty.RegisterAttached(
+                "IsMouseSelectionVisible",
+                typeof(bool),
+                typeof(StyleHelper),
+                null);
     }
 }

@@ -71,6 +71,8 @@ namespace ADB_Explorer.Models
             }
         }
 
+        public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
+
         public readonly AdbDevice Device; // will be left null for PC
         
         public FilePath(ShellObject windowsPath)

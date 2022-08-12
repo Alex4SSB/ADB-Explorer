@@ -294,7 +294,7 @@
                 IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
                 Placement="Bottom"
                 PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}">
-                <ui:ThemeShadowChrome CornerRadius="{Binding RelativeSource={RelativeSource AncestorType=MenuItem, Mode=FindAncestor}, Path=(ui:ControlHelper.CornerRadius)}" IsShadowEnabled="{DynamicResource {x:Static SystemParameters.DropShadowKey}}">
+                <ui:ThemeShadowChrome CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" IsShadowEnabled="{DynamicResource {x:Static SystemParameters.DropShadowKey}}">
                     <Border
                         x:Name="SubMenuRoot"
                         Background="{DynamicResource MenuFlyoutPresenterBackground}"
@@ -333,15 +333,18 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
                 <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPointerOver}" />
+                <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
             </Trigger>
             <!--  Selected  -->
             <Trigger Property="IsSubmenuOpen" Value="True">
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundSelected}" />
                 <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushSelected}" />
+                <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource MenuBarItemBackgroundSelected}" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPressed}" />
                 <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPressed}" />
+                <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource MenuBarItemBackgroundPressed}" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -422,21 +425,33 @@
                 <Setter TargetName="CheckGlyph" Property="Visibility" Value="Visible" />
             </Trigger>
             <Trigger Property="IsHighlighted" Value="True">
-                <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackgroundPointerOver}" />
-                <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushPointerOver}" />
                 <Setter TargetName="IconContent" Property="TextElement.Foreground" Value="{DynamicResource MenuFlyoutItemForegroundPointerOver}" />
                 <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource MenuFlyoutItemForegroundPointerOver}" />
                 <Setter TargetName="CheckGlyph" Property="Foreground" Value="{DynamicResource ToggleMenuFlyoutItemCheckGlyphForegroundPointerOver}" />
                 <Setter TargetName="KeyboardAcceleratorTextBlock" Property="Foreground" Value="{DynamicResource MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver}" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsHighlighted" Value="True" />
+                    <Condition Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackgroundPointerOver}" />
+                <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushPointerOver}" />
+            </MultiTrigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackgroundPressed}" />
-                <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushPressed}" />
                 <Setter TargetName="IconContent" Property="TextElement.Foreground" Value="{DynamicResource MenuFlyoutItemForegroundPressed}" />
                 <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource MenuFlyoutItemForegroundPressed}" />
                 <Setter TargetName="CheckGlyph" Property="Foreground" Value="{DynamicResource ToggleMenuFlyoutItemCheckGlyphForegroundPressed}" />
                 <Setter TargetName="KeyboardAcceleratorTextBlock" Property="Foreground" Value="{DynamicResource MenuFlyoutItemKeyboardAcceleratorTextForegroundPressed}" />
             </Trigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsPressed" Value="True" />
+                    <Condition Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackgroundPressed}" />
+                <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushPressed}" />
+            </MultiTrigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemBackgroundDisabled}" />
                 <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushDisabled}" />
@@ -596,6 +611,8 @@
         <Setter Property="helpers:StyleHelper.UseFluentStyles" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
         <Setter Property="helpers:StyleHelper.BeginAnimation" Value="False" />
+        <Setter Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
+        <Setter Property="helpers:StyleHelper.PressedForeground" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource MenuFlyoutItemRevealBorderThickness}" />
         <Setter Property="Foreground" Value="{DynamicResource MenuFlyoutItemForeground}" />

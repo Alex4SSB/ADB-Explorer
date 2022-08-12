@@ -2,7 +2,6 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
 
@@ -10,8 +9,8 @@
         x:Key="AdbDataGridColumnHeaderStyle"
         BasedOn="{StaticResource DefaultDataGridColumnHeaderStyle}"
         TargetType="DataGridColumnHeader">
+        <Setter Property="MinHeight" Value="{StaticResource DataGridColumnHeaderHeight}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
-        <Setter Property="helpers:DataGridHelper.IsFilteringEnabled" Value="True" />
         <Setter Property="Template">
             <!--  Template copied from ModernWPF to be modified  -->
             <Setter.Value>
@@ -57,7 +56,7 @@
                             </ContentPresenter>
                         </Grid>
 
-                        <Grid Grid.Column="1">
+                        <Grid Grid.Column="1" Background="{DynamicResource ControlBackground}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto" />
@@ -69,34 +68,6 @@
                                 VerticalAlignment="Stretch"
                                 Fill="{TemplateBinding SeparatorBrush}"
                                 Visibility="{TemplateBinding SeparatorVisibility}" />
-                            <MenuItem
-                                Margin="0"
-                                Padding="4,0"
-                                ui:ControlHelper.CornerRadius="0"
-                                BorderBrush="{DynamicResource MenuFlyoutPresenterBorderBrush}"
-                                BorderThickness="1,0,0,0">
-                                <MenuItem.Header>
-                                    <ui:FontIcon
-                                        FontSize="10"
-                                        Glyph="&#xE70D;"
-                                        Style="{StaticResource GlyphFont}" />
-                                </MenuItem.Header>
-                                <MenuItem.Style>
-                                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridColumnHeader, Mode=FindAncestor}, Path=IsMouseOver}" Value="False">
-                                                <Setter Property="Visibility" Value="Hidden" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridColumnHeader, Mode=FindAncestor}, Path=Content}" Value="{x:Null}">
-                                                <Setter Property="Visibility" Value="Hidden" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridColumnHeader, Mode=FindAncestor}, Path=(helpers:DataGridHelper.IsFilteringEnabled)}" Value="False">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </MenuItem.Style>
-                            </MenuItem>
                         </Grid>
 
                         <Grid
@@ -428,7 +399,7 @@
                                         </MultiDataTrigger>
                                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                                             <Setter TargetName="ColumnHeadersAndRowsSeparator" Property="Height" Value="0" />
-                                            <Setter TargetName="PART_ScrollContentPresenter" Property="Margin" Value="0,3,0,0" />
+                                            <Setter TargetName="PART_ScrollContentPresenter" Property="Margin" Value="{StaticResource DataGridScrollContentPresenterMargin}" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                                             <Setter TargetName="ColumnHeadersAndRowsSeparator" Property="Height" Value="1" />

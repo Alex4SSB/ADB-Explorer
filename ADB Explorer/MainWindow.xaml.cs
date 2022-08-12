@@ -43,37 +43,32 @@ namespace ADB_Explorer
         private readonly DispatcherTimer ConnectTimer = new();
         private readonly DispatcherTimer SplashTimer = new();
         private Mutex connectTimerMutex = new();
-        private ItemsPresenter ExplorerContentPresenter;
         private ScrollViewer ExplorerScroller;
         private ThemeService themeService = new();
         private int clickCount = 0;
         private int firstSelectedRow = -1;
-        public DirectoryLister DirectoryLister { get; private set; }
         public static MDNS MdnsService { get; set; } = new();
         public Devices DevicesObject { get; set; } = new();
         public PairingQrClass QrClass { get; set; }
 
-        private double ColumnHeaderHeight
+        private ItemsPresenter _explorerContentPresenter;
+        private ItemsPresenter ExplorerContentPresenter
         {
             get
             {
-                GetExplorerContentPresenter();
-                if (ExplorerContentPresenter is null)
-                    return 0;
+                if (_explorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
+                {
+                    ExplorerScroller = scroller;
+                    _explorerContentPresenter = presenter;
+                }
 
-                double height = ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight;
-
-                return height;
+                return _explorerContentPresenter;
             }
         }
-        private double DataGridContentWidth
-        {
-            get
-            {
-                GetExplorerContentPresenter();
-                return ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
-            }
-        }
+
+        private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight");
+        private double ScrollContentPresenterMargin => ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top;
+        private double DataGridContentWidth => ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
 
         private readonly List<MenuItem> PathButtons = new();
 
@@ -94,15 +89,6 @@ namespace ADB_Explorer
             return true;
         }
         protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-        private void GetExplorerContentPresenter()
-        {
-            if (ExplorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
-            {
-                ExplorerScroller = scroller;
-                ExplorerContentPresenter = presenter;
-            }
-        }
 
         public string SelectedFilesTotalSize => (selectedFiles is not null && FileClass.TotalSize(selectedFiles) is ulong size and > 0) ? size.ToSize() : "";
 
@@ -311,10 +297,10 @@ namespace ADB_Explorer
         {
             if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
             {
-                DirectoryLoadingProgressBar.Visible(DirectoryLister.IsProgressVisible);
-                UnfinishedBlock.Visible(DirectoryLister.IsProgressVisible);
+                DirectoryLoadingProgressBar.Visible(DirList.IsProgressVisible);
+                UnfinishedBlock.Visible(DirList.IsProgressVisible);
             }
-            else if (e.PropertyName == nameof(DirectoryLister.InProgress) && !DirectoryLister.InProgress)
+            else if (e.PropertyName == nameof(DirectoryLister.InProgress) && !DirList.InProgress)
             {
                 if (FileActions.IsRecycleBin)
                 {
@@ -329,14 +315,14 @@ namespace ADB_Explorer
         {
             Task.Run(() =>
             {
-                var validIndexers = DirectoryLister.FileList.Where(file => file.TrashIndex is not null).Select(file => file.TrashIndex);
+                var validIndexers = DirList.FileList.Where(file => file.TrashIndex is not null).Select(file => file.TrashIndex);
                 if (!validIndexers.Any())
                 {
                     ShellFileOperation.SilentDelete(CurrentADBDevice, RECYCLE_INDEX_PATH);
                     ShellFileOperation.SilentDelete(CurrentADBDevice, RECYCLE_INDEX_BACKUP_PATH);
                     return;
                 }
-                if (DirectoryLister.FileList.Count(file => RECYCLE_INDEX_PATHS.Contains(file.FullPath)) < 2
+                if (DirList.FileList.Count(file => RECYCLE_INDEX_PATHS.Contains(file.FullPath)) < 2
                     && validIndexers.Count() == RecycleIndex.Count
                     && RecycleIndex.All(indexer => validIndexers.Contains(indexer)))
                 {
@@ -344,7 +330,7 @@ namespace ADB_Explorer
                 }
 
                 var outString = string.Join("\r\n", validIndexers.Select(indexer => indexer.ToString()));
-                var oldIndexFile = DirectoryLister.FileList.Where(file => file.FullPath == RECYCLE_INDEX_PATH);
+                var oldIndexFile = DirList.FileList.Where(file => file.FullPath == RECYCLE_INDEX_PATH);
 
                 try
                 {
@@ -364,7 +350,7 @@ namespace ADB_Explorer
         private void EnableRecycleButtons(IEnumerable<FileClass> fileList = null)
         {
             if (fileList is null)
-                fileList = DirectoryLister.FileList;
+                fileList = DirList.FileList;
 
             FileActions.RestoreEnabled = fileList.Any(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
             FileActions.DeleteEnabled = fileList.Any(item => !RECYCLE_INDEX_PATHS.Contains(item.FullPath));
@@ -413,9 +399,9 @@ namespace ADB_Explorer
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            if (DirectoryLister is not null)
+            if (DirList is not null)
             {
-                DirectoryLister.Stop();
+                DirList.Stop();
             }
 
             ConnectTimer.Stop();
@@ -589,7 +575,7 @@ namespace ADB_Explorer
 
             if (FileActions.IsRecycleBin)
             {
-                EnableRecycleButtons(selectedFiles.Any() ? selectedFiles : DirectoryLister.FileList);
+                EnableRecycleButtons(selectedFiles.Any() ? selectedFiles : DirList.FileList);
             }
             else
             {
@@ -736,13 +722,13 @@ namespace ADB_Explorer
 
         private void InitLister()
         {
-            DirectoryLister = new(Dispatcher, CurrentADBDevice, ListerFileManipulator);
-            DirectoryLister.PropertyChanged += DirectoryLister_PropertyChanged;
+            DirList = new(Dispatcher, CurrentADBDevice, ListerFileManipulator);
+            DirList.PropertyChanged += DirectoryLister_PropertyChanged;
         }
 
         private FileClass ListerFileManipulator(FileClass item)
         {
-            if (CutItems.Any() && (CutItems[0].ParentPath == DirectoryLister.CurrentPath))
+            if (CutItems.Any() && (CutItems[0].ParentPath == DirList.CurrentPath))
             {
                 var cutItem = CutItems.Where(f => f.FullPath == item.FullPath);
                 if (cutItem.Any())
@@ -1280,7 +1266,7 @@ namespace ADB_Explorer
                     }
                 });
 
-                recycleTask.ContinueWith((t) => DirectoryLister.Navigate(realPath));
+                recycleTask.ContinueWith((t) => DirList.Navigate(realPath));
 
                 DateColumn.Header = "Date Deleted";
                 FileActions.DeleteAction = "Empty Recycle Bin";
@@ -1294,13 +1280,13 @@ namespace ADB_Explorer
             }
             else
             {
-                DirectoryLister.Navigate(realPath);
+                DirList.Navigate(realPath);
 
                 DateColumn.Header = "Date Modified";
                 FileActions.DeleteAction = "Delete";
             }
 
-            ExplorerGrid.ItemsSource = DirectoryLister.FileList;
+            ExplorerGrid.ItemsSource = DirList.FileList;
             FilterHiddenFiles();
             return true;
         }
@@ -1875,9 +1861,9 @@ namespace ADB_Explorer
             if ((e.PropertyName == "Status") &&
                 (pushOperation.Status == FileOperation.OperationStatus.Completed) &&
                 (pushOperation.TargetPath.FullPath == CurrentPath) &&
-                (!DirectoryLister.FileList.Where(f => f.FullName == pushOperation.FilePath.FullName).Any()))
+                (!DirList.FileList.Where(f => f.FullName == pushOperation.FilePath.FullName).Any()))
             {
-                DirectoryLister.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath));
+                DirList.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath));
             }
         }
 
@@ -2063,7 +2049,7 @@ namespace ADB_Explorer
                 ExplorerGrid.Visible(false);
                 DevicesObject.SetOpen(device, false);
                 CurrentADBDevice = null;
-                DirectoryLister = null;
+                DirList = null;
             }
             DeviceListSetup();
         }
@@ -2071,7 +2057,7 @@ namespace ADB_Explorer
         private void ClearExplorer(bool clearDevice = true)
         {
             PathMenu.Items.Clear();
-            DirectoryLister?.FileList?.Clear();
+            DirList?.FileList?.Clear();
             Packages.Clear();
             FileActions.PushFilesFoldersEnabled =
             FileActions.PushPackageEnabled =
@@ -2155,7 +2141,7 @@ namespace ADB_Explorer
 
             if (point.Y > (ExplorerGrid.Items.Count * ExplorerGrid.MinRowHeight + ColumnHeaderHeight)
                 || point.Y > (ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight % ExplorerGrid.MinRowHeight)
-                || point.Y < ColumnHeaderHeight
+                || point.Y < ColumnHeaderHeight + ScrollContentPresenterMargin
                 || point.X > actualRowWidth
                 || point.X > DataGridContentWidth)
             {
@@ -2772,7 +2758,7 @@ namespace ADB_Explorer
             IEnumerable<FileClass> itemsToDelete;
             if (FileActions.IsRecycleBin && !selectedFiles.Any())
             {
-                itemsToDelete = DirectoryLister.FileList.Where(f => !RECYCLE_INDEX_PATHS.Contains(f.FullPath));
+                itemsToDelete = DirList.FileList.Where(f => !RECYCLE_INDEX_PATHS.Contains(f.FullPath));
             }
             else
             {
@@ -2806,18 +2792,18 @@ namespace ADB_Explorer
 
             if (!FileActions.IsRecycleBin && Settings.EnableRecycle && !result.Item2)
             {
-                ShellFileOperation.MoveItems(CurrentADBDevice, itemsToDelete, RECYCLE_PATH, CurrentPath, DirectoryLister.FileList, Dispatcher, DevicesObject.CurrentDevice);
+                ShellFileOperation.MoveItems(CurrentADBDevice, itemsToDelete, RECYCLE_PATH, CurrentPath, DirList.FileList, Dispatcher, DevicesObject.CurrentDevice);
             }
             else
             {
-                ShellFileOperation.DeleteItems(CurrentADBDevice, itemsToDelete, DirectoryLister.FileList, Dispatcher);
+                ShellFileOperation.DeleteItems(CurrentADBDevice, itemsToDelete, DirList.FileList, Dispatcher);
 
                 if (FileActions.IsRecycleBin)
                 {
-                    EnableRecycleButtons(DirectoryLister.FileList.Except(itemsToDelete));
-                    if (!selectedFiles.Any() && DirectoryLister.FileList.Any(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
+                    EnableRecycleButtons(DirList.FileList.Except(itemsToDelete));
+                    if (!selectedFiles.Any() && DirList.FileList.Any(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
                     {
-                        _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirectoryLister.FileList.Where(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath))));
+                        _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirList.FileList.Where(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath))));
                     }
                 }
             }
@@ -2826,7 +2812,7 @@ namespace ADB_Explorer
         private void RenameFile(string newName, FileClass file)
         {
             var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Settings.ShowExtensions ? "" : file.Extension)}";
-            if (DirectoryLister.FileList.Any(file => file.FullName == newName))
+            if (DirList.FileList.Any(file => file.FullName == newName))
             {
                 DialogService.ShowMessage($"{newPath} already exists", "Rename conflict", DialogService.DialogIcon.Exclamation);
                 return;
@@ -2887,7 +2873,7 @@ namespace ADB_Explorer
             {
                 if (string.IsNullOrEmpty(textBox.Text))
                 {
-                    DirectoryLister.FileList.Remove(file);
+                    DirList.FileList.Remove(file);
                     return;
                 }
                 try
@@ -2923,7 +2909,7 @@ namespace ADB_Explorer
                 var name = DisplayName(textBox);
                 if (string.IsNullOrEmpty(name))
                 {
-                    DirectoryLister.FileList.Remove(ExplorerGrid.SelectedItem as FileClass);
+                    DirList.FileList.Remove(ExplorerGrid.SelectedItem as FileClass);
                 }
                 else
                 {
@@ -3123,7 +3109,7 @@ namespace ADB_Explorer
                                                                        targetPath,
                                                                        pasteItems,
                                                                        targetName,
-                                                                       DirectoryLister.FileList,
+                                                                       DirList.FileList,
                                                                        Dispatcher,
                                                                        CurrentADBDevice,
                                                                        CurrentPath));
@@ -3147,10 +3133,10 @@ namespace ADB_Explorer
         private void NewItem(bool isFolder)
         {
             var namePrefix = $"New {(isFolder ? "Folder" : "File")}";
-            var index = FileClass.ExistingIndexes(DirectoryLister.FileList, namePrefix);
+            var index = FileClass.ExistingIndexes(DirList.FileList, namePrefix);
 
             FileClass newItem = new($"{namePrefix}{index}", CurrentPath, isFolder ? FileType.Folder : FileType.File, isTemp: true);
-            DirectoryLister.FileList.Insert(0, newItem);
+            DirList.FileList.Insert(0, newItem);
 
             ExplorerGrid.ScrollIntoView(newItem);
             ExplorerGrid.SelectedItem = newItem;
@@ -3175,7 +3161,7 @@ namespace ADB_Explorer
             catch (Exception e)
             {
                 DialogService.ShowMessage(e.Message, "Create Error", DialogService.DialogIcon.Critical);
-                DirectoryLister.FileList.Remove(file);
+                DirList.FileList.Remove(file);
                 throw;
             }
 
@@ -3184,9 +3170,9 @@ namespace ADB_Explorer
             if (file.Type is FileType.File)
                 file.Size = 0;
 
-            var index = DirectoryLister.FileList.IndexOf(file);
-            DirectoryLister.FileList.Remove(file);
-            DirectoryLister.FileList.Insert(index, file);
+            var index = DirList.FileList.IndexOf(file);
+            DirList.FileList.Remove(file);
+            DirList.FileList.Insert(index, file);
             ExplorerGrid.SelectedItem = file;
         }
 
@@ -3271,7 +3257,7 @@ namespace ADB_Explorer
 
         private void RestoreItems()
         {
-            var restoreItems = (!selectedFiles.Any() ? DirectoryLister.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+            var restoreItems = (!selectedFiles.Any() ? DirList.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
             string[] existingItems = Array.Empty<string>();
             List<FileClass> existingFiles = new();
             bool merge = false;
@@ -3332,7 +3318,7 @@ namespace ADB_Explorer
                                              items: restoreItems,
                                              targetPath: null,
                                              currentPath: CurrentPath,
-                                             fileList: DirectoryLister.FileList,
+                                             fileList: DirList.FileList,
                                              dispatcher: Dispatcher);
 
                     if (!selectedFiles.Any())
@@ -3484,7 +3470,7 @@ namespace ADB_Explorer
 
         private void CopyToTemp()
         {
-            _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, DisplayName(selectedFiles.First()), DirectoryLister.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
+            _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, DisplayName(selectedFiles.First()), DirList.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
         }
 
         private void PushPackages()
@@ -3612,7 +3598,7 @@ namespace ADB_Explorer
         private void UpdatedModifiedDates()
         {
             var items = selectedFiles;
-            Task.Run(() => ShellFileOperation.ChangeDateFromName(CurrentADBDevice, items, DirectoryLister.FileList, Dispatcher));
+            Task.Run(() => ShellFileOperation.ChangeDateFromName(CurrentADBDevice, items, DirList.FileList, Dispatcher));
         }
     }
 }
