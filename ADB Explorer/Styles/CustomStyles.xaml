@@ -1680,4 +1680,46 @@
         <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style
+        x:Key="ContextMenuCopyPathStyle"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
+        TargetType="MenuItem">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+        <Setter Property="Icon">
+            <Setter.Value>
+                <Grid>
+                    <ui:FontIcon Glyph="&#xE62F;">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsWin11}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <TextBlock Text="\\…">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsWin11}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

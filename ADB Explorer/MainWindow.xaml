@@ -350,24 +350,8 @@
             Click="CopyPathMenuItem_Click"
             Header="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathAction}"
             InputGestureText="Shift+Ctrl+C"
-            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}">
-            <MenuItem.Icon>
-                <ui:FontIcon Glyph="&#xE62F;" />
-            </MenuItem.Icon>
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                    <Style.Triggers>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </MenuItem.Style>
-        </MenuItem>
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}"
+            Style="{StaticResource ContextMenuCopyPathStyle}" />
         <MenuItem
             x:Key="UninstallMenuItem"
             x:Shared="False"
@@ -2724,11 +2708,7 @@
                             Grid.Row="1"
                             Margin="10,0,10,10"
                             Visibility="Collapsed">
-                            <Border
-                                Background="{DynamicResource NoticeBorderBackground}"
-                                BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
-                                BorderThickness="1"
-                                Style="{StaticResource BorderStyle}">
+                            <Border Style="{StaticResource UnresponsiveServerBorderStyle}">
                                 <StackPanel Margin="4,8">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
