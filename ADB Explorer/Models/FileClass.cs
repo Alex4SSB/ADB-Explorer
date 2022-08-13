@@ -78,6 +78,18 @@ namespace ADB_Explorer.Models
             );
         }
 
+        public override string ToString()
+        {
+            if (TrashIndex is null)
+            {
+                return $"{DisplayName}\n{ModifiedTimeString}\n{TypeName}\n{SizeString}";
+            }
+            else
+            {
+                return $"{DisplayName}\n{TrashIndex.OriginalPath}\n{TrashIndex.ModifiedTimeString}\n{TypeName}\n{SizeString}\n{ModifiedTimeString}";
+            }
+        }
+
         private bool? isApk = null;
         public bool IsApk
         {

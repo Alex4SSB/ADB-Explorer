@@ -663,6 +663,16 @@ namespace ADB_Explorer
 
         private void LaunchSequence()
         {
+            var height = SystemParameters.PrimaryScreenHeight;
+            Dispatcher.BeginInvoke(() =>
+            {
+                Height = height * WINDOW_HEIGHT_RATIO;
+                Width = Height / WINDOW_WIDTH_RATIO;
+
+                if (Settings.MaxSearchBoxWidth >= DEFAULT_MAX_SEARCH_WIDTH)
+                    SearchColumn.Width = new(DEFAULT_MAX_SEARCH_WIDTH);
+            });
+
             LoadSettings();
             InitFileOpColumns();
 
@@ -967,7 +977,7 @@ namespace ADB_Explorer
             DrivesItemRepeater.Visibility = Visibility.Collapsed;
             ExplorerGrid.Visibility = Visibility.Visible;
             FileActions.IsExplorerView = true;
-            HomeButton.IsEnabled = DevicesObject.CurrentDevice.Drives.Any();
+            FileActions.HomeEnabled = DevicesObject.CurrentDevice.Drives.Any();
 
             return _navigateToPath(realPath, bfNavigated);
         }
@@ -1184,6 +1194,8 @@ namespace ADB_Explorer
         {
             if (path is null) return false;
             var realPath = FolderExists(path);
+            SearchBox.Clear();
+
             return realPath is null ? false : _navigateToPath(realPath, bfNavigated);
         }
 
@@ -2064,7 +2076,7 @@ namespace ADB_Explorer
             FileActions.PullEnabled =
             FileActions.DeleteEnabled =
             FileActions.RenameEnabled =
-            HomeButton.IsEnabled =
+            FileActions.HomeEnabled =
             FileActions.NewEnabled =
             FileActions.PasteEnabled =
             FileActions.UninstallVisible =
@@ -2075,6 +2087,8 @@ namespace ADB_Explorer
             FileActions.CopyPathEnabled =
             FileActions.UpdateModifiedEnabled =
             FileActions.ParentEnabled = false;
+
+            SearchBox.Clear();
             
             if (clearDevice)
             {
@@ -2169,6 +2183,23 @@ namespace ADB_Explorer
             PopulateButtons(TextHelper.GetAltText(PathBox));
             ResizeDetailedView();
             EnableSplitViewAnimation();
+            SearchBoxMaxWidth();
+        }
+
+        private void SearchBoxMaxWidth()
+        {
+            if (WindowState is WindowState.Maximized)
+            {
+                Settings.MaxSearchBoxWidth = SystemParameters.PrimaryScreenWidth * WIDE_WINDOW_SEARCH_WIDTH;
+            }
+            else if (Width > MIN_WINDOW_WIDTH_FOR_SEARCH_RATIO)
+            {
+                Settings.MaxSearchBoxWidth = Width * WIDE_WINDOW_SEARCH_WIDTH;
+            }
+            else
+            {
+                Settings.MaxSearchBoxWidth = Width * MAX_SEARCH_WIDTH_RATIO;
+            }
         }
 
         private void EnableSplitViewAnimation()
@@ -2389,7 +2420,7 @@ namespace ADB_Explorer
             if (FileActions.IsAppDrive)
             {
                 collectionView.Filter = Settings.ShowSystemPackages
-                    ? new(pkg => true)
+                    ? new(pkg => pkg.ToString().Contains(SearchBox.Text, StringComparison.OrdinalIgnoreCase))
                     : new(pkg => ((Package)pkg).Type is Package.PackageType.User);
 
                 ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
@@ -2409,7 +2440,7 @@ namespace ADB_Explorer
             }
         }
 
-        private static Predicate<object> HideFiles() => file =>
+        private Predicate<object> HideFiles() => file =>
         {
             if (file is not FileClass fileClass)
                 return false;
@@ -2420,9 +2451,12 @@ namespace ADB_Explorer
             return !IsHiddenRecycleItem(fileClass);
         };
 
-        private static bool IsHiddenRecycleItem(FileClass file)
+        private bool IsHiddenRecycleItem(FileClass file)
         {
             if (RECYCLE_PATHS.Contains(file.FullPath))
+                return true;
+
+            if (!file.ToString().Contains(SearchBox.Text, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -3599,6 +3633,25 @@ namespace ADB_Explorer
         {
             var items = selectedFiles;
             Task.Run(() => ShellFileOperation.ChangeDateFromName(CurrentADBDevice, items, DirList.FileList, Dispatcher));
+        }
+
+        private void MainWin_StateChanged(object sender, EventArgs e)
+        {
+            SearchBoxMaxWidth();
+        }
+
+        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            FilterHiddenFiles();
+        }
+
+        private void SearchBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key is Key.Escape)
+            {
+                SearchBox.Clear();
+                UnfocusPathBox();
+            }
         }
     }
 }

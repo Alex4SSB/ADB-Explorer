@@ -27,6 +27,7 @@
     MouseUp="Window_MouseUp"
     SizeChanged="Window_SizeChanged"
     SourceInitialized="Window_SourceInitialized"
+    StateChanged="MainWin_StateChanged"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
@@ -1374,6 +1375,12 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition
+                                x:Name="SearchColumn"
+                                Width="Auto"
+                                MinWidth="100"
+                                MaxWidth="{Binding Source={x:Static Member=models:Data.Settings}, Path=MaxSearchBoxWidth}" />
                         </Grid.ColumnDefinitions>
                         <Menu Margin="7,0,0,0">
                             <Menu.Resources>
@@ -1385,7 +1392,7 @@
                                 x:Name="HomeButton"
                                 helpers:StyleHelper.ContentAnimation="Bounce"
                                 Click="HomeButton_Click"
-                                IsEnabled="False"
+                                IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}"
                                 ToolTip="Device Drives (Home)">
                                 <MenuItem.Header>
                                     <ui:FontIcon FontSize="16" Glyph="&#xE80F;" />
@@ -1423,7 +1430,10 @@
                             </MenuItem>
                         </Menu>
 
-                        <Grid Grid.Column="1" Margin="6">
+                        <Grid
+                            Grid.Column="1"
+                            MinWidth="150"
+                            Margin="6,6,0,6">
                             <Grid.Resources>
                                 <Style TargetType="TextBlock">
                                     <Setter Property="VerticalAlignment" Value="Center" />
@@ -1432,6 +1442,7 @@
                             <TextBox
                                 x:Name="PathBox"
                                 VerticalAlignment="Center"
+                                d:Background="LightGray"
                                 helpers:TextHelper.AltText=""
                                 GotFocus="PathBox_GotFocus"
                                 IsEnabled="False"
@@ -1468,6 +1479,36 @@
                                     </Style>
                                 </Menu.Resources>
                             </Menu>
+                        </Grid>
+                        <GridSplitter
+                            Grid.Column="2"
+                            Width="6"
+                            Margin="0,6"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Stretch"
+                            Background="Transparent"
+                            Cursor="SizeWE"
+                            FocusVisualStyle="{x:Null}" />
+                        <Grid
+                            Grid.Column="3"
+                            Margin="0,6,6,6"
+                            ClipToBounds="True">
+                            <TextBox
+                                x:Name="SearchBox"
+                                Padding="30,5,6,6"
+                                d:Background="LightGray"
+                                KeyDown="SearchBox_KeyDown"
+                                ui:ControlHelper.PlaceholderText="Filter"
+                                IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}"
+                                Style="{StaticResource TextBoxFluentStyle}"
+                                TextChanged="SearchBox_TextChanged" />
+                            <ui:FontIcon
+                                Margin="6,0,0,0"
+                                HorizontalAlignment="Left"
+                                Glyph="&#xE71C;"
+                                IsHitTestVisible="False"
+                                Opacity="0.7"
+                                Style="{StaticResource GlyphFont}" />
                         </Grid>
                     </Grid>
                 </StackPanel>
@@ -2782,7 +2823,9 @@
                                         Margin="6,0,0,0"
                                         HorizontalAlignment="Left"
                                         Glyph="&#xE721;"
-                                        IsHitTestVisible="False" />
+                                        IsHitTestVisible="False"
+                                        Opacity="0.7"
+                                        Style="{StaticResource GlyphFont}" />
                                 </Grid>
                                 <Separator
                                     Grid.Row="1"

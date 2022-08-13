@@ -60,6 +60,10 @@ namespace ADB_Explorer.Models
                 Version = resV;
         }
 
+        public override string ToString()
+        {
+            return $"{Name}\n{Type}\n{Uid}\n{Version}";
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -316,28 +316,35 @@ namespace ADB_Explorer.Services
         public bool HideSettingsPane
         {
             get => hideSettingsPane;
-            set => Set(ref hideSettingsPane, value);
+            set => Set(ref hideSettingsPane, value, saveToDisk: false);
         }
 
         private bool sortedView = false;
         public bool SortedView
         {
             get => sortedView;
-            set => Set(ref sortedView, value);
+            set => Set(ref sortedView, value, saveToDisk: false);
         }
 
         private bool groupsExpanded = false;
         public bool GroupsExpanded
         {
             get => groupsExpanded;
-            set => Set(ref groupsExpanded, value);
+            set => Set(ref groupsExpanded, value, saveToDisk: false);
         }
 
         private string searchText = "";
         public string SearchText
         {
             get => searchText;
-            set => Set(ref searchText, value);
+            set => Set(ref searchText, value, saveToDisk: false);
+        }
+
+        private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_MAX_SEARCH_WIDTH;
+        public double MaxSearchBoxWidth
+        {
+            get => maxSearchBoxWidth;
+            set => Set(ref maxSearchBoxWidth, value, saveToDisk: false);
         }
 
 

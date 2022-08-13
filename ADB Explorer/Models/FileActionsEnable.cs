@@ -273,6 +273,13 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private bool homeEnabled;
+        public bool HomeEnabled
+        {
+            get => homeEnabled;
+            set => Set(ref homeEnabled, value);
+        }
+
         #endregion
 
         #region strings
