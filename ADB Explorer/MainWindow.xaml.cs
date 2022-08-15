@@ -755,7 +755,7 @@ namespace ADB_Explorer
                 if (query.Any())
                 {
                     item.TrashIndex = query.First();
-                    item.UpdateIcon();
+                    item.UpdateType();
                 }
             }
 

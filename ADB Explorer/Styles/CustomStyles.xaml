@@ -1722,4 +1722,38 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style x:Key="SearchIndicatorBorderStyle" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+                <Setter Property="CornerRadius" Value="3,0,0,3" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
+                <Setter Property="Background" Value="Transparent" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="SearchIndicatorIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
+                <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
+                <Setter Property="Opacity" Value="0.7" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                <Setter Property="Opacity" Value="1" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

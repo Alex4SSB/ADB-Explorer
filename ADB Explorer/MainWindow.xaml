@@ -1495,20 +1495,22 @@
                             ClipToBounds="True">
                             <TextBox
                                 x:Name="SearchBox"
-                                Padding="30,5,6,6"
+                                Padding="36,5,6,6"
                                 d:Background="LightGray"
-                                KeyDown="SearchBox_KeyDown"
                                 ui:ControlHelper.PlaceholderText="Filter"
                                 IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}"
+                                KeyDown="SearchBox_KeyDown"
                                 Style="{StaticResource TextBoxFluentStyle}"
                                 TextChanged="SearchBox_TextChanged" />
-                            <ui:FontIcon
-                                Margin="6,0,0,0"
+                            <Border
+                                Margin="0,1,0,1"
                                 HorizontalAlignment="Left"
-                                Glyph="&#xE71C;"
-                                IsHitTestVisible="False"
-                                Opacity="0.7"
-                                Style="{StaticResource GlyphFont}" />
+                                Style="{StaticResource SearchIndicatorBorderStyle}">
+                                <ui:FontIcon
+                                    Margin="6,0"
+                                    Glyph="&#xE71C;"
+                                    Style="{StaticResource SearchIndicatorIconStyle}" />
+                            </Border>
                         </Grid>
                     </Grid>
                 </StackPanel>

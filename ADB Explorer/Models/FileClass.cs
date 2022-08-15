@@ -225,7 +225,11 @@ namespace ADB_Explorer.Models
             };
         }
 
-        public void UpdateIcon() => Icon = GetIcon();
+        public void UpdateType()
+        {
+            TypeName = GetTypeName();
+            Icon = GetIcon();
+        }
 
         private string GetTypeName()
         {
