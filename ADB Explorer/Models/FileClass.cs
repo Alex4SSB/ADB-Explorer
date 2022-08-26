@@ -108,7 +108,6 @@ namespace ADB_Explorer.Models
 
         public bool IsHidden => FullName.StartsWith('.');
 
-        private string extension;
         public string Extension
         {
             get
@@ -116,10 +115,7 @@ namespace ADB_Explorer.Models
                 if (Type is not FileType.File || (IsHidden && FullName.Count(c => c == '.') == 1))
                     return "";
 
-                if (string.IsNullOrEmpty(extension))
-                    extension = System.IO.Path.GetExtension(FullName);
-
-                return extension;
+                return System.IO.Path.GetExtension(FullName);
             }
         }
 

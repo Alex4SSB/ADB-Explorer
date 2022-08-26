@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,9 +41,8 @@ namespace ADB_Explorer
         private readonly DispatcherTimer ServerWatchdogTimer = new();
         private readonly DispatcherTimer ConnectTimer = new();
         private readonly DispatcherTimer SplashTimer = new();
-        private Mutex connectTimerMutex = new();
-        private ScrollViewer ExplorerScroller;
-        private ThemeService themeService = new();
+        private readonly Mutex connectTimerMutex = new();
+        private readonly ThemeService themeService = new();
         private int clickCount = 0;
         private int firstSelectedRow = -1;
         public static MDNS MdnsService { get; set; } = new();
@@ -58,7 +56,6 @@ namespace ADB_Explorer
             {
                 if (_explorerContentPresenter is null && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border && border.Child is ScrollViewer scroller && scroller.Content is ItemsPresenter presenter)
                 {
-                    ExplorerScroller = scroller;
                     _explorerContentPresenter = presenter;
                 }
 
@@ -2863,6 +2860,8 @@ namespace ADB_Explorer
             }
 
             file.UpdatePath(newPath);
+            if (Settings.ShowExtensions)
+                file.UpdateType();
         }
 
         private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
