@@ -173,7 +173,7 @@ namespace ADB_Explorer.Services
             return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
         }
 
-        public static string EscapeAdbShellString(string str)
+        public static string EscapeAdbShellString(string str, char quotes = '"')
         {
             var result = string.Concat(str.Select(c =>
                 c switch
@@ -182,7 +182,7 @@ namespace ADB_Explorer.Services
                     _ => new string(c, 1)
                 }));
 
-            return $"\"{(result.StartsWith("\\~") ? result[1..] : result)}\"";
+            return $"{quotes}{(result.StartsWith("\\~") ? result[1..] : result)}{quotes}";
         }
 
         public static string EscapeAdbString(string str)

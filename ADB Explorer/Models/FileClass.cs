@@ -129,14 +129,11 @@ namespace ADB_Explorer.Models
             if (IsApk)
                 return "Android Application Package";
 
-            if (string.IsNullOrEmpty(fileName))
+            if (string.IsNullOrEmpty(fileName) || (IsHidden && FullName.Count(c => c == '.') == 1))
                 return "File";
 
             if (Extension.ToLower() == ".exe")
                 return "Windows Executable";
-
-            if (IsHidden && FullName.Count(c => c == '.') == 1)
-                return "File";
 
             var name = ShellInfoManager.GetShellFileType(fileName);
 

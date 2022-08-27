@@ -601,6 +601,23 @@ namespace ADB_Explorer
             FileActions.SubmenuUninstallEnabled = FileActions.IsTemp && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk);
 
             FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && selectedFiles.All(file => file.Type is FileType.File);
+
+            if (selectedFiles.Count() == 1 && selectedFiles.First().Extension.ToLower() == ".txt")
+            {
+                var text = "";
+                try
+                {
+                    text = ShellFileOperation.ReadAllText(CurrentADBDevice, selectedFiles.First().FullPath);
+                }
+                catch (Exception)
+                { }
+                
+                FileReaderTextbox.Text = text;
+                FileReaderGrid.Visible(true);
+                SaveReaderTextButton.Visible(false);
+            }
+            else
+                FileReaderGrid.Visible(false);
         }
 
         private void SetRowsRadius()
@@ -3182,6 +3199,9 @@ namespace ADB_Explorer
         {
             file.UpdatePath($"{CurrentPath}{(CurrentPath == "/" ? "" : "/")}{newName}");
 
+            if (Settings.ShowExtensions)
+                file.UpdateType();
+
             try
             {
                 if (file.Type is FileType.Folder)
@@ -3651,6 +3671,26 @@ namespace ADB_Explorer
                 SearchBox.Clear();
                 UnfocusPathBox();
             }
+        }
+
+        private void SaveReaderTextButton_Click(object sender, RoutedEventArgs e)
+        {
+            var file = selectedFiles.First();
+            string text = FileReaderTextbox.Text;
+
+            var writeTask = Task.Run(() =>
+            {
+                ShellFileOperation.SilentDelete(CurrentADBDevice, file);
+
+                ShellFileOperation.WriteLine(CurrentADBDevice, file.FullPath, ADBService.EscapeAdbShellString(text.Replace("\r", ""), '\''));
+            });
+
+            writeTask.ContinueWith((t) => Dispatcher.Invoke(() => SaveReaderTextButton.Visible(false)));
+        }
+
+        private void FileReaderTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SaveReaderTextButton.Visible(true);
         }
     }
 }

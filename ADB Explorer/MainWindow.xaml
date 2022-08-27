@@ -1748,6 +1748,63 @@
                                 IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
+                    <Grid x:Name="FileReaderGrid" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition
+                                Width="0.3*"
+                                MinWidth="80"
+                                MaxWidth="{Binding Source={x:Static Member=models:Data.Settings}, Path=MaxSearchBoxWidth}" />
+                        </Grid.ColumnDefinitions>
+                        <TextBox
+                            x:Name="FileReaderTextbox"
+                            Grid.Column="2"
+                            AcceptsReturn="True"
+                            FontFamily="{StaticResource ConsoleFont}"
+                            Style="{StaticResource TextBoxFluentStyle}"
+                            TextChanged="FileReaderTextbox_TextChanged"
+                            TextWrapping="Wrap" />
+                        <Border
+                            Grid.Column="2"
+                            BorderBrush="#FCCB58"
+                            BorderThickness="0,0,0,2"
+                            CornerRadius="4"
+                            Visibility="{Binding ElementName=SaveReaderTextButton, Path=Visibility}">
+                            <Border.Style>
+                                <Style TargetType="Border" />
+                            </Border.Style>
+                        </Border>
+                        <Button
+                            x:Name="SaveReaderTextButton"
+                            Grid.Column="2"
+                            Margin="6"
+                            Padding="4"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            Click="SaveReaderTextButton_Click"
+                            Opacity="0.8"
+                            ToolTip="Save Changes"
+                            Visibility="Collapsed">
+                            <ui:FontIcon Glyph="&#xE74E;" Style="{StaticResource GlyphFont}" />
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                                    <Style.Triggers>
+                                        <!--  <DataTrigger Binding="{Binding ElementName=FileReaderTextbox, Path=scroll}"  -->
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <GridSplitter
+                            Grid.Column="1"
+                            Width="6"
+                            Margin="0,0,-2,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Stretch"
+                            Background="Transparent"
+                            Cursor="SizeWE"
+                            FocusVisualStyle="{x:Null}" />
+                    </Grid>
                     <TextBox
                         x:Name="LogTextBox"
                         FontFamily="{StaticResource ConsoleFont}"
