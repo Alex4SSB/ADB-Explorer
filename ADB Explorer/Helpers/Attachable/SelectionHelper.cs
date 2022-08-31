@@ -114,6 +114,12 @@ namespace ADB_Explorer.Helpers
 
         public static void SingleSelect(this DataGrid dataGrid, Key key)
         {
+            if (dataGrid.Items.Count == 1 && dataGrid.SelectedIndex == -1)
+            {
+                dataGrid.SelectedIndex = 0;
+                return;
+            }
+
             dataGrid.SelectedIndex = GetCurrentSelectedIndex(dataGrid);
 
             if (key == Key.Up)
