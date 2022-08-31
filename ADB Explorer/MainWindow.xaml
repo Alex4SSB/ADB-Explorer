@@ -352,7 +352,11 @@
             Header="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathAction}"
             InputGestureText="Shift+Ctrl+C"
             IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}"
-            Style="{StaticResource ContextMenuCopyPathStyle}" />
+            Style="{StaticResource ContextMenuCopyPathStyle}">
+            <MenuItem.Icon>
+                <TextBlock Text="\\…" />
+            </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
             x:Key="UninstallMenuItem"
             x:Shared="False"

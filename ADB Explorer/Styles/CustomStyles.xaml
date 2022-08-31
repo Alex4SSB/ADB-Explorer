@@ -1716,12 +1716,6 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
-            </Setter.Value>
-        </Setter>
-    </Style>
     <Style x:Key="SearchIndicatorBorderStyle" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Style.Triggers>
