@@ -255,11 +255,11 @@ namespace ADB_Explorer.Models
             set => Set(ref refreshPackages, value);
         }
 
-        private bool customListingInProgress;
-        public bool CustomListingInProgress
+        private bool listingInProgress = false;
+        public bool ListingInProgress
         {
-            get => customListingInProgress;
-            set => Set(ref customListingInProgress, value);
+            get => listingInProgress;
+            set => Set(ref listingInProgress, value);
         }
 
         private bool updateModifiedEnabled;

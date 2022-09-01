@@ -297,11 +297,12 @@ namespace ADB_Explorer
                 DirectoryLoadingProgressBar.Visible(DirList.IsProgressVisible);
                 UnfinishedBlock.Visible(DirList.IsProgressVisible);
             }
-            else if (e.PropertyName == nameof(DirectoryLister.InProgress) && !DirList.InProgress)
+            else if (e.PropertyName == nameof(DirectoryLister.InProgress))
             {
-                if (FileActions.IsRecycleBin)
+                FileActions.ListingInProgress = DirList.InProgress;
+
+                if (FileActions.IsRecycleBin && !DirList.InProgress)
                 {
-                    FileActions.CustomListingInProgress = false;
                     EnableRecycleButtons();
                     UpdateIndexerFile();
                 }
@@ -1018,7 +1019,7 @@ namespace ADB_Explorer
 
         private void UpdatePackages(bool updateExplorer = false)
         {
-            FileActions.CustomListingInProgress = true;
+            FileActions.ListingInProgress = true;
 
             var version = DevicesObject.Current.AndroidVersion;
             var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
@@ -1042,7 +1043,7 @@ namespace ADB_Explorer
                         DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Package).ItemsCount = (ulong)Packages.Count;
                     }
 
-                    FileActions.CustomListingInProgress = false;
+                    FileActions.ListingInProgress = false;
                 });
             });
         }
@@ -1261,7 +1262,7 @@ namespace ADB_Explorer
 
             if (FileActions.IsRecycleBin)
             {
-                FileActions.CustomListingInProgress = true;
+                FileActions.ListingInProgress = true;
                 var recycleTask = Task.Run(() =>
                 {
                     string text = "";

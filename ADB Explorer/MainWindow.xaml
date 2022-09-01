@@ -1459,18 +1459,9 @@
                                 VerticalAlignment="Stretch"
                                 Background="Transparent"
                                 Foreground="#780078D7"
-                                IsHitTestVisible="False">
-                                <ui:ProgressBar.Style>
-                                    <Style BasedOn="{StaticResource DirectoryLoadingProgressStyle}" TargetType="ui:ProgressBar">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=MainWin, Path=DirectoryLister.IsProgressVisible}" Value="True">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ui:ProgressBar.Style>
-                            </ui:ProgressBar>
+                                IsHitTestVisible="False"
+                                Style="{StaticResource DirectoryLoadingProgressStyle}"
+                                Visibility="Collapsed" />
                             <Menu
                                 x:Name="PathMenu"
                                 Height="24"
@@ -1862,9 +1853,8 @@
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
-                                            <Condition Binding="{Binding ElementName=MainWin, Path=DirectoryLister.InProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
-                                            <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=CustomListingInProgress}" Value="False" />
+                                            <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=LogTextBox, Path=Visibility}" Value="Collapsed" />
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
