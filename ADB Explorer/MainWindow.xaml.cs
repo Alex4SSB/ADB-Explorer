@@ -520,7 +520,7 @@ namespace ADB_Explorer
                 switch (file.Type)
                 {
                     case FileType.File:
-                        if (Settings.PullOnDoubleClick)
+                        if (Settings.PullOnDoubleClick && !string.IsNullOrEmpty(Settings.DefaultFolder))
                             PullFiles(true);
                         break;
                     case FileType.Folder:
@@ -3707,6 +3707,8 @@ namespace ADB_Explorer
             {
                 FileActions.EditorText =
                 FileActions.OriginalEditorText = t.Result;
+
+                EditedFilePathTextBlock.Text = filePath;
             }));
         }
 

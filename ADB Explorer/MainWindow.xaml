@@ -1811,6 +1811,10 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
                             </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
                             <ui:SimpleStackPanel
                                 Margin="4"
                                 Orientation="Horizontal"
@@ -1839,8 +1843,17 @@
                                 </Button>
                             </ui:SimpleStackPanel>
                             <TextBox
+                                x:Name="EditedFilePathTextBlock"
+                                Grid.Column="1"
+                                Margin="2,0,6,0"
+                                IsReadOnly="True"
+                                Padding="5,5,6,6"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource TooltipTextBoxStyle}" />
+                            <TextBox
                                 x:Name="FileReaderTextbox"
                                 Grid.Row="1"
+                                Grid.ColumnSpan="2"
                                 d:Background="Gray"
                                 d:Text="Test"
                                 AcceptsReturn="True"
