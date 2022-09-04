@@ -603,16 +603,10 @@ namespace ADB_Explorer
 
             FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && selectedFiles.All(file => file.Type is FileType.File);
 
-            if (selectedFiles.Count() == 1 && selectedFiles.First().Extension.ToLower() == ".txt")
-            {
-                var text = "";
-                try
-                {
-                    text = ShellFileOperation.ReadAllText(CurrentADBDevice, selectedFiles.First().FullPath);
-                }
-                catch (Exception)
-                { }
-                
+            FileActions.EditFileEnabled = !FileActions.IsRecycleBin
+                && selectedFiles.Count() == 1
+                && selectedFiles.First().Type is FileType.File;
+
                 FileReaderTextbox.Text = text;
                 FileReaderGrid.Visible(true);
                 SaveReaderTextButton.Visible(false);
@@ -1757,6 +1751,10 @@ namespace ADB_Explorer
             else if (actualKey == Key.U && ctrl && FileActions.UpdateModifiedEnabled)
             {
                 UpdatedModifiedDates();
+            }
+            else if (actualKey == Key.E && ctrl && FileActions.EditFileEnabled)
+            {
+                OpenEditor();
             }
             else if (actualKey == Key.F10)
             { }
@@ -3686,12 +3684,43 @@ namespace ADB_Explorer
                 ShellFileOperation.WriteLine(CurrentADBDevice, file.FullPath, ADBService.EscapeAdbShellString(text.Replace("\r", ""), '\''));
             });
 
-            writeTask.ContinueWith((t) => Dispatcher.Invoke(() => SaveReaderTextButton.Visible(false)));
+            writeTask.ContinueWith((t) => Dispatcher.Invoke(() => FileActions.OriginalEditorText = FileActions.EditorText));
         }
 
-        private void FileReaderTextbox_TextChanged(object sender, TextChangedEventArgs e)
+        private void ContextMenuEditItem_Click(object sender, RoutedEventArgs e)
         {
-            SaveReaderTextButton.Visible(true);
+            OpenEditor();
+        }
+
+        private void OpenEditor()
+        {
+            FileReaderTextbox.Clear();
+            FileActions.IsEditorOpen = true;
+            
+            string filePath = selectedFiles.First().FullPath;
+
+            var readTask = Task.Run(() =>
+            {
+                var text = "";
+                try
+                {
+                    text = ShellFileOperation.ReadAllText(CurrentADBDevice, filePath);
+                }
+                catch (Exception)
+                { }
+                return text;
+            });
+
+            readTask.ContinueWith((t) => Dispatcher.Invoke(() =>
+            {
+                FileActions.EditorText =
+                FileActions.OriginalEditorText = t.Result;
+            }));
+        }
+
+        private void CloseEditorButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileActions.IsEditorOpen = false;
         }
     }
 }

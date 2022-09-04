@@ -280,6 +280,20 @@ namespace ADB_Explorer.Models
             set => Set(ref homeEnabled, value);
         }
 
+        private bool editorEnabled;
+        public bool IsEditorOpen
+        {
+            get => editorEnabled;
+            set => Set(ref editorEnabled, value);
+        }
+
+        private bool addToEditor;
+        public bool EditFileEnabled
+        {
+            get => addToEditor;
+            set => Set(ref addToEditor, value);
+        }
+
         #endregion
 
         #region strings
@@ -313,6 +327,28 @@ namespace ADB_Explorer.Models
             set => Set(ref copyPathAction, value);
         }
 
+        private string originalEditorText;
+        public string OriginalEditorText
+        {
+            get => originalEditorText;
+            set
+            {
+                if (Set(ref originalEditorText, value))
+                    OnPropertyChanged(nameof(IsEditorTextChanged));
+            }
+        }
+
+        private string editorText;
+        public string EditorText
+        {
+            get => editorText;
+            set
+            {
+                if (Set(ref editorText, value))
+                    OnPropertyChanged(nameof(IsEditorTextChanged));
+            }
+        }
+
         #endregion
 
         #region read only
@@ -327,6 +363,7 @@ namespace ADB_Explorer.Models
         public bool NameReadOnly => !RenameEnabled;
         public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
         public bool NewMenuVisible => !IsExplorerView || (!IsRecycleBin && !IsAppDrive);
+        public bool IsEditorTextChanged => OriginalEditorText != EditorText;
 
         #endregion
 

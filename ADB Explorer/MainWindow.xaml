@@ -571,6 +571,50 @@
                 </Style>
             </MenuItem.Style>
         </MenuItem>
+        <MenuItem
+            x:Key="ContextMenuEditItem"
+            x:Shared="False"
+            Click="ContextMenuEditItem_Click"
+            Header="Open In Editor"
+            InputGestureText="Ctrl+E"
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=FileEditEnabled}">
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=FileEditEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE70F;" />
+            </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem x:Key="ContextMenuMoreItem" Header="More">
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UpdateModifiedEnabled}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=FileEditEnabled}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE712;" />
+            </MenuItem.Icon>
+            <StaticResource ResourceKey="UpdateModifiedMenu" />
+            <StaticResource ResourceKey="ContextMenuEditItem" />
+        </MenuItem>
         <ContextMenu
             x:Key="RowContextMenu"
             helpers:SelectionHelper.MenuType="Context"
@@ -585,7 +629,7 @@
             <StaticResource ResourceKey="ContextMenuPasteItem" />
             <StaticResource ResourceKey="ContextMenuRenameItem" />
             <StaticResource ResourceKey="ContextMenuCopyPathItem" />
-            <StaticResource ResourceKey="UpdateModifiedMenu" />
+            <StaticResource ResourceKey="ContextMenuMoreItem" />
             <StaticResource ResourceKey="UninstallMenuItem" />
             <StaticResource ResourceKey="RestoreMenuItem" />
             <Separator Style="{StaticResource Separator3Style}" />
@@ -1317,6 +1361,7 @@
                         </MenuItem.Header>
                         <StaticResource ResourceKey="ContextMenuCopyPathItem" />
                         <StaticResource ResourceKey="UpdateModifiedMenu" />
+                        <StaticResource ResourceKey="ContextMenuEditItem" />
                         <Separator />
                         <StaticResource ResourceKey="PackageActionsItem" />
                     </MenuItem>
@@ -1743,43 +1788,81 @@
                                 IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Grid x:Name="FileReaderGrid" Visibility="Collapsed">
+                    <Grid x:Name="FileReaderGrid" d:Visibility="Visible">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorOpen}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition
                                 Width="0.3*"
-                                MinWidth="80"
+                                MinWidth="90"
                                 MaxWidth="{Binding Source={x:Static Member=models:Data.Settings}, Path=MaxSearchBoxWidth}" />
                         </Grid.ColumnDefinitions>
-                        <TextBox
-                            x:Name="FileReaderTextbox"
-                            Grid.Column="2"
-                            AcceptsReturn="True"
-                            FontFamily="{StaticResource ConsoleFont}"
-                            Style="{StaticResource TextBoxFluentStyle}"
-                            TextChanged="FileReaderTextbox_TextChanged"
-                            TextWrapping="Wrap" />
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <ui:SimpleStackPanel
+                                Margin="4"
+                                Orientation="Horizontal"
+                                Spacing="6">
+                                <Button
+                                    x:Name="CloseEditorButton"
+                                    Click="CloseEditorButton_Click"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    ToolTip="Close Editor">
+                                    <ui:FontIcon Glyph="&#xE711;" Style="{StaticResource DisabledButtonGlyphStyle}" />
+                                </Button>
+                                <Button
+                                    x:Name="SaveReaderTextButton"
+                                    Click="SaveReaderTextButton_Click"
+                                    ToolTip="Save Changes">
+                                    <Button.Style>
+                                        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
+                                                    <Setter Property="IsEnabled" Value="False" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                    <ui:FontIcon Glyph="&#xE74E;" Style="{StaticResource DisabledButtonGlyphStyle}" />
+                                </Button>
+                            </ui:SimpleStackPanel>
+                            <TextBox
+                                x:Name="FileReaderTextbox"
+                                Grid.Row="1"
+                                d:Background="Gray"
+                                d:Text="Test"
+                                AcceptsReturn="True"
+                                FontFamily="{StaticResource ConsoleFont}"
+                                Style="{StaticResource TextBoxFluentStyle}"
+                                Text="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                TextWrapping="Wrap" />
+                        </Grid>
                         <Border
                             Grid.Column="2"
                             BorderBrush="#FCCB58"
-                            BorderThickness="0,0,0,2"
-                            Style="{StaticResource BorderStyle}"
-                            Visibility="{Binding ElementName=SaveReaderTextButton, Path=Visibility}" />
-                        <Button
-                            x:Name="SaveReaderTextButton"
-                            Grid.Column="2"
-                            Margin="6"
-                            Padding="4"
-                            HorizontalAlignment="Right"
-                            VerticalAlignment="Bottom"
-                            Click="SaveReaderTextButton_Click"
-                            Opacity="0.8"
-                            Style="{StaticResource AccentButtonStyle}"
-                            ToolTip="Save Changes"
-                            Visibility="Collapsed">
-                            <ui:FontIcon Glyph="&#xE74E;" Style="{StaticResource GlyphFont}" />
-                        </Button>
+                            BorderThickness="0,0,0,2">
+                            <Border.Style>
+                                <Style BasedOn="{StaticResource BorderStyle}" TargetType="Border">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
                         <GridSplitter
                             Grid.Column="1"
                             Width="6"
