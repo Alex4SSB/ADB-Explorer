@@ -605,14 +605,7 @@ namespace ADB_Explorer
 
             FileActions.EditFileEnabled = !FileActions.IsRecycleBin
                 && selectedFiles.Count() == 1
-                && selectedFiles.First().Type is FileType.File;
-
-                FileReaderTextbox.Text = text;
-                FileReaderGrid.Visible(true);
-                SaveReaderTextButton.Visible(false);
-            }
-            else
-                FileReaderGrid.Visible(false);
+                && selectedFiles.First().Type is FileType.File;            
         }
 
         private void SetRowsRadius()
@@ -3694,7 +3687,6 @@ namespace ADB_Explorer
 
         private void OpenEditor()
         {
-            FileReaderTextbox.Clear();
             FileActions.IsEditorOpen = true;
             
             string filePath = selectedFiles.First().FullPath;
