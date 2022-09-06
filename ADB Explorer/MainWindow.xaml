@@ -354,7 +354,7 @@
             IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}"
             Style="{StaticResource ContextMenuCopyPathStyle}">
             <MenuItem.Icon>
-                <TextBlock Text="\\…" />
+                <TextBlock Text="\\.." />
             </MenuItem.Icon>
         </MenuItem>
         <MenuItem
@@ -577,14 +577,14 @@
             Click="ContextMenuEditItem_Click"
             Header="Open In Editor"
             InputGestureText="Ctrl+E"
-            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=FileEditEnabled}">
+            IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditFileEnabled}">
             <MenuItem.Style>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                     <Style.Triggers>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=FileEditEnabled}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditFileEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </MultiDataTrigger>
@@ -602,7 +602,7 @@
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UpdateModifiedEnabled}" Value="False" />
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=FileEditEnabled}" Value="False" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditFileEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Visibility" Value="Collapsed" />
                         </MultiDataTrigger>
@@ -1807,75 +1807,47 @@
                                 MaxWidth="{Binding Source={x:Static Member=models:Data.Settings}, Path=MaxSearchBoxWidth}" />
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="2">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <ui:SimpleStackPanel
-                                Margin="4"
-                                Orientation="Horizontal"
-                                Spacing="6">
-                                <Button
-                                    x:Name="CloseEditorButton"
-                                    Click="CloseEditorButton_Click"
-                                    Style="{StaticResource AccentButtonStyle}"
-                                    ToolTip="Close Editor">
-                                    <ui:FontIcon Glyph="&#xE711;" Style="{StaticResource DisabledButtonGlyphStyle}" />
-                                </Button>
-                                <Button
-                                    x:Name="SaveReaderTextButton"
-                                    Click="SaveReaderTextButton_Click"
-                                    ToolTip="Save Changes">
-                                    <Button.Style>
-                                        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
-                                                    <Setter Property="IsEnabled" Value="False" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Button.Style>
-                                    <ui:FontIcon Glyph="&#xE74E;" Style="{StaticResource DisabledButtonGlyphStyle}" />
-                                </Button>
-                            </ui:SimpleStackPanel>
-                            <TextBox
-                                x:Name="EditedFilePathTextBlock"
-                                Grid.Column="1"
-                                Margin="2,0,6,0"
-                                IsReadOnly="True"
-                                Padding="5,5,6,6"
-                                VerticalAlignment="Center"
-                                Style="{StaticResource TooltipTextBoxStyle}" />
-                            <TextBox
-                                x:Name="FileReaderTextbox"
-                                Grid.Row="1"
-                                Grid.ColumnSpan="2"
-                                d:Background="Gray"
-                                d:Text="Test"
-                                AcceptsReturn="True"
-                                FontFamily="{StaticResource ConsoleFont}"
-                                Style="{StaticResource TextBoxFluentStyle}"
-                                Text="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                TextWrapping="Wrap" />
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Border Style="{StaticResource EditorControlsBorderStyle}">
+                                    <Grid Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <ui:SimpleStackPanel
+                                            Margin="4"
+                                            Orientation="Horizontal"
+                                            Spacing="6">
+                                            <Button
+                                                x:Name="CloseEditorButton"
+                                                Click="CloseEditorButton_Click"
+                                                Style="{StaticResource AccentButtonStyle}"
+                                                ToolTip="Close Editor">
+                                                <ui:FontIcon Glyph="&#xE711;" Style="{StaticResource DisabledButtonGlyphStyle}" />
+                                            </Button>
+                                            <Button Click="SaveReaderTextButton_Click" Style="{StaticResource SaveEditorTextButtonStyle}" />
+                                        </ui:SimpleStackPanel>
+                                        <TextBox Grid.Column="1" Style="{StaticResource EditorFilePathStyle}" />
+                                    </Grid>
+                                </Border>
+                                <TextBox Grid.Row="1" Style="{StaticResource EditorTextBoxStyle}" />
+                            </Grid>
+                            <Border BorderBrush="#FCCB58" BorderThickness="0,0,0,2">
+                                <Border.Style>
+                                    <Style BasedOn="{StaticResource BorderStyle}" TargetType="Border">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
                         </Grid>
-                        <Border
-                            Grid.Column="2"
-                            BorderBrush="#FCCB58"
-                            BorderThickness="0,0,0,2">
-                            <Border.Style>
-                                <Style BasedOn="{StaticResource BorderStyle}" TargetType="Border">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
-                        </Border>
                         <GridSplitter
                             Grid.Column="1"
                             Width="6"

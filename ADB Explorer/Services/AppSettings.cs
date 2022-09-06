@@ -19,11 +19,11 @@ namespace ADB_Explorer.Services
             set
             {
                 if (Set(ref defaultFolder, value))
-                    OnPropertyChanged(nameof(EnableDoubleClickPull));
+                    OnPropertyChanged(nameof(IsPullOnDoubleClickEnabled));
             }
         }
 
-        public bool EnableDoubleClickPull => !string.IsNullOrEmpty(DefaultFolder);
+        public bool IsPullOnDoubleClickEnabled => !string.IsNullOrEmpty(DefaultFolder);
 
         private string manualAdbPath;
         public string ManualAdbPath
@@ -35,13 +35,6 @@ namespace ADB_Explorer.Services
         #endregion
 
         #region File Behavior
-
-        private bool pullOnDoubleClick;
-        public bool PullOnDoubleClick
-        {
-            get => Get(ref pullOnDoubleClick, false);
-            set => Set(ref pullOnDoubleClick, value);
-        }
 
         private bool showExtensions;
         public bool ShowExtensions
@@ -62,6 +55,17 @@ namespace ADB_Explorer.Services
         {
             get => Get(ref showHiddenItems, true);
             set => Set(ref showHiddenItems, value);
+        }
+
+        #endregion
+
+        #region Double Click
+
+        private DoubleClickAction doubleClick;
+        public DoubleClickAction DoubleClick
+        {
+            get => Get(ref doubleClick, DoubleClickAction.pull);
+            set => Set(ref doubleClick, value);
         }
 
         #endregion

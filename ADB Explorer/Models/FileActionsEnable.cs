@@ -349,6 +349,13 @@ namespace ADB_Explorer.Models
             }
         }
 
+        private string editorFilePath;
+        public string EditorFilePath
+        {
+            get => editorFilePath;
+            set => Set(ref editorFilePath, value);
+        }
+
         #endregion
 
         #region read only

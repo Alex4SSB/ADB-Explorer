@@ -13,4 +13,10 @@
         light,
         dark,
     }
+
+    public enum DoubleClickAction
+    {
+        pull,
+        edit,
+    }
 }

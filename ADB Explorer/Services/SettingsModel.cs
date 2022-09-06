@@ -66,7 +66,11 @@ namespace ADB_Explorer.Services
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), "Show File Name Extensions", "File Behavior"),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowHiddenItems)), "Show Hidden Items", "File Behavior"),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowSystemPackages)), "Show System Apps", "File Behavior", visibleProp: appSettings.GetProperty(nameof(Settings.EnableApk))),
-                    new BoolSetting(appSettings.GetProperty(nameof(Settings.PullOnDoubleClick)), "Pull To Default Folder On Double-Click", "File Behavior", enableProp: appSettings.GetProperty(nameof(Settings.EnableDoubleClickPull))),
+                }),
+                new SettingsSeparator(),
+                new SettingsGroup("File Double Click", new()
+                {
+                    new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() { { DoubleClickAction.pull, "Pull To Default Folder" }, { DoubleClickAction.edit, "Open In Editor" } }),
                 }),
                 new SettingsSeparator(),
                 new SettingsGroup("Working Directories", new()
@@ -77,7 +81,7 @@ namespace ADB_Explorer.Services
                 new SettingsSeparator(),
                 new SettingsGroup("Theme", new()
                 {
-                    new EnumSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() { { AppTheme.light, "Light" }, { AppTheme.dark, "Dark" }, { AppTheme.windowsDefault, "Windows Default" } }),
+                    new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() { { AppTheme.light, "Light" }, { AppTheme.dark, "Dark" }, { AppTheme.windowsDefault, "Windows Default" } }),
                 }),
                 new SettingsSeparator(),
                 new SettingsGroup("Graphics", new()
@@ -275,11 +279,9 @@ namespace ADB_Explorer.Services
 
         public List<EnumRadioButton> Buttons { get; } = new();
 
-        public EnumSetting(PropertyInfo valueProp, string description, Dictionary<AppTheme, string> enumNames, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
+        public EnumSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
             : base(valueProp, description, groupName, enableProp, visibleProp, commands)
-        {
-            Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
-        }
+        { }
 
         protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -287,6 +289,24 @@ namespace ADB_Explorer.Services
             {
                 IsExpanded = !string.IsNullOrEmpty(Settings.SearchText) && Buttons.Any(button => button.Name.ToLower().Contains(Settings.SearchText.ToLower()));
             }
+        }
+    }
+
+    public class ThemeSetting : EnumSetting
+    {
+        public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppTheme, string> enumNames, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
+            : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+        {
+            Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
+        }
+    }
+
+    public class DoubleClickSetting : EnumSetting
+    {
+        public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<DoubleClickAction, string> enumNames, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
+            : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+        {
+            Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
         }
     }
 

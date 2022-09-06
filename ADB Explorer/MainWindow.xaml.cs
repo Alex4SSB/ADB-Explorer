@@ -520,8 +520,17 @@ namespace ADB_Explorer
                 switch (file.Type)
                 {
                     case FileType.File:
-                        if (Settings.PullOnDoubleClick && !string.IsNullOrEmpty(Settings.DefaultFolder))
-                            PullFiles(true);
+                        switch (Settings.DoubleClick)
+                        {
+                            case DoubleClickAction.pull when Settings.IsPullOnDoubleClickEnabled:
+                                PullFiles(true);
+                                break;
+                            case DoubleClickAction.edit when FileActions.EditFileEnabled:
+                                OpenEditor();
+                                break;
+                            default:
+                                break;
+                        }
                         break;
                     case FileType.Folder:
                         NavigateToPath(file.FullPath);
@@ -3668,7 +3677,7 @@ namespace ADB_Explorer
         private void SaveReaderTextButton_Click(object sender, RoutedEventArgs e)
         {
             var file = selectedFiles.First();
-            string text = FileReaderTextbox.Text;
+            string text = FileActions.EditorText;
 
             var writeTask = Task.Run(() =>
             {
@@ -3687,16 +3696,21 @@ namespace ADB_Explorer
 
         private void OpenEditor()
         {
+            if (FileActions.IsEditorOpen)
+            {
+                FileActions.IsEditorOpen = false;
+                return;
+            }
             FileActions.IsEditorOpen = true;
             
-            string filePath = selectedFiles.First().FullPath;
+            FileActions.EditorFilePath = selectedFiles.First().FullPath;
 
             var readTask = Task.Run(() =>
             {
                 var text = "";
                 try
                 {
-                    text = ShellFileOperation.ReadAllText(CurrentADBDevice, filePath);
+                    text = ShellFileOperation.ReadAllText(CurrentADBDevice, FileActions.EditorFilePath);
                 }
                 catch (Exception)
                 { }
@@ -3707,8 +3721,6 @@ namespace ADB_Explorer
             {
                 FileActions.EditorText =
                 FileActions.OriginalEditorText = t.Result;
-
-                EditedFilePathTextBlock.Text = filePath;
             }));
         }
 
