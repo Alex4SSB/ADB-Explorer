@@ -11,6 +11,7 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="4" />
+                <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="True" />
                 <Setter Property="Template">
                     <!--  Template copied from ModernWPF to be modified  -->
                     <Setter.Value>
@@ -115,12 +116,13 @@
                                     Padding="{TemplateBinding Padding}"
                                     HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    ui:ScrollViewerHelper.AutoHideScrollBars="{TemplateBinding ui:ScrollViewerHelper.AutoHideScrollBars}"
                                     Focusable="False"
                                     HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                     IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
                                     IsTabStop="False"
                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                    Style="{DynamicResource TextControlContentHostStyle}"
+                                    Style="{DynamicResource ScrollViewerStyle}"
                                     VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
                                 <TextBlock
                                     x:Name="PlaceholderTextContentPresenter"

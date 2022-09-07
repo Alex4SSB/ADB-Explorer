@@ -1736,6 +1736,13 @@
         <Setter Property="Padding" Value="1,1,0,0" />
         <Setter Property="Margin" Value="0,0,0,-10" />
         <Setter Property="BorderThickness" Value="1" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                <Setter Property="Background" Value="Gray" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="BorderThickness" Value="1,1,1,0" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="EditorTextBoxStyle"
@@ -1745,6 +1752,7 @@
         <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
     </Style>
     <Style
         x:Key="EditorFilePathStyle"
@@ -1771,5 +1779,14 @@
             </Setter.Value>
         </Setter>
         <Setter Property="ToolTip" Value="Save Changes" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style x:Key="EditorGridStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,0,0,10" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                <Setter Property="Margin" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

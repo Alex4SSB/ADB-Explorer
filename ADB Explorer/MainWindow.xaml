@@ -1813,7 +1813,7 @@
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Border Style="{StaticResource EditorControlsBorderStyle}">
-                                    <Grid Margin="0,0,0,10">
+                                    <Grid Style="{StaticResource EditorGridStyle}">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />

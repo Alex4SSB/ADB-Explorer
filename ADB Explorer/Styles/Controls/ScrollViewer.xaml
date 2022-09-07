@@ -158,7 +158,13 @@
         </Style.Triggers>
     </Style>
 
-    <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />
+    <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 
     <Style
         x:Key="TextControlContentHostStyle"
