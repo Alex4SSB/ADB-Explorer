@@ -93,6 +93,8 @@ namespace ADB_Explorer
 
         private IEnumerable<Package> selectedPackages => FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : null;
 
+        private string prevPath = "";
+
         public MainWindow()
         {
             InitializeComponent();
@@ -300,10 +302,22 @@ namespace ADB_Explorer
             {
                 FileActions.ListingInProgress = DirList.InProgress;
 
-                if (FileActions.IsRecycleBin && !DirList.InProgress)
+                if (!DirList.InProgress)
                 {
-                    EnableRecycleButtons();
-                    UpdateIndexerFile();
+                    if (FileActions.IsRecycleBin)
+                    {
+                        EnableRecycleButtons();
+                        UpdateIndexerFile();
+                    }
+
+                    if (!string.IsNullOrEmpty(prevPath))
+                    {
+                        var prevItem = DirList.FileList.Where(item => item.FullPath == prevPath);
+                        if (prevItem.Any())
+                        {
+                            ExplorerGrid.SelectedIndex = ExplorerGrid.Items.IndexOf(prevItem.First());
+                        }
+                    }
                 }
             }
         }
@@ -1190,8 +1204,17 @@ namespace ADB_Explorer
 
         private bool _navigateToPath(string realPath, bool bfNavigated = false)
         {
-            if (!bfNavigated)
+            if (bfNavigated)
+                prevPath = CurrentPath;
+            else
+            {
                 NavHistory.Navigate(realPath);
+
+                SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);
+                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, -1);
+
+                prevPath = "";
+            }
 
             ExplorerGrid.Focus();
             UpdateNavButtons();
