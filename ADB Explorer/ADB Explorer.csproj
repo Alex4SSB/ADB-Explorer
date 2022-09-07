@@ -5,7 +5,7 @@
     <TargetFramework>net6.0-windows10.0.22000.0</TargetFramework>
     <RootNamespace>ADB_Explorer</RootNamespace>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>adb_explorer_icon_v4_icons8_combined.ico</ApplicationIcon>
+    <ApplicationIcon>adb_explorer_icon_v5_icons8_combined.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>AnyCPU;x64</Platforms>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
@@ -61,7 +61,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Update="adb_explorer_icon_v4_icons8_combined.ico">
+    <None Update="adb_explorer_icon_v5_icons8_combined.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
