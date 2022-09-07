@@ -267,16 +267,6 @@
                                                 Value="{TemplateBinding HorizontalOffset}" />
                                         </Grid>
                                     </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <MultiDataTrigger>
-                                            <MultiDataTrigger.Conditions>
-                                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ScrollViewerHelper.AutoHideScrollBars)}" Value="True" />
-                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
-                                            </MultiDataTrigger.Conditions>
-                                            <Setter TargetName="PART_VerticalScrollBar" Property="ui:ScrollBarHelper.IndicatorMode" Value="None" />
-                                            <Setter TargetName="PART_HorizontalScrollBar" Property="ui:ScrollBarHelper.IndicatorMode" Value="None" />
-                                        </MultiDataTrigger>
-                                    </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </ScrollViewer.Template>
                             <ItemsPresenter SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
@@ -405,6 +395,14 @@
                                             <Setter TargetName="ColumnHeadersAndRowsSeparator" Property="Height" Value="1" />
                                             <Setter TargetName="PART_ScrollContentPresenter" Property="Margin" Value="0" />
                                         </DataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding ElementName=PART_VerticalScrollBar, Path=Visibility}" Value="Visible" />
+                                                <Condition Binding="{Binding ElementName=PART_HorizontalScrollBar, Path=Visibility}" Value="Visible" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter TargetName="PART_VerticalScrollBar" Property="Margin" Value="-16,0,0,16" />
+                                            <Setter TargetName="PART_HorizontalScrollBar" Property="Margin" Value="0,-16,16,0" />
+                                        </MultiDataTrigger>
                                     </ControlTemplate.Triggers>
                                 </ControlTemplate>
                             </ScrollViewer.Template>
