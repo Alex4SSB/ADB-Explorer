@@ -238,7 +238,6 @@ namespace ADB_Explorer
             {
                 case nameof(AppSettings.ForceFluentStyles):
                     SetSymbolFont();
-                    SetRowsRadius();
                     PopulateButtons(CurrentPath);
                     break;
                 case nameof(AppSettings.Theme):
@@ -566,7 +565,6 @@ namespace ADB_Explorer
 
         private void UpdateFileActions()
         {
-            SetRowsRadius();
             FileActions.UninstallPackageEnabled = FileActions.IsAppDrive && selectedPackages.Any();
             FileActions.ContextPushPackagesEnabled = FileActions.IsAppDrive && !selectedPackages.Any();
             if (FileActions.IsAppDrive)
@@ -615,26 +613,6 @@ namespace ADB_Explorer
             FileActions.EditFileEnabled = !FileActions.IsRecycleBin
                 && selectedFiles.Count() == 1
                 && selectedFiles.First().Type is FileType.File;            
-        }
-
-        private void SetRowsRadius()
-        {
-            var radius = Settings.UseFluentStyles ? 2 : 0;
-
-            var selectedRows = ExplorerGrid.SelectedCells.Select(cell => DataGridRow.GetRowContainingElement(CellConverter.GetDataGridCell(cell))).Distinct().Where(row => row is not null);
-            foreach (var item in selectedRows)
-            {
-                int topRadius = 0;
-                int bottomRadius = 0;
-
-                if (!selectedRows.Any(row => row.GetIndex() == item.GetIndex() - 1))
-                    topRadius = radius;
-
-                if (!selectedRows.Any(row => row.GetIndex() == item.GetIndex() + 1))
-                    bottomRadius = radius;
-
-                ControlHelper.SetCornerRadius(item, new CornerRadius(topRadius, topRadius, bottomRadius, bottomRadius));
-            }
         }
 
         private bool IsPasteEnabled(bool ignoreSelected = false, bool isContextMenu = false)
