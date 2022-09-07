@@ -4,6 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+
+    <StreamGeometry x:Key="Cancel">M 10.888672 10 L 17.626953 16.748047 L 16.748047 17.626953 L 10 10.888672 L 3.251953 17.626953 L 2.373047 16.748047 L 9.111328 10 L 2.373047 3.251953 L 3.251953 2.373047 L 10 9.111328 L 16.748047 2.373047 L 17.626953 3.251953 Z</StreamGeometry>
+
     <Style
         x:Key="TextBoxFluentStyle"
         BasedOn="{StaticResource DefaultTextBoxStyle}"
@@ -16,50 +19,6 @@
                     <!--  Template copied from ModernWPF to be modified  -->
                     <Setter.Value>
                         <ControlTemplate TargetType="TextBox">
-                            <ControlTemplate.Resources>
-                                <Style x:Key="DeleteButtonStyle" TargetType="Button">
-                                    <Setter Property="Template">
-                                        <Setter.Value>
-                                            <ControlTemplate TargetType="Button">
-                                                <ControlTemplate.Resources>
-                                                    <StreamGeometry x:Key="Cancel">M 10.888672 10 L 17.626953 16.748047 L 16.748047 17.626953 L 10 10.888672 L 3.251953 17.626953 L 2.373047 16.748047 L 9.111328 10 L 2.373047 3.251953 L 3.251953 2.373047 L 10 9.111328 L 16.748047 2.373047 L 17.626953 3.251953 Z</StreamGeometry>
-                                                </ControlTemplate.Resources>
-                                                <Border
-                                                    x:Name="ButtonLayoutGrid"
-                                                    Background="{DynamicResource TextControlButtonBackground}"
-                                                    BorderBrush="{DynamicResource TextControlButtonBorderBrush}"
-                                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
-                                                    <ui:FontIconFallback
-                                                        x:Name="GlyphElement"
-                                                        HorizontalAlignment="Center"
-                                                        VerticalAlignment="Center"
-                                                        Data="{StaticResource Cancel}"
-                                                        FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                                                        FontSize="12"
-                                                        FontStyle="Normal"
-                                                        Foreground="{DynamicResource TextControlButtonForeground}" />
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="true">
-                                                        <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource TextControlButtonBackgroundPointerOver}" />
-                                                        <Setter TargetName="ButtonLayoutGrid" Property="BorderBrush" Value="{DynamicResource TextControlButtonBorderBrushPointerOver}" />
-                                                        <Setter TargetName="GlyphElement" Property="Foreground" Value="{DynamicResource TextControlButtonForegroundPointerOver}" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsPressed" Value="true">
-                                                        <Setter TargetName="ButtonLayoutGrid" Property="Background" Value="{DynamicResource TextControlButtonBackgroundPressed}" />
-                                                        <Setter TargetName="ButtonLayoutGrid" Property="BorderBrush" Value="{DynamicResource TextControlButtonBorderBrushPressed}" />
-                                                        <Setter TargetName="GlyphElement" Property="Foreground" Value="{DynamicResource TextControlButtonForegroundPressed}" />
-                                                    </Trigger>
-                                                    <Trigger Property="IsEnabled" Value="false">
-                                                        <Setter TargetName="ButtonLayoutGrid" Property="Opacity" Value="0" />
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </ControlTemplate.Resources>
                             <Grid SnapsToDevicePixels="True">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
@@ -140,18 +99,22 @@
                                     x:Name="DeleteButton"
                                     Grid.Row="1"
                                     Grid.Column="1"
-                                    MinWidth="34"
-                                    Padding="{DynamicResource HelperButtonThemePadding}"
-                                    VerticalAlignment="Stretch"
-                                    ui:ControlHelper.CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius,
-                                                                                    Converter={StaticResource RightCornerRadiusFilterConverter}}"
+                                    Margin="0,0,6,0"
+                                    Padding="8,5,8,4"
+                                    VerticalAlignment="Center"
                                     ui:TextBoxHelper.IsDeleteButton="True"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     Focusable="False"
                                     FontSize="{TemplateBinding FontSize}"
                                     IsTabStop="False"
-                                    Style="{StaticResource DeleteButtonStyle}"
-                                    Visibility="Collapsed" />
+                                    Visibility="Collapsed">
+                                    <ui:FontIconFallback
+                                        Data="{StaticResource Cancel}"
+                                        FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                                        FontSize="12" />
+                                </Button>
                                 <ContentPresenter
                                     x:Name="DescriptionPresenter"
                                     Grid.Row="2"
