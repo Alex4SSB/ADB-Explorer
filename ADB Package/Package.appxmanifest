@@ -9,7 +9,7 @@
   <Identity
     Name="57163AlexSSB.ADBExplorer"
     Publisher="CN=23CA18F3-0DFA-4F77-B8D7-9EF595185D27"
-    Version="0.7.6.0" />
+    Version="0.7.7.0" />
 
   <Properties>
     <DisplayName>ADB Explorer</DisplayName>
