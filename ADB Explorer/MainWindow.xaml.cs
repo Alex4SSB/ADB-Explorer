@@ -605,8 +605,8 @@ namespace ADB_Explorer
             FileActions.DeleteAction = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
             FileActions.RestoreAction = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
 
-            FileActions.PullEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && FileActions.IsRegularItem;
-            FileActions.ContextPushEnabled = !FileActions.IsRecycleBin && (!selectedFiles.Any() || (selectedFiles.Count() == 1 && selectedFiles.First().IsDirectory));
+            FileActions.PullEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && selectedFiles.Any() && FileActions.IsRegularItem;
+            FileActions.ContextPushEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && (!selectedFiles.Any() || (selectedFiles.Count() == 1 && selectedFiles.First().IsDirectory));
 
             FileActions.RenameEnabled = !FileActions.IsRecycleBin && selectedFiles.Count() == 1 && FileActions.IsRegularItem;
 
@@ -678,6 +678,7 @@ namespace ADB_Explorer
 
             LoadSettings();
             InitFileOpColumns();
+            VerifyProgressRedirection();
 
             if (Settings.CheckForUpdates is true)
                 CheckForUpdates(Dispatcher);
@@ -787,6 +788,21 @@ namespace ADB_Explorer
                 SettingsList.ItemsSource = UISettings.GroupedSettings;
                 SortedSettings.ItemsSource = UISettings.SortSettings;
             });
+        }
+
+        private void VerifyProgressRedirection()
+        {
+            if (!File.Exists($"{Environment.CurrentDirectory}\\AdbProgressRedirection.exe"))
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    DevicesSplitView.IsPaneOpen = false;
+                    DialogService.ShowMessage("AdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease reinstall the app to fix this issue.",
+                                              "Missing Progress Redirection",
+                                              DialogService.DialogIcon.Critical);
+                    FileActions.PushPullEnabled = false;
+                });
+            }
         }
 
         private void SetSymbolFont()
@@ -1239,7 +1255,7 @@ namespace ADB_Explorer
             FileActions.PushFilesFoldersEnabled =
             FileActions.ContextNewEnabled =
             FileActions.ContextPushEnabled =
-            FileActions.NewEnabled = !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
+            FileActions.NewEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
             OriginalPath.Visibility =
             OriginalDate.Visibility = Visible(FileActions.IsRecycleBin);
@@ -1312,6 +1328,7 @@ namespace ADB_Explorer
 
             ExplorerGrid.ItemsSource = DirList.FileList;
             FilterHiddenFiles();
+            UpdateFileActions();
             return true;
         }
 
@@ -2088,7 +2105,6 @@ namespace ADB_Explorer
             DirList?.FileList?.Clear();
             Packages.Clear();
             FileActions.PushFilesFoldersEnabled =
-            FileActions.PushPackageEnabled =
             FileActions.PullEnabled =
             FileActions.DeleteEnabled =
             FileActions.RenameEnabled =
@@ -2104,6 +2120,8 @@ namespace ADB_Explorer
             FileActions.UpdateModifiedEnabled =
             FileActions.ParentEnabled = false;
 
+            FileActions.PushPackageEnabled = Settings.EnableApk;
+
             SearchBox.Clear();
             
             if (clearDevice)
@@ -2112,6 +2130,7 @@ namespace ADB_Explorer
                 CurrentPath = null;
                 CurrentDeviceDetailsPanel.DataContext = null;
                 TextHelper.SetAltText(PathBox, "");
+                FileActions.PushPackageEnabled =
                 PathBox.IsEnabled =
                 BackButton.IsEnabled =
                 ForwardButton.IsEnabled = false;

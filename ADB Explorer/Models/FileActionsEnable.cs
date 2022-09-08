@@ -10,7 +10,14 @@ namespace ADB_Explorer.Models
 
         #region booleans
 
-        private bool pushFilesFoldersEnabled;
+        private bool pushPullEnabled = true;
+        public bool PushPullEnabled
+        {
+            get => pushPullEnabled;
+            set => Set(ref pushPullEnabled, value);
+        }
+
+        private bool pushFilesFoldersEnabled = false;
         public bool PushFilesFoldersEnabled
         {
             get => pushFilesFoldersEnabled;

@@ -214,7 +214,7 @@ namespace ADB_Explorer.Services
         {
             get
             {
-                if (Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32")
+                if (IsAppDeployed)
                     return null;
 
                 return Get(ref checkForUpdates, true);
@@ -350,6 +350,8 @@ namespace ADB_Explorer.Services
             get => maxSearchBoxWidth;
             set => Set(ref maxSearchBoxWidth, value, saveToDisk: false);
         }
+
+        public static bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
 
         public event PropertyChangedEventHandler PropertyChanged;

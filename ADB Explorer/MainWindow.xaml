@@ -1160,7 +1160,6 @@
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
                     <MenuItem
-                        x:Name="PullMenuButton"
                         Click="PullMenuButton_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PullEnabled}"
                         ToolTip="Pull (Alt+C)">
@@ -1175,7 +1174,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="PushMenuButton"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PushEnabled}"
                         Resources="{StaticResource TopMenuStyles}"
                         ToolTip="Push">
@@ -1196,10 +1194,7 @@
                         <StaticResource ResourceKey="PushPackagesMenu" />
                     </MenuItem>
                     <Separator Margin="4,0" Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" />
-                    <MenuItem
-                        x:Name="NewMenuButton"
-                        IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NewEnabled}"
-                        Resources="{StaticResource TopMenuStyles}">
+                    <MenuItem IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NewEnabled}" Resources="{StaticResource TopMenuStyles}">
                         <MenuItem.Style>
                             <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                                 <Style.Triggers>
@@ -1219,7 +1214,6 @@
                         <StaticResource ResourceKey="NewFileMenuItem" />
                     </MenuItem>
                     <MenuItem
-                        x:Name="CutMenuButton"
                         helpers:StyleHelper.ContentAnimation="UpMarquee"
                         Click="ContextMenuCutItem_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}"
@@ -1229,7 +1223,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="CopyMenuButton"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="CopyMenuButton_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}"
@@ -1239,7 +1232,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="PasteMenuButton"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="ContextMenuPasteItem_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PasteEnabled}">
@@ -1292,7 +1284,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="RenameMenuButton"
                         helpers:StyleHelper.ContentAnimation="Bounce"
                         Click="ContextMenuRenameItem_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}"
@@ -1302,7 +1293,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="RestoreMenuButton"
                         d:Visibility="Visible"
                         Click="RestoreMenuButton_Click"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}"
@@ -1331,7 +1321,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="UninstallPackageMenu"
                         d:Visibility="Visible"
                         helpers:StyleHelper.ContentAnimation="DownMarquee"
                         Click="UninstallPackage_Click"
@@ -1352,7 +1341,6 @@
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem
-                        x:Name="MoreMenuButton"
                         IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=MoreEnabled}"
                         Resources="{StaticResource TopMenuStyles}"
                         ToolTip="More Options">
