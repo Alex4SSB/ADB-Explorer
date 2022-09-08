@@ -113,6 +113,8 @@ namespace ADB_Explorer
             CommandLog.CollectionChanged += CommandLog_CollectionChanged;
             fileOperationQueue.PropertyChanged += FileOperationQueue_PropertyChanged;
             FileActions.PropertyChanged += FileActions_PropertyChanged;
+            SettingsSearchBox.GotFocus += SettingsSearchBox_FocusChanged;
+            SettingsSearchBox.LostFocus += SettingsSearchBox_FocusChanged;
 
             Task<bool> versionTask = Task.Run(() => CheckAdbVersion());
 
@@ -150,6 +152,14 @@ namespace ADB_Explorer
                 Task.WaitAll(launchTask, versionTask);
                 Settings.WindowLoaded = true;
             });
+        }
+
+        private void SettingsSearchBox_FocusChanged(object sender, RoutedEventArgs e)
+        {
+            if (!Settings.DisableAnimation)
+            {
+                Settings.IsAnimated = !SettingsSearchBox.IsFocused;
+            }
         }
 
         private void FileActions_PropertyChanged(object sender, PropertyChangedEventArgs e)
