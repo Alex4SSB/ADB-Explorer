@@ -72,6 +72,7 @@
                                     Grid.Row="1"
                                     Grid.Column="0"
                                     Margin="{TemplateBinding BorderThickness}"
+                                    ui:ControlHelper.CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
                                     Padding="{TemplateBinding Padding}"
                                     HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
                                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
