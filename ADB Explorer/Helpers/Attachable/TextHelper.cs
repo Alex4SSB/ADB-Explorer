@@ -115,6 +115,9 @@ namespace ADB_Explorer.Helpers
             if (text.Length < 1)
                 return;
 
+            if (numeric && altText.Length - 1 == text.Length && specialChars.Contains(altText[^1]))
+                text = text[..^1];
+
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
