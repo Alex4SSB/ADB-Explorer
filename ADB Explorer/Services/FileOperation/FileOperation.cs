@@ -70,7 +70,7 @@ namespace ADB_Explorer.Services
         public bool CompletedStatsVisible => Status is OperationStatus.Completed
                                              && OperationName is OperationType.Push or OperationType.Pull;
 
-        public bool FinishedIconVisible => OperationName is not OperationType.Push and not OperationType.Pull
+        public bool FinishedIconVisible => ((OperationName is not OperationType.Push and not OperationType.Pull) || Status is OperationStatus.Canceled or OperationStatus.Failed)
                                            && Status is not OperationStatus.InProgress and not OperationStatus.Waiting;
 
         public OperationIcon OpIcon { get; private set; }
