@@ -66,6 +66,10 @@ namespace ADB_Explorer.Models
 
         public static DirectoryLister DirList { get; set; }
 
+        public static string IsolatedStorageLocation { get; set; } = "";
+
+        public static string ProgressRedirectionPath { get; set; } = "AdbProgressRedirection.exe";
+
 
         public static event PropertyChangedEventHandler PropertyChanged;
         private static bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

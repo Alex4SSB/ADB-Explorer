@@ -38,8 +38,6 @@ namespace ADB_Explorer.Services
                 ID = other.ID;
             }
 
-            private const string ADB_PROGRESS_HELPER_PATH = "AdbProgressRedirection.exe";
-
             private const string CURRENT_DIR = ".";
             private const string PARENT_DIR = "..";
             private static readonly string[] SPECIAL_DIRS = { CURRENT_DIR, PARENT_DIR };
@@ -147,7 +145,7 @@ namespace ADB_Explorer.Services
             {
                 // Execute adb file sync operation
                 var stdout = ExecuteCommandAsync(
-                    ADB_PROGRESS_HELPER_PATH,
+                    Data.ProgressRedirectionPath,
                     ADB_PATH,
                     cancellationToken,
                     Encoding.Unicode,

@@ -112,5 +112,7 @@ namespace ADB_Explorer.Models
         public static readonly double DEFAULT_MAX_SEARCH_WIDTH = 300;
         public static readonly double MIN_WINDOW_WIDTH_FOR_SEARCH_RATIO = 800;
         public static readonly double WIDE_WINDOW_SEARCH_WIDTH = 0.6;
+
+        public static readonly string APP_SETTINGS_FILE = "App.txt";
     }
 }

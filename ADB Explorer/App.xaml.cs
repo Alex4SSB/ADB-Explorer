@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ADB_Explorer.Models;
+using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -6,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Newtonsoft.Json;
 
 namespace ADB_Explorer
 {
@@ -15,7 +16,7 @@ namespace ADB_Explorer
     /// </summary>
     public partial class App : Application
     {
-        private readonly string filename = "App.txt";
+        
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -23,12 +24,12 @@ namespace ADB_Explorer
             IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
             try
             {
-                using IsolatedStorageFileStream stream = new(filename, FileMode.Open, storage);
+                using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE, FileMode.Open, storage);
+                Data.IsolatedStorageLocation = Path.GetDirectoryName(stream.GetType().GetField("_fullPath", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(stream).ToString());
 
                 if (Keyboard.IsKeyDown(Key.LeftCtrl))
                 {
-                    var path = stream.GetType().GetField("_fullPath", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(stream).ToString();
-                    Process.Start("explorer.exe", path[..path.LastIndexOf('\\')]);
+                    Process.Start("explorer.exe", Data.IsolatedStorageLocation);
                 }
 
                 using StreamReader reader = new(stream);
@@ -67,13 +68,13 @@ namespace ADB_Explorer
             // Persist application-scope property to isolated storage
             IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
 
-            if (Models.Data.Settings.ResetAppSettings)
+            if (Data.Settings.ResetAppSettings)
             {
-                storage.DeleteFile(filename);
+                storage.DeleteFile(AdbExplorerConst.APP_SETTINGS_FILE);
                 return;
             }
 
-            using IsolatedStorageFileStream stream = new(filename, FileMode.Create, storage);
+            using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE, FileMode.Create, storage);
             using StreamWriter writer = new(stream);
             // Persist each application-scope property individually
             foreach (string key in Properties.Keys)

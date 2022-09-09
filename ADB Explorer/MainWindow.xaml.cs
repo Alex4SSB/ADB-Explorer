@@ -688,7 +688,6 @@ namespace ADB_Explorer
 
             LoadSettings();
             InitFileOpColumns();
-            VerifyProgressRedirection();
 
             if (Settings.CheckForUpdates is true)
                 CheckForUpdates(Dispatcher);
@@ -802,17 +801,39 @@ namespace ADB_Explorer
 
         private void VerifyProgressRedirection()
         {
-            if (!File.Exists($"{Environment.CurrentDirectory}\\AdbProgressRedirection.exe"))
+            Task.Run(() =>
             {
-                Dispatcher.Invoke(() =>
+                if (!File.Exists($"{Environment.CurrentDirectory}\\{ProgressRedirectionPath}"))
                 {
-                    DevicesSplitView.IsPaneOpen = false;
-                    DialogService.ShowMessage("AdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease reinstall the app to fix this issue.",
-                                              "Missing Progress Redirection",
-                                              DialogService.DialogIcon.Critical);
-                    FileActions.PushPullEnabled = false;
-                });
-            }
+                    try
+                    {
+                        string newPath = $"{IsolatedStorageLocation}\\{ProgressRedirectionPath}";
+                        if (File.Exists(newPath))
+                        {
+                            ProgressRedirectionPath = newPath;
+                        }
+                        else
+                        {
+                            File.WriteAllBytes(newPath, Properties.Resources.AdbProgressRedirection);
+                            ProgressRedirectionPath = newPath;
+                        }
+
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        DevicesSplitView.IsPaneOpen = false;
+                        DialogService.ShowMessage("AdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease download and install the app from GitHub (link in Settings > About) to fix this issue.",
+                                                  "Missing Progress Redirection",
+                                                  DialogService.DialogIcon.Critical);
+                        FileActions.PushPullEnabled = false;
+                    });
+                }
+            });
         }
 
         private void SetSymbolFont()
@@ -947,8 +968,11 @@ namespace ADB_Explorer
             CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
             DeleteMenuButton.DataContext = DevicesObject.CurrentDevice;
             FileActions.PushPackageEnabled = Settings.EnableApk;
-
+#if DEBUG
             TestCurrentOperation();
+#endif
+
+            VerifyProgressRedirection();
         }
 
         private void SetAndroidVersion()

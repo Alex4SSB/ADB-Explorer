@@ -118,6 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="AdbProgressRedirection" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AdbProgressRedirection;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="adb_explorer_icon_v4_icons8_combined" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\adb_explorer_icon_v4_icons8_combined.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -128,6 +131,6 @@
     <value>ADB Explorer</value>
   </data>
   <data name="AppVersion" xml:space="preserve">
-    <value>0.7.7.0</value>
+    <value>0.7.8.0</value>
   </data>
 </root>

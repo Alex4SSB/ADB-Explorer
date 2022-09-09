@@ -71,6 +71,16 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] AdbProgressRedirection {
+            get {
+                object obj = ResourceManager.GetObject("AdbProgressRedirection", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         public static System.Drawing.Icon APK_icon {
@@ -90,7 +100,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.7.7.0.
+        ///   Looks up a localized string similar to 0.7.8.0.
         /// </summary>
         public static string AppVersion {
             get {
