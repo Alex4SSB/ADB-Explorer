@@ -1417,7 +1417,7 @@
                                 x:Name="SearchColumn"
                                 Width="Auto"
                                 MinWidth="100"
-                                MaxWidth="{Binding Source={x:Static Member=models:Data.Settings}, Path=MaxSearchBoxWidth}" />
+                                MaxWidth="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
                         </Grid.ColumnDefinitions>
                         <Menu Margin="7,0,0,0">
                             <Menu.Resources>
@@ -1792,7 +1792,7 @@
                             <ColumnDefinition
                                 Width="0.3*"
                                 MinWidth="90"
-                                MaxWidth="{Binding Source={x:Static Member=models:Data.Settings}, Path=MaxSearchBoxWidth}" />
+                                MaxWidth="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="2">
                             <Grid>
@@ -1990,21 +1990,9 @@
                 Margin="0,0,0,-3"
                 helpers:ExpanderHelper.ExpanderArrow="None"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
-                ExpandDirection="Up">
-                <Expander.Style>
-                    <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
-                        <Style.Triggers>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" Value="True" />
-                                    <Condition Binding="{Binding ElementName=FileOperationsButton, Path=(helpers:RemoteToggle.IsTargetVisible)}" Value="True" />
-                                </MultiDataTrigger.Conditions>
-                                <Setter Property="IsExpanded" Value="True" />
-                            </MultiDataTrigger>
-                        </Style.Triggers>
-                        <Setter Property="IsExpanded" Value="False" />
-                    </Style>
-                </Expander.Style>
+                ExpandDirection="Up"
+                IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}"
+                Style="{StaticResource FluentExpanderStyle}">
                 <Expander.Content>
                     <Grid x:Name="FileOpDetailedGrid" IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
                         <Grid.RowDefinitions>
@@ -2253,7 +2241,6 @@
             d:IsHidden="True"
             FocusVisualStyle="{x:Null}"
             OpenPaneLength="300"
-            PaneClosing="FileOperationsSplitView_PaneClosing"
             PanePlacement="Right">
             <ui:SplitView.Style>
                 <Style TargetType="ui:SplitView">
@@ -2343,6 +2330,7 @@
             x:Name="DevicesSplitView"
             d:IsHidden="True"
             FocusVisualStyle="{x:Null}"
+            IsPaneOpen="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDevicesPaneOpen, Mode=TwoWay}"
             PaneClosing="DevicesSplitView_PaneClosing"
             PaneOpening="DevicesSplitView_PaneOpening"
             PanePlacement="Left">
@@ -2386,6 +2374,7 @@
                                 Collapsed="PairingExpander_Expanded"
                                 Expanded="PairingExpander_Expanded"
                                 Header="Pair / Connect Device"
+                                IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsPairingExpanderOpen, Mode=TwoWay}"
                                 Style="{StaticResource FluentExpanderStyle}">
                                 <StackPanel x:Name="NewDevicePanel" Margin="0,0,0,6">
                                     <Grid>
@@ -2782,6 +2771,7 @@
             x:Name="SettingsSplitView"
             d:IsHidden="True"
             FocusVisualStyle="{x:Null}"
+            IsPaneOpen="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSettingsPaneOpen, Mode=TwoWay}"
             OpenPaneLength="350"
             PanePlacement="Right">
             <ui:SplitView.Resources>
@@ -2811,7 +2801,6 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="52" />
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Menu Margin="0,0,8,0" HorizontalAlignment="Right">
@@ -2843,45 +2832,7 @@
                             VerticalAlignment="Center"
                             FontSize="24"
                             Text="Settings" />
-                        <Grid
-                            x:Name="MissingAdbGrid"
-                            Grid.Row="1"
-                            Margin="10,0,10,10"
-                            Visibility="Collapsed">
-                            <Border Style="{StaticResource UnresponsiveServerBorderStyle}">
-                                <StackPanel Margin="4,8">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition />
-                                        </Grid.ColumnDefinitions>
-                                        <ui:FontIcon
-                                            Margin="8,2,8,0"
-                                            Glyph="&#xEA39;"
-                                            Style="{StaticResource GlyphFont}" />
-                                        <TextBlock
-                                            x:Name="MissingAdbTextblock"
-                                            Grid.Column="1"
-                                            FontWeight="Bold"
-                                            Text="Could not find ADB in the environment PATH"
-                                            TextWrapping="Wrap" />
-                                        <TextBlock
-                                            x:Name="AdbVersionTooLowTextblock"
-                                            Grid.Column="1"
-                                            FontWeight="Bold"
-                                            Text="ADB version too low"
-                                            TextWrapping="Wrap"
-                                            Visibility="Collapsed" />
-                                    </Grid>
-                                    <ui:HyperlinkButton
-                                        Margin="8,0"
-                                        Content="Learn More About ADB"
-                                        NavigateUri="https://developer.android.com/studio/command-line/adb"
-                                        ToolTip="https://developer.android.com/studio/command-line/adb" />
-                                </StackPanel>
-                            </Border>
-                        </Grid>
-                        <Grid Grid.Row="2" Margin="18,0,0,0">
+                        <Grid Grid.Row="1" Margin="18,0,0,0">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition />
@@ -2904,7 +2855,7 @@
                                     <Grid.Style>
                                         <Style TargetType="Grid">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="False">
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -2916,7 +2867,8 @@
                                         MinHeight="31"
                                         Padding="30,5,6,6"
                                         ui:ControlHelper.PlaceholderText="Search Settings"
-                                        Text="{Binding Source={x:Static Member=models:Data.Settings}, Path=SearchText, Mode=TwoWay}"
+                                        GotFocus="SettingsSearchBox_GotFocus"
+                                        Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay}"
                                         TextChanged="SettingsSearchBox_TextChanged" />
                                     <ui:FontIcon
                                         Margin="6,0,0,0"
@@ -2932,7 +2884,7 @@
                                     Margin="0,8,0,4"
                                     Style="{x:Null}" />
                             </Grid>
-                            <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                            <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" >
                                 <ui:SimpleStackPanel
                                     Margin="6,0,24,10"
                                     HorizontalAlignment="Left"
@@ -2943,6 +2895,7 @@
                                         Style="{StaticResource GroupSettingsListView}" />
                                     <ListView
                                         x:Name="SortedSettings"
+                                        MouseMove="SortedSettings_MouseMove"
                                         Margin="0,2,0,-3"
                                         Style="{StaticResource SortedSettingsListView}" />
                                     <Separator />
@@ -2950,7 +2903,7 @@
                                         <Expander.Style>
                                             <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=SortedView}" Value="True">
+                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
                                                         <Setter Property="Visibility" Value="Collapsed" />
                                                     </DataTrigger>
                                                 </Style.Triggers>

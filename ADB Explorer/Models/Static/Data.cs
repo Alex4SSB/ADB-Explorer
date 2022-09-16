@@ -42,6 +42,8 @@ namespace ADB_Explorer.Models
 
         public static AppSettings Settings { get; set; } = new();
 
+        public static AppRuntimeSettings RuntimeSettings { get; set; } = new();
+
         public static ObservableList<FileClass> CutItems { get; private set; } = new();
 
         public static ObservableCollection<Log> CommandLog { get; set; } = new();

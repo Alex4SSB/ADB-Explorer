@@ -49,9 +49,7 @@ namespace ADB_Explorer
             }
             catch // FileNotFoundException ex
             {
-                // Handle when file is not found in isolated storage:
-                // * When the first application session
-                // * When file has been deleted
+                WriteSettings();
             }
 
             //Select the text in a TextBox when it receives focus.
@@ -65,10 +63,15 @@ namespace ADB_Explorer
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
+            WriteSettings();
+        }
+
+        private void WriteSettings()
+        {
             // Persist application-scope property to isolated storage
             IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
 
-            if (Data.Settings.ResetAppSettings)
+            if (Data.RuntimeSettings.ResetAppSettings)
             {
                 storage.DeleteFile(AdbExplorerConst.APP_SETTINGS_FILE);
                 return;
@@ -79,7 +82,7 @@ namespace ADB_Explorer
             // Persist each application-scope property individually
             foreach (string key in Properties.Keys)
             {
-                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects})};");
+                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })};");
             }
         }
 

@@ -134,13 +134,13 @@ namespace ADB_Explorer.Services
             Name = name;
             Children = children;
 
-            Settings.PropertyChanged += Settings_PropertyChanged;
+            RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
         }
 
-        private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(AppSettings.GroupsExpanded))
-                IsExpanded = Settings.GroupsExpanded;
+            if (e.PropertyName == nameof(AppRuntimeSettings.GroupsExpanded))
+                IsExpanded = RuntimeSettings.GroupsExpanded;
         }
     }
 
@@ -285,9 +285,9 @@ namespace ADB_Explorer.Services
 
         protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(AppSettings.SearchText))
+            if (e.PropertyName == nameof(AppRuntimeSettings.SearchText))
             {
-                IsExpanded = !string.IsNullOrEmpty(Settings.SearchText) && Buttons.Any(button => button.Name.ToLower().Contains(Settings.SearchText.ToLower()));
+                IsExpanded = !string.IsNullOrEmpty(RuntimeSettings.SearchText) && Buttons.Any(button => button.Name.ToLower().Contains(RuntimeSettings.SearchText.ToLower()));
             }
         }
     }
@@ -374,7 +374,6 @@ namespace ADB_Explorer.Services
     {
         public static void Action()
         {
-            Settings.HideSettingsPane = true;
             DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
         }
 
@@ -469,7 +468,6 @@ namespace ADB_Explorer.Services
 
                 if (message != "")
                 {
-                    Settings.HideSettingsPane = true;
                     DialogService.ShowMessage(message, "Fail to override ADB", DialogService.DialogIcon.Exclamation);
                     return;
                 }

@@ -32,7 +32,7 @@ namespace ADB_Explorer.Services
 
         private static readonly ContentDialog windowDialog = new();
 
-        public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true)
+        public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true, bool hidePanes = true)
         {
             if (censorContent)
             {
@@ -42,16 +42,25 @@ namespace ADB_Explorer.Services
                 }
             }
 
-            ShowDialog(content, title, icon);
+            ShowDialog(content, title, icon, hidePanes);
         }
 
-        public static void ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None)
+        private static void HidePanes()
+        {
+            Data.RuntimeSettings.IsSettingsPaneOpen = 
+            Data.RuntimeSettings.IsDevicesPaneOpen = false;
+        }
+
+        public static void ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true)
         {
             windowDialog.Content = content;
             windowDialog.Title = title;
             windowDialog.PrimaryButtonText = null;
             windowDialog.CloseButtonText = "Ok";
             TextHelper.SetAltText(windowDialog, Icon(icon));
+
+            if (hidePanes)
+                HidePanes();
 
             windowDialog.ShowAsync();
         }
@@ -96,7 +105,8 @@ namespace ADB_Explorer.Services
                                             string cancelText = "Cancel",
                                             string checkBoxText = "",
                                             DialogIcon icon = DialogIcon.None,
-                                            bool censorContent = true)
+                                            bool censorContent = true,
+                                            bool hidePanes = true)
         {
             if (windowDialog.IsVisible)
             {
@@ -120,7 +130,10 @@ namespace ADB_Explorer.Services
             windowDialog.SecondaryButtonText = secondaryText;
             windowDialog.CloseButtonText = cancelText;
             TextHelper.SetAltText(windowDialog, Icon(icon));
-            
+
+            if (hidePanes)
+                HidePanes();
+
             var result = await windowDialog.ShowAsync();
 
             return (result, IsDialogChecked);

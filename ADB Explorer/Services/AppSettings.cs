@@ -226,11 +226,6 @@ namespace ADB_Explorer.Services
 
         #region graphics
 
-        public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
-        public bool HideForceFluent => !IsWin11;
-
-        public bool UseFluentStyles => IsWin11 || ForceFluentStyles;
-
         private bool forceFluentStyles;
         /// <summary>
         /// Use Fluent [Windows 11] Styles In Windows 10
@@ -244,6 +239,8 @@ namespace ADB_Explorer.Services
                     OnPropertyChanged(nameof(UseFluentStyles));
             }
         }
+
+        public bool UseFluentStyles => IsWin11 || ForceFluentStyles;
 
         private bool swRender;
         /// <summary>
@@ -285,11 +282,7 @@ namespace ADB_Explorer.Services
 
                 return value;
             }
-            set
-            {
-                Set(ref disableAnimation, value);
-                
-            }
+            set => Set(ref disableAnimation, value);
         }
 
         private bool enableSplash;
@@ -312,50 +305,17 @@ namespace ADB_Explorer.Services
 
         #endregion theme
 
-        public bool WindowLoaded { get; set; } = false;
-
-        public bool ResetAppSettings { get; set; } = false;
-
-        private bool hideSettingsPane = false;
-        public bool HideSettingsPane
-        {
-            get => hideSettingsPane;
-            set => Set(ref hideSettingsPane, value, saveToDisk: false);
-        }
-
-        private bool sortedView = false;
-        public bool SortedView
-        {
-            get => sortedView;
-            set => Set(ref sortedView, value, saveToDisk: false);
-        }
-
-        private bool groupsExpanded = false;
-        public bool GroupsExpanded
-        {
-            get => groupsExpanded;
-            set => Set(ref groupsExpanded, value, saveToDisk: false);
-        }
-
-        private string searchText = "";
-        public string SearchText
-        {
-            get => searchText;
-            set => Set(ref searchText, value, saveToDisk: false);
-        }
-
-        private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_MAX_SEARCH_WIDTH;
-        public double MaxSearchBoxWidth
-        {
-            get => maxSearchBoxWidth;
-            set => Set(ref maxSearchBoxWidth, value, saveToDisk: false);
-        }
-
         public static bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
+
+        public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
+
+        public bool HideForceFluent => !IsWin11;
+
+        public bool WindowLoaded { get; set; } = false;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null, bool saveToDisk = true)
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
         {
             if (Equals(storage, value))
             {
@@ -363,10 +323,7 @@ namespace ADB_Explorer.Services
             }
 
             storage = value;
-            if (saveToDisk)
-            {
-                Storage.StoreValue(propertyName, value);
-            }
+            Storage.StoreValue(propertyName, value);
 
             OnPropertyChanged(propertyName);
 
@@ -392,5 +349,82 @@ namespace ADB_Explorer.Services
 
             return storage;
         }
+    }
+
+    public class AppRuntimeSettings : INotifyPropertyChanged
+    {
+        public bool ResetAppSettings { get; set; } = false;
+
+        private bool isSettingsPaneOpen = false;
+        public bool IsSettingsPaneOpen
+        {
+            get => isSettingsPaneOpen;
+            set => Set(ref isSettingsPaneOpen, value);
+        }
+
+        private bool isDevicesPaneOpen = false;
+        public bool IsDevicesPaneOpen
+        {
+            get => isDevicesPaneOpen;
+            set => Set(ref isDevicesPaneOpen, value);
+        }
+
+        private bool isPairingExpanderOpen = false;
+        public bool IsPairingExpanderOpen
+        {
+            get => isPairingExpanderOpen;
+            set => Set(ref isPairingExpanderOpen, value);
+        }
+
+        private bool isOperationsViewOpen = false;
+        public bool IsOperationsViewOpen
+        {
+            get => isOperationsViewOpen;
+            set => Set(ref isOperationsViewOpen, value);
+        }
+
+        private bool sortedView = false;
+        public bool SortedView
+        {
+            get => sortedView;
+            set => Set(ref sortedView, value);
+        }
+
+        private bool groupsExpanded = false;
+        public bool GroupsExpanded
+        {
+            get => groupsExpanded;
+            set => Set(ref groupsExpanded, value);
+        }
+
+        private string searchText = "";
+        public string SearchText
+        {
+            get => searchText;
+            set => Set(ref searchText, value);
+        }
+
+        private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_MAX_SEARCH_WIDTH;
+        public double MaxSearchBoxWidth
+        {
+            get => maxSearchBoxWidth;
+            set => Set(ref maxSearchBoxWidth, value);
+        }
+
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

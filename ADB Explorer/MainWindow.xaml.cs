@@ -30,6 +30,8 @@ using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
+using static ADB_Explorer.Resources.Links;
+using static ADB_Explorer.Resources.Strings;
 
 namespace ADB_Explorer
 {
@@ -126,7 +128,7 @@ namespace ADB_Explorer
                     {
                         ConnectTimer.Start();
                         OpenDevicesButton.IsEnabled = true;
-                        DevicesSplitView.IsPaneOpen = true;
+                        RuntimeSettings.IsDevicesPaneOpen = true;
                     });
                 }
             });
@@ -286,15 +288,8 @@ namespace ADB_Explorer
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                         RefreshDrives(true);
                     break;
-                case nameof(AppSettings.HideSettingsPane):
-                    if (Settings.HideSettingsPane)
-                    {
-                        SettingsSplitView.IsPaneOpen = false;
-                        Settings.HideSettingsPane = false;
-                    }
-                    break;
-                case nameof(AppSettings.GroupsExpanded):
-                    SettingsAboutExpander.IsExpanded = Settings.GroupsExpanded;
+                case nameof(AppRuntimeSettings.GroupsExpanded):
+                    SettingsAboutExpander.IsExpanded = RuntimeSettings.GroupsExpanded;
                     break;
                 default:
                     break;
@@ -404,15 +399,32 @@ namespace ADB_Explorer
 
             Dispatcher.Invoke(() =>
             {
-                if (version is not null)
+                SimpleStackPanel stack = new()
                 {
-                    MissingAdbTextblock.Visibility = Visibility.Collapsed;
-                    AdbVersionTooLowTextblock.Visibility = Visibility.Visible;
-                }
+                    Spacing = 8,
+                    Children =
+                    {
+                        new TextBlock()
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                            Text = version is null ? S_MISSING_ADB : S_ADB_VERSION_LOW,
+                        },
+                        new TextBlock()
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                            Text = S_OVERRIDE_ADB,
+                        },
+                        new HyperlinkButton()
+                        {
+                            Content = S_ADB_LEARN_MORE,
+                            ToolTip = L_ADB_PAGE,
+                            NavigateUri = L_ADB_PAGE,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                        }
+                    }
+                };
 
-                SettingsSplitView.IsPaneOpen = true;
-                //WorkingDirectoriesExpander.IsExpanded = true;
-                MissingAdbGrid.Visibility = Visibility.Visible;
+                DialogService.ShowDialog(stack, S_MISSING_ADB_TITLE, DialogService.DialogIcon.Critical);
             });
 
             return false;
@@ -434,7 +446,7 @@ namespace ADB_Explorer
         {
             Storage.StoreValue(SystemVals.windowMaximized, WindowState == WindowState.Maximized);
 
-            var detailedVisible = FileOpVisibility() && Settings.ShowExtendedView;
+            var detailedVisible = RuntimeSettings.IsOperationsViewOpen && Settings.ShowExtendedView;
             Storage.StoreValue(SystemVals.detailedVisible, detailedVisible);
             if (detailedVisible)
                 Storage.StoreValue(SystemVals.detailedHeight, FileOpDetailedGrid.Height);
@@ -682,7 +694,7 @@ namespace ADB_Explorer
                 Height = height * WINDOW_HEIGHT_RATIO;
                 Width = Height / WINDOW_WIDTH_RATIO;
 
-                if (Settings.MaxSearchBoxWidth >= DEFAULT_MAX_SEARCH_WIDTH)
+                if (RuntimeSettings.MaxSearchBoxWidth >= DEFAULT_MAX_SEARCH_WIDTH)
                     SearchColumn.Width = new(DEFAULT_MAX_SEARCH_WIDTH);
             });
 
@@ -733,7 +745,7 @@ namespace ADB_Explorer
                     return;
 
                 if (!ConnectTimer.IsEnabled)
-                    DevicesSplitView.IsPaneOpen = false;
+                    RuntimeSettings.IsDevicesPaneOpen = false;
             }
 
             DevicesObject.SetOpen(DevicesObject.Current, true);
@@ -820,18 +832,16 @@ namespace ADB_Explorer
 
                         return;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        Dispatcher.Invoke(() =>
+                        {
+                            DialogService.ShowMessage($"{e.Message}\n\nAdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease download and install the app from GitHub (link in Settings > About) to fix this issue.",
+                                                      "Missing Progress Redirection",
+                                                      DialogService.DialogIcon.Critical);
+                            FileActions.PushPullEnabled = false;
+                        });
                     }
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        DevicesSplitView.IsPaneOpen = false;
-                        DialogService.ShowMessage("AdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease download and install the app from GitHub (link in Settings > About) to fix this issue.",
-                                                  "Missing Progress Redirection",
-                                                  DialogService.DialogIcon.Critical);
-                        FileActions.PushPullEnabled = false;
-                    });
                 }
             });
         }
@@ -1151,7 +1161,7 @@ namespace ADB_Explorer
                         if (t.Result)
                             Dispatcher.Invoke(() =>
                             {
-                                PairingExpander.IsExpanded = false;
+                                RuntimeSettings.IsPairingExpanderOpen = false;
                                 DebuggingResetPrompt.Visible(true);
                             });
                     });
@@ -1163,7 +1173,6 @@ namespace ADB_Explorer
         {
             ServerWatchdogTimer.Start();
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
-            var devicesVisible = DevicesSplitView.IsPaneOpen;
             var driveView = NavHistory.Current is NavHistory.SpecialLocation.DriveView;
 
             Task.Run(() =>
@@ -1175,12 +1184,12 @@ namespace ADB_Explorer
 
                 if (Settings.PollDevices)
                 {
-                    RefreshDevices(devicesVisible);
+                    RefreshDevices(RuntimeSettings.IsDevicesPaneOpen);
                 }
 
                 if (Settings.PollBattery)
                 {
-                    UpdateDevicesBatInfo(devicesVisible);
+                    UpdateDevicesBatInfo(RuntimeSettings.IsDevicesPaneOpen);
                 }
 
                 if (driveView && Settings.PollDrives)
@@ -1193,7 +1202,7 @@ namespace ADB_Explorer
                     { }
                 }
 
-                if (devicesVisible)
+                if (RuntimeSettings.IsDevicesPaneOpen)
                     UpdateDevicesRootAccess();
 
                 connectTimerMutex.ReleaseMutex();
@@ -1576,7 +1585,7 @@ namespace ADB_Explorer
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
-            SettingsSplitView.IsPaneOpen = true;
+            RuntimeSettings.IsSettingsPaneOpen = true;
         }
 
         private void ParentButton_Click(object sender, RoutedEventArgs e)
@@ -1990,7 +1999,7 @@ namespace ADB_Explorer
         private void OpenDevicesButton_Click(object sender, RoutedEventArgs e)
         {
             UnfocusPathBox();
-            DevicesSplitView.IsPaneOpen = true;
+            RuntimeSettings.IsDevicesPaneOpen = true;
         }
 
         private void ConnectNewDeviceButton_Click(object sender, RoutedEventArgs e)
@@ -2027,7 +2036,7 @@ namespace ADB_Explorer
 
             NewDeviceIpBox.Clear();
             NewDevicePortBox.Clear();
-            PairingExpander.IsExpanded = false;
+            RuntimeSettings.IsPairingExpanderOpen = false;
             DeviceListSetup(deviceAddress);
         }
 
@@ -2089,7 +2098,7 @@ namespace ADB_Explorer
                 NavHistory.Reset();
                 InitDevice();
 
-                DevicesSplitView.IsPaneOpen = false;
+                RuntimeSettings.IsDevicesPaneOpen = false;
             }
         }
 
@@ -2185,7 +2194,7 @@ namespace ADB_Explorer
                 return;
             }
 
-            PairingExpander.IsExpanded = false;
+            RuntimeSettings.IsPairingExpanderOpen = false;
             DevicesObject.UnselectAll();
         }
 
@@ -2244,7 +2253,7 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
         {
-            PairingExpander.IsExpanded = false;
+            RuntimeSettings.IsPairingExpanderOpen = false;
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -2255,21 +2264,12 @@ namespace ADB_Explorer
             SearchBoxMaxWidth();
         }
 
-        private void SearchBoxMaxWidth()
+        private void SearchBoxMaxWidth() => RuntimeSettings.MaxSearchBoxWidth = WindowState switch
         {
-            if (WindowState is WindowState.Maximized)
-            {
-                Settings.MaxSearchBoxWidth = SystemParameters.PrimaryScreenWidth * WIDE_WINDOW_SEARCH_WIDTH;
-            }
-            else if (Width > MIN_WINDOW_WIDTH_FOR_SEARCH_RATIO)
-            {
-                Settings.MaxSearchBoxWidth = Width * WIDE_WINDOW_SEARCH_WIDTH;
-            }
-            else
-            {
-                Settings.MaxSearchBoxWidth = Width * MAX_SEARCH_WIDTH_RATIO;
-            }
-        }
+            WindowState.Maximized => SystemParameters.PrimaryScreenWidth * WIDE_WINDOW_SEARCH_WIDTH,
+            WindowState.Normal when Width > MIN_WINDOW_WIDTH_FOR_SEARCH_RATIO => Width * WIDE_WINDOW_SEARCH_WIDTH,
+            _ => Width * MAX_SEARCH_WIDTH_RATIO,
+        };
 
         private void EnableSplitViewAnimation()
         {
@@ -2297,23 +2297,7 @@ namespace ADB_Explorer
 
         private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
         {
-            FileOpVisibility(null);
-        }
-
-        private void FileOpVisibility(bool? value = null)
-        {
-            if (value is not null)
-            {
-                RemoteToggle.SetIsTargetVisible(FileOperationsButton, value.Value);
-                return;
-            }
-
-            RemoteToggle.SetIsTargetVisible(FileOperationsButton, !FileOpVisibility());
-        }
-
-        private bool FileOpVisibility()
-        {
-            return RemoteToggle.GetIsTargetVisible(FileOperationsButton);
+            RuntimeSettings.IsOperationsViewOpen = !RuntimeSettings.IsOperationsViewOpen;
         }
 
         private void PairingCodeBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -2342,7 +2326,7 @@ namespace ADB_Explorer
 
             ConnectNewDevice();
             ManualPairingPanel.IsEnabled = false;
-            PairingExpander.IsExpanded = false;
+            RuntimeSettings.IsPairingExpanderOpen = false;
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -2445,7 +2429,7 @@ namespace ADB_Explorer
 
         private void PaneCollapse_Click(object sender, RoutedEventArgs e)
         {
-            ((MenuItem)sender).FindAscendant<SplitView>().IsPaneOpen = false;
+            RuntimeSettings.IsSettingsPaneOpen = false;
         }
 
         private void PathMenuEdit_Click(object sender, RoutedEventArgs e)
@@ -2593,7 +2577,7 @@ namespace ADB_Explorer
         private void ChangeConnectionType()
         {
             if (ManualConnectionRadioButton.IsChecked == false
-                            && PairingExpander.IsExpanded
+                            && RuntimeSettings.IsPairingExpanderOpen
                             && MdnsService.State == MDNS.MdnsState.Disabled)
             {
                 MdnsService.State = MDNS.MdnsState.Unchecked;
@@ -2678,7 +2662,7 @@ namespace ADB_Explorer
             if (FindResource("PairServiceFlyout") is Flyout flyout)
             {
                 flyout.Hide();
-                PairingExpander.IsExpanded = false;
+                RuntimeSettings.IsPairingExpanderOpen = false;
                 DevicesObject.UnselectAll();
                 //DevicesObject.ConsolidateDevices();
             }
@@ -2740,7 +2724,7 @@ namespace ADB_Explorer
 
             if (Storage.RetrieveBool(SystemVals.detailedVisible) is bool and true)
             {
-                FileOpVisibility(true);
+                RuntimeSettings.IsOperationsViewOpen = true;
             }
 
             if (double.TryParse(Storage.RetrieveValue(SystemVals.detailedHeight)?.ToString(), out double detailedHeight))
@@ -2761,7 +2745,7 @@ namespace ADB_Explorer
         {
             DevicesObject.UnselectAll();
 
-            if (PairingExpander.IsExpanded)
+            if (RuntimeSettings.IsPairingExpanderOpen)
             {
                 RetrieveIp();
             }
@@ -2788,7 +2772,6 @@ namespace ADB_Explorer
                 {
                     if (logical.Root is AbstractDevice.RootStatus.Forbidden)
                     {
-                        DevicesSplitView.IsPaneOpen = false;
                         DialogService.ShowMessage("Root access cannot be enabled on selected device.", "Root Access", DialogService.DialogIcon.Critical);
                     }
                 }));
@@ -2934,11 +2917,6 @@ namespace ADB_Explorer
             file.UpdatePath(newPath);
             if (Settings.ShowExtensions)
                 file.UpdateType();
-        }
-
-        private void FileOperationsSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
-        {
-            FileOpVisibility(false);
         }
 
         private void ContextMenuRenameItem_Click(object sender, RoutedEventArgs e)
@@ -3450,16 +3428,16 @@ namespace ADB_Explorer
         {
             HyperlinkButton ccLink = new()
             {
-                Content = "Creative Commons",
-                ToolTip = "https://creativecommons.org/licenses/by-sa/3.0/",
-                NavigateUri = new("https://creativecommons.org/licenses/by-sa/3.0/"),
+                Content = S_CC_NAME,
+                ToolTip = L_CC_LIC,
+                NavigateUri = L_CC_LIC,
                 HorizontalAlignment = HorizontalAlignment.Center,
             };
             HyperlinkButton apacheLink = new()
             {
-                Content = "Apache",
-                ToolTip = "https://www.apache.org/licenses/LICENSE-2.0",
-                NavigateUri = new("https://www.apache.org/licenses/LICENSE-2.0"),
+                Content = S_APACHE_NAME,
+                ToolTip = L_APACHE_LIC,
+                NavigateUri = L_APACHE_LIC,
                 HorizontalAlignment = HorizontalAlignment.Center,
             };
             apacheLink.SetValue(Grid.ColumnProperty, 1);
@@ -3472,12 +3450,12 @@ namespace ADB_Explorer
                     new TextBlock()
                     {
                         TextWrapping = TextWrapping.Wrap,
-                        Text = "The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License."
+                        Text = S_ANDROID_ROBOT_LIC,
                     },
                     new TextBlock()
                     {
                         TextWrapping = TextWrapping.Wrap,
-                        Text = "The APK icon is licensed under the Apache License, Version 2.0."
+                        Text = S_APK_ICON_LIC,
                     },
                     new Grid()
                     {
@@ -3487,13 +3465,12 @@ namespace ADB_Explorer
                 }
             };
 
-            DialogService.ShowDialog(stack, "The Android Robot Icon(s)", DialogService.DialogIcon.Informational);
+            DialogService.ShowDialog(stack, S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
         }
 
         private void DisableAnimationInfo_Click(object sender, RoutedEventArgs e)
         {
-            SettingsSplitView.IsPaneOpen = false;
-            DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
+            DialogService.ShowMessage(S_DISABLE_ANIMATION, S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
         }
 
         private ListSortDirection Invert(ListSortDirection? value)
@@ -3624,7 +3601,7 @@ namespace ADB_Explorer
             var dialog = new OpenFileDialog()
             {
                 Multiselect = false,
-                Title = "Select ADB Executable",
+                Title = S_OVERRIDE_ADB_BROWSE,
                 Filter = "ADB Executable|adb.exe",
             };
 
@@ -3639,34 +3616,24 @@ namespace ADB_Explorer
 
             if (dialog.ShowDialog() == true)
             {
-                string message = "";
                 var version = ADBService.VerifyAdbVersion(dialog.FileName);
-                if (version is null)
+                if (version >= MIN_ADB_VERSION)
                 {
-                    message = "Could not get ADB version from provided path.";
-                }
-                else if (version < MIN_ADB_VERSION)
-                {
-                    message = "ADB version from provided path is too low.";
-                }
-                
-                if (message != "")
-                {
-                    SettingsSplitView.IsPaneOpen = false;
-                    DialogService.ShowMessage(message, "Fail to override ADB", DialogService.DialogIcon.Exclamation);
+                    Settings.ManualAdbPath = dialog.FileName;
                     return;
                 }
 
-                Settings.ManualAdbPath = dialog.FileName;
+                DialogService.ShowMessage(version is null ? S_MISSING_ADB_OVERRIDE : S_ADB_VERSION_LOW_OVERRIDE,
+                                          S_FAIL_OVERRIDE_TITLE,
+                                          DialogService.DialogIcon.Exclamation);
             }
         }
 
         private async void ResetSettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            SettingsSplitView.IsPaneOpen = false;
             var result = await DialogService.ShowConfirmation(
-                            "All app settings will be reset upon closing the app.\nThis cannot be undone. Are you sure?",
-                            "Reset App Settings",
+                            S_RESET_SETTINGS,
+                            S_RESET_SETTINGS_TITLE,
                             primaryText: "Confirm",
                             cancelText: "Cancel",
                             icon: DialogService.DialogIcon.Exclamation);
@@ -3674,7 +3641,7 @@ namespace ADB_Explorer
             if (result.Item1 == ContentDialogResult.None)
                 return;
 
-            Settings.ResetAppSettings = true;
+            RuntimeSettings.ResetAppSettings = true;
         }
 
         private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
@@ -3684,7 +3651,6 @@ namespace ADB_Explorer
 
         private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Settings.SearchText = SettingsSearchBox.Text;
             FilterSettings();
         }
 
@@ -3781,6 +3747,16 @@ namespace ADB_Explorer
         private void CloseEditorButton_Click(object sender, RoutedEventArgs e)
         {
             FileActions.IsEditorOpen = false;
+        }
+
+        private void SettingsSearchBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            RuntimeSettings.IsOperationsViewOpen = false;
+        }
+
+        private void SortedSettings_MouseMove(object sender, MouseEventArgs e)
+        {
+            SortedSettings.Focus();
         }
     }
 }

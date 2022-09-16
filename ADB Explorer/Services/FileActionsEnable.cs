@@ -1,7 +1,8 @@
-﻿using System.ComponentModel;
+﻿using ADB_Explorer.Models;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace ADB_Explorer.Models
+namespace ADB_Explorer.Services
 {
     public class FileActionsEnable : INotifyPropertyChanged
     {
