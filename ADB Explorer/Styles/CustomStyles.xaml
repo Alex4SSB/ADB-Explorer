@@ -1046,12 +1046,11 @@
         x:Key="FileOpButtonStyle"
         BasedOn="{StaticResource AdbMenuItemStyle}"
         TargetType="MenuItem">
-        <Setter Property="helpers:RemoteToggle.IsTargetVisible" Value="False" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCW" />
         <Style.Triggers>
-            <Trigger Property="helpers:RemoteToggle.IsTargetVisible" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="False">
                 <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCCW" />
-            </Trigger>
+            </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=FileOpRing, Path=Visibility}" Value="Visible">
                 <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
             </DataTrigger>
