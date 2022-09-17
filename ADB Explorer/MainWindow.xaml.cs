@@ -208,7 +208,7 @@ namespace ADB_Explorer
                 if (t.Result is null || t.Result <= AppVersion)
                     return;
 
-                dispatcher.Invoke(() => DialogService.ShowMessage($"A new {Properties.Resources.AppDisplayName}, version {t.Result}, is available", "New App Version", DialogService.DialogIcon.Informational));
+                dispatcher.Invoke(() => DialogService.ShowMessage(S_NEW_VERSION(t.Result), S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
             });
         }
 
@@ -719,7 +719,7 @@ namespace ADB_Explorer
 
             if (!DevicesObject.DevicesAvailable())
             {
-                Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
+                Title = $"{Properties.Resources.AppDisplayName}{S_NO_DEVICES_TITLE}";
                 ClearExplorer();
                 NavHistory.Reset();
                 ClearDrives();
@@ -791,7 +791,7 @@ namespace ADB_Explorer
         {
             Dispatcher.Invoke(() =>
             {
-                Title = $"{Properties.Resources.AppDisplayName} - NO CONNECTED DEVICES";
+                Title = $"{Properties.Resources.AppDisplayName}{S_NO_DEVICES_TITLE}";
                 SetSymbolFont();
             });
 
@@ -836,9 +836,7 @@ namespace ADB_Explorer
                     {
                         Dispatcher.Invoke(() =>
                         {
-                            DialogService.ShowMessage($"{e.Message}\n\nAdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease download and install the app from GitHub (link in Settings > About) to fix this issue.",
-                                                      "Missing Progress Redirection",
-                                                      DialogService.DialogIcon.Critical);
+                            DialogService.ShowMessage(S_MISSING_REDIRECTION(e.Message), S_MISSING_REDIRECTION_TITLE, DialogService.DialogIcon.Critical);
                             FileActions.PushPullEnabled = false;
                         });
                     }
@@ -1246,7 +1244,7 @@ namespace ADB_Explorer
             catch (Exception e)
             {
                 if (path != RECYCLE_PATH)
-                    DialogService.ShowMessage(e.Message, "Navigation Error", DialogService.DialogIcon.Critical);
+                    DialogService.ShowMessage(e.Message, S_NAV_ERR_TITLE, DialogService.DialogIcon.Critical);
 
                 return null;
             }
@@ -1314,7 +1312,7 @@ namespace ADB_Explorer
             TypeColumn.Visibility =
             SizeColumn.Visibility = Visible(!FileActions.IsAppDrive);
 
-            FileActions.CopyPathAction = FileActions.IsAppDrive ? "Copy Package Name" : "Copy Item Path";
+            FileActions.CopyPathAction = FileActions.IsAppDrive ? S_COPY_APK_NAME : S_COPY_PATH;
 
             if (FileActions.IsRecycleBin)
             {
@@ -1351,9 +1349,9 @@ namespace ADB_Explorer
 
                 recycleTask.ContinueWith((t) => DirList.Navigate(realPath));
 
-                DateColumn.Header = "Date Deleted";
-                FileActions.DeleteAction = "Empty Recycle Bin";
-                FileActions.RestoreAction = "Restore All Items";
+                DateColumn.Header = S_DATE_DEL_COL;
+                FileActions.DeleteAction = S_EMPTY_TRASH;
+                FileActions.RestoreAction = S_RESTORE_ALL;
             }
             else if (FileActions.IsAppDrive)
             {
@@ -1365,8 +1363,8 @@ namespace ADB_Explorer
             {
                 DirList.Navigate(realPath);
 
-                DateColumn.Header = "Date Modified";
-                FileActions.DeleteAction = "Delete";
+                DateColumn.Header = S_DATE_MOD_COL;
+                FileActions.DeleteAction = S_DELETE_ACTION;
             }
 
             ExplorerGrid.ItemsSource = DirList.FileList;
@@ -1884,7 +1882,7 @@ namespace ADB_Explorer
                     IsFolderPicker = true,
                     Multiselect = false,
                     DefaultDirectory = Settings.DefaultFolder,
-                    Title = "Select destination for " + (itemsCount > 1 ? "multiple items" : ExplorerGrid.SelectedItem)
+                    Title = S_ITEMS_DESTINATION(itemsCount > 1, ExplorerGrid.SelectedItem),
                 };
 
                 if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -1903,7 +1901,7 @@ namespace ADB_Explorer
                 }
                 catch (Exception e)
                 {
-                    DialogService.ShowMessage(e.Message, "Destination Path Error", DialogService.DialogIcon.Critical);
+                    DialogService.ShowMessage(e.Message, S_DEST_ERR, DialogService.DialogIcon.Critical);
                     return;
                 }
             }
@@ -1927,7 +1925,7 @@ namespace ADB_Explorer
                 IsFolderPicker = isFolderPicker,
                 Multiselect = true,
                 DefaultDirectory = Settings.DefaultFolder,
-                Title = $"Select {(isFolderPicker ? "folder" : "file")}s to push{(targetPath.FullPath == CurrentPath ? "" : $" into {targetPath.FullName}")}"
+                Title = S_PUSH_BROWSE_TITLE(isFolderPicker, targetPath.FullPath == CurrentPath ? "" : targetPath.FullName),
             };
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -2016,14 +2014,14 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains($"failed to connect to {deviceAddress}"))
+                if (ex.Message.Contains(S_FAILED_CONN + deviceAddress))
                 {
                     ManualPairingPanel.IsEnabled = true;
                     ManualPairingPortBox.Clear();
                     ManualPairingCodeBox.Clear();
                 }
                 else
-                    DialogService.ShowMessage(ex.Message, "Connection Error", DialogService.DialogIcon.Critical);
+                    DialogService.ShowMessage(ex.Message, S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical);
 
                 return;
             }
@@ -2125,7 +2123,7 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, "Disconnection Error", DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(ex.Message, S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical);
                 return;
             }
 
@@ -2319,7 +2317,7 @@ namespace ADB_Explorer
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, "Pairing Error", DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(ex.Message, S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical);
                 (FindResource("PairServiceFlyout") as Flyout).Hide();
                 return;
             }
@@ -2638,7 +2636,7 @@ namespace ADB_Explorer
                 }
                 catch (Exception ex)
                 {
-                    Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, "Pairing Error", DialogService.DialogIcon.Critical));
+                    Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical));
                     return false;
                 }
 
@@ -2664,7 +2662,6 @@ namespace ADB_Explorer
                 flyout.Hide();
                 RuntimeSettings.IsPairingExpanderOpen = false;
                 DevicesObject.UnselectAll();
-                //DevicesObject.ConsolidateDevices();
             }
         }
 
@@ -2772,7 +2769,7 @@ namespace ADB_Explorer
                 {
                     if (logical.Root is AbstractDevice.RootStatus.Forbidden)
                     {
-                        DialogService.ShowMessage("Root access cannot be enabled on selected device.", "Root Access", DialogService.DialogIcon.Critical);
+                        DialogService.ShowMessage(S_ROOT_FORBID, S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical);
                     }
                 }));
             }
@@ -2867,10 +2864,10 @@ namespace ADB_Explorer
             }
 
             var result = await DialogService.ShowConfirmation(
-                $"The following will be{(FileActions.IsRecycleBin ? " permanently" : "")} deleted:\n{deletedString}",
-                "Confirm Delete",
-                "Delete",
-                checkBoxText: Settings.EnableRecycle && !FileActions.IsRecycleBin ? "Permanently Delete" : "",
+                S_DELETE_CONF(FileActions.IsRecycleBin, deletedString),
+                S_DEL_CONF_TITLE,
+                S_DELETE_ACTION,
+                checkBoxText: Settings.EnableRecycle && !FileActions.IsRecycleBin ? S_PERM_DEL : "",
                 icon: DialogService.DialogIcon.Delete);
 
             if (result.Item1 is not ContentDialogResult.Primary)
@@ -2900,7 +2897,7 @@ namespace ADB_Explorer
             var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Settings.ShowExtensions ? "" : file.Extension)}";
             if (DirList.FileList.Any(file => file.FullName == newName))
             {
-                DialogService.ShowMessage($"{newPath} already exists", "Rename conflict", DialogService.DialogIcon.Exclamation);
+                DialogService.ShowMessage(S_PATH_EXIST(newPath), S_RENAME_CONF_TITLE, DialogService.DialogIcon.Exclamation);
                 return;
             }
 
@@ -2910,7 +2907,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                DialogService.ShowMessage(e.Message, "Rename Error", DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(e.Message, S_RENAME_ERR_TITLE, DialogService.DialogIcon.Critical);
                 throw;
             }
 
@@ -3215,7 +3212,7 @@ namespace ADB_Explorer
 
         private void NewItem(bool isFolder)
         {
-            var namePrefix = $"New {(isFolder ? "Folder" : "File")}";
+            var namePrefix = S_NEW_ITEM(isFolder);
             var index = FileClass.ExistingIndexes(DirList.FileList, namePrefix);
 
             FileClass newItem = new($"{namePrefix}{index}", CurrentPath, isFolder ? FileType.Folder : FileType.File, isTemp: true);
@@ -3246,7 +3243,7 @@ namespace ADB_Explorer
             }
             catch (Exception e)
             {
-                DialogService.ShowMessage(e.Message, "Create Error", DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(e.Message, S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical);
                 DirList.FileList.Remove(file);
                 throw;
             }
@@ -3381,9 +3378,9 @@ namespace ADB_Explorer
                     if (existingItems.Length is int count and > 0)
                     {
                         var result = await DialogService.ShowConfirmation(
-                            $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")}",
-                            "Restore Conflicts",
-                            primaryText: $"{(merge ? "Merge or ": "")}Replace",
+                            S_CONFLICT_ITEMS(count),
+                            S_RESTORE_CONF_TITLE,
+                            primaryText: S_MERGE_REPLACE(merge),
                             secondaryText: count == restoreItems.Count() ? "" : "Skip",
                             cancelText: "Cancel",
                             icon: DialogService.DialogIcon.Exclamation);
@@ -3519,15 +3516,9 @@ namespace ADB_Explorer
             var pkgs = selectedPackages;
             var files = selectedFiles;
 
-            var uniString = "";
-            if (FileActions.IsAppDrive)
-                uniString = $"{selectedPackages.Count()} package{(selectedPackages.Count() > 1 ? "s" : "")}";
-            else
-                uniString = $"{selectedFiles.Count()} APK{(selectedFiles.Count() > 1 ? "s" : "")}";
-
             var result = await DialogService.ShowConfirmation(
-                $"The following will be removed:\n{uniString}",
-                "Confirm Uninstall",
+                S_REM_APK(!FileActions.IsAppDrive, FileActions.IsAppDrive ? pkgs.Count() : files.Count()),
+                S_CONF_UNI_TITLE,
                 "Uninstall",
             icon: DialogService.DialogIcon.Exclamation);
 
@@ -3565,7 +3556,7 @@ namespace ADB_Explorer
                 IsFolderPicker = false,
                 Multiselect = true,
                 DefaultDirectory = Settings.DefaultFolder,
-                Title = $"Select packages to install"
+                Title = S_INSTALL_APK
             };
             dialog.Filters.Add(new("Android Package", string.Join(';', INSTALL_APK.Select(name => name[1..]))));
 

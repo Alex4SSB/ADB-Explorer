@@ -23,7 +23,7 @@ namespace ADB_Explorer.Services
 
         public static Version LatestAppRelease()
         {
-            var response = GetRequest(Models.AdbExplorerConst.REPO_RELEASES_URL);
+            var response = GetRequest(Resources.Links.REPO_RELEASES_URL);
             if (response is null)
                 return null;
 

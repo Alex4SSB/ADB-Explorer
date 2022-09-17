@@ -1,4 +1,9 @@
-﻿namespace ADB_Explorer.Resources
+﻿using System;
+using System.IO;
+using Windows.Devices.Geolocation;
+using Windows.Storage.Pickers;
+
+namespace ADB_Explorer.Resources
 {
     public static class Strings
     {
@@ -20,5 +25,67 @@
         public const string S_OVERRIDE_ADB_BROWSE = "Select ADB Executable";
         public const string S_RESET_SETTINGS = "All app settings will be reset upon closing the app.\nThis cannot be undone. Are you sure?";
         public const string S_RESET_SETTINGS_TITLE = "Reset App Settings";
+        public const string S_MISSING_REDIRECTION_TITLE = "Missing Progress Redirection";
+        public const string S_NO_DEVICES_TITLE = " - NO CONNECTED DEVICES";
+        public const string S_NEW_VERSION_TITLE = "New App Version";
+        public const string S_NAV_ERR_TITLE = "Navigation Error";
+        public const string S_COPY_APK_NAME = "Copy Package Name";
+        public const string S_COPY_PATH = "Copy Item Path";
+        public const string S_RESTORE_ALL = "Restore All Items";
+        public const string S_EMPTY_TRASH = "Empty Recycle Bin";
+        public const string S_DATE_DEL_COL = "Date Deleted";
+        public const string S_DATE_MOD_COL = "Date Modified";
+        public const string S_DELETE_ACTION = "Delete";
+        public const string S_DEST_ERR = "Destination Path Error";
+        public const string S_FAILED_CONN = "failed to connect to ";
+        public const string S_FAILED_CONN_TITLE = "Connection Error";
+        public const string S_DISCONN_FAILED_TITLE = "Disconnection Error";
+        public const string S_PAIR_ERR_TITLE = "Pairing Error";
+        public const string S_ROOT_FORBID = "Root access cannot be enabled on selected device.";
+        public const string S_ROOT_FORBID_TITLE = "Root Access";
+        public const string S_DEL_CONF_TITLE = "Confirm Delete";
+        public const string S_PERM_DEL = "Permanently Delete";
+        public const string S_RENAME_CONF_TITLE = "Rename conflict";
+        public const string S_RENAME_ERR_TITLE = "Rename Error";
+        public const string S_CREATE_ERR_TITLE = "Create Error";
+        public const string S_RESTORE_CONF_TITLE = "Restore Conflicts";
+        public const string S_CONF_UNI_TITLE = "Confirm Uninstall";
+        public const string S_INSTALL_APK = "Select packages to install";
+
+
+        public static string S_MISSING_REDIRECTION(string exception) =>
+            $"{exception}\n\nAdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease download and install the app from GitHub (link in Settings > About) to fix this issue.";
+
+        public static string S_NEW_VERSION(Version newVersion) =>
+            $"A new {Properties.Resources.AppDisplayName}, version {newVersion}, is available";
+
+        public static string S_ITEMS_DESTINATION(bool multipleItems, object singleItem) =>
+            "Select destination for " + (multipleItems ? "multiple items" : singleItem);
+
+        public static string S_PUSH_BROWSE_TITLE(bool isFolderPicker, string targetName)
+        {
+            if (!string.IsNullOrEmpty(targetName))
+                targetName = $" into {targetName}";
+
+            return $"Select {(isFolderPicker ? "folder" : "file")}s to push{targetName}";
+        }
+
+        public static string S_DELETE_CONF(bool permanent, string deletedString) =>
+            $"The following will be{(permanent ? " permanently" : "")} deleted:\n{deletedString}";
+
+        public static string S_PATH_EXIST(string newPath) =>
+            $"{newPath} already exists";
+
+        public static string S_NEW_ITEM(bool isFolder) =>
+            $"New {(isFolder ? "Folder" : "File")}";
+
+        public static string S_CONFLICT_ITEMS(int count) =>
+            $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")}";
+
+        public static string S_MERGE_REPLACE(bool merge) =>
+            $"{(merge ? "Merge or " : "")}Replace";
+
+        public static string S_REM_APK(bool apk, int count) =>
+            $"The following will be removed:\n{count} {(apk ? "APK" : "package")}{(count > 1 ? "s" : "")}";
     }
 }
