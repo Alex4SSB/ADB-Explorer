@@ -307,7 +307,9 @@ namespace ADB_Explorer.Services
 
         public static bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
-        public static bool IsWin11 => Environment.OSVersion.Version > AdbExplorerConst.WIN11_VERSION;
+        public static bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
+
+        public static bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 
         public bool HideForceFluent => !IsWin11;
 
