@@ -3113,11 +3113,6 @@ namespace ADB_Explorer
             (sender as TextBox).FilterString(INVALID_ANDROID_CHARS);
         }
 
-        private void PairingCodeTextBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            (sender as TextBox).SelectAll();
-        }
-
         private void Drive_GotFocus(object sender, RoutedEventArgs e)
         {
             ClearSelectedDrives();

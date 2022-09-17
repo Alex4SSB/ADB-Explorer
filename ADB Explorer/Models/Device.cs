@@ -739,11 +739,22 @@ namespace ADB_Explorer.Models
             get => port;
             set
             {
-                port = value;
-                UpdateStatus();
+                if (Set(ref port, value))
+                    UpdateStatus();
             }
         }
-        public ServiceType MdnsType { get; set; }
+
+        private ServiceType mdnsType;
+        public ServiceType MdnsType
+        {
+            get => mdnsType;
+            set
+            {
+                if (Set(ref mdnsType, value))
+                    UpdateStatus();
+            }
+        }
+
         public string PairingCode { get; set; }
 
         public string PairingAddress => $"{IpAddress}:{Port}";

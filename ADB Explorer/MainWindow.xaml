@@ -1010,7 +1010,6 @@
                             ui:ControlHelper.PlaceholderText="Pairing Code"
                             ui:TextBoxHelper.IsDeleteButtonVisible="False"
                             KeyDown="PairingCodeTextBox_KeyDown"
-                            MouseDoubleClick="PairingCodeTextBox_MouseDoubleClick"
                             Style="{StaticResource PairingTextBoxStyle}"
                             Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                             TextChanged="PairingCodeTextBox_TextChanged" />
@@ -2884,7 +2883,7 @@
                                     Margin="0,8,0,4"
                                     Style="{x:Null}" />
                             </Grid>
-                            <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" >
+                            <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
                                 <ui:SimpleStackPanel
                                     Margin="6,0,24,10"
                                     HorizontalAlignment="Left"
@@ -2895,8 +2894,8 @@
                                         Style="{StaticResource GroupSettingsListView}" />
                                     <ListView
                                         x:Name="SortedSettings"
-                                        MouseMove="SortedSettings_MouseMove"
                                         Margin="0,2,0,-3"
+                                        MouseMove="SortedSettings_MouseMove"
                                         Style="{StaticResource SortedSettingsListView}" />
                                     <Separator />
                                     <Expander x:Name="SettingsAboutExpander" Header="About">

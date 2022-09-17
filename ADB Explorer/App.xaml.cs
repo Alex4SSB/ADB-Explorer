@@ -108,7 +108,7 @@ namespace ADB_Explorer
 
         private void SelectAllText(object sender, RoutedEventArgs e)
         {
-            if (e.OriginalSource is TextBox tb)
+            if (sender is TextBox tb)
                 tb.SelectAll();
         }
     }
