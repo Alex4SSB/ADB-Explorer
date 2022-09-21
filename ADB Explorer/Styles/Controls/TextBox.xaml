@@ -109,8 +109,7 @@
                                     BorderThickness="{TemplateBinding BorderThickness}"
                                     Focusable="False"
                                     FontSize="{TemplateBinding FontSize}"
-                                    IsTabStop="False"
-                                    Visibility="Collapsed">
+                                    IsTabStop="False">
                                     <ui:FontIconFallback
                                         Data="{StaticResource Cancel}"
                                         FontFamily="{DynamicResource SymbolThemeFontFamily}"
@@ -125,18 +124,6 @@
                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                     TextElement.Foreground="{DynamicResource SystemControlDescriptionTextForegroundBrush}"
                                     Visibility="{TemplateBinding ui:ControlHelper.DescriptionVisibility}" />
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="ButtonStates">
-                                        <VisualState x:Name="ButtonVisible">
-                                            <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DeleteButton" Storyboard.TargetProperty="Visibility">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Visible}" />
-                                                </ObjectAnimationUsingKeyFrames>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="ButtonCollapsed" />
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="ui:ControlHelper.PlaceholderForeground" Value="{x:Null}">
@@ -144,6 +131,9 @@
                                 </Trigger>
                                 <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
                                     <Setter TargetName="PlaceholderTextContentPresenter" Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                                <Trigger Property="Visibility" Value="Visible">
+                                    <Setter TargetName="DeleteButton" Property="Visibility" Value="Collapsed" />
                                 </Trigger>
                                 <Trigger Property="IsEnabled" Value="false">
                                     <Setter TargetName="HeaderContentPresenter" Property="Foreground" Value="{DynamicResource TextControlHeaderForegroundDisabled}" />
@@ -188,8 +178,9 @@
                                         <Condition Property="IsReadOnly" Value="False" />
                                         <Condition Property="AcceptsReturn" Value="False" />
                                         <Condition Property="TextWrapping" Value="NoWrap" />
+                                        <Condition Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="True" />
                                     </MultiTrigger.Conditions>
-                                    <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="True" />
+                                    <Setter TargetName="DeleteButton" Property="Visibility" Value="Visible" />
                                 </MultiTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
@@ -198,6 +189,7 @@
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
+        <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="True" />
     </Style>
 
     <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox" />
