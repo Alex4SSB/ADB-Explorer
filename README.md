@@ -3,9 +3,17 @@
   <h1 align="center">ADB Explorer</h1>
 </p>
 
-<a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
-      <img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" />
+<a title="Platform" target="_blank">
+	<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
 </a>
+
+<p >
+  <a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
+    <img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" />
+  </a>
+  <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/Alex4SSB/ADB-Explorer?color=orange&label=Total%20lines">
+  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit">
+</p>
 
 An interface to ADB that allows browsing, transferring, and editing of files with ease, in a modern and fluent Windows app, built in WPF.
 
