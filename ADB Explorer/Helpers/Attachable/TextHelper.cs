@@ -45,6 +45,18 @@ namespace ADB_Explorer.Helpers
                 typeof(TextHelper),
                 null);
 
+        public enum ValidationType
+        {
+            None,
+            SeparateDigits,
+            SeparateAndLimitDigits,
+            LimitDigits,
+            LimitNumber,
+            LimitDigitsAndNumber,
+            FilterString,
+            SeparateFormat,
+        }
+
         public static void SeparateDigits(this TextBox textbox, char separator) => TextBoxValidation(textbox, separator);
 
         public static void SeparateAndLimitDigits(this TextBox textbox, char separator, int maxChars) => TextBoxValidation(textbox, separator, maxChars);
