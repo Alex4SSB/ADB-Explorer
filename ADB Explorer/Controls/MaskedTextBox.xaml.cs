@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using static ADB_Explorer.Helpers.TextHelper;
 
 namespace ADB_Explorer.Controls
@@ -105,10 +106,21 @@ namespace ADB_Explorer.Controls
             DependencyProperty.Register("ControlStyle", typeof(Style),
               typeof(MaskedTextBox), new PropertyMetadata(default(Style)));
 
+        public ICommand EnterCommand
+        {
+            get => (ICommand)GetValue(EnterCommandProperty);
+            set => SetValue(EnterCommandProperty, value);
+        }
+
+        public static readonly DependencyProperty EnterCommandProperty =
+            DependencyProperty.Register("EnterCommand", typeof(ICommand),
+              typeof(MaskedTextBox), new PropertyMetadata(default(ICommand)));
+
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textbox = sender as TextBox;
-
+            Text = textbox.Text;
+            
             switch (ValidationType)
             {
                 case ValidationType.SeparateDigits:

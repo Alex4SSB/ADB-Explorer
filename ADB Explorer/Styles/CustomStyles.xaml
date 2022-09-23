@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -75,18 +76,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="RemoveDeviceButtonStyle"
-        BasedOn="{StaticResource DisabledButtonTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="Text" Value="Remove" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
-                <Setter Property="Text" Value="Kill" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="Transparent" />
     </Style>
@@ -110,16 +99,6 @@
             </Trigger>
         </Style.Triggers>
         <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
-    </Style>
-    <Style
-        x:Key="PairingTextBoxStyle"
-        BasedOn="{StaticResource NumericTextBoxStyle}"
-        TargetType="TextBox">
-        <Style.Triggers>
-            <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
-                <Setter Property="FontSize" Value="18" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="TrimmedTextTooltipStyle"
@@ -181,51 +160,23 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="DeviceButtonStyle"
-        BasedOn="{StaticResource ButtonStyle}"
-        TargetType="Button">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsMdns}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="Visibility" Value="Visible" />
-    </Style>
-    <Style
-        x:Key="DeviceBrowseButtonStyle"
-        BasedOn="{StaticResource DeviceButtonStyle}"
-        TargetType="Button">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Offline">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="IsEnabled" Value="True" />
-    </Style>
-    <Style
-        x:Key="DeviceRemoveButtonStyle"
-        BasedOn="{StaticResource DeviceButtonStyle}"
-        TargetType="Button">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Type}" Value="Remote">
-                <Setter Property="IsEnabled" Value="True" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
-                <Setter Property="IsEnabled" Value="True" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="IsEnabled" Value="False" />
-    </Style>
-    <Style
         x:Key="DeviceNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
         TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="LogicalDeviceNameStyle"
+        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding Name}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsOpen}" Value="True">
                 <Setter Property="FontWeight" Value="Bold" />
@@ -239,22 +190,17 @@
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Device.Type}" Value="Service" />
-                    <Condition Binding="{Binding IsMdns}" Value="False" />
                     <Condition Binding="{Binding Name}" Value="" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Text" Value="[Service]" />
             </MultiDataTrigger>
-            <DataTrigger Binding="{Binding IsMdns}" Value="True">
-                <Setter Property="Text" Value="{Binding Device.IpAddress}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
-            </DataTrigger>
         </Style.Triggers>
-        <Setter Property="Text" Value="{Binding Name}" />
+    </Style>
+    <Style
+        x:Key="ServiceDeviceNameStyle"
+        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding Device.IpAddress}" />
     </Style>
     <ResourceDictionary x:Key="ContextMenuStyles">
         <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem" />
@@ -807,11 +753,11 @@
         BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                <Setter Property="Visibility" Value="Visible" />
+            <DataTrigger Binding="{Binding Device.IsOpen}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
-        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="ToolTip" Value="Currently Browsing" />
     </Style>
     <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
         <Style.Triggers>
@@ -1124,9 +1070,11 @@
                 </Grid>
             </Setter.Value>
         </Setter>
-        <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Unknown">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -1337,12 +1285,12 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <DataTemplate x:Key="ResetButtonTemplate" DataType="services:ResetButton">
+    <DataTemplate x:Key="ResetButtonTemplate" DataType="services:ResetCommand">
         <Button Command="{Binding Command}" Style="{StaticResource RestartAppButtonStyle}">
             <ui:FontIcon />
         </Button>
     </DataTemplate>
-    <DataTemplate x:Key="AnimationTipButtonTemplate" DataType="services:ResetButton">
+    <DataTemplate x:Key="AnimationTipButtonTemplate" DataType="services:ShowAnimationTipCommand">
         <Button
             Command="{Binding Command}"
             Style="{StaticResource RestartAppButtonStyle}"
@@ -1350,7 +1298,7 @@
             <ui:FontIcon Glyph="&#xE82F;" />
         </Button>
     </DataTemplate>
-    <DataTemplate x:Key="ClearTextButtonTemplate" DataType="services:ResetButton">
+    <DataTemplate x:Key="ClearTextButtonTemplate" DataType="services:ClearTextSettingCommand">
         <Button
             Command="{Binding Command}"
             Style="{StaticResource RestartAppButtonStyle}"
@@ -1358,7 +1306,7 @@
             <ui:FontIcon Glyph="&#xE711;" />
         </Button>
     </DataTemplate>
-    <DataTemplate x:Key="ChangeTextButtonTemplate" DataType="services:ResetButton">
+    <DataTemplate x:Key="ChangeTextButtonTemplate">
         <Button
             Command="{Binding Command}"
             Style="{StaticResource RestartAppButtonStyle}"
@@ -1794,6 +1742,371 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="Margin" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Menu
+        x:Key="DeviceActionsMenu"
+        x:Shared="False"
+        Resources="{StaticResource DeviceMenuStyles}">
+        <Menu.Style>
+            <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                <Setter Property="IsEnabled" Value="False" />
+                <Setter Property="Height" Value="30" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Device.Status}" Value="Online">
+                        <Setter Property="IsEnabled" Value="True" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                        <Setter Property="Height" Value="32" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Menu.Style>
+        <MenuItem ToolTip="More Actions">
+            <MenuItem.Header>
+                <ui:FontIcon Margin="-6" Glyph="&#xE712;" />
+            </MenuItem.Header>
+            <MenuItem Header="Root Access">
+                <MenuItem.Icon>
+                    <ui:FontIcon Glyph="&#xE7EF;" />
+                </MenuItem.Icon>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <StackPanel>
+                            <TextBlock FontWeight="Bold" Text="Status: " />
+                            <TextBlock FontWeight="Bold" Text="{Binding Device.Root}" />
+                            <TextBlock
+                                FontWeight="Bold"
+                                Style="{StaticResource RecoveryRootStatusStyle}"
+                                Text=" - Recovery" />
+                        </StackPanel>
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator>
+                    <Separator.Style>
+                        <Style BasedOn="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" TargetType="Separator">
+                            <Setter Property="Margin" Value="-11,0" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Separator.Style>
+                </Separator>
+                <MenuItem Command="{Binding ToggleRootCommand.Command}">
+                    <MenuItem.Style>
+                        <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </MenuItem.Style>
+                    <MenuItem.Header>
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
+                                    <Setter Property="Text" Value="Enable" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
+                                            <Setter Property="Text" Value="Disable" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="Reboot">
+                <MenuItem.Icon>
+                    <ui:FontIcon Glyph="&#xE777;" />
+                </MenuItem.Icon>
+                <MenuItem IsEnabled="False">
+                    <MenuItem.Header>
+                        <TextBlock FontWeight="Bold" Text="Reboot Into:" />
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator Margin="-10,0" />
+                <MenuItem Command="{Binding RebootCommand.Command}" Header="System Image" />
+                <MenuItem Command="{Binding BootloaderCommand.Command}" Header="Bootloader" />
+                <MenuItem Command="{Binding RecoveryCommand.Command}" Header="Recovery" />
+                <MenuItem Command="{Binding SideloadCommand.Command}" Header="Sideload" />
+                <MenuItem Command="{Binding SideloadAutoCommand.Command}" Header="Sideload (Auto Reboot)" />
+            </MenuItem>
+        </MenuItem>
+    </Menu>
+    <Style x:Key="MaskedTextBoxStyle" TargetType="controls:MaskedTextBox">
+        <Setter Property="ValidationType" Value="None" />
+        <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />
+    </Style>
+    <Style
+        x:Key="PairingBoxStyle"
+        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceUIPairingCode, Mode=TwoWay}" />
+        <Setter Property="ValidationType" Value="SeparateAndLimitDigits" />
+        <Setter Property="Separator" Value="-" />
+        <Setter Property="MaxChars" Value="6" />
+        <Setter Property="ControlStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="Pairing Code" />
+                    <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
+                    <Style.Triggers>
+                        <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
+                            <Setter Property="FontSize" Value="18" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="NewDeviceIpBoxStyle"
+        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceIp, Mode=TwoWay}" />
+        <Setter Property="ValidationType" Value="SeparateFormat" />
+        <Setter Property="Separator" Value="." />
+        <Setter Property="MaxNumber" Value="255" />
+        <Setter Property="MaxSeparators" Value="3" />
+        <Setter Property="ControlStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="IP Address" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="NewDevicePortBoxStyle"
+        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceConnectPort, Mode=TwoWay}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ValidationType" Value="LimitNumber" />
+        <Setter Property="MaxNumber" Value="65535" />
+        <Setter Property="ControlStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="Port" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="NewDevicePairingPortBoxStyle"
+        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDevicePairingPort, Mode=TwoWay}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ValidationType" Value="LimitNumber" />
+        <Setter Property="MaxNumber" Value="65535" />
+        <Setter Property="ControlStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="Pairing Port" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <DataTemplate x:Key="LogicalDeviceTemplate" DataType="UILogicalDevice">
+        <Expander x:Name="DeviceExpander" Style="{StaticResource DeviceExpanderStyle}">
+            <Expander.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.Resources>
+                            <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
+                        </Grid.Resources>
+                        <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                        <Grid Style="{StaticResource DeviceStatusGridStyle}">
+                            <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
+                            <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
+                        </Grid>
+                    </Grid>
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4"
+                        Style="{StaticResource LogicalDeviceNameStyle}"
+                        TextTrimming="CharacterEllipsis" />
+                    <ui:SimpleStackPanel
+                        Grid.Column="2"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="6">
+                        <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
+                        <ui:FontIcon Glyph="&#xE838;" Style="{StaticResource DeviceOpenIconStyle}" />
+                        <ui:FontIcon Style="{StaticResource BatteryIconStyle}" />
+                    </ui:SimpleStackPanel>
+                </Grid>
+            </Expander.Header>
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StaticResource ResourceKey="DeviceActionsMenu" />
+                <Button
+                    Grid.Column="1"
+                    Margin="8,0"
+                    Padding="0,5,0,6"
+                    HorizontalAlignment="Stretch"
+                    Command="{Binding BrowseCommand.Command}"
+                    Content="Browse" />
+                <Button Grid.Column="2" Command="{Binding RemoveCommand.Command}">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:FontIcon
+                            Margin="-4,1,4,-2"
+                            VerticalAlignment="Center"
+                            Glyph="&#xECC9;"
+                            Style="{DynamicResource DisabledButtonGlyphStyle}" />
+                        <Grid>
+                            <TextBlock Text="Remove" Visibility="Hidden" />
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource DisabledButtonTextBlockStyle}"
+                                Text="{Binding RemoveCommand.RemoveAction}" />
+                        </Grid>
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Expander>
+    </DataTemplate>
+    <DataTemplate x:Key="ServiceDeviceTemplate" DataType="UIServiceDevice">
+        <Expander>
+            <Expander.Style>
+                <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Device.MdnsType}" Value="QrCode">
+                            <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Expander.Style>
+            <Expander.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid>
+                        <Grid.Resources>
+                            <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
+                        </Grid.Resources>
+                        <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                        <Grid Style="{StaticResource DeviceStatusGridStyle}">
+                            <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
+                            <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
+                        </Grid>
+                    </Grid>
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4"
+                        Style="{StaticResource ServiceDeviceNameStyle}"
+                        TextTrimming="CharacterEllipsis" />
+                </Grid>
+            </Expander.Header>
+            <Grid Margin="0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <controls:MaskedTextBox
+                    x:Name="PairingCodeTextBox"
+                    Height="32"
+                    EnterCommand="{Binding PairCommand.Command}"
+                    Style="{StaticResource PairingBoxStyle}"
+                    Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <Button
+                    Grid.Column="1"
+                    Height="32"
+                    Margin="8,0,0,0"
+                    VerticalAlignment="Center"
+                    Command="{Binding PairCommand.Command}"
+                    Content="Pair" />
+            </Grid>
+        </Expander>
+    </DataTemplate>
+    <helpers:DeviceTemplateSelector
+        x:Key="DeviceTemplateSelector"
+        LogicalDeviceTemplate="{StaticResource LogicalDeviceTemplate}"
+        ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}" />
+    <Style
+        x:Key="DeviceContainerStyle"
+        BasedOn="{StaticResource StretchListViewItem}"
+        TargetType="ListViewItem">
+        <Setter Property="Margin" Value="0,1" />
+    </Style>
+    <Style
+        x:Key="DevicesListViewStyle"
+        BasedOn="{StaticResource DefaultListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="ItemContainerStyle" Value="{StaticResource DeviceContainerStyle}" />
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource DeviceTemplateSelector}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ConnectNewDeviceButtonStyle"
+        BasedOn="{StaticResource ButtonStyle}"
+        TargetType="Button">
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Content" Value="Connect" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDeviceIpValid}" Value="False">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDeviceConnectPortValid}" Value="False">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="PairNewDeviceButtonStyle"
+        BasedOn="{StaticResource ButtonStyle}"
+        TargetType="Button">
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Content" Value="Pair" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingPortValid}" Value="False">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingCodeValid}" Value="False">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="ManualPairingPanelStyle" TargetType="StackPanel">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingEnabled}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DeviceConnectionPanel" TargetType="StackPanel">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

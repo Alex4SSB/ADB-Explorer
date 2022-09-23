@@ -22,8 +22,8 @@
                 <ResourceDictionary Source="Styles\Controls\ToggleButton.xaml" />
                 <ResourceDictionary Source="Styles\Controls\TextBox.xaml" />
                 <ResourceDictionary Source="Styles\Controls\MenuItem.xaml" />
-                <ResourceDictionary Source="Styles\CustomStyles.xaml" />
                 <ResourceDictionary Source="Styles\Controls\Expander.xaml" />
+                <ResourceDictionary Source="Styles\CustomStyles.xaml" />
                 <ResourceDictionary Source="Styles\Controls\DataGrid.xaml" />
                 <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
                 <ResourceDictionary Source="Styles\Controls\SplitView.xaml" />

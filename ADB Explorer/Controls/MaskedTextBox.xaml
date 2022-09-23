@@ -13,6 +13,10 @@
         <TextBox
             Style="{Binding ControlStyle}"
             Text="{Binding Text, Mode=TwoWay}"
-            TextChanged="TextBox_TextChanged" />
+            TextChanged="TextBox_TextChanged">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding EnterCommand}" />
+            </TextBox.InputBindings>
+        </TextBox>
     </Grid>
 </UserControl>

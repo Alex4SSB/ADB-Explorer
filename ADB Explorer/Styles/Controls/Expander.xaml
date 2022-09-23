@@ -460,9 +460,6 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource AdbButtonLowerBorderNormal}" />
             </MultiDataTrigger>
-            <DataTrigger Binding="{Binding Device.MdnsType}" Value="QrCode">
-                <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
-            </DataTrigger>
         </Style.Triggers>
         <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="None" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
