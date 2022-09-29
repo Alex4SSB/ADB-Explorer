@@ -435,104 +435,11 @@ namespace ADB_Explorer.Services
             set => Set(ref removeDevice, value);
         }
 
-        private string newDeviceIp;
-        public string NewDeviceIp
-        {
-            get => newDeviceIp;
-            set
-            {
-                if (Set(ref newDeviceIp, value))
-                    OnPropertyChanged(nameof(IsNewDeviceIpValid));
-            }
-        }
-
-        public bool IsNewDeviceIpValid
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(NewDeviceIp)
-                    && NewDeviceIp.Count(c => c == '.') == 3
-                    && NewDeviceIp.Split('.').Count(i => byte.TryParse(i, out _)) == 4;
-            }
-        }
-
-        private string newDeviceConnectPort;
-        public string NewDeviceConnectPort
-        {
-            get => newDeviceConnectPort;
-            set
-            {
-                if (Set(ref newDeviceConnectPort, value))
-                    OnPropertyChanged(nameof(IsNewDeviceConnectPortValid));
-            }
-        }
-
-        public bool IsNewDeviceConnectPortValid
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(NewDeviceConnectPort)
-                    && ushort.TryParse(NewDeviceConnectPort, out _);
-            }
-        }
-
-        private string newDevicePairingPort;
-        public string NewDevicePairingPort
-        {
-            get => newDevicePairingPort;
-            set
-            {
-                if (Set(ref newDevicePairingPort, value))
-                    OnPropertyChanged(nameof(IsNewDevicePairingPortValid));
-            }
-        }
-
-        public bool IsNewDevicePairingPortValid
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(NewDevicePairingPort)
-                    && ushort.TryParse(NewDevicePairingPort, out _);
-            }
-        }
-
-        private string newDevicePairingCode;
-        public string NewDeviceUIPairingCode
-        {
-            get => newDevicePairingCode;
-            set
-            {
-                if (Set(ref newDevicePairingCode, value))
-                {
-                    OnPropertyChanged(nameof(NewDevicePairingCode));
-                    OnPropertyChanged(nameof(IsNewDevicePairingCodeValid));
-                }
-            }
-        }
-
-        public string NewDevicePairingCode => NewDeviceUIPairingCode?.Replace("-", "");
-
-        public bool IsNewDevicePairingCodeValid
-        {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(NewDevicePairingCode)
-                    && NewDevicePairingCode.Length == 6;
-            }
-        }
-
         private ServiceDevice deviceToPair;
         public ServiceDevice DeviceToPair
         {
             get => deviceToPair;
             set => Set(ref deviceToPair, value);
-        }
-
-        private bool isNewDevicePairingEnabled = false;
-        public bool IsNewDevicePairingEnabled
-        {
-            get => isNewDevicePairingEnabled;
-            set => Set(ref isNewDevicePairingEnabled, value);
         }
 
         private bool isManualPairingInProgress = false;
@@ -549,7 +456,14 @@ namespace ADB_Explorer.Services
             set => Set(ref rootAttemptForbidden, value);
         }
 
-        
+        private bool connectNewDevice = false;
+        public bool ConnectNewDevice
+        {
+            get => connectNewDevice;
+            set => Set(ref connectNewDevice, value);
+        }
+
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

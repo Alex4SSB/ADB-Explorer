@@ -437,6 +437,7 @@
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Background" Value="Transparent" />

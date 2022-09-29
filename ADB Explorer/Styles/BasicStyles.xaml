@@ -13,6 +13,7 @@
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
     </Style>
     <Style
         x:Key="DisabledGlyphStyle"
@@ -234,5 +235,8 @@
     <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />
     <Style TargetType="ui:HyperlinkButton">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+    </Style>
+    <Style TargetType="GridSplitter">
+        <Setter Property="IsTabStop" Value="False" />
     </Style>
 </ResourceDictionary>

@@ -109,5 +109,18 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(StyleHelper),
                 null);
+
+        public static Brush GetAltBorderBrush(UIElement control) =>
+            (Brush)control.GetValue(AltBorderBrushProperty);
+
+        public static void SetAltBorderBrush(UIElement control, Brush value) =>
+            control.SetValue(AltBorderBrushProperty, value);
+
+        public static readonly DependencyProperty AltBorderBrushProperty =
+            DependencyProperty.RegisterAttached(
+                "AltBorderBrush",
+                typeof(Brush),
+                typeof(StyleHelper),
+                null);
     }
 }

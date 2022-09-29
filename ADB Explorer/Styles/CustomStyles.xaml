@@ -14,6 +14,7 @@
     <FontFamily x:Key="ConsoleFont">Cascadia Mono, Consolas</FontFamily>
     <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
@@ -46,7 +47,6 @@
         x:Key="DeviceHeaderIcon"
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
@@ -753,7 +753,7 @@
         BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.IsOpen}" Value="False">
+            <DataTrigger Binding="{Binding IsOpen}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -786,7 +786,6 @@
                 <Setter Property="Glyph" Value="&#xE72C;" />
             </Style>
         </Style.Resources>
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="Padding" Value="2" />
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="Restart app for changes to take effect" />
@@ -858,7 +857,6 @@
         TargetType="ui:ProgressBar">
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="IsIndeterminate" Value="False" />
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ToolTip" Value="{Binding StringProgress}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsActive}" Value="True">
@@ -918,7 +916,6 @@
         x:Key="DriveUsageBarStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ui:ProgressBar">
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ToolTip">
             <Setter.Value>
                 <StackPanel Orientation="Horizontal">
@@ -1119,7 +1116,6 @@
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
         <Setter Property="Visibility" Value="Collapsed" />
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersionIncompatible}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
@@ -1851,31 +1847,57 @@
     </Style>
     <Style
         x:Key="PairingBoxStyle"
+        BasedOn="{StaticResource NumericTextBoxStyle}"
+        TargetType="TextBox">
+        <Setter Property="ui:ControlHelper.PlaceholderText" Value="Pairing Code" />
+        <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
+        <Style.Triggers>
+            <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
+                <Setter Property="FontSize" Value="18" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="NewDeviceMaskedTextBoxStyle"
         BasedOn="{StaticResource MaskedTextBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Height" Value="32" />
+        <Setter Property="EnterCommand" Value="{Binding ConnectCommand.Command}" />
+    </Style>
+    <Style
+        x:Key="PairingCodeBoxStyle"
+        BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
         <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceUIPairingCode, Mode=TwoWay}" />
         <Setter Property="ValidationType" Value="SeparateAndLimitDigits" />
         <Setter Property="Separator" Value="-" />
         <Setter Property="MaxChars" Value="6" />
+        <Setter Property="ControlStyle" Value="{StaticResource PairingBoxStyle}" />
+    </Style>
+    <Style
+        x:Key="NewDevicePairingCodeBoxStyle"
+        BasedOn="{StaticResource PairingCodeBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Text" Value="{Binding UIPairingCode, Mode=TwoWay}" />
         <Setter Property="ControlStyle">
             <Setter.Value>
-                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="Pairing Code" />
-                    <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="False" />
-                    <Style.Triggers>
-                        <Trigger Property="ui:TextBoxHelper.HasText" Value="True">
-                            <Setter Property="FontSize" Value="18" />
-                        </Trigger>
-                    </Style.Triggers>
+                <Style BasedOn="{StaticResource PairingBoxStyle}" TargetType="TextBox">
+                    <Setter Property="Padding" Value="7,5,0,6" />
+                    <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.IsPairingCodeValid}" Value="False">
+                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="NewDeviceIpBoxStyle"
-        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceIp, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding Device.IpAddress, Mode=TwoWay}" />
         <Setter Property="ValidationType" Value="SeparateFormat" />
         <Setter Property="Separator" Value="." />
         <Setter Property="MaxNumber" Value="255" />
@@ -1883,32 +1905,52 @@
         <Setter Property="ControlStyle">
             <Setter.Value>
                 <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="IP Address" />
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" IP Address" />
+                    <Setter Property="Padding" Value="4,5,0,6" />
+                    <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.IsIpAddressValid}" Value="False">
+                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="NewDevicePortBoxStyle"
-        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDeviceConnectPort, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding Device.ConnectPort, Mode=TwoWay}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ValidationType" Value="LimitNumber" />
         <Setter Property="MaxNumber" Value="65535" />
         <Setter Property="ControlStyle">
             <Setter.Value>
                 <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value="Port" />
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" Port" />
+                    <Setter Property="Padding" Value="4,5,0,6" />
+                    <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.IsConnectPortValid}" Value="False">
+                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="NewDevicePairingPortBoxStyle"
-        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=NewDevicePairingPort, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding Device.PairingPort, Mode=TwoWay}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ValidationType" Value="LimitNumber" />
         <Setter Property="MaxNumber" Value="65535" />
@@ -1916,9 +1958,24 @@
             <Setter.Value>
                 <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
                     <Setter Property="ui:ControlHelper.PlaceholderText" Value="Pairing Port" />
+                    <Setter Property="Padding" Value="7,5,0,6" />
+                    <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.IsPairingPortValid}" Value="False">
+                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DeviceContentGridStyle" TargetType="Grid">
+        <Setter Property="Margin" Value="0,5" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <DataTemplate x:Key="LogicalDeviceTemplate" DataType="UILogicalDevice">
         <Expander x:Name="DeviceExpander" Style="{StaticResource DeviceExpanderStyle}">
@@ -1956,7 +2013,7 @@
                     </ui:SimpleStackPanel>
                 </Grid>
             </Expander.Header>
-            <Grid Margin="0,5">
+            <Grid Style="{StaticResource DeviceContentGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
@@ -2023,7 +2080,7 @@
                         TextTrimming="CharacterEllipsis" />
                 </Grid>
             </Expander.Header>
-            <Grid Margin="0,5">
+            <Grid Style="{StaticResource DeviceContentGridStyle}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
@@ -2032,7 +2089,7 @@
                     x:Name="PairingCodeTextBox"
                     Height="32"
                     EnterCommand="{Binding PairCommand.Command}"
-                    Style="{StaticResource PairingBoxStyle}"
+                    Style="{StaticResource PairingCodeBoxStyle}"
                     Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 <Button
                     Grid.Column="1"
@@ -2044,9 +2101,173 @@
             </Grid>
         </Expander>
     </DataTemplate>
+    <Style
+        x:Key="NewDeviceNameStyle"
+        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="Add New Device" />
+    </Style>
+    <Style
+        x:Key="ConnectNewDeviceButtonStyle"
+        BasedOn="{StaticResource ButtonStyle}"
+        TargetType="Button">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Content" Value="Connect" />
+        <Setter Property="Command" Value="{Binding ConnectCommand.Command}" />
+        <Setter Property="IsEnabled" Value="False" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
+                <Setter Property="Content" Value="Pair &amp; Connect" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsPairingEnabled}" Value="False" />
+                    <Condition Binding="{Binding Device.IsIpAddressValid}" Value="True" />
+                    <Condition Binding="{Binding Device.IsConnectPortValid}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="IsEnabled" Value="True" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsPairingEnabled}" Value="True" />
+                    <Condition Binding="{Binding Device.IsIpAddressValid}" Value="True" />
+                    <Condition Binding="{Binding Device.IsConnectPortValid}" Value="True" />
+                    <Condition Binding="{Binding Device.IsPairingCodeValid}" Value="True" />
+                    <Condition Binding="{Binding Device.IsPairingPortValid}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="IsEnabled" Value="True" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="NewDevicePairingGrid" TargetType="Grid">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="NewDeviceClearButtonStyle"
+        BasedOn="{StaticResource RestartAppButtonStyle}"
+        TargetType="Button">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding DeviceSelected}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="NewDeviceContentPanelStyle" TargetType="ui:SimpleStackPanel">
+        <Setter Property="Margin" Value="0,5" />
+        <Setter Property="Spacing" Value="8" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <DataTemplate x:Key="NewDeviceTemplate" DataType="UINewDevice">
+        <Expander>
+            <Expander.Style>
+                <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander" />
+            </Expander.Style>
+            <Expander.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="4"
+                        Style="{StaticResource NewDeviceNameStyle}"
+                        TextTrimming="CharacterEllipsis" />
+                    <Button
+                        Grid.Column="2"
+                        Command="{Binding ClearCommand.Command}"
+                        Style="{StaticResource NewDeviceClearButtonStyle}"
+                        ToolTip="Clear All">
+                        <ui:FontIcon Glyph="&#xE711;" />
+                    </Button>
+                </Grid>
+            </Expander.Header>
+            <ui:SimpleStackPanel Style="{StaticResource NewDeviceContentPanelStyle}">
+                <ui:SimpleStackPanel.Resources>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Margin" Value="-1,0,4,0" />
+                    </Style>
+                </ui:SimpleStackPanel.Resources>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE774;" ToolTip="IP Address" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDeviceIpBoxStyle}" />
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE177;" ToolTip="Port" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
+                </Grid>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Separator">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Separator />
+                    <Button
+                        Grid.Column="1"
+                        Margin="4,0"
+                        Style="{StaticResource ConnectNewDeviceButtonStyle}" />
+                    <Separator Grid.Column="2" />
+                </Grid>
+                <Grid Style="{StaticResource NewDevicePairingGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="Pairing Code" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
+                </Grid>
+                <Grid Style="{StaticResource NewDevicePairingGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid Margin="-1,0,4,0">
+                        <ui:FontIcon
+                            Margin="0,0,0,0"
+                            Glyph="&#xE177;"
+                            ToolTip="Pairing Port" />
+                        <ui:FontIcon
+                            Margin="0,4,0,0"
+                            Glyph="&#xEA21;"
+                            ToolTip="Pairing Port" />
+                    </Grid>
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
+                </Grid>
+            </ui:SimpleStackPanel>
+        </Expander>
+    </DataTemplate>
     <helpers:DeviceTemplateSelector
         x:Key="DeviceTemplateSelector"
         LogicalDeviceTemplate="{StaticResource LogicalDeviceTemplate}"
+        NewDeviceTemplate="{StaticResource NewDeviceTemplate}"
         ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}" />
     <Style
         x:Key="DeviceContainerStyle"
@@ -2060,48 +2281,7 @@
         TargetType="ListView">
         <Setter Property="ItemContainerStyle" Value="{StaticResource DeviceContainerStyle}" />
         <Setter Property="ItemTemplateSelector" Value="{StaticResource DeviceTemplateSelector}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ConnectNewDeviceButtonStyle"
-        BasedOn="{StaticResource ButtonStyle}"
-        TargetType="Button">
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="Content" Value="Connect" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDeviceIpValid}" Value="False">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDeviceConnectPortValid}" Value="False">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="PairNewDeviceButtonStyle"
-        BasedOn="{StaticResource ButtonStyle}"
-        TargetType="Button">
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="Content" Value="Pair" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingPortValid}" Value="False">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingCodeValid}" Value="False">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="ManualPairingPanelStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingEnabled}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
     <Style x:Key="DeviceConnectionPanel" TargetType="StackPanel">
         <Style.Triggers>

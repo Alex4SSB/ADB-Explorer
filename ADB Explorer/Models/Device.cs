@@ -21,6 +21,7 @@ namespace ADB_Explorer.Models
             Emulator,
             Service,
             Sideload,
+            New,
         }
 
         public enum DeviceStatus
@@ -28,6 +29,7 @@ namespace ADB_Explorer.Models
             Online,
             Offline,
             Unauthorized,
+            New,
         }
 
         public enum RootStatus
@@ -61,7 +63,11 @@ namespace ADB_Explorer.Models
         public ObservableList<UIDevice> UIList
         {
             get => uiDevices;
-            private set => Set(ref uiDevices, value);
+            private set
+            {
+                if (Set(ref uiDevices, value))
+                    OnPropertyChanged(nameof(Count));
+            }
         }
 
         private ObservableList<ConnectService> connectServices = new();
@@ -93,14 +99,23 @@ namespace ADB_Explorer.Models
 
         public UIDevice SelectedDevice => UIList?.Find(device => device.DeviceSelected);
 
+        public UINewDevice NewDevice => UIList.OfType<UINewDevice>().First();
+
         public DateTime LastUpdate { get; set; }
+
+        public int Count => UIList.Count(d => d.Device.Status is DeviceStatus.Online or DeviceStatus.Unauthorized);
+
+        public Devices()
+        {
+            UIList.Add(new UINewDevice());
+        }
 
         public void UpdateConnectServices()
         {
             foreach (var item in LogicalDevices)
             {
                 var service = ConnectServices.Where(srv => srv.ID == item.BaseID);
-                if (service.Any() && (item.Service is null || item.Service.Port != service.First().Port))
+                if (service.Any() && (item.Service is null || item.Service.PairingPort != service.First().PairingPort))
                     item.UpdateConnectService(service.First());
             }
 
@@ -151,7 +166,12 @@ namespace ADB_Explorer.Models
             ConsolidateDevices(self);
         }
 
-        public bool UpdateDevices(IEnumerable<LogicalDevice> other) => UpdateDevices(UIList, other, ConnectServices);
+        public bool UpdateDevices(IEnumerable<LogicalDevice> other)
+        {
+            var result = UpdateDevices(UIList, other, ConnectServices);
+            OnPropertyChanged(nameof(Count));
+            return result;
+        }
 
         public static bool UpdateDevices(ObservableList<UIDevice> self, IEnumerable<LogicalDevice> other, ObservableList<ConnectService> services)
         {
@@ -185,7 +205,7 @@ namespace ADB_Explorer.Models
                     foreach (var item in self.OfType<UILogicalDevice>().Select(dev => dev.Device as LogicalDevice))
                     {
                         var service = services.Where(srv => srv.ID == item.ID);
-                        if (service.Any() && (item.Service is null || item.Service.Port != service.First().Port))
+                        if (service.Any() && (item.Service is null || item.Service.PairingPort != service.First().PairingPort))
                             item.UpdateConnectService(service.First());
                     }
                 }
@@ -248,7 +268,11 @@ namespace ADB_Explorer.Models
                     other.OrderBy(otherDevice => otherDevice.ID), new LogicalDeviceEqualityComparer());
         }
 
-        public void ConsolidateDevices() => ConsolidateDevices(UIList);
+        public void ConsolidateDevices()
+        {
+            ConsolidateDevices(UIList);
+            OnPropertyChanged(nameof(Count));
+        }
 
         public static void ConsolidateDevices(ObservableList<UIDevice> devices)
         {
@@ -332,6 +356,54 @@ namespace ADB_Explorer.Models
         }
     }
 
+    public abstract class NetworkDevice : Device
+    {
+        private string ipAddress;
+        public string IpAddress
+        {
+            get => ipAddress;
+            set
+            {
+                if (Set(ref ipAddress, value))
+                    OnPropertyChanged(nameof(IsIpAddressValid));
+            }
+        }
+
+        public bool IsIpAddressValid => !string.IsNullOrWhiteSpace(IpAddress)
+                                        && IpAddress.Count(c => c == '.') == 3
+                                        && IpAddress.Split('.').Count(i => byte.TryParse(i, out _)) == 4;
+
+        private string pairingPort;
+        public virtual string PairingPort
+        {
+            get => pairingPort;
+            set
+            {
+                if (Set(ref pairingPort, value))
+                    OnPropertyChanged(nameof(IsPairingPortValid));
+            }
+        }
+
+        public bool IsPairingPortValid => !string.IsNullOrWhiteSpace(PairingPort)
+                                          && ushort.TryParse(PairingPort, out _);
+
+        private string pairingCode;
+        public string PairingCode
+        {
+            get => pairingCode;
+            set
+            {
+                if (Set(ref pairingCode, value))
+                    OnPropertyChanged(nameof(IsPairingCodeValid));
+            }
+        }
+
+        public bool IsPairingCodeValid => !string.IsNullOrWhiteSpace(PairingCode) && PairingCode.Length == 6;
+
+        public string PairingAddress => $"{IpAddress}:{PairingPort}";
+
+    }
+
     public abstract class UIDevice : AbstractDevice
     {
         public Device Device { get; protected set; }
@@ -342,8 +414,8 @@ namespace ADB_Explorer.Models
             get => isSelected;
             set => Set(ref isSelected, value);
         }
-        public bool IsMdns { get; protected set; }
-        public abstract string Tooltip { get; }
+        
+        public virtual string Tooltip { get; }
 
         public string TypeIcon => Device.Type switch
         {
@@ -353,28 +425,32 @@ namespace ADB_Explorer.Models
             DeviceType.Service when Device is ServiceDevice service && service.MdnsType is ServiceDevice.ServiceType.QrCode => "\uED14",
             DeviceType.Service => "\uEDE4",
             DeviceType.Sideload => "\uED10",
+            DeviceType.New => "\uE710",
             _ => throw new NotImplementedException(),
         };
+
         public string StatusIcon => Device.Status switch
         {
-            DeviceStatus.Online => "",
+            DeviceStatus.Online or DeviceStatus.New => "",
             DeviceStatus.Offline => "\uEBFF",
             DeviceStatus.Unauthorized => "\uEC00",
             _ => throw new NotImplementedException(),
         };
 
-        public void SetSelected(ObservableList<UIDevice> devices, bool selectedState = true)
-        {
-            devices.ForEach(device => device.DeviceSelected =
-                device.Equals(this) && selectedState);
-        }
-
-        public static void SetSelected(ObservableList<UIDevice> devices)
-        {
-            devices.ForEach(device => device.DeviceSelected = false);
-        }
-
         public static implicit operator bool(UIDevice obj) => obj?.Device;
+
+        protected UIDevice()
+        {
+            Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        }
+
+        private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDevices) && Data.RuntimeSettings.CollapseDevices)
+            {
+                DeviceSelected = false;
+            }
+        }
     }
 
     public class LogicalDevice : Device, INotifyPropertyChanged
@@ -681,7 +757,6 @@ namespace ADB_Explorer.Models
         public UILogicalDevice(LogicalDevice device)
         {
             Device = device;
-            IsMdns = false;
 
             BrowseCommand = new(this);
             RemoveCommand = new(this);
@@ -701,10 +776,6 @@ namespace ADB_Explorer.Models
             {
                 if (Data.CurrentADBDevice is null || Data.CurrentADBDevice.ID != Device.ID)
                     IsOpen = false;
-            }
-            else if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDevices) && Data.RuntimeSettings.CollapseDevices)
-            {
-                DeviceSelected = false;
             }
         }
 
@@ -729,7 +800,7 @@ namespace ADB_Explorer.Models
         }
     }
 
-    public abstract class ServiceDevice : Device
+    public abstract class ServiceDevice : NetworkDevice
     {
         public ServiceDevice()
         {
@@ -740,7 +811,7 @@ namespace ADB_Explorer.Models
         {
             ID = id;
             IpAddress = ipAddress;
-            Port = port;
+            PairingPort = port;
             UpdateStatus();
         }
 
@@ -750,28 +821,28 @@ namespace ADB_Explorer.Models
             PairingCode
         }
 
+        public override string PairingPort
+        {
+            get => base.PairingPort;
+            set
+            {
+                if (base.PairingPort is not null && base.PairingPort.Equals(value))
+                    return;
+
+                base.PairingPort = value;
+                UpdateStatus();
+            }
+        }
+
         public void UpdateService(ServiceDevice other)
         {
-            Port = other.Port;
+            PairingPort = other.PairingPort;
             UpdateStatus();
         }
 
         private void UpdateStatus()
         {
             Status = MdnsType is ServiceType.QrCode ? DeviceStatus.Online : DeviceStatus.Unauthorized;
-        }
-
-        public string IpAddress { get; set; }
-
-        private string port;
-        public string Port
-        {
-            get => port;
-            set
-            {
-                if (Set(ref port, value))
-                    UpdateStatus();
-            }
         }
 
         private ServiceType mdnsType;
@@ -784,15 +855,6 @@ namespace ADB_Explorer.Models
                     UpdateStatus();
             }
         }
-
-        private string pairingCode;
-        public string PairingCode
-        {
-            get => pairingCode;
-            set => Set(ref pairingCode, value);
-        }
-
-        public string PairingAddress => $"{IpAddress}:{Port}";
     }
 
     public class PairingService : ServiceDevice
@@ -812,19 +874,8 @@ namespace ADB_Explorer.Models
         public UIServiceDevice(ServiceDevice service)
         {
             Device = service;
-            IsMdns = true;
 
             PairCommand = new(this);
-
-            Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-        }
-
-        private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDevices) && Data.RuntimeSettings.CollapseDevices)
-            {
-                DeviceSelected = false;
-            }
         }
 
         public PairCommand PairCommand { get; private set; }
@@ -862,7 +913,7 @@ namespace ADB_Explorer.Models
         {
             // IDs are equal and either both ports have a value, or they're both null
             // We do not update the port since it can change too frequently, and we do not use it anyway
-            return x.ID == y.ID && !(string.IsNullOrEmpty(x.Port) ^ string.IsNullOrEmpty(y.Port));
+            return x.ID == y.ID && !(string.IsNullOrEmpty(x.PairingPort) ^ string.IsNullOrEmpty(y.PairingPort));
         }
 
         public int GetHashCode([DisallowNull] ServiceDevice obj)
@@ -955,7 +1006,7 @@ namespace ADB_Explorer.Models
 
     public class PairCommand : DeviceAction
     {
-        public override bool IsEnabled => ((ServiceDevice)device.Device).PairingCode?.Length == 6
+        public override bool IsEnabled => ((NetworkDevice)device.Device).IsPairingCodeValid
             && device.Device.Status is AbstractDevice.DeviceStatus.Unauthorized;
 
         public PairCommand(UIServiceDevice device) : base(device)
@@ -1049,6 +1100,130 @@ namespace ADB_Explorer.Models
         { }
 
         public void Action() => Task.Run(() => ADBService.AdbDevice.Reboot((LogicalDevice)device.Device, "sideload-auto-reboot"));
+
+        private ICommand command;
+        public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
+    }
+
+    public class NewDevice : NetworkDevice
+    {
+        private string connectPort;
+        public string ConnectPort
+        {
+            get => connectPort;
+            set
+            {
+                if (Set(ref connectPort, value))
+                    OnPropertyChanged(nameof(IsConnectPortValid));
+            }
+        }
+
+        public bool IsConnectPortValid => !string.IsNullOrWhiteSpace(ConnectPort)
+                                          && ushort.TryParse(ConnectPort, out _);
+
+        public NewDevice()
+        {
+            Type = DeviceType.New;
+            Status = DeviceStatus.New;
+        }
+
+        public string ConnectAddress => $"{IpAddress}:{ConnectPort}";
+    }
+
+    public class UINewDevice : UIDevice
+    {
+        public ConnectCommand ConnectCommand { get; private set; }
+
+        public ClearCommand ClearCommand { get; private set; }
+
+        private bool isPairingEnabled = false;
+        public bool IsPairingEnabled
+        {
+            get => isPairingEnabled;
+            set => Set(ref isPairingEnabled, value);
+        }
+
+        private string uiPairingCode;
+        public string UIPairingCode
+        {
+            get => uiPairingCode;
+            set
+            {
+                if (Set(ref uiPairingCode, value))
+                    ((NewDevice)Device).PairingCode = uiPairingCode?.Replace("-", "");
+            }
+        }
+
+        public UINewDevice()
+        {
+            Device = new NewDevice();
+
+            ConnectCommand = new(this);
+            ClearCommand = new(this);
+        }
+
+        public void ClearDevice()
+        {
+            var dev = Device as NewDevice;
+
+            dev.IpAddress =
+            dev.ConnectPort =
+            dev.PairingPort =
+            UIPairingCode = "";
+            IsPairingEnabled = false;
+        }
+
+        public void EnablePairing()
+        {
+            var dev = Device as NewDevice;
+
+            dev.PairingPort =
+            UIPairingCode = "";
+            IsPairingEnabled = true;
+        }
+    }
+
+    public class ConnectCommand : DeviceAction
+    {
+        private NewDevice dev => device.Device as NewDevice;
+
+        public override bool IsEnabled => dev.IsIpAddressValid
+            && dev.IsConnectPortValid
+            && (!((UINewDevice)device).IsPairingEnabled
+                || (dev.IsPairingCodeValid && dev.IsPairingPortValid));
+
+        public ConnectCommand(UINewDevice device) : base(device)
+        { }
+
+        public void Action()
+        {
+            Data.RuntimeSettings.ConnectNewDevice = true;
+        }
+
+        private ICommand command;
+        public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
+    }
+
+    public class ClearCommand : DeviceAction
+    {
+        private NewDevice dev => device.Device as NewDevice;
+
+        public override bool IsEnabled
+        {
+            get
+            {
+                return Data.RuntimeSettings.IsManualPairingInProgress
+                    || !(string.IsNullOrEmpty(dev.IpAddress)
+                        && string.IsNullOrEmpty(dev.ConnectPort)
+                        && string.IsNullOrEmpty(dev.PairingPort)
+                        && string.IsNullOrEmpty(dev.PairingCode));
+            }
+        }
+
+        public ClearCommand(UINewDevice device) : base(device)
+        { }
+
+        public void Action() => ((UINewDevice)device).ClearDevice();
 
         private ICommand command;
         public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);

@@ -119,7 +119,6 @@ namespace ADB_Explorer.Controls
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textbox = sender as TextBox;
-            Text = textbox.Text;
             
             switch (ValidationType)
             {
@@ -147,6 +146,8 @@ namespace ADB_Explorer.Controls
                 default: // including None
                     break;
             }
+
+            Text = textbox.Text;
         }
     }
 }

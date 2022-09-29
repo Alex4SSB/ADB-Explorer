@@ -892,7 +892,7 @@
                                     HorizontalAlignment="Right"
                                     VerticalAlignment="Bottom"
                                     d:Text="1"
-                                    Text="{Binding ElementName=DevicesList, Path=ItemsSource.Count, NotifyOnTargetUpdated=True}">
+                                    Text="{Binding ElementName=MainWin, Path=DevicesObject.Count, NotifyOnTargetUpdated=True}">
                                     <TextBlock.Triggers>
                                         <EventTrigger RoutedEvent="Binding.TargetUpdated">
                                             <BeginStoryboard Storyboard="{StaticResource PulsatingBackgroundStoryboard}" />
@@ -2212,7 +2212,7 @@
                                                         <ui:FontIcon
                                                             Margin="0,-4,0,0"
                                                             FontSize="30"
-                                                            Glyph="&#xE1E1;"
+                                                            Glyph="&#xE8F9;"
                                                             Style="{StaticResource GlyphFont}" />
                                                     </RadioButton>
                                                 </Grid>
@@ -2305,78 +2305,6 @@
                                                 Style="{StaticResource ButtonStyle}" />
                                         </StackPanel>
                                     </Grid>
-                                    <StackPanel x:Name="ManualDeviceConnectPanel">
-                                        <StackPanel.Style>
-                                            <Style TargetType="StackPanel">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsNewDevicePairingEnabled}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </StackPanel.Style>
-                                        <controls:MaskedTextBox
-                                            Margin="0,6,0,12"
-                                            KeyDown="NewDeviceIpBox_KeyDown"
-                                            Style="{StaticResource NewDeviceIpBoxStyle}" />
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <controls:MaskedTextBox KeyDown="NewDeviceIpBox_KeyDown" Style="{StaticResource NewDevicePortBoxStyle}" />
-                                            <Button
-                                                Grid.Column="1"
-                                                Margin="8,0,0,0"
-                                                Click="ConnectNewDeviceButton_Click"
-                                                Style="{StaticResource ConnectNewDeviceButtonStyle}" />
-                                        </Grid>
-                                    </StackPanel>
-                                    <StackPanel d:Visibility="Visible" Style="{StaticResource ManualPairingPanelStyle}">
-                                        <Grid Margin="0,6,0,0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <ui:FontIcon
-                                                Margin="0,0,8,0"
-                                                Glyph="&#xE783;"
-                                                Style="{StaticResource GlyphFont}" />
-                                            <TextBlock
-                                                Grid.Column="1"
-                                                Text="Unable to connect. Try pairing"
-                                                TextWrapping="Wrap" />
-                                            <Button
-                                                Grid.Column="2"
-                                                Margin="4"
-                                                Click="CancelManualPairing_Click"
-                                                Style="{StaticResource ButtonStyle}"
-                                                ToolTip="Cancel">
-                                                <ui:FontIcon
-                                                    FontSize="10"
-                                                    Glyph="&#xE8BB;"
-                                                    Style="{StaticResource DisabledButtonGlyphStyle}" />
-                                            </Button>
-                                        </Grid>
-                                        <Grid Margin="0,8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <controls:MaskedTextBox KeyDown="ManualPairingPortBox_KeyDown" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
-                                            <Button
-                                                Grid.Column="1"
-                                                Margin="8,0,0,0"
-                                                Click="PairNewDeviceButton_Click"
-                                                Style="{StaticResource PairNewDeviceButtonStyle}" />
-                                        </Grid>
-                                        <controls:MaskedTextBox KeyDown="ManualPairingPortBox_KeyDown" Style="{StaticResource PairingBoxStyle}" />
-                                    </StackPanel>
                                 </StackPanel>
                             </Expander>
                             <Grid Grid.Row="1" Margin="0,6">

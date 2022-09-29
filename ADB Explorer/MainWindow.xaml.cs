@@ -202,6 +202,15 @@ namespace ADB_Explorer
                     RuntimeSettings.RootAttemptForbidden = false;
                     DialogService.ShowMessage(S_ROOT_FORBID, S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical);
                 }
+                else if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice) && RuntimeSettings.ConnectNewDevice)
+                {
+                    RuntimeSettings.IsManualPairingInProgress = true;
+
+                    if (DevicesObject.NewDevice.IsPairingEnabled)
+                        PairNewDevice();
+                    else
+                        ConnectNewDevice();
+                }
             });
         }
 
@@ -2050,38 +2059,28 @@ namespace ADB_Explorer
             RuntimeSettings.IsDevicesPaneOpen = true;
         }
 
-        private void ConnectNewDeviceButton_Click(object sender, RoutedEventArgs e)
+        private async void ConnectNewDevice()
         {
-            ConnectNewDevice();
-        }
-
-        private void ConnectNewDevice()
-        {
-            RuntimeSettings.IsManualPairingInProgress = true;
-
-            string deviceAddress = $"{RuntimeSettings.NewDeviceIp}:{RuntimeSettings.NewDeviceConnectPort}";
-            var connectTask = Task.Run(() =>
+            var dev = (NewDevice)DevicesObject.NewDevice.Device;
+            await Task.Run(() =>
             {
                 try
                 {
-                    ADBService.ConnectNetworkDevice(deviceAddress);
+                    ADBService.ConnectNetworkDevice(dev.ConnectAddress);
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    if (ex.Message.Contains(S_FAILED_CONN + deviceAddress))
+                    if (ex.Message.Contains(S_FAILED_CONN + dev.ConnectAddress) && !DevicesObject.NewDevice.IsPairingEnabled)
                     {
-                        RuntimeSettings.IsNewDevicePairingEnabled = true;
-                        RuntimeSettings.NewDevicePairingPort =
-                        RuntimeSettings.NewDeviceUIPairingCode = "";
+                        DevicesObject.NewDevice.EnablePairing();
                     }
                     else
                         Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical));
 
                     return false;
                 }
-            });
-            connectTask.ContinueWith((t) =>
+            }).ContinueWith((t) =>
             {
                 if (t.IsCanceled)
                     return;
@@ -2091,18 +2090,49 @@ namespace ADB_Explorer
                     if (t.Result)
                     {
                         if (Settings.RememberIp)
-                            Settings.LastIp = RuntimeSettings.NewDeviceIp;
+                            Settings.LastIp = ((NewDevice)DevicesObject.NewDevice.Device).IpAddress;
 
                         if (Settings.RememberPort)
-                            Settings.LastPort = RuntimeSettings.NewDeviceConnectPort;
+                            Settings.LastPort = ((NewDevice)DevicesObject.NewDevice.Device).ConnectPort;
 
-                        RuntimeSettings.NewDeviceIp =
-                        RuntimeSettings.NewDeviceConnectPort = "";
-                        RuntimeSettings.IsPairingExpanderOpen = false;
-
-                        DeviceListSetup(deviceAddress);
+                        var newDeviceAddress = ((NewDevice)DevicesObject.NewDevice.Device).ConnectAddress;
+                        DevicesObject.NewDevice.ClearDevice();
+                        CollapseDevices();
+                        DeviceListSetup(newDeviceAddress);
                     }
+                    
+                    RuntimeSettings.ConnectNewDevice =
+                    RuntimeSettings.IsManualPairingInProgress = false;
+                });
+            });
+        }
 
+        private async void PairNewDevice()
+        {
+            var dev = (NewDevice)DevicesObject.NewDevice.Device;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    ADBService.PairNetworkDevice(dev.PairingAddress, dev.PairingCode);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical));
+                    return false;
+                }
+            }).ContinueWith((t) =>
+            {
+                if (t.IsCanceled)
+                    return;
+
+                Dispatcher.Invoke(() =>
+                {
+                    if (t.Result)
+                        ConnectNewDevice();
+
+                    RuntimeSettings.ConnectNewDevice =
                     RuntimeSettings.IsManualPairingInProgress = false;
                 });
             });
@@ -2110,18 +2140,22 @@ namespace ADB_Explorer
 
         private void RetrieveIp()
         {
-            if (!string.IsNullOrWhiteSpace(RuntimeSettings.NewDeviceIp) && !string.IsNullOrWhiteSpace(RuntimeSettings.NewDeviceConnectPort))
+            if (DevicesObject?.NewDevice is null)
+                return;
+
+            var dev = DevicesObject.NewDevice.Device as NewDevice;
+            if (!string.IsNullOrWhiteSpace(dev.IpAddress) && !string.IsNullOrWhiteSpace(dev.ConnectPort))
                 return;
 
             if (Settings.RememberIp
                 && Settings.LastIp is string lastIp
-                && !DevicesObject.UIList.Find(d => d.Device.ID.Split(':')[0] == lastIp))
+                && !DevicesObject.UIList.Any(d => d.Device.ID.Split(':')[0] == lastIp))
             {
-                RuntimeSettings.NewDeviceIp = lastIp;
+                dev.IpAddress = lastIp;
                 if (Settings.RememberPort
                     && Settings.LastPort is string lastPort)
                 {
-                    RuntimeSettings.NewDeviceConnectPort = lastPort;
+                    dev.ConnectPort = lastPort;
                 }
             }
         }
@@ -2174,14 +2208,6 @@ namespace ADB_Explorer
         {
             RuntimeSettings.IsPairingExpanderOpen = false;
             CollapseDevices();
-        }
-
-        private void NewDeviceIpBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter && RuntimeSettings.IsNewDeviceIpValid && RuntimeSettings.IsNewDeviceConnectPortValid)
-            {
-                ConnectNewDevice();
-            }
         }
 
         private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -2272,40 +2298,6 @@ namespace ADB_Explorer
         private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
         {
             RuntimeSettings.IsOperationsViewOpen = !RuntimeSettings.IsOperationsViewOpen;
-        }
-
-        private void PairNewDeviceButton_Click(object sender, RoutedEventArgs e)
-        {
-            PairDeviceManual();
-        }
-
-        private void PairDeviceManual()
-        {
-            RuntimeSettings.IsManualPairingInProgress = true;
-
-            var pairingTask = Task.Run(() =>
-            {
-                try
-                {
-                    ADBService.PairNetworkDevice($"{RuntimeSettings.NewDeviceIp}:{RuntimeSettings.NewDevicePairingPort}", RuntimeSettings.NewDevicePairingCode);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    DialogService.ShowMessage(ex.Message, S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical);
-                    return false;
-                }
-            });
-            pairingTask.ContinueWith((t) =>
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    ConnectNewDevice();
-                    RuntimeSettings.IsNewDevicePairingEnabled =
-                    RuntimeSettings.IsPairingExpanderOpen =
-                    RuntimeSettings.IsManualPairingInProgress = false;
-                });
-            });
         }
 
         private void HomeButton_Click(object sender, RoutedEventArgs e)
@@ -2572,8 +2564,6 @@ namespace ADB_Explorer
             {
                 UpdateQrClass();
             }
-
-            RuntimeSettings.IsNewDevicePairingEnabled = false;
         }
 
         private void UpdateQrClass()
@@ -2603,11 +2593,6 @@ namespace ADB_Explorer
 
                 return true;
             });
-        }
-
-        private void CancelManualPairing_Click(object sender, RoutedEventArgs e)
-        {
-            RuntimeSettings.IsNewDevicePairingEnabled = false;
         }
 
         private void EnableMdns() => Dispatcher.Invoke(() =>
@@ -3641,12 +3626,6 @@ namespace ADB_Explorer
         private void SortedSettings_MouseMove(object sender, MouseEventArgs e)
         {
             SortedSettings.Focus();
-        }
-
-        private void ManualPairingPortBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter && RuntimeSettings.IsNewDevicePairingPortValid && RuntimeSettings.IsNewDevicePairingCodeValid)
-                PairDeviceManual();
         }
     }
 }
