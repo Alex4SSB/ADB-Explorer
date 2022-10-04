@@ -363,9 +363,11 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
                         </Trigger>
+                        <Trigger Property="IsEnabled" Value="True">
+                            <Setter TargetName="ContentPresenter" Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=Padding}" />
+                        </Trigger>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
-                            <Setter TargetName="ContentPresenter" Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=Padding}" />
                         </Trigger>
                         <Trigger SourceName="HeaderSite" Property="IsMouseOver" Value="True">
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
@@ -417,14 +419,18 @@
                             <Setter TargetName="ContentBorder" Property="BorderThickness" Value="0" />
                             <Setter TargetName="ExpanderContent" Property="Margin" Value="0" />
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding ElementName=ContentPresenter, Path=ActualHeight}" Value="0">
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsContentCollapsed)}" Value="True" />
+                                <Condition Binding="{Binding ElementName=ContentPresenter, Path=ActualHeight}" Value="0" />
+                            </MultiDataTrigger.Conditions>
                             <Setter TargetName="ContentPresenter" Property="Margin" Value="0" />
                             <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
-                        </DataTrigger>
+                        </MultiDataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
