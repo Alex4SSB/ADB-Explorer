@@ -323,14 +323,8 @@
                                     </MultiBinding>
                                 </StackPanel.Margin>
                                 <StackPanel x:Name="ExpanderContent">
-                                    <StackPanel.Style>
-                                        <Style TargetType="StackPanel">
-                                            <Setter Property="Margin" Value="6,0" />
-                                        </Style>
-                                    </StackPanel.Style>
                                     <ContentPresenter
                                         x:Name="ContentPresenter"
-                                        Margin="0,2"
                                         HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                         helpers:ExpanderHelper.IsAnimationActive="False"
                                         ContentSource="Content"
@@ -371,6 +365,7 @@
                         </Trigger>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
+                            <Setter TargetName="ContentPresenter" Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=Padding}" />
                         </Trigger>
                         <Trigger SourceName="HeaderSite" Property="IsMouseOver" Value="True">
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
@@ -422,6 +417,14 @@
                             <Setter TargetName="ContentBorder" Property="BorderThickness" Value="0" />
                             <Setter TargetName="ExpanderContent" Property="Margin" Value="0" />
                         </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=ContentPresenter, Path=ActualHeight}" Value="0">
+                            <Setter TargetName="ContentPresenter" Property="Margin" Value="0" />
+                            <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -447,6 +450,7 @@
         <Setter Property="ExpandDirection" Value="Down" />
         <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
         <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />
+        <Setter Property="Padding" Value="6,2" />
     </Style>
 
     <Style
