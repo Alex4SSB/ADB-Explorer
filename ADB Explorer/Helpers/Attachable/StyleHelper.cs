@@ -122,5 +122,18 @@ namespace ADB_Explorer.Helpers
                 typeof(Brush),
                 typeof(StyleHelper),
                 null);
+
+        public static string GetThreeStateGlyph(CheckBox control) =>
+            (string)control.GetValue(ThreeStateGlyphProperty);
+
+        public static void SetThreeStateGlyph(CheckBox control, string value) =>
+            control.SetValue(ThreeStateGlyphProperty, value);
+
+        public static readonly DependencyProperty ThreeStateGlyphProperty =
+            DependencyProperty.RegisterAttached(
+                "ThreeStateGlyph",
+                typeof(string),
+                typeof(StyleHelper),
+                null);
     }
 }

@@ -459,6 +459,8 @@
         <Setter Property="Padding" Value="6,2" />
     </Style>
 
+    <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander" />
+
     <Style
         x:Key="DeviceExpanderStyle"
         BasedOn="{StaticResource FluentExpanderStyle}"

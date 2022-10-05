@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ADB_Explorer.Models;
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ADB_Explorer.Services
 {
@@ -18,7 +15,7 @@ namespace ADB_Explorer.Services
         public enum MdnsState
         {
             Disabled,
-            Unchecked,
+            InProgress,
             NotRunning,
             Running,
         }
@@ -29,12 +26,15 @@ namespace ADB_Explorer.Services
             get => state;
             set
             {
-                state = value;
-                NotifyPropertyChanged();
+                if (Set(ref state, value))
+                {
+                    if (value is MdnsState.InProgress)
+                        checkStart = DateTime.Now;
+                    else
+                        Progress = 0.0;
+                }
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
 
         public void CheckMdns()
         {
@@ -44,7 +44,44 @@ namespace ADB_Explorer.Services
                 State = MdnsState.NotRunning;
         }
 
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        private double progress;
+        public double Progress
+        {
+            get => progress;
+            set
+            {
+                if (Set(ref progress, value))
+                    OnPropertyChanged(nameof(TimePassedString));
+            }
+        }
+
+        private DateTime checkStart;
+
+        private TimeSpan timePassed = TimeSpan.MinValue;
+
+        public string TimePassedString => timePassed == TimeSpan.MinValue ? "" : Converters.UnitConverter.ToTime((decimal)timePassed.TotalSeconds, useMilli: false, digits: 0);
+
+        public void UpdateProgress()
+        {
+            timePassed = DateTime.Now.Subtract(checkStart);
+
+            Progress = timePassed < AdbExplorerConst.MDNS_DOWN_RESPONSE_TIME
+                ? timePassed / AdbExplorerConst.MDNS_DOWN_RESPONSE_TIME * 100
+                : 100;
+        }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+                return false;
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

@@ -21,7 +21,7 @@ namespace ADB_Explorer.Converters
             return $"{(Math.Round(value, value < 100 ? bigRound : smallRound))}{(scaleSpace ? " " : "")}{scale_table[scale]}";
         }
 
-        public static string ToTime(this decimal? seconds, bool scaleSpace = false)
+        public static string ToTime(this decimal? seconds, bool scaleSpace = false, bool useMilli = true, int digits = 2)
         {
             if (seconds is null)
                 return "";
@@ -36,14 +36,14 @@ namespace ADB_Explorer.Converters
                 {
                     if (span.Minutes == 0)
                     {
-                        if (span.Seconds == 0)
+                        if (useMilli && span.Seconds == 0)
                         {
-                            value = $"{Math.Round(span.TotalMilliseconds, span.TotalMilliseconds < 100 ? 2 : 1)}";
+                            value = $"{Math.Round(span.TotalMilliseconds, span.TotalMilliseconds < 100 ? digits : 1)}";
                             resolution = "ms";
                         }
                         else
                         {
-                            value = $"{Math.Round(span.TotalSeconds, 2)}";
+                            value = $"{Math.Round(span.TotalSeconds, digits)}";
                             resolution = "s";
                         }
                     }

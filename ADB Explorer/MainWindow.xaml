@@ -1650,7 +1650,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </ToggleButton.Style>
-                            <ui:FontIcon Glyph="&#xE769;" Style="{StaticResource GlyphFont}" />
+                            <ui:FontIcon Glyph="&#xE769;" />
                         </ToggleButton>
                         <Button Click="ClearLogButton_Click" ToolTip="Clear Command Log">
                             <Button.Style>
@@ -1663,10 +1663,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </Button.Style>
-                            <ui:FontIcon
-                                Margin="1,1,-1,-1"
-                                Glyph="&#xE894;"
-                                Style="{StaticResource GlyphFont}" />
+                            <ui:FontIcon Margin="1,1,-1,-1" Glyph="&#xE894;" />
                         </Button>
                     </ui:SimpleStackPanel>
                     <Grid Margin="0,40" DataContext="{Binding ElementName=DeleteMenuButton, Path=DataContext}">
@@ -1760,8 +1757,7 @@
                 helpers:ExpanderHelper.ExpanderArrow="None"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
                 ExpandDirection="Up"
-                IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}"
-                Style="{StaticResource FluentExpanderStyle}">
+                IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}">
                 <Expander.Content>
                     <Grid x:Name="FileOpDetailedGrid" IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
                         <Grid.RowDefinitions>
@@ -1804,10 +1800,7 @@
                                             </Style>
                                         </DataGridTemplateColumn.HeaderStyle>
                                         <DataGridTemplateColumn.Header>
-                                            <ui:FontIcon
-                                                Margin="-7,0"
-                                                Glyph="&#xE8AF;"
-                                                Style="{StaticResource GlyphFont}" />
+                                            <ui:FontIcon Margin="-7,0" Glyph="&#xE8AF;" />
                                         </DataGridTemplateColumn.Header>
                                     </DataGridTemplateColumn>
                                     <DataGridTemplateColumn
@@ -2000,7 +1993,7 @@
                                 </Style.Triggers>
                             </Style>
                         </ToggleButton.Style>
-                        <ui:FontIcon Glyph="&#xE756;" Style="{StaticResource GlyphFont}" />
+                        <ui:FontIcon Glyph="&#xE756;" />
                     </ToggleButton>
                 </StackPanel>
             </Grid>
@@ -2135,241 +2128,78 @@
                             </Grid.Style>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
+                                <RowDefinition />
                             </Grid.RowDefinitions>
-                            <Expander
-                                x:Name="PairingExpander"
-                                Collapsed="PairingExpander_Expanded"
-                                Expanded="PairingExpander_Expanded"
-                                Header="Pair / Connect Device"
-                                IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsPairingExpanderOpen, Mode=TwoWay}"
-                                Style="{StaticResource FluentExpanderStyle}">
-                                <StackPanel Margin="0,0,0,6" Style="{StaticResource DeviceConnectionPanel}">
-                                    <Grid>
-                                        <Grid.Resources>
-                                            <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton" />
-                                        </Grid.Resources>
-                                        <Grid.Style>
-                                            <Style TargetType="Grid">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableMdns}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </Style>
-                                        </Grid.Style>
-                                        <StackPanel Margin="6,0,0,0">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition />
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <RadioButton
-                                                    x:Name="ManualConnectionRadioButton"
-                                                    Checked="ConnectionTypeRadioButton_Checked"
-                                                    Content="Manual"
-                                                    GroupName="ConnectionType"
-                                                    IsChecked="True"
-                                                    Unchecked="ConnectionTypeRadioButton_Checked" />
-                                                <RadioButton
-                                                    Grid.Column="1"
-                                                    Margin="0,0,6,0"
-                                                    Content="mDNS"
-                                                    GroupName="ConnectionType" />
-                                            </Grid>
-                                            <StackPanel>
-                                                <StackPanel.Style>
-                                                    <Style TargetType="StackPanel">
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="True">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </StackPanel.Style>
-                                                <Separator Margin="4,6,10,6" />
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition />
-                                                        <ColumnDefinition />
-                                                    </Grid.ColumnDefinitions>
-                                                    <RadioButton
-                                                        x:Name="QrConnectionRadioButton"
-                                                        Checked="ConnectionTypeRadioButton_Checked"
-                                                        ToolTip="QR Code"
-                                                        Unchecked="ConnectionTypeRadioButton_Checked">
-                                                        <ui:FontIcon Glyph="&#xED14;" Style="{StaticResource GlyphFont}" />
-                                                    </RadioButton>
-                                                    <RadioButton
-                                                        x:Name="PasswordConnectionRadioButton"
-                                                        Grid.Column="1"
-                                                        Checked="ConnectionTypeRadioButton_Checked"
-                                                        IsChecked="True"
-                                                        ToolTip="6 Digit Code"
-                                                        Unchecked="ConnectionTypeRadioButton_Checked">
-                                                        <ui:FontIcon
-                                                            Margin="0,-4,0,0"
-                                                            FontSize="30"
-                                                            Glyph="&#xE8F9;"
-                                                            Style="{StaticResource GlyphFont}" />
-                                                    </RadioButton>
-                                                </Grid>
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </Grid>
-                                    <Grid x:Name="MdnsPairingGrid">
-                                        <Grid.Style>
-                                            <Style TargetType="Grid">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding ElementName=ManualConnectionRadioButton, Path=IsChecked}" Value="False">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </Style>
-                                        </Grid.Style>
-                                        <StackPanel x:Name="QrPairingPanel" Margin="-6,-6,-6,-8">
-                                            <StackPanel.Style>
-                                                <Style TargetType="StackPanel">
-                                                    <Style.Triggers>
-                                                        <MultiDataTrigger>
-                                                            <MultiDataTrigger.Conditions>
-                                                                <Condition Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running" />
-                                                                <Condition Binding="{Binding ElementName=QrConnectionRadioButton, Path=IsChecked}" Value="True" />
-                                                            </MultiDataTrigger.Conditions>
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </MultiDataTrigger>
-                                                    </Style.Triggers>
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </Style>
-                                            </StackPanel.Style>
-                                            <Border Style="{StaticResource QrBackgroundStyle}">
-                                                <Image
-                                                    x:Name="PairingQrImage"
-                                                    Margin="6"
-                                                    RenderOptions.EdgeMode="Aliased" />
+                            <ui:SimpleStackPanel Spacing="6">
+                                <Expander d:Visibility="Visible" Style="{StaticResource MdnsExpanderStyle}">
+                                    <Expander.Header>
+                                        <Grid>
+                                            <CheckBox Click="MdnsCheckBox_Click" Style="{StaticResource MdnsCheckBoxStyle}" />
+                                            <Border Margin="-24,0,-5,-5" ClipToBounds="True">
+                                                <ui:ProgressBar Style="{StaticResource MdnsProgressBarStyle}" />
                                             </Border>
+                                        </Grid>
+                                    </Expander.Header>
+                                    <Grid>
+                                        <Border Style="{StaticResource QrBackgroundStyle}">
+                                            <Image
+                                                x:Name="PairingQrImage"
+                                                Margin="6"
+                                                RenderOptions.EdgeMode="Aliased" />
+                                        </Border>
+                                        <StackPanel
+                                            Margin="0,4"
+                                            Orientation="Horizontal"
+                                            Style="{StaticResource MdnsInProgressPanelStyle}">
+                                            <ui:FontIcon Margin="0,0,6,0" Glyph="&#xE823;" />
+                                            <TextBlock Text="Awaiting response: " />
+                                            <TextBlock Text="{Binding ElementName=MainWin, Path=MdnsService.TimePassedString}" />
                                         </StackPanel>
-                                        <StackPanel x:Name="MdnsLoadingPanel">
-                                            <StackPanel.Style>
-                                                <Style TargetType="StackPanel">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Unchecked">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </StackPanel.Style>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <ui:FontIcon
-                                                    Margin="0,0,8,0"
-                                                    Glyph="&#xE946;"
-                                                    Style="{StaticResource GlyphFont}" />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    Text="Checking mDNS status please wait"
-                                                    TextWrapping="Wrap" />
-                                            </Grid>
-                                        </StackPanel>
-                                        <StackPanel x:Name="MdnsDownPanel">
-                                            <StackPanel.Style>
-                                                <Style TargetType="StackPanel">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
-                                                            <Setter Property="Visibility" Value="Visible" />
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </StackPanel.Style>
-                                            <StackPanel Orientation="Horizontal">
-                                                <ui:FontIcon
-                                                    Margin="0,0,8,0"
-                                                    Glyph="&#xE783;"
-                                                    Style="{StaticResource GlyphFont}" />
-                                                <TextBlock x:Name="MdnsDownBlock" Text="mDNS server is down" />
-                                            </StackPanel>
+                                        <ui:SimpleStackPanel
+                                            Margin="0,4"
+                                            Spacing="6"
+                                            Style="{StaticResource MdnsDownPanelStyle}">
+                                            <ui:SimpleStackPanel
+                                                HorizontalAlignment="Center"
+                                                Orientation="Horizontal"
+                                                Spacing="6">
+                                                <ui:FontIcon Glyph="&#xE783;" />
+                                                <TextBlock Text="Server is down" />
+                                            </ui:SimpleStackPanel>
                                             <Button
-                                                x:Name="RestartAdbButton"
-                                                Margin="0,6,0,0"
                                                 HorizontalAlignment="Center"
                                                 Click="RestartAdbButton_Click"
-                                                Content="Restart ADB"
-                                                Style="{StaticResource ButtonStyle}" />
-                                        </StackPanel>
+                                                Content="Restart ADB" />
+                                        </ui:SimpleStackPanel>
                                     </Grid>
-                                </StackPanel>
-                            </Expander>
-                            <Grid Grid.Row="1" Margin="0,6">
-                                <Grid Margin="6,4,0,0" HorizontalAlignment="Left">
-                                    <ui:ProgressRing IsActive="True">
-                                        <ui:ProgressRing.Style>
-                                            <Style BasedOn="{StaticResource FluentProgressRingStyle}" TargetType="ui:ProgressRing">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="False">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ui:ProgressRing.Style>
-                                    </ui:ProgressRing>
-                                    <Button Click="RefreshDevicesButton_Click" ToolTip="Refresh Devices">
-                                        <Button.Style>
-                                            <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                        <ui:FontIcon
-                                            FontSize="15"
-                                            Glyph="&#xE72C;"
-                                            Style="{StaticResource GlyphFont}" />
-                                    </Button>
+                                </Expander>
+                                <Grid>
+                                    <Grid Margin="6,4,0,0" HorizontalAlignment="Left">
+                                        <ui:ProgressRing IsActive="True" Style="{StaticResource DevicesPollingProgressRingStyle}" />
+                                        <Button
+                                            Click="RefreshDevicesButton_Click"
+                                            Style="{StaticResource DevicesManualPollingButtonStyle}"
+                                            ToolTip="Refresh Devices">
+                                            <ui:FontIcon FontSize="15" Glyph="&#xE72C;" />
+                                        </Button>
+                                    </Grid>
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        FontSize="24"
+                                        Text="Devices" />
                                 </Grid>
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    FontSize="24"
-                                    Text="Devices" />
-                            </Grid>
-                            <Grid Grid.Row="2">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Border
-                                    x:Name="ServerUnresponsiveNotice"
-                                    Padding="4"
-                                    Style="{StaticResource UnresponsiveServerBorderStyle}"
-                                    Visibility="Collapsed">
+                                <Border Padding="4" Style="{StaticResource UnresponsiveServerBorderStyle}">
                                     <StackPanel Margin="2,0">
                                         <ui:SimpleStackPanel Orientation="Horizontal" Spacing="8">
-                                            <ui:FontIcon
-                                                FontSize="24"
-                                                Glyph="&#xEBE8;"
-                                                Style="{StaticResource GlyphFont}" />
+                                            <ui:FontIcon FontSize="24" Glyph="&#xEBE8;" />
                                             <StackPanel>
                                                 <TextBlock Text="ADB Server Unresponsive" />
                                                 <StackPanel
                                                     Margin="0,4"
                                                     Orientation="Horizontal"
                                                     ToolTip="Time from last server response">
-                                                    <ui:FontIcon
-                                                        Margin="0,0,4,0"
-                                                        Glyph="&#xE823;"
-                                                        Style="{StaticResource GlyphFont}" />
-                                                    <TextBlock Text="{Binding ElementName=MainWin, Path=TimeFromLastResponse}" />
+                                                    <ui:FontIcon Margin="0,0,4,0" Glyph="&#xE823;" />
+                                                    <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=TimeFromLastResponse}" />
                                                     <TextBlock Text="s" />
                                                 </StackPanel>
                                             </StackPanel>
@@ -2392,32 +2222,19 @@
                                         </ui:SimpleStackPanel>
                                     </StackPanel>
                                 </Border>
-                                <Grid
-                                    x:Name="DebuggingResetPrompt"
-                                    Grid.Row="1"
-                                    Visibility="Collapsed">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <ui:FontIcon
-                                        Margin="0,0,6,0"
-                                        VerticalAlignment="Center"
-                                        Glyph="&#xE946;"
-                                        Style="{StaticResource GlyphFont}" />
-                                    <TextBlock
-                                        Grid.Column="1"
-                                        Text="Switching wireless debugging off and then on may shorten connection time"
-                                        TextWrapping="Wrap" />
-                                </Grid>
+                            </ui:SimpleStackPanel>
+                            <Grid Grid.Row="1" Margin="0,6,0,0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
                                 <ListView
                                     x:Name="DevicesList"
-                                    Grid.Row="2"
                                     DataContext="{Binding ElementName=MainWin, Path=DevicesObject}"
                                     ItemsSource="{Binding UIList}"
                                     Style="{StaticResource DevicesListViewStyle}" />
                                 <Border
-                                    Grid.Row="3"
+                                    Grid.Row="1"
                                     Background="Transparent"
                                     MouseDown="Border_MouseDown" />
                             </Grid>
@@ -2534,8 +2351,7 @@
                                         HorizontalAlignment="Left"
                                         Glyph="&#xE721;"
                                         IsHitTestVisible="False"
-                                        Opacity="0.7"
-                                        Style="{StaticResource GlyphFont}" />
+                                        Opacity="0.7" />
                                 </Grid>
                                 <Separator
                                     Grid.Row="1"

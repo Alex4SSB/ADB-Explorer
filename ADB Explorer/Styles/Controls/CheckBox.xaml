@@ -12,6 +12,8 @@
         TargetType="CheckBox">
         <Setter Property="ui:FocusVisualHelper.FocusVisualMargin" Value="-6,0" />
         <Setter Property="helpers:StyleHelper.IsUnchecked" Value="False" />
+        <Setter Property="helpers:StyleHelper.ThreeStateGlyph" Value="&#xE73C;" />
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
@@ -204,8 +206,8 @@
                                 </Trigger>
 
                                 <Trigger Property="IsChecked" Value="{x:Null}">
-                                    <Setter TargetName="CheckGlyph" Property="Glyph" Value="&#xE73C;" />
-                                    <Setter TargetName="UncheckGlyph" Property="Glyph" Value="&#xE73C;" />
+                                    <Setter TargetName="CheckGlyph" Property="Glyph" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=CheckBox}, Path=(helpers:StyleHelper.ThreeStateGlyph)}" />
+                                    <Setter TargetName="UncheckGlyph" Property="Glyph" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=CheckBox}, Path=(helpers:StyleHelper.ThreeStateGlyph)}" />
                                 </Trigger>
 
                                 <!--  RECTANGLE, GLYPH: Dark Theme, Checked, Animated  -->

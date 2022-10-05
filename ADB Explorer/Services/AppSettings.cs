@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Models;
 using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace ADB_Explorer.Services
@@ -372,11 +371,11 @@ namespace ADB_Explorer.Services
             set => Set(ref isDevicesPaneOpen, value);
         }
 
-        private bool isPairingExpanderOpen = false;
-        public bool IsPairingExpanderOpen
+        private bool isMdnsExpanderOpen = false;
+        public bool IsMdnsExpanderOpen
         {
-            get => isPairingExpanderOpen;
-            set => Set(ref isPairingExpanderOpen, value);
+            get => isMdnsExpanderOpen;
+            set => Set(ref isMdnsExpanderOpen, value);
         }
 
         private bool isOperationsViewOpen = false;
@@ -462,6 +461,24 @@ namespace ADB_Explorer.Services
             get => connectNewDevice;
             set => Set(ref connectNewDevice, value);
         }
+
+        private DateTime lastServerResponse = DateTime.Now;
+        public DateTime LastServerResponse
+        {
+            get => lastServerResponse;
+            set
+            {
+                lastServerResponse = value;
+                OnPropertyChanged(nameof(lastServerResponse));
+
+                OnPropertyChanged(nameof(TimeFromLastResponse));
+                OnPropertyChanged(nameof(ServerUnresponsive));
+            }
+        }
+
+        public string TimeFromLastResponse => $"{DateTime.Now.Subtract(LastServerResponse).TotalSeconds:0}";
+
+        public bool ServerUnresponsive => Data.Settings.PollDevices && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT;
 
 
         public event PropertyChangedEventHandler PropertyChanged;

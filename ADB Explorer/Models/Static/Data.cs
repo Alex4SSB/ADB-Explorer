@@ -50,16 +50,6 @@ namespace ADB_Explorer.Models
 
         public static ObservableList<TrashIndexer> RecycleIndex { get; set; } = new();
 
-        private static DateTime lastServerResponse = DateTime.Now;
-        public static DateTime LastServerResponse
-        {
-            get => lastServerResponse;
-            set
-            {
-                Set(ref lastServerResponse, value);
-            }
-        }
-
         public static ObservableList<Package> Packages { get; set; } = new();
 
         public static Version AppVersion => new(Properties.Resources.AppVersion);

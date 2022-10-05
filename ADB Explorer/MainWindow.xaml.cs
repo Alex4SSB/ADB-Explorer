@@ -71,8 +71,6 @@ namespace ADB_Explorer
 
         private readonly List<MenuItem> PathButtons = new();
 
-        public string TimeFromLastResponse => $"{DateTime.Now.Subtract(LastServerResponse).TotalSeconds:0}";
-
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
@@ -157,6 +155,11 @@ namespace ADB_Explorer
             });
         }
 
+        private void ServerWatchdogTimer_Tick(object sender, EventArgs e)
+        {
+            RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
+        }
+
         private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             Dispatcher.Invoke(() =>
@@ -210,6 +213,16 @@ namespace ADB_Explorer
                         PairNewDevice();
                     else
                         ConnectNewDevice();
+                }
+                else if (e.PropertyName == nameof(AppRuntimeSettings.IsMdnsExpanderOpen))
+                {
+                    if (MdnsService?.State is not MDNS.MdnsState.Disabled)
+                    {
+                        CollapseDevices();
+
+                        if (RuntimeSettings.IsMdnsExpanderOpen)
+                            UpdateQrClass();
+                    }
                 }
             });
         }
@@ -268,18 +281,6 @@ namespace ADB_Explorer
 
                 dispatcher.Invoke(() => DialogService.ShowMessage(S_NEW_VERSION(t.Result), S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
             });
-        }
-
-        private void ServerWatchdogTimer_Tick(object sender, EventArgs e)
-        {
-            if (DateTime.Now.Subtract(LastServerResponse) > SERVER_RESPONSE_TIMEOUT)
-            {
-                OnPropertyChanged(nameof(TimeFromLastResponse));
-                ServerUnresponsiveNotice.Visible(true);
-            }
-            else
-                ServerUnresponsiveNotice.Visible(false);
-
         }
 
         private void CommandLog_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -853,9 +854,6 @@ namespace ADB_Explorer
                 SetSymbolFont();
             });
 
-            if (Settings.EnableMdns)
-                QrClass = new();
-
             SetTheme(Settings.Theme);
             SetRenderMode();
 
@@ -1154,13 +1152,11 @@ namespace ADB_Explorer
 
         private void ListDevices(IEnumerable<LogicalDevice> devices)
         {
-            LastServerResponse = DateTime.Now;
+            RuntimeSettings.LastServerResponse = DateTime.Now;
 
             if (devices is not null && DevicesObject.DevicesChanged(devices))
             {
                 DeviceListSetup(devices);
-
-                DebuggingResetPrompt.Visible(false);
 
                 if (Settings.AutoRoot)
                 {
@@ -1198,7 +1194,7 @@ namespace ADB_Explorer
 
         private void ListServices(IEnumerable<ServiceDevice> services)
         {
-            LastServerResponse = DateTime.Now;
+            RuntimeSettings.LastServerResponse = DateTime.Now;
 
             if (services is not null && DevicesObject.ServicesChanged(services))
             {
@@ -1210,17 +1206,7 @@ namespace ADB_Explorer
 
                 if (qrServices.Any())
                 {
-                    PairService(qrServices.First()).ContinueWith((t) =>
-                    {
-                        LastServerResponse = DateTime.Now;
-
-                        if (t.Result)
-                            Dispatcher.Invoke(() =>
-                            {
-                                RuntimeSettings.IsPairingExpanderOpen = false;
-                                DebuggingResetPrompt.Visible(true);
-                            });
-                    });
+                    PairService(qrServices.First()).ContinueWith((t) => RuntimeSettings.LastServerResponse = DateTime.Now);
                 }
             }
         }
@@ -1282,11 +1268,20 @@ namespace ADB_Explorer
             }
         }
 
-        private static void MdnsCheck()
+        private void MdnsCheck()
         {
             Task.Run(() =>
             {
                 return MdnsService.State = ADBService.CheckMDNS() ? MDNS.MdnsState.Running : MDNS.MdnsState.NotRunning;
+            });
+            Task.Run(() =>
+            {
+                while (MdnsService.State is MDNS.MdnsState.InProgress)
+                {
+                    Dispatcher.Invoke(() => MdnsService.UpdateProgress());
+
+                    Task.Delay(MDNS_STATUS_UPDATE_INTERVAL);
+                }
             });
         }
 
@@ -2206,7 +2201,6 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
         {
-            RuntimeSettings.IsPairingExpanderOpen = false;
             CollapseDevices();
         }
 
@@ -2253,7 +2247,7 @@ namespace ADB_Explorer
 
         private void DevicesSplitView_PaneOpening(SplitView sender, object args)
         {
-            RuntimeSettings.IsPairingExpanderOpen = false;
+            RetrieveIp();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -2540,27 +2534,19 @@ namespace ADB_Explorer
             ResizeDetailedView();
         }
 
-        private void ConnectionTypeRadioButton_Checked(object sender, RoutedEventArgs e)
+        private void UpdateMdns()
         {
-            ChangeConnectionType();
-        }
-
-        private void ChangeConnectionType()
-        {
-            if (ManualConnectionRadioButton.IsChecked == false
-                            && RuntimeSettings.IsPairingExpanderOpen
-                            && MdnsService.State == MDNS.MdnsState.Disabled)
+            if (MdnsService.State == MDNS.MdnsState.Disabled)
             {
-                MdnsService.State = MDNS.MdnsState.Unchecked;
+                MdnsService.State = MDNS.MdnsState.InProgress;
                 MdnsCheck();
             }
-            else if (ManualConnectionRadioButton.IsChecked == true)
+            else
             {
                 MdnsService.State = MDNS.MdnsState.Disabled;
-                DevicesObject.UIList.RemoveAll(device => device is UIServiceDevice);
             }
 
-            if (QrConnectionRadioButton?.IsChecked == true)
+            if (RuntimeSettings.IsMdnsExpanderOpen)
             {
                 UpdateQrClass();
             }
@@ -2604,7 +2590,8 @@ namespace ADB_Explorer
             }
             else
             {
-                ManualConnectionRadioButton.IsChecked = true;
+                QrClass = null;
+                MdnsService.State = MDNS.MdnsState.Disabled;
             }
         });
 
@@ -2657,17 +2644,7 @@ namespace ADB_Explorer
         {
             ADBService.KillAdbServer();
             MdnsService.State = MDNS.MdnsState.Disabled;
-            ChangeConnectionType();
-        }
-
-        private void PairingExpander_Expanded(object sender, RoutedEventArgs e)
-        {
-            CollapseDevices();
-
-            if (RuntimeSettings.IsPairingExpanderOpen)
-            {
-                RetrieveIp();
-            }
+            UpdateMdns();
         }
 
         private void Border_MouseDown(object sender, MouseButtonEventArgs e)
@@ -3626,6 +3603,11 @@ namespace ADB_Explorer
         private void SortedSettings_MouseMove(object sender, MouseEventArgs e)
         {
             SortedSettings.Focus();
+        }
+
+        private void MdnsCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateMdns();
         }
     }
 }
