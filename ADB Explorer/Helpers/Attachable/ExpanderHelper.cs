@@ -102,5 +102,18 @@ namespace ADB_Explorer.Helpers
                 typeof(bool),
                 typeof(ExpanderHelper),
                 null);
+
+        public static object GetHeaderBottomContent(UIElement control) =>
+            control.GetValue(HeaderBottomContentProperty);
+
+        public static void SetHeaderBottomContent(UIElement control, object value) =>
+            control.SetValue(HeaderBottomContentProperty, value);
+
+        public static readonly DependencyProperty HeaderBottomContentProperty =
+            DependencyProperty.RegisterAttached(
+                "HeaderBottomContent",
+                typeof(object),
+                typeof(ExpanderHelper),
+                null);
     }
 }

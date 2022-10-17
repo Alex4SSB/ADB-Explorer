@@ -270,24 +270,37 @@
                                 Background="{TemplateBinding Background}"
                                 CornerRadius="{Binding ElementName=HeaderUpperBorder, Path=CornerRadius}"
                                 SnapsToDevicePixels="True">
-                                <ToggleButton
-                                    x:Name="HeaderSite"
-                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    ui:FocusVisualHelper.FocusVisualMargin="-3"
-                                    ui:FocusVisualHelper.UseSystemFocusVisuals="True"
-                                    Content="{TemplateBinding Header}"
-                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                    ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
-                                    FocusVisualStyle="{x:Null}"
-                                    FontFamily="{TemplateBinding FontFamily}"
-                                    FontSize="{TemplateBinding FontSize}"
-                                    FontStretch="{TemplateBinding FontStretch}"
-                                    FontStyle="{TemplateBinding FontStyle}"
-                                    FontWeight="{TemplateBinding FontWeight}"
-                                    Foreground="{TemplateBinding Foreground}"
-                                    IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                    Style="{StaticResource ExpanderHeaderStyle}" />
+                                <Grid>
+                                    <ToggleButton
+                                        x:Name="HeaderSite"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        ui:FocusVisualHelper.FocusVisualMargin="-3"
+                                        ui:FocusVisualHelper.UseSystemFocusVisuals="True"
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                        ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
+                                        FocusVisualStyle="{x:Null}"
+                                        FontFamily="{TemplateBinding FontFamily}"
+                                        FontSize="{TemplateBinding FontSize}"
+                                        FontStretch="{TemplateBinding FontStretch}"
+                                        FontStyle="{TemplateBinding FontStyle}"
+                                        FontWeight="{TemplateBinding FontWeight}"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        IsChecked="{Binding IsExpanded, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Style="{StaticResource ExpanderHeaderStyle}" />
+                                    <ContentPresenter
+                                        x:Name="HeaderBottomSite"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Bottom"
+                                        Content="{TemplateBinding helpers:ExpanderHelper.HeaderBottomContent}" />
+                                    <Border
+                                        x:Name="BottomExtraBorder"
+                                        Margin="-1"
+                                        BorderBrush="{DynamicResource DevicesListBackground}"
+                                        BorderThickness="2,0,0,2"
+                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                </Grid>
                             </Border>
                             <Border
                                 x:Name="HeaderUpperBorder"
@@ -362,9 +375,11 @@
                         </MultiDataTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
+                            <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Hidden" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="True">
                             <Setter TargetName="ContentPresenter" Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=Padding}" />
+                            <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Hidden" />
                         </Trigger>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
@@ -375,12 +390,13 @@
                             <Setter TargetName="HeaderLowerBorder" Property="BorderBrush" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
                             <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="{DynamicResource ExpanderSideBorderMouseOver}" />
                         </Trigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
-                            </MultiDataTrigger.Conditions>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                            <Setter TargetName="HeaderBottomSite" Property="Margin" Value="1,0,1,1" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                             <Setter TargetName="HeaderBorder" Property="Margin" Value="1,1,1,0" />
-                        </MultiDataTrigger>
+                            <Setter TargetName="HeaderBottomSite" Property="Margin" Value="0" />
+                        </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
@@ -413,6 +429,7 @@
                             <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
+                            <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderVisible)}" Value="False">
                             <Setter TargetName="HeaderArea" Property="Visibility" Value="Collapsed" />
