@@ -102,6 +102,9 @@
     <Color x:Key="DarkSeparatorForeground">#FF808080</Color>
     <Color x:Key="LightSeparatorForeground">#FF919191</Color>
 
+    <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="#FFABA673" />
+    <SolidColorBrush x:Key="NewDeviceBottomBorderBrush" Color="#FF05A300" />
+
     <ResourceDictionary x:Key="DynamicBrushes">
         <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
         <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />

@@ -99,6 +99,7 @@ namespace ADB_Explorer.Models
         public static readonly Version WIN11_22H2 = new(10, 0, 22621);
 
         public static readonly bool DISPLAY_OFFLINE_SERVICES = false;
+        public static readonly bool DISPLAY_CONNECT_SERVICES = false;
 
         public static readonly TimeSpan DOUBLE_CLICK_TIMEOUT = TimeSpan.FromMilliseconds(300);
         public static readonly TimeSpan SELECTION_CHANGED_DELAY = TimeSpan.FromMilliseconds(150);

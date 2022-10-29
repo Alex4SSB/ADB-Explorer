@@ -119,6 +119,8 @@ namespace ADB_Explorer.Controls
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textbox = sender as TextBox;
+            if (!textbox.IsFocused)
+                return;
             
             switch (ValidationType)
             {

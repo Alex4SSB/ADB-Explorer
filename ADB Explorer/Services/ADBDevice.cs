@@ -82,7 +82,7 @@ namespace ADB_Explorer.Services
                 var stdout = ExecuteDeviceAdbCommandAsync(ID, "ls", cancellationToken, EscapeAdbString(path));
                 foreach (string stdoutLine in stdout)
                 {
-                    var match = AdbRegEx.LS_FILE_ENTRY_RE.Match(stdoutLine);
+                    var match = AdbRegEx.RE_LS_FILE_ENTRY.Match(stdoutLine);
                     if (!match.Success)
                     {
                         throw new Exception($"Invalid output for adb ls command: {stdoutLine}");
@@ -161,7 +161,7 @@ namespace ADB_Explorer.Services
                 foreach (string stdoutLine in stdout)
                 {
                     lastStdoutLine = stdoutLine;
-                    var progressMatch = AdbRegEx.FILE_SYNC_PROGRESS_RE.Match(stdoutLine);
+                    var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS.Match(stdoutLine);
                     if (!progressMatch.Success)
                     {
                         continue;
@@ -197,7 +197,7 @@ namespace ADB_Explorer.Services
                     return null;
                 }
 
-                var match = AdbRegEx.FILE_SYNC_STATS_RE.Match(lastStdoutLine);
+                var match = AdbRegEx.RE_FILE_SYNC_STATS.Match(lastStdoutLine);
                 if (!match.Success)
                 {
                     return null;
@@ -237,19 +237,19 @@ namespace ADB_Explorer.Services
             {
                 List<Drive> drives = new();
 
-                var root = ReadDrives(AdbRegEx.EMULATED_STORAGE_SINGLE, "/");
+                var root = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE, "/");
                 if (root is null)
                     return null;
                 else if (root.Any())
                     drives.Add(root.First());
 
-                var intStorage = ReadDrives(AdbRegEx.EMULATED_STORAGE_SINGLE, "/sdcard");
+                var intStorage = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE, "/sdcard");
                 if (intStorage is null)
                     return drives;
                 else if (intStorage.Any())
                     drives.Add(intStorage.First());
 
-                var extStorage = ReadDrives(AdbRegEx.EMULATED_ONLY, EMULATED_DRIVES_GREP);
+                var extStorage = ReadDrives(AdbRegEx.RE_EMULATED_ONLY, EMULATED_DRIVES_GREP);
                 if (extStorage is null)
                     return drives;
                 else
@@ -328,6 +328,20 @@ namespace ADB_Explorer.Services
             {
                 if (ExecuteDeviceAdbCommand(device.ID, "reboot", out string stdout, out string stderr, arg) != 0)
                     throw new Exception(stderr);
+            }
+
+            public static bool GetDeviceIp(LogicalDevice device)
+            {
+                if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out string stderr, new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
+                    return false;
+
+                var match = AdbRegEx.RE_DEVICE_WLAN_INET.Match(stdout);
+                if (!match.Success)
+                    return false;
+
+                device.IpAddress = match.Groups["IP"].Value;
+
+                return true;
             }
         }
     }

@@ -41,7 +41,7 @@ namespace ADB_Explorer.Models
 
         public static Package New(string package, PackageType type)
         {
-            var match = AdbRegEx.PACKAGE_LISTING.Match(package);
+            var match = AdbRegEx.RE_PACKAGE_LISTING.Match(package);
             if (!match.Success)
                 return null;
 

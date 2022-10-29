@@ -51,7 +51,7 @@ namespace ADB_Explorer.Services
             ADBService.ExecuteAdbCommand("mdns", out string services, out _, "services");
 
             List<ServiceDevice> mdnsServices = new();
-            var matches = AdbRegEx.MDNS_SERVICE.Matches(services);
+            var matches = AdbRegEx.RE_MDNS_SERVICE.Matches(services);
             foreach (Match item in matches)
             {
                 var id = item.Groups["ID"].Value;

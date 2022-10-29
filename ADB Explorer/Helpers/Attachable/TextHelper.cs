@@ -216,6 +216,9 @@ namespace ADB_Explorer.Helpers
                 text = altText;
                 caretIndex -= deletedChars;
 
+                if (caretIndex < 0)
+                    caretIndex = 0;
+
                 return;
             }
 

@@ -1,12 +1,12 @@
-﻿using System;
-using System.IO;
-using Windows.Devices.Geolocation;
-using Windows.Storage.Pickers;
+﻿using ADB_Explorer.Models;
+using System;
 
 namespace ADB_Explorer.Resources
 {
     public static class Strings
     {
+        public const string S_SAVED_DEVICES = "SavedDevices";
+
         public const string S_MISSING_ADB = "Failed to execute ADB from the environment PATH to get its version. Make sure there's a PATH entry pointing to the Android Platform Tools directory.";
         public const string S_ADB_VERSION_LOW = "ADB version is too low. Please install a newer version.";
         public const string S_OVERRIDE_ADB = "Alternatively, you can define / override ADB path in the app settings.";
@@ -51,6 +51,8 @@ namespace ADB_Explorer.Resources
         public const string S_RESTORE_CONF_TITLE = "Restore Conflicts";
         public const string S_CONF_UNI_TITLE = "Confirm Uninstall";
         public const string S_INSTALL_APK = "Select packages to install";
+        public const string S_KILL_EMU = "Kill Emulator";
+        public const string S_REMOVE_DEV = "Remove Device";
 
 
         public static string S_MISSING_REDIRECTION(string exception) =>
@@ -87,5 +89,23 @@ namespace ADB_Explorer.Resources
 
         public static string S_REM_APK(bool apk, int count) =>
             $"The following will be removed:\n{count} {(apk ? "APK" : "package")}{(count > 1 ? "s" : "")}";
+
+        public static string S_REM_DEVICE(Device device) =>
+            $"Are you sure you want to {(device.Type is AbstractDevice.DeviceType.Emulator ? "kill this emulator" : "remove this device")}?";
+
+        public static string S_REM_DEVICE_TITLE(Device device)
+        {
+            var remType = device.Type is AbstractDevice.DeviceType.Emulator ? "Kill" : "Remove";
+
+            var name = device switch
+            {
+                HistoryDevice dev when string.IsNullOrEmpty(dev.DeviceName) => dev.IpAddress,
+                HistoryDevice dev => dev.DeviceName,
+                LogicalDevice dev => dev.Name,
+                _ => throw new NotImplementedException(),
+            };
+
+            return $"{remType} {name}";
+        }
     }
 }

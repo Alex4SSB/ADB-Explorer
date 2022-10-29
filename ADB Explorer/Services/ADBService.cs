@@ -202,16 +202,15 @@ namespace ADB_Explorer.Services
             return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
         }
 
-        public static IEnumerable<LogicalDevice> GetDevices(ObservableList<ConnectService> services = null)
+        public static IEnumerable<LogicalDevice> GetDevices()
         {
             ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
 
-            return DEVICE_NAME_RE.Matches(stdout).Select(
+            return RE_DEVICE_NAME.Matches(stdout).Select(
                 m => LogicalDevice.New(
                     name: LogicalDevice.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                     id: m.Groups["id"].Value,
-                    status: m.Groups["status"].Value,
-                    services: services)
+                    status: m.Groups["status"].Value)
                 ).Where(d => d);
         }
 
@@ -251,7 +250,7 @@ namespace ADB_Explorer.Services
             // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
 
             // Get major and minor nodes in hex and return
-            return MMC_BLOCK_DEVICE_NODE.Match(stdout).Groups;
+            return RE_MMC_BLOCK_DEVICE_NODE.Match(stdout).Groups;
         }
 
         public static string GetMmcId(string deviceID)
@@ -394,7 +393,7 @@ namespace ADB_Explorer.Services
             if (exitCode != 0)
                 return null;
 
-            string version = ADB_VERSION.Match(stdout).Groups["version"]?.Value;
+            string version = RE_ADB_VERSION.Match(stdout).Groups["version"]?.Value;
             return string.IsNullOrEmpty(version) ? null : new Version(version);
         }
     }

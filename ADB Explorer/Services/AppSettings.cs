@@ -72,32 +72,11 @@ namespace ADB_Explorer.Services
 
         #region device
 
-        private bool rememberIp;
-        public bool RememberIp
+        private bool saveDevices;
+        public bool SaveDevices
         {
-            get => Get(ref rememberIp, false);
-            set => Set(ref rememberIp, value);
-        }
-
-        private string lastIp;
-        public string LastIp
-        {
-            get => Get(ref lastIp, "");
-            set => Set(ref lastIp, value);
-        }
-
-        private bool rememberPort;
-        public bool RememberPort
-        {
-            get => Get(ref rememberPort, false);
-            set => Set(ref rememberPort, value);
-        }
-
-        private string lastPort;
-        public string LastPort
-        {
-            get => Get(ref lastPort, "");
-            set => Set(ref lastPort, value);
+            get => Get(ref saveDevices, true);
+            set => Set(ref saveDevices, value);
         }
 
         private bool autoOpen;
@@ -427,8 +406,8 @@ namespace ADB_Explorer.Services
             set => Set(ref updateCurrentDevice, value);
         }
 
-        private bool? removeDevice = null;
-        public bool? RemoveDevice
+        private UIDevice removeDevice = null;
+        public UIDevice DeviceToRemove
         {
             get => removeDevice;
             set => Set(ref removeDevice, value);
@@ -455,8 +434,8 @@ namespace ADB_Explorer.Services
             set => Set(ref rootAttemptForbidden, value);
         }
 
-        private bool connectNewDevice = false;
-        public bool ConnectNewDevice
+        private UIDevice connectNewDevice = null;
+        public UIDevice ConnectNewDevice
         {
             get => connectNewDevice;
             set => Set(ref connectNewDevice, value);

@@ -36,7 +36,6 @@
         <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
         <converters:DoubleEquals x:Key="DoubleEquals" />
         <CollectionViewSource x:Key="FileListView" Source="{Binding Source={x:Static Member=models:Data.DirList}, Path=FileList}" />
-        <CollectionViewSource x:Key="SortedSettingsView" Source="{Binding Source={x:Static Member=services:UISettings.SortSettings}}" />
         <Style
             x:Key="FileOpHeaderResizeStyle"
             BasedOn="{StaticResource FileOpColumnHeaderStyle}"
@@ -1754,6 +1753,7 @@
             <Expander
                 Grid.Row="4"
                 Margin="0,0,0,-3"
+                Padding="0,2"
                 helpers:ExpanderHelper.ExpanderArrow="None"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
                 ExpandDirection="Up"
@@ -1770,7 +1770,7 @@
                             Margin="0,-2,0,0"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Top"
-                            BorderBrush="Gray"
+                            Background="Gray"
                             DragDelta="GridSplitter_DragDelta"
                             FocusVisualStyle="{x:Null}" />
                         <Grid Grid.Row="1">
@@ -2094,7 +2094,6 @@
             FocusVisualStyle="{x:Null}"
             IsPaneOpen="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDevicesPaneOpen, Mode=TwoWay}"
             PaneClosing="DevicesSplitView_PaneClosing"
-            PaneOpening="DevicesSplitView_PaneOpening"
             PanePlacement="Left">
             <ui:SplitView.Style>
                 <Style BasedOn="{StaticResource SplitViewStyle}" TargetType="ui:SplitView">
@@ -2132,15 +2131,24 @@
                             </Grid.RowDefinitions>
                             <ui:SimpleStackPanel Spacing="6">
                                 <Expander d:Visibility="Visible" Style="{StaticResource MdnsExpanderStyle}">
+                                    <helpers:ExpanderHelper.HeaderBottomContent>
+                                        <ui:ProgressBar Style="{StaticResource MdnsProgressBarStyle}" />
+                                    </helpers:ExpanderHelper.HeaderBottomContent>
                                     <Expander.Header>
-                                        <Grid>
-                                            <CheckBox Click="MdnsCheckBox_Click" Style="{StaticResource MdnsCheckBoxStyle}" />
-                                            <Border Margin="-24,0,-5,-5" ClipToBounds="True">
-                                                <ui:ProgressBar Style="{StaticResource MdnsProgressBarStyle}" />
-                                            </Border>
-                                        </Grid>
+                                        <CheckBox Click="MdnsCheckBox_Click" Style="{StaticResource MdnsCheckBoxStyle}" />
                                     </Expander.Header>
                                     <Grid>
+                                        <ui:SimpleStackPanel
+                                            Margin="4"
+                                            Spacing="6"
+                                            Style="{StaticResource MdnsOffPanelStyle}">
+                                            <TextBlock Text="• Polling for services is OFF" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="• Server " />
+                                                <TextBlock FontStyle="Italic" Text="might" />
+                                                <TextBlock Text=" be ON" />
+                                            </StackPanel>
+                                        </ui:SimpleStackPanel>
                                         <Border Style="{StaticResource QrBackgroundStyle}">
                                             <Image
                                                 x:Name="PairingQrImage"

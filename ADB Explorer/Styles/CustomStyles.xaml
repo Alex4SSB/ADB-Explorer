@@ -761,7 +761,7 @@
     </Style>
     <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Online">
+            <DataTrigger Binding="{Binding Device.Status}" Value="Ok">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -1373,6 +1373,23 @@
                 Style="{StaticResource RightHorizontalItemsControlStyle}" />
         </Grid>
     </DataTemplate>
+    <Style x:Key="BlueDotTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Text" Value="•" />
+        <Setter Property="FontSize" Value="20" />
+        <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
     <DataTemplate x:Key="StringSettingTemplate" DataType="services:StringSetting">
         <Grid Margin="0,6,0,10" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -1389,26 +1406,7 @@
                     <TextBlock
                         Margin="0,-5,0,-10"
                         HorizontalAlignment="Center"
-                        FontSize="20"
-                        Text="•">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                                        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
-                                    </DataTrigger>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
-                                            <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                        Style="{StaticResource BlueDotTextBlockStyle}" />
                 </Grid>
                 <TextBlock Grid.Column="1" Text="{Binding Description}" />
                 <ItemsControl
@@ -1759,7 +1757,7 @@
                 <Setter Property="IsEnabled" Value="False" />
                 <Setter Property="Height" Value="30" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Device.Status}" Value="Online">
+                    <DataTrigger Binding="{Binding Device.Status}" Value="Ok">
                         <Setter Property="IsEnabled" Value="True" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
@@ -1770,7 +1768,7 @@
         </Menu.Style>
         <MenuItem ToolTip="More Actions">
             <MenuItem.Header>
-                <ui:FontIcon Margin="-6" Glyph="&#xE712;" />
+                <ui:FontIcon Margin="-4" Glyph="&#xE712;" />
             </MenuItem.Header>
             <MenuItem Header="Root Access">
                 <MenuItem.Icon>
@@ -1930,22 +1928,20 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="NewDevicePortBoxStyle"
+        x:Key="PortTextBoxStyle"
+        BasedOn="{StaticResource NumericTextBoxStyle}"
+        TargetType="TextBox">
+        <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
+    </Style>
+    <Style
+        x:Key="MaskedPortBoxStyle"
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
         <Setter Property="Text" Value="{Binding Device.ConnectPort, Mode=TwoWay}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ValidationType" Value="LimitNumber" />
         <Setter Property="MaxNumber" Value="65535" />
-        <Setter Property="ControlStyle">
-            <Setter.Value>
-                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" Port" />
-                    <Setter Property="Padding" Value="4,5,0,6" />
-                    <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
-                </Style>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="ControlStyle" Value="{StaticResource PortTextBoxStyle}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.IsConnectPortValid}" Value="False">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
@@ -1954,6 +1950,19 @@
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="NewDevicePortBoxStyle"
+        BasedOn="{StaticResource MaskedPortBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="ControlStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource PortTextBoxStyle}" TargetType="TextBox">
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" Port" />
+                    <Setter Property="Padding" Value="4,5,0,6" />
+                </Style>
+            </Setter.Value>
+        </Setter>
     </Style>
     <Style
         x:Key="NewDevicePairingPortBoxStyle"
@@ -2029,32 +2038,36 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StaticResource ResourceKey="DeviceActionsMenu" />
-                <Button
+                <ui:SimpleStackPanel
                     Grid.Column="1"
-                    Margin="8,0"
-                    Padding="0,5,0,6"
-                    HorizontalAlignment="Stretch"
-                    Command="{Binding BrowseCommand.Command}"
-                    Content="Browse" />
-                <Button Grid.Column="2" Command="{Binding RemoveCommand.Command}">
-                    <StackPanel Orientation="Horizontal">
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal"
+                    Spacing="8">
+                    <Button
+                        Padding="5"
+                        Command="{Binding RemoveCommand.Command}"
+                        ToolTip="{Binding RemoveCommand.RemoveAction}">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
                         <ui:FontIcon
-                            Margin="-4,1,4,-2"
-                            VerticalAlignment="Center"
-                            Glyph="&#xECC9;"
+                            FontSize="12"
+                            Glyph="&#xE711;"
                             Style="{DynamicResource DisabledButtonGlyphStyle}" />
-                        <Grid>
-                            <TextBlock Text="Remove" Visibility="Hidden" />
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                Style="{StaticResource DisabledButtonTextBlockStyle}"
-                                Text="{Binding RemoveCommand.RemoveAction}" />
-                        </Grid>
-                    </StackPanel>
-                </Button>
+                    </Button>
+                    <Button
+                        Padding="14,5,14,6"
+                        Command="{Binding BrowseCommand.Command}"
+                        Content="Browse" />
+                </ui:SimpleStackPanel>
             </Grid>
         </Expander>
     </DataTemplate>
@@ -2163,9 +2176,9 @@
         BasedOn="{StaticResource RestartAppButtonStyle}"
         TargetType="Button">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding DeviceSelected}" Value="False">
+            <Trigger Property="Opacity" Value="0">
                 <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
+            </Trigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="NewDeviceContentPanelStyle" TargetType="ui:SimpleStackPanel">
@@ -2192,10 +2205,10 @@
         </Style.Triggers>
     </Style>
     <DataTemplate x:Key="NewDeviceTemplate" DataType="UINewDevice">
-        <Expander>
-            <Expander.Style>
-                <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander" />
-            </Expander.Style>
+        <Expander Style="{StaticResource DeviceExpanderStyle}">
+            <helpers:ExpanderHelper.HeaderBottomContent>
+                <Border BorderBrush="{StaticResource NewDeviceBottomBorderBrush}" BorderThickness="0,1" />
+            </helpers:ExpanderHelper.HeaderBottomContent>
             <Expander.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -2212,6 +2225,7 @@
                     <Button
                         Grid.Column="2"
                         Command="{Binding ClearCommand.Command}"
+                        Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                         Style="{StaticResource NewDeviceClearButtonStyle}"
                         ToolTip="Clear All">
                         <ui:FontIcon Glyph="&#xE711;" />
@@ -2290,8 +2304,98 @@
             </ui:SimpleStackPanel>
         </Expander>
     </DataTemplate>
+    <Style
+        x:Key="HistoryDeviceNameStyle"
+        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        <Setter Property="Text" Value="{Binding Device.DeviceName}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.DeviceName}" Value="{x:Null}">
+                <Setter Property="Text" Value="{Binding Device.IpAddress}" />
+                <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <DataTemplate x:Key="HistoryDeviceTemplate" DataType="UIHistoryDevice">
+        <Expander Style="{StaticResource DeviceExpanderStyle}">
+            <helpers:ExpanderHelper.HeaderBottomContent>
+                <Border BorderBrush="{StaticResource HistoryDeviceBottomBorderBrush}" BorderThickness="0,1" />
+            </helpers:ExpanderHelper.HeaderBottomContent>
+            <Expander.Header>
+                <Border
+                    Margin="-5"
+                    Padding="5"
+                    ClipToBounds="True"
+                    Style="{StaticResource BorderStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="4"
+                            Style="{StaticResource HistoryDeviceNameStyle}" />
+                        <Button
+                            Grid.Column="2"
+                            Command="{Binding RemoveCommand.Command}"
+                            Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
+                            Style="{StaticResource NewDeviceClearButtonStyle}"
+                            ToolTip="Remove Device">
+                            <ui:FontIcon Glyph="&#xE74D;" />
+                        </Button>
+                    </Grid>
+                </Border>
+            </Expander.Header>
+            <Grid Style="{StaticResource DeviceContentGridStyle}">
+                <ui:SimpleStackPanel Spacing="6">
+                    <ui:SimpleStackPanel
+                        Margin="4,0"
+                        Orientation="Horizontal"
+                        Spacing="6">
+                        <TextBlock
+                            Margin="0,-5"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource BlueDotTextBlockStyle}" />
+                        <TextBlock Text="IP Address" />
+                    </ui:SimpleStackPanel>
+                    <TextBox
+                        IsReadOnly="True"
+                        Style="{StaticResource NumericTextBoxStyle}"
+                        Text="{Binding Device.IpAddress}" />
+                    <ui:SimpleStackPanel
+                        Margin="4,0"
+                        Orientation="Horizontal"
+                        Spacing="6">
+                        <TextBlock
+                            Margin="0,-5"
+                            VerticalAlignment="Top"
+                            Style="{StaticResource BlueDotTextBlockStyle}" />
+                        <TextBlock Text="Port" />
+                    </ui:SimpleStackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <controls:MaskedTextBox Style="{StaticResource MaskedPortBoxStyle}" />
+                        <Button
+                            Grid.Column="1"
+                            Margin="8,0,2,0"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding ConnectCommand.Command}"
+                            Content="Connect" />
+                    </Grid>
+                </ui:SimpleStackPanel>
+            </Grid>
+        </Expander>
+    </DataTemplate>
     <helpers:DeviceTemplateSelector
         x:Key="DeviceTemplateSelector"
+        HistoryDeviceTemplate="{StaticResource HistoryDeviceTemplate}"
         LogicalDeviceTemplate="{StaticResource LogicalDeviceTemplate}"
         NewDeviceTemplate="{StaticResource NewDeviceTemplate}"
         ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}" />
@@ -2310,6 +2414,34 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
     </Style>
     <Style
+        x:Key="MdnsProgressBarStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="0,1" />
+        <Setter Property="Margin" Value="0,0,0,-1" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Value" Value="{Binding ElementName=MainWin, Path=MdnsService.Progress}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.Progress}" Value="100">
+                <Setter Property="IsIndeterminate" Value="True" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Foreground" Value="Red" />
+                <Setter Property="Value" Value="100" />
+                <Setter Property="IsIndeterminate" Value="False" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsMdnsExpanderOpen}" Value="True">
+                <Setter Property="Padding" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
         x:Key="MdnsExpanderStyle"
         BasedOn="{StaticResource FluentExpanderStyle}"
         TargetType="Expander">
@@ -2318,11 +2450,16 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Disabled">
-                <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
-            </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=EnableMdns}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="MdnsOffPanelStyle" TargetType="ui:SimpleStackPanel">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Disabled">
+                <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -2347,6 +2484,7 @@
         </Setter>
         <Setter Property="Margin" Value="0,-5" />
         <Setter Property="MinWidth" Value="50" />
+        <Setter Property="ToolTip" Value="Click to enable server and polling" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
                 <Setter Property="IsEnabled" Value="False" />
@@ -2361,35 +2499,6 @@
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running">
                 <Setter Property="IsChecked" Value="True" />
                 <Setter Property="ToolTip" Value="Server is up and running" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="MdnsProgressBarStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="Padding" Value="0,0,1,0" />
-        <Setter Property="VerticalAlignment" Value="Bottom" />
-        <Setter Property="Margin" Value="0,0,0,-2" />
-        <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Value" Value="{Binding ElementName=MainWin, Path=MdnsService.Progress}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.Progress}" Value="100">
-                <Setter Property="IsIndeterminate" Value="True" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Foreground" Value="Red" />
-                <Setter Property="Value" Value="100" />
-                <Setter Property="IsIndeterminate" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsMdnsExpanderOpen}" Value="True">
-                <Setter Property="Padding" Value="0" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

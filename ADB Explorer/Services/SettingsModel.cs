@@ -49,8 +49,7 @@ namespace ADB_Explorer.Services
                 new SettingsGroup("Device", new()
                 {
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoRoot)), "Automatically Enable Root", "Device"),
-                    new BoolSetting(appSettings.GetProperty(nameof(Settings.RememberIp)), "Remember Last IP", "Device"),
-                    new BoolSetting(appSettings.GetProperty(nameof(Settings.RememberPort)), "Remember Last Port", "Device", enableProp: appSettings.GetProperty(nameof(Settings.RememberIp))),
+                    new BoolSetting(appSettings.GetProperty(nameof(Settings.SaveDevices)), "Save Manually Connected Devices", "Device"),
                     new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoOpen)), "Automatically Open For Browsing", "Device"),
                 }),
                 new SettingsSeparator(),

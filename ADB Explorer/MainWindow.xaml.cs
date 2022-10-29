@@ -164,65 +164,79 @@ namespace ADB_Explorer
         {
             Dispatcher.Invoke(() =>
             {
-                if (e.PropertyName == nameof(AppRuntimeSettings.UpdateCurrentDevice)
-                    && RuntimeSettings.UpdateCurrentDevice
-                    && CurrentADBDevice is not null)
+                switch (e.PropertyName)
                 {
-                    RuntimeSettings.UpdateCurrentDevice = false;
+                    case nameof(AppRuntimeSettings.UpdateCurrentDevice) when RuntimeSettings.UpdateCurrentDevice && CurrentADBDevice is not null:
+                        RuntimeSettings.UpdateCurrentDevice = false;
 
-                    InitLister();
-                    ClearExplorer();
-                    NavHistory.Reset();
-                    InitDevice();
-
-                    RuntimeSettings.IsDevicesPaneOpen = false;
-                }
-                else if (e.PropertyName == nameof(AppRuntimeSettings.RemoveDevice) && RuntimeSettings.RemoveDevice is bool val)
-                {
-                    if (val)
-                    {
-                        ClearDrives();
+                        InitLister();
                         ClearExplorer();
                         NavHistory.Reset();
-                        ExplorerGrid.Visible(false);
-                        CurrentADBDevice = null;
-                        DirList = null;
-                        RuntimeSettings.UpdateCurrentDevice = true;
-                    }
-                    DeviceListSetup();
+                        InitDevice();
 
-                    RuntimeSettings.UpdateCurrentDevice = false;
-                    RuntimeSettings.RemoveDevice = null;
-                }
-                else if (e.PropertyName == nameof(AppRuntimeSettings.DeviceToPair) && RuntimeSettings.DeviceToPair is not null)
-                {
-                    var deviceToPair = RuntimeSettings.DeviceToPair;
-                    _ = PairService(deviceToPair);
-                    RuntimeSettings.DeviceToPair = null;
-                }
-                else if (e.PropertyName == nameof(AppRuntimeSettings.RootAttemptForbidden) && RuntimeSettings.RootAttemptForbidden)
-                {
-                    RuntimeSettings.RootAttemptForbidden = false;
-                    DialogService.ShowMessage(S_ROOT_FORBID, S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical);
-                }
-                else if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice) && RuntimeSettings.ConnectNewDevice)
-                {
-                    RuntimeSettings.IsManualPairingInProgress = true;
+                        RuntimeSettings.IsDevicesPaneOpen = false;
+                        break;
+                    case nameof(AppRuntimeSettings.DeviceToRemove) when RuntimeSettings.DeviceToRemove is not null:
+                        switch (RuntimeSettings.DeviceToRemove)
+                        {
+                            case UILogicalDevice logical:
+                                if (logical.IsOpen)
+                                {
+                                    ClearDrives();
+                                    ClearExplorer();
+                                    NavHistory.Reset();
+                                    ExplorerGrid.Visible(false);
+                                    CurrentADBDevice = null;
+                                    DirList = null;
+                                    RuntimeSettings.UpdateCurrentDevice = true;
+                                }
+                                DeviceListSetup();
 
-                    if (DevicesObject.NewDevice.IsPairingEnabled)
-                        PairNewDevice();
-                    else
-                        ConnectNewDevice();
-                }
-                else if (e.PropertyName == nameof(AppRuntimeSettings.IsMdnsExpanderOpen))
-                {
-                    if (MdnsService?.State is not MDNS.MdnsState.Disabled)
-                    {
-                        CollapseDevices();
+                                RuntimeSettings.UpdateCurrentDevice = false;
+                                break;
+                            case UIHistoryDevice hist:
+                                DevicesObject.RemoveHistoryDevice(hist);
+                                break;
+                            default:
+                                throw new NotImplementedException();
+                        }
 
-                        if (RuntimeSettings.IsMdnsExpanderOpen)
-                            UpdateQrClass();
-                    }
+                        RuntimeSettings.DeviceToRemove = null;
+                        break;
+
+                    case nameof(AppRuntimeSettings.DeviceToPair) when RuntimeSettings.DeviceToPair is not null:
+                        var deviceToPair = RuntimeSettings.DeviceToPair;
+                        _ = PairService(deviceToPair);
+                        RuntimeSettings.DeviceToPair = null;
+                        break;
+
+                    case nameof(AppRuntimeSettings.RootAttemptForbidden) when RuntimeSettings.RootAttemptForbidden:
+                        RuntimeSettings.RootAttemptForbidden = false;
+                        DialogService.ShowMessage(S_ROOT_FORBID, S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical);
+                        break;
+
+                    case nameof(AppRuntimeSettings.ConnectNewDevice) when RuntimeSettings.ConnectNewDevice is not null:
+                        RuntimeSettings.IsManualPairingInProgress = true;
+
+                        if (RuntimeSettings.ConnectNewDevice is UINewDevice newDevice && newDevice.IsPairingEnabled)
+                            PairNewDevice();
+                        else
+                            ConnectNewDevice();
+                        break;
+
+                    case nameof(AppRuntimeSettings.IsMdnsExpanderOpen):
+                        if (MdnsService?.State is not MDNS.MdnsState.Disabled)
+                        {
+                            CollapseDevices();
+
+                            if (RuntimeSettings.IsMdnsExpanderOpen)
+                                UpdateQrClass();
+                        }
+                        break;
+
+                    case nameof(AppRuntimeSettings.GroupsExpanded):
+                        SettingsAboutExpander.IsExpanded = RuntimeSettings.GroupsExpanded;
+                        break;
                 }
             });
         }
@@ -347,8 +361,11 @@ namespace ADB_Explorer
                     if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                         RefreshDrives(true);
                     break;
-                case nameof(AppRuntimeSettings.GroupsExpanded):
-                    SettingsAboutExpander.IsExpanded = RuntimeSettings.GroupsExpanded;
+                case nameof(AppSettings.SaveDevices):
+                    if (Settings.SaveDevices && !DevicesObject.HistoryDevices.Any())
+                        DevicesObject.RetrieveHistoryDevices();
+
+                    FilterDevices();
                     break;
                 default:
                     break;
@@ -707,7 +724,7 @@ namespace ADB_Explorer
 
             FileActions.EditFileEnabled = !FileActions.IsRecycleBin
                 && selectedFiles.Count() == 1
-                && selectedFiles.First().Type is FileType.File;            
+                && selectedFiles.First().Type is FileType.File;
         }
 
         private bool IsPasteEnabled(bool ignoreSelected = false, bool isContextMenu = false)
@@ -766,14 +783,15 @@ namespace ADB_Explorer
 
         private void DeviceListSetup(string selectedAddress = "")
         {
-            Task.Run(() => ADBService.GetDevices(DevicesObject.ConnectServices)).ContinueWith((t) => DeviceListSetup(t.Result, selectedAddress));
+            Task.Run(() => ADBService.GetDevices()).ContinueWith((t) => DeviceListSetup(t.Result, selectedAddress));
         }
 
         private void DeviceListSetup(IEnumerable<LogicalDevice> devices, string selectedAddress = "")
         {
             var init = !DevicesObject.UpdateDevices(devices);
+            FilterDevices();
 
-            if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.CurrentDevice.Status != AbstractDevice.DeviceStatus.Online)
+            if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.CurrentDevice.Status != AbstractDevice.DeviceStatus.Ok)
                 ClearDrives();
 
             if (!DevicesObject.DevicesAvailable())
@@ -812,6 +830,60 @@ namespace ADB_Explorer
             InitLister();
             if (init)
                 InitDevice();
+        }
+
+        private void FilterDevices()
+        {
+            var collectionView = CollectionViewSource.GetDefaultView(DevicesList.ItemsSource);
+            if (collectionView is null)
+                return;
+
+            Predicate<object> predicate = d =>
+            {
+                var device = (UIDevice)d;
+
+                if (device.Device is LogicalDevice logical && logical.Type is AbstractDevice.DeviceType.Service)
+                {
+                    if (logical.Status is AbstractDevice.DeviceStatus.Offline)
+                    {
+                        // if a logical service is offline, and we have one of its services - hide the logical service
+                        return !DevicesObject.ServiceDevices.Any(s => s.IpAddress == ((LogicalDevice)device.Device).IpAddress);
+                    }
+                    else
+                    {
+                        // if there's a logical service and a remote device with the same IP - hide the logical service
+                        return !DevicesObject.LogicalDevices.Any(l => l.Type is AbstractDevice.DeviceType.Remote && l.IpAddress == ((LogicalDevice)device.Device).IpAddress);
+                    }
+                }
+                else if (device.Device is HistoryDevice history)
+                {
+                    // if there's any device with the IP of a history device - hide the history device
+                    return Settings.SaveDevices && !DevicesObject.LogicalDevices.Any(logical => logical.IpAddress == history.IpAddress)
+                            && !DevicesObject.ServiceDevices.Any(service => service.IpAddress == history.IpAddress);
+                }
+                else if (device.Device is ServiceDevice service)
+                {
+                    // connect services are always hidden
+                    if (service is ConnectService)
+                        return DISPLAY_CONNECT_SERVICES;
+
+                    // if there's any online logical device with the IP of a pairing service - hide the pairing service
+                    if (DevicesObject.LogicalDevices.Any(logical => logical.Status is not AbstractDevice.DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
+                        return false;
+
+                    // if there's any QR service with the IP of a code pairing service - hide the code pairing service
+                    if (service.MdnsType is ServiceDevice.ServiceType.PairingCode
+                        && DevicesObject.ServiceDevices.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
+                                                                  && qr.IpAddress == service.IpAddress))
+                        return false;
+                }
+
+                return true;
+            };
+
+            collectionView.Filter = new(predicate);
+            collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new SortDescription("Device.Type", ListSortDirection.Ascending));
         }
 
         private void InitLister()
@@ -1177,13 +1249,14 @@ namespace ADB_Explorer
             }
         }
 
-        private void UpdateDevicesBatInfo(bool devicesVisible)
+        private void UpdateDevicesBatInfo()
         {
             DevicesObject.CurrentDevice?.UpdateBattery();
 
-            if (DateTime.Now - DevicesObject.LastUpdate > BATTERY_UPDATE_INTERVAL || devicesVisible)
+            if (DateTime.Now - DevicesObject.LastUpdate > BATTERY_UPDATE_INTERVAL || RuntimeSettings.IsDevicesPaneOpen)
             {
-                foreach (var item in DevicesObject.LogicalDevices.Where(device => device != DevicesObject.CurrentDevice))
+                var items = DevicesObject.LogicalDevices.Where(device => device != DevicesObject.CurrentDevice);
+                foreach (var item in items)
                 {
                     item.UpdateBattery();
                 }
@@ -1226,12 +1299,12 @@ namespace ADB_Explorer
 
                 if (Settings.PollDevices)
                 {
-                    RefreshDevices(RuntimeSettings.IsDevicesPaneOpen);
+                    RefreshDevices();
                 }
 
                 if (Settings.PollBattery)
                 {
-                    UpdateDevicesBatInfo(RuntimeSettings.IsDevicesPaneOpen);
+                    UpdateDevicesBatInfo();
                 }
 
                 if (driveView && Settings.PollDrives)
@@ -1251,18 +1324,16 @@ namespace ADB_Explorer
             });
         }
 
-        private void RefreshDevices(bool devicesVisible)
+        private void RefreshDevices()
         {
-            Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices(DevicesObject.ConnectServices)).Wait();
+            Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
 
-            if (MdnsService.State == MDNS.MdnsState.Running && devicesVisible)
+            if (MdnsService.State == MDNS.MdnsState.Running && RuntimeSettings.IsDevicesPaneOpen)
             {
                 Dispatcher.Invoke(() =>
                 {
-                    if (DevicesObject.LogicalDevices.Any(device => device.Service is null) && DevicesObject.ConnectServices.Any())
-                    {
-                        DevicesObject.UpdateConnectServices();
-                    }
+                    DevicesObject.UpdateLogicalIp();
+                    FilterDevices();
                 });
                 Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();
             }
@@ -1995,7 +2066,7 @@ namespace ADB_Explorer
         private void PushOpeartion_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var pushOperation = sender as FilePushOperation;
-            
+
             // If operation completed now and current path is where the new file was pushed to and it is not shown yet
             if ((e.PropertyName == "Status") &&
                 (pushOperation.Status == FileOperation.OperationStatus.Completed) &&
@@ -2056,7 +2127,7 @@ namespace ADB_Explorer
 
         private async void ConnectNewDevice()
         {
-            var dev = (NewDevice)DevicesObject.NewDevice.Device;
+            var dev = (NewDevice)RuntimeSettings.ConnectNewDevice.Device;
             await Task.Run(() =>
             {
                 try
@@ -2066,7 +2137,7 @@ namespace ADB_Explorer
                 }
                 catch (Exception ex)
                 {
-                    if (ex.Message.Contains(S_FAILED_CONN + dev.ConnectAddress) && !DevicesObject.NewDevice.IsPairingEnabled)
+                    if (ex.Message.Contains(S_FAILED_CONN + dev.ConnectAddress) && dev.Type is AbstractDevice.DeviceType.New && ((UINewDevice)RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
                     {
                         DevicesObject.NewDevice.EnablePairing();
                     }
@@ -2084,19 +2155,30 @@ namespace ADB_Explorer
                 {
                     if (t.Result)
                     {
-                        if (Settings.RememberIp)
-                            Settings.LastIp = ((NewDevice)DevicesObject.NewDevice.Device).IpAddress;
+                        string newDeviceAddress = "";
+                        if (RuntimeSettings.ConnectNewDevice.Device.Type is AbstractDevice.DeviceType.New)
+                        {
+                            if (Settings.SaveDevices)
+                                DevicesObject.AddHistoryDevice(new(dev));
 
-                        if (Settings.RememberPort)
-                            Settings.LastPort = ((NewDevice)DevicesObject.NewDevice.Device).ConnectPort;
+                            newDeviceAddress = dev.ConnectAddress;
+                            ((UINewDevice)RuntimeSettings.ConnectNewDevice).ClearDevice();
+                        }
+                        else
+                        {
+                            newDeviceAddress = ((HistoryDevice)RuntimeSettings.ConnectNewDevice.Device).ConnectAddress;
 
-                        var newDeviceAddress = ((NewDevice)DevicesObject.NewDevice.Device).ConnectAddress;
-                        DevicesObject.NewDevice.ClearDevice();
+                            // In case user has changed the port of the history device
+                            if (Settings.SaveDevices)
+                                DevicesObject.StoreHistoryDevices();
+                        }
+
+
                         CollapseDevices();
                         DeviceListSetup(newDeviceAddress);
                     }
-                    
-                    RuntimeSettings.ConnectNewDevice =
+
+                    RuntimeSettings.ConnectNewDevice = null;
                     RuntimeSettings.IsManualPairingInProgress = false;
                 });
             });
@@ -2104,7 +2186,7 @@ namespace ADB_Explorer
 
         private async void PairNewDevice()
         {
-            var dev = (NewDevice)DevicesObject.NewDevice.Device;
+            var dev = (NewDevice)RuntimeSettings.ConnectNewDevice.Device;
             await Task.Run(() =>
             {
                 try
@@ -2127,32 +2209,10 @@ namespace ADB_Explorer
                     if (t.Result)
                         ConnectNewDevice();
 
-                    RuntimeSettings.ConnectNewDevice =
+                    RuntimeSettings.ConnectNewDevice = null;
                     RuntimeSettings.IsManualPairingInProgress = false;
                 });
             });
-        }
-
-        private void RetrieveIp()
-        {
-            if (DevicesObject?.NewDevice is null)
-                return;
-
-            var dev = DevicesObject.NewDevice.Device as NewDevice;
-            if (!string.IsNullOrWhiteSpace(dev.IpAddress) && !string.IsNullOrWhiteSpace(dev.ConnectPort))
-                return;
-
-            if (Settings.RememberIp
-                && Settings.LastIp is string lastIp
-                && !DevicesObject.UIList.Any(d => d.Device.ID.Split(':')[0] == lastIp))
-            {
-                dev.IpAddress = lastIp;
-                if (Settings.RememberPort
-                    && Settings.LastPort is string lastPort)
-                {
-                    dev.ConnectPort = lastPort;
-                }
-            }
         }
 
         private void ClearExplorer(bool clearDevice = true)
@@ -2179,7 +2239,7 @@ namespace ADB_Explorer
             FileActions.PushPackageEnabled = Settings.EnableApk;
 
             SearchBox.Clear();
-            
+
             if (clearDevice)
             {
                 CurrentDisplayNames.Clear();
@@ -2243,11 +2303,6 @@ namespace ADB_Explorer
 
             SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, selectionIndex);
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, selectionIndex);
-        }
-
-        private void DevicesSplitView_PaneOpening(SplitView sender, object args)
-        {
-            RetrieveIp();
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -2340,7 +2395,7 @@ namespace ADB_Explorer
             var driveTask = Task.Run(() =>
             {
                 var drives = CurrentADBDevice.GetDrives();
-                
+
                 if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash))
                     UpdateRecycledItemsCount();
 
@@ -2427,7 +2482,7 @@ namespace ADB_Explorer
         private void FilterHiddenFiles()
         {
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
-            
+
             if (!ExplorerGrid.Visible())
                 return;
 
@@ -3185,7 +3240,7 @@ namespace ADB_Explorer
 
         private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
         {
-            RefreshDevices(true);
+            RefreshDevices();
         }
 
         private void RestoreMenuButton_Click(object sender, RoutedEventArgs e)
@@ -3568,7 +3623,7 @@ namespace ADB_Explorer
                 return;
             }
             FileActions.IsEditorOpen = true;
-            
+
             FileActions.EditorFilePath = selectedFiles.First().FullPath;
 
             var readTask = Task.Run(() =>

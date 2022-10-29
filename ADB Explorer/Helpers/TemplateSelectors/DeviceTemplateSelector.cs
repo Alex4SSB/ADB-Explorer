@@ -10,6 +10,7 @@ namespace ADB_Explorer.Helpers
         public DataTemplate LogicalDeviceTemplate { get; set; }
         public DataTemplate ServiceDeviceTemplate { get; set; }
         public DataTemplate NewDeviceTemplate { get; set; }
+        public DataTemplate HistoryDeviceTemplate { get; set; }
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
@@ -18,6 +19,7 @@ namespace ADB_Explorer.Helpers
                 UILogicalDevice => LogicalDeviceTemplate,
                 UIServiceDevice => ServiceDeviceTemplate,
                 UINewDevice => NewDeviceTemplate,
+                UIHistoryDevice => HistoryDeviceTemplate,
                 _ => throw new NotImplementedException(),
             };
         }
