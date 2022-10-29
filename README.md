@@ -19,5 +19,5 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 
 
 <a href="https://www.microsoft.com/store/apps/9PPGN2WM50QB">
-      <img alt="Issues" width=300px src="https://get.microsoft.com/images/en-us%20dark.svg" />
+      <img alt="Issues" width=300px src="https://get.microsoft.com/images/en-us%20light.svg" />
 </a>
