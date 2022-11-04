@@ -1041,7 +1041,7 @@
                                                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CutItems}, Path=Count}" Value="0">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
                                                     <Setter Property="Visibility" Value="Collapsed" />
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -1297,7 +1297,7 @@
                                 IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}"
                                 KeyDown="SearchBox_KeyDown"
                                 Style="{StaticResource TextBoxFluentStyle}"
-                                TextChanged="SearchBox_TextChanged" />
+                                Text="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             <Border
                                 Margin="0,1,0,1"
                                 HorizontalAlignment="Left"
@@ -1326,7 +1326,7 @@
                 MouseDown="GridBackgroundBlock_MouseDown"
                 Style="{StaticResource ExplorerViewBackgroundStyle}">
                 <Grid>
-                    <ScrollViewer Visibility="{Binding ElementName=DrivesItemRepeater, Path=Visibility}">
+                    <ScrollViewer Style="{StaticResource DriveViewScrollViewerStyle}">
                         <ui:ItemsRepeater
                             x:Name="DrivesItemRepeater"
                             Margin="10,10,10,0"
@@ -1368,8 +1368,7 @@
                         SelectionMode="Extended"
                         SelectionUnit="FullRow"
                         Sorting="ExplorerGrid_Sorting"
-                        Style="{StaticResource ExplorerGridStyle}"
-                        Visibility="Collapsed">
+                        Style="{StaticResource ExplorerGridStyle}">
                         <DataGrid.Columns>
                             <DataGridTemplateColumn
                                 x:Name="IconColumn"
@@ -1673,7 +1672,7 @@
                                     <MultiDataTrigger>
                                         <MultiDataTrigger.Conditions>
                                             <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
-                                            <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Visible" />
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
                                             <Condition Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="True" />
                                             <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
                                             <Condition Binding="{Binding ElementName=LogTextBox, Path=Visibility}" Value="Collapsed" />
@@ -2352,8 +2351,7 @@
                                         Padding="30,5,6,6"
                                         ui:ControlHelper.PlaceholderText="Search Settings"
                                         GotFocus="SettingsSearchBox_GotFocus"
-                                        Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay}"
-                                        TextChanged="SettingsSearchBox_TextChanged" />
+                                        Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <ui:FontIcon
                                         Margin="6,0,0,0"
                                         HorizontalAlignment="Left"

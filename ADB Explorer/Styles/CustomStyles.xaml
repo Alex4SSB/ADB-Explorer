@@ -2543,4 +2543,14 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="DriveViewScrollViewerStyle"
+        BasedOn="{StaticResource ScrollViewerStyle}"
+        TargetType="ScrollViewer">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

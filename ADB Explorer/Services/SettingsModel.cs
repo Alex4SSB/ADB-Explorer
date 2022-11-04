@@ -280,13 +280,15 @@ namespace ADB_Explorer.Services
 
         public EnumSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
             : base(valueProp, description, groupName, enableProp, visibleProp, commands)
-        { }
+        {
+            RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        }
 
-        protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(AppRuntimeSettings.SearchText))
             {
-                IsExpanded = !string.IsNullOrEmpty(RuntimeSettings.SearchText) && Buttons.Any(button => button.Name.ToLower().Contains(RuntimeSettings.SearchText.ToLower()));
+                IsExpanded = !string.IsNullOrEmpty(RuntimeSettings.SearchText) && Buttons.Any(button => button.Name.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase));
             }
         }
     }

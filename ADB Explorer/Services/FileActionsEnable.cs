@@ -236,15 +236,22 @@ namespace ADB_Explorer.Services
             set => Set(ref isTemp, value);
         }
 
-        private bool isExplorerView;
-        public bool IsExplorerView
+        private bool isExplorerVisible = false;
+        public bool IsExplorerVisible
         {
-            get => isExplorerView;
+            get => isExplorerVisible;
             set
             {
-                if (Set(ref isExplorerView, value))
+                if (Set(ref isExplorerVisible, value))
                     OnPropertyChanged(nameof(NewMenuVisible));
             }
+        }
+
+        private bool isDriveViewVisible = false;
+        public bool IsDriveViewVisible
+        {
+            get => isDriveViewVisible;
+            set => Set(ref isDriveViewVisible, value);
         }
 
         private bool parentEnabled;
@@ -362,6 +369,13 @@ namespace ADB_Explorer.Services
             set => Set(ref editorFilePath, value);
         }
 
+        private string explorerFilter = "";
+        public string ExplorerFilter
+        {
+            get => explorerFilter;
+            set => Set(ref explorerFilter, value);
+        }
+
         #endregion
 
         #region read only
@@ -375,7 +389,7 @@ namespace ADB_Explorer.Services
         public string MenuRestoreTooltip => $"{RestoreAction} (Ctrl+R)";
         public bool NameReadOnly => !RenameEnabled;
         public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
-        public bool NewMenuVisible => !IsExplorerView || (!IsRecycleBin && !IsAppDrive);
+        public bool NewMenuVisible => !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
         public bool IsEditorTextChanged => OriginalEditorText != EditorText;
 
         #endregion

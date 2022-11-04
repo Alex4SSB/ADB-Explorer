@@ -199,7 +199,7 @@ namespace ADB_Explorer
                                     ClearDrives();
                                     ClearExplorer();
                                     NavHistory.Reset();
-                                    ExplorerGrid.Visible(false);
+                                    FileActions.IsExplorerVisible = false;
                                     CurrentADBDevice = null;
                                     DirList = null;
                                     RuntimeSettings.UpdateCurrentDevice = true;
@@ -254,6 +254,10 @@ namespace ADB_Explorer
                     case nameof(AppRuntimeSettings.GroupsExpanded):
                         SettingsAboutExpander.IsExpanded = RuntimeSettings.GroupsExpanded;
                         break;
+
+                    case nameof(AppRuntimeSettings.SearchText):
+                        FilterSettings();
+                        break;
                 }
             });
         }
@@ -268,13 +272,17 @@ namespace ADB_Explorer
 
         private void FileActions_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(FileActions.RefreshPackages) && FileActions.RefreshPackages)
+            if (e.PropertyName == nameof(FileActionsEnable.RefreshPackages) && FileActions.RefreshPackages)
             {
                 if (FileActions.IsAppDrive)
                 {
                     Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
                     FileActions.RefreshPackages = false;
                 }
+            }
+            else if (e.PropertyName == nameof(FileActionsEnable.ExplorerFilter))
+            {
+                FilterHiddenFiles();
             }
         }
 
@@ -357,7 +365,7 @@ namespace ADB_Explorer
                     if (DevicesObject.CurrentDevice is null)
                         return;
 
-                    if (ExplorerGrid.Visible())
+                    if (FileActions.IsExplorerVisible)
                         FilterHiddenFiles();
                     else
                         UpdatePackages();
@@ -831,7 +839,7 @@ namespace ADB_Explorer
                     DevicesObject.CloseAll();
 
                     ClearExplorer();
-                    ExplorerGrid.Visible(false);
+                    FileActions.IsExplorerVisible = false;
                     NavHistory.Reset();
                     return;
                 }
@@ -1158,8 +1166,7 @@ namespace ADB_Explorer
         private void DriveViewNav()
         {
             ClearExplorer(false);
-            ExplorerGrid.Visibility = Visibility.Collapsed;
-            DrivesItemRepeater.Visibility = Visibility.Visible;
+            FileActions.IsDriveViewVisible = true;
             PathBox.IsEnabled = true;
 
             MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
@@ -1192,9 +1199,8 @@ namespace ADB_Explorer
             if (realPath is null)
                 return false;
 
-            DrivesItemRepeater.Visibility = Visibility.Collapsed;
-            ExplorerGrid.Visibility = Visibility.Visible;
-            FileActions.IsExplorerView = true;
+            FileActions.IsDriveViewVisible = false;
+            FileActions.IsExplorerVisible = true;
             FileActions.HomeEnabled = DevicesObject.CurrentDevice.Drives.Any();
 
             return _navigateToPath(realPath, bfNavigated);
@@ -1412,7 +1418,7 @@ namespace ADB_Explorer
         {
             if (path is null) return false;
             var realPath = FolderExists(path);
-            SearchBox.Clear();
+            FileActions.ExplorerFilter = "";
 
             return realPath is null ? false : _navigateToPath(realPath, bfNavigated);
         }
@@ -1756,7 +1762,7 @@ namespace ADB_Explorer
 
             if (location is string path)
             {
-                if (!ExplorerGrid.Visible())
+                if (!FileActions.IsExplorerVisible)
                     InitNavigation(path, bfNavigated);
                 else
                     NavigateToPath(path, bfNavigated);
@@ -1903,7 +1909,7 @@ namespace ADB_Explorer
             {
                 if (!alt)
                     FocusPathBox();
-                else if (!FileActions.IsRecycleBin && ExplorerGrid.Visible())
+                else if (!FileActions.IsRecycleBin && FileActions.IsExplorerVisible)
                     Clipboard.SetText(CurrentPath);
             }
             else if (actualKey == Key.A && ctrl)
@@ -1933,7 +1939,7 @@ namespace ADB_Explorer
             {
                 CopyItemPath();
             }
-            else if (actualKey == Key.Home && ExplorerGrid.Visible())
+            else if (actualKey == Key.Home && FileActions.IsExplorerVisible)
             {
                 AnimateControl(HomeButton);
                 NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
@@ -2264,7 +2270,7 @@ namespace ADB_Explorer
             FileActions.UninstallVisible =
             FileActions.CutEnabled =
             FileActions.CopyEnabled =
-            FileActions.IsExplorerView =
+            FileActions.IsExplorerVisible =
             FileActions.PackageActionsEnabled =
             FileActions.CopyPathEnabled =
             FileActions.UpdateModifiedEnabled =
@@ -2272,7 +2278,7 @@ namespace ADB_Explorer
 
             FileActions.PushPackageEnabled = Settings.EnableApk;
 
-            SearchBox.Clear();
+            FileActions.ExplorerFilter = "";
 
             if (clearDevice)
             {
@@ -2291,6 +2297,7 @@ namespace ADB_Explorer
         {
             DevicesObject.CurrentDevice?.Drives.Clear();
             DrivesItemRepeater.ItemsSource = null;
+            FileActions.IsDriveViewVisible = false;
         }
 
         private void DevicesSplitView_PaneClosing(SplitView sender, SplitViewPaneClosingEventArgs args)
@@ -2394,7 +2401,7 @@ namespace ADB_Explorer
             if (DevicesObject.CurrentDevice is null)
                 return;
 
-            if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !ExplorerGrid.Visible())
+            if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !FileActions.IsExplorerVisible)
                 asyncClasify = true;
 
             var trashExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash);
@@ -2520,7 +2527,7 @@ namespace ADB_Explorer
         {
             //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
-            if (!ExplorerGrid.Visible())
+            if (!FileActions.IsExplorerVisible)
                 return;
 
             var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
@@ -2530,7 +2537,7 @@ namespace ADB_Explorer
             if (FileActions.IsAppDrive)
             {
                 collectionView.Filter = Settings.ShowSystemPackages
-                    ? new(pkg => pkg.ToString().Contains(SearchBox.Text, StringComparison.OrdinalIgnoreCase))
+                    ? new(pkg => pkg.ToString().Contains(FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
                     : new(pkg => ((Package)pkg).Type is Package.PackageType.User);
 
                 ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
@@ -2566,7 +2573,7 @@ namespace ADB_Explorer
             if (RECYCLE_PATHS.Contains(file.FullPath))
                 return true;
 
-            if (!file.ToString().Contains(SearchBox.Text, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(FileActions.ExplorerFilter) && !file.ToString().Contains(FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
                 return true;
 
             return false;
@@ -3587,19 +3594,19 @@ namespace ADB_Explorer
             SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
         }
 
-        private void SettingsSearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterSettings();
-        }
-
         private void FilterSettings()
         {
             var collectionView = CollectionViewSource.GetDefaultView(SortedSettings.ItemsSource);
             if (collectionView is null)
                 return;
 
-            collectionView.Filter = new(sett => ((AbstractSetting)sett).Description.ToLower().Contains(SettingsSearchBox.Text.ToLower())
-                || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.ToLower().Contains(SettingsSearchBox.Text.ToLower()))));
+            if (string.IsNullOrEmpty(RuntimeSettings.SearchText))
+                collectionView.Filter = null;
+            else
+            {
+                collectionView.Filter = new(sett => ((AbstractSetting)sett).Description.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase)
+                || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase))));
+            }
         }
 
         private void ModifiedFromName_Click(object sender, RoutedEventArgs e)
@@ -3618,16 +3625,11 @@ namespace ADB_Explorer
             SearchBoxMaxWidth();
         }
 
-        private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterHiddenFiles();
-        }
-
         private void SearchBox_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key is Key.Escape)
             {
-                SearchBox.Clear();
+                FileActions.ExplorerFilter = "";
                 UnfocusPathBox();
             }
         }
