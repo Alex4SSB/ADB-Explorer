@@ -2424,7 +2424,6 @@
         <Setter Property="BorderThickness" Value="0,1" />
         <Setter Property="Margin" Value="0,0,0,-1" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
                 <Setter Property="Visibility" Value="Visible" />
