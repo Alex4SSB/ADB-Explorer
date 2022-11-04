@@ -78,7 +78,7 @@ namespace ADB_Explorer.Models
 
         public IEnumerable<LogicalDevice> LogicalDevices => UILogicalDevices.Select(d => d.Device as LogicalDevice);
         public IEnumerable<ServiceDevice> ServiceDevices => UIServiceDevices.Select(d => d.Device as ServiceDevice);
-        public IEnumerable<HistoryDevice> HistoryDevices => UIServiceDevices.Select(d => d.Device as HistoryDevice);
+        public IEnumerable<HistoryDevice> HistoryDevices => UIHistoryDevices.Select(d => d.Device as HistoryDevice);
 
         public UILogicalDevice Current
         {
@@ -98,7 +98,23 @@ namespace ADB_Explorer.Models
         public DateTime LastUpdate { get; set; }
 
         public int Count => UIList.Count(d => d.Device.Type is not DeviceType.New and not DeviceType.History
-            && d.Device.Status is DeviceStatus.Ok or DeviceStatus.Unauthorized);
+            && d.Device.Status is not DeviceStatus.Offline);
+
+        public string AppTitle
+        {
+            get
+            {
+                if (Count < 1)
+                    return $"{Properties.Resources.AppDisplayName}{Strings.S_NO_DEVICES_TITLE}";
+                else
+                {
+                    if (CurrentDevice)
+                        return $"{Properties.Resources.AppDisplayName} - {CurrentDevice.Name}";
+                    else
+                        return Properties.Resources.AppDisplayName;
+                }
+            }
+        }
 
         public void RetrieveHistoryDevices() => RetrieveHistoryDevices(UIList);
 
@@ -139,11 +155,27 @@ namespace ADB_Explorer.Models
             UIList.Add(new UINewDevice());
             if (Data.Settings.SaveDevices)
                 RetrieveHistoryDevices();
+
+            UIList.CollectionChanged += UIList_CollectionChanged;
         }
 
-        public void SetOpen(UILogicalDevice device, bool openState = true) => device.SetOpen(UILogicalDevices.ToList(), openState);
+        private void UIList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Count));
+            OnPropertyChanged(nameof(AppTitle));
+        }
 
-        public void CloseAll() => UILogicalDevice.SetOpen(UILogicalDevices.ToList());
+        public void SetOpen(UILogicalDevice device, bool openState = true)
+        {
+            device.SetOpen(UILogicalDevices.ToList(), openState);
+            OnPropertyChanged(nameof(AppTitle));
+        }
+
+        public void CloseAll()
+        {
+            UILogicalDevice.SetOpen(UILogicalDevices.ToList());
+            OnPropertyChanged(nameof(AppTitle));
+        }
 
         public void UpdateServices(IEnumerable<ServiceDevice> other) => UpdateServices(UIList, other);
 
@@ -168,10 +200,14 @@ namespace ADB_Explorer.Models
         {
             var result = UpdateDevices(UIList, other);
             OnPropertyChanged(nameof(Count));
+
+            UpdateLogicalIp();
+            UpdateHistoryNames();
+            
             return result;
         }
 
-        public static bool UpdateDevices(ObservableList<UIDevice> self, IEnumerable<LogicalDevice> other)
+        private static bool UpdateDevices(ObservableList<UIDevice> self, IEnumerable<LogicalDevice> other)
         {
             bool isCurrentTypeUpdated = false;
 
@@ -196,15 +232,18 @@ namespace ADB_Explorer.Models
                 }
             }
 
-            UpdateLogicalIp(self);
-
-            UpdateHistoryNames(self);
-
             return isCurrentTypeUpdated;
         }
 
-        public static void UpdateHistoryNames(ObservableList<UIDevice> devices)
+        public void UpdateHistoryNames()
         {
+            if (UpdateHistoryNames(UIList))
+                OnPropertyChanged(nameof(UIList));
+        }
+
+        public static bool UpdateHistoryNames(ObservableList<UIDevice> devices)
+        {
+            var result = false;
             foreach (var item in devices.OfType<UIHistoryDevice>().Where(d => string.IsNullOrEmpty(((HistoryDevice)d.Device).DeviceName)))
             {
                 var logical = devices.OfType<UILogicalDevice>().Where(l => ((LogicalDevice)l.Device).Type is DeviceType.Remote or DeviceType.Service
@@ -213,22 +252,42 @@ namespace ADB_Explorer.Models
                 {
                     ((HistoryDevice)item.Device).DeviceName = logical.First().Name;
                     StoreHistoryDevices(devices.OfType<UIHistoryDevice>().Select(d => (HistoryDevice)d.Device));
+
+                    result = true;
                 }
             }
+
+            return result;
         }
 
-        public void UpdateLogicalIp() => UpdateLogicalIp(UIList);
-
-        public static async void UpdateLogicalIp(ObservableList<UIDevice> devices)
+        public async void UpdateLogicalIp()
         {
-            foreach (var item in devices.Where(d => d.Device.Type is DeviceType.Service && string.IsNullOrEmpty(((LogicalDevice)d.Device).IpAddress)))
+            if (await UpdateLogicalIp(UIList))
+                OnPropertyChanged(nameof(UIList));
+        }
+
+        public static async Task<bool> UpdateLogicalIp(ObservableList<UIDevice> devices)
+        {
+            var result = false;
+            foreach (var item in devices.Where(d => d.Device.Type is DeviceType.Service or DeviceType.Local && string.IsNullOrEmpty(((LogicalDevice)d.Device).IpAddress)))
             {
-                var service = devices.Where(d => d.Device is ServiceDevice srv && (srv.ID == item.Device.ID || srv.ID == ((LogicalDevice)item.Device).BaseID) && !string.IsNullOrEmpty(srv.IpAddress));
-                if (service.Any())
-                    ((LogicalDevice)item.Device).IpAddress = ((ServiceDevice)service.First().Device).IpAddress;
-                else
-                    await Task.Run(() => ADBService.AdbDevice.GetDeviceIp((LogicalDevice)item.Device));
+                result = true;
+
+                if (item.Device.Type is DeviceType.Service)
+                {
+                    var service = devices.Where(d => d.Device is ServiceDevice srv && (srv.ID == item.Device.ID || srv.ID == ((LogicalDevice)item.Device).BaseID) && !string.IsNullOrEmpty(srv.IpAddress));
+                    if (service.Any())
+                    {
+                        ((LogicalDevice)item.Device).IpAddress = ((ServiceDevice)service.First().Device).IpAddress;
+                        continue;
+                    }
+                }
+                
+                
+                await Task.Run(() => ADBService.AdbDevice.GetDeviceIp((LogicalDevice)item.Device));
             }
+
+            return result;
         }
 
         private IEnumerable<UILogicalDevice> AvailableDevices(bool current = false)
@@ -252,6 +311,7 @@ namespace ADB_Explorer.Models
             if (availableDevices.Any() && availableDevices.First() is UILogicalDevice ui)
             {
                 ui.SetOpen(UILogicalDevices.ToList());
+                OnPropertyChanged(nameof(AppTitle));
                 return true;
             }
             else
@@ -372,11 +432,11 @@ namespace ADB_Explorer.Models
     {
         public Device Device { get; protected set; }
 
-        private bool isSelected;
+        private bool deviceSelected;
         public bool DeviceSelected
         {
-            get => isSelected;
-            set => Set(ref isSelected, value);
+            get => deviceSelected;
+            set => Set(ref deviceSelected, value);
         }
 
         public virtual string Tooltip { get; }
@@ -436,6 +496,8 @@ namespace ADB_Explorer.Models
 
         public string BaseID => Type == DeviceType.Service ? ID.Split('.')[0] : ID;
 
+        public string LogicalID => Type == DeviceType.Service && ID.Count(c => c == '-') > 1 ? ID.Split('-')[1] : ID;
+
         private RootStatus root = RootStatus.Unchecked;
         public RootStatus Root
         {
@@ -468,6 +530,7 @@ namespace ADB_Explorer.Models
         {
             var deviceType = GetType(id, status);
             var deviceStatus = GetStatus(status);
+            var ip = deviceType is DeviceType.Remote ? id.Split(':')[0] : "";
             var rootStatus = deviceType is DeviceType.Sideload
                 ? RootStatus.Enabled
                 : RootStatus.Unchecked;
@@ -475,7 +538,7 @@ namespace ADB_Explorer.Models
             if (!AdbExplorerConst.DISPLAY_OFFLINE_SERVICES && deviceType is DeviceType.Service && deviceStatus is DeviceStatus.Offline)
                 return null;
 
-            return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus, Root = rootStatus };
+            return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus, Root = rootStatus, IpAddress = ip };
         }
 
         private static DeviceStatus GetStatus(string status)
@@ -652,7 +715,12 @@ namespace ADB_Explorer.Models
 
     public class UILogicalDevice : UIDevice
     {
-        public bool IsOpen { get; set; }
+        private bool isOpen = false;
+        public bool IsOpen
+        {
+            get => isOpen;
+            private set => Set(ref isOpen, value);
+        }
 
         public string Name => ((LogicalDevice)Device).Name;
 
@@ -906,7 +974,6 @@ namespace ADB_Explorer.Models
 
         public void Action()
         {
-            ((UILogicalDevice)device).IsOpen = true;
             Data.CurrentADBDevice = new(device);
             Data.RuntimeSettings.UpdateCurrentDevice = true;
         }
@@ -921,16 +988,20 @@ namespace ADB_Explorer.Models
         {
             get
             {
-                if (device.Device.Type is AbstractDevice.DeviceType.History)
-                    return true;
-                else
-                    return !Data.RuntimeSettings.IsManualPairingInProgress
-                        && device.Device.Type is AbstractDevice.DeviceType.Remote
-                                              or AbstractDevice.DeviceType.Emulator;
+                return device.Device.Type is AbstractDevice.DeviceType.History
+                        || (!Data.RuntimeSettings.IsManualPairingInProgress
+                            && device.Device.Type is AbstractDevice.DeviceType.Remote
+                                                  or AbstractDevice.DeviceType.Emulator);
             }
         }
 
-        public string RemoveAction => device.Device.Type is AbstractDevice.DeviceType.Emulator ? Strings.S_KILL_EMU : Strings.S_REMOVE_DEV;
+        public string RemoveAction => device.Device.Type switch
+        {
+            AbstractDevice.DeviceType.Remote => Strings.S_REM_DEV,
+            AbstractDevice.DeviceType.Emulator => Strings.S_REM_EMU,
+            AbstractDevice.DeviceType.History => Strings.S_REM_HIST_DEV,
+            _ => "",
+        };
 
         public RemoveCommand(UILogicalDevice device) : base(device)
         { }

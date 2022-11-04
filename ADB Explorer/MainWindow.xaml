@@ -13,7 +13,7 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="MainWin"
-    Title="ADB Explorer"
+    Title="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DevicesObject.AppTitle}"
     Width="800"
     Height="450"
     MinWidth="605"

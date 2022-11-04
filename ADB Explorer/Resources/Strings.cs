@@ -51,8 +51,9 @@ namespace ADB_Explorer.Resources
         public const string S_RESTORE_CONF_TITLE = "Restore Conflicts";
         public const string S_CONF_UNI_TITLE = "Confirm Uninstall";
         public const string S_INSTALL_APK = "Select packages to install";
-        public const string S_KILL_EMU = "Kill Emulator";
-        public const string S_REMOVE_DEV = "Remove Device";
+        public const string S_REM_EMU = "Kill Emulator";
+        public const string S_REM_HIST_DEV = "Remove Device";
+        public const string S_REM_DEV = "Disconnect Device";
 
 
         public static string S_MISSING_REDIRECTION(string exception) =>

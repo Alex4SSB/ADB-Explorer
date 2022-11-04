@@ -1946,9 +1946,6 @@
             <DataTrigger Binding="{Binding Device.IsConnectPortValid}" Value="False">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -1963,6 +1960,11 @@
                 </Style>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="NewDevicePairingPortBoxStyle"
@@ -2379,12 +2381,13 @@
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <controls:MaskedTextBox Style="{StaticResource MaskedPortBoxStyle}" />
                         <Button
                             Grid.Column="1"
                             Margin="8,0,2,0"
+                            Padding="14,5,14,6"
                             HorizontalAlignment="Stretch"
                             Command="{Binding ConnectCommand.Command}"
                             Content="Connect" />
