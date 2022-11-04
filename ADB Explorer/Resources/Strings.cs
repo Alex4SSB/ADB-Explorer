@@ -57,7 +57,7 @@ namespace ADB_Explorer.Resources
 
 
         public static string S_MISSING_REDIRECTION(string exception) =>
-            $"{exception}\n\nAdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nPlease download and install the app from GitHub (link in Settings > About) to fix this issue.";
+            $"{exception}\n\nAdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nRestarting the app may help. If the issue persists, please download and install the app from GitHub (link in Settings > About) to fix this issue.";
 
         public static string S_NEW_VERSION(Version newVersion) =>
             $"A new {Properties.Resources.AppDisplayName}, version {newVersion}, is available";
