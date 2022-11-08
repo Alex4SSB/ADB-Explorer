@@ -1,7 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell;
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using static ADB_Explorer.Converters.FileTypeClass;

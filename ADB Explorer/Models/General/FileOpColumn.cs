@@ -7,8 +7,6 @@
         public double Width { get; set; }
 
         public FileOpColumn()
-        {
-
-        }
+        { }
     }
 }

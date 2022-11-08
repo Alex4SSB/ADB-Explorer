@@ -1,13 +1,11 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Services;
-using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Windows.Threading;
 
-namespace ADB_Explorer.Models
+namespace ADB_Explorer.Services
 {
     public class FileOperationQueue : INotifyPropertyChanged
     {
