@@ -254,18 +254,18 @@ namespace ADB_Explorer.Services
                     return drives;
                 else
                 {
-                    Func<Drive, bool> predicate = drives.Any(drive => drive.Type is DriveType.Internal)
-                        ? d => d.Type is not DriveType.Internal or DriveType.Root
-                        : d => d.Type is not DriveType.Root;
+                    Func<Drive, bool> predicate = drives.Any(drive => drive.Type is AbstractDrive.DriveType.Internal)
+                        ? d => d.Type is not AbstractDrive.DriveType.Internal or AbstractDrive.DriveType.Root
+                        : d => d.Type is not AbstractDrive.DriveType.Root;
                     drives.AddRange(extStorage.Where(predicate));
                 }
 
-                if (!drives.Any(d => d.Type == DriveType.Internal))
+                if (!drives.Any(d => d.Type == AbstractDrive.DriveType.Internal))
                 {
                     drives.Insert(0, new(path: AdbExplorerConst.DEFAULT_PATH));
                 }
 
-                if (!drives.Any(d => d.Type == DriveType.Root))
+                if (!drives.Any(d => d.Type == AbstractDrive.DriveType.Root))
                 {
                     drives.Insert(0, new(path: "/"));
                 }

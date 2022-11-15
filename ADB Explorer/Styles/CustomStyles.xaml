@@ -923,7 +923,7 @@
         <Setter Property="ToolTip">
             <Setter.Value>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding UsageP}" />
+                    <TextBlock Text="{Binding Drive.UsageP}" />
                     <TextBlock Text="% Used" />
                 </StackPanel>
             </Setter.Value>
@@ -939,7 +939,7 @@
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Type}" Value="Unknown">
+            <DataTrigger Binding="{Binding Drive.Type}" Value="Unknown">
                 <Setter Property="Visibility" Value="Hidden" />
             </DataTrigger>
         </Style.Triggers>
@@ -1169,13 +1169,13 @@
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="BorderThickness" Value="0,0,0,1" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Type}" Value="Trash">
+            <DataTrigger Binding="{Binding Drive.Type}" Value="Trash">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Temp">
+            <DataTrigger Binding="{Binding Drive.Type}" Value="Temp">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Package">
+            <DataTrigger Binding="{Binding Drive.Type}" Value="Package">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="BorderBrush" Value="ForestGreen" />
             </DataTrigger>

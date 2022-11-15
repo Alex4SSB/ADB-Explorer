@@ -464,8 +464,8 @@ namespace ADB_Explorer.Models
             private set => Set(ref name, value);
         }
 
-        private ObservableList<Drive> drives = new();
-        public ObservableList<Drive> Drives
+        private ObservableList<UIDrive> drives = new();
+        public ObservableList<UIDrive> Drives
         {
             get => drives;
             set => Set(ref drives, value);
@@ -554,13 +554,13 @@ namespace ADB_Explorer.Models
         /// </summary>
         /// <param name="value">The new drives to be assigned</param>
         /// <param name="asyncClasify">true to update only after fully acquiring all information</param>
-        internal void SetDrives(IEnumerable<Drive> value, Dispatcher dispatcher, bool asyncClasify = false)
+        internal void SetDrives(IEnumerable<UIDrive> value, Dispatcher dispatcher, bool asyncClasify = false)
         {
             if (asyncClasify)
             {
                 var asyncTask = Task.Run(() =>
                 {
-                    GetMmcDrive(value, ID)?.SetMmc();
+                    GetMmcDrive(value, ID)?.Drive.SetMmc();
                     SetExternalDrives(ref value);
                 });
                 asyncTask.ContinueWith((t) =>
@@ -586,67 +586,67 @@ namespace ADB_Explorer.Models
 
                     dispatcher.BeginInvoke(() =>
                     {
-                        t.Result?.SetMmc();
+                        t.Result?.Drive.SetMmc();
                         SetExternalDrives(ref value);
                     });
                 });
             }
         }
 
-        private void _setDrives(IEnumerable<Drive> drives)
+        private void _setDrives(IEnumerable<UIDrive> drives)
         {
-            if (drives is null || !DrivesChanged(drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp and not DriveType.Package)))
+            if (drives is null || !DrivesChanged(drives.Where(d => d.Drive.Type is not AbstractDrive.DriveType.Trash and not AbstractDrive.DriveType.Temp and not AbstractDrive.DriveType.Package)))
                 return;
 
-            var trash = Drives.Where(d => d.Type is DriveType.Trash);
+            var trash = Drives.Where(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
             if (trash.Any())
                 drives = drives.Append(trash.First());
 
-            var temp = Drives.Where(d => d.Type is DriveType.Temp);
+            var temp = Drives.Where(d => d.Drive.Type is AbstractDrive.DriveType.Temp);
             if (temp.Any())
                 drives = drives.Append(temp.First());
 
-            var apk = Drives.Where(d => d.Type is DriveType.Package);
+            var apk = Drives.Where(d => d.Drive.Type is AbstractDrive.DriveType.Package);
             if (apk.Any())
                 drives = drives.Append(apk.First());
 
             Drives.Set(drives);
         }
 
-        public bool DrivesChanged(IEnumerable<Drive> other)
+        public bool DrivesChanged(IEnumerable<UIDrive> other)
         {
-            var self = Drives.Where(d => d.Type is not DriveType.Trash and not DriveType.Temp and not DriveType.Package);
+            var self = Drives.Where(d => d.Drive.Type is not AbstractDrive.DriveType.Trash and not AbstractDrive.DriveType.Temp and not AbstractDrive.DriveType.Package);
 
             return other is not null
-                && !self.OrderBy(thisDrive => thisDrive.ID).SequenceEqual(
-                    other.OrderBy(otherDrive => otherDrive.ID), new Drive.DriveEqualityComparer());
+                && !self.OrderBy(thisDrive => thisDrive.Drive.Type).SequenceEqual(
+                    other.OrderBy(otherDrive => otherDrive.Drive.ID), new UIDrive.UIDriveEqualityComparer());
         }
 
-        public static Drive GetMmcDrive(IEnumerable<Drive> drives, string deviceID)
+        public static UIDrive GetMmcDrive(IEnumerable<UIDrive> drives, string deviceID)
         {
             if (drives is null)
                 return null;
 
             if (Data.CurrentADBDevice.MmcProp is string mmcId)
             {
-                var mmcDrive = drives.Where(d => d.ID == mmcId);
+                var mmcDrive = drives.Where(d => d.Drive.ID == mmcId);
                 if (mmcDrive.Any())
                 {
                     var mmc = mmcDrive.First();
-                    mmc.SetMmc();
+                    mmc.Drive.SetMmc();
                     return mmc;
                 }
             }
             else if (Data.CurrentADBDevice.OtgProp is not null)
                 return null;
 
-            var externalDrives = drives.Where(d => d.Type == DriveType.Unknown);
+            var externalDrives = drives.Where(d => d.Drive.Type == AbstractDrive.DriveType.Unknown);
 
             switch (externalDrives.Count())
             {
                 case > 1:
                     var mmc = ADBService.GetMmcId(deviceID);
-                    var drive = drives.Where(d => d.ID == mmc);
+                    var drive = drives.Where(d => d.Drive.ID == mmc);
                     return drive.Any() ? drive.First() : null;
                 case 1:
                     return ADBService.MmcExists(deviceID) ? externalDrives.First() : null;
@@ -655,14 +655,14 @@ namespace ADB_Explorer.Models
             }
         }
 
-        public static void SetExternalDrives(ref IEnumerable<Drive> drives)
+        public static void SetExternalDrives(ref IEnumerable<UIDrive> drives)
         {
             if (drives is null)
                 return;
 
-            foreach (var item in drives.Where(d => d.Type == DriveType.Unknown))
+            foreach (var item in drives.Where(d => d.Drive.Type == AbstractDrive.DriveType.Unknown))
             {
-                item.SetOtg();
+                item.Drive.SetOtg();
             }
         }
 

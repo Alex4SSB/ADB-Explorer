@@ -9,31 +9,49 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models
 {
-    public enum DriveType
+    public abstract class AbstractDrive : INotifyPropertyChanged
     {
-        Root,
-        Internal,
-        Expansion,
-        External,
-        Unknown,
-        Emulated,
-        Trash,
-        Temp,
-        Package,
+        public enum DriveType
+        {
+            Root,
+            Internal,
+            Expansion,
+            External,
+            Unknown,
+            Emulated,
+            Trash,
+            Temp,
+            Package,
+        }
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (Equals(storage, value))
+            {
+                return false;
+            }
+
+            storage = value;
+            OnPropertyChanged(propertyName);
+
+            return true;
+        }
+
+        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+    
 
-    public class Drive : INotifyPropertyChanged
+    public class Drive : AbstractDrive
     {
-        private const sbyte usageWarningTh = 90;
-
         public string Size { get; private set; }
         public string Used { get; private set; }
         public string Available { get; private set; }
         public sbyte UsageP { get; private set; }
         public string Path { get; private set; }
         public string ID => Path[(Path.LastIndexOf('/') + 1)..];
-        public string DisplayName => DRIVE_DISPLAY_NAMES[Type];
-        public bool UsageWarning => UsageP >= usageWarningTh;
 
         private DriveType type;
         public DriveType Type
@@ -42,23 +60,11 @@ namespace ADB_Explorer.Models
             private set
             {
                 Set(ref type, value);
-                OnPropertyChanged(nameof(DriveIcon));
-                OnPropertyChanged(nameof(DisplayName));
+                //OnPropertyChanged(nameof(DriveIcon));
+                //OnPropertyChanged(nameof(DisplayName));
             }
         }
-        public string DriveIcon => Type switch
-        {
-            DriveType.Root => "\uF259",
-            DriveType.Internal => "\uEDA2",
-            DriveType.Expansion => "\uE7F1",
-            DriveType.External => "\uE88E",
-            DriveType.Unknown => "\uE9CE",
-            DriveType.Emulated => "\uEDA2",
-            DriveType.Trash => "\uE74D",
-            DriveType.Temp => "\uE912",
-            DriveType.Package => "\uE7B8",
-            _ => throw new NotImplementedException(),
-        };
+        
 
         private ulong itemsCount;
         public ulong ItemsCount
@@ -154,22 +160,6 @@ namespace ADB_Explorer.Models
             return Path.GetHashCode();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (Equals(storage, value))
-            {
-                return false;
-            }
-
-            storage = value;
-            OnPropertyChanged(propertyName);
-
-            return true;
-        }
-
-        protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public class DriveEqualityComparer : IEqualityComparer<Drive>
         {

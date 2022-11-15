@@ -1177,10 +1177,10 @@ namespace ADB_Explorer
 
         private void CombineDisplayNames()
         {
-            foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Type != Models.DriveType.Root))
+            foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Drive.Type != AbstractDrive.DriveType.Root))
             {
-                CurrentDisplayNames.TryAdd(drive.Path, drive.Type is Models.DriveType.External
-                    ? drive.ID : drive.DisplayName);
+                CurrentDisplayNames.TryAdd(drive.Drive.Path, drive.Drive.Type is AbstractDrive.DriveType.External
+                    ? drive.Drive.ID : drive.DisplayName);
             }
             foreach (var item in SPECIAL_FOLDERS_DISPLAY_NAMES)
             {
@@ -1213,9 +1213,9 @@ namespace ADB_Explorer
             {
                 if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
                 {
-                    var trash = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Trash);
+                    var trash = DevicesObject.CurrentDevice.Drives.Find(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
                     if (trash is not null)
-                        trash.ItemsCount = t.Result;
+                        trash.Drive.ItemsCount = t.Result;
                 }
             }));
         }
@@ -1226,7 +1226,7 @@ namespace ADB_Explorer
             countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
             {
                 if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
-                    DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Temp).ItemsCount = t.Result;
+                    DevicesObject.CurrentDevice.Drives.Find(d => d.Drive.Type is AbstractDrive.DriveType.Temp).Drive.ItemsCount = t.Result;
             }));
         }
 
@@ -1253,7 +1253,7 @@ namespace ADB_Explorer
 
                     if (!updateExplorer && DevicesObject.CurrentDevice is not null)
                     {
-                        DevicesObject.CurrentDevice.Drives.Find(d => d.Type is Models.DriveType.Package).ItemsCount = (ulong)Packages.Count;
+                        DevicesObject.CurrentDevice.Drives.Find(d => d.Drive.Type is AbstractDrive.DriveType.Package).Drive.ItemsCount = (ulong)Packages.Count;
                     }
 
                     FileActions.ListingInProgress = false;
@@ -1607,7 +1607,7 @@ namespace ADB_Explorer
                 while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
                 {
                     var path = TextHelper.GetAltObject(PathButtons[i]).ToString();
-                    var drives = DevicesObject.CurrentDevice.Drives.Where(drive => drive.Path == path);
+                    var drives = DevicesObject.CurrentDevice.Drives.Where(drive => drive.Drive.Path == path);
                     var icon = "\uE8B7";
                     if (drives.Any())
                         icon = drives.First().DriveIcon;
@@ -2404,9 +2404,9 @@ namespace ADB_Explorer
             if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !FileActions.IsExplorerVisible)
                 asyncClasify = true;
 
-            var trashExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash);
+            var trashExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
             if (!Settings.EnableRecycle && trashExists)
-                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Trash);
+                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
             else if (Settings.EnableRecycle && !trashExists)
             {
                 var trashTask = Task.Run(() => string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)));
@@ -2414,22 +2414,22 @@ namespace ADB_Explorer
                 {
                     if (!t.IsCanceled && !t.Result)
                     {
-                        App.Current.Dispatcher.Invoke(() => DevicesObject.CurrentDevice.Drives.Add(new(path: RECYCLE_PATH)));
+                        App.Current.Dispatcher.Invoke(() => DevicesObject.CurrentDevice.Drives.Add(new(new Drive(path: RECYCLE_PATH))));
                     }
                 });
             }
 
-            var tempExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp);
-            var pkgExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Package);
+            var tempExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Temp);
+            var pkgExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Package);
             if (!Settings.EnableApk && (tempExists || pkgExists))
-                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Type is Models.DriveType.Temp or Models.DriveType.Package);
+                DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Drive.Type is AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package);
             else if (Settings.EnableApk)
             {
                 if (!tempExists)
-                    DevicesObject.CurrentDevice.Drives.Add(new(path: TEMP_PATH));
+                    DevicesObject.CurrentDevice.Drives.Add(new(new Drive(path: TEMP_PATH)));
 
                 if (!pkgExists)
-                    DevicesObject.CurrentDevice.Drives.Add(new(path: PACKAGE_PATH));
+                    DevicesObject.CurrentDevice.Drives.Add(new(new Drive(path: PACKAGE_PATH)));
             }
 
             var dispatcher = Dispatcher;
@@ -2440,13 +2440,13 @@ namespace ADB_Explorer
 
                 var drives = CurrentADBDevice.GetDrives();
 
-                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Trash))
+                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Trash))
                     UpdateRecycledItemsCount();
 
-                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Temp))
+                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Temp))
                     UpdateInstallersCount();
 
-                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is Models.DriveType.Package))
+                if (DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Package))
                     UpdatePackages();
 
                 return drives;
@@ -2458,7 +2458,7 @@ namespace ADB_Explorer
 
                 dispatcher.Invoke(() =>
                 {
-                    DevicesObject.CurrentDevice?.SetDrives(t.Result, dispatcher, asyncClasify);
+                    DevicesObject.CurrentDevice?.SetDrives(t.Result.Select(d => new UIDrive(d)), dispatcher, asyncClasify);
                     if (DrivesItemRepeater.ItemsSource is null)
                         DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice?.Drives;
                 });
@@ -2509,9 +2509,9 @@ namespace ADB_Explorer
 
         private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (sender is Button item && item.DataContext is Drive drive)
+            if (sender is Button item && item.DataContext is UIDrive drive)
             {
-                InitNavigation(drive.Path);
+                InitNavigation(drive.Drive.Path);
             }
         }
 

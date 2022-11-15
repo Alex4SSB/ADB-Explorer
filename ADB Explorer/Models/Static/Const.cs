@@ -31,26 +31,26 @@ namespace ADB_Explorer.Models
             { "/", "Root" }
         };
 
-        public static readonly Dictionary<string, DriveType> DRIVE_TYPES = new()
+        public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
         {
-            { "/storage/emulated", DriveType.Internal },
-            { "/sdcard", DriveType.Internal },
-            { "/", DriveType.Root },
-            { RECYCLE_PATH, DriveType.Trash },
-            { TEMP_PATH, DriveType.Temp },
-            { PACKAGE_PATH, DriveType.Package },
+            { "/storage/emulated", AbstractDrive.DriveType.Internal },
+            { "/sdcard", AbstractDrive.DriveType.Internal },
+            { "/", AbstractDrive.DriveType.Root },
+            { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
+            { TEMP_PATH, AbstractDrive.DriveType.Temp },
+            { PACKAGE_PATH, AbstractDrive.DriveType.Package },
         };
-        public static readonly Dictionary<DriveType, string> DRIVE_DISPLAY_NAMES = new()
+        public static readonly Dictionary<AbstractDrive.DriveType, string> DRIVE_DISPLAY_NAMES = new()
         {
-            { DriveType.Root, "Root" },
-            { DriveType.Internal, "Internal Storage" },
-            { DriveType.Expansion, "µSD Card" },
-            { DriveType.External, "OTG Drive" },
-            { DriveType.Unknown, "" }, // "Other Drive"
-            { DriveType.Emulated, "Emulated Drive" },
-            { DriveType.Trash, "Recycle Bin" },
-            { DriveType.Temp, "Temp" },
-            { DriveType.Package, "Installed Apps" },
+            { AbstractDrive.DriveType.Root, "Root" },
+            { AbstractDrive.DriveType.Internal, "Internal Storage" },
+            { AbstractDrive.DriveType.Expansion, "µSD Card" },
+            { AbstractDrive.DriveType.External, "OTG Drive" },
+            { AbstractDrive.DriveType.Unknown, "" }, // "Other Drive"
+            { AbstractDrive.DriveType.Emulated, "Emulated Drive" },
+            { AbstractDrive.DriveType.Trash, "Recycle Bin" },
+            { AbstractDrive.DriveType.Temp, "Temp" },
+            { AbstractDrive.DriveType.Package, "Installed Apps" },
         };
 
         public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
@@ -115,5 +115,7 @@ namespace ADB_Explorer.Models
         public static readonly double WIDE_WINDOW_SEARCH_WIDTH = 0.6;
 
         public static readonly string APP_SETTINGS_FILE = "App.txt";
+
+        public static readonly int DRIVE_WARNING = 90;
     }
 }
