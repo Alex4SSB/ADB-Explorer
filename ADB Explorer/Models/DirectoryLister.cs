@@ -1,185 +1,176 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
-namespace ADB_Explorer.Models
+namespace ADB_Explorer.Models;
+
+public class DirectoryLister : INotifyPropertyChanged
 {
-    public class DirectoryLister : INotifyPropertyChanged
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public ADBService.AdbDevice Device { get; }
+    public ObservableList<FileClass> FileList { get; }
+
+    private string currentPath;
+    public string CurrentPath
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        get => currentPath;
+        private set => SetField(ref currentPath, value);
+    }
 
-        public ADBService.AdbDevice Device { get; }
-        public ObservableList<FileClass> FileList { get; }
+    private bool inProgress;
+    public bool InProgress
+    { 
+        get => inProgress;
+        private set => SetField(ref inProgress, value);
+    }
 
-        private string currentPath;
-        public string CurrentPath
-        {
-            get => currentPath;
-            private set => SetField(ref currentPath, value);
-        }
+    private bool isProgressVisible;
+    public bool IsProgressVisible
+    {
+        get => isProgressVisible;
+        private set => SetField(ref isProgressVisible, value);
+    }
 
-        private bool inProgress;
-        public bool InProgress
-        { 
-            get => inProgress;
-            private set => SetField(ref inProgress, value);
-        }
+    private Dispatcher Dispatcher { get; }
+    private Task UpdateTask { get; set; }
+    private TimeSpan UpdateInterval { get; set; }
+    private int MinUpdateThreshold { get; set; }
+    private Task ReadTask { get; set; }
+    private CancellationTokenSource CurrentCancellationToken { get; set; }
+    private Func<FileClass, FileClass> FileManipulator { get; }
 
-        private bool isProgressVisible;
-        public bool IsProgressVisible
-        {
-            get => isProgressVisible;
-            private set => SetField(ref isProgressVisible, value);
-        }
+    private ConcurrentQueue<FileStat> currentFileQueue;
 
-        private Dispatcher Dispatcher { get; }
-        private Task UpdateTask { get; set; }
-        private TimeSpan UpdateInterval { get; set; }
-        private int MinUpdateThreshold { get; set; }
-        private Task ReadTask { get; set; }
-        private CancellationTokenSource CurrentCancellationToken { get; set; }
-        private Func<FileClass, FileClass> FileManipulator { get; }
+    protected void OnPropertyChanged(string propertyName)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        private ConcurrentQueue<FileStat> currentFileQueue;
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 
-        protected void OnPropertyChanged(string propertyName)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    public DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null)
+    {
+        Dispatcher = dispatcher;
+        FileList = new();
+        Device = adbDevice;
+        FileManipulator = fileManipulator;
+    }
 
-        protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-            field = value;
-            OnPropertyChanged(propertyName);
-            return true;
-        }
+    public void Navigate(string path)
+    {
+        StartDirectoryList(path);
+    }
 
-        public DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null)
-        {
-            Dispatcher = dispatcher;
-            FileList = new();
-            Device = adbDevice;
-            FileManipulator = fileManipulator;
-        }
+    public void Stop()
+    {
+        StopDirectoryList();
+    }
 
-        public void Navigate(string path)
-        {
-            StartDirectoryList(path);
-        }
-
-        public void Stop()
+    private void StartDirectoryList(string path)
+    {
+        Dispatcher.BeginInvoke(() =>
         {
             StopDirectoryList();
+            FileList.RemoveAll();
+
+            InProgress = true;
+            IsProgressVisible = false;
+            CurrentPath = path;
+        }).Wait();
+
+        CurrentCancellationToken = new CancellationTokenSource();
+        currentFileQueue = new ConcurrentQueue<FileStat>();
+        ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(StopDirectoryList), CurrentCancellationToken.Token);
+        
+        Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => { IsProgressVisible = InProgress; }), CurrentCancellationToken.Token);
+
+        ScheduleUpdate();
+    }
+
+    private void ScheduleUpdate()
+    {
+        bool manyPendingFilesExist = currentFileQueue.Count >= DIR_LIST_UPDATE_THRESHOLD_MAX;
+        bool isListingStarting = FileList.Count < DIR_LIST_START_COUNT;
+
+        if (isListingStarting || manyPendingFilesExist)
+        {
+            UpdateInterval = DIR_LIST_UPDATE_START_INTERVAL;
+            MinUpdateThreshold = DIR_LIST_UPDATE_START_THRESHOLD_MIN;
+        }
+        else
+        {
+            UpdateInterval = DIR_LIST_UPDATE_INTERVAL;
+            MinUpdateThreshold = DIR_LIST_UPDATE_THRESHOLD_MIN;
         }
 
-        private void StartDirectoryList(string path)
+        UpdateTask = Task.Delay(UpdateInterval);
+        UpdateTask.ContinueWith(
+            (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)), 
+            CurrentCancellationToken.Token, 
+            TaskContinuationOptions.OnlyOnRanToCompletion, 
+            TaskScheduler.Default);
+    }
+
+    private void UpdateDirectoryList(bool finish)
+    {
+        if (finish || (currentFileQueue.Count >= MinUpdateThreshold))
         {
-            Dispatcher.BeginInvoke(() =>
+            for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
             {
-                StopDirectoryList();
-                FileList.RemoveAll();
+                FileStat fileStat;
+                if (!currentFileQueue.TryDequeue(out fileStat))
+                {
+                    break;
+                }
 
-                InProgress = true;
-                IsProgressVisible = false;
-                CurrentPath = path;
-            }).Wait();
+                FileClass item = FileClass.GenerateAndroidFile(fileStat);
 
-            CurrentCancellationToken = new CancellationTokenSource();
-            currentFileQueue = new ConcurrentQueue<FileStat>();
-            ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
-            ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(StopDirectoryList), CurrentCancellationToken.Token);
-            
-            Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => { IsProgressVisible = InProgress; }), CurrentCancellationToken.Token);
+                if (FileManipulator != null)
+                {
+                    item = FileManipulator(item);
+                }
 
+                FileList.Add(item);
+            }
+        }
+
+        if (!finish)
+        {
             ScheduleUpdate();
         }
+    }
 
-        private void ScheduleUpdate()
+    private void StopDirectoryList()
+    {
+        if (ReadTask == null)
         {
-            bool manyPendingFilesExist = currentFileQueue.Count >= DIR_LIST_UPDATE_THRESHOLD_MAX;
-            bool isListingStarting = FileList.Count < DIR_LIST_START_COUNT;
-
-            if (isListingStarting || manyPendingFilesExist)
-            {
-                UpdateInterval = DIR_LIST_UPDATE_START_INTERVAL;
-                MinUpdateThreshold = DIR_LIST_UPDATE_START_THRESHOLD_MIN;
-            }
-            else
-            {
-                UpdateInterval = DIR_LIST_UPDATE_INTERVAL;
-                MinUpdateThreshold = DIR_LIST_UPDATE_THRESHOLD_MIN;
-            }
-
-            UpdateTask = Task.Delay(UpdateInterval);
-            UpdateTask.ContinueWith(
-                (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)), 
-                CurrentCancellationToken.Token, 
-                TaskContinuationOptions.OnlyOnRanToCompletion, 
-                TaskScheduler.Default);
+            return;
         }
 
-        private void UpdateDirectoryList(bool finish)
+        CurrentCancellationToken.Cancel();
+
+        try
         {
-            if (finish || (currentFileQueue.Count >= MinUpdateThreshold))
+            ReadTask.Wait();
+        }
+        catch (Exception e)
+        {
+            if ((e is not AggregateException) || ((e as AggregateException).InnerException is not TaskCanceledException))
             {
-                for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
-                {
-                    FileStat fileStat;
-                    if (!currentFileQueue.TryDequeue(out fileStat))
-                    {
-                        break;
-                    }
-
-                    FileClass item = FileClass.GenerateAndroidFile(fileStat);
-
-                    if (FileManipulator != null)
-                    {
-                        item = FileManipulator(item);
-                    }
-
-                    FileList.Add(item);
-                }
-            }
-
-            if (!finish)
-            {
-                ScheduleUpdate();
+                throw;
             }
         }
 
-        private void StopDirectoryList()
-        {
-            if (ReadTask == null)
-            {
-                return;
-            }
-
-            CurrentCancellationToken.Cancel();
-
-            try
-            {
-                ReadTask.Wait();
-            }
-            catch (Exception e)
-            {
-                if ((e is not AggregateException) || ((e as AggregateException).InnerException is not TaskCanceledException))
-                {
-                    throw;
-                }
-            }
-
-            UpdateDirectoryList(true);
-            InProgress = false;
-            IsProgressVisible = false;
-            ReadTask = null;
-            CurrentCancellationToken = null;
-        }
+        UpdateDirectoryList(true);
+        InProgress = false;
+        IsProgressVisible = false;
+        ReadTask = null;
+        CurrentCancellationToken = null;
     }
 }

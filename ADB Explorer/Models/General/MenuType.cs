@@ -1,9 +1,8 @@
-﻿namespace ADB_Explorer.Models
+﻿namespace ADB_Explorer.Models;
+
+public enum MenuType
 {
-    public enum MenuType
-    {
-        ExplorerItem,
-        EmptySpace,
-        Header
-    }
+    ExplorerItem,
+    EmptySpace,
+    Header
 }

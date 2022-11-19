@@ -31,8 +31,6 @@
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
-        <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
-        <converters:DoubleEquals x:Key="DoubleEquals" />
         <CollectionViewSource x:Key="FileListView" Source="{Binding Source={x:Static Member=models:Data.DirList}, Path=FileList}" />
         <Style
             x:Key="FileOpHeaderResizeStyle"

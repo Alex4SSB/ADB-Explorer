@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ADB_Explorer.Converters
+﻿namespace ADB_Explorer.Converters
 {
     public static class UnitConverter
     {

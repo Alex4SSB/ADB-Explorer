@@ -1,22 +1,21 @@
-﻿namespace ADB_Explorer.Models
+﻿namespace ADB_Explorer.Models;
+
+public enum SystemVals
 {
-    public enum SystemVals
-    {
-        windowMaximized,
-        detailedVisible,
-        detailedHeight,
-    }
+    windowMaximized,
+    detailedVisible,
+    detailedHeight,
+}
 
-    public enum AppTheme
-    {
-        windowsDefault,
-        light,
-        dark,
-    }
+public enum AppTheme
+{
+    windowsDefault,
+    light,
+    dark,
+}
 
-    public enum DoubleClickAction
-    {
-        pull,
-        edit,
-    }
+public enum DoubleClickAction
+{
+    pull,
+    edit,
 }

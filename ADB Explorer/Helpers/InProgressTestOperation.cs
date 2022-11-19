@@ -1,69 +1,67 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
-using System.Windows.Threading;
 using static ADB_Explorer.Services.ADBService.AdbDevice;
 
-namespace ADB_Explorer.Helpers
+namespace ADB_Explorer.Helpers;
+
+public class InProgressTestOperation : FileOperation
 {
-    public class InProgressTestOperation : FileOperation
+    private FileSyncOperation.InProgressInfo info;
+
+    private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
+        base(dispatcher, adbDevice, new FilePath(filePath))
     {
-        private FileSyncOperation.InProgressInfo info;
+        this.info = new FileSyncOperation.InProgressInfo(adbInfo);
+    }
 
-        private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
-            base(dispatcher, adbDevice, new FilePath(filePath))
+    public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
+    {
+        return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
         {
-            this.info = new FileSyncOperation.InProgressInfo(adbInfo);
-        }
+            CurrentFile = null,
+            TotalPercentage = null,
+            CurrentFilePercentage = null,
+            CurrentFileBytesTransferred = null
+        });
+    }
 
-        public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
+    public static InProgressTestOperation CreateFileInProgress(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
+    {
+        return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
         {
-            return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
-            {
-                CurrentFile = null,
-                TotalPercentage = null,
-                CurrentFilePercentage = null,
-                CurrentFileBytesTransferred = null
-            });
-        }
+            CurrentFile = null,
+            TotalPercentage = 40,
+            CurrentFilePercentage = null,
+            CurrentFileBytesTransferred = null
+        });
+    }
 
-        public static InProgressTestOperation CreateFileInProgress(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
+    public static InProgressTestOperation CreateFolderInProgress(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
+    {
+        return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
         {
-            return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
-            {
-                CurrentFile = null,
-                TotalPercentage = 40,
-                CurrentFilePercentage = null,
-                CurrentFileBytesTransferred = null
-            });
-        }
+            CurrentFile = "Subfile.txt",
+            TotalPercentage = 40,
+            CurrentFilePercentage = 60,
+            CurrentFileBytesTransferred = null
+        });
+    }
 
-        public static InProgressTestOperation CreateFolderInProgress(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
-        {
-            return new InProgressTestOperation(dispatcher, adbDevice, filePath, new AdbSyncProgressInfo
-            {
-                CurrentFile = "Subfile.txt",
-                TotalPercentage = 40,
-                CurrentFilePercentage = 60,
-                CurrentFileBytesTransferred = null
-            });
-        }
+    public override void Start()
+    {
+        Status = OperationStatus.InProgress;
+        StatusInfo = info;
+    }
 
-        public override void Start()
-        {
-            Status = OperationStatus.InProgress;
-            StatusInfo = info;
-        }
+    public override void Cancel()
+    {
+        Status = OperationStatus.Canceled;
+        StatusInfo = null;
+    }
 
-        public override void Cancel()
-        {
-            Status = OperationStatus.Canceled;
-            StatusInfo = null;
-        }
-
-        public void Fail(string errorMsg)
-        {
-            Status = OperationStatus.Failed;
-            StatusInfo = errorMsg;
-        }
+    public void Fail(string errorMsg)
+    {
+        Status = OperationStatus.Failed;
+        StatusInfo = errorMsg;
     }
 }

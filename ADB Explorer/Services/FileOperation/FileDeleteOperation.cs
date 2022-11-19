@@ -1,75 +1,70 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Threading;
 
-namespace ADB_Explorer.Services
+namespace ADB_Explorer.Services;
+
+public class FileDeleteOperation : FileOperation
 {
-    public class FileDeleteOperation : FileOperation
+    private Task operationTask;
+    private CancellationTokenSource cancelTokenSource;
+    private readonly ObservableList<FileClass> fileList;
+
+    public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path, ObservableList<FileClass> fileList) : base(dispatcher, adbDevice, path)
     {
-        private Task operationTask;
-        private CancellationTokenSource cancelTokenSource;
-        private readonly ObservableList<FileClass> fileList;
+        OperationName = OperationType.Delete;
+        this.fileList = fileList;
+    }
 
-        public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path, ObservableList<FileClass> fileList) : base(dispatcher, adbDevice, path)
+    public override void Start()
+    {
+        if (Status == OperationStatus.InProgress)
         {
-            OperationName = OperationType.Delete;
-            this.fileList = fileList;
+            throw new Exception("Cannot start an already active operation!");
         }
 
-        public override void Start()
+        Status = OperationStatus.InProgress;
+        cancelTokenSource = new CancellationTokenSource();
+        operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", out _, out _, new[] { "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath) }));
+
+        operationTask.ContinueWith((t) =>
         {
-            if (Status == OperationStatus.InProgress)
+            var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
+            Status = operationStatus;
+            StatusInfo = null;
+
+            if (operationStatus is OperationStatus.Completed)
             {
-                throw new Exception("Cannot start an already active operation!");
-            }
-
-            Status = OperationStatus.InProgress;
-            cancelTokenSource = new CancellationTokenSource();
-            operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", out _, out _, new[] { "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath) }));
-
-            operationTask.ContinueWith((t) =>
-            {
-                var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
-                Status = operationStatus;
-                StatusInfo = null;
-
-                if (operationStatus is OperationStatus.Completed)
+                Dispatcher.Invoke(() =>
                 {
-                    Dispatcher.Invoke(() =>
-                    {
-                        ((FileClass)FilePath).CutState = FileClass.CutType.None;
-                        Data.CutItems.Remove((FileClass)FilePath);
+                    ((FileClass)FilePath).CutState = FileClass.CutType.None;
+                    Data.CutItems.Remove((FileClass)FilePath);
 
-                        fileList.Remove((FileClass)FilePath);
-                    });
-                }
-
-            }, TaskContinuationOptions.OnlyOnRanToCompletion);
-
-            operationTask.ContinueWith((t) =>
-            {
-                Status = OperationStatus.Canceled;
-                StatusInfo = null;
-            }, TaskContinuationOptions.OnlyOnCanceled);
-
-            operationTask.ContinueWith((t) =>
-            {
-                Status = OperationStatus.Failed;
-                StatusInfo = t.Exception.InnerException.Message;
-            }, TaskContinuationOptions.OnlyOnFaulted);
-        }
-
-        public override void Cancel()
-        {
-            if (Status != OperationStatus.InProgress)
-            {
-                throw new Exception("Cannot cancel a deactivated operation!");
+                    fileList.Remove((FileClass)FilePath);
+                });
             }
 
-            cancelTokenSource.Cancel();
+        }, TaskContinuationOptions.OnlyOnRanToCompletion);
+
+        operationTask.ContinueWith((t) =>
+        {
+            Status = OperationStatus.Canceled;
+            StatusInfo = null;
+        }, TaskContinuationOptions.OnlyOnCanceled);
+
+        operationTask.ContinueWith((t) =>
+        {
+            Status = OperationStatus.Failed;
+            StatusInfo = t.Exception.InnerException.Message;
+        }, TaskContinuationOptions.OnlyOnFaulted);
+    }
+
+    public override void Cancel()
+    {
+        if (Status != OperationStatus.InProgress)
+        {
+            throw new Exception("Cannot cancel a deactivated operation!");
         }
+
+        cancelTokenSource.Cancel();
     }
 }

@@ -1,15 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿namespace ADB_Explorer.Helpers;
 
-namespace ADB_Explorer.Helpers
+public static class ConcurrentQueueExtensions
 {
-    public static class ConcurrentQueueExtensions
+    public static IEnumerable<T> DequeueAllExisting<T>(this ConcurrentQueue<T> queue)
     {
-        public static IEnumerable<T> DequeueAllExisting<T>(this ConcurrentQueue<T> queue)
-        {
-            T item;
-            while (queue.TryDequeue(out item))
-                yield return item;
-        }
+        T item;
+        while (queue.TryDequeue(out item))
+            yield return item;
     }
 }

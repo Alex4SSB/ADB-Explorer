@@ -1,27 +1,23 @@
 ﻿using ADB_Explorer.Services;
-using System;
-using System.Windows;
-using System.Windows.Controls;
 
-namespace ADB_Explorer.Helpers
+namespace ADB_Explorer.Helpers;
+
+public class ActionButtonTemplateSelector : DataTemplateSelector
 {
-    public class ActionButtonTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate ResetSettingTemplate { get; set; }
-        public DataTemplate AnimationTipSettingTemplate { get; set; }
-        public DataTemplate ClearTextSettingTemplate { get; set; }
-        public DataTemplate ChangeSettingTemplate { get; set; }
+    public DataTemplate ResetSettingTemplate { get; set; }
+    public DataTemplate AnimationTipSettingTemplate { get; set; }
+    public DataTemplate ClearTextSettingTemplate { get; set; }
+    public DataTemplate ChangeSettingTemplate { get; set; }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    {
+        return item switch
         {
-            return item switch
-            {
-                ResetCommand => ResetSettingTemplate,
-                ShowAnimationTipCommand => AnimationTipSettingTemplate,
-                ClearTextSettingCommand => ClearTextSettingTemplate,
-                ChangeDefaultPathCommand or ChangeAdbPathCommand => ChangeSettingTemplate,
-                _ => throw new NotImplementedException(),
-            };
-        }
+            ResetCommand => ResetSettingTemplate,
+            ShowAnimationTipCommand => AnimationTipSettingTemplate,
+            ClearTextSettingCommand => ClearTextSettingTemplate,
+            ChangeDefaultPathCommand or ChangeAdbPathCommand => ChangeSettingTemplate,
+            _ => throw new NotImplementedException(),
+        };
     }
 }

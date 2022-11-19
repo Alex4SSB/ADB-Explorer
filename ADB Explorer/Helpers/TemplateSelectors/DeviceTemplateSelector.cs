@@ -1,27 +1,23 @@
 ﻿using ADB_Explorer.Models;
-using System;
-using System.Windows;
-using System.Windows.Controls;
 
-namespace ADB_Explorer.Helpers
+namespace ADB_Explorer.Helpers;
+
+public class DeviceTemplateSelector : DataTemplateSelector
 {
-    public class DeviceTemplateSelector : DataTemplateSelector
-    {
-        public DataTemplate LogicalDeviceTemplate { get; set; }
-        public DataTemplate ServiceDeviceTemplate { get; set; }
-        public DataTemplate NewDeviceTemplate { get; set; }
-        public DataTemplate HistoryDeviceTemplate { get; set; }
+    public DataTemplate LogicalDeviceTemplate { get; set; }
+    public DataTemplate ServiceDeviceTemplate { get; set; }
+    public DataTemplate NewDeviceTemplate { get; set; }
+    public DataTemplate HistoryDeviceTemplate { get; set; }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    {
+        return item switch
         {
-            return item switch
-            {
-                UILogicalDevice => LogicalDeviceTemplate,
-                UIServiceDevice => ServiceDeviceTemplate,
-                UINewDevice => NewDeviceTemplate,
-                UIHistoryDevice => HistoryDeviceTemplate,
-                _ => throw new NotImplementedException(),
-            };
-        }
+            UILogicalDevice => LogicalDeviceTemplate,
+            UIServiceDevice => ServiceDeviceTemplate,
+            UINewDevice => NewDeviceTemplate,
+            UIHistoryDevice => HistoryDeviceTemplate,
+            _ => throw new NotImplementedException(),
+        };
     }
 }

@@ -1,104 +1,96 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
+﻿namespace ADB_Explorer.Helpers;
 
-namespace ADB_Explorer.Helpers
+public class ObservableList<T> : ObservableCollection<T> where T : INotifyPropertyChanged
 {
-    public class ObservableList<T> : ObservableCollection<T> where T : INotifyPropertyChanged
+    private bool suppressOnCollectionChanged = false;
+
+    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
     {
-        private bool suppressOnCollectionChanged = false;
-
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        if (!suppressOnCollectionChanged)
         {
-            if (!suppressOnCollectionChanged)
-            {
-                base.OnCollectionChanged(e);
-            }
+            base.OnCollectionChanged(e);
+        }
+    }
+
+    public void AddRange(IEnumerable<T> collection)
+    {
+        suppressOnCollectionChanged = true;
+
+        foreach (T item in collection)
+        {
+            Add(item);
         }
 
-        public void AddRange(IEnumerable<T> collection)
+        suppressOnCollectionChanged = false;
+
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+    }
+
+    public void RemoveAll()
+    {
+        suppressOnCollectionChanged = true;
+
+        while (base.Count > 0)
         {
-            suppressOnCollectionChanged = true;
-
-            foreach (T item in collection)
-            {
-                Add(item);
-            }
-
-            suppressOnCollectionChanged = false;
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            RemoveAt(0);
         }
 
-        public void RemoveAll()
-        {
-            suppressOnCollectionChanged = true;
+        suppressOnCollectionChanged = false;
 
-            while (base.Count > 0)
-            {
-                RemoveAt(0);
-            }
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+    }
 
-            suppressOnCollectionChanged = false;
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-        }
-
-        public T Find(Func<T, bool> predicate)
-        {
-            if (!this.Any() || predicate is null)
-                return default;
-
-            if (this.Where(predicate) is IEnumerable<T> result && result.Any())
-                return result.First();
-
+    public T Find(Func<T, bool> predicate)
+    {
+        if (!this.Any() || predicate is null)
             return default;
-        }
 
-        public void RemoveAll(Func<T, bool> predicate)
+        if (this.Where(predicate) is IEnumerable<T> result && result.Any())
+            return result.First();
+
+        return default;
+    }
+
+    public void RemoveAll(Func<T, bool> predicate)
+    {
+        suppressOnCollectionChanged = true;
+
+        if (this.Where(predicate) is IEnumerable<T> result && result.Any())
         {
-            suppressOnCollectionChanged = true;
-
-            if (this.Where(predicate) is IEnumerable<T> result && result.Any())
-            {
-                foreach (T item in result.ToList())
-                {
-                    Remove(item);
-                }
-            }
-
-            suppressOnCollectionChanged = false;
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-        }
-
-        public void RemoveAll(IEnumerable<T> items)
-        {
-            foreach (var item in items)
+            foreach (T item in result.ToList())
             {
                 Remove(item);
             }
         }
 
-        public void ForEach(Action<T> action)
+        suppressOnCollectionChanged = false;
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+    }
+
+    public void RemoveAll(IEnumerable<T> items)
+    {
+        foreach (var item in items)
         {
-            suppressOnCollectionChanged = true;
+            Remove(item);
+        }
+    }
 
-            foreach (var item in this)
-            {
-                action(item);
-            }
+    public void ForEach(Action<T> action)
+    {
+        suppressOnCollectionChanged = true;
 
-            suppressOnCollectionChanged = false;
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        foreach (var item in this)
+        {
+            action(item);
         }
 
-        public void Set(IEnumerable<T> other)
-        {
-            RemoveAll();
-            AddRange(other);
-        }
+        suppressOnCollectionChanged = false;
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+    }
+
+    public void Set(IEnumerable<T> other)
+    {
+        RemoveAll();
+        AddRange(other);
     }
 }
