@@ -12,11 +12,19 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
         }
     }
 
-    public void AddRange(IEnumerable<T> collection)
+    public void AddRange(IEnumerable<T> items)
     {
+        if (items.Count() < 2)
+        {
+            if (items.Any())
+                Add(items.First());
+
+            return;
+        }
+
         suppressOnCollectionChanged = true;
 
-        foreach (T item in collection)
+        foreach (T item in items)
         {
             Add(item);
         }
@@ -30,7 +38,7 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
     {
         suppressOnCollectionChanged = true;
 
-        while (base.Count > 0)
+        while (Count > 0)
         {
             RemoveAt(0);
         }
@@ -53,26 +61,47 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
 
     public void RemoveAll(Func<T, bool> predicate)
     {
-        suppressOnCollectionChanged = true;
-
         if (this.Where(predicate) is IEnumerable<T> result && result.Any())
         {
+            if (result.Count() == 1)
+            {
+                Remove(result.First());
+                return;
+            }
+
+            suppressOnCollectionChanged = true;
+
             foreach (T item in result.ToList())
             {
                 Remove(item);
             }
-        }
 
-        suppressOnCollectionChanged = false;
-        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            suppressOnCollectionChanged = false;
+
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
     }
 
     public void RemoveAll(IEnumerable<T> items)
     {
+        if (items.Count() < 2)
+        {
+            if (items.Any())
+                Remove(items.First());
+
+            return;
+        }
+
+        suppressOnCollectionChanged = true;
+
         foreach (var item in items)
         {
             Remove(item);
         }
+
+        suppressOnCollectionChanged = false;
+
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
 
     public void ForEach(Action<T> action)
