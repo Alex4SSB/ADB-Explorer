@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
@@ -455,8 +456,8 @@ public class LogicalDevice : Device
         private set => Set(ref name, value);
     }
 
-    private ObservableList<UIDrive> drives = new();
-    public ObservableList<UIDrive> Drives
+    private ObservableList<DriveViewModel> drives = new();
+    public ObservableList<DriveViewModel> Drives
     {
         get => drives;
         set => Set(ref drives, value);
@@ -492,6 +493,10 @@ public class LogicalDevice : Device
         Name = name;
         ID = id;
         Battery = new Battery();
+
+        Drives.Add(new(new Drive(path: AdbExplorerConst.RECYCLE_PATH)));
+        Drives.Add(new(new Drive(path: AdbExplorerConst.TEMP_PATH)));
+        Drives.Add(new(new Drive(path: AdbExplorerConst.PACKAGE_PATH)));
     }
 
     public static LogicalDevice New(string name, string id, string status)
@@ -541,104 +546,127 @@ public class LogicalDevice : Device
     }
 
     /// <summary>
-    /// Set <see cref="Device"/> with new drives
+    /// Update <see cref="Device"/> with new drives
     /// </summary>
-    /// <param name="value">The new drives to be assigned</param>
-    /// <param name="asyncClasify">true to update only after fully acquiring all information</param>
-    internal void SetDrives(IEnumerable<UIDrive> value, Dispatcher dispatcher, bool asyncClasify = false)
+    /// <param name="drives">The new drives to be assigned</param>
+    /// <param name="asyncClasify"><see langword="true"/> to update only after fully acquiring all information</param>
+    public async Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClasify = false)
     {
+        var collectionChanged = false;
+
+        // MMC and OTG drives are searched for and only then UI is updated with all changes
         if (asyncClasify)
         {
-            var asyncTask = Task.Run(() =>
-            {
-                GetMmcDrive(value, ID)?.Drive.SetMmc();
-                SetExternalDrives(ref value);
-            });
-            asyncTask.ContinueWith((t) =>
-            {
-                if (t.IsCanceled)
-                    return;
-
-                dispatcher.BeginInvoke(() =>
-                {
-                    _setDrives(value);
-                });
-            });
+            collectionChanged = await UpdateExtensionDrivesAsync(drives, dispatcher);
         }
+        // All drives are first updated in UI, and only then MMC and OTG drives are searched for
         else
         {
-            _setDrives(value);
-
-            var mmcTask = Task.Run(() => { return GetMmcDrive(value, ID); });
-            mmcTask.ContinueWith((t) =>
-            {
-                if (t.IsCanceled)
-                    return;
-
-                dispatcher.BeginInvoke(() =>
-                {
-                    t.Result?.Drive.SetMmc();
-                    SetExternalDrives(ref value);
-                });
-            });
+            collectionChanged = SetDrives(drives);
+            UpdateExtensionDrives(drives, dispatcher);
         }
+
+        return collectionChanged;
     }
 
-    private void _setDrives(IEnumerable<UIDrive> drives)
+    private void UpdateExtensionDrives(IEnumerable<Drive> drives, Dispatcher dispatcher)
     {
-        if (drives is null || !DrivesChanged(drives.Where(d => d.Drive.Type is not AbstractDrive.DriveType.Trash and not AbstractDrive.DriveType.Temp and not AbstractDrive.DriveType.Package)))
-            return;
+        var mmcTask = Task.Run(() => GetMmcDrive(drives, ID));
+        mmcTask.ContinueWith((t) =>
+        {
+            if (t.IsCanceled)
+                return;
 
-        var trash = Drives.Where(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
-        if (trash.Any())
-            drives = drives.Append(trash.First());
-
-        var temp = Drives.Where(d => d.Drive.Type is AbstractDrive.DriveType.Temp);
-        if (temp.Any())
-            drives = drives.Append(temp.First());
-
-        var apk = Drives.Where(d => d.Drive.Type is AbstractDrive.DriveType.Package);
-        if (apk.Any())
-            drives = drives.Append(apk.First());
-
-        Drives.Set(drives);
+            dispatcher.BeginInvoke(() =>
+            {
+                SetMmcDrive(t.Result);
+                SetExternalDrives();
+            });
+        });
     }
 
-    public bool DrivesChanged(IEnumerable<UIDrive> other)
+    private async Task<bool> UpdateExtensionDrivesAsync(IEnumerable<Drive> drives, Dispatcher dispatcher)
     {
-        var self = Drives.Where(d => d.Drive.Type is not AbstractDrive.DriveType.Trash and not AbstractDrive.DriveType.Temp and not AbstractDrive.DriveType.Package);
+        await Task.Run(() =>
+        {
+            if (GetMmcDrive(drives, ID) is Drive mmc)
+                mmc.Type = AbstractDrive.DriveType.Expansion;
 
-        return other is not null
-            && !self.OrderBy(thisDrive => thisDrive.Drive.Type).SequenceEqual(
-                other.OrderBy(otherDrive => otherDrive.Drive.ID), new UIDrive.UIDriveEqualityComparer());
+            SetExternalDrives(ref drives);
+        });
+
+        var result = false;
+        await dispatcher.BeginInvoke(() => result = SetDrives(drives));
+
+        return result;
     }
 
-    public static UIDrive GetMmcDrive(IEnumerable<UIDrive> drives, string deviceID)
+    /// <summary>
+    /// Update drive parameters, add new drives, remove non-existent drives
+    /// </summary>
+    /// <param name="drives"></param>
+    /// <returns><see langword="true"/> if drives have been added or removed</returns>
+    private bool SetDrives(IEnumerable<Drive> drives)
+    {
+        if (drives is null)
+            return false;
+
+        bool added = false;
+
+        foreach (var other in drives)
+        {
+            // Accommodate for changing the path to /sdcard
+            var selfQ = Drives.Where(d => d.Path == other.Path || (other.Type is AbstractDrive.DriveType.Internal && d.Type is AbstractDrive.DriveType.Internal));
+            if (selfQ.Any())
+            {
+                // Update the drive if it exists
+                var self = selfQ.First();
+                
+                self.SetParams(other);
+                if (other.Type is not AbstractDrive.DriveType.Unknown)
+                    self.SetType(other.Type);
+
+                if (self.IsVirtual)
+                    self.SetItemsCount(other.ItemsCount);
+            }
+            // Create a new drive if it doesn't exist
+            else
+            {
+                Drives.Add(new(other));
+                added = true;
+            }
+        }
+
+        // Remove all drives that were not discovered in the last update
+        var removed = Drives.RemoveAll(self => !self.IsVirtual && !drives.Any(other => other.Path == self.Path || (other.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
+
+        return added || removed;
+    }
+
+    public static Drive GetMmcDrive(IEnumerable<Drive> drives, string deviceID)
     {
         if (drives is null)
             return null;
 
+        // Try to find the MMC in the props
         if (Data.CurrentADBDevice.MmcProp is string mmcId)
         {
-            var mmcDrive = drives.Where(d => d.Drive.ID == mmcId);
-            if (mmcDrive.Any())
-            {
-                var mmc = mmcDrive.First();
-                mmc.Drive.SetMmc();
-                return mmc;
-            }
+            return drives.FirstOrDefault(d => d.ID == mmcId);
         }
+        // If OTG exists, but no MMC ID - there is no MMC
         else if (Data.CurrentADBDevice.OtgProp is not null)
             return null;
 
-        var externalDrives = drives.Where(d => d.Drive.Type == AbstractDrive.DriveType.Unknown);
+        var externalDrives = drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown);
 
         switch (externalDrives.Count())
         {
+            // MMC ID has to be acquired if more than one extension drive exists
             case > 1:
                 var mmc = ADBService.GetMmcId(deviceID);
-                var drive = drives.Where(d => d.Drive.ID == mmc);
-                return drive.Any() ? drive.First() : null;
+                return drives.FirstOrDefault(d => d.ID == mmc);
+
+            // Only check whether MMC exists if there's only one drive
             case 1:
                 return ADBService.MmcExists(deviceID) ? externalDrives.First() : null;
             default:
@@ -646,14 +674,34 @@ public class LogicalDevice : Device
         }
     }
 
-    public static void SetExternalDrives(ref IEnumerable<UIDrive> drives)
+    public void SetMmcDrive(Drive mmcDrive) => Drives.Where(d => d.Path == mmcDrive.Path).FirstOrDefault()?.SetExtension();
+
+    /// <summary>
+    /// Sets type of all <see cref="DriveViewModel"/> with unknown type as external. Changes the local property.
+    /// </summary>
+    public void SetExternalDrives()
     {
         if (drives is null)
             return;
 
-        foreach (var item in drives.Where(d => d.Drive.Type == AbstractDrive.DriveType.Unknown))
+        foreach (var item in Drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown))
         {
-            item.Drive.SetOtg();
+            item.SetExtension(false);
+        }
+    }
+
+    /// <summary>
+    /// Sets type of all drives with unknown type as external. Changes the <see cref="Drive"/> object itself.
+    /// </summary>
+    /// <param name="drives">The collection of <see cref="Drive"/>s to change</param>
+    public static void SetExternalDrives(ref IEnumerable<Drive> drives)
+    {
+        if (drives is null)
+            return;
+        
+        foreach (var item in drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown))
+        {
+            item.Type = AbstractDrive.DriveType.External;
         }
     }
 

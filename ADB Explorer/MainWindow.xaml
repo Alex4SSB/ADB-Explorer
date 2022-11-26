@@ -641,10 +641,10 @@
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Drive.Type}" Value="External">
+                                        <DataTrigger Binding="{Binding Type}" Value="External">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Drive.Type}" Value="Emulated">
+                                        <DataTrigger Binding="{Binding Type}" Value="Emulated">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -655,7 +655,7 @@
                                 VerticalAlignment="Center"
                                 FontFamily="{StaticResource ConsoleFont}"
                                 FontWeight="Regular"
-                                Text="{Binding Drive.ID}" />
+                                Text="{Binding ID}" />
                             <TextBlock Text=")" />
                         </StackPanel>
                     </StackPanel>
@@ -663,11 +663,11 @@
                         Grid.Row="1"
                         Grid.Column="1"
                         Margin="0,6"
-                        Value="{Binding Drive.UsageP, Mode=OneWay}">
+                        Value="{Binding UsageP, Mode=OneWay}">
                         <ui:ProgressBar.Style>
                             <Style BasedOn="{StaticResource DriveUsageBarStyle}" TargetType="ui:ProgressBar">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Drive.UsageP}" Value="-1">
+                                    <DataTrigger Binding="{Binding UsageP}" Value="-1">
                                         <Setter Property="Visibility" Value="Hidden" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -681,15 +681,15 @@
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Drive.UsageP}" Value="-1">
+                                    <DataTrigger Binding="{Binding UsageP}" Value="-1">
                                         <Setter Property="Visibility" Value="Hidden" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="{Binding Drive.Available, Mode=OneWay}" />
+                        <TextBlock Text="{Binding Available, Mode=OneWay}" />
                         <TextBlock Text=" free of " />
-                        <TextBlock Text="{Binding Drive.Size, Mode=OneWay}" />
+                        <TextBlock Text="{Binding Size, Mode=OneWay}" />
                     </StackPanel>
                     <Grid
                         Grid.Row="1"
@@ -699,13 +699,13 @@
                             <Style TargetType="Grid">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Drive.Type}" Value="Trash">
+                                    <DataTrigger Binding="{Binding Type}" Value="Trash">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding Drive.Type}" Value="Temp">
+                                    <DataTrigger Binding="{Binding Type}" Value="Temp">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding Drive.Type}" Value="Package">
+                                    <DataTrigger Binding="{Binding Type}" Value="Package">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -721,25 +721,25 @@
                                 <Style TargetType="StackPanel">
                                     <Setter Property="Visibility" Value="Visible" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Drive.ItemsCount}" Value="0">
+                                        <DataTrigger Binding="{Binding ItemsCount}" Value="0">
                                             <Setter Property="Visibility" Value="Collapsed" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <TextBlock Text="{Binding Drive.ItemsCount}" />
+                            <TextBlock Text="{Binding ItemsCount}" />
                             <TextBlock>
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="VerticalAlignment" Value="Center" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Drive.Type}" Value="Trash">
+                                            <DataTrigger Binding="{Binding Type}" Value="Trash">
                                                 <Setter Property="Text" Value=" Item" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Drive.Type}" Value="Temp">
+                                            <DataTrigger Binding="{Binding Type}" Value="Temp">
                                                 <Setter Property="Text" Value=" APK Installer" />
                                             </DataTrigger>
-                                            <DataTrigger Binding="{Binding Drive.Type}" Value="Package">
+                                            <DataTrigger Binding="{Binding Type}" Value="Package">
                                                 <Setter Property="Text" Value=" Package" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -752,7 +752,7 @@
                                         <Setter Property="VerticalAlignment" Value="Center" />
                                         <Setter Property="Visibility" Value="Visible" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Drive.ItemsCount}" Value="1">
+                                            <DataTrigger Binding="{Binding ItemsCount}" Value="1">
                                                 <Setter Property="Visibility" Value="Collapsed" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -766,7 +766,7 @@
                                     <Setter Property="VerticalAlignment" Value="Center" />
                                     <Setter Property="Visibility" Value="Collapsed" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Drive.ItemsCount}" Value="0">
+                                        <DataTrigger Binding="{Binding ItemsCount}" Value="0">
                                             <Setter Property="Visibility" Value="Visible" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -1323,19 +1323,14 @@
                 Style="{StaticResource ExplorerViewBackgroundStyle}">
                 <Grid>
                     <ScrollViewer Style="{StaticResource DriveViewScrollViewerStyle}">
-                        <ui:ItemsRepeater
-                            x:Name="DrivesItemRepeater"
+                        <ListView
+                            x:Name="DriveList"
                             Margin="10,10,10,0"
+                            DataContext="{Binding ElementName=MainWin, Path=DevicesObject.CurrentDevice}"
+                            ItemContainerStyle="{StaticResource DriveContainerStyle}"
                             ItemTemplate="{StaticResource DriveItemTemplate}"
-                            ItemsSource="{Binding}">
-                            <ui:ItemsRepeater.Layout>
-                                <ui:UniformGridLayout
-                                    MinColumnSpacing="10"
-                                    MinItemHeight="60"
-                                    MinItemWidth="280"
-                                    MinRowSpacing="10" />
-                            </ui:ItemsRepeater.Layout>
-                        </ui:ItemsRepeater>
+                            ItemsPanel="{StaticResource DrivePanelTemplate}"
+                            ItemsSource="{Binding Drives}" />
                     </ScrollViewer>
                     <DataGrid
                         x:Name="ExplorerGrid"

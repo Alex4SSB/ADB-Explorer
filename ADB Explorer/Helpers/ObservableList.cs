@@ -59,14 +59,14 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
         return default;
     }
 
-    public void RemoveAll(Func<T, bool> predicate)
+    public bool RemoveAll(Func<T, bool> predicate)
     {
         if (this.Where(predicate) is IEnumerable<T> result && result.Any())
         {
             if (result.Count() == 1)
             {
                 Remove(result.First());
-                return;
+                return true;
             }
 
             suppressOnCollectionChanged = true;
@@ -79,7 +79,11 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
             suppressOnCollectionChanged = false;
 
             OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+            return true;
         }
+
+        return false;
     }
 
     public void RemoveAll(IEnumerable<T> items)

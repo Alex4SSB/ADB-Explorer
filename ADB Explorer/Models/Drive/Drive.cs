@@ -1,9 +1,10 @@
 ﻿using ADB_Explorer.Converters;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public abstract class AbstractDrive : INotifyPropertyChanged
+public abstract class AbstractDrive : ViewModelBase
 {
     public enum DriveType
     {
@@ -11,64 +12,101 @@ public abstract class AbstractDrive : INotifyPropertyChanged
         Internal,
         Expansion,
         External,
-        Unknown,
         Emulated,
+        Unknown,
         Trash,
         Temp,
         Package,
     }
 
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-        {
-            return false;
-        }
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-}
-
-
-public class Drive : AbstractDrive
-{
-    public string Size { get; private set; }
-    public string Used { get; private set; }
-    public string Available { get; private set; }
-    public sbyte UsageP { get; private set; }
-    public string Path { get; private set; }
-    public string ID => Path[(Path.LastIndexOf('/') + 1)..];
-
-    private DriveType type;
+    private DriveType type = DriveType.Unknown;
     public DriveType Type
     {
         get => type;
-        private set
-        {
-            Set(ref type, value);
-            //OnPropertyChanged(nameof(DriveIcon));
-            //OnPropertyChanged(nameof(DisplayName));
-        }
+        set => Set(ref type, value);
     }
-    
+}
 
-    private ulong itemsCount;
+public class Drive : AbstractDrive
+{
+    private string size;
+    public string Size
+    {
+        get => size;
+        set => Set(ref size, value);
+    }
+
+    private string used;
+    public string Used
+    {
+        get => used;
+        set => Set(ref used, value);
+    }
+
+    private string available;
+    public string Available
+    {
+        get => available;
+        set => Set(ref available, value);
+    }
+
+    private sbyte usageP;
+    public sbyte UsageP
+    {
+        get => usageP;
+        set => Set(ref usageP, value);
+    }
+
+    public string Path { get; }
+
+    private ulong itemsCount = 0;
     public ulong ItemsCount
     {
         get => itemsCount;
         set => Set(ref itemsCount, value);
     }
 
+    public string ID => Path[(Path.LastIndexOf('/') + 1)..];
+
+    public List<string> SetDriveParams(string size = "", string used = "", string available = "", sbyte usageP = -1)
+    {
+        List<string> updatedParams = new();
+
+        if (usageP is < -1 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(usageP));
+
+        if (size != "" && Size != size)
+        {
+            Size = size;
+            updatedParams.Add(nameof(Size));
+        }
+
+        if (used != "" && Used != used)
+        {
+            Used = used;
+            updatedParams.Add(nameof(Used));
+        }
+
+        if (available != "" && Available != available)
+        {
+            Available = available;
+            updatedParams.Add(nameof(Available));
+        }
+
+        if (usageP > -1 && UsageP != usageP)
+        {
+            UsageP = usageP;
+            updatedParams.Add(nameof(UsageP));
+        }
+
+        return updatedParams;
+    }
+
     public Drive(string size = "", string used = "", string available = "", sbyte usageP = -1, string path = "", bool isMMC = false, bool isEmulator = false)
     {
+        if (usageP is < -1 or > 100)
+            throw new ArgumentOutOfRangeException(nameof(usageP));
+
         Size = size;
         Used = used;
         Available = available;
@@ -105,16 +143,6 @@ public class Drive : AbstractDrive
               isMMC,
               isEmulator)
     { }
-
-    public void SetMmc()
-    {
-        Type = DriveType.Expansion;
-    }
-
-    public void SetOtg()
-    {
-        Type = DriveType.External;
-    }
 
     public static implicit operator bool(Drive obj)
     {
@@ -159,10 +187,10 @@ public class Drive : AbstractDrive
     {
         public bool Equals(Drive x, Drive y)
         {
-            if (x.ID != y.ID) return false;
+            if (x.Path != y.Path) return false;
             if (x.Size != y.Size) return false;
             if (x.Used != y.Used) return false;
-            if (y.type is not DriveType.Unknown && x.Type != y.Type) return false;
+            if (y.Type is not DriveType.Unknown && x.Type != y.Type) return false;
 
             return true;
         }

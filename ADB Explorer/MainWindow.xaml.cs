@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -357,6 +358,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 if (DevicesObject.CurrentDevice is null)
                     return;
 
+                FilterDrives();
                 FileActions.PushPackageEnabled = Settings.EnableApk;
 
                 if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
@@ -1108,11 +1110,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void InitDevice()
     {
-        DrivesItemRepeater.ItemsSource = null;
         SetAndroidVersion();
         RefreshDrives(true);
         DriveViewNav();
         NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+        FilterDrives();
 
         CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
         DeleteMenuButton.DataContext = DevicesObject.CurrentDevice;
@@ -1149,14 +1151,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         button.Click += HomeButton_Click;
         AddPathButton(button);
         TextHelper.SetAltText(PathBox, "");
+
+        DriveList.ItemsSource = DevicesObject.CurrentDevice.Drives;
     }
 
     private void CombineDisplayNames()
     {
-        foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Drive.Type != AbstractDrive.DriveType.Root))
+        foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Type != AbstractDrive.DriveType.Root))
         {
-            CurrentDisplayNames.TryAdd(drive.Drive.Path, drive.Drive.Type is AbstractDrive.DriveType.External
-                ? drive.Drive.ID : drive.DisplayName);
+            CurrentDisplayNames.TryAdd(drive.Path, drive.Type is AbstractDrive.DriveType.External
+                ? drive.ID : drive.DisplayName);
         }
         foreach (var item in SPECIAL_FOLDERS_DISPLAY_NAMES)
         {
@@ -1187,12 +1191,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var countTask = Task.Run(() => ADBService.CountRecycle(DevicesObject.CurrentDevice.ID));
         countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
         {
-            if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
-            {
-                var trash = DevicesObject.CurrentDevice.Drives.Find(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
-                if (trash is not null)
-                    trash.Drive.ItemsCount = t.Result;
-            }
+            if (t.IsCanceled || DevicesObject.CurrentDevice is null)
+                return;
+
+            var trash = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
+            if (trash is not null)
+                trash.SetItemsCount(t.Result);
         }));
     }
 
@@ -1202,7 +1206,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
         {
             if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
-                DevicesObject.CurrentDevice.Drives.Find(d => d.Drive.Type is AbstractDrive.DriveType.Temp).Drive.ItemsCount = t.Result;
+                DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp).SetItemsCount(t.Result);
         }));
     }
 
@@ -1229,7 +1233,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 if (!updateExplorer && DevicesObject.CurrentDevice is not null)
                 {
-                    DevicesObject.CurrentDevice.Drives.Find(d => d.Drive.Type is AbstractDrive.DriveType.Package).Drive.ItemsCount = (ulong)Packages.Count;
+                    DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package).SetItemsCount(Packages.Count);
                 }
 
                 FileActions.ListingInProgress = false;
@@ -1583,7 +1587,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
             {
                 var path = TextHelper.GetAltObject(PathButtons[i]).ToString();
-                var drives = DevicesObject.CurrentDevice.Drives.Where(drive => drive.Drive.Path == path);
+                var drives = DevicesObject.CurrentDevice.Drives.Where(drive => drive.Path == path);
                 var icon = "\uE8B7";
                 if (drives.Any())
                     icon = drives.First().DriveIcon;
@@ -2272,7 +2276,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ClearDrives()
     {
         DevicesObject.CurrentDevice?.Drives.Clear();
-        DrivesItemRepeater.ItemsSource = null;
         FileActions.IsDriveViewVisible = false;
     }
 
@@ -2372,41 +2375,42 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         NavigateToLocation(NavHistory.SpecialLocation.DriveView);
     }
 
+    private void FilterDrives()
+    {
+        var collectionView = CollectionViewSource.GetDefaultView(DriveList.ItemsSource);
+        if (collectionView is null)
+            return;
+
+        if (collectionView.Filter is not null)
+        {
+            collectionView.Refresh();
+            return;
+        }
+
+        Predicate<object> predicate = d =>
+        {
+            var drive = (DriveViewModel)d;
+
+            return drive.Type switch
+            {
+                AbstractDrive.DriveType.Trash => Settings.EnableRecycle,
+                AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package => Settings.EnableApk,
+                _ => true,
+            };
+        };
+
+        collectionView.Filter = new(predicate);
+        collectionView.SortDescriptions.Clear();
+        collectionView.SortDescriptions.Add(new SortDescription("Type", ListSortDirection.Ascending));
+    }
+
     private void RefreshDrives(bool asyncClasify = false)
     {
         if (DevicesObject.CurrentDevice is null)
             return;
-
+        
         if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !FileActions.IsExplorerVisible)
             asyncClasify = true;
-
-        var trashExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
-        if (!Settings.EnableRecycle && trashExists)
-            DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Drive.Type is AbstractDrive.DriveType.Trash);
-        else if (Settings.EnableRecycle && !trashExists)
-        {
-            var trashTask = Task.Run(() => string.IsNullOrEmpty(FolderExists(RECYCLE_PATH)));
-            trashTask.ContinueWith((t) =>
-            {
-                if (!t.IsCanceled && !t.Result)
-                {
-                    App.Current.Dispatcher.Invoke(() => DevicesObject.CurrentDevice.Drives.Add(new(new Drive(path: RECYCLE_PATH))));
-                }
-            });
-        }
-
-        var tempExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Temp);
-        var pkgExists = DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Package);
-        if (!Settings.EnableApk && (tempExists || pkgExists))
-            DevicesObject.CurrentDevice.Drives.RemoveAll(d => d.Drive.Type is AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package);
-        else if (Settings.EnableApk)
-        {
-            if (!tempExists)
-                DevicesObject.CurrentDevice.Drives.Add(new(new Drive(path: TEMP_PATH)));
-
-            if (!pkgExists)
-                DevicesObject.CurrentDevice.Drives.Add(new(new Drive(path: PACKAGE_PATH)));
-        }
 
         var dispatcher = Dispatcher;
         var driveTask = Task.Run(() =>
@@ -2416,13 +2420,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             var drives = CurrentADBDevice.GetDrives();
 
-            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Trash))
+            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
                 UpdateRecycledItemsCount();
 
-            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Temp))
+            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
                 UpdateInstallersCount();
 
-            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Drive.Type is AbstractDrive.DriveType.Package))
+            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
                 UpdatePackages();
 
             return drives;
@@ -2432,11 +2436,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (t.IsCanceled || t.Result is null)
                 return;
 
-            dispatcher.Invoke(() =>
+            dispatcher.Invoke(async () =>
             {
-                DevicesObject.CurrentDevice?.SetDrives(t.Result.Select(d => new UIDrive(d)), dispatcher, asyncClasify);
-                if (DrivesItemRepeater.ItemsSource is null)
-                    DrivesItemRepeater.ItemsSource = DevicesObject.CurrentDevice?.Drives;
+                var update = await DevicesObject.CurrentDevice?.UpdateDrives(t.Result, dispatcher, asyncClasify);
+                if (update is true)
+                    FilterDrives();
             });
         });
     }
@@ -2485,9 +2489,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (sender is Button item && item.DataContext is UIDrive drive)
+        if (sender is Button item && item.DataContext is DriveViewModel drive)
         {
-            InitNavigation(drive.Drive.Path);
+            InitNavigation(drive.Path);
         }
     }
 
@@ -2741,18 +2745,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ClearSelectedDrives();
 
-        RepeaterHelper.SetIsSelected(sender as Button, true);
-        RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 1);
+        ((DriveViewModel)(sender as Button).DataContext).DriveSelected = true;
     }
 
-    private void ClearSelectedDrives()
+    private static void ClearSelectedDrives()
     {
-        foreach (Button drive in DrivesItemRepeater.Children)
-        {
-            RepeaterHelper.SetIsSelected(drive, false);
-        }
-
-        RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 0);
+        RuntimeSettings.CollapseDrives = true;
+        RuntimeSettings.CollapseDrives = false;
     }
 
     private void CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
@@ -3079,8 +3078,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ClearSelectedDrives();
 
-        RepeaterHelper.SetIsSelected(sender as Button, true);
-        RepeaterHelper.SetSelectedItems(DrivesItemRepeater, 1);
+        ((DriveViewModel)(sender as Button).DataContext).DriveSelected = true;
     }
 
     private void ContextMenuCutItem_Click(object sender, RoutedEventArgs e)

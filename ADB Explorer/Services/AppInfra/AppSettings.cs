@@ -396,6 +396,13 @@ public class AppRuntimeSettings : INotifyPropertyChanged
         set => Set(ref collapseDevices, value);
     }
 
+    private bool collapseDrives = false;
+    public bool CollapseDrives
+    {
+        get => collapseDrives;
+        set => Set(ref collapseDrives, value);
+    }
+
     private bool updateCurrentDevice = false;
     public bool UpdateCurrentDevice
     {
