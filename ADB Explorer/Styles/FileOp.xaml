@@ -1,0 +1,364 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+    <DataTemplate x:Key="FileOpFileNameTemplate">
+        <Grid Margin="4,0,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon
+                Margin="0,0,4,0"
+                FontSize="16"
+                Glyph="&#xE8b7;">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+            <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis">
+                <TextBlock.Style>
+                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                        <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
+                        <Setter Property="FontWeight" Value="Regular" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
+                                <Setter Property="Text" Value="{Binding FilePath.FullName}" />
+                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding OperationName}" Value="Install" />
+                                    <Condition Binding="{Binding FilePath}" Value="{x:Null}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Text" Value="{Binding PackageName}" />
+                            </MultiDataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,-3,0,0"
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Text="└">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Visibility" Value="Visible" />
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="1"
+                TextTrimming="CharacterEllipsis">
+                <TextBlock.Style>
+                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
+                        <Setter Property="FontWeight" Value="Regular" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
+                                <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="FontWeight" Value="Bold" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="FileOpSourcePathTemplate">
+        <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
+            <TextBlock.Style>
+                <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Regular" />
+                    <Setter Property="Text" Value="{Binding FilePath.ParentPath}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding FilePath.ParentPath}" Value="{x:Static Member=models:AdbExplorerConst.RECYCLE_PATH}">
+                            <Setter Property="Text" Value="Recycle Bin" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </DataTemplate>
+    <DataTemplate x:Key="FileOpTargetPathTemplate">
+        <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
+            <TextBlock.Style>
+                <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Regular" />
+                    <Setter Property="Text" Value="{Binding TargetPath.FullPath}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding OperationName}" Value="Delete">
+                            <Setter Property="Text" Value="Permanent Deletion" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
+                            <Setter Property="Text" Value="Recycle Bin" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </DataTemplate>
+    <Style
+        x:Key="CompletedOperationsProgressStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource DoubleEquals}, ConverterParameter=100, Path=Value}" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <DataTemplate x:Key="FileOpProgressTemplate">
+        <Grid Margin="4,0">
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="FontWeight" Value="Bold" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
+                <ui:ProgressBar Grid.Row="1" Value="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}">
+                    <ui:ProgressBar.Style>
+                        <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </Style>
+                    </ui:ProgressBar.Style>
+                </ui:ProgressBar>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
+                    <TextBlock Text="%" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Visible" />
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" />
+                    <TextBlock Text="%" />
+                </StackPanel>
+            </Grid>
+            <Grid>
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding CompletedStatsVisible}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding StatusInfo.FileCountCompletedString}" Value="0 of 0">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </Grid.Style>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding StatusInfo.FileCountCompletedRate, Mode=OneWay}" />
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="4,0"
+                            Text="{Binding StatusInfo.FileCountCompletedString}"
+                            TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                    <TextBlock
+                        Grid.Row="1"
+                        Text="{Binding StatusInfo, Converter={StaticResource CompletedStatsConverter}}"
+                        TextTrimming="CharacterEllipsis" />
+                </Grid>
+                <Grid>
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FinishedIconVisible}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Status}" Value="Completed" />
+                                        <Condition Binding="{Binding StatusInfo.FileCountCompletedString}" Value="0 of 0" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Style>
+                    </Grid.Style>
+                    <ui:SimpleStackPanel Orientation="Horizontal" Spacing="4">
+                        <ui:FontIcon Glyph="&#xF13D;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                        <ui:FontIcon Glyph="&#xF13E;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                        <TextBlock Text="{Binding Status}" />
+                    </ui:SimpleStackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="OperationIconTemplate">
+        <Grid Margin="0,0,6,0">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+                    <Setter Property="ToolTip" Value="{Binding OperationName}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding OperationName}" Value="Install">
+                            <Setter Property="ToolTip" Value="Uninstall" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding OperationName}" Value="Install" />
+                                <Condition Binding="{Binding PackageName}" Value="{x:Null}" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="ToolTip" Value="Install" />
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <ui:FontIcon>
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Glyph" Value="{Binding OpIcon.PrimaryIcon}" />
+                        <Setter Property="HorizontalAlignment" Value="{Binding OpIcon.PrimaryAlignment}" />
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+            <ui:FontIcon>
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Glyph" Value="{Binding OpIcon.SecondaryIcon}" />
+                        <Setter Property="Margin" Value="{Binding OpIcon.SecondaryMargin}" />
+                        <Setter Property="FontSize" Value="{Binding OpIcon.SecondarySize}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding OperationName}" Value="Install">
+                                <Setter Property="Glyph" Value="&#xECC9;" />
+                            </DataTrigger>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding OperationName}" Value="Install" />
+                                    <Condition Binding="{Binding PackageName}" Value="{x:Null}" />
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Glyph" Value="&#xE896;" />
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

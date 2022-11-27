@@ -1,0 +1,101 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+    <Style
+        x:Key="DriveItemStyle"
+        BasedOn="{StaticResource DriveButtonStyle}"
+        TargetType="Button">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
+                    <Condition Binding="{Binding DriveSelected}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="Transparent" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DriveUsageBarStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding UsageP}" />
+                    <TextBlock Text="% Used" />
+                </StackPanel>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding UsageWarning}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DriveIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Type}" Value="Unknown">
+                <Setter Property="Visibility" Value="Hidden" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DriveNameTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style x:Key="ItemsCountStyle" TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+        <Setter Property="Margin" Value="0,4" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=ItemsSource.Count}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="SpecialDriveAccent" TargetType="Border">
+        <Setter Property="Margin" Value="-9,0,-9,-3" />
+        <Setter Property="BorderBrush" Value="OrangeRed" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BorderThickness" Value="0,0,0,1" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Type}" Value="Trash">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="Temp">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="Package">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="BorderBrush" Value="ForestGreen" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="BorderThickness" Value="0,0,0,2" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <ItemsPanelTemplate x:Key="DrivePanelTemplate">
+        <WrapPanel
+            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
+            ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
+            ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
+    </ItemsPanelTemplate>
+    <Style x:Key="DriveContainerStyle" TargetType="ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <ContentPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
+    </Style>
+</ResourceDictionary>
