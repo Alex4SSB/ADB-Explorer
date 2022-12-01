@@ -1365,13 +1365,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             return MdnsService.State = ADBService.CheckMDNS() ? MDNS.MdnsState.Running : MDNS.MdnsState.NotRunning;
         });
-        Task.Run(() =>
+        Task.Run(async () =>
         {
             while (MdnsService.State is MDNS.MdnsState.InProgress)
             {
                 Dispatcher.Invoke(() => MdnsService.UpdateProgress());
 
-                Task.Delay(MDNS_STATUS_UPDATE_INTERVAL);
+                await Task.Delay(MDNS_STATUS_UPDATE_INTERVAL);
             }
         });
     }
