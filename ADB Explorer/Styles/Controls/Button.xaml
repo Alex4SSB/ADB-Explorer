@@ -172,6 +172,11 @@
                                             SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                             TextElement.Foreground="{TemplateBinding Foreground}" />
                                     </Border>
+                                    <Border
+                                        x:Name="AltBorder"
+                                        BorderBrush="{TemplateBinding helpers:StyleHelper.AltBorderBrush}"
+                                        BorderThickness="0,0,0,2"
+                                        CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
                                 </Grid>
                             </Border>
                             <ControlTemplate.Triggers>

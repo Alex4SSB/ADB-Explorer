@@ -10,7 +10,6 @@
     <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
     <converters:DoubleEquals x:Key="DoubleEquals" />
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
-    <FontFamily x:Key="ConsoleFont">Cascadia Mono, Consolas</FontFamily>
     <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
@@ -680,7 +679,7 @@
         <Setter Property="ToolTip">
             <Setter.Value>
                 <ui:SimpleStackPanel Spacing="4">
-                    <TextBlock Text="{Binding Device.Battery.BatteryState}" />
+                    <TextBlock Text="{Binding Device.Battery.BatteryStateString}" />
                     <TextBlock Text="{Binding Device.Battery.BatteryHealthString}" />
                     <TextBlock Text="{Binding Device.Battery.VoltageString}" />
                     <TextBlock Text="{Binding Device.Battery.CurrentConsumption}" />
@@ -688,7 +687,6 @@
                 </ui:SimpleStackPanel>
             </Setter.Value>
         </Setter>
-
         <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
             <Trigger Property="DataContext" Value="{x:Null}">
