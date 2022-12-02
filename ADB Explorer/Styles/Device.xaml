@@ -362,7 +362,7 @@
     <DataTemplate x:Key="NewDeviceTemplate" DataType="UINewDevice">
         <Expander Style="{StaticResource DeviceExpanderStyle}">
             <helpers:ExpanderHelper.HeaderBottomContent>
-                <Border BorderBrush="{StaticResource NewDeviceBottomBorderBrush}" BorderThickness="0,1" />
+                <Border BorderBrush="{DynamicResource NewDeviceAltBorder}" BorderThickness="0,1" />
             </helpers:ExpanderHelper.HeaderBottomContent>
             <Expander.Header>
                 <Grid>

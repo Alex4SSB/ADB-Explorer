@@ -103,7 +103,9 @@
     <Color x:Key="LightSeparatorForeground">#FF919191</Color>
 
     <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="#FFABA673" />
-    <SolidColorBrush x:Key="NewDeviceBottomBorderBrush" Color="#FF05A300" />
+
+    <Color x:Key="DarkNewDeviceAltBorder">#FF228B22</Color>
+    <Color x:Key="LightNewDeviceAltBorder">#FF1B701B</Color>
 
     <ResourceDictionary x:Key="DynamicBrushes">
         <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
@@ -153,5 +155,7 @@
         <SolidColorBrush x:Key="NoticeBorderBackground" Color="{DynamicResource LightNoticeBorderBackground}" />
 
         <SolidColorBrush x:Key="SeparatorForeground" Color="{DynamicResource LightSeparatorForeground}" />
+
+        <SolidColorBrush x:Key="NewDeviceAltBorder" Color="{DynamicResource LightNewDeviceAltBorder}" />
     </ResourceDictionary>
 </ResourceDictionary>
