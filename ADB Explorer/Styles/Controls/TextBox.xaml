@@ -173,16 +173,16 @@
                                     <MultiTrigger.Conditions>
                                         <Condition Property="IsSelectionActive" Value="true" />
                                         <Condition Property="ui:ThemeManager.ActualTheme" Value="Light" />
-                                        <Condition Property="helpers:StyleHelper.AltBorderBrush" Value="{x:Null}" />
                                     </MultiTrigger.Conditions>
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                                 </MultiTrigger>
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
                                         <Condition Property="IsSelectionActive" Value="true" />
                                         <Condition Property="ui:ThemeManager.ActualTheme" Value="Light" />
+                                        <Condition Property="helpers:StyleHelper.AltBorderBrush" Value="{x:Null}" />
                                     </MultiTrigger.Conditions>
-                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
+                                    <Setter TargetName="LowerBorder" Property="BorderBrush" Value="{DynamicResource SystemAccentColorDark1Brush}" />
                                 </MultiTrigger>
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
