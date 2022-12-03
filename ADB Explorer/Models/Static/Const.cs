@@ -18,7 +18,6 @@ public static class AdbExplorerConst
 
     public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
     {
-        { RECYCLE_PATH, "Recycle Bin" },
         { "/sdcard", "Internal Storage" },
         { "/storage/emulated/0", "Internal Storage" },
         { "/storage/self/primary", "Internal Storage" },

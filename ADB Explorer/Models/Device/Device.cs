@@ -494,9 +494,12 @@ public class LogicalDevice : Device
         ID = id;
         Battery = new Battery();
 
-        Drives.Add(new(new Drive(path: AdbExplorerConst.RECYCLE_PATH)));
-        Drives.Add(new(new Drive(path: AdbExplorerConst.TEMP_PATH)));
-        Drives.Add(new(new Drive(path: AdbExplorerConst.PACKAGE_PATH)));
+        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Root).Key)));
+        Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
+
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.RECYCLE_PATH)));
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.TEMP_PATH)));
+        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.PACKAGE_PATH)));
     }
 
     public static LogicalDevice New(string name, string id, string status)
@@ -571,7 +574,7 @@ public class LogicalDevice : Device
 
     private void UpdateExtensionDrives(IEnumerable<Drive> drives, Dispatcher dispatcher)
     {
-        var mmcTask = Task.Run(() => GetMmcDrive(drives, ID));
+        var mmcTask = Task.Run(() => GetMmcDrive(drives.OfType<LogicalDrive>(), ID));
         mmcTask.ContinueWith((t) =>
         {
             if (t.IsCanceled)
@@ -589,10 +592,10 @@ public class LogicalDevice : Device
     {
         await Task.Run(() =>
         {
-            if (GetMmcDrive(drives, ID) is Drive mmc)
+            if (GetMmcDrive(drives.OfType<LogicalDrive>(), ID) is LogicalDrive mmc)
                 mmc.Type = AbstractDrive.DriveType.Expansion;
 
-            SetExternalDrives(ref drives);
+            SetExternalDrives(drives.OfType<LogicalDrive>());
         });
 
         var result = false;
@@ -621,29 +624,40 @@ public class LogicalDevice : Device
             {
                 // Update the drive if it exists
                 var self = selfQ.First();
-                
-                self.SetParams(other);
-                if (other.Type is not AbstractDrive.DriveType.Unknown)
-                    self.SetType(other.Type);
 
-                if (self.IsVirtual)
-                    self.SetItemsCount(other.ItemsCount);
+                switch (self)
+                {
+                    case LogicalDriveViewModel logical:
+                        logical.SetParams((LogicalDrive)other);
+                        if (other.Type is not AbstractDrive.DriveType.Unknown)
+                            logical.SetType(other.Type);
+                        break;
+                    case VirtualDriveViewModel virt:
+                        virt.SetItemsCount(((VirtualDrive)other).ItemsCount);
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
             // Create a new drive if it doesn't exist
-            else
+            else if (other is LogicalDrive logical)
             {
-                Drives.Add(new(other));
+                Drives.Add(new LogicalDriveViewModel(logical));
                 added = true;
             }
+            else
+                throw new NotImplementedException();
         }
 
         // Remove all drives that were not discovered in the last update
-        var removed = Drives.RemoveAll(self => !self.IsVirtual && !drives.Any(other => other.Path == self.Path || (other.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
+        var removed = Drives.RemoveAll(self => self is LogicalDriveViewModel
+                                               && !drives.Any(other => other.Path == self.Path
+                                                    || (other.Type is AbstractDrive.DriveType.Internal && self.Type is AbstractDrive.DriveType.Internal)));
 
         return added || removed;
     }
 
-    public static Drive GetMmcDrive(IEnumerable<Drive> drives, string deviceID)
+    public static LogicalDrive GetMmcDrive(IEnumerable<LogicalDrive> drives, string deviceID)
     {
         if (drives is null)
             return null;
@@ -674,7 +688,7 @@ public class LogicalDevice : Device
         }
     }
 
-    public void SetMmcDrive(Drive mmcDrive) => Drives.Where(d => d.Path == mmcDrive.Path).FirstOrDefault()?.SetExtension();
+    public void SetMmcDrive(LogicalDrive mmcDrive) => ((LogicalDriveViewModel)Drives.Where(d => d.Path == mmcDrive.Path).FirstOrDefault())?.SetExtension();
 
     /// <summary>
     /// Sets type of all <see cref="DriveViewModel"/> with unknown type as external. Changes the local property.
@@ -686,7 +700,7 @@ public class LogicalDevice : Device
 
         foreach (var item in Drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown))
         {
-            item.SetExtension(false);
+            ((LogicalDriveViewModel)item).SetExtension(false);
         }
     }
 
@@ -694,7 +708,7 @@ public class LogicalDevice : Device
     /// Sets type of all drives with unknown type as external. Changes the <see cref="Drive"/> object itself.
     /// </summary>
     /// <param name="drives">The collection of <see cref="Drive"/>s to change</param>
-    public static void SetExternalDrives(ref IEnumerable<Drive> drives)
+    public static void SetExternalDrives(IEnumerable<LogicalDrive> drives)
     {
         if (drives is null)
             return;

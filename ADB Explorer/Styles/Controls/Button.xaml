@@ -385,13 +385,6 @@
     </Style>
 
     <Style
-        x:Key="DriveButtonStyle"
-        BasedOn="{StaticResource BaseButtonStyle}"
-        TargetType="Button">
-        <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />
-    </Style>
-
-    <Style
         x:Key="ButtonStyle"
         BasedOn="{StaticResource BaseButtonStyle}"
         TargetType="Button">

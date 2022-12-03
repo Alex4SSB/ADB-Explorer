@@ -1,0 +1,89 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.LogicalDriveControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:LogicalDriveViewModel}"
+    mc:Ignorable="d">
+    <Button
+        MouseDoubleClick="Button_MouseDoubleClick"
+        PreviewMouseUp="Button_PreviewMouseUp"
+        Style="{StaticResource DriveItemStyle}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <ui:FontIcon Grid.RowSpan="3" Style="{StaticResource DriveIconStyle}" />
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
+                </StackPanel.Resources>
+                <TextBlock Text="{Binding DisplayName}" />
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="External">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Emulated">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text=" (" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource ConsoleFont}"
+                        FontWeight="Regular"
+                        Text="{Binding ID}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
+            </StackPanel>
+            <ui:ProgressBar
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="0,6"
+                Value="{Binding UsageP, Mode=OneWay}">
+                <ui:ProgressBar.Style>
+                    <Style BasedOn="{StaticResource DriveUsageBarStyle}" TargetType="ui:ProgressBar">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:ProgressBar.Style>
+            </ui:ProgressBar>
+            <StackPanel
+                Grid.Row="2"
+                Grid.Column="2"
+                Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="{Binding Available, Mode=OneWay}" />
+                <TextBlock Text=" free of " />
+                <TextBlock Text="{Binding Size, Mode=OneWay}" />
+            </StackPanel>
+        </Grid>
+    </Button>
+</UserControl>

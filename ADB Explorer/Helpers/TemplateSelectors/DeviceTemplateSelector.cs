@@ -9,15 +9,12 @@ public class DeviceTemplateSelector : DataTemplateSelector
     public DataTemplate NewDeviceTemplate { get; set; }
     public DataTemplate HistoryDeviceTemplate { get; set; }
 
-    public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
     {
-        return item switch
-        {
-            UILogicalDevice => LogicalDeviceTemplate,
-            UIServiceDevice => ServiceDeviceTemplate,
-            UINewDevice => NewDeviceTemplate,
-            UIHistoryDevice => HistoryDeviceTemplate,
-            _ => throw new NotImplementedException(),
-        };
-    }
+        UILogicalDevice => LogicalDeviceTemplate,
+        UIServiceDevice => ServiceDeviceTemplate,
+        UINewDevice => NewDeviceTemplate,
+        UIHistoryDevice => HistoryDeviceTemplate,
+        _ => throw new NotImplementedException(),
+    };
 }

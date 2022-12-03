@@ -1320,4 +1320,10 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="ListViewStyle"
+        BasedOn="{StaticResource DefaultListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
 </ResourceDictionary>

@@ -225,9 +225,9 @@ public partial class ADBService
 
         public string TranslateDeviceParentPath(string path) => TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
 
-        public List<Drive> GetDrives()
+        public List<LogicalDrive> GetDrives()
         {
-            List<Drive> drives = new();
+            List<LogicalDrive> drives = new();
 
             var root = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE, "/");
             if (root is null)
@@ -246,7 +246,7 @@ public partial class ADBService
                 return drives;
             else
             {
-                Func<Drive, bool> predicate = drives.Any(drive => drive.Type is AbstractDrive.DriveType.Internal)
+                Func<LogicalDrive, bool> predicate = drives.Any(drive => drive.Type is AbstractDrive.DriveType.Internal)
                     ? d => d.Type is not AbstractDrive.DriveType.Internal or AbstractDrive.DriveType.Root
                     : d => d.Type is not AbstractDrive.DriveType.Root;
                 drives.AddRange(extStorage.Where(predicate));
@@ -265,13 +265,13 @@ public partial class ADBService
             return drives;
         }
 
-        private IEnumerable<Drive> ReadDrives(Regex re, params string[] args)
+        private IEnumerable<LogicalDrive> ReadDrives(Regex re, params string[] args)
         {
             int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr, args);
             if (exitCode != 0)
                 return null;
 
-            return re.Matches(stdout).Select(m => new Drive(m.Groups, isEmulator: ID.Contains("emulator"), forcePath: args[0] == "/" ? "/" : ""));
+            return re.Matches(stdout).Select(m => new LogicalDrive(m.Groups, isEmulator: ID.Contains("emulator"), forcePath: args[0] == "/" ? "/" : ""));
         }
 
         private Dictionary<string, string> props;

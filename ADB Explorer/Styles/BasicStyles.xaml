@@ -4,6 +4,7 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+    <FontFamily x:Key="ConsoleFont">Cascadia Mono, Consolas</FontFamily>
     <sys:Double x:Key="DataGridColumnHeaderHeight">30.0</sys:Double>
     <Thickness x:Key="DataGridScrollContentPresenterMargin">0,3,0,0</Thickness>
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">

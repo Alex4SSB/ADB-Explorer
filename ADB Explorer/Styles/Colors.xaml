@@ -107,6 +107,12 @@
     <Color x:Key="DarkNewDeviceAltBorder">#FF228B22</Color>
     <Color x:Key="LightNewDeviceAltBorder">#FF1B701B</Color>
 
+    <Color x:Key="DarkTempDriveAltBorder">#FFA349A4</Color>
+    <Color x:Key="LightTempDriveAltBorder">#FF813A82</Color>
+
+    <Color x:Key="DarkTrashDriveAltBorder">#FFFF4500</Color>
+    <Color x:Key="LightTrashDriveAltBorder">#FFEB3324</Color>
+
     <ResourceDictionary x:Key="DynamicBrushes">
         <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
         <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
@@ -157,5 +163,7 @@
         <SolidColorBrush x:Key="SeparatorForeground" Color="{DynamicResource LightSeparatorForeground}" />
 
         <SolidColorBrush x:Key="NewDeviceAltBorder" Color="{DynamicResource LightNewDeviceAltBorder}" />
+        <SolidColorBrush x:Key="TempDriveAltBorder" Color="{DynamicResource LightTempDriveAltBorder}" />
+        <SolidColorBrush x:Key="TrashDriveAltBorder" Color="{DynamicResource LightTrashDriveAltBorder}" />
     </ResourceDictionary>
 </ResourceDictionary>

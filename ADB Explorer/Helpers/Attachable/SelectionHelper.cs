@@ -137,4 +137,7 @@ public static class SelectionHelper
         if (dataGrid.SelectedIndex > -1)
             dataGrid.ScrollIntoView(dataGrid.SelectedItem);
     }
+
+    public static System.Windows.Controls.ListViewItem GetListViewItemContainer(System.Windows.Controls.ListView listView, int index = -1) =>
+        listView.ItemContainerGenerator.ContainerFromIndex(index < 0 ? listView.SelectedIndex : index) as System.Windows.Controls.ListViewItem;
 }

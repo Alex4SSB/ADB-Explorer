@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -436,6 +437,13 @@ public class AppRuntimeSettings : INotifyPropertyChanged
     {
         get => rootAttemptForbidden;
         set => Set(ref rootAttemptForbidden, value);
+    }
+
+    private DriveViewModel browseDrive = null;
+    public DriveViewModel BrowseDrive
+    {
+        get => browseDrive;
+        set => Set(ref browseDrive, value);
     }
 
     private UIDevice connectNewDevice = null;

@@ -76,6 +76,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         InitializeComponent();
 
+        KeyDown += new KeyEventHandler(OnButtonKeyDown);
+
         fileOperationQueue = new(this.Dispatcher);
         Task launchTask = Task.Run(() => LaunchSequence());
 
@@ -234,6 +236,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.SearchText):
                     FilterSettings();
+                    break;
+
+                case nameof(AppRuntimeSettings.BrowseDrive):
+                    InitNavigation(RuntimeSettings.BrowseDrive.Path);
                     break;
             }
         });
@@ -1153,11 +1159,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         TextHelper.SetAltText(PathBox, "");
 
         DriveList.ItemsSource = DevicesObject.CurrentDevice.Drives;
+
+        if (DriveList.SelectedIndex > -1)
+            SelectionHelper.GetListViewItemContainer(DriveList).Focus();
     }
 
     private void CombineDisplayNames()
     {
-        foreach (var drive in DevicesObject.CurrentDevice.Drives.Where(d => d.Type != AbstractDrive.DriveType.Root))
+        foreach (var drive in DevicesObject.CurrentDevice.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type != AbstractDrive.DriveType.Root))
         {
             CurrentDisplayNames.TryAdd(drive.Path, drive.Type is AbstractDrive.DriveType.External
                 ? drive.ID : drive.DisplayName);
@@ -1165,6 +1174,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         foreach (var item in SPECIAL_FOLDERS_DISPLAY_NAMES)
         {
             CurrentDisplayNames.TryAdd(item.Key, item.Value);
+        }
+        foreach (var item in DRIVE_TYPES)
+        {
+            var names = DRIVE_DISPLAY_NAMES.Where(n => n.Key == item.Value);
+            if (names.Any())
+                CurrentDisplayNames.TryAdd(item.Key, names.First().Value);
         }
     }
 
@@ -1195,8 +1210,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
 
             var trash = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
-            if (trash is not null)
-                trash.SetItemsCount(t.Result);
+            ((VirtualDriveViewModel)trash)?.SetItemsCount(t.Result);
         }));
     }
 
@@ -1206,7 +1220,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
         {
             if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
-                DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp).SetItemsCount(t.Result);
+            {
+                var temp = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
+                ((VirtualDriveViewModel)temp)?.SetItemsCount(t.Result);
+            }
         }));
     }
 
@@ -1233,7 +1250,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 if (!updateExplorer && DevicesObject.CurrentDevice is not null)
                 {
-                    DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package).SetItemsCount(Packages.Count);
+                    var package = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+                    ((VirtualDriveViewModel)package)?.SetItemsCount(Packages.Count);
                 }
 
                 FileActions.ListingInProgress = false;
@@ -1370,7 +1388,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             while (MdnsService.State is MDNS.MdnsState.InProgress)
             {
                 Dispatcher.Invoke(() => MdnsService.UpdateProgress());
-
+                
                 await Task.Delay(MDNS_STATUS_UPDATE_INTERVAL);
             }
         });
@@ -1863,9 +1881,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _ => e.Key,
     };
 
-    private void Window_KeyDown(object sender, KeyEventArgs e)
+    private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
-
         var nonShortcuttableKeys = new[] { Key.LeftAlt, Key.RightAlt, Key.LeftCtrl, Key.RightCtrl, Key.LeftShift, Key.RightShift };
         var actualKey = RealKey(e);
         bool alt, ctrl, shift;
@@ -1963,19 +1980,62 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else if (actualKey == Key.F10)
         { }
-        else
+        else if (actualKey is Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Escape)
         {
             bool handle = false;
-            if (NavHistory.Current is string)
-                handle = ExplorerGridKeyNavigation(actualKey);
 
-            if (handle)
-                e.Handled = true;
+            if (FileActions.IsExplorerVisible)
+            {
+                handle |= ExplorerGridKeyNavigation(actualKey);
+            }
+            else if (FileActions.IsDriveViewVisible)
+            {
+                handle |= DriveViewKeyNavigation(actualKey);
+            }
 
+            if (!handle)
+                return;
+        }
+        else
+        {
             return;
         }
 
         e.Handled = true;
+    }
+
+    private bool DriveViewKeyNavigation(Key key)
+    {
+        if (DriveList.Items.Count == 0)
+            return false;
+
+        if (DriveList.SelectedItems.Count == 0)
+        {
+            if (key is Key.Left or Key.Up)
+                DriveList.SelectedIndex = DriveList.Items.Count - 1;
+            else if (key is Key.Right or Key.Down)
+                DriveList.SelectedIndex = 0;
+            else
+                return false;
+
+            SelectionHelper.GetListViewItemContainer(DriveList).Focus();
+            return true;
+        }
+        else
+        {
+            if (key is Key.Enter)
+            {
+                ((DriveViewModel)DriveList.SelectedItem).BrowseCommand.Action();
+                return true;
+            }
+            else if (key is Key.Escape)
+            {
+                // Should've been clear selected drives, but causes inconsistent behavior
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private bool ExplorerGridKeyNavigation(Key key)
@@ -2487,14 +2547,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ClearSelectedDrives();
     }
 
-    private void DriveItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-    {
-        if (sender is Button item && item.DataContext is DriveViewModel drive)
-        {
-            InitNavigation(drive.Path);
-        }
-    }
-
     private void PathMenuCopy_Click(object sender, RoutedEventArgs e)
     {
         var text = TextHelper.GetAltText(PathBox);
@@ -2739,13 +2791,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         // To make sure value changes to true
         RuntimeSettings.CollapseDevices = false;
         RuntimeSettings.CollapseDevices = true;
-    }
-
-    private void DriveItem_Click(object sender, RoutedEventArgs e)
-    {
-        ClearSelectedDrives();
-
-        ((DriveViewModel)(sender as Button).DataContext).DriveSelected = true;
     }
 
     private static void ClearSelectedDrives()
@@ -3072,13 +3117,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
         (sender as TextBox).FilterString(INVALID_ANDROID_CHARS);
-    }
-
-    private void Drive_GotFocus(object sender, RoutedEventArgs e)
-    {
-        ClearSelectedDrives();
-
-        ((DriveViewModel)(sender as Button).DataContext).DriveSelected = true;
     }
 
     private void ContextMenuCutItem_Click(object sender, RoutedEventArgs e)
