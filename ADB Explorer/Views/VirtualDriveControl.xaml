@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:VirtualDriveViewModel}"
@@ -84,6 +85,29 @@
                     </TextBlock>
                 </Grid>
             </Grid>
+            <Border
+                Grid.ColumnSpan="3"
+                VerticalAlignment="Bottom"
+                BorderThickness="1">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="Trash">
+                                <Setter Property="BorderBrush" Value="{DynamicResource TrashDriveAltBorder}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="Temp">
+                                <Setter Property="BorderBrush" Value="{DynamicResource TempDriveAltBorder}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Type}" Value="Package">
+                                <Setter Property="BorderBrush" Value="{DynamicResource NewDeviceAltBorder}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
         </Grid>
     </Button>
 </UserControl>
