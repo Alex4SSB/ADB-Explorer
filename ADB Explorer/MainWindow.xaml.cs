@@ -234,7 +234,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     FilterSettings();
                     break;
 
-                case nameof(AppRuntimeSettings.BrowseDrive):
+                case nameof(AppRuntimeSettings.BrowseDrive) when RuntimeSettings.BrowseDrive:
                     InitNavigation(RuntimeSettings.BrowseDrive.Path);
                     break;
             }
@@ -1195,6 +1195,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.IsDriveViewVisible = false;
         FileActions.IsExplorerVisible = true;
         FileActions.HomeEnabled = DevicesObject.Current.Drives.Any();
+        RuntimeSettings.BrowseDrive = null;
 
         return _navigateToPath(realPath, bfNavigated);
     }
@@ -1944,7 +1945,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             CopyItemPath();
         }
-        else if (actualKey == Key.Home && FileActions.IsExplorerVisible)
+        else if (actualKey == Key.H && ctrl && FileActions.IsExplorerVisible)
         {
             AnimateControl(HomeButton);
             NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
@@ -1988,7 +1989,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else if (actualKey == Key.F10)
         { }
-        else if (actualKey is Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Escape)
+        else if (actualKey is Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Escape or Key.Home or Key.End)
         {
             bool handle = false;
 
@@ -2053,7 +2054,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         switch (key)
         {
-            case Key.Down or Key.Up:
+            case Key.Down or Key.Up or Key.Home or Key.End:
                 if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
                     ExplorerGrid.MultiSelect(key);
                 else

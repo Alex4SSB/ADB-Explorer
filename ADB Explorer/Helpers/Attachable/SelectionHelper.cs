@@ -132,6 +132,14 @@ public static class SelectionHelper
             else
                 dataGrid.SelectedIndex = -1;
         }
+        else if (key == Key.Home)
+        {
+            dataGrid.SelectedIndex = 0;
+        }
+        else if (key == Key.End)
+        {
+            dataGrid.SelectedIndex = dataGrid.Items.Count - 1;
+        }
 
         SetCurrentSelectedIndex(dataGrid, dataGrid.SelectedIndex);
         if (dataGrid.SelectedIndex > -1)

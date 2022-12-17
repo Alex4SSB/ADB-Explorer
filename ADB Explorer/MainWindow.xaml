@@ -978,7 +978,7 @@
                                 helpers:StyleHelper.ContentAnimation="Bounce"
                                 Click="HomeButton_Click"
                                 IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}"
-                                ToolTip="Device Drives (Home)">
+                                ToolTip="Device Drives (Ctrl+H)">
                                 <MenuItem.Header>
                                     <ui:FontIcon FontSize="16" Glyph="&#xE80F;" />
                                 </MenuItem.Header>
