@@ -1203,14 +1203,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void UpdateRecycledItemsCount()
     {
         var countTask = Task.Run(() => ADBService.CountRecycle(DevicesObject.Current.ID));
-        countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
+        countTask.ContinueWith((t) =>
         {
             if (t.IsCanceled || DevicesObject.Current is null)
                 return;
 
+            var count = t.Result;
+            if (count < 1)
+                count = FolderExists(RECYCLE_PATH) is null ? -1 : 0;
+
             var trash = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
-            ((VirtualDriveViewModel)trash)?.SetItemsCount(t.Result);
-        }));
+            Dispatcher.Invoke(() => ((VirtualDriveViewModel)trash)?.SetItemsCount(count));
+        });
     }
 
     private void UpdateInstallersCount()
@@ -1221,7 +1225,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (!t.IsCanceled && DevicesObject.Current is not null)
             {
                 var temp = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
-                ((VirtualDriveViewModel)temp)?.SetItemsCount(t.Result);
+                ((VirtualDriveViewModel)temp)?.SetItemsCount((long)t.Result);
             }
         }));
     }

@@ -11,7 +11,7 @@ class VirtualDriveViewModel : DriveViewModel
         set => Set(ref drive, value);
     }
 
-    public ulong ItemsCount => Drive.ItemsCount;
+    public long ItemsCount => Drive.ItemsCount;
 
     
     public VirtualDriveViewModel(VirtualDrive drive) : base(drive)
@@ -19,9 +19,9 @@ class VirtualDriveViewModel : DriveViewModel
         Drive = drive;
     }
 
-    public void SetItemsCount(int count) => SetItemsCount((ulong)count);
+    public void SetItemsCount(int count) => SetItemsCount((long)count);
 
-    public void SetItemsCount(ulong newCount)
+    public void SetItemsCount(long newCount)
     {
         if (Drive.ItemsCount != newCount)
         {

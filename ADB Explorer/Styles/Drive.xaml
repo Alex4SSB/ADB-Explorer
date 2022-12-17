@@ -25,6 +25,13 @@
             <DataTrigger Binding="{Binding Type}" Value="Trash">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource TrashDriveAltBorder}" />
             </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Type}" Value="Trash" />
+                    <Condition Binding="{Binding ItemsCount}" Value="-1" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Gray" />
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding Type}" Value="Temp">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource TempDriveAltBorder}" />
             </DataTrigger>
@@ -89,6 +96,8 @@
     </ItemsPanelTemplate>
     <Style x:Key="DriveContainerStyle" TargetType="ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
@@ -96,8 +105,11 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Setter Property="Margin" Value="5" />
-        <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ItemsCount}" Value="-1">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <DataTemplate x:Key="LogicalDriveTemplate">
         <views:LogicalDriveControl />

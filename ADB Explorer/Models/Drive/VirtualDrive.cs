@@ -2,14 +2,14 @@
 
 public class VirtualDrive : Drive
 {
-    private ulong itemsCount = 0;
-    public ulong ItemsCount
+    private long itemsCount = 0;
+    public long ItemsCount
     {
         get => itemsCount;
         set => Set(ref itemsCount, value);
     }
 
-    public VirtualDrive(string path = "", ulong itemsCount = 0) : base(path)
+    public VirtualDrive(string path = "", long itemsCount = 0) : base(path)
     {
         ItemsCount = itemsCount;
     }

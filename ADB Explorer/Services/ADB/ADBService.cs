@@ -359,9 +359,9 @@ public partial class ADBService
         return args;
     }
 
-    public static ulong CountRecycle(string deviceID)
+    public static long CountRecycle(string deviceID)
     {
-        return CountFiles(deviceID, RECYCLE_PATH, excludeNames: RECYCLE_INDEXES);
+        return (long)CountFiles(deviceID, RECYCLE_PATH, excludeNames: RECYCLE_INDEXES);
     }
 
     public static ulong CountPackages(string deviceID)
