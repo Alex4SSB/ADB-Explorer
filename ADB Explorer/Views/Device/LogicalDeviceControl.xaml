@@ -1,0 +1,102 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.LogicalDeviceControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:LogicalDeviceViewModel}"
+    mc:Ignorable="d">
+    <Expander Style="{StaticResource DeviceExpanderStyle}">
+        <Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.Resources>
+                        <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
+                    </Grid.Resources>
+                    <ui:FontIcon Glyph="{Binding TypeIcon}" />
+                    <Grid Style="{StaticResource DeviceStatusGridStyle}">
+                        <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
+                        <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}, Path=Background}" Glyph="{Binding StatusIcon}" />
+                    </Grid>
+                </Grid>
+                <TextBlock Grid.Column="1" Margin="4">
+                    <TextBlock.Style>
+                        <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
+                            <Setter Property="Text" Value="{Binding Name}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+                                    <Setter Property="Text" Value="[Unauthorized]" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Emulator">
+                                    <Setter Property="Text" Value="{Binding ID}" />
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding Type}" Value="Service" />
+                                        <Condition Binding="{Binding Name}" Value="" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Text" Value="[Service]" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <ui:SimpleStackPanel
+                    Grid.Column="2"
+                    Margin="2,0,0,0"
+                    VerticalAlignment="Center"
+                    Orientation="Horizontal"
+                    Spacing="6">
+                    <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
+                    <ui:FontIcon Glyph="&#xE838;" Style="{StaticResource DeviceOpenIconStyle}" />
+                    <ui:FontIcon Style="{StaticResource BatteryIconStyle}" />
+                </ui:SimpleStackPanel>
+            </Grid>
+        </Expander.Header>
+        <Grid Style="{StaticResource DeviceContentGridStyle}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StaticResource ResourceKey="DeviceActionsMenu" />
+            <ui:SimpleStackPanel
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal"
+                Spacing="8">
+                <Button
+                    Padding="5"
+                    Command="{Binding RemoveCommand.Command}"
+                    ToolTip="{Binding RemoveCommand.RemoveAction}">
+                    <Button.Style>
+                        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <ui:FontIcon
+                        FontSize="12"
+                        Glyph="&#xE711;"
+                        Style="{DynamicResource DisabledButtonGlyphStyle}" />
+                </Button>
+                <Button
+                    Padding="14,5,14,6"
+                    Command="{Binding BrowseCommand.Command}"
+                    Content="Browse" />
+            </ui:SimpleStackPanel>
+        </Grid>
+    </Expander>
+</UserControl>

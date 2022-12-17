@@ -19,7 +19,7 @@ public class DriveViewModel : AbstractDrive
         set => Set(ref driveSelected, value);
     }
 
-    public BrowseCommand BrowseCommand { get; private set; }
+    public DriveBrowseCommand BrowseCommand { get; private set; }
     public SelectCommand SelectCommand { get; private set; }
 
     public string Path => Drive.Path;

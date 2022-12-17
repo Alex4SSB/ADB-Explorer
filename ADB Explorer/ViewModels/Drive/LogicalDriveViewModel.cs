@@ -4,23 +4,32 @@ namespace ADB_Explorer.ViewModels;
 
 class LogicalDriveViewModel : DriveViewModel
 {
-    public string Size => ((LogicalDrive)Drive).Size;
-    public string Used => ((LogicalDrive)Drive).Used;
-    public string Available => ((LogicalDrive)Drive).Available;
-    public sbyte UsageP => ((LogicalDrive)Drive).UsageP;
+    private LogicalDrive drive;
+    protected new LogicalDrive Drive
+    {
+        get => drive;
+        set => Set(ref drive, value);
+    }
+
+    public string Size => Drive.Size;
+    public string Used => Drive.Used;
+    public string Available => Drive.Available;
+    public sbyte UsageP => Drive.UsageP;
 
     public bool UsageWarning => UsageP >= AdbExplorerConst.DRIVE_WARNING;
-    public string ID => ((LogicalDrive)Drive).ID;
+    public string ID => Drive.ID;
 
 
     public LogicalDriveViewModel(LogicalDrive drive) : base(drive)
-    { }
+    {
+        Drive = drive;
+    }
 
-    public void SetParams(LogicalDriveViewModel other) => SetParams((LogicalDrive)other.Drive);
+    public void SetParams(LogicalDriveViewModel other) => SetParams(other.Drive);
 
     public void SetParams(LogicalDrive other)
     {
-        var updatedParams = ((LogicalDrive)Drive).SetDriveParams(other.Size, other.Used, other.Available, other.UsageP);
+        var updatedParams = Drive.SetDriveParams(other.Size, other.Used, other.Available, other.UsageP);
         updatedParams.ForEach(p => OnPropertyChanged(p));
     }
 

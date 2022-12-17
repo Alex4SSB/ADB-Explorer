@@ -69,7 +69,7 @@
         <Setter Property="VerticalAlignment" Value="Bottom" />
         <Setter Property="Glyph" Value="&#xEBFE;" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Offline">
+            <DataTrigger Binding="{Binding Status}" Value="Offline">
                 <Setter Property="Glyph" Value="&#xEBFD;" />
             </DataTrigger>
         </Style.Triggers>
@@ -179,26 +179,20 @@
             <DataTrigger Binding="{Binding IsOpen}" Value="True">
                 <Setter Property="FontWeight" Value="Bold" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Unauthorized">
+            <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
                 <Setter Property="Text" Value="[Unauthorized]" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Type}" Value="Emulator">
-                <Setter Property="Text" Value="{Binding Device.ID}" />
+            <DataTrigger Binding="{Binding Type}" Value="Emulator">
+                <Setter Property="Text" Value="{Binding ID}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Device.Type}" Value="Service" />
+                    <Condition Binding="{Binding Type}" Value="Service" />
                     <Condition Binding="{Binding Name}" Value="" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Text" Value="[Service]" />
             </MultiDataTrigger>
         </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ServiceDeviceNameStyle"
-        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Device.IpAddress}" />
     </Style>
     <ResourceDictionary x:Key="ContextMenuStyles">
         <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem" />
@@ -401,7 +395,7 @@
     </Style>
     <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Status}" Value="Ok">
+            <DataTrigger Binding="{Binding Status}" Value="Ok">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -424,6 +418,11 @@
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Setter Property="FontSize" Value="14" />
                 <Setter Property="Glyph" Value="&#xE72C;" />
+                <Style.Triggers>
+                    <Trigger Property="Opacity" Value="0">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </Trigger>
+                </Style.Triggers>
             </Style>
         </Style.Resources>
         <Setter Property="Padding" Value="2" />
@@ -449,12 +448,12 @@
         BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Root}" Value="Disabled">
+            <DataTrigger Binding="{Binding Root}" Value="Disabled">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
                 <Setter Property="ToolTip" Value="Root Can Be Enabled" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="ToolTip" Value="Root Access Enabled" />
             </DataTrigger>
@@ -611,7 +610,7 @@
         x:Key="BatteryIconStyle"
         BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
-        <Setter Property="Glyph" Value="{Binding Device.Battery.BatteryIcon}" />
+        <Setter Property="Glyph" Value="{Binding Battery.BatteryIcon}" />
         <Setter Property="ToolTip">
             <Setter.Value>
                 <Grid>
@@ -619,19 +618,19 @@
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Unknown">
+                                    <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Unknown">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="{Binding Device.Battery.Level}" />
+                        <TextBlock Text="{Binding Battery.Level}" />
                         <TextBlock Text="%" />
                         <TextBlock>
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Charging">
+                                        <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Charging">
                                             <Setter Property="Text" Value=", Plugged In" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -644,7 +643,7 @@
                             <Style TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Unknown">
+                                    <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Unknown">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -658,7 +657,7 @@
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Device.Battery.ChargeState}" Value="Unknown">
+            <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Unknown">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -679,11 +678,11 @@
         <Setter Property="ToolTip">
             <Setter.Value>
                 <ui:SimpleStackPanel Spacing="4">
-                    <TextBlock Text="{Binding Device.Battery.BatteryStateString}" />
-                    <TextBlock Text="{Binding Device.Battery.BatteryHealthString}" />
-                    <TextBlock Text="{Binding Device.Battery.VoltageString}" />
-                    <TextBlock Text="{Binding Device.Battery.CurrentConsumption}" />
-                    <TextBlock Text="{Binding Device.Battery.TemperatureString}" />
+                    <TextBlock Text="{Binding Battery.BatteryStateString}" />
+                    <TextBlock Text="{Binding Battery.BatteryHealthString}" />
+                    <TextBlock Text="{Binding Battery.VoltageString}" />
+                    <TextBlock Text="{Binding Battery.CurrentConsumption}" />
+                    <TextBlock Text="{Binding Battery.TemperatureString}" />
                 </ui:SimpleStackPanel>
             </Setter.Value>
         </Setter>
@@ -720,7 +719,7 @@
     <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Battery.Level}" Value="{x:Null}">
+            <DataTrigger Binding="{Binding Battery.Level}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
@@ -739,7 +738,7 @@
     <Style x:Key="RecoveryRootStatusStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+            <DataTrigger Binding="{Binding Type}" Value="Sideload">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
@@ -1088,7 +1087,7 @@
                 <Setter Property="IsEnabled" Value="False" />
                 <Setter Property="Height" Value="30" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Device.Status}" Value="Ok">
+                    <DataTrigger Binding="{Binding Status}" Value="Ok">
                         <Setter Property="IsEnabled" Value="True" />
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
@@ -1109,7 +1108,7 @@
                     <MenuItem.Header>
                         <StackPanel>
                             <TextBlock FontWeight="Bold" Text="Status: " />
-                            <TextBlock FontWeight="Bold" Text="{Binding Device.Root}" />
+                            <TextBlock FontWeight="Bold" Text="{Binding Root}" />
                             <TextBlock
                                 FontWeight="Bold"
                                 Style="{StaticResource RecoveryRootStatusStyle}"
@@ -1122,10 +1121,10 @@
                         <Style BasedOn="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" TargetType="Separator">
                             <Setter Property="Margin" Value="-11,0" />
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
+                                <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                <DataTrigger Binding="{Binding Type}" Value="Sideload">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -1136,10 +1135,10 @@
                     <MenuItem.Style>
                         <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Device.Root}" Value="Forbidden">
+                                <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                <DataTrigger Binding="{Binding Type}" Value="Sideload">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -1151,7 +1150,7 @@
                                 <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
                                     <Setter Property="Text" Value="Enable" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Device.Root}" Value="Enabled">
+                                        <DataTrigger Binding="{Binding Root}" Value="Enabled">
                                             <Setter Property="Text" Value="Disable" />
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -1184,13 +1183,18 @@
         <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />
     </Style>
     <Style
-        x:Key="MdnsProgressBarStyle"
+        x:Key="ExpanderHeaderProgressBarStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ui:ProgressBar">
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="BorderThickness" Value="0,1" />
-        <Setter Property="Margin" Value="0,0,0,-1" />
         <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style
+        x:Key="MdnsProgressBarStyle"
+        BasedOn="{StaticResource ExpanderHeaderProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Setter Property="Margin" Value="0,0,0,-1" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
                 <Setter Property="Visibility" Value="Visible" />

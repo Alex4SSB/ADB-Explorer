@@ -928,9 +928,8 @@
                         Style="{StaticResource FileOpButtonStyle}">
                         <MenuItem.ToolTip>
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="File Operations (" />
                                 <TextBlock Text="{Binding Operations.Count}" />
-                                <TextBlock Text=")" />
+                                <TextBlock Text=" File Operations" />
                             </StackPanel>
                         </MenuItem.ToolTip>
                         <MenuItem.Header>
@@ -1110,7 +1109,7 @@
                     <ScrollViewer Style="{StaticResource DriveViewScrollViewerStyle}">
                         <ListView
                             x:Name="DriveList"
-                            DataContext="{Binding ElementName=MainWin, Path=DevicesObject.CurrentDevice}"
+                            DataContext="{Binding ElementName=MainWin, Path=DevicesObject.Current}"
                             ItemsSource="{Binding Drives}"
                             Style="{StaticResource DriveListViewStyle}" />
                     </ScrollViewer>
@@ -1699,7 +1698,7 @@
                         Orientation="Horizontal"
                         Spacing="6">
                         <StackPanel Orientation="Horizontal" Style="{StaticResource DeviceDetailsBatteryPercentStyle}">
-                            <TextBlock Text="{Binding Device.Battery.Level}" />
+                            <TextBlock Text="{Binding Battery.Level}" />
                             <TextBlock Text="%" />
                         </StackPanel>
                         <ui:FontIcon

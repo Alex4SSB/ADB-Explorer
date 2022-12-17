@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
 using static ADB_Explorer.Models.Data;
@@ -199,7 +200,7 @@ public partial class ADBService
 
         return RE_DEVICE_NAME.Matches(stdout).Select(
             m => LogicalDevice.New(
-                name: LogicalDevice.DeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
+                name: DeviceHelpers.ParseDeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                 id: m.Groups["id"].Value,
                 status: m.Groups["status"].Value)
             ).Where(d => d);
@@ -295,9 +296,9 @@ public partial class ADBService
         return stdout.Contains("restarting adbd as non root");
     }
 
-    public static bool WhoAmI(LogicalDevice device)
+    public static bool WhoAmI(string deviceId)
     {
-        if (ExecuteDeviceAdbShellCommand(device.ID, "whoami", out string stdout, out _) != 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out _) != 0)
             return false;
 
         return stdout.Trim() == "root";

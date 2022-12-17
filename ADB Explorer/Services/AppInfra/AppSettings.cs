@@ -404,22 +404,22 @@ public class AppRuntimeSettings : INotifyPropertyChanged
         set => Set(ref collapseDrives, value);
     }
 
-    private bool updateCurrentDevice = false;
-    public bool UpdateCurrentDevice
+    private LogicalDeviceViewModel deviceToBrowse = null;
+    public LogicalDeviceViewModel DeviceToOpen
     {
-        get => updateCurrentDevice;
-        set => Set(ref updateCurrentDevice, value);
+        get => deviceToBrowse;
+        set => Set(ref deviceToBrowse, value);
     }
 
-    private UIDevice removeDevice = null;
-    public UIDevice DeviceToRemove
+    private DeviceViewModel removeDevice = null;
+    public DeviceViewModel DeviceToRemove
     {
         get => removeDevice;
         set => Set(ref removeDevice, value);
     }
 
-    private ServiceDevice deviceToPair;
-    public ServiceDevice DeviceToPair
+    private ServiceDeviceViewModel deviceToPair;
+    public ServiceDeviceViewModel DeviceToPair
     {
         get => deviceToPair;
         set => Set(ref deviceToPair, value);
@@ -446,8 +446,8 @@ public class AppRuntimeSettings : INotifyPropertyChanged
         set => Set(ref browseDrive, value);
     }
 
-    private UIDevice connectNewDevice = null;
-    public UIDevice ConnectNewDevice
+    private DeviceViewModel connectNewDevice = null;
+    public DeviceViewModel ConnectNewDevice
     {
         get => connectNewDevice;
         set => Set(ref connectNewDevice, value);

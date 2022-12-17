@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer.Services;
@@ -20,9 +21,9 @@ public partial class ADBService
 
     public class AdbDevice : Device
     {
-        public AdbDevice(UIDevice other)
+        public AdbDevice(DeviceViewModel other)
         {
-            ID = other.Device.ID;
+            ID = other.ID;
         }
 
         public AdbDevice(LogicalDevice other)
@@ -316,13 +317,13 @@ public partial class ADBService
             return null;
         }
 
-        public static void Reboot(LogicalDevice device, string arg)
+        public static void Reboot(string deviceId, string arg)
         {
-            if (ExecuteDeviceAdbCommand(device.ID, "reboot", out string stdout, out string stderr, arg) != 0)
+            if (ExecuteDeviceAdbCommand(deviceId, "reboot", out string stdout, out string stderr, arg) != 0)
                 throw new Exception(stderr);
         }
 
-        public static bool GetDeviceIp(LogicalDevice device)
+        public static bool GetDeviceIp(DeviceViewModel device)
         {
             if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out string stderr, new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
                 return false;
@@ -331,7 +332,7 @@ public partial class ADBService
             if (!match.Success)
                 return false;
 
-            device.IpAddress = match.Groups["IP"].Value;
+            device.SetIpAddress(match.Groups["IP"].Value);
 
             return true;
         }

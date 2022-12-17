@@ -15,9 +15,9 @@ public abstract class DriveAction : ViewModelBase
     }
 }
 
-public class BrowseCommand : DriveAction
+public class DriveBrowseCommand : DriveAction
 {
-    public BrowseCommand(DriveViewModel drive) : base(drive)
+    public DriveBrowseCommand(DriveViewModel drive) : base(drive)
     { }
 
     public void Action()

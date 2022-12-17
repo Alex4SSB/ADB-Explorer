@@ -4,7 +4,8 @@
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    xmlns:ui="http://schemas.modernwpf.com/2019">
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:views="clr-namespace:ADB_Explorer.Views">
     <Style
         x:Key="PairingBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
@@ -48,7 +49,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.IsPairingCodeValid}" Value="False">
+            <DataTrigger Binding="{Binding IsPairingCodeValid}" Value="False">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
             </DataTrigger>
         </Style.Triggers>
@@ -57,7 +58,7 @@
         x:Key="NewDeviceIpBoxStyle"
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Device.IpAddress, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding IpAddress, Mode=TwoWay}" />
         <Setter Property="ValidationType" Value="SeparateFormat" />
         <Setter Property="Separator" Value="." />
         <Setter Property="MaxNumber" Value="255" />
@@ -72,7 +73,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.IsIpAddressValid}" Value="False">
+            <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
             </DataTrigger>
             <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
@@ -90,13 +91,13 @@
         x:Key="MaskedPortBoxStyle"
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Device.ConnectPort, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding ConnectPort, Mode=TwoWay}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ValidationType" Value="LimitNumber" />
         <Setter Property="MaxNumber" Value="65535" />
         <Setter Property="ControlStyle" Value="{StaticResource PortTextBoxStyle}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.IsConnectPortValid}" Value="False">
+            <DataTrigger Binding="{Binding IsConnectPortValid}" Value="False">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
             </DataTrigger>
         </Style.Triggers>
@@ -123,7 +124,7 @@
         x:Key="NewDevicePairingPortBoxStyle"
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding Device.PairingPort, Mode=TwoWay}" />
+        <Setter Property="Text" Value="{Binding PairingPort, Mode=TwoWay}" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ValidationType" Value="LimitNumber" />
         <Setter Property="MaxNumber" Value="65535" />
@@ -137,7 +138,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.IsPairingPortValid}" Value="False">
+            <DataTrigger Binding="{Binding IsPairingPortValid}" Value="False">
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
             </DataTrigger>
         </Style.Triggers>
@@ -152,140 +153,6 @@
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>
-    </Style>
-    <DataTemplate x:Key="LogicalDeviceTemplate" DataType="UILogicalDevice">
-        <Expander x:Name="DeviceExpander" Style="{StaticResource DeviceExpanderStyle}">
-            <Expander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <Grid>
-                        <Grid.Resources>
-                            <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                        </Grid.Resources>
-                        <ui:FontIcon Glyph="{Binding TypeIcon}" />
-                        <Grid Style="{StaticResource DeviceStatusGridStyle}">
-                            <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                            <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
-                        </Grid>
-                    </Grid>
-                    <TextBlock
-                        Grid.Column="1"
-                        Margin="4"
-                        Style="{StaticResource LogicalDeviceNameStyle}"
-                        TextTrimming="CharacterEllipsis" />
-                    <ui:SimpleStackPanel
-                        Grid.Column="2"
-                        Margin="2,0,0,0"
-                        VerticalAlignment="Center"
-                        Orientation="Horizontal"
-                        Spacing="6">
-                        <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
-                        <ui:FontIcon Glyph="&#xE838;" Style="{StaticResource DeviceOpenIconStyle}" />
-                        <ui:FontIcon Style="{StaticResource BatteryIconStyle}" />
-                    </ui:SimpleStackPanel>
-                </Grid>
-            </Expander.Header>
-            <Grid Style="{StaticResource DeviceContentGridStyle}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <StaticResource ResourceKey="DeviceActionsMenu" />
-                <ui:SimpleStackPanel
-                    Grid.Column="1"
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal"
-                    Spacing="8">
-                    <Button
-                        Padding="5"
-                        Command="{Binding RemoveCommand.Command}"
-                        ToolTip="{Binding RemoveCommand.RemoveAction}">
-                        <Button.Style>
-                            <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                        <ui:FontIcon
-                            FontSize="12"
-                            Glyph="&#xE711;"
-                            Style="{DynamicResource DisabledButtonGlyphStyle}" />
-                    </Button>
-                    <Button
-                        Padding="14,5,14,6"
-                        Command="{Binding BrowseCommand.Command}"
-                        Content="Browse" />
-                </ui:SimpleStackPanel>
-            </Grid>
-        </Expander>
-    </DataTemplate>
-    <DataTemplate x:Key="ServiceDeviceTemplate" DataType="UIServiceDevice">
-        <Expander>
-            <Expander.Style>
-                <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Device.MdnsType}" Value="QrCode">
-                            <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="False" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Expander.Style>
-            <Expander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid>
-                        <Grid.Resources>
-                            <Style BasedOn="{StaticResource DeviceStatusFontSizeStyle}" TargetType="ui:FontIcon" />
-                        </Grid.Resources>
-                        <ui:FontIcon Glyph="{Binding TypeIcon}" />
-                        <Grid Style="{StaticResource DeviceStatusGridStyle}">
-                            <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                            <ui:FontIcon Foreground="{Binding Background, RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}}" Glyph="{Binding StatusIcon}" />
-                        </Grid>
-                    </Grid>
-                    <TextBlock
-                        Grid.Column="1"
-                        Margin="4"
-                        Style="{StaticResource ServiceDeviceNameStyle}"
-                        TextTrimming="CharacterEllipsis" />
-                </Grid>
-            </Expander.Header>
-            <Grid Style="{StaticResource DeviceContentGridStyle}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <controls:MaskedTextBox
-                    x:Name="PairingCodeTextBox"
-                    Height="32"
-                    EnterCommand="{Binding PairCommand.Command}"
-                    Style="{StaticResource PairingCodeBoxStyle}"
-                    Text="{Binding UIPairingCode, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <Button
-                    Grid.Column="1"
-                    Height="32"
-                    Margin="8,0,0,0"
-                    VerticalAlignment="Center"
-                    Command="{Binding PairCommand.Command}"
-                    Content="Pair" />
-            </Grid>
-        </Expander>
-    </DataTemplate>
-    <Style
-        x:Key="NewDeviceNameStyle"
-        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="Add New Device" />
     </Style>
     <Style
         x:Key="ConnectNewDeviceButtonStyle"
@@ -302,18 +169,18 @@
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsPairingEnabled}" Value="False" />
-                    <Condition Binding="{Binding Device.IsIpAddressValid}" Value="True" />
-                    <Condition Binding="{Binding Device.IsConnectPortValid}" Value="True" />
+                    <Condition Binding="{Binding IsIpAddressValid}" Value="True" />
+                    <Condition Binding="{Binding IsConnectPortValid}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="IsEnabled" Value="True" />
             </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding IsPairingEnabled}" Value="True" />
-                    <Condition Binding="{Binding Device.IsIpAddressValid}" Value="True" />
-                    <Condition Binding="{Binding Device.IsConnectPortValid}" Value="True" />
-                    <Condition Binding="{Binding Device.IsPairingCodeValid}" Value="True" />
-                    <Condition Binding="{Binding Device.IsPairingPortValid}" Value="True" />
+                    <Condition Binding="{Binding IsIpAddressValid}" Value="True" />
+                    <Condition Binding="{Binding IsConnectPortValid}" Value="True" />
+                    <Condition Binding="{Binding IsPairingCodeValid}" Value="True" />
+                    <Condition Binding="{Binding IsPairingPortValid}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="IsEnabled" Value="True" />
             </MultiDataTrigger>
@@ -323,28 +190,6 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="NewDeviceClearButtonStyle"
-        BasedOn="{StaticResource RestartAppButtonStyle}"
-        TargetType="Button">
-        <Style.Triggers>
-            <Trigger Property="Opacity" Value="0">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="NewDeviceContentPanelStyle" TargetType="ui:SimpleStackPanel">
-        <Setter Property="Margin" Value="0,5" />
-        <Setter Property="Spacing" Value="8" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
-                <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -359,195 +204,17 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <DataTemplate x:Key="NewDeviceTemplate" DataType="UINewDevice">
-        <Expander Style="{StaticResource DeviceExpanderStyle}">
-            <helpers:ExpanderHelper.HeaderBottomContent>
-                <Border BorderBrush="{DynamicResource NewDeviceAltBorder}" BorderThickness="0,1" />
-            </helpers:ExpanderHelper.HeaderBottomContent>
-            <Expander.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
-                    <TextBlock
-                        Grid.Column="1"
-                        Margin="4"
-                        Style="{StaticResource NewDeviceNameStyle}"
-                        TextTrimming="CharacterEllipsis" />
-                    <Button
-                        Grid.Column="2"
-                        Command="{Binding ClearCommand.Command}"
-                        Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
-                        Style="{StaticResource NewDeviceClearButtonStyle}"
-                        ToolTip="Clear All">
-                        <ui:FontIcon Glyph="&#xE711;" />
-                    </Button>
-                </Grid>
-            </Expander.Header>
-            <ui:SimpleStackPanel Style="{StaticResource NewDeviceContentPanelStyle}">
-                <ui:SimpleStackPanel.Resources>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                        <Setter Property="Margin" Value="-1,0,4,0" />
-                    </Style>
-                </ui:SimpleStackPanel.Resources>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE774;" ToolTip="IP Address" />
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDeviceIpBoxStyle}" />
-                </Grid>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE177;" ToolTip="Port" />
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
-                </Grid>
-                <Grid>
-                    <Grid.Resources>
-                        <Style TargetType="Separator">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Grid.Resources>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Separator />
-                    <Button
-                        Grid.Column="1"
-                        Margin="4,0"
-                        Style="{StaticResource ConnectNewDeviceButtonStyle}" />
-                    <Separator Grid.Column="2" />
-                </Grid>
-                <Grid Style="{StaticResource NewDevicePairingGrid}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="Pairing Code" />
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
-                </Grid>
-                <Grid Style="{StaticResource NewDevicePairingGrid}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-                    <Grid Margin="-1,0,4,0">
-                        <ui:FontIcon
-                            Margin="0,0,0,0"
-                            Glyph="&#xE177;"
-                            ToolTip="Pairing Port" />
-                        <ui:FontIcon
-                            Glyph="&#xEA21;"
-                            Style="{StaticResource NewDevicePairingPortAsteriskStyle}"
-                            ToolTip="Pairing Port" />
-                    </Grid>
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
-                </Grid>
-            </ui:SimpleStackPanel>
-        </Expander>
+    <DataTemplate x:Key="LogicalDeviceTemplate">
+        <views:LogicalDeviceControl />
     </DataTemplate>
-    <Style
-        x:Key="HistoryDeviceNameStyle"
-        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
-        <Setter Property="Text" Value="{Binding Device.DeviceName}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Device.DeviceName}" Value="{x:Null}">
-                <Setter Property="Text" Value="{Binding Device.IpAddress}" />
-                <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <DataTemplate x:Key="HistoryDeviceTemplate" DataType="UIHistoryDevice">
-        <Expander Style="{StaticResource DeviceExpanderStyle}">
-            <helpers:ExpanderHelper.HeaderBottomContent>
-                <Border BorderBrush="{StaticResource HistoryDeviceBottomBorderBrush}" BorderThickness="0,1" />
-            </helpers:ExpanderHelper.HeaderBottomContent>
-            <Expander.Header>
-                <Border
-                    Margin="-5"
-                    Padding="5"
-                    ClipToBounds="True"
-                    Style="{StaticResource BorderStyle}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="4"
-                            Style="{StaticResource HistoryDeviceNameStyle}" />
-                        <Button
-                            Grid.Column="2"
-                            Command="{Binding RemoveCommand.Command}"
-                            Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
-                            Style="{StaticResource NewDeviceClearButtonStyle}"
-                            ToolTip="Remove Device">
-                            <ui:FontIcon Glyph="&#xE74D;" />
-                        </Button>
-                    </Grid>
-                </Border>
-            </Expander.Header>
-            <Grid Style="{StaticResource DeviceContentGridStyle}">
-                <ui:SimpleStackPanel Spacing="6">
-                    <ui:SimpleStackPanel
-                        Margin="4,0"
-                        Orientation="Horizontal"
-                        Spacing="6">
-                        <TextBlock
-                            Margin="0,-5"
-                            VerticalAlignment="Top"
-                            Style="{StaticResource BlueDotTextBlockStyle}" />
-                        <TextBlock Text="IP Address" />
-                    </ui:SimpleStackPanel>
-                    <TextBox
-                        IsReadOnly="True"
-                        Style="{StaticResource NumericTextBoxStyle}"
-                        Text="{Binding Device.IpAddress}" />
-                    <ui:SimpleStackPanel
-                        Margin="4,0"
-                        Orientation="Horizontal"
-                        Spacing="6">
-                        <TextBlock
-                            Margin="0,-5"
-                            VerticalAlignment="Top"
-                            Style="{StaticResource BlueDotTextBlockStyle}" />
-                        <TextBlock Text="Port" />
-                    </ui:SimpleStackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <controls:MaskedTextBox Style="{StaticResource MaskedPortBoxStyle}" />
-                        <Button
-                            Grid.Column="1"
-                            Margin="8,0,2,0"
-                            Padding="14,5,14,6"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding ConnectCommand.Command}"
-                            Content="Connect" />
-                    </Grid>
-                </ui:SimpleStackPanel>
-            </Grid>
-        </Expander>
+    <DataTemplate x:Key="ServiceDeviceTemplate">
+        <views:ServiceDeviceControl />
+    </DataTemplate>
+    <DataTemplate x:Key="NewDeviceTemplate">
+        <views:NewDeviceControl />
+    </DataTemplate>
+    <DataTemplate x:Key="HistoryDeviceTemplate">
+        <views:HistoryDeviceControl />
     </DataTemplate>
     <helpers:DeviceTemplateSelector
         x:Key="DeviceTemplateSelector"

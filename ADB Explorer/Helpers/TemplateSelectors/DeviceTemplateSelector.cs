@@ -1,4 +1,4 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Helpers;
 
@@ -11,10 +11,10 @@ public class DeviceTemplateSelector : DataTemplateSelector
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
     {
-        UILogicalDevice => LogicalDeviceTemplate,
-        UIServiceDevice => ServiceDeviceTemplate,
-        UINewDevice => NewDeviceTemplate,
-        UIHistoryDevice => HistoryDeviceTemplate,
+        LogicalDeviceViewModel => LogicalDeviceTemplate,
+        ServiceDeviceViewModel => ServiceDeviceTemplate,
+        HistoryDeviceViewModel => HistoryDeviceTemplate,
+        NewDeviceViewModel => NewDeviceTemplate,
         _ => throw new NotImplementedException(),
     };
 }

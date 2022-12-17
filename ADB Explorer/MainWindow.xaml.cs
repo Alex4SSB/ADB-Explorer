@@ -158,10 +158,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             switch (e.PropertyName)
             {
-                case nameof(AppRuntimeSettings.UpdateCurrentDevice) when RuntimeSettings.UpdateCurrentDevice && CurrentADBDevice is not null:
-                    RuntimeSettings.UpdateCurrentDevice = false;
-
-                    DevicesObject.SetCurrentDevice(CurrentADBDevice.ID);
+                case nameof(AppRuntimeSettings.DeviceToOpen) when RuntimeSettings.DeviceToOpen:
+                    DevicesObject.SetOpenDevice(RuntimeSettings.DeviceToOpen);
                     InitLister();
                     ClearExplorer();
                     NavHistory.Reset();
@@ -172,7 +170,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.DeviceToRemove) when RuntimeSettings.DeviceToRemove is not null:
                     switch (RuntimeSettings.DeviceToRemove)
                     {
-                        case UILogicalDevice logical:
+                        case LogicalDeviceViewModel logical:
                             if (logical.IsOpen)
                             {
                                 ClearDrives();
@@ -181,16 +179,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                                 FileActions.IsExplorerVisible = false;
                                 CurrentADBDevice = null;
                                 DirList = null;
-                                RuntimeSettings.UpdateCurrentDevice = true;
+                                RuntimeSettings.DeviceToOpen = null;
                             }
 
                             DevicesObject.UIList.Remove(RuntimeSettings.DeviceToRemove);
                             FilterDevices();
                             DeviceListSetup();
-
-                            RuntimeSettings.UpdateCurrentDevice = false;
                             break;
-                        case UIHistoryDevice hist:
+                        case HistoryDeviceViewModel hist:
                             DevicesObject.RemoveHistoryDevice(hist);
                             break;
                         default:
@@ -214,7 +210,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.ConnectNewDevice) when RuntimeSettings.ConnectNewDevice is not null:
                     RuntimeSettings.IsManualPairingInProgress = true;
 
-                    if (RuntimeSettings.ConnectNewDevice is UINewDevice newDevice && newDevice.IsPairingEnabled)
+                    if (RuntimeSettings.ConnectNewDevice is NewDeviceViewModel newDevice && newDevice.IsPairingEnabled)
                         PairNewDevice();
                     else
                         ConnectNewDevice();
@@ -345,7 +341,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 FilterHiddenFiles();
                 break;
             case nameof(AppSettings.ShowSystemPackages):
-                if (DevicesObject.CurrentDevice is null)
+                if (DevicesObject.Current is null)
                     return;
 
                 if (FileActions.IsExplorerVisible)
@@ -361,7 +357,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 SetRenderMode();
                 break;
             case nameof(AppSettings.EnableRecycle) or nameof(AppSettings.EnableApk):
-                if (DevicesObject.CurrentDevice is null)
+                if (DevicesObject.Current is null)
                     return;
 
                 FilterDrives();
@@ -371,7 +367,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     RefreshDrives(true);
                 break;
             case nameof(AppSettings.SaveDevices):
-                if (Settings.SaveDevices && !DevicesObject.HistoryDevices.Any())
+                if (Settings.SaveDevices && !DevicesObject.HistoryDeviceViewModels.Any())
                     DevicesObject.RetrieveHistoryDevices();
 
                 FilterDevices();
@@ -696,7 +692,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
 
-        FileActions.IsRegularItem = !(selectedFiles.Any() && DevicesObject.CurrentDevice?.Root != AbstractDevice.RootStatus.Enabled
+        FileActions.IsRegularItem = !(selectedFiles.Any() && DevicesObject.Current?.Root is not AbstractDevice.RootStatus.Enabled
             && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder)));
 
         if (FileActions.IsRecycleBin)
@@ -792,18 +788,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(() => ADBService.GetDevices()).ContinueWith((t) => Dispatcher.Invoke(() => DeviceListSetup(t.Result, selectedAddress)));
+        Task.Run(() => ADBService.GetDevices()).ContinueWith((t) => Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
     }
 
-    private void DeviceListSetup(IEnumerable<LogicalDevice> devices, string selectedAddress = "")
+    private void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
     {
         var init = !DevicesObject.UpdateDevices(devices);
         FilterDevices();
 
-        if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.CurrentDevice.Status != AbstractDevice.DeviceStatus.Ok)
+        if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.Current.Status is not AbstractDevice.DeviceStatus.Ok)
         {
             ClearDrives();
-            DevicesObject.CloseAll();
+            DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
         }
 
         if (!DevicesObject.DevicesAvailable())
@@ -820,7 +816,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             if (!Settings.AutoOpen)
             {
-                DevicesObject.CloseAll();
+                DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
 
                 ClearExplorer();
                 FileActions.IsExplorerVisible = false;
@@ -828,15 +824,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
             }
 
-            if (!DevicesObject.SetCurrentDevice(selectedAddress))
+            if (!DevicesObject.SetOpenDevice(selectedAddress))
                 return;
 
             if (!ConnectTimer.IsEnabled)
                 RuntimeSettings.IsDevicesPaneOpen = false;
         }
 
-        DevicesObject.SetOpen(DevicesObject.Current, true);
-        CurrentADBDevice = new(DevicesObject.CurrentDevice);
+        DevicesObject.SetOpenDevice(DevicesObject.Current);
+        CurrentADBDevice = new(DevicesObject.Current);
         InitLister();
         if (init)
             InitDevice();
@@ -856,49 +852,51 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Predicate<object> predicate = d =>
         {
-            var device = (UIDevice)d;
+            var device = (DeviceViewModel)d;
 
             // current device cannot be hidden
-            if (device is UILogicalDevice ui && ui.IsOpen)
+            if (device is LogicalDeviceViewModel ui && ui.IsOpen)
                 return true;
 
-            if (device.Device is LogicalDevice logical && logical.Type is AbstractDevice.DeviceType.Service)
+            if (device is LogicalDeviceViewModel && device.Type is AbstractDevice.DeviceType.Service)
             {
-                if (logical.Status is AbstractDevice.DeviceStatus.Offline)
+                if (device.Status is AbstractDevice.DeviceStatus.Offline)
                 {
                     // if a logical service is offline, and we have one of its services - hide the logical service
-                    return !DevicesObject.ServiceDevices.Any(s => s.IpAddress == ((LogicalDevice)device.Device).IpAddress);
+                    return !DevicesObject.ServiceDeviceViewModels.Any(s => s.IpAddress == device.IpAddress);
                 }
 
                 // if there's a logical service and a remote device with the same IP - hide the logical service
-                return !DevicesObject.LogicalDevices.Any(l => l.IpAddress == logical.IpAddress
-                                                        && (l.Type is AbstractDevice.DeviceType.Remote
-                                                            || l.Type is AbstractDevice.DeviceType.Local && l.Status is AbstractDevice.DeviceStatus.Ok));
+                return !DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
+                                                        && l.Type is AbstractDevice.DeviceType.Remote or AbstractDevice.DeviceType.Local
+                                                        && l.Status is AbstractDevice.DeviceStatus.Ok);
             }
-            else if (device.Device is LogicalDevice remote && remote.Type is AbstractDevice.DeviceType.Remote)
+            else if (device is LogicalDeviceViewModel && device.Type is AbstractDevice.DeviceType.Remote)
             {
                 // if a remote device is also connected by USB and both are authorized - hide the remote device
-                return !DevicesObject.LogicalDevices.Any(usb => usb.Type is AbstractDevice.DeviceType.Local && usb.Status is AbstractDevice.DeviceStatus.Ok && usb.IpAddress == remote.IpAddress);
+                return !DevicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is AbstractDevice.DeviceType.Local
+                    && usb.Status is AbstractDevice.DeviceStatus.Ok
+                    && usb.IpAddress == device.IpAddress);
             }
-            else if (device.Device is HistoryDevice history)
+            else if (device is HistoryDeviceViewModel)
             {
                 // if there's any device with the IP of a history device - hide the history device
-                return Settings.SaveDevices && !DevicesObject.LogicalDevices.Any(logical => logical.IpAddress == history.IpAddress)
-                        && !DevicesObject.ServiceDevices.Any(service => service.IpAddress == history.IpAddress);
+                return Settings.SaveDevices && !DevicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == device.IpAddress)
+                        && !DevicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == device.IpAddress);
             }
-            else if (device.Device is ServiceDevice service)
+            else if (device is ServiceDeviceViewModel service)
             {
                 // connect services are always hidden
-                if (service is ConnectService)
-                    return DISPLAY_CONNECT_SERVICES;
+                if (service is ConnectServiceViewModel)
+                    return false;
 
                 // if there's any online logical device with the IP of a pairing service - hide the pairing service
-                if (DevicesObject.LogicalDevices.Any(logical => logical.Status is not AbstractDevice.DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
+                if (DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not AbstractDevice.DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
                     return false;
 
                 // if there's any QR service with the IP of a code pairing service - hide the code pairing service
                 if (service.MdnsType is ServiceDevice.ServiceType.PairingCode
-                    && DevicesObject.ServiceDevices.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
+                    && DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
                                                               && qr.IpAddress == service.IpAddress))
                     return false;
             }
@@ -1123,7 +1121,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FilterDrives();
 
         CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
-        DeleteMenuButton.DataContext = DevicesObject.CurrentDevice;
+        DeleteMenuButton.DataContext = DevicesObject.Current;
         FileActions.PushPackageEnabled = Settings.EnableApk;
 #if DEBUG
         TestCurrentOperation();
@@ -1158,7 +1156,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         AddPathButton(button);
         TextHelper.SetAltText(PathBox, "");
 
-        DriveList.ItemsSource = DevicesObject.CurrentDevice.Drives;
+        DriveList.ItemsSource = DevicesObject.Current.Drives;
 
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
@@ -1166,7 +1164,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void CombineDisplayNames()
     {
-        foreach (var drive in DevicesObject.CurrentDevice.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type != AbstractDrive.DriveType.Root))
+        foreach (var drive in DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type != AbstractDrive.DriveType.Root))
         {
             CurrentDisplayNames.TryAdd(drive.Path, drive.Type is AbstractDrive.DriveType.External
                 ? drive.ID : drive.DisplayName);
@@ -1196,32 +1194,32 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileActions.IsDriveViewVisible = false;
         FileActions.IsExplorerVisible = true;
-        FileActions.HomeEnabled = DevicesObject.CurrentDevice.Drives.Any();
+        FileActions.HomeEnabled = DevicesObject.Current.Drives.Any();
 
         return _navigateToPath(realPath, bfNavigated);
     }
 
     private void UpdateRecycledItemsCount()
     {
-        var countTask = Task.Run(() => ADBService.CountRecycle(DevicesObject.CurrentDevice.ID));
+        var countTask = Task.Run(() => ADBService.CountRecycle(DevicesObject.Current.ID));
         countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
         {
-            if (t.IsCanceled || DevicesObject.CurrentDevice is null)
+            if (t.IsCanceled || DevicesObject.Current is null)
                 return;
 
-            var trash = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
+            var trash = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Trash);
             ((VirtualDriveViewModel)trash)?.SetItemsCount(t.Result);
         }));
     }
 
     private void UpdateInstallersCount()
     {
-        var countTask = Task.Run(() => ADBService.CountPackages(DevicesObject.CurrentDevice.ID));
+        var countTask = Task.Run(() => ADBService.CountPackages(DevicesObject.Current.ID));
         countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
         {
-            if (!t.IsCanceled && DevicesObject.CurrentDevice is not null)
+            if (!t.IsCanceled && DevicesObject.Current is not null)
             {
-                var temp = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
+                var temp = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
                 ((VirtualDriveViewModel)temp)?.SetItemsCount(t.Result);
             }
         }));
@@ -1248,9 +1246,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     FilterHiddenFiles();
                 }
 
-                if (!updateExplorer && DevicesObject.CurrentDevice is not null)
+                if (!updateExplorer && DevicesObject.Current is not null)
                 {
-                    var package = DevicesObject.CurrentDevice.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+                    var package = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
                     ((VirtualDriveViewModel)package)?.SetItemsCount(Packages.Count);
                 }
 
@@ -1263,13 +1261,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RuntimeSettings.LastServerResponse = DateTime.Now;
 
-        if (devices is not null && DevicesObject.DevicesChanged(devices))
+        if (devices is null)
+            return;
+
+        var viewModels = devices.Select(d => new LogicalDeviceViewModel(d));
+
+        if (DevicesObject.DevicesChanged(viewModels))
         {
-            DeviceListSetup(devices);
+            DeviceListSetup(viewModels);
 
             if (Settings.AutoRoot)
             {
-                foreach (var item in DevicesObject.LogicalDevices.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
+                foreach (var item in DevicesObject.LogicalDeviceViewModels.Where(device => device.Root is AbstractDevice.RootStatus.Unchecked))
                 {
                     Task.Run(() => item.EnableRoot(true));
                 }
@@ -1279,20 +1282,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateDevicesRootAccess()
     {
-        foreach (var device in DevicesObject.LogicalDevices.Where(d => d.Root is AbstractDevice.RootStatus.Unchecked))
+        foreach (var device in DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is AbstractDevice.RootStatus.Unchecked))
         {
-            bool root = ADBService.WhoAmI(device);
-            Dispatcher.Invoke(() => device.Root = root ? AbstractDevice.RootStatus.Enabled : AbstractDevice.RootStatus.Unchecked);
+            bool root = ADBService.WhoAmI(device.ID);
+            Dispatcher.Invoke(() => device.SetRootStatus(root ? AbstractDevice.RootStatus.Enabled : AbstractDevice.RootStatus.Unchecked));
         }
     }
 
     private void UpdateDevicesBatInfo()
     {
-        DevicesObject.CurrentDevice?.UpdateBattery();
+        DevicesObject.Current?.UpdateBattery();
 
         if (DateTime.Now - DevicesObject.LastUpdate > BATTERY_UPDATE_INTERVAL || RuntimeSettings.IsDevicesPaneOpen)
         {
-            var items = DevicesObject.LogicalDevices.Where(device => device != DevicesObject.CurrentDevice);
+            var items = DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen);
             foreach (var item in items)
             {
                 item.UpdateBattery();
@@ -1306,11 +1309,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RuntimeSettings.LastServerResponse = DateTime.Now;
 
-        if (services is not null && DevicesObject.ServicesChanged(services))
-        {
-            DevicesObject.UpdateServices(services);
+        if (services is null)
+            return;
 
-            var qrServices = DevicesObject.ServiceDevices.Where(service =>
+        var viewModels = services.Select(s => ServiceDeviceViewModel.New(s));
+
+        if (DevicesObject.ServicesChanged(viewModels))
+        {
+            DevicesObject.UpdateServices(viewModels);
+
+            var qrServices = DevicesObject.ServiceDeviceViewModels.Where(service =>
                 service.MdnsType == ServiceDevice.ServiceType.QrCode
                 && service.ID == QrClass.ServiceName);
 
@@ -1605,7 +1613,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
             {
                 var path = TextHelper.GetAltObject(PathButtons[i]).ToString();
-                var drives = DevicesObject.CurrentDevice.Drives.Where(drive => drive.Path == path);
+                var drives = DevicesObject.Current.Drives.Where(drive => drive.Path == path);
                 var icon = "\uE8B7";
                 if (drives.Any())
                     icon = drives.First().DriveIcon;
@@ -2207,7 +2215,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void ConnectNewDevice()
     {
-        var dev = (NewDevice)RuntimeSettings.ConnectNewDevice.Device;
+        var dev = (NewDeviceViewModel)RuntimeSettings.ConnectNewDevice;
         await Task.Run(() =>
         {
             try
@@ -2217,7 +2225,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             catch (Exception ex)
             {
-                if (ex.Message.Contains(S_FAILED_CONN + dev.ConnectAddress) && dev.Type is AbstractDevice.DeviceType.New && ((UINewDevice)RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
+                if (ex.Message.Contains(S_FAILED_CONN + dev.ConnectAddress) && dev.Type is AbstractDevice.DeviceType.New && ((NewDeviceViewModel)RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
                 {
                     DevicesObject.NewDevice.EnablePairing();
                 }
@@ -2236,17 +2244,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 if (t.Result)
                 {
                     string newDeviceAddress = "";
-                    if (RuntimeSettings.ConnectNewDevice.Device.Type is AbstractDevice.DeviceType.New)
+                    if (RuntimeSettings.ConnectNewDevice.Type is AbstractDevice.DeviceType.New)
                     {
                         if (Settings.SaveDevices)
-                            DevicesObject.AddHistoryDevice(new(dev));
+                            DevicesObject.AddHistoryDevice((HistoryDeviceViewModel)dev);
 
                         newDeviceAddress = dev.ConnectAddress;
-                        ((UINewDevice)RuntimeSettings.ConnectNewDevice).ClearDevice();
+                        ((NewDeviceViewModel)RuntimeSettings.ConnectNewDevice).ClearDevice();
                     }
                     else
                     {
-                        newDeviceAddress = ((HistoryDevice)RuntimeSettings.ConnectNewDevice.Device).ConnectAddress;
+                        newDeviceAddress = ((HistoryDeviceViewModel)RuntimeSettings.ConnectNewDevice).ConnectAddress;
 
                         // In case user has changed the port of the history device
                         if (Settings.SaveDevices)
@@ -2266,7 +2274,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void PairNewDevice()
     {
-        var dev = (NewDevice)RuntimeSettings.ConnectNewDevice.Device;
+        var dev = (NewDeviceViewModel)RuntimeSettings.ConnectNewDevice;
         await Task.Run(() =>
         {
             try
@@ -2335,7 +2343,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ClearDrives()
     {
-        DevicesObject.CurrentDevice?.Drives.Clear();
+        DevicesObject.Current?.Drives.Clear();
         FileActions.IsDriveViewVisible = false;
     }
 
@@ -2466,10 +2474,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void RefreshDrives(bool asyncClasify = false)
     {
-        if (DevicesObject.CurrentDevice is null)
+        if (DevicesObject.Current is null)
             return;
         
-        if (!asyncClasify && DevicesObject.CurrentDevice.Drives?.Count > 0 && !FileActions.IsExplorerVisible)
+        if (!asyncClasify && DevicesObject.Current.Drives?.Count > 0 && !FileActions.IsExplorerVisible)
             asyncClasify = true;
 
         var dispatcher = Dispatcher;
@@ -2480,13 +2488,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             var drives = CurrentADBDevice.GetDrives();
 
-            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
+            if (DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
                 UpdateRecycledItemsCount();
 
-            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
+            if (DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
                 UpdateInstallersCount();
 
-            if (DevicesObject.CurrentDevice.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
+            if (DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
                 UpdatePackages();
 
             return drives;
@@ -2498,7 +2506,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             dispatcher.Invoke(async () =>
             {
-                var update = await DevicesObject.CurrentDevice?.UpdateDrives(t.Result, dispatcher, asyncClasify);
+                var update = await DevicesObject.Current?.UpdateDrives(t.Result, dispatcher, asyncClasify);
                 if (update is true)
                     FilterDrives();
             });
@@ -2690,7 +2698,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PairingQrImage.Source = QrClass.Image;
     }
 
-    private async Task<bool> PairService(ServiceDevice service)
+    private async Task<bool> PairService(ServiceDeviceViewModel service)
     {
         var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
             ? QrClass.Password
@@ -2851,7 +2859,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else
         {
-            itemsToDelete = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+            itemsToDelete = DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
                     ? selectedFiles.Where(file => file.Type is FileType.File or FileType.Folder) : selectedFiles;
         }
 
@@ -2881,7 +2889,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (!FileActions.IsRecycleBin && Settings.EnableRecycle && !result.Item2)
         {
-            ShellFileOperation.MoveItems(CurrentADBDevice, itemsToDelete, RECYCLE_PATH, CurrentPath, DirList.FileList, Dispatcher, DevicesObject.CurrentDevice);
+            ShellFileOperation.MoveItems(CurrentADBDevice, itemsToDelete, RECYCLE_PATH, CurrentPath, DirList.FileList, Dispatcher, DevicesObject.Current);
         }
         else
         {
@@ -3072,7 +3080,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     return;
                 }
 
-                if (cell.IsReadOnly || (DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+                if (cell.IsReadOnly || (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
                     && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
                     return;
 
@@ -3128,7 +3136,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ClearCutFiles();
 
-        var itemsToCut = DevicesObject.CurrentDevice.Root != AbstractDevice.RootStatus.Enabled
+        var itemsToCut = DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
                     ? items.Where(file => file.Type is FileType.File or FileType.Folder) : items;
 
         foreach (var item in itemsToCut)

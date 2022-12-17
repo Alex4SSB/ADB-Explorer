@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Resources;
 
@@ -90,18 +91,18 @@ public static class Strings
     public static string S_REM_APK(bool apk, int count) =>
         $"The following will be removed:\n{count} {(apk ? "APK" : "package")}{(count > 1 ? "s" : "")}";
 
-    public static string S_REM_DEVICE(Device device) =>
+    public static string S_REM_DEVICE(DeviceViewModel device) =>
         $"Are you sure you want to {(device.Type is AbstractDevice.DeviceType.Emulator ? "kill this emulator" : "remove this device")}?";
 
-    public static string S_REM_DEVICE_TITLE(Device device)
+    public static string S_REM_DEVICE_TITLE(DeviceViewModel device)
     {
         var remType = device.Type is AbstractDevice.DeviceType.Emulator ? "Kill" : "Remove";
 
         var name = device switch
         {
-            HistoryDevice dev when string.IsNullOrEmpty(dev.DeviceName) => dev.IpAddress,
-            HistoryDevice dev => dev.DeviceName,
-            LogicalDevice dev => dev.Name,
+            HistoryDeviceViewModel dev when string.IsNullOrEmpty(dev.DeviceName) => dev.IpAddress,
+            HistoryDeviceViewModel dev => dev.DeviceName,
+            LogicalDeviceViewModel dev => dev.Name,
             _ => throw new NotImplementedException(),
         };
 

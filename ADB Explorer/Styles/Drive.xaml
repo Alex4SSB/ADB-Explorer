@@ -99,10 +99,10 @@
         <Setter Property="Margin" Value="5" />
         <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
     </Style>
-    <DataTemplate x:Key="LogicalDriveTemplate" DataType="Drive">
+    <DataTemplate x:Key="LogicalDriveTemplate">
         <views:LogicalDriveControl />
     </DataTemplate>
-    <DataTemplate x:Key="VirtualDriveTemplate" DataType="Drive">
+    <DataTemplate x:Key="VirtualDriveTemplate">
         <views:VirtualDriveControl />
     </DataTemplate>
     <helpers:DriveTemplateSelector
