@@ -1739,7 +1739,7 @@
                                         <Setter Property="Margin" Value="0,4" />
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Device.Type}" Value="Sideload">
+                                            <DataTrigger Binding="{Binding Type}" Value="Sideload">
                                                 <Setter Property="Visibility" Value="Visible" />
                                             </DataTrigger>
                                         </Style.Triggers>

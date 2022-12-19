@@ -906,7 +906,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         collectionView.Filter = new(predicate);
         collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new SortDescription("Device.Type", ListSortDirection.Ascending));
+        collectionView.SortDescriptions.Add(new SortDescription(nameof(DeviceViewModel.Type), ListSortDirection.Ascending));
     }
 
     private void InitLister()
@@ -2474,7 +2474,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         collectionView.Filter = new(predicate);
         collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new SortDescription("Type", ListSortDirection.Ascending));
+        collectionView.SortDescriptions.Add(new SortDescription(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
     }
 
     private void RefreshDrives(bool asyncClasify = false)
@@ -2587,7 +2587,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
             collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new("Type", ListSortDirection.Descending));
+            collectionView.SortDescriptions.Add(new(nameof(Package.Type), ListSortDirection.Descending));
         }
         else
         {
@@ -2597,8 +2597,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
             collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new("IsDirectory", ListSortDirection.Descending));
-            collectionView.SortDescriptions.Add(new("FullName", ListSortDirection.Ascending));
+            collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
+            collectionView.SortDescriptions.Add(new(nameof(FileClass.FullName), ListSortDirection.Ascending));
         }
     }
 
@@ -3464,7 +3464,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         e.Column.SortDirection = sortDirection;
 
         collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new("IsDirectory", Invert(sortDirection)));
+        collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), Invert(sortDirection)));
         collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
 
         e.Handled = true;
