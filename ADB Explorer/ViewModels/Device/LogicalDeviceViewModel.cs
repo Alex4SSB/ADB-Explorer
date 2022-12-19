@@ -32,11 +32,23 @@ public class LogicalDeviceViewModel : DeviceViewModel
         private set => Set(ref androidVersion, value);
     }
 
+    public DateTime DiscoverTime { get; private set; }
+
     #endregion
 
     #region Read only properties
 
-    public string Name => Device.Name;
+    public string Name
+    {
+        get
+        {
+            // to prevent displaying [Service] for offline connect services acquired via adb devices -l upon first contact
+            if (string.IsNullOrEmpty(Device.Name) && DiscoverTime - DateTime.Now < AdbExplorerConst.SERVICE_DISPLAY_DELAY)
+                return " ";
+
+            return Device.Name;
+        }
+    }
 
     public string BaseID => Type == DeviceType.Service ? ID.Split('.')[0] : ID;
 
