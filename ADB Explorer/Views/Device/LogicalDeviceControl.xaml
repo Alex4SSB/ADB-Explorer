@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    xmlns:views="clr-namespace:ADB_Explorer.Views"
     d:DataContext="{d:DesignInstance Type=viewmodels:LogicalDeviceViewModel}"
     mc:Ignorable="d">
     <Expander Style="{StaticResource DeviceExpanderStyle}">
@@ -59,7 +60,7 @@
                     Spacing="6">
                     <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
                     <ui:FontIcon Glyph="&#xE838;" Style="{StaticResource DeviceOpenIconStyle}" />
-                    <ui:FontIcon Style="{StaticResource BatteryIconStyle}" />
+                    <views:CompactBatteryControl DataContext="{Binding Battery}" />
                 </ui:SimpleStackPanel>
             </Grid>
         </Expander.Header>

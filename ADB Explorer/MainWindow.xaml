@@ -9,6 +9,7 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:views="clr-namespace:ADB_Explorer.Views"
     x:Name="MainWin"
     Title="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DevicesObject.AppTitle}"
     Width="800"
@@ -1697,16 +1698,7 @@
                         VerticalAlignment="Center"
                         Orientation="Horizontal"
                         Spacing="6">
-                        <StackPanel Orientation="Horizontal" Style="{StaticResource DeviceDetailsBatteryPercentStyle}">
-                            <TextBlock Text="{Binding Battery.Level}" />
-                            <TextBlock Text="%" />
-                        </StackPanel>
-                        <ui:FontIcon
-                            x:Name="CurrentDeviceBatteryIcon"
-                            Style="{StaticResource DeviceDetailsBatteryStyle}"
-                            ToolTipService.InitialShowDelay="0"
-                            ToolTipService.Placement="Top"
-                            ToolTipService.ShowDuration="60000" />
+                        <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />
                         <Separator Margin="2,6">
                             <Separator.Style>
                                 <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">

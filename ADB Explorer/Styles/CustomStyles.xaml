@@ -607,96 +607,6 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="BatteryIconStyle"
-        BasedOn="{StaticResource DeviceHeaderIcon}"
-        TargetType="ui:FontIcon">
-        <Setter Property="Glyph" Value="{Binding Battery.BatteryIcon}" />
-        <Setter Property="ToolTip">
-            <Setter.Value>
-                <Grid>
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Unknown">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Style>
-                        <TextBlock Text="{Binding Battery.Level}" />
-                        <TextBlock Text="%" />
-                        <TextBlock>
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Charging">
-                                            <Setter Property="Text" Value=", Plugged In" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </StackPanel>
-                    <TextBlock Text="Battery Status Unknown">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Unknown">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </Grid>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Battery.ChargeState}" Value="Unknown">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="DeviceDetailsBatteryStyle"
-        BasedOn="{StaticResource BatteryIconStyle}"
-        TargetType="ui:FontIcon">
-        <Style.Resources>
-            <Style TargetType="TextBlock">
-                <Style.Triggers>
-                    <Trigger Property="Text" Value="">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-        </Style.Resources>
-        <Setter Property="ToolTip">
-            <Setter.Value>
-                <ui:SimpleStackPanel Spacing="4">
-                    <TextBlock Text="{Binding Battery.BatteryStateString}" />
-                    <TextBlock Text="{Binding Battery.BatteryHealthString}" />
-                    <TextBlock Text="{Binding Battery.VoltageString}" />
-                    <TextBlock Text="{Binding Battery.CurrentConsumption}" />
-                    <TextBlock Text="{Binding Battery.TemperatureString}" />
-                </ui:SimpleStackPanel>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Visibility" Value="Visible" />
-        <Style.Triggers>
-            <Trigger Property="DataContext" Value="{x:Null}">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </Trigger>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="UnsupportedIconStyle"
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
@@ -712,17 +622,6 @@
         <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="DeviceDetailsBatteryPercentStyle" TargetType="StackPanel">
-        <Setter Property="Visibility" Value="Visible" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Battery.Level}" Value="{x:Null}">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>

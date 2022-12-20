@@ -1,10 +1,13 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
-public class Battery : INotifyPropertyChanged
+public class Battery : ViewModelBase
 {
+    #region Enums
+
     public enum State
     {
         Unknown = 1,
@@ -40,6 +43,10 @@ public class Battery : INotifyPropertyChanged
         Wireless,
     }
 
+    #endregion
+
+    #region Full properties
+
     private Source chargeSource = Source.None;
     public Source ChargeSource
     {
@@ -59,18 +66,6 @@ public class Battery : INotifyPropertyChanged
         {
             if (Set(ref batteryState, value))
                 OnPropertyChanged(nameof(BatteryStateString));
-        }
-    }
-    public string BatteryStateString
-    {
-        get
-        {
-            if (BatteryState == 0)
-                return "";
-            else if (byte.TryParse(BatteryState.ToString(), out _))
-                return $"Status: {(ChargeSource == Source.None ? "Discharging" : $"Charging ({ChargeSource})")}";
-            else
-                return $"Status: {BatteryState.ToString().Replace('_', ' ')}{(ChargeSource == Source.None ? "" : $" ({ChargeSource})")}";
         }
     }
 
@@ -106,16 +101,57 @@ public class Battery : INotifyPropertyChanged
                 OnPropertyChanged(nameof(VoltageString));
         }
     }
+
+    private double? temperature;
+    public double? Temperature
+    {
+        get => temperature;
+        set
+        {
+            if (Set(ref temperature, value))
+                OnPropertyChanged(nameof(TemperatureString));
+        }
+    }
+
+    private Health batteryHealth = 0;
+    public Health BatteryHealth
+    {
+        get => batteryHealth;
+        set
+        {
+            if (Set(ref batteryHealth, value))
+                OnPropertyChanged(nameof(BatteryHealthString));
+        }
+    }
+
+    #endregion
+
+    private long? chargeCounter = null;
+    private long? prevChargeCounter = null;
+    private DateTime? chargeUpdate = null;
+    private DateTime? prevChargeUpdate = null;
+
+    #region Read only properties
+
+    public string BatteryStateString
+    {
+        get
+        {
+            if (BatteryState == 0)
+                return "";
+            else if (byte.TryParse(BatteryState.ToString(), out _))
+                return $"Status: {(ChargeSource == Source.None ? "Discharging" : $"Charging ({ChargeSource})")}";
+            else
+                return $"Status: {BatteryState.ToString().Replace('_', ' ')}{(ChargeSource == Source.None ? "" : $" ({ChargeSource})")}";
+        }
+    }
+
     public string VoltageString => Voltage switch
     {
         null => "",
         _ => $"Voltage: {Voltage}v"
     };
 
-    private long? chargeCounter = null;
-    private long? prevChargeCounter = null;
-    private DateTime? chargeUpdate = null;
-    private DateTime? prevChargeUpdate = null;
     public string CurrentConsumption
     {
         get
@@ -132,33 +168,13 @@ public class Battery : INotifyPropertyChanged
         }
     }
 
-    private double? temperature;
-    public double? Temperature
-    {
-        get => temperature;
-        set
-        {
-            if (Set(ref temperature, value))
-                OnPropertyChanged(nameof(TemperatureString));
-        }
-    }
     public string TemperatureString => Temperature switch
     {
         null => "",
         _ => $"Temperature: {Temperature}°C"
     };
 
-    private Health batteryHealth = 0;
-    public Health BatteryHealth
-    {
-        get => batteryHealth;
-        set
-        {
-            if (Set(ref batteryHealth, value))
-                OnPropertyChanged(nameof(BatteryHealthString));
-        }
-    }
-    public string BatteryHealthString => batteryHealth switch
+    public string BatteryHealthString => BatteryHealth switch
     {
         0 => "",
         _ => $"Health: {BatteryHealth.ToString().Replace('_', ' ')}"
@@ -180,6 +196,8 @@ public class Battery : INotifyPropertyChanged
             return $"{Convert.ToChar(level)}";
         }
     }
+
+    #endregion
 
     public Battery()
     {
@@ -257,18 +275,4 @@ public class Battery : INotifyPropertyChanged
 
         OnPropertyChanged(nameof(CurrentConsumption));
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
