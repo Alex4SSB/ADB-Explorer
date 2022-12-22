@@ -76,7 +76,10 @@ public class Battery : ViewModelBase
         set
         {
             if (Set(ref chargeState, value))
+            {
                 OnPropertyChanged(nameof(BatteryIcon));
+                OnPropertyChanged(nameof(CompactStateString));
+            }
         }
     }
 
@@ -87,7 +90,10 @@ public class Battery : ViewModelBase
         set
         {
             if (Set(ref level, value))
+            {
                 OnPropertyChanged(nameof(BatteryIcon));
+                OnPropertyChanged(nameof(CompactStateString));
+            }
         }
     }
 
@@ -145,6 +151,10 @@ public class Battery : ViewModelBase
                 return $"Status: {BatteryState.ToString().Replace('_', ' ')}{(ChargeSource == Source.None ? "" : $" ({ChargeSource})")}";
         }
     }
+
+    public string CompactStateString => ChargeState is ChargingState.Unknown
+                ? "Battery Status Unknown"
+                : $"{Level}%{(ChargeState is ChargingState.Charging ? ", Plugged In" : "")}";
 
     public string VoltageString => Voltage switch
     {

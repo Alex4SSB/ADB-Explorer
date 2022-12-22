@@ -98,6 +98,7 @@
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Margin" Value="5" />
         <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
+        <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListViewItem">
@@ -105,11 +106,6 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ItemsCount}" Value="-1">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <DataTemplate x:Key="LogicalDriveTemplate">
         <views:LogicalDriveControl />

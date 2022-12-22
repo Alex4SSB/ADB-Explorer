@@ -8,5 +8,21 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DataContext="{d:DesignInstance Type=models:Battery}"
     mc:Ignorable="d">
-    <ui:FontIcon Margin="0,1,0,0" Style="{StaticResource BatteryIconStyle}" />
+    <ui:FontIcon
+        Margin="0,1,0,0"
+        Glyph="{Binding BatteryIcon}"
+        ToolTip="{Binding CompactStateString}">
+        <ui:FontIcon.Style>
+            <Style BasedOn="{StaticResource DeviceHeaderIcon}" TargetType="ui:FontIcon">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ChargeState}" Value="Unknown">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </ui:FontIcon.Style>
+    </ui:FontIcon>
 </UserControl>

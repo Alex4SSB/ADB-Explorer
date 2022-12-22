@@ -1381,10 +1381,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (!RuntimeSettings.IsDevicesPaneOpen)
             return;
 
-        Dispatcher.Invoke(() =>
-        {
-            DevicesObject.UpdateLogicalIp();
-        });
+        Dispatcher.Invoke(() => DevicesObject.UpdateLogicalIp());
 
         if (MdnsService.State == MDNS.MdnsState.Running)
             Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(ListServices), WiFiPairingService.GetServices()).Wait();

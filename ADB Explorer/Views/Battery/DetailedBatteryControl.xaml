@@ -30,11 +30,12 @@
             <TextBlock Text="%" />
         </StackPanel>
         <ui:FontIcon
+            Glyph="{Binding BatteryIcon}"
             ToolTipService.InitialShowDelay="0"
             ToolTipService.Placement="Top"
             ToolTipService.ShowDuration="60000">
             <ui:FontIcon.Style>
-                <Style BasedOn="{StaticResource BatteryIconStyle}" TargetType="ui:FontIcon">
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                     <Style.Resources>
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
@@ -55,12 +56,14 @@
                             </ui:SimpleStackPanel>
                         </Setter.Value>
                     </Setter>
-                    <Setter Property="Visibility" Value="Visible" />
                     <Style.Triggers>
                         <Trigger Property="DataContext" Value="{x:Null}">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ChargeState}" Value="Unknown">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>

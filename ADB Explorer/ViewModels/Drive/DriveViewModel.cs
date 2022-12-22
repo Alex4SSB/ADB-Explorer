@@ -5,6 +5,8 @@ namespace ADB_Explorer.ViewModels;
 
 public class DriveViewModel : AbstractDrive
 {
+    #region Full properties
+
     private Drive drive;
     protected Drive Drive
     {
@@ -19,8 +21,16 @@ public class DriveViewModel : AbstractDrive
         set => Set(ref driveSelected, value);
     }
 
-    public DriveBrowseCommand BrowseCommand { get; private set; }
-    public SelectCommand SelectCommand { get; private set; }
+    private bool driveEnabled = true;
+    public bool DriveEnabled
+    {
+        get => driveEnabled;
+        protected set => Set(ref driveEnabled, value);
+    }
+
+    #endregion
+
+    #region Read only properties
 
     public string Path => Drive.Path;
     public new DriveType Type => Drive.Type;
@@ -40,6 +50,14 @@ public class DriveViewModel : AbstractDrive
         _ => throw new NotImplementedException(),
     };
 
+    #endregion
+
+    #region Commands
+
+    public DriveBrowseCommand BrowseCommand { get; private set; }
+    public SelectCommand SelectCommand { get; private set; }
+
+    #endregion
 
     public DriveViewModel(Drive drive)
     {

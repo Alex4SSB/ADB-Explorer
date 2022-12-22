@@ -30,7 +30,6 @@
                 <ResourceDictionary Source="Styles\Settings.xaml" />
                 <ResourceDictionary Source="Styles\Drive.xaml" />
                 <ResourceDictionary Source="Styles\Device.xaml" />
-                <ResourceDictionary Source="Styles\Battery.xaml" />
                 <ResourceDictionary Source="Styles\FileOp.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
