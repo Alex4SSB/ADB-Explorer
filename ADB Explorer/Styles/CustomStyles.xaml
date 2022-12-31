@@ -585,15 +585,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Storyboard x:Key="PulsatingBackgroundStoryboard" RepeatBehavior="3x">
-        <ColorAnimation
-            AutoReverse="True"
-            Storyboard.TargetName="OpenDevicesButton"
-            Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
-            From="#00000000"
-            To="Gray"
-            Duration="00:00:00.15" />
-    </Storyboard>
     <Style
         x:Key="StopFileOpMenuStyle"
         BasedOn="{StaticResource MenuStyle}"
@@ -673,7 +664,7 @@
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPasteEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PasteEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
@@ -702,7 +693,7 @@
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPasteEnabled}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PasteEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />

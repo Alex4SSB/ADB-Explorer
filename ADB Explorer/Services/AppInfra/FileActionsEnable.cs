@@ -127,13 +127,6 @@ public class FileActionsEnable : INotifyPropertyChanged
         set => Set(ref pasteEnabled, value);
     }
 
-    private bool contextPasteEnabled;
-    public bool ContextPasteEnabled
-    {
-        get => contextPasteEnabled;
-        set => Set(ref contextPasteEnabled, value);
-    }
-
     private bool renameEnabled;
     public bool RenameEnabled
     {

@@ -126,7 +126,7 @@ public class FilePath : INotifyPropertyChanged
         if (other == FullPath)
             return RelationType.Self;
 
-        if (other.StartsWith(FullPath))
+        if (other.StartsWith(FullPath) && other[FullPath.Length..(FullPath.Length + 1)] == "/")
             return RelationType.Descendant;
 
         if (FullPath.StartsWith(other))

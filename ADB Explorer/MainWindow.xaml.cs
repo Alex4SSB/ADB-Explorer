@@ -717,7 +717,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileActions.CopyEnabled = !FileActions.IsRecycleBin && FileActions.IsRegularItem && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
         FileActions.PasteEnabled = IsPasteEnabled();
-        FileActions.ContextPasteEnabled = IsPasteEnabled(isContextMenu: true);
 
         FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk) && !FileActions.IsRecycleBin;
         FileActions.CopyPathEnabled = selectedFiles.Count() == 1 && !FileActions.IsRecycleBin;
@@ -732,12 +731,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             && selectedFiles.First().Type is FileType.File;
     }
 
-    private bool IsPasteEnabled(bool ignoreSelected = false, bool isContextMenu = false)
+    private bool IsPasteEnabled(bool ignoreSelected = false, bool isKeyboard = false)
     {
         if (CutItems.Count < 1 || FileActions.IsRecycleBin)
             return false;
 
-        if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self && CutItems[0].CutState is FileClass.CutType.Cut)
+        if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self)
             return false;
 
         var selected = ignoreSelected ? 0 : selectedFiles?.Count();
@@ -746,7 +745,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             case 0:
                 return !(CutItems[0].ParentPath == CurrentPath && CutItems[0].CutState is FileClass.CutType.Cut);
             case 1:
-                if (!isContextMenu && CutItems[0].CutState is FileClass.CutType.Copy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
+                if (isKeyboard && CutItems[0].CutState is FileClass.CutType.Copy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
                     return true;
 
                 var item = ExplorerGrid.SelectedItem as FilePath;
@@ -1934,7 +1933,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             CutFiles(selectedFiles, true);
         }
-        else if (actualKey == Key.V && ctrl && FileActions.PasteEnabled)
+        else if (actualKey == Key.V && ctrl && (FileActions.PasteEnabled || IsPasteEnabled(true)))
         {
             PasteFiles();
         }

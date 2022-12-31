@@ -15,7 +15,8 @@ public class FileMoveOperation : FileOperation
     private string recycleName;
     private DateTime? dateModified;
 
-    public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false) : base(dispatcher, adbDevice, filePath)
+    public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false)
+        : base(dispatcher, adbDevice, filePath)
     {
         if (isCopy)
             OperationName = OperationType.Copy;
@@ -57,12 +58,13 @@ public class FileMoveOperation : FileOperation
             }
             else
                 fullTargetPath = $"{targetParent}{targetName}";
-
+            
             var command = OperationName is OperationType.Copy ? "cp" : "mv";
             if (OperationName is OperationType.Copy)
                 dateModified = DateTime.Now;
 
             return ADBService.ExecuteDeviceAdbShellCommand(Device.ID, command, out _, out _, new[] {
+                OperationName is OperationType.Copy && FilePath.IsDirectory ? "-r" : "",
                 ADBService.EscapeAdbShellString(FilePath.FullPath),
                 ADBService.EscapeAdbShellString(fullTargetPath) });
         });

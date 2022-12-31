@@ -334,7 +334,7 @@
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                     <Setter Property="Visibility" Value="Collapsed" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ContextPasteEnabled}" Value="True">
+                        <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=PasteEnabled}" Value="True">
                             <Setter Property="Visibility" Value="Visible" />
                         </DataTrigger>
                     </Style.Triggers>
