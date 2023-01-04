@@ -17,21 +17,22 @@ public class FileClass : FileStat
 
     private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
 
-    public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false) :
-        base(fileName, path, type, isLink, size)
+    public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false)
+        : base(fileName, path, type, isLink, size)
     {
         icon = GetIcon();
         typeName = GetTypeName();
         IsTemp = isTemp;
         ModifiedTime = modifiedTime;
+
+        SortName = new(fileName);
     }
 
-    public FileClass(FileClass other) : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
+    public FileClass(FileClass other)
+        : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
     { }
 
-    public static FileClass GenerateAndroidFile(FileStat fileStat)
-    {
-        return new FileClass
+    public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
         (
             fileName: fileStat.FullName,
             path: fileStat.FullPath,
@@ -40,7 +41,6 @@ public class FileClass : FileStat
             modifiedTime: fileStat.ModifiedTime,
             isLink: fileStat.IsLink
         );
-    }
 
     public static FileClass FromWindowsPath(FilePath androidTargetPath, FilePath windowsFilePath)
     {
@@ -49,10 +49,10 @@ public class FileClass : FileStat
         DateTime? modifiedTime = null;
         try
         {
-            isDir = System.IO.Directory.Exists(windowsFilePath.FullPath);
+            isDir = Directory.Exists(windowsFilePath.FullPath);
             if (!isDir)
             {
-                var fileInfo = new System.IO.FileInfo(windowsFilePath.FullPath);
+                var fileInfo = new FileInfo(windowsFilePath.FullPath);
                 fileSize = (ulong)fileInfo.Length;
                 modifiedTime = fileInfo.LastWriteTime;
             }
@@ -107,7 +107,7 @@ public class FileClass : FileStat
             if (Type is not FileType.File || (IsHidden && FullName.Count(c => c == '.') == 1))
                 return "";
 
-            return System.IO.Path.GetExtension(FullName);
+            return Path.GetExtension(FullName);
         }
     }
 
@@ -190,8 +190,10 @@ public class FileClass : FileStat
         }
     }
 
-    private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, false));
-    private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(System.IO.Path.GetTempPath(), iconSize, true));
+    public FileNameSort SortName { get; private set; }
+
+    private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, false));
+    private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, true));
     private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
 
     private static BitmapSource IconToBitmapSource(Icon icon)
@@ -315,5 +317,28 @@ public class FileClass : FileStat
         }
 
         return base.Set(ref storage, value, propertyName);
+    }
+}
+
+public class FileNameSort : IComparable
+{
+    public string Name { get; }
+
+    public FileNameSort(string name)
+    {
+        Name = name;
+    }
+
+    public override string ToString()
+    {
+        return Name;
+    }
+
+    public int CompareTo(object obj)
+    {
+        if (obj is not FileNameSort other)
+            return 0;
+
+        return ShellInfoManager.StringCompareLogical(Name, other.Name);
     }
 }

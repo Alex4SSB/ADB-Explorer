@@ -24,7 +24,7 @@ public static class ShellInfoManager
         public string szTypeName;
     };
 
-    [DllImport("Shell32.dll")]
+    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr SHGetFileInfo(
         string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
 
@@ -98,4 +98,9 @@ public static class ShellInfoManager
 
         return shinfo.szTypeName;
     }
+
+    [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
+    private static extern int StrCmpLogicalW(string psz1, string psz2);
+
+    public static int StringCompareLogical(string a, string b) => StrCmpLogicalW(a, b);
 }

@@ -2594,7 +2594,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
             collectionView.SortDescriptions.Clear();
             collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
-            collectionView.SortDescriptions.Add(new(nameof(FileClass.FullName), ListSortDirection.Ascending));
+            collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
         }
     }
 
@@ -3462,6 +3462,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         collectionView.SortDescriptions.Clear();
         collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), Invert(sortDirection)));
         collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
+        collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), sortDirection));
 
         e.Handled = true;
     }
