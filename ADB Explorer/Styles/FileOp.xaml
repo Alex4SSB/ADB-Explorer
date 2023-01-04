@@ -258,6 +258,7 @@
                     </Grid>
                     <TextBlock
                         Grid.Row="1"
+                        Style="{StaticResource InvisibleTextBlockStyle}"
                         Text="{Binding StatusInfo, Converter={StaticResource CompletedStatsConverter}}"
                         TextTrimming="CharacterEllipsis" />
                 </Grid>
