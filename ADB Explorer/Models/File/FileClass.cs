@@ -192,6 +192,13 @@ public class FileClass : FileStat
 
     public FileNameSort SortName { get; private set; }
 
+    public override void UpdatePath(string androidPath)
+    {
+        base.UpdatePath(androidPath);
+
+        SortName = new(FullName);
+    }
+
     private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, false));
     private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, true));
     private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));

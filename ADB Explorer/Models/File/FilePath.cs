@@ -94,7 +94,7 @@ public class FilePath : INotifyPropertyChanged
         Device = device;
     }
 
-    public void UpdatePath(string androidPath)
+    public virtual void UpdatePath(string androidPath)
     {
         FullPath = androidPath;
         FullName = GetFullName(androidPath);

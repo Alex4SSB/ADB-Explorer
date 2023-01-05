@@ -3461,7 +3461,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         collectionView.SortDescriptions.Clear();
         collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), Invert(sortDirection)));
+
+        if (e.Column.SortMemberPath != nameof(FileClass.FullName))
         collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
+
         collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), sortDirection));
 
         e.Handled = true;
