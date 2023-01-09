@@ -467,6 +467,13 @@ public class AppRuntimeSettings : INotifyPropertyChanged
         }
     }
 
+    private Version adbVersion;
+    public Version AdbVersion
+    {
+        get => adbVersion;
+        set => Set(ref adbVersion, value);
+    }
+
     public string TimeFromLastResponse => $"{DateTime.Now.Subtract(LastServerResponse).TotalSeconds:0}";
 
     public bool ServerUnresponsive => Data.Settings.PollDevices && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT;

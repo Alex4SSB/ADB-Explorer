@@ -463,18 +463,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool CheckAdbVersion()
     {
-        Version version = null;
-
         if (string.IsNullOrEmpty(Settings.ManualAdbPath))
         {
-            version = ADBService.VerifyAdbVersion("adb");
-            if (version >= MIN_ADB_VERSION)
+            RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion("adb");
+            if (RuntimeSettings.AdbVersion >= MIN_ADB_VERSION)
                 return true;
         }
         else
         {
-            version = ADBService.VerifyAdbVersion(Settings.ManualAdbPath);
-            if (version >= MIN_ADB_VERSION)
+            RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion(Settings.ManualAdbPath);
+            if (RuntimeSettings.AdbVersion >= MIN_ADB_VERSION)
                 return true;
         }
 
@@ -488,7 +486,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     new TextBlock()
                     {
                         TextWrapping = TextWrapping.Wrap,
-                        Text = version is null ? S_MISSING_ADB : S_ADB_VERSION_LOW,
+                        Text = RuntimeSettings.AdbVersion is null ? S_MISSING_ADB : S_ADB_VERSION_LOW,
                     },
                     new TextBlock()
                     {
@@ -501,8 +499,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                         ToolTip = L_ADB_PAGE,
                         NavigateUri = L_ADB_PAGE,
                         HorizontalAlignment = HorizontalAlignment.Center,
-                    }
-                }
+                    },
+                },
             };
 
             DialogService.ShowDialog(stack, S_MISSING_ADB_TITLE, DialogService.DialogIcon.Critical);

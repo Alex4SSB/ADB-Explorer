@@ -207,7 +207,29 @@
         </Style.Triggers>
     </Style>
     <DataTemplate x:Key="SettingsExpanderTemplate" DataType="services:SettingsGroup">
-        <Expander Header="{Binding Name}" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+        <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <Expander.Header>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Name}" />
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Name}" Value="ADB">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text=" - v" />
+                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" />
+                    </StackPanel>
+                </StackPanel>
+            </Expander.Header>
             <ListView
                 ItemContainerStyle="{StaticResource StretchListViewItem}"
                 ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
