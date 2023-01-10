@@ -6,7 +6,11 @@ namespace ADB_Explorer.Models
     {
         public enum SpecialLocation
         {
+            None,
             DriveView,
+            Back,
+            Forward,
+            Up,
         }
 
         public static List<object> PathHistory { get; set; } = new();

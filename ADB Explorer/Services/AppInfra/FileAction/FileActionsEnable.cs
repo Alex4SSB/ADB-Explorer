@@ -1,10 +1,11 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class FileActionsEnable : INotifyPropertyChanged
+internal class FileActionsEnable : ViewModelBase
 {
-
     #region booleans
 
     private bool pushPullEnabled = true;
@@ -45,13 +46,13 @@ public class FileActionsEnable : INotifyPropertyChanged
         set => Set(ref contextPushPackagesEnabled, value);
     }
 
-    private bool copyPathEnabled;
-    public bool CopyPathEnabled
+    private bool isCopyItemPathEnabled;
+    public bool IsCopyItemPathEnabled
     {
-        get => copyPathEnabled;
+        get => isCopyItemPathEnabled;
         set
         {
-            if (Set(ref copyPathEnabled, value))
+            if (Set(ref isCopyItemPathEnabled, value))
                 OnPropertyChanged(nameof(MoreEnabled));
         }
     }
@@ -291,44 +292,39 @@ public class FileActionsEnable : INotifyPropertyChanged
         set => Set(ref editorEnabled, value);
     }
 
-    private bool addToEditor;
+    private bool editFileEnabled;
     public bool EditFileEnabled
     {
-        get => addToEditor;
-        set => Set(ref addToEditor, value);
+        get => editFileEnabled;
+        set => Set(ref editFileEnabled, value);
     }
 
-    #endregion
-
-    #region strings
-
-    private string deleteAction;
-    public string DeleteAction
+    private bool isRefreshEnabled = false;
+    public bool IsRefreshEnabled
     {
-        get => deleteAction;
+        get => isRefreshEnabled;
+        set => Set(ref isRefreshEnabled, value);
+    }
+
+    private bool isCopyCurrentPathEnabled = false;
+    public bool IsCopyCurrentPathEnabled
+    {
+        get => isCopyCurrentPathEnabled;
+        set => Set(ref isCopyCurrentPathEnabled, value);
+    }
+
+    private FileClass.CutType isCopyPasteAction = FileClass.CutType.None;
+    public FileClass.CutType PasteState
+    {
+        get => isCopyPasteAction;
         set
         {
-            if (Set(ref deleteAction, value))
-                OnPropertyChanged(nameof(MenuDeleteTooltip));
+            if (Set(ref isCopyPasteAction, value))
+            {
+                IsCutState.Value = value is FileClass.CutType.Cut;
+                IsCopyState.Value = value is FileClass.CutType.Copy;
+            }
         }
-    }
-
-    private string restoreAction;
-    public string RestoreAction
-    {
-        get => restoreAction;
-        set
-        {
-            if (Set(ref restoreAction, value))
-                OnPropertyChanged(nameof(MenuRestoreTooltip));
-        }
-    }
-
-    private string copyPathAction;
-    public string CopyPathAction
-    {
-        get => copyPathAction;
-        set => Set(ref copyPathAction, value);
     }
 
     private string originalEditorText;
@@ -369,34 +365,36 @@ public class FileActionsEnable : INotifyPropertyChanged
 
     #endregion
 
+    #region Observable properties
+
+    public ObservableProperty<string> CopyPathAction = new();
+
+    public ObservableProperty<string> DeleteAction = new();
+
+    public ObservableProperty<string> RestoreAction = new();
+
+    public ObservableProperty<string> PasteAction = new();
+
+    public ObservableProperty<string> CutItemsCount = new();
+    
+    public ObservableProperty<bool> IsCutState = new();
+
+    public ObservableProperty<bool> IsCopyState = new();
+
+    #endregion
+
     #region read only
 
     public bool InstallUninstallEnabled => PackageActionsEnabled && InstallPackageEnabled;
     public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
     public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
     public bool PushPackageVisible => PushPackageEnabled && Data.Settings.EnableApk;
-    public bool MoreEnabled => PackageActionsEnabled || CopyPathEnabled || UpdateModifiedEnabled;
-    public string MenuDeleteTooltip => $"{DeleteAction} (Del)";
-    public string MenuRestoreTooltip => $"{RestoreAction} (Ctrl+R)";
+    public bool MoreEnabled => PackageActionsEnabled || IsCopyItemPathEnabled || UpdateModifiedEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
     public bool NewMenuVisible => !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
+    public bool IsPasteStateVisible => IsExplorerVisible && !IsRecycleBin && !IsAppDrive;
     public bool IsEditorTextChanged => OriginalEditorText != EditorText;
 
     #endregion
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

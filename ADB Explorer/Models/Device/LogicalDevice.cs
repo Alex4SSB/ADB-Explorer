@@ -175,7 +175,7 @@ public class LogicalDevice : Device
                         virt.SetItemsCount(((VirtualDrive)other).ItemsCount);
                         break;
                     default:
-                        throw new NotImplementedException();
+                        throw new NotSupportedException();
                 }
             }
             // Create a new drive if it doesn't exist
@@ -185,7 +185,7 @@ public class LogicalDevice : Device
                 added = true;
             }
             else
-                throw new NotImplementedException();
+                throw new NotSupportedException();
         }
 
         // Remove all drives that were not discovered in the last update
@@ -196,7 +196,13 @@ public class LogicalDevice : Device
         return added || removed;
     }
 
-    public void SetMmcDrive(LogicalDrive mmcDrive) => ((LogicalDriveViewModel)Drives.Where(d => d.Path == mmcDrive.Path).FirstOrDefault())?.SetExtension();
+    public void SetMmcDrive(LogicalDrive mmcDrive)
+    {
+        if (mmcDrive is null)
+            return;
+
+        ((LogicalDriveViewModel)Drives.FirstOrDefault(d => d.Path == mmcDrive.Path))?.SetExtension();
+    }
 
     /// <summary>
     /// Sets type of all <see cref="DriveViewModel"/> with unknown type as external. Changes the local property.

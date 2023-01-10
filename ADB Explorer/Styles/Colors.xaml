@@ -102,6 +102,8 @@
     <Color x:Key="DarkSeparatorForeground">#FF808080</Color>
     <Color x:Key="LightSeparatorForeground">#FF919191</Color>
 
+    <SolidColorBrush x:Key="MenuSeparatorColor" Color="#FFB6BDC5" />
+
     <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="#FFABA673" />
 
     <Color x:Key="DarkNewDeviceAltBorder">#FF228B22</Color>

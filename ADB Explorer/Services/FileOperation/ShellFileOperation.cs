@@ -22,7 +22,7 @@ public static class ShellFileOperation
     {
         foreach (var item in items)
         {
-            Data.fileOperationQueue.AddOperation(new FileDeleteOperation(dispatcher, device, item, fileList));
+            Data.FileOpQ.AddOperation(new FileDeleteOperation(dispatcher, device, item, fileList));
         }
     }
 
@@ -51,7 +51,7 @@ public static class ShellFileOperation
                 {
                     foreach (var item in items)
                     {
-                        Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, item.FullName, currentPath, fileList));
+                        Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, item.FullName, currentPath, fileList));
                     }
                 });
             });
@@ -63,7 +63,7 @@ public static class ShellFileOperation
                 if (AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath))
                     continue;
 
-                Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList));
+                Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList));
             }
         }
         else
@@ -75,7 +75,7 @@ public static class ShellFileOperation
                 {
                     targetName = $"{((FileClass)item).NoExtName}{FileClass.ExistingIndexes(fileList, ((FileClass)item).NoExtName, isCopy)}{((FileClass)item).Extension}";
                 }
-                Data.fileOperationQueue.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, isCopy));
+                Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, isCopy));
             }
         }
     }
@@ -151,7 +151,7 @@ public static class ShellFileOperation
         string[] existingItems = Array.Empty<string>();
         string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : targetName;
 
-        var moveTask = Task.Run(() =>
+        await Task.Run(() =>
         {
             if (targetPath == currentPath)
                 return;
@@ -169,49 +169,46 @@ public static class ShellFileOperation
             }
         });
 
-        await moveTask.ContinueWith((t) =>
+        await dispatcher.BeginInvoke(async () =>
         {
-            App.Current.Dispatcher.BeginInvoke(async () =>
+            string primaryText = "";
+            if (merge)
             {
-                string primaryText = "";
-                if (merge)
-                {
-                    if (pasteItems.All(item => item.IsDirectory))
-                        primaryText = "Merge";
-                    else
-                        primaryText = "Merge or Replace";
-                }
+                if (pasteItems.All(item => item.IsDirectory))
+                    primaryText = "Merge";
                 else
-                    primaryText = "Replace";
+                    primaryText = "Merge or Replace";
+            }
+            else
+                primaryText = "Replace";
 
-                if (existingItems.Length is int count and > 0)
+            if (existingItems.Length is int count and > 0)
+            {
+                var result = await DialogService.ShowConfirmation(
+                    $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")} in {destination}",
+                    "Paste Conflicts",
+                    primaryText: primaryText,
+                    secondaryText: count == pasteItems.Count() ? "" : "Skip",
+                    cancelText: "Cancel",
+                    icon: DialogService.DialogIcon.Exclamation);
+
+                if (result.Item1 is ContentDialogResult.None)
                 {
-                    var result = await DialogService.ShowConfirmation(
-                        $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")} in {destination}",
-                        "Paste Conflicts",
-                        primaryText: primaryText,
-                        secondaryText: count == pasteItems.Count() ? "" : "Skip",
-                        cancelText: "Cancel",
-                        icon: DialogService.DialogIcon.Exclamation);
-
-                    if (result.Item1 is ContentDialogResult.None)
-                    {
-                        return;
-                    }
-                    else if (result.Item1 is ContentDialogResult.Secondary)
-                    {
-                        pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
-                    }
+                    return;
                 }
+                else if (result.Item1 is ContentDialogResult.Secondary)
+                {
+                    pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
+                }
+            }
 
-                MoveItems(device: device,
-                          items: pasteItems,
-                          targetPath: targetPath,
-                          currentPath: currentPath,
-                          fileList: fileList,
-                          dispatcher: dispatcher,
-                          isCopy: isCopy);
-            });
+            MoveItems(device: device,
+                      items: pasteItems,
+                      targetPath: targetPath,
+                      currentPath: currentPath,
+                      fileList: fileList,
+                      dispatcher: dispatcher,
+                      isCopy: isCopy);
         });
     }
 
@@ -235,7 +232,7 @@ public static class ShellFileOperation
     {
         foreach (var item in items)
         {
-            dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, item)));
+            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, item)));
         }
     }
 
@@ -243,7 +240,7 @@ public static class ShellFileOperation
     {
         foreach (var item in items)
         {
-            dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, new(item), pushPackage: true, isPackagePath: isPackagePath)));
+            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, new(item), pushPackage: true, isPackagePath: isPackagePath)));
         }
     }
 
@@ -251,7 +248,7 @@ public static class ShellFileOperation
     {
         foreach (var item in packages)
         {
-            dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new PackageInstallOperation(dispatcher, device, packageName: item, packageList: packageList)));
+            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, packageName: item, packageList: packageList)));
         }
     }
 
@@ -310,7 +307,7 @@ public static class ShellFileOperation
 
             if (((FileClass)item).ModifiedTime is DateTime modified && modified > nameDate)
             {
-                dispatcher.Invoke(() => Data.fileOperationQueue.AddOperation(new FileChangeModifiedOperation(dispatcher, device, item, fileList, nameDate)));
+                dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new FileChangeModifiedOperation(dispatcher, device, item, fileList, nameDate)));
             }
         }
     }

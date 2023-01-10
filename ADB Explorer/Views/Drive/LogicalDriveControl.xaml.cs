@@ -19,6 +19,7 @@ public partial class LogicalDriveControl : UserControl
 
     private void Button_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        ((DriveViewModel)((Button)sender).DataContext).SelectCommand.Action();
+        if (((Button)sender).DataContext is DriveViewModel drive)
+            drive.SelectCommand.Action();
     }
 }

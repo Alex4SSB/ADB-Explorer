@@ -2,6 +2,7 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
@@ -139,6 +140,15 @@
                     </DoubleAnimation.EasingFunction>
                 </DoubleAnimation>
             </Storyboard>
+            <Storyboard x:Key="PulsatingBackgroundStoryBoard" RepeatBehavior="3x">
+                <ColorAnimation
+                    AutoReverse="True"
+                    Storyboard.TargetName="Background"
+                    Storyboard.TargetProperty="Background.(SolidColorBrush.Color)"
+                    From="#00000000"
+                    To="Gray"
+                    Duration="00:00:00.15" />
+            </Storyboard>
         </ControlTemplate.Resources>
         <Grid
             x:Name="ContentRoot"
@@ -174,6 +184,7 @@
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.BeginAnimation)}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.AnimateOnClick)}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
             </MultiDataTrigger>
@@ -256,6 +267,16 @@
                     <BeginStoryboard Storyboard="{StaticResource DownMarqueeStoryBoard}" />
                 </MultiTrigger.EnterActions>
             </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:StyleHelper.ActivateAnimation" Value="True" />
+                    <Condition Property="helpers:StyleHelper.ContentAnimation" Value="Pulsate" />
+                    <Condition Property="helpers:StyleHelper.UseFluentStyles" Value="True" />
+                </MultiTrigger.Conditions>
+                <MultiTrigger.EnterActions>
+                    <BeginStoryboard Storyboard="{StaticResource PulsatingBackgroundStoryBoard}" />
+                </MultiTrigger.EnterActions>
+            </MultiTrigger>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
                 <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPointerOver}" />
@@ -278,7 +299,6 @@
                 BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
                 Style="{StaticResource MenuBorderStyle}" />
-
             <ContentPresenter
                 x:Name="ContentPresenter"
                 Margin="{TemplateBinding Padding}"
@@ -286,7 +306,6 @@
                 ContentSource="Header"
                 RecognizesAccessKey="True"
                 SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-
             <ui:MenuPopup
                 x:Name="PART_Popup"
                 AllowsTransparency="true"
@@ -611,6 +630,7 @@
         <Setter Property="helpers:StyleHelper.UseFluentStyles" Value="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
         <Setter Property="helpers:StyleHelper.BeginAnimation" Value="False" />
+        <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="True" />
         <Setter Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
         <Setter Property="helpers:StyleHelper.PressedForeground" Value="Transparent" />
         <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrush}" />

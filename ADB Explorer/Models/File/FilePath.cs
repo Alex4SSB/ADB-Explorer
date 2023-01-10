@@ -1,4 +1,6 @@
-﻿using static ADB_Explorer.Converters.FileTypeClass;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.ViewModels;
+using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Services.ADBService;
 
 namespace ADB_Explorer.Models;
@@ -17,7 +19,7 @@ public enum RelationType
     Unrelated,
 }
 
-public class FilePath : INotifyPropertyChanged
+public class FilePath : ViewModelBase
 {
     public PathType PathType { get; protected set; }
 
@@ -134,23 +136,6 @@ public class FilePath : INotifyPropertyChanged
 
         return RelationType.Unrelated;
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-        {
-            return false;
-        }
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public override string ToString()
     {

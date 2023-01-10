@@ -5,7 +5,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
-public abstract class DeviceAction : ViewModelBase
+public abstract class DeviceAction
 {
     protected DeviceViewModel device;
 
@@ -49,7 +49,7 @@ public abstract class NewDeviceAction : DeviceAction
 
 public class BrowseCommand : LogicalDeviceAction
 {
-    public override bool IsEnabled => !((LogicalDeviceViewModel)device).IsOpen
+    public override bool IsEnabled => !device.IsOpen
         && device.Status is AbstractDevice.DeviceStatus.Ok;
 
     public BrowseCommand(LogicalDeviceViewModel device) : base(device)

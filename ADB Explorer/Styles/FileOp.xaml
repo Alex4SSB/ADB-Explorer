@@ -84,7 +84,7 @@
                         <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
                         <Setter Property="FontWeight" Value="Regular" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=ShowExtensionsCheckBox, Path=IsChecked}" Value="False">
+                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
                                 <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">

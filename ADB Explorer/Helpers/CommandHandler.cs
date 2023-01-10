@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Helpers;
+﻿using ADB_Explorer.ViewModels;
+
+namespace ADB_Explorer.Helpers;
 
 public class CommandHandler : ICommand
 {
@@ -27,4 +29,21 @@ public class CommandHandler : ICommand
         remove => CommandManager.RequerySuggested -= value;
     }
 
+}
+
+public class BaseAction : ViewModelBase
+{
+    private readonly Func<bool> canExecute;
+    public bool IsEnabled => canExecute();
+
+    private readonly Action action;
+
+    private ICommand command;
+    public ICommand Command => command ??= new CommandHandler(action, canExecute);
+
+    public BaseAction(Func<bool> canExecute, Action action)
+    {
+        this.canExecute = canExecute;
+        this.action = action;
+    }
 }

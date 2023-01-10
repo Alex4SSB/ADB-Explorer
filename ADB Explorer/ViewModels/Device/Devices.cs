@@ -37,6 +37,8 @@ public class Devices : AbstractDevice
 
     public int Count => UIList.Count(d => d.DeviceExists);
 
+    public ObservableProperty<string> ObservableCount = new();
+
     public string AppTitle
     {
         get
@@ -63,6 +65,15 @@ public class Devices : AbstractDevice
             RetrieveHistoryDevices();
 
         UIList.CollectionChanged += UIList_CollectionChanged;
+        PropertyChanged += Devices_PropertyChanged;
+
+        ObservableCount.Value = "0";
+    }
+
+    private void Devices_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Count))
+            ObservableCount.Value = Count.ToString();
     }
 
     private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

@@ -12,6 +12,7 @@ public static class StyleHelper
         RightMarquee,
         UpMarquee,
         DownMarquee,
+        Pulsate,
     }
 
     public static ContentAnimation GetContentAnimation(Control control) =>
@@ -49,6 +50,19 @@ public static class StyleHelper
     public static readonly DependencyProperty UseFluentStylesProperty =
         DependencyProperty.RegisterAttached(
             "UseFluentStyles",
+            typeof(bool),
+            typeof(StyleHelper),
+            null);
+
+    public static bool GetAnimateOnClick(Control control) =>
+    (bool)control.GetValue(AnimateOnClickProperty);
+
+    public static void SetAnimateOnClick(Control control, bool value) =>
+        control.SetValue(AnimateOnClickProperty, value);
+
+    public static readonly DependencyProperty AnimateOnClickProperty =
+        DependencyProperty.RegisterAttached(
+            "AnimateOnClick",
             typeof(bool),
             typeof(StyleHelper),
             null);
@@ -130,4 +144,13 @@ public static class StyleHelper
             typeof(string),
             typeof(StyleHelper),
             null);
+
+    public static void VerifyIcon(ref string icon)
+    {
+        if (!IsFontIcon(icon))
+            throw new ArgumentException("An icon must be one char in range E000-F8FF", nameof(icon));
+    }
+
+    public static bool IsFontIcon(string icon) =>
+        icon.Length == 1 && char.GetUnicodeCategory(icon, 0) is UnicodeCategory.PrivateUse;
 }

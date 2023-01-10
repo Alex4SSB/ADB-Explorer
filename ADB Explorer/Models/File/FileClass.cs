@@ -15,6 +15,14 @@ public class FileClass : FileStat
         Copy,
     }
 
+    public static string CutTypeString(CutType cutType) => cutType switch
+    {
+        CutType.None => "",
+        CutType.Cut => "Cut",
+        CutType.Copy => "Copied",
+        _ => throw new NotImplementedException(),
+    };
+
     private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
 
     public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false)
@@ -33,14 +41,14 @@ public class FileClass : FileStat
     { }
 
     public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
-        (
-            fileName: fileStat.FullName,
-            path: fileStat.FullPath,
-            type: fileStat.Type,
-            size: fileStat.Size,
-            modifiedTime: fileStat.ModifiedTime,
-            isLink: fileStat.IsLink
-        );
+    (
+        fileName: fileStat.FullName,
+        path: fileStat.FullPath,
+        type: fileStat.Type,
+        size: fileStat.Size,
+        modifiedTime: fileStat.ModifiedTime,
+        isLink: fileStat.IsLink
+    );
 
     public static FileClass FromWindowsPath(FilePath androidTargetPath, FilePath windowsFilePath)
     {

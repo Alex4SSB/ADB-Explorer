@@ -8,7 +8,6 @@ namespace ADB_Explorer;
 public partial class App : Application
 {
     
-
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         // Restore application-scope property from isolated storage

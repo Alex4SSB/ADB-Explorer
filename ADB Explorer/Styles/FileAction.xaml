@@ -1,0 +1,235 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+    <Style
+        x:Key="MenuIconStyle"
+        BasedOn="{StaticResource DisabledGlyphStyle}"
+        TargetType="ui:FontIcon">
+        <Setter Property="FontSize" Value="{Binding IconSize}" />
+        <Setter Property="Glyph" Value="{Binding Icon}" />
+    </Style>
+    <Style
+        x:Key="MenuSelectionBarStyle"
+        BasedOn="{StaticResource MenuIconStyle}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Glyph" Value="&#xE73C;" />
+        <Setter Property="Margin" Value="0,0,0,-16" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsSelectionBarVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="InvisibleTextBlockStyle"
+        BasedOn="{StaticResource DisabledTextBlockStyle}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="Text" Value="">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <ui:FontIcon
+        x:Key="MenuIcon"
+        x:Shared="False"
+        Style="{StaticResource MenuIconStyle}" />
+    <Grid
+        x:Key="AltIconSubMenuPanel"
+        Margin="-3,0,-4,0"
+        x:Shared="False">
+        <ui:FontIcon
+            HorizontalAlignment="Left"
+            Glyph="{Binding Icon}"
+            Style="{StaticResource MenuIconStyle}" />
+        <ui:FontIcon
+            Margin="11,0,0,0"
+            FontSize="{Binding AltIconSize}"
+            Glyph="{Binding AltIcon}"
+            Style="{StaticResource DisabledGlyphStyle}" />
+    </Grid>
+    <TextBlock
+        x:Key="IconTextBlock"
+        x:Shared="False"
+        Style="{StaticResource DisabledTextBlockStyle}"
+        Text="{Binding Icon}" />
+    <DataTemplate x:Key="IconMenuTemplate">
+        <Grid>
+            <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
+            <ui:FontIcon Style="{StaticResource MenuSelectionBarStyle}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="AnimatedNotifyTemplate">
+        <Grid>
+            <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
+            <TextBlock
+                Margin="0,0,-10,-12"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Style="{StaticResource DisabledTextBlockStyle}"
+                Text="{Binding AltText}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="AltIconMenuTemplate">
+        <ui:SimpleStackPanel
+            Margin="-5,0"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="-4">
+            <ui:FontIcon Glyph="{Binding Icon}" Style="{StaticResource MenuIconStyle}" />
+            <ui:FontIcon
+                FontSize="{Binding AltIconSize}"
+                Glyph="{Binding AltIcon}"
+                Style="{StaticResource DisabledGlyphStyle}" />
+        </ui:SimpleStackPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="DynamicAltTextTemplate">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon Glyph="{Binding Icon}" Style="{StaticResource MenuIconStyle}" />
+            <TextBlock
+                Grid.Column="1"
+                Height="{Binding IconSize}"
+                Margin="6,0,0,0"
+                Style="{StaticResource InvisibleTextBlockStyle}"
+                Text="{Binding AltText}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="MenuSeparatorTemplate">
+        <Border
+            Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=ActualHeight}"
+            BorderBrush="{StaticResource MenuSeparatorColor}"
+            BorderThickness="1,0,0,0" />
+    </DataTemplate>
+    <helpers:MenuTemplateSelector
+        x:Key="MenuTemplateSelector"
+        AltIconSubMenuTemplate="{x:Null}"
+        AltIconTemplate="{StaticResource AltIconMenuTemplate}"
+        AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
+        DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
+        IconMenuTemplate="{StaticResource IconMenuTemplate}"
+        SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
+        SubMenuSeparatorTemplate="{x:Null}"
+        SubMenuTemplate="{x:Null}" />
+    <Style
+        x:Key="BaseMenuItemStyle"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="Command" Value="{Binding Action.Command.Command}" />
+        <Setter Property="ItemsSource" Value="{Binding Children}" />
+    </Style>
+    <Style
+        x:Key="IconMenuStyle"
+        BasedOn="{StaticResource BaseMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="MinWidth" Value="42" />
+        <Setter Property="ToolTip" Value="{Binding Tooltip}" />
+        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
+    </Style>
+    <Style
+        x:Key="DynamicAltTextStyle"
+        BasedOn="{StaticResource IconMenuStyle}"
+        TargetType="MenuItem" />
+    <Style
+        x:Key="AltIconMenuStyle"
+        BasedOn="{StaticResource IconMenuStyle}"
+        TargetType="MenuItem" />
+    <Style
+        x:Key="AnimatedNotifyStyle"
+        BasedOn="{StaticResource DynamicAltTextStyle}"
+        TargetType="MenuItem">
+        <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="False" />
+        <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
+    </Style>
+    <Style
+        x:Key="MenuSeparatorStyle"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="IsEnabled" Value="False" />
+        <Setter Property="Padding" Value="4,0" />
+    </Style>
+    <Style
+        x:Key="SubMenuSeparatorStyle"
+        BasedOn="{StaticResource BaseMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Separator Margin="5,3" Background="Gray" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="IsEnabled" Value="False" />
+        <Setter Property="Padding" Value="0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding HideSeparator}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="SubMenuItemStyle"
+        BasedOn="{StaticResource BaseMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="Header" Value="{Binding Action.Description}" />
+        <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
+        <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IconIsText}" Value="True">
+                <Setter Property="Icon" Value="{StaticResource IconTextBlock}" />
+            </DataTrigger>
+            <!--  Special case for empty trash context menu item  -->
+            <DataTrigger Binding="{Binding Icon}" Value="&#xF141;">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+            <!--  Special case for push packages menu item  -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Icon}" Value="&#xE7B8;" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PushPackageVisible}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="AltIconSubMenuItemStyle"
+        BasedOn="{StaticResource SubMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="Icon" Value="{StaticResource AltIconSubMenuPanel}" />
+    </Style>
+    <helpers:MenuStyleSelector
+        x:Key="MenuStyleSelector"
+        AltIconStyle="{StaticResource AltIconMenuStyle}"
+        AltIconSubMenuStyle="{StaticResource AltIconSubMenuItemStyle}"
+        AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
+        DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
+        IconMenuStyle="{StaticResource IconMenuStyle}"
+        SeparatorStyle="{StaticResource MenuSeparatorStyle}"
+        SubMenuSeparatorStyle="{StaticResource SubMenuSeparatorStyle}"
+        SubMenuStyle="{StaticResource SubMenuItemStyle}" />
+    <Style
+        x:Key="ToolBarStyle"
+        x:Shared="False"
+        BasedOn="{StaticResource MenuStyle}"
+        TargetType="Menu">
+        <Setter Property="Margin" Value="7,0,0,0" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource MenuTemplateSelector}" />
+        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />
+    </Style>
+    <Style
+        x:Key="ExplorerContextMenuStyle"
+        BasedOn="{StaticResource AdbContextMenuStyle}"
+        TargetType="ContextMenu">
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource MenuTemplateSelector}" />
+        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />
+    </Style>
+</ResourceDictionary>

@@ -2,6 +2,7 @@ using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 
 namespace ADB_Test
@@ -128,6 +129,20 @@ namespace ADB_Test
             Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(new[] { "" }, true));
             Assert.AreEqual(" - Copy 2", FileClass.ExistingIndexes(names, true));
             Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(names1, true));
+        }
+
+        [TestMethod]
+        public void VerifyIconTest()
+        {
+            var goodIcon = "\uE8EA";
+            var badIcon1 = "\u0050";
+            var badIcon2 = "FOO";
+
+            // Verify this does not throw an exception by simply executing it
+            StyleHelper.VerifyIcon(ref goodIcon);
+
+            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(ref badIcon1));
+            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(ref badIcon2));
         }
     }
 }

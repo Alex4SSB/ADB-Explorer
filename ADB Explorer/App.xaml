@@ -27,6 +27,7 @@
                 <ResourceDictionary Source="Styles\Controls\DataGrid.xaml" />
                 <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
                 <ResourceDictionary Source="Styles\Controls\SplitView.xaml" />
+                <ResourceDictionary Source="Styles\FileAction.xaml" />
                 <ResourceDictionary Source="Styles\Settings.xaml" />
                 <ResourceDictionary Source="Styles\Drive.xaml" />
                 <ResourceDictionary Source="Styles\Device.xaml" />

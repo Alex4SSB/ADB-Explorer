@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 
@@ -86,23 +87,10 @@ public static class UISettings
     }
 }
 
-public abstract class AbstractGroup : INotifyPropertyChanged
+public abstract class AbstractGroup : ViewModelBase
 {
     public List<AbstractSetting> Children { get; set; }
-    public event PropertyChangedEventHandler PropertyChanged;
 
-    protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 public class SettingsGroup : AbstractGroup
@@ -144,7 +132,7 @@ public class Ungrouped : AbstractGroup
     }
 }
 
-public abstract class AbstractSetting : INotifyPropertyChanged
+public abstract class AbstractSetting : ViewModelBase
 {
     protected readonly PropertyInfo valueProp;
     protected readonly PropertyInfo enableProp;
@@ -181,18 +169,6 @@ public abstract class AbstractSetting : INotifyPropertyChanged
         }
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 public class BoolSetting : AbstractSetting
@@ -328,23 +304,10 @@ public class EnumRadioButton
     }
 }
 
-public abstract class SettingButton : INotifyPropertyChanged
+public abstract class SettingButton : ViewModelBase
 {
     public virtual bool IsEnabled { get; } = true;
 
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 public class ResetCommand : SettingButton
