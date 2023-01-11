@@ -199,16 +199,16 @@ public partial class ADBService
             var path = match.Groups["TargetPath"].Value;
             UInt64 totalTransferred = UInt64.Parse(match.Groups["TotalTransferred"].Value);
             UInt64 totalSkipped = UInt64.Parse(match.Groups["TotalSkipped"].Value);
-            decimal? avrageRate = match.Groups["AverageRate"].Success ? decimal.Parse(match.Groups["AverageRate"].Value) : null;
+            decimal? averageRate = match.Groups["AverageRate"].Success ? decimal.Parse(match.Groups["AverageRate"].Value, CultureInfo.InvariantCulture) : null;
             UInt64? totalBytes = match.Groups["TotalBytes"].Success ? UInt64.Parse(match.Groups["TotalBytes"].Value) : null;
-            decimal? totalTime = match.Groups["TotalTime"].Success ? decimal.Parse(match.Groups["TotalTime"].Value) : null;
+            decimal? totalTime = match.Groups["TotalTime"].Success ? decimal.Parse(match.Groups["TotalTime"].Value, CultureInfo.InvariantCulture) : null;
 
             return new AdbSyncStatsInfo
             {
                 TargetPath = path,
                 FilesTransferred = totalTransferred,
                 FilesSkipped = totalSkipped,
-                AverageRate = avrageRate,
+                AverageRate = averageRate,
                 TotalBytes = totalBytes,
                 TotalTime = totalTime
             };
