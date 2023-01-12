@@ -1388,8 +1388,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.HomeEnabled = true;
         RuntimeSettings.BrowseDrive = null;
 
-        ExplorerGrid.ContextMenu.ItemsSource = ExplorerContextMenu.List;
-
         return _navigateToPath(realPath, bfNavigated);
     }
 
@@ -2584,23 +2582,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         RuntimeSettings.IsSettingsPaneOpen = false;
     }
 
-    private void PathMenuEdit_Click(object sender, RoutedEventArgs e)
-    {
-        PathBox.Focus();
-    }
-
     private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
     {
         UnfocusPathBox();
         ClearSelectedDrives();
-    }
-
-    private void PathMenuCopy_Click(object sender, RoutedEventArgs e)
-    {
-        var text = TextHelper.GetAltText(PathBox);
-
-        if (text != RECYCLE_PATH && text != PACKAGE_PATH)
-            Clipboard.SetText(text);
     }
 
     private void FilterHiddenFiles()

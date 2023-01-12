@@ -37,26 +37,6 @@
             TargetType="DataGridColumnHeader">
             <EventSetter Event="SizeChanged" Handler="DataGridColumnHeader_SizeChanged" />
         </Style>
-        <MenuItem
-            x:Key="PathMenuEdit"
-            x:Shared="False"
-            Click="PathMenuEdit_Click"
-            Header="Edit"
-            InputGestureText="F6">
-            <MenuItem.Icon>
-                <ui:FontIcon Glyph="&#xE70F;" />
-            </MenuItem.Icon>
-        </MenuItem>
-        <MenuItem
-            x:Key="PathMenuCopy"
-            x:Shared="False"
-            Click="PathMenuCopy_Click"
-            Header="Copy"
-            InputGestureText="Alt+F6">
-            <MenuItem.Icon>
-                <ui:FontIcon Glyph="&#xE8C8;" />
-            </MenuItem.Icon>
-        </MenuItem>
         <ContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
         <Menu
             x:Key="FileOpStopMenu"
@@ -137,13 +117,7 @@
                 </MenuItem.Header>
             </MenuItem>
         </Menu>
-        <ContextMenu
-            x:Key="PathButtonsMenu"
-            Name="PathButtonsMenu"
-            Resources="{StaticResource ContextMenuStyles}">
-            <StaticResource ResourceKey="PathMenuEdit" />
-            <StaticResource ResourceKey="PathMenuCopy" />
-        </ContextMenu>
+        <ContextMenu x:Key="PathButtonsMenu" Style="{StaticResource PathBoxContextMenuStyle}" />
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"

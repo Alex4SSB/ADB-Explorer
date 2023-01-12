@@ -209,3 +209,14 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EmptyTrash), "\uF141"),
     };
 }
+
+internal static class PathContextMenu
+{
+    public static ObservableList<SubMenu> List { get; } = new()
+    {
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EditCurrentPath), "\uE70F"),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyCurrentPath), "\uE8C8"),
+        new SubMenuSeparator(() => true),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh), "\uE72C"),
+    };
+}

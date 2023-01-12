@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <Style
         x:Key="MenuIconStyle"
@@ -226,10 +227,22 @@
         <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />
     </Style>
     <Style
-        x:Key="ExplorerContextMenuStyle"
+        x:Key="BaseContextMenuStyle"
         BasedOn="{StaticResource AdbContextMenuStyle}"
         TargetType="ContextMenu">
         <Setter Property="ItemTemplateSelector" Value="{StaticResource MenuTemplateSelector}" />
         <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />
+    </Style>
+    <Style
+        x:Key="ExplorerContextMenuStyle"
+        BasedOn="{StaticResource BaseContextMenuStyle}"
+        TargetType="ContextMenu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ExplorerContextMenu.List}}" />
+    </Style>
+    <Style
+        x:Key="PathBoxContextMenuStyle"
+        BasedOn="{StaticResource BaseContextMenuStyle}"
+        TargetType="ContextMenu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:PathContextMenu.List}}" />
     </Style>
 </ResourceDictionary>
