@@ -103,6 +103,11 @@ internal static class AppActions
             () => Data.RuntimeSettings.Copy = true,
             "Copy",
             new(Key.C, ModifierKeys.Control)),
+        new(FileAction.FileActionType.KeyboardPaste,
+            () => Data.FileActions.IsKeyboardPasteEnabled,
+            () => Data.RuntimeSettings.Paste = true,
+            Data.FileActions.PasteAction,
+            new(Key.V, ModifierKeys.Control)),
         new(FileAction.FileActionType.Paste,
             () => Data.FileActions.PasteEnabled,
             () => Data.RuntimeSettings.Paste = true,
@@ -176,10 +181,17 @@ internal static class AppActions
             () => Data.FileActions.EmptyTrash,
             () => { },
             "Recycle Bin Is Empty"),
+        new(FileAction.FileActionType.None,
+            new(),
+            "",
+            new(Key.F10)),
     };
 
     public static List<KeyBinding> Bindings =>
-        List.Select(action => action.KeyBinding).Where(binding => binding is not null).ToList();
+        List.Where(a => a.Name is not FileAction.FileActionType.Paste)
+            .Select(action => action.KeyBinding)
+            .Where(binding => binding is not null)
+            .ToList();
 }
 
 internal class FileAction : ViewModelBase
@@ -207,6 +219,7 @@ internal class FileAction : ViewModelBase
         SelectAll,
         Cut,
         Copy,
+        KeyboardPaste,
         Paste,
         Rename,
         Restore,

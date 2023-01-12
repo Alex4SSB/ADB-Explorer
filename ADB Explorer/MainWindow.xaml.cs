@@ -833,6 +833,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileActions.CopyEnabled = !FileActions.IsRecycleBin && FileActions.IsRegularItem && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
         FileActions.PasteEnabled = IsPasteEnabled();
+        FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
 
         FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk) && !FileActions.IsRecycleBin;
         FileActions.IsCopyItemPathEnabled = selectedFiles.Count() == 1 && !FileActions.IsRecycleBin;
@@ -2062,55 +2063,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void IsInEditMode(bool isEditing) => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = isEditing;
 
-    public static Key RealKey(KeyEventArgs e) => e.Key switch
-    {
-        Key.System => e.SystemKey,
-        Key.ImeProcessed => e.ImeProcessedKey,
-        Key.DeadCharProcessed => e.DeadCharProcessedKey,
-        _ => e.Key,
-    };
-
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
-        var nonShortcuttableKeys = new[] { Key.LeftAlt, Key.RightAlt, Key.LeftCtrl, Key.RightCtrl, Key.LeftShift, Key.RightShift };
-        var actualKey = RealKey(e);
-        bool alt, ctrl, shift;
-
-        if (!e.IsDown || nonShortcuttableKeys.Contains(actualKey))
-            return;
-
-        ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-        alt = Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
-        shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
-
-        if (actualKey == Key.V && ctrl && (FileActions.PasteEnabled || IsPasteEnabled(true)))
-        {
-            PasteFiles();
-        }
-        else if (actualKey == Key.F10)
-        { }
-        else if (actualKey is Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Escape or Key.Home or Key.End)
+        if (e.Key is Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Escape or Key.Home or Key.End)
         {
             bool handle = false;
 
             if (FileActions.IsExplorerVisible)
             {
-                handle |= ExplorerGridKeyNavigation(actualKey);
+                handle |= ExplorerGridKeyNavigation(e.Key);
             }
             else if (FileActions.IsDriveViewVisible)
             {
-                handle |= DriveViewKeyNavigation(actualKey);
+                handle |= DriveViewKeyNavigation(e.Key);
             }
 
-            if (!handle)
-                return;
+            e.Handled = handle;
         }
-        else
-        {
-            return;
-        }
-
-        e.Handled = true;
     }
 
     private bool DriveViewKeyNavigation(Key key)
@@ -3202,6 +3171,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.CutEnabled = isCopy;
 
         FileActions.PasteEnabled = IsPasteEnabled();
+        FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
 
         FilterFileActions();
     }

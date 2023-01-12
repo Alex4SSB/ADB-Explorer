@@ -128,6 +128,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref pasteEnabled, value);
     }
 
+    private bool isKeyboardPasteEnabled;
+    public bool IsKeyboardPasteEnabled
+    {
+        get => isKeyboardPasteEnabled;
+        set => Set(ref isKeyboardPasteEnabled, value);
+    }
+
     private bool renameEnabled;
     public bool RenameEnabled
     {

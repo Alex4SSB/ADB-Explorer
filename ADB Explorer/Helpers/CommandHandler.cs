@@ -46,4 +46,10 @@ public class BaseAction : ViewModelBase
         this.canExecute = canExecute;
         this.action = action;
     }
+
+    public BaseAction()
+    {
+        canExecute = () => true;
+        action = () => { };
+    }
 }
