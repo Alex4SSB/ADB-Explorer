@@ -1302,6 +1302,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
         FileActions.PushPackageEnabled = Settings.EnableApk;
 
+        UpdateFileActions();
+
 #if DEBUG
         TestCurrentOperation();
 #endif
