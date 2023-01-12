@@ -841,7 +841,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.ContextNewEnabled = !selectedFiles.Any() && !FileActions.IsRecycleBin;
         FileActions.SubmenuUninstallEnabled = FileActions.IsTemp && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk);
 
-        FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && selectedFiles.All(file => file.Type is FileType.File);
+        FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && selectedFiles.All(file => file.Type is FileType.File && !file.IsApk);
 
         FileActions.EditFileEnabled = !FileActions.IsRecycleBin
             && selectedFiles.Count() == 1

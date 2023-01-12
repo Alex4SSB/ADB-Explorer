@@ -148,7 +148,11 @@ public class AppRuntimeSettings : ViewModelBase
     public NavHistory.SpecialLocation LocationToNavigate
     {
         get => locationToNavigate;
-        set => Set(ref locationToNavigate, value);
+        set
+        {
+            if (!Set(ref locationToNavigate, value))
+                OnPropertyChanged();
+        }
     }
 
     private bool isDevicesViewEnabled = false;
