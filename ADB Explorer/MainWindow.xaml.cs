@@ -1981,37 +1981,47 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+    private void Window_MouseUp(object sender, MouseButtonEventArgs e) => e.Handled = e.ChangedButton switch
     {
-        switch (e.ChangedButton)
+        MouseButton.XButton1 => NavigateBack(),
+        MouseButton.XButton2 => NavigateForward(),
+        _ => false,
+    };
+
+    private static bool NavigateForward()
+    {
+        if (!NavHistory.ForwardAvailable)
         {
-            case MouseButton.XButton1:
-                if (NavHistory.BackAvailable)
-                    NavigateBack();
-                break;
-            case MouseButton.XButton2:
-                if (NavHistory.ForwardAvailable)
-                    NavigateForward();
-                break;
+            if (FileActions.IsDriveViewVisible)
+                ClearSelectedDrives();
+
+            return false;
         }
+
+        var command = AppActions.List.First(action => action.Name is FileAction.FileActionType.Forward).Command.Command as CommandHandler;
+
+        RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.Forward;
+        command.OnExecute.Value ^= true;
+
+        return true;
     }
 
-    private void NavigateForward()
+    private static bool NavigateBack()
     {
-        //AnimateControl(ForwardButton);
-        NavigateToLocation(NavHistory.GoForward(), true);
-    }
+        if (!NavHistory.BackAvailable)
+        {
+            if (FileActions.IsDriveViewVisible)
+                ClearSelectedDrives();
 
-    private void NavigateBack()
-    {
-        //AnimateControl(BackButton);
-        NavigateToLocation(NavHistory.GoBack(), true);
-    }
+            return false;
+        }
 
-    private void AnimateControl(Control control)
-    {
-        StyleHelper.SetActivateAnimation(control, true);
-        Task.Delay(400).ContinueWith(_ => Dispatcher.Invoke(() => StyleHelper.SetActivateAnimation(control, false)));
+        var command = AppActions.List.First(action => action.Name is FileAction.FileActionType.Back).Command.Command as CommandHandler;
+
+        RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.Back;
+        command.OnExecute.Value ^= true;
+
+        return true;
     }
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)

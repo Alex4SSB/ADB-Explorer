@@ -133,6 +133,8 @@
         <Setter Property="MinWidth" Value="42" />
         <Setter Property="ToolTip" Value="{Binding Tooltip}" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
+        <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
+        <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
     </Style>
     <Style
         x:Key="DynamicAltTextStyle"
@@ -145,10 +147,7 @@
     <Style
         x:Key="AnimatedNotifyStyle"
         BasedOn="{StaticResource DynamicAltTextStyle}"
-        TargetType="MenuItem">
-        <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="False" />
-        <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
-    </Style>
+        TargetType="MenuItem" />
     <Style
         x:Key="MenuSeparatorStyle"
         BasedOn="{StaticResource AdbMenuItemStyle}"

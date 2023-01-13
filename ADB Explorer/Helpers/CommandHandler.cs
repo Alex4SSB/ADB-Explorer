@@ -7,9 +7,13 @@ public class CommandHandler : ICommand
     private readonly Action _action;
     private readonly Func<bool> _canExecute;
 
+    public ObservableProperty<bool> OnExecute { get; set; } = new();
+
     public void Execute(object parameter)
     {
         _action();
+
+        OnExecute.Value ^= true;
     }
 
     public bool CanExecute(object parameter)

@@ -12,7 +12,7 @@ internal static class AppActions
             () => Data.FileActions.HomeEnabled,
             () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.DriveView,
             "Device Drives",
-            new(Key.H, ModifierKeys.Control)),
+            new(Key.H, ModifierKeys.Alt)),
         new(FileAction.FileActionType.Back,
             () => NavHistory.BackAvailable,
             () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.Back,

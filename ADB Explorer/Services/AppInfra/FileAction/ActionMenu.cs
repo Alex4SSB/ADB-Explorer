@@ -6,6 +6,14 @@ namespace ADB_Explorer.Services;
 
 internal abstract class ActionMenu : ViewModelBase
 {
+    public enum AnimationSource
+    {
+        None,
+        Click,
+        Command,
+        External,
+    }
+
     #region Full properties
 
     public FileAction Action { get; }
@@ -18,11 +26,22 @@ internal abstract class ActionMenu : ViewModelBase
     
     public StyleHelper.ContentAnimation Animation { get; }
 
+    public AnimationSource ActionAnimationSource { get; }
+
+    private bool activateAnimation = false;
+    public bool ActivateAnimation
+    {
+        get => activateAnimation;
+        set => Set(ref activateAnimation, value);
+    }
+
     #endregion
-    
+
+    public bool AnimateOnClick => ActionAnimationSource is AnimationSource.Click;
+
     public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
 
-    protected ActionMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 18)
+    protected ActionMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 18, AnimationSource animationSource = AnimationSource.Command)
     {
         if (this is not SubMenu)
             StyleHelper.VerifyIcon(ref icon);
@@ -31,8 +50,20 @@ internal abstract class ActionMenu : ViewModelBase
         Animation = animation;
         IconSize = iconSize;
         Children = children;
-
+        ActionAnimationSource = animationSource;
         Action = fileAction;
+
+        if (animationSource is AnimationSource.Command)
+        {
+            ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
+            {
+                if (!Data.Settings.IsAnimated)
+                    return;
+
+                ActivateAnimation = true;
+                Task.Delay(200).ContinueWith((t) => ActivateAnimation = false);
+            };
+        }
     }
 
     protected ActionMenu()
@@ -44,44 +75,34 @@ internal class MenuSeparator : ActionMenu
 
 internal class AltTextMenu : ActionMenu
 {
-    public bool AnimateIcon { get; }
-
-    private bool activateAnimation = false;
-    public bool ActivateAnimation
-    {
-        get => activateAnimation;
-        set => Set(ref activateAnimation, value);
-    }
-
     protected string altText = "";
     public string AltText
     {
         get => altText;
         set
         {
-            if (Set(ref altText, value) && Data.Settings.IsAnimated && !AnimateIcon)
+            if (Set(ref altText, value) && Data.Settings.IsAnimated && ActionAnimationSource is AnimationSource.External)
             {
                 ActivateAnimation = true;
-                ActivateAnimation = false;
+                Task.Delay(Animation is StyleHelper.ContentAnimation.Pulsate ? 500 : 200).ContinueWith((t) => ActivateAnimation = false);
             }
         }
     }
 
-    public AltTextMenu(FileAction fileAction, string icon, string altText = null, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, bool animateIcon = true, int iconSize = 18)
-        : base(fileAction, icon, children, animation, iconSize)
+    public AltTextMenu(FileAction fileAction, string icon, string altText = null, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 18, AnimationSource animationSource = AnimationSource.Command)
+        : base(fileAction, icon, children, animation, iconSize, animationSource)
     {
         if (children is not null && children.Any())
             altText = fileAction.Description;
 
-        AnimateIcon = animateIcon;
         AltText = altText;
     }
 }
 
 internal class DynamicAltTextMenu : AltTextMenu
 {
-    public DynamicAltTextMenu(FileAction fileAction, ObservableProperty<string> altText, string icon,  StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, bool animateIcon = true, int iconSize = 20)
-        : base(fileAction, icon, altText, animation: animation, animateIcon: animateIcon, iconSize: iconSize)
+    public DynamicAltTextMenu(FileAction fileAction, ObservableProperty<string> altText, string icon, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 20, AnimationSource animationSource = AnimationSource.Command)
+        : base(fileAction, icon, altText, animation: animation, iconSize: iconSize, animationSource: animationSource)
     {
         altText.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => AltText = e.NewValue;
     }
@@ -109,8 +130,8 @@ internal class IconMenu : ActionMenu
 
 internal class AnimatedNotifyMenu : DynamicAltTextMenu
 {
-    public AnimatedNotifyMenu(FileAction fileAction, ObservableProperty<string> altText, string icon, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.Pulsate, bool animateIcon = false, int iconSize = 18)
-        : base(fileAction, altText, icon, animation, animateIcon, iconSize)
+    public AnimatedNotifyMenu(FileAction fileAction, ObservableProperty<string> altText, string icon, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.Pulsate, int iconSize = 18, AnimationSource animationSource = AnimationSource.External)
+        : base(fileAction, altText, icon, animation, iconSize, animationSource)
     { }
 }
 
