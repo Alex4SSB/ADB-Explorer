@@ -35,6 +35,27 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="OperationsIconStyle"
+        BasedOn="{StaticResource MenuIconStyle}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="OperationsProgressRingStyle"
+        BasedOn="{StaticResource FluentProgressRingStyle}"
+        TargetType="ui:ProgressRing">
+        <Setter Property="IsActive" Value="True" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <ui:FontIcon
         x:Key="MenuIcon"
         x:Shared="False"
@@ -103,6 +124,12 @@
                 Text="{Binding AltText}" />
         </Grid>
     </DataTemplate>
+    <DataTemplate x:Key="AltObjectMenuTemplate">
+        <Grid>
+            <ui:FontIcon Style="{StaticResource OperationsIconStyle}" />
+            <ui:ProgressRing Style="{StaticResource OperationsProgressRingStyle}" />
+        </Grid>
+    </DataTemplate>
     <DataTemplate x:Key="MenuSeparatorTemplate">
         <Border
             Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=ActualHeight}"
@@ -113,6 +140,7 @@
         x:Key="MenuTemplateSelector"
         AltIconSubMenuTemplate="{x:Null}"
         AltIconTemplate="{StaticResource AltIconMenuTemplate}"
+        AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
         AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
         DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
@@ -139,15 +167,31 @@
     <Style
         x:Key="DynamicAltTextStyle"
         BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="MenuItem" />
+        TargetType="MenuItem">
+        <Setter Property="ToolTipService.IsEnabled" Value="{Binding IsTooltipVisible}" />
+    </Style>
     <Style
         x:Key="AltIconMenuStyle"
         BasedOn="{StaticResource IconMenuStyle}"
         TargetType="MenuItem" />
     <Style
         x:Key="AnimatedNotifyStyle"
-        BasedOn="{StaticResource DynamicAltTextStyle}"
+        BasedOn="{StaticResource IconMenuStyle}"
         TargetType="MenuItem" />
+    <Style
+        x:Key="AltObjectMenuStyle"
+        BasedOn="{StaticResource IconMenuStyle}"
+        TargetType="MenuItem">
+        <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCW" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="False">
+                <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCCW" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="True">
+                <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style
         x:Key="MenuSeparatorStyle"
         BasedOn="{StaticResource AdbMenuItemStyle}"
@@ -209,6 +253,7 @@
         x:Key="MenuStyleSelector"
         AltIconStyle="{StaticResource AltIconMenuStyle}"
         AltIconSubMenuStyle="{StaticResource AltIconSubMenuItemStyle}"
+        AltObjectStyle="{StaticResource AltObjectMenuStyle}"
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
@@ -243,5 +288,21 @@
         BasedOn="{StaticResource BaseContextMenuStyle}"
         TargetType="ContextMenu">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:PathContextMenu.List}}" />
+    </Style>
+    <Style
+        x:Key="SettingsMenuStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="Margin" Value="0,0,7,0" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsMenu.List}}" />
+    </Style>
+    <Style
+        x:Key="SettingsPaneMenuStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="Margin" Value="0,0,7,0" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsPaneMenu.List}}" />
     </Style>
 </ResourceDictionary>

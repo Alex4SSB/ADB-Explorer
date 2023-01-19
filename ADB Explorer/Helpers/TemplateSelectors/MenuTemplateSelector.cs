@@ -11,7 +11,7 @@ internal class MenuTemplateSelector : DataTemplateSelector
     public DataTemplate AltIconTemplate { get; set; }
     public DataTemplate SubMenuTemplate { get; set; }
     public DataTemplate SubMenuSeparatorTemplate { get; set; }
-
+    public DataTemplate AltObjectTemplate { get; set; }
     public DataTemplate AltIconSubMenuTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
@@ -26,6 +26,7 @@ internal class MenuTemplateSelector : DataTemplateSelector
             AltTextMenu => DynamicAltTextTemplate,
             AltIconMenu => AltIconTemplate,
             IconMenu => IconMenuTemplate,
+            AltObjectMenu => AltObjectTemplate,
             _ => throw new NotSupportedException(),
         };
     }
@@ -41,6 +42,7 @@ internal class MenuStyleSelector : StyleSelector
     public Style SubMenuStyle { get; set; }
     public Style SubMenuSeparatorStyle { get; set; }
     public Style AltIconSubMenuStyle { get; set; }
+    public Style AltObjectStyle { get; set; }
 
     public override Style SelectStyle(object item, DependencyObject container)
     {
@@ -54,6 +56,7 @@ internal class MenuStyleSelector : StyleSelector
             AltTextMenu => DynamicAltTextStyle,
             AltIconMenu => AltIconStyle,
             IconMenu => IconMenuStyle,
+            AltObjectMenu => AltObjectStyle,
             _ => throw new NotSupportedException(),
         };
     }

@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -33,8 +34,9 @@ internal static class AppActions
             new(Key.F, ModifierKeys.Control)),
         new(FileAction.FileActionType.OpenDevices,
             () => Data.RuntimeSettings.IsDevicesViewEnabled,
-            () => Data.RuntimeSettings.IsDevicesPaneOpen = true,
-            "Devices"),
+            () => Data.RuntimeSettings.IsDevicesPaneOpen ^= true,
+            "Devices",
+            new(Key.D1, ModifierKeys.Alt)),
         new(FileAction.FileActionType.Pull,
             () => Data.FileActions.PullEnabled,
             () => Data.RuntimeSettings.BeginPull = true,
@@ -170,21 +172,36 @@ internal static class AppActions
         new(FileAction.FileActionType.PushPackages,
             () => Data.FileActions.PushPackageEnabled,
             () => Data.RuntimeSettings.PushPackages = true,
-            "Install Packages",
+            Strings.S_PUSH_PKG,
             new(Key.I, ModifierKeys.Alt)),
         new(FileAction.FileActionType.ContextPushPackages,
             () => Data.FileActions.ContextPushPackagesEnabled,
             () => Data.RuntimeSettings.PushPackages = true,
-            "Install Packages",
+            Strings.S_PUSH_PKG,
             new(Key.I, ModifierKeys.Alt)),
         new(FileAction.FileActionType.EmptyTrash,
             () => Data.FileActions.EmptyTrash,
             () => { },
-            "Recycle Bin Is Empty"),
+            Strings.S_TRASH_IS_EMPTY),
         new(FileAction.FileActionType.None,
             new(),
             "",
             new(Key.F10)),
+        new(FileAction.FileActionType.OpenSettings,
+            () => true,
+            () => Data.RuntimeSettings.IsSettingsPaneOpen ^= true,
+            "Settings",
+            new(Key.D0, ModifierKeys.Alt)),
+        new(FileAction.FileActionType.HideSettings,
+            () => true,
+            () => Data.RuntimeSettings.IsSettingsPaneOpen ^= true,
+            "Hide",
+            new(Key.D0, ModifierKeys.Alt)),
+        new(FileAction.FileActionType.OpenFileOps,
+            () => true,
+            () => Data.RuntimeSettings.IsOperationsViewOpen ^= true,
+            Strings.S_FILE_OP_TOOLTIP,
+            new(Key.D9, ModifierKeys.Alt)),
     };
 
     public static List<KeyBinding> Bindings =>
@@ -236,6 +253,9 @@ internal class FileAction : ViewModelBase
         PushPackages,
         ContextPushPackages,
         EmptyTrash,
+        OpenSettings,
+        HideSettings,
+        OpenFileOps,
     }
 
     public FileActionType Name { get; }
@@ -267,7 +287,11 @@ internal class FileAction : ViewModelBase
                 result += "+";
             }
 
-            result += Gesture.Key;
+            string key = Gesture.Key.ToString();
+            if (key.Length > 1 && key[0] == 'D')
+                key = key[1..];
+
+            result += key;
 
             result = result.Replace("Delete", "Del");
 

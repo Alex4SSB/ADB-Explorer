@@ -249,7 +249,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     }
                     break;
 
-                case nameof(AppRuntimeSettings.IsDevicesPaneOpen):
+                case nameof(AppRuntimeSettings.IsDevicesPaneOpen)
+                    or nameof(AppRuntimeSettings.IsSettingsPaneOpen)
+                    or nameof(AppRuntimeSettings.IsOperationsViewOpen):
                     UnfocusPathBox();
                     break;
 
@@ -1838,7 +1840,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (excessLength > 0)
         {
-            PathButtons[^1].Width = PathButtons[^1].ActualWidth - (ControlSize.GetWidth(PathMenu) - PathBox.ActualWidth) - 4;
+            var width = PathButtons[^1].ActualWidth - (ControlSize.GetWidth(PathMenu) - PathBox.ActualWidth) - 4;
+            if (width < 0)
+                width = 0;
+
+            PathButtons[^1].Width = width;
         }
         else
             PathButtons[^1].Width = double.NaN;
@@ -1941,12 +1947,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             else if (TextHelper.GetAltObject(item) is LogicalDevice)
                 RefreshDrives(true);
         }
-    }
-
-    private void SettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        UnfocusPathBox();
-        RuntimeSettings.IsSettingsPaneOpen = true;
     }
 
     private void NavigateToLocation(object location, bool bfNavigated = false)

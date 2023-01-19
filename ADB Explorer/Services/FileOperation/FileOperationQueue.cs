@@ -1,135 +1,101 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class FileOperationQueue : INotifyPropertyChanged
+public class FileOperationQueue : ViewModelBase
 {
+    #region Full properties
+
+    private int currentOperationIndex = 0;
+    public int CurrentOperationIndex
+    {
+        get => currentOperationIndex;
+        private set
+        {
+            if (Set(ref currentOperationIndex, value))
+                UpdateProgress();
+        }
+    }
+
+    private bool isActive = false;
+    public bool IsActive
+    {
+        get => isActive;
+        private set
+        {
+            if (Set(ref isActive, value))
+                FileOpRingVisibility();
+        }
+    }
+
+    private bool autoStart = true;
+    public bool AutoStart
+    {
+        get => autoStart;
+        set => Set(ref autoStart, value);
+    }
+
+    private bool stopAfterFailure = false;
+    public bool StopAfterFailure
+    {
+        get => stopAfterFailure;
+        set => Set(ref stopAfterFailure, value);
+    }
+
+    private bool autoClear = true;
+    public bool AutoClear
+    {
+        get => autoClear;
+        set => Set(ref autoClear, value);
+    }
+
+    private double progress = 0;
+    public double Progress
+    {
+        get => progress;
+        set
+        {
+            if (Set(ref progress, value))
+            {
+                OnPropertyChanged(nameof(AnyFailedOperations));
+                OnPropertyChanged(nameof(StringProgress));
+                FileOpRingVisibility();
+            }
+        }
+    }
+
+    #endregion
+
+    #region Read only properties
+
     public Dispatcher Dispatcher { get; }
 
     public ObservableList<FileOperation> Operations { get; } = new();
 
     public bool HasIncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
 
-    private int currentOperationIndex = 0;
-    public int CurrentOperationIndex { 
-        get
-        {
-            return currentOperationIndex;
-        }
-        private set
-        {
-            currentOperationIndex = value;
-            UpdateProgress();
-        } 
-    }
-
     public FileOperation CurrentOperation => (CurrentOperationIndex < TotalCount) ? Operations[CurrentOperationIndex] : null;
 
-    private bool isActive = false;
-
-    public bool IsActive {
-        get
-        {
-            return isActive;
-        }
-        private set
-        {
-            if (isActive != value)
-            {
-                isActive = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
-    private bool autoStart = true;
-
-    public bool AutoStart
-    {
-        get
-        {
-            return autoStart;
-        }
-        set
-        {
-            if (autoStart != value)
-            {
-                autoStart = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
-    private bool stopAfterFailure = false;
-
-    public bool StopAfterFailure
-    {
-        get
-        {
-            return stopAfterFailure;
-        }
-        set
-        {
-            if (stopAfterFailure != value)
-            {
-                stopAfterFailure = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
-    private bool autoClear = true;
-    public bool AutoClear
-    {
-        get
-        {
-            return autoClear;
-        }
-        set
-        {
-            if (autoClear != value)
-            {
-                autoClear = value;
-                NotifyPropertyChanged();
-            }
-        }
-    }
-
     public int TotalCount => Operations.Count;
-
-    private double currOperationLastProgress = 0;
-    private double progress = 0;
-    public double Progress
-    {
-        get
-        {
-            return progress;
-        }
-        private set
-        {
-            if (progress != value)
-            {
-                progress = value;
-                NotifyPropertyChanged();
-                NotifyPropertyChanged(nameof(AnyFailedOperations));
-                NotifyPropertyChanged(nameof(StringProgress));
-            }
-        }
-    }
 
     public string StringProgress => $"{Operations.Count(op => op.Status is FileOperation.OperationStatus.Completed)} / {TotalCount}";
 
     public bool AnyFailedOperations => Operations.Any(op => op.Status is FileOperation.OperationStatus.Failed);
+
+    private readonly Mutex mutex = new Mutex();
+
+    #endregion
+
+    private double currOperationLastProgress = 0;
 
     public FileOperationQueue(Dispatcher dispatcher)
     {
         Dispatcher = dispatcher;
         Operations.CollectionChanged += Operations_CollectionChanged;
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    private Mutex mutex = new Mutex();
 
     public void AddOperation(FileOperation fileOp)
     {
@@ -138,7 +104,7 @@ public class FileOperationQueue : INotifyPropertyChanged
             mutex.WaitOne();
 
             Operations.Add(fileOp);
-            NotifyPropertyChanged(nameof(HasIncompleteOperations));
+            OnPropertyChanged(nameof(HasIncompleteOperations));
 
             if (AutoStart)
             {
@@ -227,6 +193,8 @@ public class FileOperationQueue : INotifyPropertyChanged
         }
         
         Progress = ((double)CurrentOperationIndex + (currOperationLastProgress / 100.0)) / TotalCount;
+
+        FileOpRingVisibility();
     }
 
     public void Start()
@@ -269,7 +237,8 @@ public class FileOperationQueue : INotifyPropertyChanged
                 UpdateProgress(0);
             }
 
-            NotifyPropertyChanged(nameof(HasIncompleteOperations));
+            OnPropertyChanged(nameof(HasIncompleteOperations));
+            FileOpRingVisibility();
         }
         finally
         { 
@@ -332,13 +301,16 @@ public class FileOperationQueue : INotifyPropertyChanged
         }
     }
 
-    private void Operations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void FileOpRingVisibility()
     {
-        UpdateProgress();
+        Data.FileActions.IsFileOpRingVisible = IsActive && !AnyFailedOperations && Progress > 0 && TotalCount > 0;
     }
 
-    protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+    private void Operations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        UpdateProgress();
+
+        OnPropertyChanged(nameof(TotalCount));
+        FileOpRingVisibility();
     }
 }

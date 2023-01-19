@@ -54,6 +54,9 @@ public static class Strings
     public const string S_REM_EMU = "Kill Emulator";
     public const string S_REM_HIST_DEV = "Remove Device";
     public const string S_REM_DEV = "Disconnect Device";
+    public const string S_FILE_OP_TOOLTIP = "File Operations";
+    public const string S_TRASH_IS_EMPTY = "Recycle Bin Is Empty";
+    public const string S_PUSH_PKG = "Install Packages";
 
 
     public static string S_MISSING_REDIRECTION(string exception) =>

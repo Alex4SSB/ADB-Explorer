@@ -55,6 +55,7 @@ internal static class MainToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.New),
             "\uECC8",
             iconSize: 20,
+            isTooltipVisible: false,
             children: new SubMenu[]
             {
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), "\uE8F4"),
@@ -219,5 +220,26 @@ internal static class PathContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyCurrentPath), "\uE8C8"),
         new SubMenuSeparator(() => true),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh), "\uE72C"),
+    };
+}
+
+internal static class SettingsMenu
+{
+    public static ObservableList<ActionMenu> List { get; } = new()
+    {
+        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps), "\uF16A"),
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
+            "\uE713",
+            iconSize: 18),
+    };
+}
+
+internal static class SettingsPaneMenu
+{
+    public static ObservableList<ActionMenu> List { get; } = new()
+    {
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.HideSettings),
+            "\uE761",
+            iconSize: 20),
     };
 }

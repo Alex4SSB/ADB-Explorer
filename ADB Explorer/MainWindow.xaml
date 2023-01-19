@@ -151,58 +151,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Menu x:Name="MainToolBar" Style="{StaticResource ToolBarStyle}" />
                 <Border
                     Grid.Column="1"
                     Background="Transparent"
                     MouseDown="Window_MouseDown" />
+                <Menu Grid.Column="2" Style="{StaticResource SettingsMenuStyle}" />
             </Grid>
-            <StackPanel
-                Margin="0,0,7,0"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <Style
-                        x:Key="RightMenuGlyph"
-                        BasedOn="{StaticResource DisabledGlyphStyle}"
-                        TargetType="ui:FontIcon">
-                        <Setter Property="FontSize" Value="18" />
-                    </Style>
-                </StackPanel.Resources>
-                <Menu>
-                    <MenuItem
-                        x:Name="FileOperationsButton"
-                        Click="FileOperationsButton_Click"
-                        DataContext="{Binding ElementName=UpperProgressBar, Path=DataContext}"
-                        Style="{StaticResource FileOpButtonStyle}">
-                        <MenuItem.ToolTip>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Operations.Count}" />
-                                <TextBlock Text=" File Operations" />
-                            </StackPanel>
-                        </MenuItem.ToolTip>
-                        <MenuItem.Header>
-                            <Grid>
-                                <ui:FontIcon Glyph="&#xF16A;" Style="{StaticResource OperationsIconStyle}" />
-                                <ui:ProgressRing
-                                    x:Name="FileOpRing"
-                                    IsActive="True"
-                                    Style="{StaticResource OperationsProgressRingStyle}" />
-                            </Grid>
-                        </MenuItem.Header>
-                    </MenuItem>
-                    <MenuItem
-                        x:Name="SettingsButton"
-                        helpers:StyleHelper.ContentAnimation="RotateCW"
-                        Click="SettingsButton_Click"
-                        ToolTip="Settings">
-                        <MenuItem.Header>
-                            <ui:FontIcon Glyph="&#xE713;" Style="{DynamicResource RightMenuGlyph}" />
-                        </MenuItem.Header>
-                    </MenuItem>
-                </Menu>
-            </StackPanel>
             <Grid Grid.Row="1">
                 <StackPanel Margin="0,4,0,2">
                     <Separator />
@@ -832,6 +789,11 @@
                     </Style>
                     <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock" />
                 </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <StackPanel Margin="8,0" Orientation="Horizontal">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                         <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
@@ -895,6 +857,7 @@
                     </StackPanel>
                 </StackPanel>
                 <StackPanel
+                    Grid.Column="2"
                     Margin="6,0"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
@@ -1254,16 +1217,7 @@
                             <RowDefinition Height="52" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Menu Margin="0,0,8,0" HorizontalAlignment="Right">
-                            <MenuItem Click="PaneCollapse_Click" ToolTip="Hide">
-                                <MenuItem.Header>
-                                    <ui:FontIcon
-                                        Margin="0,0,0,-2"
-                                        Glyph="&#xE761;"
-                                        Style="{DynamicResource GlyphFont}" />
-                                </MenuItem.Header>
-                            </MenuItem>
-                        </Menu>
+                        <Menu Style="{StaticResource SettingsPaneMenuStyle}" />
                         <Button
                             Margin="10"
                             Click="ResetSettingsButton_Click"

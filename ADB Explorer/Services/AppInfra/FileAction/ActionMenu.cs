@@ -41,7 +41,12 @@ internal abstract class ActionMenu : ViewModelBase
 
     public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
 
-    protected ActionMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 18, AnimationSource animationSource = AnimationSource.Command)
+    protected ActionMenu(FileAction fileAction,
+                         string icon,
+                         IEnumerable<SubMenu> children = null,
+                         StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                         int iconSize = 18,
+                         AnimationSource animationSource = AnimationSource.Command)
     {
         if (this is not SubMenu)
             StyleHelper.VerifyIcon(ref icon);
@@ -89,23 +94,45 @@ internal class AltTextMenu : ActionMenu
         }
     }
 
-    public AltTextMenu(FileAction fileAction, string icon, string altText = null, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 18, AnimationSource animationSource = AnimationSource.Command)
+    public bool IsTooltipVisible { get; }
+
+    public AltTextMenu(FileAction fileAction,
+                       string icon,
+                       string altText = null,
+                       IEnumerable<SubMenu> children = null,
+                       StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                       int iconSize = 18,
+                       AnimationSource animationSource = AnimationSource.Command,
+                       bool isTooltipVisible = true)
         : base(fileAction, icon, children, animation, iconSize, animationSource)
     {
         if (children is not null && children.Any())
             altText = fileAction.Description;
 
         AltText = altText;
+        IsTooltipVisible = isTooltipVisible;
     }
 }
 
 internal class DynamicAltTextMenu : AltTextMenu
 {
-    public DynamicAltTextMenu(FileAction fileAction, ObservableProperty<string> altText, string icon, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 20, AnimationSource animationSource = AnimationSource.Command)
+    public DynamicAltTextMenu(FileAction fileAction,
+                              ObservableProperty<string> altText,
+                              string icon,
+                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                              int iconSize = 20,
+                              AnimationSource animationSource = AnimationSource.Command)
         : base(fileAction, icon, altText, animation: animation, iconSize: iconSize, animationSource: animationSource)
     {
         altText.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => AltText = e.NewValue;
     }
+}
+
+internal class AltObjectMenu : ActionMenu
+{
+    public AltObjectMenu(FileAction fileAction, string icon)
+        : base(fileAction, icon)
+    { }
 }
 
 internal class IconMenu : ActionMenu
@@ -117,7 +144,12 @@ internal class IconMenu : ActionMenu
         set => Set(ref isSelectionBarVisible, value);
     }
 
-    public IconMenu(FileAction fileAction, string icon, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None, int iconSize = 16, ObservableProperty<bool> selectionBar = null, IEnumerable<SubMenu> children = null)
+    public IconMenu(FileAction fileAction,
+                    string icon,
+                    StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                    int iconSize = 16,
+                    ObservableProperty<bool> selectionBar = null,
+                    IEnumerable<SubMenu> children = null)
         : base(fileAction, icon, children, animation, iconSize: iconSize)
     {
         if (selectionBar is not null)
@@ -130,7 +162,12 @@ internal class IconMenu : ActionMenu
 
 internal class AnimatedNotifyMenu : DynamicAltTextMenu
 {
-    public AnimatedNotifyMenu(FileAction fileAction, ObservableProperty<string> altText, string icon, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.Pulsate, int iconSize = 18, AnimationSource animationSource = AnimationSource.External)
+    public AnimatedNotifyMenu(FileAction fileAction,
+                              ObservableProperty<string> altText,
+                              string icon,
+                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.Pulsate,
+                              int iconSize = 18,
+                              AnimationSource animationSource = AnimationSource.External)
         : base(fileAction, altText, icon, animation, iconSize, animationSource)
     { }
 }
@@ -141,7 +178,13 @@ internal class AltIconMenu : ActionMenu
 
     public int AltIconSize { get; }
 
-    public AltIconMenu(FileAction fileAction, string icon, string altIcon, int iconSize = 18, int altIconSize = 14, IEnumerable<SubMenu> children = null, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
+    public AltIconMenu(FileAction fileAction,
+                       string icon,
+                       string altIcon,
+                       int iconSize = 18,
+                       int altIconSize = 14,
+                       IEnumerable<SubMenu> children = null,
+                       StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
         : base(fileAction, icon, children, animation, iconSize)
     {
         StyleHelper.VerifyIcon(ref altIcon);
@@ -171,7 +214,12 @@ internal class AltIconSubMenu : SubMenu
 
     public int AltIconSize { get; }
 
-    public AltIconSubMenu(FileAction fileAction, string icon, string altIcon, IEnumerable<SubMenu> children = null, int iconSize = 16, int altIconSize = 12)
+    public AltIconSubMenu(FileAction fileAction,
+                          string icon,
+                          string altIcon,
+                          IEnumerable<SubMenu> children = null,
+                          int iconSize = 16,
+                          int altIconSize = 12)
         : base(fileAction, icon, children, iconSize: iconSize)
     {
         StyleHelper.VerifyIcon(ref altIcon);

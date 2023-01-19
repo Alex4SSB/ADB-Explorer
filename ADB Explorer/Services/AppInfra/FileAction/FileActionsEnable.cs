@@ -320,6 +320,15 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isCopyCurrentPathEnabled, value);
     }
 
+    private bool isFileOpRingVisible = false;
+    public bool IsFileOpRingVisible
+    {
+        get => isFileOpRingVisible;
+        set => Set(ref isFileOpRingVisible, value);
+    }
+
+    #endregion
+
     private FileClass.CutType isCopyPasteAction = FileClass.CutType.None;
     public FileClass.CutType PasteState
     {
@@ -370,8 +379,6 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref explorerFilter, value);
     }
 
-    #endregion
-
     #region Observable properties
 
     public ObservableProperty<string> CopyPathAction = new();
@@ -383,7 +390,7 @@ internal class FileActionsEnable : ViewModelBase
     public ObservableProperty<string> PasteAction = new();
 
     public ObservableProperty<string> CutItemsCount = new();
-    
+
     public ObservableProperty<bool> IsCutState = new();
 
     public ObservableProperty<bool> IsCopyState = new();
