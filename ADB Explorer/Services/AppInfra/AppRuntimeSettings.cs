@@ -169,6 +169,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref adbVersion, value);
     }
 
+    private int selectedDevicesCount = 0;
+    public int SelectedDevicesCount
+    {
+        get => selectedDevicesCount;
+        set => Set(ref selectedDevicesCount, value);
+    }
+
     #region Event-only properties
 
     public bool BeginPull { get => false; set => OnPropertyChanged(); }

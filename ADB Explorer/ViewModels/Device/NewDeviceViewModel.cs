@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 
 namespace ADB_Explorer.ViewModels;
@@ -52,16 +53,24 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
     #endregion
 
-    public ConnectCommand ConnectCommand { get; private set; }
+    public DeviceAction ConnectCommand { get; }
 
-    public ClearCommand ClearCommand { get; private set; }
+    public DeviceAction ClearCommand { get; private set; }
 
     public NewDeviceViewModel(NewDevice device) : base(device)
     {
         Device = device;
 
-        ConnectCommand = new(this);
-        ClearCommand = new(this);
+        ConnectCommand = DeviceHelpers.ConnectDeviceCommand(this);
+
+        ClearCommand = new(() =>
+        {
+            return !(string.IsNullOrEmpty(device.IpAddress)
+                    && string.IsNullOrEmpty(device.ConnectPort)
+                    && string.IsNullOrEmpty(device.PairingPort)
+                    && string.IsNullOrEmpty(device.PairingCode));
+        },
+        () => ClearDevice());
     }
 
     public void ClearDevice()

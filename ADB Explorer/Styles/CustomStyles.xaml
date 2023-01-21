@@ -225,32 +225,6 @@
             <Setter Property="Margin" Value="6,0,0,0" />
         </Style>
     </ResourceDictionary>
-    <ResourceDictionary x:Key="DeviceMenuStyles">
-        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-            <Setter Property="FontSize" Value="20" />
-        </Style>
-        <Style TargetType="StackPanel">
-            <Setter Property="Orientation" Value="Horizontal" />
-        </Style>
-        <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-            <Setter Property="Height" Value="30" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                    <Setter Property="Height" Value="32" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-        <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-            <Setter Property="Height" Value="30" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                    <Setter Property="Height" Value="32" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </ResourceDictionary>
     <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextSubMenuStyles}">
         <MenuItem>
             <MenuItem.Header>
@@ -920,106 +894,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Menu
-        x:Key="DeviceActionsMenu"
-        x:Shared="False"
-        Resources="{StaticResource DeviceMenuStyles}">
-        <Menu.Style>
-            <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                <Setter Property="IsEnabled" Value="False" />
-                <Setter Property="Height" Value="30" />
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Status}" Value="Ok">
-                        <Setter Property="IsEnabled" Value="True" />
-                    </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                        <Setter Property="Height" Value="32" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Menu.Style>
-        <MenuItem ToolTip="More Actions">
-            <MenuItem.Header>
-                <ui:FontIcon Margin="-4" Glyph="&#xE712;" />
-            </MenuItem.Header>
-            <MenuItem Header="Root Access">
-                <MenuItem.Icon>
-                    <ui:FontIcon Glyph="&#xE7EF;" />
-                </MenuItem.Icon>
-                <MenuItem IsEnabled="False">
-                    <MenuItem.Header>
-                        <StackPanel>
-                            <TextBlock FontWeight="Bold" Text="Status: " />
-                            <TextBlock FontWeight="Bold" Text="{Binding Root}" />
-                            <TextBlock
-                                FontWeight="Bold"
-                                Style="{StaticResource RecoveryRootStatusStyle}"
-                                Text=" - Recovery" />
-                        </StackPanel>
-                    </MenuItem.Header>
-                </MenuItem>
-                <Separator>
-                    <Separator.Style>
-                        <Style BasedOn="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" TargetType="Separator">
-                            <Setter Property="Margin" Value="-11,0" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Root}" Value="Forbidden">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Sideload">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Separator.Style>
-                </Separator>
-                <MenuItem Command="{Binding ToggleRootCommand.Command}">
-                    <MenuItem.Style>
-                        <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Root}" Value="Forbidden">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Sideload">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </MenuItem.Style>
-                    <MenuItem.Header>
-                        <TextBlock>
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
-                                    <Setter Property="Text" Value="Enable" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                                            <Setter Property="Text" Value="Disable" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </MenuItem.Header>
-                </MenuItem>
-            </MenuItem>
-            <MenuItem Header="Reboot">
-                <MenuItem.Icon>
-                    <ui:FontIcon Glyph="&#xE777;" />
-                </MenuItem.Icon>
-                <MenuItem IsEnabled="False">
-                    <MenuItem.Header>
-                        <TextBlock FontWeight="Bold" Text="Reboot Into:" />
-                    </MenuItem.Header>
-                </MenuItem>
-                <Separator Margin="-10,0" />
-                <MenuItem Command="{Binding RebootCommand.Command}" Header="System Image" />
-                <MenuItem Command="{Binding BootloaderCommand.Command}" Header="Bootloader" />
-                <MenuItem Command="{Binding RecoveryCommand.Command}" Header="Recovery" />
-                <MenuItem Command="{Binding SideloadCommand.Command}" Header="Sideload" />
-                <MenuItem Command="{Binding SideloadAutoCommand.Command}" Header="Sideload (Auto Reboot)" />
-            </MenuItem>
-        </MenuItem>
-    </Menu>
     <Style x:Key="MaskedTextBoxStyle" TargetType="controls:MaskedTextBox">
         <Setter Property="ValidationType" Value="None" />
         <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />

@@ -34,7 +34,7 @@ internal static class AppActions
             new(Key.F, ModifierKeys.Control)),
         new(FileAction.FileActionType.OpenDevices,
             () => Data.RuntimeSettings.IsDevicesViewEnabled,
-            () => Data.RuntimeSettings.IsDevicesPaneOpen ^= true,
+            ToggleDevicesPane,
             "Devices",
             new(Key.D1, ModifierKeys.Alt)),
         new(FileAction.FileActionType.Pull,
@@ -189,12 +189,12 @@ internal static class AppActions
             new(Key.F10)),
         new(FileAction.FileActionType.OpenSettings,
             () => true,
-            () => Data.RuntimeSettings.IsSettingsPaneOpen ^= true,
+            ToggleSettingsPane,
             "Settings",
             new(Key.D0, ModifierKeys.Alt)),
         new(FileAction.FileActionType.HideSettings,
             () => true,
-            () => Data.RuntimeSettings.IsSettingsPaneOpen ^= true,
+            ToggleSettingsPane,
             "Hide",
             new(Key.D0, ModifierKeys.Alt)),
         new(FileAction.FileActionType.OpenFileOps,
@@ -209,6 +209,22 @@ internal static class AppActions
             .Select(action => action.KeyBinding)
             .Where(binding => binding is not null)
             .ToList();
+
+    private static void ToggleSettingsPane()
+    {
+        Data.RuntimeSettings.IsSettingsPaneOpen ^= true;
+
+        if (Data.RuntimeSettings.IsSettingsPaneOpen)
+            Data.RuntimeSettings.IsDevicesPaneOpen = false;
+    }
+
+    private static void ToggleDevicesPane()
+    {
+        Data.RuntimeSettings.IsDevicesPaneOpen ^= true;
+
+        if (Data.RuntimeSettings.IsDevicesPaneOpen)
+            Data.RuntimeSettings.IsSettingsPaneOpen = false;
+    }
 }
 
 internal class FileAction : ViewModelBase

@@ -34,13 +34,14 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
 
     #endregion
 
-    public PairCommand PairCommand { get; private set; }
+    public DeviceAction PairCommand { get; }
 
     public ServiceDeviceViewModel(ServiceDevice service) : base(service)
     {
         Device = service;
 
-        PairCommand = new(this);
+        PairCommand = new(() => IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
+                          () => Data.RuntimeSettings.DeviceToPair = this);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -19,13 +20,13 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
 
     #endregion
 
-    public RemoveCommand RemoveCommand { get; private set; }
+    public DeviceAction RemoveCommand { get; }
 
     public HistoryDeviceViewModel(HistoryDevice device) : base(device)
     {
         Device = device;
 
-        RemoveCommand = new(this);
+        RemoveCommand = DeviceHelpers.RemoveDeviceCommand(this);
     }
 
     public static HistoryDeviceViewModel New(StorageDevice device) => new(new HistoryDevice()

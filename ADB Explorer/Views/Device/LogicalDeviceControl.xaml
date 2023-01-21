@@ -78,7 +78,7 @@
                 <Button
                     Padding="5"
                     Command="{Binding RemoveCommand.Command}"
-                    ToolTip="{Binding RemoveCommand.RemoveAction}">
+                    ToolTip="{Binding RemoveCommand.Description}">
                     <Button.Style>
                         <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
                             <Style.Triggers>

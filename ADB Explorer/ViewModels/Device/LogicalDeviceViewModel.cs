@@ -1,6 +1,6 @@
-﻿using ADB_Explorer.Services;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Helpers;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -94,14 +94,10 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     #region Commands
 
-    public BrowseCommand BrowseCommand { get; private set; }
-    public RemoveCommand RemoveCommand { get; private set; }
-    public ToggleRootCommand ToggleRootCommand { get; private set; }
-    public RebootCommand RebootCommand { get; private set; }
-    public BootloaderCommand BootloaderCommand { get; private set; }
-    public RecoveryCommand RecoveryCommand { get; private set; }
-    public SideloadCommand SideloadCommand { get; private set; }
-    public SideloadAutoCommand SideloadAutoCommand { get; private set; }
+    public DeviceAction BrowseCommand { get; }
+    public DeviceAction RemoveCommand { get; }
+    public DeviceAction ToggleRootCommand { get; }
+    public List<RebootCommand> RebootCommands { get; } = new();
 
     #endregion
 
@@ -109,14 +105,17 @@ public class LogicalDeviceViewModel : DeviceViewModel
     {
         Device = device;
 
-        BrowseCommand = new(this);
-        RemoveCommand = new(this);
-        ToggleRootCommand = new(this);
-        RebootCommand = new(this);
-        BootloaderCommand = new(this);
-        RecoveryCommand = new(this);
-        SideloadCommand = new(this);
-        SideloadAutoCommand = new(this);
+        BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok,
+                            () => DeviceHelpers.BrosweDeviceAction(this));
+
+        RemoveCommand = DeviceHelpers.RemoveDeviceCommand(this);
+
+        ToggleRootCommand = DeviceHelpers.ToggleRootDeviceCommand(this);
+
+        foreach (RebootCommand.RebootType item in Enum.GetValues(typeof(RebootCommand.RebootType)))
+        {
+            RebootCommands.Add(new(this, item));
+        }
 
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }
@@ -156,6 +155,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
         if (Root != status)
         {
             Device.Root = status;
+            OnPropertyChanged(nameof(Root));
 
             return true;
         }

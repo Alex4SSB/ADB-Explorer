@@ -1,9 +1,12 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
+using static ADB_Explorer.Models.AbstractDevice;
 
 namespace ADB_Explorer.Helpers
 {
-    public class DeviceHelpers : AbstractDevice
+    public static class DeviceHelpers
     {
         public static DeviceStatus GetStatus(string status) => status switch
         {
@@ -81,5 +84,92 @@ namespace ADB_Explorer.Helpers
 
             return name.Replace('_', ' ');
         }
+
+        public static void BrosweDeviceAction(LogicalDeviceViewModel device)
+        {
+            Data.CurrentADBDevice = new(device);
+            Data.RuntimeSettings.DeviceToOpen = device;
+        }
+
+        private static async void RemoveDeviceAction(DeviceViewModel device)
+        {
+            var dialogTask = await DialogService.ShowConfirmation(Strings.S_REM_DEVICE(device), Strings.S_REM_DEVICE_TITLE(device));
+            if (dialogTask.Item1 is not ContentDialogResult.Primary)
+                return;
+
+            if (device.Type is DeviceType.Emulator)
+            {
+                try
+                {
+                    ADBService.KillEmulator(device.ID);
+                }
+                catch (Exception ex)
+                {
+                    DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical);
+                    return;
+                }
+            }
+            else if (device.Type is DeviceType.Remote)
+            {
+                try
+                {
+                    ADBService.DisconnectNetworkDevice(device.ID);
+                }
+                catch (Exception ex)
+                {
+                    DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical);
+                    return;
+                }
+            }
+            else if (device.Type is DeviceType.History)
+            { } // No additional action is required
+            else
+            {
+                throw new NotImplementedException();
+            }
+
+            Data.RuntimeSettings.DeviceToRemove = device;
+        }
+
+        public static DeviceAction RemoveDeviceCommand(DeviceViewModel device) => new(
+                () => device.Type is DeviceType.History
+                    || !Data.RuntimeSettings.IsManualPairingInProgress
+                        && device.Type is DeviceType.Remote or DeviceType.Emulator,
+                () => RemoveDeviceAction(device),
+                device.Type switch
+                {
+                    DeviceType.Remote => Strings.S_REM_DEV,
+                    DeviceType.Emulator => Strings.S_REM_EMU,
+                    DeviceType.History => Strings.S_REM_HIST_DEV,
+                    _ => "",
+                });
+
+        public static DeviceAction ToggleRootDeviceCommand(LogicalDeviceViewModel device) => new(
+            () => device.Root is not RootStatus.Forbidden && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
+            () => ToggleRootAction(device));
+
+        private static async void ToggleRootAction(LogicalDeviceViewModel device)
+        {
+            bool rootEnabled = device.Root is RootStatus.Enabled;
+
+            await Task.Run(() => device.EnableRoot(!rootEnabled));
+
+            if (device.Root is RootStatus.Forbidden)
+                Data.RuntimeSettings.RootAttemptForbidden = true;
+        }
+
+        public static DeviceAction ConnectDeviceCommand(NewDeviceViewModel device) => new(
+            () => {
+                if (!device.IsIpAddressValid || !device.IsConnectPortValid)
+                    return false;
+
+                if (device is not null and not HistoryDeviceViewModel
+                    && device.IsPairingEnabled
+                    && (!device.IsPairingCodeValid || !device.IsPairingPortValid))
+                    return false;
+
+                return true;
+            },
+            () => Data.RuntimeSettings.ConnectNewDevice = device);
     }
 }

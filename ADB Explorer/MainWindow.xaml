@@ -952,7 +952,7 @@
                 <Border
                     BorderBrush="Gray"
                     BorderThickness="1,1,0,0"
-                    Style="{StaticResource DevicesListStyle}">
+                    Style="{StaticResource SplitViewBorderStyle}">
                     <Grid>
                         <Grid Margin="8">
                             <Grid.RowDefinitions>
@@ -1022,25 +1022,10 @@
             x:Name="DevicesSplitView"
             d:IsHidden="False"
             d:IsPaneOpen="True"
-            FocusVisualStyle="{x:Null}"
-            IsPaneOpen="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDevicesPaneOpen, Mode=TwoWay}"
             PaneClosing="DevicesSplitView_PaneClosing"
-            PanePlacement="Left">
-            <ui:SplitView.Style>
-                <Style BasedOn="{StaticResource SplitViewStyle}" TargetType="ui:SplitView">
-                    <Setter Property="OpenPaneLength" Value="236" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding ElementName=DeviceListScrollViewer, Path=ScrollableHeight}" Value="0">
-                            <Setter Property="OpenPaneLength" Value="220" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ui:SplitView.Style>
+            Style="{StaticResource DevicesSplitViewStyle}">
             <ui:SplitView.Pane>
-                <Border
-                    BorderBrush="Gray"
-                    BorderThickness="0,1,1,0"
-                    Style="{StaticResource DevicesListStyle}">
+                <Border Style="{StaticResource DevicesListStyle}">
                     <ScrollViewer
                         x:Name="DeviceListScrollViewer"
                         Grid.Row="2"
@@ -1180,6 +1165,9 @@
                     </ScrollViewer>
                 </Border>
             </ui:SplitView.Pane>
+            <ui:SplitView.Content>
+                <Border Style="{StaticResource DevicesRedBorderStyle}" />
+            </ui:SplitView.Content>
         </ui:SplitView>
         <ui:SplitView
             x:Name="SettingsSplitView"
@@ -1211,7 +1199,7 @@
                 <Border
                     BorderBrush="Gray"
                     BorderThickness="1,1,0,0"
-                    Style="{StaticResource DevicesListStyle}">
+                    Style="{StaticResource SplitViewBorderStyle}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="52" />
