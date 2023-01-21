@@ -57,6 +57,8 @@ public static class Strings
     public const string S_FILE_OP_TOOLTIP = "File Operations";
     public const string S_TRASH_IS_EMPTY = "Recycle Bin Is Empty";
     public const string S_PUSH_PKG = "Install Packages";
+    public const string S_NEW_DEVICE_TIP = "Pair and/or connect a WiFi device (without using mDNS)";
+    public const string S_RESTART_APP = "Restart app for changes to take effect";
 
 
     public static string S_MISSING_REDIRECTION(string exception) =>

@@ -4,41 +4,14 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
-    <DataTemplate x:Key="ResetButtonTemplate" DataType="services:ResetCommand">
-        <Button Command="{Binding Command}" Style="{StaticResource RestartAppButtonStyle}">
-            <ui:FontIcon />
-        </Button>
-    </DataTemplate>
-    <DataTemplate x:Key="AnimationTipButtonTemplate" DataType="services:ShowAnimationTipCommand">
+    <DataTemplate x:Key="SettingsActionTemplate" DataType="services:SettingsAction">
         <Button
             Command="{Binding Command}"
             Style="{StaticResource RestartAppButtonStyle}"
-            ToolTip="More Info">
-            <ui:FontIcon Glyph="&#xE82F;" />
+            ToolTip="{Binding Tooltip}">
+            <ui:FontIcon Glyph="{Binding Icon}" />
         </Button>
     </DataTemplate>
-    <DataTemplate x:Key="ClearTextButtonTemplate" DataType="services:ClearTextSettingCommand">
-        <Button
-            Command="{Binding Command}"
-            Style="{StaticResource RestartAppButtonStyle}"
-            ToolTip="Clear">
-            <ui:FontIcon Glyph="&#xE711;" />
-        </Button>
-    </DataTemplate>
-    <DataTemplate x:Key="ChangeTextButtonTemplate">
-        <Button
-            Command="{Binding Command}"
-            Style="{StaticResource RestartAppButtonStyle}"
-            ToolTip="Change">
-            <ui:FontIcon Glyph="&#xE70F;" />
-        </Button>
-    </DataTemplate>
-    <helpers:ActionButtonTemplateSelector
-        x:Key="ActionButtonTemplateSelector"
-        AnimationTipSettingTemplate="{StaticResource AnimationTipButtonTemplate}"
-        ChangeSettingTemplate="{StaticResource ChangeTextButtonTemplate}"
-        ClearTextSettingTemplate="{StaticResource ClearTextButtonTemplate}"
-        ResetSettingTemplate="{StaticResource ResetButtonTemplate}" />
     <DataTemplate x:Key="BoolSettingTemplate" DataType="services:BoolSetting">
         <Grid>
             <Grid.ColumnDefinitions>
@@ -87,7 +60,7 @@
             </CheckBox>
             <ItemsControl
                 Grid.Column="1"
-                ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
+                ItemTemplate="{StaticResource SettingsActionTemplate}"
                 ItemsSource="{Binding Commands}"
                 Style="{StaticResource RightHorizontalItemsControlStyle}" />
         </Grid>
@@ -113,7 +86,7 @@
                 <TextBlock Grid.Column="1" Text="{Binding Description}" />
                 <ItemsControl
                     Grid.Column="2"
-                    ItemTemplateSelector="{StaticResource ActionButtonTemplateSelector}"
+                    ItemTemplate="{StaticResource SettingsActionTemplate}"
                     ItemsSource="{Binding Commands}"
                     Style="{StaticResource RightHorizontalItemsControlStyle}" />
             </Grid>

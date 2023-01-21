@@ -18,4 +18,5 @@ public enum DoubleClickAction
 {
     pull,
     edit,
+    none,
 }

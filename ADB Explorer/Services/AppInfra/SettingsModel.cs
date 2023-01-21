@@ -1,7 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
-using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Services;
@@ -20,10 +20,6 @@ public static class UISettings
     public static void Init()
     {
         Type appSettings = Settings.GetType();
-        ResetCommand resetCommand = new();
-        ShowAnimationTipCommand tipCommand = new();
-        ChangeDefaultPathCommand defPathCommand = new();
-        ChangeAdbPathCommand adbPathCommand = new();
 
         SettingsList = new()
         {
@@ -58,13 +54,26 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("File Double Click", new()
             {
-                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() { { DoubleClickAction.pull, "Pull To Default Folder" }, { DoubleClickAction.edit, "Open In Editor" } }),
+                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() { { DoubleClickAction.none, "None" }, { DoubleClickAction.pull, "Pull To Default Folder" }, { DoubleClickAction.edit, "Open In Editor" } }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Working Directories", new()
             {
-                new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)), "Default Folder", "Working Directories", null, null, defPathCommand, new ClearTextSettingCommand(appSettings.GetProperty(nameof(Settings.DefaultFolder)))),
-                new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)), "Override ADB Path", "Working Directories", null, null, adbPathCommand, new ClearTextSettingCommand(appSettings.GetProperty(nameof(Settings.ManualAdbPath))), resetCommand),
+                new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)),
+                                  "Default Folder",
+                                  "Working Directories",
+                                  commands: new SettingsAction[] {
+                                      new(() => true, () => SettingsHelpers.ChangeDefaultPathAction(), "\uE70F", "Change"),
+                                      new(() => !string.IsNullOrEmpty(Settings.DefaultFolder), () => Settings.DefaultFolder = "", "\uE711", "Clear"),
+                                  }),
+                new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)),
+                                  "Override ADB Path",
+                                  "Working Directories",
+                                  commands: new SettingsAction[] {
+                                      new(() => true,() => SettingsHelpers.ChangeAdbPathAction(), "\uE70F", "Change"),
+                                      new(() => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", "\uE711", "Clear"),
+                                      new(() => true, () => SettingsHelpers.ResetAppAction(), "\uE72C", Strings.S_RESTART_APP),
+                                  }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Theme", new()
@@ -76,7 +85,13 @@ public static class UISettings
             {
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: appSettings.GetProperty(nameof(Settings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration", "Graphics"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)), "Disable Animations", "Graphics", null, null, resetCommand, tipCommand),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
+                                "Disable Animations",
+                                "Graphics",
+                                commands: new SettingsAction[] {
+                                    new(() => true, () => SettingsHelpers.ResetAppAction(), "\uE72C", Strings.S_RESTART_APP),
+                                    new(() => true, () => SettingsHelpers.DisableAnimationTipAction(), "\uE82F", "More Info"),
+                                }),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableSplash)), "Display Splash Screen", "Graphics"),
             }),
             new Ungrouped(new()
@@ -90,7 +105,6 @@ public static class UISettings
 public abstract class AbstractGroup : ViewModelBase
 {
     public List<AbstractSetting> Children { get; set; }
-
 }
 
 public class SettingsGroup : AbstractGroup
@@ -120,9 +134,7 @@ public class SettingsGroup : AbstractGroup
 }
 
 public class SettingsSeparator : AbstractGroup
-{
-
-}
+{ }
 
 public class Ungrouped : AbstractGroup
 {
@@ -135,19 +147,16 @@ public class Ungrouped : AbstractGroup
 public abstract class AbstractSetting : ViewModelBase
 {
     protected readonly PropertyInfo valueProp;
-    protected readonly PropertyInfo enableProp;
     protected readonly PropertyInfo visibleProp;
 
     public string Description { get; private set; }
     public string GroupName { get; private set; }
-    public SettingButton[] Commands { get; private set; }
+    public BaseAction[] Commands { get; private set; }
 
-    public bool IsEnabled => enableProp is null || (bool)enableProp.GetValue(Settings);
     public Visibility Visibility => visibleProp is null || (bool)visibleProp.GetValue(Settings) ? Visibility.Visible : Visibility.Collapsed;
 
-    protected AbstractSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
+    protected AbstractSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
     {
-        this.enableProp = enableProp;
         this.visibleProp = visibleProp;
         this.valueProp = valueProp;
         Description = description;
@@ -159,11 +168,7 @@ public abstract class AbstractSetting : ViewModelBase
 
     protected virtual void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == enableProp?.Name)
-        {
-            OnPropertyChanged(nameof(IsEnabled));
-        }
-        else if (e.PropertyName == visibleProp?.Name)
+        if (e.PropertyName == visibleProp?.Name)
         {
             OnPropertyChanged(nameof(Visibility));
         }
@@ -179,8 +184,8 @@ public class BoolSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public BoolSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
-        : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+    public BoolSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, groupName, visibleProp, commands)
     { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -188,10 +193,6 @@ public class BoolSetting : AbstractSetting
         if (e.PropertyName == valueProp.Name)
         {
             OnPropertyChanged(nameof(Value));
-        }
-        else if (e.PropertyName == enableProp?.Name)
-        {
-            OnPropertyChanged(nameof(IsEnabled));
         }
         else if (e.PropertyName == visibleProp?.Name)
         {
@@ -208,21 +209,15 @@ public class StringSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public StringSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
-        : base(valueProp, description, groupName, enableProp, visibleProp, commands)
-    {
-
-    }
+    public StringSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, groupName, visibleProp, commands)
+    { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == valueProp.Name)
         {
             OnPropertyChanged(nameof(Value));
-        }
-        else if (e.PropertyName == enableProp?.Name)
-        {
-            OnPropertyChanged(nameof(IsEnabled));
         }
         else if (e.PropertyName == visibleProp?.Name)
         {
@@ -242,8 +237,8 @@ public class EnumSetting : AbstractSetting
 
     public List<EnumRadioButton> Buttons { get; } = new();
 
-    public EnumSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
-        : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+    public EnumSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, groupName, visibleProp, commands)
     {
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }
@@ -259,8 +254,8 @@ public class EnumSetting : AbstractSetting
 
 public class ThemeSetting : EnumSetting
 {
-    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppTheme, string> enumNames, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
-        : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppTheme, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, groupName, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
     }
@@ -268,8 +263,8 @@ public class ThemeSetting : EnumSetting
 
 public class DoubleClickSetting : EnumSetting
 {
-    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<DoubleClickAction, string> enumNames, string groupName = null, PropertyInfo enableProp = null, PropertyInfo visibleProp = null, params SettingButton[] commands)
-        : base(valueProp, description, groupName, enableProp, visibleProp, commands)
+    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<DoubleClickAction, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, groupName, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
     }
@@ -304,130 +299,16 @@ public class EnumRadioButton
     }
 }
 
-public abstract class SettingButton : ViewModelBase
+public class SettingsAction : BaseAction
 {
-    public virtual bool IsEnabled { get; } = true;
+    public string Icon { get; }
 
-}
+    public string Tooltip { get; }
 
-public class ResetCommand : SettingButton
-{
-    public static void Action()
+    public SettingsAction(Func<bool> canExecute, Action action, string icon, string tooltip)
+        : base(canExecute, action)
     {
-        Process.Start(Environment.ProcessPath);
-        Application.Current.Shutdown();
+        Icon = icon;
+        Tooltip = tooltip;
     }
-
-    private ICommand command;
-    public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
-}
-
-public class ShowAnimationTipCommand : SettingButton
-{
-    public static void Action()
-    {
-        DialogService.ShowMessage("The app has many animations that are enabled as part of the fluent design.\nThe side views animation is always disabled when the app window is maximized on a secondary display.\n\n• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.", "App Animations", DialogService.DialogIcon.Tip);
-    }
-
-    private ICommand command;
-    public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
-}
-
-public class ClearTextSettingCommand : SettingButton
-{
-    private readonly PropertyInfo sourceProp;
-
-    public override bool IsEnabled => sourceProp.GetValue(Settings) is string str && !string.IsNullOrEmpty(str);
-
-    public ClearTextSettingCommand(PropertyInfo sourceProp)
-    {
-        this.sourceProp = sourceProp;
-
-        Settings.PropertyChanged += Settings_PropertyChanged;
-    }
-
-    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == sourceProp.Name)
-        {
-            OnPropertyChanged(nameof(IsEnabled));
-        }
-    }
-
-    public void Action()
-    {
-        sourceProp.SetValue(Settings, "");
-    }
-
-    private ICommand command;
-    public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
-}
-
-public class ChangeDefaultPathCommand : SettingButton
-{
-    public static void Action()
-    {
-        var dialog = new CommonOpenFileDialog()
-        {
-            IsFolderPicker = true,
-            Multiselect = false
-        };
-        if (Settings.DefaultFolder != "")
-            dialog.DefaultDirectory = Settings.DefaultFolder;
-
-        if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-        {
-            Settings.DefaultFolder = dialog.FileName;
-        }
-    }
-
-    private ICommand command;
-    public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
-}
-
-public class ChangeAdbPathCommand : SettingButton
-{
-    public static void Action()
-    {
-        var dialog = new OpenFileDialog()
-        {
-            Multiselect = false,
-            Title = "Select ADB Executable",
-            Filter = "ADB Executable|adb.exe",
-        };
-
-        if (!string.IsNullOrEmpty(Settings.ManualAdbPath))
-        {
-            try
-            {
-                dialog.InitialDirectory = Directory.GetParent(Settings.ManualAdbPath).FullName;
-            }
-            catch (Exception) { }
-        }
-
-        if (dialog.ShowDialog() == true)
-        {
-            string message = "";
-            var version = ADBService.VerifyAdbVersion(dialog.FileName);
-            if (version is null)
-            {
-                message = "Could not get ADB version from provided path.";
-            }
-            else if (version < MIN_ADB_VERSION)
-            {
-                message = "ADB version from provided path is too low.";
-            }
-
-            if (message != "")
-            {
-                DialogService.ShowMessage(message, "Fail to override ADB", DialogService.DialogIcon.Exclamation);
-                return;
-            }
-
-            Settings.ManualAdbPath = dialog.FileName;
-        }
-    }
-
-    private ICommand command;
-    public ICommand Command => command ??= new CommandHandler(() => Action(), () => IsEnabled);
 }

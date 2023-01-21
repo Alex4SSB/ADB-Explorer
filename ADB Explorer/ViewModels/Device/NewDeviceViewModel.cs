@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -46,6 +47,8 @@ public class NewDeviceViewModel : PairingDeviceViewModel
     public bool IsConnectPortValid => !string.IsNullOrWhiteSpace(ConnectPort)
                                       && ushort.TryParse(ConnectPort, out ushort res)
                                       && res > 0;
+
+    public override string Tooltip => Strings.S_NEW_DEVICE_TIP;
 
     #endregion
 
