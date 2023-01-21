@@ -2110,7 +2110,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (key is Key.Enter)
         {
-            ((DriveViewModel)DriveList.SelectedItem).BrowseCommand.Action();
+            ((DriveViewModel)DriveList.SelectedItem).BrowseCommand.Execute();
             return true;
         }
 

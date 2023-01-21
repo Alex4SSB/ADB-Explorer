@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
@@ -54,8 +55,8 @@ public class DriveViewModel : AbstractDrive
 
     #region Commands
 
-    public DriveBrowseCommand BrowseCommand { get; private set; }
-    public SelectCommand SelectCommand { get; private set; }
+    public BaseAction BrowseCommand { get; private set; }
+    public BaseAction SelectCommand { get; private set; }
 
     #endregion
 
@@ -63,8 +64,8 @@ public class DriveViewModel : AbstractDrive
     {
         Drive = drive;
 
-        BrowseCommand = new(this);
-        SelectCommand = new(this);
+        BrowseCommand = new(() => true, () => Data.RuntimeSettings.BrowseDrive = this);
+        SelectCommand = new(() => true, () => DriveSelected = true);
 
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }

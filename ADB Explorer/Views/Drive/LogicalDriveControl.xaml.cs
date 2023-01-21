@@ -14,12 +14,12 @@ public partial class LogicalDriveControl : UserControl
 
     private void Button_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        ((DriveViewModel)((Button)sender).DataContext).BrowseCommand.Action();
+        ((DriveViewModel)((Button)sender).DataContext).BrowseCommand.Execute();
     }
 
     private void Button_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         if (((Button)sender).DataContext is DriveViewModel drive)
-            drive.SelectCommand.Action();
+            drive.SelectCommand.Execute();
     }
 }

@@ -56,4 +56,6 @@ public class BaseAction : ViewModelBase
         canExecute = () => true;
         action = () => { };
     }
+
+    public void Execute() => Command.Execute(null);
 }
