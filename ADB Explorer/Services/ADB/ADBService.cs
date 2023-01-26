@@ -200,7 +200,7 @@ public partial class ADBService
 
         return RE_DEVICE_NAME.Matches(stdout).Select(
             m => LogicalDevice.New(
-                name: DeviceHelpers.ParseDeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
+                name: DeviceHelper.ParseDeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                 id: m.Groups["id"].Value,
                 status: m.Groups["status"].Value)
             ).Where(d => d);

@@ -182,19 +182,13 @@ public class AppSettings : INotifyPropertyChanged
 
     #region about
 
-    private bool? checkForUpdates;
+    private bool checkForUpdates;
     /// <summary>
     /// GET releases on GitHub repo on each launch
     /// </summary>
-    public bool? CheckForUpdates
+    public bool CheckForUpdates
     {
-        get
-        {
-            if (IsAppDeployed)
-                return null;
-
-            return Get(ref checkForUpdates, true);
-        }
+        get => !IsAppDeployed && Get(ref checkForUpdates, true);
         set => Set(ref checkForUpdates, value);
     }
 

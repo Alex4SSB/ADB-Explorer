@@ -1022,7 +1022,6 @@
             x:Name="DevicesSplitView"
             d:IsHidden="False"
             d:IsPaneOpen="True"
-            PaneClosing="DevicesSplitView_PaneClosing"
             Style="{StaticResource DevicesSplitViewStyle}">
             <ui:SplitView.Pane>
                 <Border Style="{StaticResource DevicesListStyle}">
@@ -1069,7 +1068,8 @@
                                             <Image
                                                 x:Name="PairingQrImage"
                                                 Margin="6"
-                                                RenderOptions.EdgeMode="Aliased" />
+                                                RenderOptions.EdgeMode="Aliased"
+                                                Source="{Binding Source={x:Static Member=models:Data.QrClass}, Path=Image}" />
                                         </Border>
                                         <StackPanel
                                             Margin="0,4"
@@ -1077,7 +1077,7 @@
                                             Style="{StaticResource MdnsInProgressPanelStyle}">
                                             <ui:FontIcon Margin="0,0,6,0" Glyph="&#xE823;" />
                                             <TextBlock Text="Awaiting response: " />
-                                            <TextBlock Text="{Binding ElementName=MainWin, Path=MdnsService.TimePassedString}" />
+                                            <TextBlock Text="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=TimePassedString}" />
                                         </StackPanel>
                                         <ui:SimpleStackPanel
                                             Margin="0,4"
@@ -1290,7 +1290,10 @@
                                         MouseMove="SortedSettings_MouseMove"
                                         Style="{StaticResource SortedSettingsListView}" />
                                     <Separator />
-                                    <Expander x:Name="SettingsAboutExpander" Header="About">
+                                    <Expander
+                                        x:Name="SettingsAboutExpander"
+                                        Header="About"
+                                        IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded}">
                                         <Expander.Style>
                                             <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                                                 <Style.Triggers>
@@ -1376,9 +1379,8 @@
         </ui:SplitView>
         <Border
             x:Name="SplashScreen"
-            Margin="0,-50,0,0"
             d:Visibility="Collapsed"
-            Background="#FF80C9E4">
+            Style="{StaticResource SplashScreenStyle}">
             <Grid>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Image Width="150">

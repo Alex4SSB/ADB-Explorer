@@ -176,6 +176,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref selectedDevicesCount, value);
     }
 
+    private bool isSplashScreenVisible = true;
+    public bool IsSplashScreenVisible
+    {
+        get => isSplashScreenVisible;
+        set => Set(ref isSplashScreenVisible, value);
+    }
+
     #region Event-only properties
 
     public bool BeginPull { get => false; set => OnPropertyChanged(); }

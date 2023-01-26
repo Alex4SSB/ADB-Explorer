@@ -4,30 +4,24 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Services;
 
-public class PairingQrClass : INotifyPropertyChanged
+public class PairingQrClass
 {
-    public PairingQrClass(SolidColorBrush background, SolidColorBrush foreground) : this()
-    {
-        Background = background;
-        Foreground = foreground;
-    }
+    public string ServiceName { get; }
+    public string Password { get; }
+    public SolidColorBrush Background { get; }
+    public SolidColorBrush Foreground { get; }
+
+    public DrawingImage Image => string.IsNullOrEmpty(PairingString) ? null : QrGenerator.GenerateQR(PairingString, Background, Foreground);
+    public string PairingString => WiFiPairingService.CreatePairingString(ServiceName, Password);
 
     public PairingQrClass()
     {
         ServiceName = PAIRING_SERVICE_PREFIX + RandomString.GetUniqueKey(10);
         Password = RandomString.GetUniqueKey(12);
+
+        Background = QR_BACKGROUND;
+        Foreground = QR_FOREGROUND;
     }
-
-    public string ServiceName { get; private set; }
-    public string Password { get; private set; }
-    public DrawingImage Image => string.IsNullOrEmpty(PairingString) ? null : QrGenerator.GenerateQR(PairingString, Background, Foreground);
-    public string PairingString => WiFiPairingService.CreatePairingString(ServiceName, Password);
-    public SolidColorBrush Background { get; set; }
-    public SolidColorBrush Foreground { get; set; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 public class WiFiPairingService

@@ -53,8 +53,8 @@ public class LogicalDevice : Device
 
     public static LogicalDevice New(string name, string id, string status)
     {
-        var deviceType = DeviceHelpers.GetType(id, status);
-        var deviceStatus = DeviceHelpers.GetStatus(status);
+        var deviceType = DeviceHelper.GetType(id, status);
+        var deviceStatus = DeviceHelper.GetStatus(status);
         var ip = deviceType is DeviceType.Remote ? id.Split(':')[0] : "";
         var rootStatus = deviceType is DeviceType.Sideload
             ? RootStatus.Enabled
@@ -113,7 +113,7 @@ public class LogicalDevice : Device
 
     private void UpdateExtensionDrives(IEnumerable<Drive> drives, Dispatcher dispatcher)
     {
-        var mmcTask = Task.Run(() => DeviceHelpers.GetMmcDrive(drives.OfType<LogicalDrive>(), ID));
+        var mmcTask = Task.Run(() => DeviceHelper.GetMmcDrive(drives.OfType<LogicalDrive>(), ID));
         mmcTask.ContinueWith((t) =>
         {
             if (t.IsCanceled)
@@ -131,10 +131,10 @@ public class LogicalDevice : Device
     {
         await Task.Run(() =>
         {
-            if (DeviceHelpers.GetMmcDrive(drives.OfType<LogicalDrive>(), ID) is LogicalDrive mmc)
+            if (DeviceHelper.GetMmcDrive(drives.OfType<LogicalDrive>(), ID) is LogicalDrive mmc)
                 mmc.Type = AbstractDrive.DriveType.Expansion;
 
-            DeviceHelpers.SetExternalDrives(drives.OfType<LogicalDrive>());
+            DeviceHelper.SetExternalDrives(drives.OfType<LogicalDrive>());
         });
 
         var result = false;

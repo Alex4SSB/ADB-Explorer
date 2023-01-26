@@ -106,11 +106,11 @@ public class LogicalDeviceViewModel : DeviceViewModel
         Device = device;
 
         BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok,
-                            () => DeviceHelpers.BrosweDeviceAction(this));
+                            () => DeviceHelper.BrosweDeviceAction(this));
 
-        RemoveCommand = DeviceHelpers.RemoveDeviceCommand(this);
+        RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
 
-        ToggleRootCommand = DeviceHelpers.ToggleRootDeviceCommand(this);
+        ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
         foreach (RebootCommand.RebootType item in Enum.GetValues(typeof(RebootCommand.RebootType)))
         {

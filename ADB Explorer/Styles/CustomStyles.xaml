@@ -408,7 +408,7 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="CornerRadius" Value="0,0,5,5" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
@@ -912,14 +912,14 @@
         TargetType="ui:ProgressBar">
         <Setter Property="Margin" Value="0,0,0,-1" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Value" Value="{Binding ElementName=MainWin, Path=MdnsService.Progress}" />
+                <Setter Property="Value" Value="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress}" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.Progress}" Value="100">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress}" Value="100">
                 <Setter Property="IsIndeterminate" Value="True" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="Foreground" Value="Red" />
                 <Setter Property="Value" Value="100" />
@@ -947,7 +947,7 @@
     <Style x:Key="MdnsOffPanelStyle" TargetType="ui:SimpleStackPanel">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Disabled">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Disabled">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
@@ -975,17 +975,17 @@
         <Setter Property="MinWidth" Value="50" />
         <Setter Property="ToolTip" Value="Click to enable server and polling" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="IsEnabled" Value="False" />
                 <Setter Property="IsChecked" Value="{x:Null}" />
                 <Setter Property="helpers:StyleHelper.ThreeStateGlyph" Value="&#xE897;" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
                 <Setter Property="IsChecked" Value="{x:Null}" />
                 <Setter Property="helpers:StyleHelper.ThreeStateGlyph" Value="&#xE711;" />
                 <Setter Property="ToolTip" Value="Server is down" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="Running">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
                 <Setter Property="IsChecked" Value="True" />
                 <Setter Property="ToolTip" Value="Server is up and running" />
             </DataTrigger>
@@ -999,7 +999,7 @@
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
@@ -1017,7 +1017,7 @@
     <Style x:Key="MdnsInProgressPanelStyle" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
@@ -1025,7 +1025,7 @@
     <Style x:Key="MdnsDownPanelStyle" TargetType="ui:SimpleStackPanel">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="NotRunning">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
@@ -1045,5 +1045,14 @@
         BasedOn="{StaticResource DefaultListViewStyle}"
         TargetType="ListView">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    </Style>
+    <Style x:Key="SplashScreenStyle" TargetType="Border">
+        <Setter Property="Background" Value="#FF80C9E4" />
+        <Setter Property="Margin" Value="0,-50,0,0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSplashScreenVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

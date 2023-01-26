@@ -5,24 +5,6 @@ using System.Drawing;
 
 namespace ADB_Explorer.Models;
 
-internal class Log
-{
-    public string Content { get; set; }
-
-    public DateTime TimeStamp { get; set; }
-
-    public Log(string content, DateTime? timeStamp = null)
-    {
-        Content = content;
-        TimeStamp = timeStamp is null ? DateTime.Now : timeStamp.Value;
-    }
-
-    public override string ToString()
-    {
-        return $"{TimeStamp:HH:mm:ss:fff} ⁞ {Content}";
-    }
-}
-
 internal static class Data
 {
     public static ADBService.AdbDevice CurrentADBDevice { get; set; } = null;
@@ -59,4 +41,8 @@ internal static class Data
     public static string ProgressRedirectionPath { get; set; } = "AdbProgressRedirection.exe";
 
     public static Devices DevicesObject { get; set; } = new();
+
+    public static MDNS MdnsService { get; set; } = new();
+
+    public static PairingQrClass QrClass { get; set; }
 }

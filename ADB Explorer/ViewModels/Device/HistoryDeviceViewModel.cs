@@ -26,7 +26,7 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
     {
         Device = device;
 
-        RemoveCommand = DeviceHelpers.RemoveDeviceCommand(this);
+        RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
     }
 
     public static HistoryDeviceViewModel New(StorageDevice device) => new(new HistoryDevice()

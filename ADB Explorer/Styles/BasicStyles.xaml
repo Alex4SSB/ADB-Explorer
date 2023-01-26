@@ -5,15 +5,17 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <FontFamily x:Key="ConsoleFont">Cascadia Mono, Consolas</FontFamily>
+    <FontFamily x:Key="AltSymbolThemeFontFamily">Segoe MDL2 Assets</FontFamily>
+    <FontFamily x:Key="FluentSymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
     <sys:Double x:Key="DataGridColumnHeaderHeight">30.0</sys:Double>
     <Thickness x:Key="DataGridScrollContentPresenterMargin">0,3,0,0</Thickness>
     <Style x:Key="GlyphFont" TargetType="ui:FontIcon">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+                <Setter Property="FontFamily" Value="{StaticResource FluentSymbolThemeFontFamily}" />
             </DataTrigger>
         </Style.Triggers>
-        <Setter Property="FontFamily" Value="Segoe MDL2 Assets" />
+        <Setter Property="FontFamily" Value="{StaticResource AltSymbolThemeFontFamily}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
     </Style>
     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon" />

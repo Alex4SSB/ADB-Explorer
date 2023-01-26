@@ -149,7 +149,7 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=MainWin, Path=MdnsService.State}" Value="InProgress">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
         </Style.Triggers>

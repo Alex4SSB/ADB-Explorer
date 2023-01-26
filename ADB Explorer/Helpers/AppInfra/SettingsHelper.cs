@@ -4,7 +4,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Helpers;
 
-internal static class SettingsHelpers
+internal static class SettingsHelper
 {
     public static void DisableAnimationTipAction() =>
         DialogService.ShowMessage(Strings.S_DISABLE_ANIMATION, Strings.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
@@ -71,5 +71,34 @@ internal static class SettingsHelpers
 
             Data.Settings.ManualAdbPath = dialog.FileName;
         }
+    }
+
+    public static void SetSymbolFont()
+    {
+
+        Application.Current.Resources["SymbolThemeFontFamily"] = App.Current.FindResource(Data.Settings.UseFluentStyles ? "FluentSymbolThemeFontFamily" : "AltSymbolThemeFontFamily");
+        // new FontFamily(Data.Settings.UseFluentStyles ? "Segoe Fluent Icons, Segoe MDL2 Assets" : "Segoe MDL2 Assets");
+    }
+
+    public static async void SplashScreenTask()
+    {
+        await Task.Delay(Data.Settings.EnableSplash ? AdbExplorerConst.SPLASH_DISPLAY_TIME : TimeSpan.Zero);
+
+        App.Current.Dispatcher.Invoke(() => Data.RuntimeSettings.IsSplashScreenVisible = false);
+    }
+
+    public static void CheckForUpdates()
+    {
+        if (!Data.Settings.CheckForUpdates)
+            return;
+
+        var version = Task.Run(() => Network.LatestAppRelease());
+        version.ContinueWith((t) =>
+        {
+            if (t.Result is null || t.Result <= Data.AppVersion)
+                return;
+
+            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_NEW_VERSION(t.Result), Strings.S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
+        });
     }
 }

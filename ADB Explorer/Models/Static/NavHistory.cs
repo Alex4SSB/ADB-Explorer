@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Services;
+using System.Collections.Generic;
 
 namespace ADB_Explorer.Models
 {
@@ -19,6 +21,37 @@ namespace ADB_Explorer.Models
 
         public static bool BackAvailable { get { return historyIndex > 0; } }
         public static bool ForwardAvailable { get { return historyIndex < PathHistory.Count - 1; } }
+
+        public static bool NavigationAvailable(SpecialLocation direction) => direction switch
+        {
+            SpecialLocation.Back => BackAvailable,
+            SpecialLocation.Forward => ForwardAvailable,
+            _ => throw new ArgumentException("Only Back & Forward navigation is accepted"),
+        };
+
+        public static bool NavigateBF(SpecialLocation direction)
+        {
+            if (direction is not SpecialLocation.Back or SpecialLocation.Forward)
+                throw new ArgumentException("Only Back & Forward navigation is accepted");
+
+            if (!NavigationAvailable(direction))
+            {
+                if (Data.FileActions.IsDriveViewVisible)
+                    DriveHelper.ClearSelectedDrives();
+
+                return false;
+            }
+
+            var fileAction = direction is not SpecialLocation.Back
+                ? FileAction.FileActionType.Back
+                : FileAction.FileActionType.Forward;
+            var command = AppActions.List.First(action => action.Name == fileAction).Command.Command as CommandHandler;
+
+            Data.RuntimeSettings.LocationToNavigate = direction;
+            command.OnExecute.Value ^= true;
+
+            return true;
+        }
 
         public static object GoBack()
         {

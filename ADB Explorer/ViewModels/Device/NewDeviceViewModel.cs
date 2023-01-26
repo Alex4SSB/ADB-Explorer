@@ -61,7 +61,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
     {
         Device = device;
 
-        ConnectCommand = DeviceHelpers.ConnectDeviceCommand(this);
+        ConnectCommand = DeviceHelper.ConnectDeviceCommand(this);
 
         ClearCommand = new(() =>
         {
