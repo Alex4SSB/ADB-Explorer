@@ -14,8 +14,6 @@ public static class AdbExplorerConst
     public static readonly string[] RECYCLE_INDEX_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH };
     public static readonly string[] RECYCLE_PATHS = { RECYCLE_INDEX_PATH, RECYCLE_INDEX_BACKUP_PATH, RECYCLE_PATH };
 
-    public static readonly string PACKAGE_PATH = "[PACKAGE_DRIVE]";
-
     public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
     {
         { "/sdcard", "Internal Storage" },
@@ -31,8 +29,9 @@ public static class AdbExplorerConst
         { "/sdcard", AbstractDrive.DriveType.Internal },
         { "/", AbstractDrive.DriveType.Root },
         { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
+        { NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
         { TEMP_PATH, AbstractDrive.DriveType.Temp },
-        { PACKAGE_PATH, AbstractDrive.DriveType.Package },
+        { NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
     };
     public static readonly Dictionary<AbstractDrive.DriveType, string> DRIVE_DISPLAY_NAMES = new()
     {

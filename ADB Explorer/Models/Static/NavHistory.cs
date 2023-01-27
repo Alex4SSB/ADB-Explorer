@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
-using System.Collections.Generic;
 
 namespace ADB_Explorer.Models
 {
@@ -13,6 +12,20 @@ namespace ADB_Explorer.Models
             Back,
             Forward,
             Up,
+            RecycleBin,
+            PackageDrive,
+        }
+
+        public static string StringFromLocation(SpecialLocation location) => $"[{Enum.GetName(typeof(SpecialLocation), location)}]";
+
+        public static SpecialLocation LocationFromString(string location)
+        {
+            if (location.EndsWith(']') && location.StartsWith('[') && Enum.TryParse<SpecialLocation>(location.Trim('[', ']'), out var result))
+            {
+                return result;
+            }
+            else
+                return SpecialLocation.None;
         }
 
         public static List<object> PathHistory { get; set; } = new();
@@ -31,7 +44,7 @@ namespace ADB_Explorer.Models
 
         public static bool NavigateBF(SpecialLocation direction)
         {
-            if (direction is not SpecialLocation.Back or SpecialLocation.Forward)
+            if (direction is not SpecialLocation.Back and not SpecialLocation.Forward)
                 throw new ArgumentException("Only Back & Forward navigation is accepted");
 
             if (!NavigationAvailable(direction))
@@ -42,7 +55,7 @@ namespace ADB_Explorer.Models
                 return false;
             }
 
-            var fileAction = direction is not SpecialLocation.Back
+            var fileAction = direction is not SpecialLocation.Forward
                 ? FileAction.FileActionType.Back
                 : FileAction.FileActionType.Forward;
             var command = AppActions.List.First(action => action.Name == fileAction).Command.Command as CommandHandler;

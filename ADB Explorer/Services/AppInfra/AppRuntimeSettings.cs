@@ -144,14 +144,25 @@ public class AppRuntimeSettings : ViewModelBase
 
     public bool ServerUnresponsive => Data.Settings.PollDevices && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT;
 
-    private NavHistory.SpecialLocation locationToNavigate = NavHistory.SpecialLocation.None;
-    public NavHistory.SpecialLocation LocationToNavigate
+    private object locationToNavigate = NavHistory.SpecialLocation.None;
+    public object LocationToNavigate
     {
         get => locationToNavigate;
         set
         {
             if (!Set(ref locationToNavigate, value))
                 OnPropertyChanged();
+        }
+    }
+
+    private string pathBoxNavigation = "";
+    public string PathBoxNavigation
+    {
+        get => pathBoxNavigation;
+        set
+        {
+            if (!Set(ref pathBoxNavigation, value))
+                OnPropertyChanged();        
         }
     }
 

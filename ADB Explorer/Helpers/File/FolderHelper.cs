@@ -9,6 +9,8 @@ internal class FolderHelper
 {
     public static void CombineDisplayNames()
     {
+        Data.CurrentDisplayNames.TryAdd(NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView), Data.DevicesObject.Current.Name);
+
         foreach (var drive in Data.DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type is not AbstractDrive.DriveType.Root))
         {
             Data.CurrentDisplayNames.TryAdd(drive.Path, drive.Type is AbstractDrive.DriveType.External
@@ -28,8 +30,11 @@ internal class FolderHelper
 
     public static string FolderExists(string path)
     {
-        if (path == AdbExplorerConst.PACKAGE_PATH)
+        if (path == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive))
             return path;
+
+        if (path == NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin))
+            return AdbExplorerConst.RECYCLE_PATH;
 
         try
         {

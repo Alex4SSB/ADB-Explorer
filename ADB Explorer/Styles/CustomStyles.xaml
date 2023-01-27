@@ -458,26 +458,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DirectoryLoadingProgressStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=PathBox, Path=IsFocused}" Value="True">
-                <Setter Property="IsIndeterminate" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=PathBox, Path=IsEnabled}" Value="False">
-                <Setter Property="CornerRadius" Value="4" />
-                <Setter Property="Margin" Value="0" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
-                <Setter Property="CornerRadius" Value="0" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="IsIndeterminate" Value="True" />
-        <Setter Property="CornerRadius" Value="4,4,2,2" />
-        <Setter Property="Margin" Value="0,0,0,1" />
-    </Style>
     <Style x:Key="ItemsCountStackPanelStyle" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
@@ -1054,5 +1034,11 @@
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style TargetType="controls:NavigationBox">
+        <Setter Property="MenuPadding" Value="4" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="DisplayNames" Value="{Binding Source={x:Static Member=models:Data.CurrentDisplayNames}}" />
+        <Setter Property="IsLoadingProgressVisible" Value="{Binding Source={x:Static Member=models:Data.DirList}, Path=IsProgressVisible}" />
     </Style>
 </ResourceDictionary>

@@ -215,13 +215,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     InitNavigation(RuntimeSettings.BrowseDrive.Path);
                     break;
 
+
+                case nameof(AppRuntimeSettings.PathBoxNavigation):
+                    if (RuntimeSettings.PathBoxNavigation == "-")
+                        NavigateToLocation(NavHistory.GoBack(), true);
+                    else
+                    {
+                        if (FileActions.IsExplorerVisible)
+                            NavigateToLocation(RuntimeSettings.PathBoxNavigation);
+                        else
+                        {
+                            if (!InitNavigation(RuntimeSettings.PathBoxNavigation))
+                            {
+                                DriveViewNav();
+                                NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+                                return;
+                            }
+                        }
+                    }
+                    break;
+
                 case nameof(AppRuntimeSettings.LocationToNavigate):
                     switch (RuntimeSettings.LocationToNavigate)
                     {
-                        case NavHistory.SpecialLocation.DriveView:
-                            NavHistory.Navigate(RuntimeSettings.LocationToNavigate);
-                            NavigateToLocation(RuntimeSettings.LocationToNavigate);
-                            break;
                         case NavHistory.SpecialLocation.Back:
                             NavigateToLocation(NavHistory.GoBack(), true);
                             break;
@@ -230,6 +246,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             break;
                         case NavHistory.SpecialLocation.Up:
                             NavigateToPath(ParentPath);
+                            break;
+                        case not null:
+                            if (FileActions.IsDriveViewVisible
+                            && (RuntimeSettings.LocationToNavigate is NavHistory.SpecialLocation.DriveView
+                                || (RuntimeSettings.LocationToNavigate is string location && location == NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView))))
+                                RefreshDrives(true);
+                            else
+                            {
+                                NavHistory.Navigate(RuntimeSettings.LocationToNavigate);
+                                NavigateToLocation(RuntimeSettings.LocationToNavigate);
+                            }
                             break;
                         default:
                             break;
@@ -330,7 +357,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.EditCurrentPath):
-                    if (PathBox.IsFocused)
+                    if (NavigationBox.Mode is Controls.NavigationBox.ViewMode.Path)
                         UnfocusPathBox();
                     else
                         FocusPathBox();
@@ -414,7 +441,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             case nameof(AppSettings.ForceFluentStyles):
                 SettingsHelper.SetSymbolFont();
-                PopulateButtons(CurrentPath);
+                NavigationBox.Refresh();
                 break;
             case nameof(AppSettings.Theme):
                 SetTheme(Settings.Theme);
@@ -466,7 +493,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
         {
-            DirectoryLoadingProgressBar.Visible(DirList.IsProgressVisible);
             UnfinishedBlock.Visible(DirList.IsProgressVisible);
         }
         else if (e.PropertyName == nameof(DirectoryLister.InProgress))
@@ -543,68 +569,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
     });
 
-    private void SetResourceColor(ApplicationTheme theme, string resource)
+    private static void SetResourceColor(ApplicationTheme theme, string resource)
     {
-        Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
-    }
-
-    private void PathBox_GotFocus(object sender, RoutedEventArgs e)
-    {
-        FocusPathBox();
+        App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
     }
 
     private void FocusPathBox()
     {
-        PathMenu.Visibility = Visibility.Collapsed;
-        if (!FileActions.IsRecycleBin && !FileActions.IsAppDrive)
-            PathBox.Text = TextHelper.GetAltText(PathBox);
-
-        PathBox.IsReadOnly = false;
-        PathBox.Focus();
-        PathBox.SelectAll();
+        NavigationBox.Mode = Controls.NavigationBox.ViewMode.Path;
     }
 
     private void UnfocusPathBox()
     {
-        PathMenu.Visibility = Visibility.Visible;
-        PathBox.Clear();
-        PathBox.IsReadOnly = true;
-        FileOperationsSplitView.Focus();
-    }
-
-    private void PathBox_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key == Key.Escape || (e.Key == Key.Enter && PathBox.Text == ""))
-        {
-            UnfocusPathBox();
-        }
-        else if (e.Key == Key.Enter)
-        {
-            if (ExplorerGrid.IsVisible)
-            {
-                if (PathBox.Text == "-")
-                    NavHistory.NavigateBF(NavHistory.SpecialLocation.Back);
-                else if (NavigateToPath(PathBox.Text.StartsWith(RECYCLE_PATH) ? RECYCLE_PATH : PathBox.Text))
-                    return;
-            }
-            else
-            {
-                if (!InitNavigation(PathBox.Text))
-                {
-                    DriveViewNav();
-                    NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
-                    return;
-                }
-            }
-
-            e.Handled = true;
-            ExplorerGrid.Focus();
-        }
-    }
-
-    private void PathBox_LostFocus(object sender, RoutedEventArgs e)
-    {
-        UnfocusPathBox();
+        NavigationBox.UnfocusTarget = FileOperationsSplitView;
+        NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
     }
 
     private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -1035,6 +1013,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         SetAndroidVersion();
         RefreshDrives(true);
+
+        FolderHelper.CombineDisplayNames();
         DriveViewNav();
         NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
@@ -1080,13 +1060,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
-        PathBox.IsEnabled = true;
 
-        MenuItem button = CreatePathButton(DevicesObject.Current, DevicesObject.Current.Name);
-        button.Command = AppActions.List.First(action => action.Name is FileAction.FileActionType.Refresh).Command.Command;
-        
-        AddPathButton(button);
-        TextHelper.SetAltText(PathBox, "");
+        NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
+        NavigationBox.Path = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
 
         DriveList.ItemsSource = DevicesObject.Current.Drives;
 
@@ -1099,8 +1075,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (path is null)
             return true;
 
-        FolderHelper.CombineDisplayNames();
-
         var realPath = FolderHelper.FolderExists(string.IsNullOrEmpty(path) ? DEFAULT_PATH : path);
         if (realPath is null)
             return false;
@@ -1112,8 +1086,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         return _navigateToPath(realPath, bfNavigated);
     }
-
-    
 
     private void UpdateInstallersCount()
     {
@@ -1264,14 +1236,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         ExplorerGrid.Focus();
-
-        TextHelper.SetAltText(PathBox, realPath);
         CurrentPath = realPath;
-        PopulateButtons(realPath);
+
+        NavigationBox.Path = realPath == RECYCLE_PATH ? NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin) : realPath;
+
         ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
 
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
-        FileActions.IsAppDrive = CurrentPath == PACKAGE_PATH;
+        FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
         FileActions.PasteEnabled = IsPasteEnabled();
@@ -1362,211 +1334,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return true;
     }
 
-    private void PopulateButtons(string path)
-    {
-        if (string.IsNullOrEmpty(path))
-            return;
-
-        var expectedLength = 0.0;
-        List<MenuItem> tempButtons = new();
-        List<string> pathItems = new();
-
-        var pairs = CurrentDisplayNames.Where(kv => path.StartsWith(kv.Key));
-        var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.First();
-        if (specialPair.Key != null)
-        {
-            MenuItem button = CreatePathButton(specialPair);
-            tempButtons.Add(button);
-            pathItems.Add(specialPair.Key);
-            path = path[specialPair.Key.Length..].TrimStart('/');
-            expectedLength = ControlSize.GetWidth(button);
-        }
-
-        var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var dir in dirs)
-        {
-            pathItems.Add(dir);
-            var dirPath = string.Join('/', pathItems).Replace("//", "/");
-            MenuItem button = CreatePathButton(dirPath, dir);
-            tempButtons.Add(button);
-            expectedLength += ControlSize.GetWidth(button);
-        }
-
-        expectedLength += (tempButtons.Count - 1) * ControlSize.GetWidth(CreatePathArrow());
-
-        int i = 0;
-        for (; i < PathButtons.Count && i < tempButtons.Count; i++)
-        {
-            var oldB = PathButtons[i];
-            var newB = tempButtons[i];
-            if (oldB.Header.ToString() != newB.Header.ToString() ||
-                TextHelper.GetAltObject(oldB).ToString() != TextHelper.GetAltObject(newB).ToString())
-            {
-                break;
-            }
-        }
-        PathButtons.RemoveRange(i, PathButtons.Count - i);
-        PathButtons.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
-
-        ConsolidateButtons(expectedLength);
-    }
-
-    private void ConsolidateButtons(double expectedLength)
-    {
-        if (expectedLength > PathBox.ActualWidth)
-            expectedLength += ControlSize.GetWidth(CreateExcessButton());
-
-        double excessLength = expectedLength - PathBox.ActualWidth;
-        List<MenuItem> excessButtons = new();
-        PathMenu.Items.Clear();
-
-        if (excessLength > 0)
-        {
-            int i = 0;
-            while (excessLength >= 0 && PathButtons.Count - excessButtons.Count > 1)
-            {
-                var path = TextHelper.GetAltObject(PathButtons[i]).ToString();
-                var drives = DevicesObject.Current.Drives.Where(drive => drive.Path == path);
-                var icon = "\uE8B7";
-                if (drives.Any())
-                    icon = drives.First().DriveIcon;
-
-                excessButtons.Add(PathButtons[i]);
-                PathButtons[i].ContextMenu = null;
-                PathButtons[i].Height = double.NaN;
-                PathButtons[i].Padding = new(10, 4, 10, 4);
-                PathButtons[i].Icon = new FontIcon() { Glyph = icon, Style = FindResource("GlyphFont") as Style };
-
-                PathButtons[i].Margin = Settings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
-                ControlHelper.SetCornerRadius(PathButtons[i], new(Settings.UseFluentStyles ? 4 : 0));
-
-                excessLength -= ControlSize.GetWidth(PathButtons[i]);
-
-                i++;
-            }
-
-            AddExcessButton(excessButtons);
-        }
-
-        foreach (var item in PathButtons.Except(excessButtons))
-        {
-            if (PathMenu.Items.Count > 0)
-                AddPathArrow();
-
-            AddPathButton(item);
-        }
-
-        if (excessLength > 0)
-        {
-            var width = PathButtons[^1].ActualWidth - (ControlSize.GetWidth(PathMenu) - PathBox.ActualWidth) - 4;
-            if (width < 0)
-                width = 0;
-
-            PathButtons[^1].Width = width;
-        }
-        else
-            PathButtons[^1].Width = double.NaN;
-    }
-
-    private MenuItem CreateExcessButton()
-    {
-        var menuItem = new MenuItem()
-        {
-            VerticalAlignment = VerticalAlignment.Center,
-            Height = 24,
-            Padding = new(10, 4, 10, 4),
-            Margin = new(0),
-            Header = new FontIcon()
-            {
-                Glyph = "\uE712",
-                FontSize = 18,
-                Style = FindResource("GlyphFont") as Style,
-            },
-        };
-
-        return menuItem;
-    }
-
-    private void AddExcessButton(List<MenuItem> excessButtons = null)
-    {
-        if (excessButtons is not null && !excessButtons.Any())
-            return;
-
-        var button = CreateExcessButton();
-        button.ItemsSource = excessButtons;
-
-        PathMenu.Items.Add(button);
-    }
-
-    private MenuItem CreatePathButton(KeyValuePair<string, string> kv) => CreatePathButton(kv.Key, kv.Value);
-    private MenuItem CreatePathButton(object path, string name)
-    {
-        MenuItem button = new()
-        {
-            Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new(0),
-            Padding = new(8, 0, 8, 0),
-            Height = 24,
-        };
-        button.Click += PathButton_Click;
-        TextHelper.SetAltObject(button, path);
-
-        return button;
-    }
-
-    private void AddPathButton(MenuItem button)
-    {
-        if (TextHelper.GetAltObject(button) is string str && str == RECYCLE_PATH)
-            button.ContextMenu = null;
-
-        button.Height = 24;
-        button.Padding = new(8, 0, 8, 0);
-        button.Margin = new(0);
-
-        ControlHelper.SetCornerRadius(button, new(Settings.UseFluentStyles ? 3 : 0));
-
-        button.ContextMenu = Resources["PathButtonsMenu"] as ContextMenu;
-
-        PathMenu.Items.Add(button);
-    }
-
-    private MenuItem CreatePathArrow() => new()
-    {
-        VerticalAlignment = VerticalAlignment.Center,
-        Height = 24,
-        Margin = new(0),
-        Padding = new(3, 0, 3, 0),
-        IsEnabled = false,
-        Header = new FontIcon()
-        {
-            Glyph = "\uE970",
-            FontSize = 8,
-            Style = FindResource("GlyphFont") as Style,
-        },
-    };
-
-    private void AddPathArrow(bool append = true)
-    {
-        var arrow = CreatePathArrow();
-
-        if (append)
-            PathMenu.Items.Add(arrow);
-        else
-            PathMenu.Items.Insert(0, arrow);
-    }
-
-    private void PathButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem item)
-        {
-            if (TextHelper.GetAltObject(item) is string path and not "")
-                NavigateToPath(path);
-            else if (TextHelper.GetAltObject(item) is LogicalDevice)
-                RefreshDrives(true);
-        }
-    }
-
     private void NavigateToLocation(object location, bool bfNavigated = false)
     {
         RecycleIndex.Clear();
@@ -1579,21 +1346,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             else
                 NavigateToPath(path, bfNavigated);
         }
-        else if (location is NavHistory.SpecialLocation special)
+        else if (location is NavHistory.SpecialLocation.DriveView)
         {
-            switch (special)
-            {
-                case NavHistory.SpecialLocation.DriveView:
-                    FileActions.IsRecycleBin = false;
-                    UnfocusPathBox();
-                    RefreshDrives();
-                    DriveViewNav();
+            FileActions.IsRecycleBin = false;
+            UnfocusPathBox();
+            RefreshDrives();
+            DriveViewNav();
 
-                    UpdateFileActions();
-                    break;
-                default:
-                    throw new NotSupportedException();
-            }
+            UpdateFileActions();
         }
     }
 
@@ -1946,7 +1706,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ClearExplorer(bool clearDevice = true)
     {
-        PathMenu.Items.Clear();
         DirList?.FileList?.Clear();
         Packages.Clear();
         FileActions.PushFilesFoldersEnabled =
@@ -1974,9 +1733,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             CurrentDisplayNames.Clear();
             CurrentPath = null;
             CurrentDeviceDetailsPanel.DataContext = null;
-            TextHelper.SetAltText(PathBox, "");
-            FileActions.PushPackageEnabled =
-            PathBox.IsEnabled = false;
+            FileActions.PushPackageEnabled = false;
+
+            NavigationBox.Path = null;
+            NavigationBox.Mode = Controls.NavigationBox.ViewMode.None;
         }
 
         FilterFileActions();
@@ -2025,7 +1785,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        PopulateButtons(TextHelper.GetAltText(PathBox));
+        NavigationBox.Refresh();
         ResizeDetailedView();
         EnableSplitViewAnimation();
         SearchBoxMaxWidth();

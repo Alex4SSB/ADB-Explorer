@@ -82,9 +82,9 @@ public class LogicalDevice : Device
         Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Root).Key)));
         Drives.Add(new LogicalDriveViewModel(new(path: AdbExplorerConst.DRIVE_TYPES.First(d => d.Value is AbstractDrive.DriveType.Internal).Key)));
 
-        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.RECYCLE_PATH, -1)));
+        Drives.Add(new VirtualDriveViewModel(new(path: NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin), -1)));
         Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.TEMP_PATH)));
-        Drives.Add(new VirtualDriveViewModel(new(path: AdbExplorerConst.PACKAGE_PATH)));
+        Drives.Add(new VirtualDriveViewModel(new(path: NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive))));
     }
 
     /// <summary>
