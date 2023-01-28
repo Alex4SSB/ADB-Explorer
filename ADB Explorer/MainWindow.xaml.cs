@@ -45,17 +45,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private double ScrollContentPresenterMargin => ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top;
     private double DataGridContentWidth => ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
 
-    private readonly List<MenuItem> PathButtons = new();
-
 
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    public string SelectedFilesTotalSize => (selectedFiles is not null && FileClass.TotalSize(selectedFiles) is ulong size and > 0) ? size.ToSize() : "";
-
-    private IEnumerable<FileClass> selectedFiles => FileActions.IsAppDrive ? null : ExplorerGrid.SelectedItems.OfType<FileClass>();
-
-    private IEnumerable<Package> selectedPackages => FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : null;
+    public string SelectedFilesTotalSize => (SelectedFiles is not null && FileClass.TotalSize(SelectedFiles) is ulong size and > 0) ? size.ToSize() : "";
 
     private string prevPath = "";
 
@@ -298,11 +292,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.Cut):
-                    CutFiles(selectedFiles);
+                    CutFiles(SelectedFiles);
                     break;
                     
                 case nameof(AppRuntimeSettings.Copy):
-                    CutFiles(selectedFiles, true);
+                    CutFiles(SelectedFiles, true);
                     break;
 
                 case nameof(AppRuntimeSettings.Paste):
@@ -581,13 +575,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UnfocusPathBox()
     {
+        if (NavigationBox.Mode is Controls.NavigationBox.ViewMode.None)
+            return;
+
         NavigationBox.UnfocusTarget = FileOperationsSplitView;
         NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
     }
 
     private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && selectedFiles.Count() == 1 && !IsInEditMode())
+        if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && SelectedFiles.Count() == 1 && !IsInEditMode())
             DoubleClick(ExplorerGrid.SelectedItem);
     }
 
@@ -634,6 +631,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
         }
 
+        SelectedFiles = FileActions.IsAppDrive ? null : ExplorerGrid.SelectedItems.OfType<FileClass>();
+        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : null;
+
         if (SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
         {
             Task.Run(() => Task.Delay(SELECTION_CHANGED_DELAY)).ContinueWith((t) => Dispatcher.Invoke(() => UpdateFileActions()));
@@ -644,15 +644,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateFileActions()
     {
-        FileActions.UninstallPackageEnabled = FileActions.IsAppDrive && selectedPackages.Any();
-        FileActions.ContextPushPackagesEnabled = FileActions.IsAppDrive && !selectedPackages.Any();
+        FileActions.UninstallPackageEnabled = FileActions.IsAppDrive && SelectedPackages.Any();
+        FileActions.ContextPushPackagesEnabled = FileActions.IsAppDrive && !SelectedPackages.Any();
 
         FileActions.IsRefreshEnabled = FileActions.IsDriveViewVisible || FileActions.IsExplorerVisible;
         FileActions.IsCopyCurrentPathEnabled = FileActions.IsExplorerVisible && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
         if (FileActions.IsAppDrive)
         {
-            FileActions.IsCopyItemPathEnabled = selectedPackages.Count() == 1;
+            FileActions.IsCopyItemPathEnabled = SelectedPackages.Count() == 1;
 
             FilterFileActions();
             return;
@@ -660,45 +660,45 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
 
-        FileActions.IsRegularItem = !(selectedFiles.Any() && DevicesObject.Current?.Root is not AbstractDevice.RootStatus.Enabled
-            && selectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder)));
+        FileActions.IsRegularItem = !(SelectedFiles.Any() && DevicesObject.Current?.Root is not AbstractDevice.RootStatus.Enabled
+            && SelectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder)));
 
         if (FileActions.IsRecycleBin)
         {
-            TrashHelper.EnableRecycleButtons(selectedFiles.Any() ? selectedFiles : DirList.FileList);
+            TrashHelper.EnableRecycleButtons(SelectedFiles.Any() ? SelectedFiles : DirList.FileList);
         }
         else
         {
-            FileActions.DeleteEnabled = selectedFiles.Any() && FileActions.IsRegularItem;
+            FileActions.DeleteEnabled = SelectedFiles.Any() && FileActions.IsRegularItem;
             FileActions.RestoreEnabled = false;
         }
 
-        FileActions.DeleteAction.Value = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
-        FileActions.RestoreAction.Value = FileActions.IsRecycleBin && !selectedFiles.Any() ? "Restore All Items" : "Restore";
+        FileActions.DeleteAction.Value = FileActions.IsRecycleBin && !SelectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
+        FileActions.RestoreAction.Value = FileActions.IsRecycleBin && !SelectedFiles.Any() ? "Restore All Items" : "Restore";
 
-        FileActions.PullEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && selectedFiles.Any() && FileActions.IsRegularItem;
-        FileActions.ContextPushEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && (!selectedFiles.Any() || (selectedFiles.Count() == 1 && selectedFiles.First().IsDirectory));
+        FileActions.PullEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && SelectedFiles.Any() && FileActions.IsRegularItem;
+        FileActions.ContextPushEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && (!SelectedFiles.Any() || (SelectedFiles.Count() == 1 && SelectedFiles.First().IsDirectory));
 
-        FileActions.RenameEnabled = !FileActions.IsRecycleBin && selectedFiles.Count() == 1 && FileActions.IsRegularItem;
+        FileActions.RenameEnabled = !FileActions.IsRecycleBin && SelectedFiles.Count() == 1 && FileActions.IsRegularItem;
 
-        FileActions.CutEnabled = !selectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && FileActions.IsRegularItem;
+        FileActions.CutEnabled = !SelectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && FileActions.IsRegularItem;
 
-        FileActions.CopyEnabled = !FileActions.IsRecycleBin && FileActions.IsRegularItem && !selectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
+        FileActions.CopyEnabled = !FileActions.IsRecycleBin && FileActions.IsRegularItem && !SelectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
         FileActions.PasteEnabled = IsPasteEnabled();
         FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
 
-        FileActions.PackageActionsEnabled = Settings.EnableApk && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk) && !FileActions.IsRecycleBin;
-        FileActions.IsCopyItemPathEnabled = selectedFiles.Count() == 1 && !FileActions.IsRecycleBin;
+        FileActions.PackageActionsEnabled = Settings.EnableApk && SelectedFiles.Any() && SelectedFiles.All(file => file.IsInstallApk) && !FileActions.IsRecycleBin;
+        FileActions.IsCopyItemPathEnabled = SelectedFiles.Count() == 1 && !FileActions.IsRecycleBin;
 
-        FileActions.ContextNewEnabled = !selectedFiles.Any() && !FileActions.IsRecycleBin;
-        FileActions.SubmenuUninstallEnabled = FileActions.IsTemp && selectedFiles.Any() && selectedFiles.All(file => file.IsInstallApk);
+        FileActions.ContextNewEnabled = !SelectedFiles.Any() && !FileActions.IsRecycleBin;
+        FileActions.SubmenuUninstallEnabled = FileActions.IsTemp && SelectedFiles.Any() && SelectedFiles.All(file => file.IsInstallApk);
 
-        FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && selectedFiles.Any() && selectedFiles.All(file => file.Type is FileType.File && !file.IsApk);
+        FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && SelectedFiles.Any() && SelectedFiles.All(file => file.Type is FileType.File && !file.IsApk);
 
         FileActions.EditFileEnabled = !FileActions.IsRecycleBin
-            && selectedFiles.Count() == 1
-            && selectedFiles.First().Type is FileType.File
-            && !selectedFiles.First().IsApk;
+            && SelectedFiles.Count() == 1
+            && SelectedFiles.First().Type is FileType.File
+            && !SelectedFiles.First().IsApk;
 
         FilterFileActions();
     }
@@ -727,13 +727,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self)
             return false;
 
-        var selected = ignoreSelected ? 0 : selectedFiles?.Count();
+        var selected = ignoreSelected ? 0 : SelectedFiles?.Count();
         switch (selected)
         {
             case 0:
                 return !(CutItems[0].ParentPath == CurrentPath && FileActions.PasteState is FileClass.CutType.Cut);
             case 1:
-                if (isKeyboard && FileActions.PasteState is FileClass.CutType.Copy && CutItems[0].Relation(selectedFiles.First()) is RelationType.Self)
+                if (isKeyboard && FileActions.PasteState is FileClass.CutType.Copy && CutItems[0].Relation(SelectedFiles.First()) is RelationType.Self)
                     return true;
 
                 var item = ExplorerGrid.SelectedItem as FilePath;
@@ -1492,7 +1492,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void PullFiles(bool quick = false)
     {
-        int itemsCount = selectedFiles.Count();
+        int itemsCount = SelectedFiles.Count();
         ShellObject path;
 
         if (quick)
@@ -1539,7 +1539,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void PushItems(bool isFolderPicker, bool isContextMenu)
     {
         FilePath targetPath;
-        if (isContextMenu && selectedFiles.Count() == 1)
+        if (isContextMenu && SelectedFiles.Count() == 1)
             targetPath = (FilePath)ExplorerGrid.SelectedItem;
         else
             targetPath = new(CurrentPath);
@@ -2123,14 +2123,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private async void DeleteFiles()
     {
         IEnumerable<FileClass> itemsToDelete;
-        if (FileActions.IsRecycleBin && !selectedFiles.Any())
+        if (FileActions.IsRecycleBin && !SelectedFiles.Any())
         {
             itemsToDelete = DirList.FileList.Where(f => !RECYCLE_INDEX_PATHS.Contains(f.FullPath));
         }
         else
         {
             itemsToDelete = DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
-                    ? selectedFiles.Where(file => file.Type is FileType.File or FileType.Folder) : selectedFiles;
+                    ? SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder) : SelectedFiles;
         }
 
         string deletedString;
@@ -2168,7 +2168,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (FileActions.IsRecycleBin)
             {
                 TrashHelper.EnableRecycleButtons(DirList.FileList.Except(itemsToDelete));
-                if (!selectedFiles.Any() && DirList.FileList.Any(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
+                if (!SelectedFiles.Any() && DirList.FileList.Any(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
                 {
                     _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirList.FileList.Where(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath))));
                 }
@@ -2313,7 +2313,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             else
             {
-                if (selectedFiles is null || selectedFiles.Count() > 1)
+                if (SelectedFiles is null || SelectedFiles.Count() > 1)
                 {
                     ExplorerGrid.SelectedItems.Clear();
                     row.IsSelected = true;
@@ -2332,7 +2332,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                     Dispatcher.Invoke(() =>
                     {
-                        if (e.LeftButton == MouseButtonState.Released && selectedFiles.Count() == 1)
+                        if (e.LeftButton == MouseButtonState.Released && SelectedFiles.Count() == 1)
                             cell.IsEditing = true;
                     });
                 });
@@ -2394,11 +2394,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void PasteFiles()
     {
-        var firstSelectedFile = selectedFiles.Any() ? selectedFiles.First() : null;
+        var firstSelectedFile = SelectedFiles.Any() ? SelectedFiles.First() : null;
         var targetName = "";
         var targetPath = "";
 
-        if (selectedFiles.Count() != 1 || (FileActions.PasteState is FileClass.CutType.Copy && CutItems[0].Relation(firstSelectedFile) is RelationType.Self))
+        if (SelectedFiles.Count() != 1 || (FileActions.PasteState is FileClass.CutType.Copy && CutItems[0].Relation(firstSelectedFile) is RelationType.Self))
         {
             targetPath = CurrentPath;
             targetName = CurrentPath[CurrentPath.LastIndexOf('/')..];
@@ -2510,7 +2510,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void RestoreItems()
     {
-        var restoreItems = (!selectedFiles.Any() ? DirList.FileList : selectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
+        var restoreItems = (!SelectedFiles.Any() ? DirList.FileList : SelectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
         string[] existingItems = Array.Empty<string>();
         List<FileClass> existingFiles = new();
         bool merge = false;
@@ -2575,7 +2575,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                                          fileList: DirList.FileList,
                                          dispatcher: Dispatcher);
 
-                if (!selectedFiles.Any())
+                if (!SelectedFiles.Any())
                     TrashHelper.EnableRecycleButtons();
             });
         });
@@ -2652,7 +2652,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void InstallPackages()
     {
-        var packages = selectedFiles;
+        var packages = SelectedFiles;
 
         Task.Run(() =>
         {
@@ -2662,8 +2662,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void UninstallPackages()
     {
-        var pkgs = selectedPackages;
-        var files = selectedFiles;
+        var pkgs = SelectedPackages;
+        var files = SelectedFiles;
 
         var result = await DialogService.ShowConfirmation(
             S_REM_APK(!FileActions.IsAppDrive, FileActions.IsAppDrive ? pkgs.Count() : files.Count()),
@@ -2687,7 +2687,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void CopyToTemp()
     {
-        _ = ShellFileOperation.MoveItems(true, TEMP_PATH, selectedFiles, FileHelper.DisplayName(selectedFiles.First()), DirList.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
+        _ = ShellFileOperation.MoveItems(true, TEMP_PATH, SelectedFiles, FileHelper.DisplayName(SelectedFiles.First()), DirList.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
     }
 
     private void PushPackages()
@@ -2760,7 +2760,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdatedModifiedDates()
     {
-        var items = selectedFiles;
+        var items = SelectedFiles;
         Task.Run(() => ShellFileOperation.ChangeDateFromName(CurrentADBDevice, items, DirList.FileList, Dispatcher));
     }
 
@@ -2780,7 +2780,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void SaveReaderTextButton_Click(object sender, RoutedEventArgs e)
     {
-        var file = selectedFiles.First();
+        var file = SelectedFiles.First();
         string text = FileActions.EditorText;
 
         var writeTask = Task.Run(() =>
@@ -2802,7 +2802,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         FileActions.IsEditorOpen = true;
 
-        FileActions.EditorFilePath = selectedFiles.First().FullPath;
+        FileActions.EditorFilePath = SelectedFiles.First().FullPath;
 
         var readTask = Task.Run(() =>
         {

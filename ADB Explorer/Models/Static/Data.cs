@@ -45,4 +45,8 @@ internal static class Data
     public static MDNS MdnsService { get; set; } = new();
 
     public static PairingQrClass QrClass { get; set; }
+
+    public static IEnumerable<FileClass> SelectedFiles { get; set; } = Enumerable.Empty<FileClass>();
+
+    public static IEnumerable<Package> SelectedPackages { get; set; } = Enumerable.Empty<Package>();
 }

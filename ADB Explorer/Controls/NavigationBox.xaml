@@ -11,9 +11,6 @@
     d:DesignHeight="32"
     d:DesignWidth="500"
     mc:Ignorable="d">
-    <!--<UserControl.Resources>
-        <ContextMenu x:Key="BreadcrumbContextMenu" Style="{StaticResource PathBoxContextMenuStyle}" />
-    </UserControl.Resources>-->
     <Grid
         Height="{Binding Height}"
         MinWidth="150"
@@ -47,7 +44,7 @@
             Margin="0,0,0,1"
             VerticalAlignment="Stretch"
             Background="Transparent"
-            Foreground="#780078D7"
+            Foreground="{StaticResource NavigationBarProgressBrush}"
             IsHitTestVisible="False"
             IsIndeterminate="True">
             <ui:ProgressBar.Style>

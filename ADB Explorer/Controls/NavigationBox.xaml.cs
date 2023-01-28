@@ -21,6 +21,8 @@ public partial class NavigationBox : UserControl
         InitializeComponent();
 
         Breadcrumbs = new();
+
+        Mode = ViewMode.None;
     }
 
     public string Path
@@ -120,7 +122,7 @@ public partial class NavigationBox : UserControl
 
             if (value is ViewMode.Path)
                 PathBox.Focus();
-            else
+            else if (UnfocusTarget is not null && PathBox.IsFocused)
                 UnfocusTarget.Focus();
         }
     }
@@ -205,7 +207,6 @@ public partial class NavigationBox : UserControl
                 Breadcrumbs[i].Icon = new FontIcon()
                 {
                     Glyph = string.IsNullOrEmpty(DriveIcon) ? "\uE8B7" : DriveIcon,
-                    //Style = FindResource("GlyphFont") as Style
                 };
 
                 Breadcrumbs[i].Margin = Data.Settings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
@@ -251,7 +252,6 @@ public partial class NavigationBox : UserControl
             {
                 Glyph = "\uE712",
                 FontSize = 18,
-                //Style = FindResource("GlyphFont") as Style,
             },
         };
 
@@ -297,8 +297,6 @@ public partial class NavigationBox : UserControl
 
         ControlHelper.SetCornerRadius(button, new(Data.Settings.UseFluentStyles ? 3 : 0));
 
-        //button.ContextMenu = Resources["BreadcrumbsMenu"] as ContextMenu;
-
         BreadcrumbMenu.Items.Add(button);
     }
 
@@ -313,7 +311,6 @@ public partial class NavigationBox : UserControl
         {
             Glyph = "\uE970",
             FontSize = 8,
-            //Style = FindResource("GlyphFont") as Style,
         },
     };
 
