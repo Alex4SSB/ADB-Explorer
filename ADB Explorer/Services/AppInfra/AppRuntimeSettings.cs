@@ -1,5 +1,7 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using System.Collections;
 
 namespace ADB_Explorer.Services;
 
@@ -11,14 +13,22 @@ public class AppRuntimeSettings : ViewModelBase
     public bool IsSettingsPaneOpen
     {
         get => isSettingsPaneOpen;
-        set => Set(ref isSettingsPaneOpen, value);
+        set
+        {
+            if (Set(ref isSettingsPaneOpen, value))
+                DeviceHelper.CollapseDevices();
+        }
     }
 
     private bool isDevicesPaneOpen = false;
     public bool IsDevicesPaneOpen
     {
         get => isDevicesPaneOpen;
-        set => Set(ref isDevicesPaneOpen, value);
+        set
+        {
+            if (Set(ref isDevicesPaneOpen, value))
+                DeviceHelper.CollapseDevices();
+        }
     }
 
     private bool isMdnsExpanderOpen = false;
@@ -32,7 +42,11 @@ public class AppRuntimeSettings : ViewModelBase
     public bool IsOperationsViewOpen
     {
         get => isOperationsViewOpen;
-        set => Set(ref isOperationsViewOpen, value);
+        set
+        {
+            if (Set(ref isOperationsViewOpen, value))
+                DeviceHelper.CollapseDevices();
+        }
     }
 
     private bool sortedView = false;
@@ -81,21 +95,14 @@ public class AppRuntimeSettings : ViewModelBase
     public LogicalDeviceViewModel DeviceToOpen
     {
         get => deviceToBrowse;
-        set => Set(ref deviceToBrowse, value);
-    }
-
-    private DeviceViewModel removeDevice = null;
-    public DeviceViewModel DeviceToRemove
-    {
-        get => removeDevice;
-        set => Set(ref removeDevice, value);
-    }
-
-    private ServiceDeviceViewModel deviceToPair;
-    public ServiceDeviceViewModel DeviceToPair
-    {
-        get => deviceToPair;
-        set => Set(ref deviceToPair, value);
+        set
+        {
+            if (Set(ref deviceToBrowse, value))
+            {
+                if (value is not null)
+                    DeviceHelper.OpenDevice(value);
+            }
+        }
     }
 
     private bool isManualPairingInProgress = false;
@@ -103,13 +110,6 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => isManualPairingInProgress;
         set => Set(ref isManualPairingInProgress, value);
-    }
-
-    private bool rootAttemptForbidden = false;
-    public bool RootAttemptForbidden
-    {
-        get => rootAttemptForbidden;
-        set => Set(ref rootAttemptForbidden, value);
     }
 
     private DriveViewModel browseDrive = null;
@@ -123,7 +123,14 @@ public class AppRuntimeSettings : ViewModelBase
     public DeviceViewModel ConnectNewDevice
     {
         get => connectNewDevice;
-        set => Set(ref connectNewDevice, value);
+        set
+        {
+            if (Set(ref connectNewDevice, value))
+            {
+                if (value is not null)
+                    DeviceHelper.ConnectDevice(value);
+            }
+        }
     }
 
     private DateTime lastServerResponse = DateTime.Now;
@@ -194,30 +201,45 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isSplashScreenVisible, value);
     }
 
+    private IEnumerable explorerSource;
+    public IEnumerable ExplorerSource
+    {
+        get => explorerSource;
+        set => Set(ref explorerSource, value);
+    }
+
+    private LogicalDeviceViewModel currentBatteryContext = null;
+    public LogicalDeviceViewModel CurrentBatteryContext
+    {
+        get => currentBatteryContext;
+        set => Set(ref currentBatteryContext, value);
+    }
+
+    private bool? isPathBoxFocused = null;
+    public bool? IsPathBoxFocused
+    {
+        get => isPathBoxFocused;
+        set
+        {
+            if (!Set(ref isPathBoxFocused, value))
+                OnPropertyChanged();
+        }
+    }
+
     #region Event-only properties
 
-    public bool BeginPull { get => false; set => OnPropertyChanged(); }
-    public bool PushFolders { get => false; set => OnPropertyChanged(); }
-    public bool PushFiles { get => false; set => OnPropertyChanged(); }
-    public bool PushPackages { get => false; set => OnPropertyChanged(); }
     public bool NewFolder { get => false; set => OnPropertyChanged(); }
     public bool NewFile { get => false; set => OnPropertyChanged(); }
-    public bool Cut { get => false; set => OnPropertyChanged(); }
-    public bool Copy { get => false; set => OnPropertyChanged(); }
-    public bool Paste { get => false; set => OnPropertyChanged(); }
     public bool Rename { get => false; set => OnPropertyChanged(); }
-    public bool Restore { get => false; set => OnPropertyChanged(); }
-    public bool Delete { get => false; set => OnPropertyChanged(); }
-    public bool Uninstall { get => false; set => OnPropertyChanged(); }
-    public bool CopyItemPath { get => false; set => OnPropertyChanged(); }
-    public bool UpdateModifiedTime { get => false; set => OnPropertyChanged(); }
-    public bool EditItem { get => false; set => OnPropertyChanged(); }
-    public bool InstallPackage { get => false; set => OnPropertyChanged(); }
-    public bool CopyToTemp { get => false; set => OnPropertyChanged(); }
     public bool SelectAll { get => false; set => OnPropertyChanged(); }
     public bool Refresh { get => false; set => OnPropertyChanged(); }
-    public bool EditCurrentPath { get => false; set => OnPropertyChanged(); }
     public bool Filter { get => false; set => OnPropertyChanged(); }
+    public bool FilterDrives { get => false; set => OnPropertyChanged(); }
+    public bool FilterDevices { get => false; set => OnPropertyChanged(); }
+    public bool FilterActions { get => false; set => OnPropertyChanged(); }
+    public bool ClearNavBox { get => false; set => OnPropertyChanged(); }
+    public bool InitLister { get => false; set => OnPropertyChanged(); }
+    public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

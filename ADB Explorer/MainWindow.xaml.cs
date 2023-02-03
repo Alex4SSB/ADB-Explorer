@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Helpers.VisibilityHelper;
@@ -99,8 +100,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
 
 #if DEBUG
-        TestCurrentOperation();
-        TestDevices();
+        FileOpHelper.TestCurrentOperation();
+        DeviceHelper.TestDevices();
 #endif
 
         Task.Run(() =>
@@ -133,64 +134,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             switch (e.PropertyName)
             {
-                case nameof(AppRuntimeSettings.DeviceToOpen) when RuntimeSettings.DeviceToOpen:
-                    DevicesObject.SetOpenDevice(RuntimeSettings.DeviceToOpen);
-                    InitLister();
-                    ClearExplorer();
-                    NavHistory.Reset();
-                    InitDevice();
-
-                    RuntimeSettings.IsDevicesPaneOpen = false;
-                    break;
-                case nameof(AppRuntimeSettings.DeviceToRemove) when RuntimeSettings.DeviceToRemove is not null:
-                    switch (RuntimeSettings.DeviceToRemove)
-                    {
-                        case LogicalDeviceViewModel logical:
-                            if (logical.IsOpen)
-                            {
-                                DriveHelper.ClearDrives();
-                                ClearExplorer();
-                                NavHistory.Reset();
-                                FileActions.IsExplorerVisible = false;
-                                CurrentADBDevice = null;
-                                DirList = null;
-                                RuntimeSettings.DeviceToOpen = null;
-                            }
-
-                            DevicesObject.UIList.Remove(RuntimeSettings.DeviceToRemove);
-                            FilterDevices();
-                            DeviceListSetup();
-                            break;
-                        case HistoryDeviceViewModel hist:
-                            DevicesObject.RemoveHistoryDevice(hist);
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-
-                    RuntimeSettings.DeviceToRemove = null;
-                    break;
-
-                case nameof(AppRuntimeSettings.DeviceToPair) when RuntimeSettings.DeviceToPair is not null:
-                    var deviceToPair = RuntimeSettings.DeviceToPair;
-                    _ = DeviceHelper.PairService(deviceToPair);
-                    RuntimeSettings.DeviceToPair = null;
-                    break;
-
-                case nameof(AppRuntimeSettings.RootAttemptForbidden) when RuntimeSettings.RootAttemptForbidden:
-                    RuntimeSettings.RootAttemptForbidden = false;
-                    DialogService.ShowMessage(S_ROOT_FORBID, S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical);
-                    break;
-
-                case nameof(AppRuntimeSettings.ConnectNewDevice) when RuntimeSettings.ConnectNewDevice is not null:
-                    RuntimeSettings.IsManualPairingInProgress = true;
-
-                    if (RuntimeSettings.ConnectNewDevice is NewDeviceViewModel newDevice && newDevice.IsPairingEnabled)
-                        PairNewDevice();
-                    else
-                        ConnectNewDevice();
-                    break;
-
                 case nameof(AppRuntimeSettings.IsMdnsExpanderOpen):
                     if (MdnsService?.State is not MDNS.MdnsState.Disabled)
                     {
@@ -245,7 +188,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             if (FileActions.IsDriveViewVisible
                             && (RuntimeSettings.LocationToNavigate is NavHistory.SpecialLocation.DriveView
                                 || (RuntimeSettings.LocationToNavigate is string location && location == NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView))))
-                                RefreshDrives(true);
+                                FileActionLogic.RefreshDrives(true);
                             else
                             {
                                 NavHistory.Navigate(RuntimeSettings.LocationToNavigate);
@@ -257,32 +200,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     }
                     break;
 
-                case nameof(AppRuntimeSettings.IsDevicesPaneOpen)
-                    or nameof(AppRuntimeSettings.IsSettingsPaneOpen)
-                    or nameof(AppRuntimeSettings.IsOperationsViewOpen):
-                    UnfocusPathBox();
-                    DeviceHelper.CollapseDevices();
-                    break;
-
-                case nameof(AppRuntimeSettings.BeginPull):
-                    UnfocusPathBox();
-                    PullFiles();
-                    break;
-
-                case nameof(AppRuntimeSettings.PushFolders):
-                    UnfocusPathBox();
-                    PushItems(true, false);
-                    break;
-
-                case nameof(AppRuntimeSettings.PushFiles):
-                    UnfocusPathBox();
-                    PushItems(false, false);
-                    break;
-
-                case nameof(AppRuntimeSettings.PushPackages):
-                    PushPackages();
-                    break;
-
                 case nameof(AppRuntimeSettings.NewFolder):
                     NewItem(true);
                     break;
@@ -291,52 +208,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     NewItem(false);
                     break;
 
-                case nameof(AppRuntimeSettings.Cut):
-                    CutFiles(SelectedFiles);
-                    break;
-                    
-                case nameof(AppRuntimeSettings.Copy):
-                    CutFiles(SelectedFiles, true);
-                    break;
-
-                case nameof(AppRuntimeSettings.Paste):
-                    PasteFiles();
-                    break;
-
                 case nameof(AppRuntimeSettings.Rename):
                     BeginRename();
-                    break;
-
-                case nameof(AppRuntimeSettings.Restore):
-                    RestoreItems();
-                    break;
-
-                case nameof(AppRuntimeSettings.Delete):
-                    DeleteFiles();
-                    break;
-
-                case nameof(AppRuntimeSettings.Uninstall):
-                    UninstallPackages();
-                    break;
-
-                case nameof(AppRuntimeSettings.CopyItemPath):
-                    CopyItemPath();
-                    break;
-
-                case nameof(AppRuntimeSettings.UpdateModifiedTime):
-                    UpdatedModifiedDates();
-                    break;
-
-                case nameof(AppRuntimeSettings.EditItem):
-                    OpenEditor();
-                    break;
-
-                case nameof(AppRuntimeSettings.InstallPackage):
-                    InstallPackages();
-                    break;
-
-                case nameof(AppRuntimeSettings.CopyToTemp):
-                    CopyToTemp();
                     break;
 
                 case nameof(AppRuntimeSettings.SelectAll):
@@ -350,11 +223,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     RefreshLocation();
                     break;
 
-                case nameof(AppRuntimeSettings.EditCurrentPath):
-                    if (NavigationBox.Mode is Controls.NavigationBox.ViewMode.Path)
-                        UnfocusPathBox();
-                    else
-                        FocusPathBox();
+                case nameof(AppRuntimeSettings.IsPathBoxFocused):
+                    IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused is null
+                        ? NavigationBox.Mode is Controls.NavigationBox.ViewMode.Breadcrumbs
+                        : RuntimeSettings.IsPathBoxFocused.Value);
                     break;
 
                 case nameof(AppRuntimeSettings.Filter):
@@ -363,8 +235,43 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     else
                         SearchBox.Focus();
                     break;
+
+                case nameof(AppRuntimeSettings.ExplorerSource):
+                    ExplorerGrid.ItemsSource = RuntimeSettings.ExplorerSource;
+                    FilterHiddenFiles();
+                    break;
+
+                case nameof(AppRuntimeSettings.FilterDrives):
+                    FilterDrives();
+                    break;
+
+                case nameof(AppRuntimeSettings.FilterDevices):
+                    FilterDevices();
+                    break;
+
+                case nameof(AppRuntimeSettings.FilterActions):
+                    FilterFileActions();
+                    break;
+
+                case nameof(AppRuntimeSettings.ClearNavBox):
+                    ClearNavBox();
+                    break;
+
+                case nameof(AppRuntimeSettings.InitLister):
+                    InitLister();
+                    break;
+
+                case nameof(AppRuntimeSettings.DriveViewNav):
+                    DriveViewNav();
+                    break;
             }
         });
+    }
+
+    private void ClearNavBox()
+    {
+        NavigationBox.Path = null;
+        NavigationBox.Mode = Controls.NavigationBox.ViewMode.None;
     }
 
     private void SettingsSearchBox_FocusChanged(object sender, RoutedEventArgs e)
@@ -386,6 +293,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         else if (e.PropertyName == nameof(FileActionsEnable.ExplorerFilter))
         {
             FilterHiddenFiles();
+        }
+        else if (e.PropertyName == nameof(FileActionsEnable.ItemToSelect) && FileActions.ItemToSelect is not null)
+        {
+            ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
+            ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
+        }
+        else if (e.PropertyName == nameof(FileActionsEnable.PasteEnabled))
+        {
+            FilterFileActions();
         }
     }
 
@@ -453,7 +369,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 if (FileActions.IsExplorerVisible)
                     FilterHiddenFiles();
                 else
-                    UpdatePackages();
+                    FileActionLogic.UpdatePackages();
                 break;
             case nameof(AppSettings.EnableLog):
                 if (!Settings.EnableLog)
@@ -470,7 +386,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 FileActions.PushPackageEnabled = Settings.EnableApk;
 
                 if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
-                    RefreshDrives(true);
+                    FileActionLogic.RefreshDrives(true);
                 break;
             case nameof(AppSettings.SaveDevices):
                 if (Settings.SaveDevices && !DevicesObject.HistoryDeviceViewModels.Any())
@@ -568,18 +484,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
     }
 
-    private void FocusPathBox()
+    private void IsPathBoxFocused(bool isFocused)
     {
-        NavigationBox.Mode = Controls.NavigationBox.ViewMode.Path;
-    }
+        if (isFocused)
+            _focusPathBox();
+        else
+            _unfocusPathBox();
 
-    private void UnfocusPathBox()
-    {
-        if (NavigationBox.Mode is Controls.NavigationBox.ViewMode.None)
-            return;
+        void _focusPathBox()
+        {
+            NavigationBox.Mode = Controls.NavigationBox.ViewMode.Path;
+        }
 
-        NavigationBox.UnfocusTarget = FileOperationsSplitView;
-        NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
+        void _unfocusPathBox()
+        {
+            if (NavigationBox.Mode is Controls.NavigationBox.ViewMode.None)
+                return;
+
+            NavigationBox.UnfocusTarget = FileOperationsSplitView;
+            NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
+        }
     }
 
     private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -598,10 +522,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     switch (Settings.DoubleClick)
                     {
                         case DoubleClickAction.pull when Settings.IsPullOnDoubleClickEnabled:
-                            PullFiles(true);
+                            FileActionLogic.PullFiles(true);
                             break;
                         case DoubleClickAction.edit when FileActions.EditFileEnabled:
-                            OpenEditor();
+                            FileActionLogic.OpenEditor();
                             break;
                         default:
                             break;
@@ -633,120 +557,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         SelectedFiles = FileActions.IsAppDrive ? null : ExplorerGrid.SelectedItems.OfType<FileClass>();
         SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : null;
+        OnPropertyChanged(nameof(SelectedFilesTotalSize));
 
         if (SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
         {
-            Task.Run(() => Task.Delay(SELECTION_CHANGED_DELAY)).ContinueWith((t) => Dispatcher.Invoke(() => UpdateFileActions()));
+            Task.Run(() => Task.Delay(SELECTION_CHANGED_DELAY)).ContinueWith((t) => Dispatcher.Invoke(() => FileActionLogic.UpdateFileActions()));
         }
         else
-            UpdateFileActions();
-    }
-
-    private void UpdateFileActions()
-    {
-        FileActions.UninstallPackageEnabled = FileActions.IsAppDrive && SelectedPackages.Any();
-        FileActions.ContextPushPackagesEnabled = FileActions.IsAppDrive && !SelectedPackages.Any();
-
-        FileActions.IsRefreshEnabled = FileActions.IsDriveViewVisible || FileActions.IsExplorerVisible;
-        FileActions.IsCopyCurrentPathEnabled = FileActions.IsExplorerVisible && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
-
-        if (FileActions.IsAppDrive)
-        {
-            FileActions.IsCopyItemPathEnabled = SelectedPackages.Count() == 1;
-
-            FilterFileActions();
-            return;
-        }
-
-        OnPropertyChanged(nameof(SelectedFilesTotalSize));
-
-        FileActions.IsRegularItem = !(SelectedFiles.Any() && DevicesObject.Current?.Root is not AbstractDevice.RootStatus.Enabled
-            && SelectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder)));
-
-        if (FileActions.IsRecycleBin)
-        {
-            TrashHelper.EnableRecycleButtons(SelectedFiles.Any() ? SelectedFiles : DirList.FileList);
-        }
-        else
-        {
-            FileActions.DeleteEnabled = SelectedFiles.Any() && FileActions.IsRegularItem;
-            FileActions.RestoreEnabled = false;
-        }
-
-        FileActions.DeleteAction.Value = FileActions.IsRecycleBin && !SelectedFiles.Any() ? "Empty Recycle Bin" : "Delete";
-        FileActions.RestoreAction.Value = FileActions.IsRecycleBin && !SelectedFiles.Any() ? "Restore All Items" : "Restore";
-
-        FileActions.PullEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && SelectedFiles.Any() && FileActions.IsRegularItem;
-        FileActions.ContextPushEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && (!SelectedFiles.Any() || (SelectedFiles.Count() == 1 && SelectedFiles.First().IsDirectory));
-
-        FileActions.RenameEnabled = !FileActions.IsRecycleBin && SelectedFiles.Count() == 1 && FileActions.IsRegularItem;
-
-        FileActions.CutEnabled = !SelectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && FileActions.IsRegularItem;
-
-        FileActions.CopyEnabled = !FileActions.IsRecycleBin && FileActions.IsRegularItem && !SelectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
-        FileActions.PasteEnabled = IsPasteEnabled();
-        FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
-
-        FileActions.PackageActionsEnabled = Settings.EnableApk && SelectedFiles.Any() && SelectedFiles.All(file => file.IsInstallApk) && !FileActions.IsRecycleBin;
-        FileActions.IsCopyItemPathEnabled = SelectedFiles.Count() == 1 && !FileActions.IsRecycleBin;
-
-        FileActions.ContextNewEnabled = !SelectedFiles.Any() && !FileActions.IsRecycleBin;
-        FileActions.SubmenuUninstallEnabled = FileActions.IsTemp && SelectedFiles.Any() && SelectedFiles.All(file => file.IsInstallApk);
-
-        FileActions.UpdateModifiedEnabled = !FileActions.IsRecycleBin && SelectedFiles.Any() && SelectedFiles.All(file => file.Type is FileType.File && !file.IsApk);
-
-        FileActions.EditFileEnabled = !FileActions.IsRecycleBin
-            && SelectedFiles.Count() == 1
-            && SelectedFiles.First().Type is FileType.File
-            && !SelectedFiles.First().IsApk;
-
-        FilterFileActions();
-    }
-
-    private bool IsPasteEnabled(bool ignoreSelected = false, bool isKeyboard = false)
-    {
-        // Explorer view but not trash or app drive
-        if (FileActions.IsPasteStateVisible)
-        {
-            FileActions.CutItemsCount.Value = CutItems.Count > 0 ? CutItems.Count.ToString() : "";
-            FileActions.IsCutState.Value = FileActions.PasteState is FileClass.CutType.Cut;
-            FileActions.IsCopyState.Value = FileActions.PasteState is FileClass.CutType.Copy;
-        }
-        else
-        {
-            FileActions.CutItemsCount.Value = "";
-            FileActions.IsCopyState.Value = false;
-            FileActions.IsCutState.Value = false;
-        }
-        
-        FileActions.PasteAction.Value = $"Paste {CutItems.Count} {FileClass.CutTypeString(FileActions.PasteState)} Item{(CutItems.Count > 1 ? "s" : "")}";
-
-        if (CutItems.Count < 1 || FileActions.IsRecycleBin || !FileActions.IsExplorerVisible)
-            return false;
-
-        if (CutItems.Count == 1 && CutItems[0].Relation(CurrentPath) is RelationType.Descendant or RelationType.Self)
-            return false;
-
-        var selected = ignoreSelected ? 0 : SelectedFiles?.Count();
-        switch (selected)
-        {
-            case 0:
-                return !(CutItems[0].ParentPath == CurrentPath && FileActions.PasteState is FileClass.CutType.Cut);
-            case 1:
-                if (isKeyboard && FileActions.PasteState is FileClass.CutType.Copy && CutItems[0].Relation(SelectedFiles.First()) is RelationType.Self)
-                    return true;
-
-                var item = ExplorerGrid.SelectedItem as FilePath;
-                if (!item.IsDirectory
-                    || (CutItems.Count == 1 && CutItems[0].FullPath == item.FullPath)
-                    || (CutItems[0].ParentPath == item.FullPath))
-                    return false;
-                break;
-            default:
-                return false;
-        }
-
-        return true;
+            FileActionLogic.UpdateFileActions();
     }
 
     private void FilterFileActions(bool filterContextMenu = true)
@@ -788,7 +606,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        UnfocusPathBox();
+        RuntimeSettings.IsPathBoxFocused = false;
     }
 
     private void LaunchSequence()
@@ -807,56 +625,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitFileOpColumns();
 
         SettingsHelper.CheckForUpdates();
-    }
-
-    private void DeviceListSetup(string selectedAddress = "")
-    {
-        Task.Run(() => ADBService.GetDevices()).ContinueWith((t) => Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
-    }
-
-    private void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
-    {
-        var init = !DevicesObject.UpdateDevices(devices);
-        FilterDevices();
-
-        if (DevicesObject.Current is null || DevicesObject.Current.IsOpen && DevicesObject.Current.Status is not AbstractDevice.DeviceStatus.Ok)
-        {
-            DriveHelper.ClearDrives();
-            DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
-        }
-
-        if (!DevicesObject.DevicesAvailable())
-        {
-            ClearExplorer();
-            NavHistory.Reset();
-            DriveHelper.ClearDrives();
-            return;
-        }
-
-        if (DevicesObject.DevicesAvailable(true))
-            return;
-
-        if (!Settings.AutoOpen)
-        {
-            DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
-
-            ClearExplorer();
-            FileActions.IsExplorerVisible = false;
-            NavHistory.Reset();
-            return;
-        }
-
-        if (!DevicesObject.SetOpenDevice(selectedAddress))
-            return;
-
-        if (!ConnectTimer.IsEnabled)
-            RuntimeSettings.IsDevicesPaneOpen = false;
-
-        DevicesObject.SetOpenDevice(DevicesObject.Current);
-        CurrentADBDevice = new(DevicesObject.Current);
-        InitLister();
-        if (init)
-            InitDevice();
     }
 
     private void FilterDevices() => DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(DevicesList.ItemsSource));
@@ -885,15 +653,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             NavigationToolBar.ItemsSource = Services.NavigationToolBar.List;
             MainToolBar.ItemsSource = Services.MainToolBar.List;
-            UpdateFileActions();
+            FileActionLogic.UpdateFileActions();
 
             FilterDevices();
         });
     }
-
-    
-
-    
 
     private void SetRenderMode() => Dispatcher.Invoke(() =>
     {
@@ -1009,56 +773,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Width = column.ActualWidth,
     };
 
-    private void InitDevice()
-    {
-        SetAndroidVersion();
-        RefreshDrives(true);
-
-        FolderHelper.CombineDisplayNames();
-        DriveViewNav();
-        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
-
-        FileHelper.ClearCutFiles();
-        FilterDrives();
-
-        CurrentDeviceDetailsPanel.DataContext = DevicesObject.Current;
-        FileActions.PushPackageEnabled = Settings.EnableApk;
-
-        UpdateFileActions();
-
-#if DEBUG
-        TestCurrentOperation();
-#endif
-
-        AdbHelper.VerifyProgressRedirection();
-    }
-
-    private void SetAndroidVersion()
-    {
-        var versionTask = Task.Run(async () => await CurrentADBDevice.GetAndroidVersion());
-        versionTask.ContinueWith((t) =>
-        {
-            if (t.IsCanceled)
-                return;
-
-            Dispatcher.Invoke(() =>
-            {
-                DevicesObject.Current.SetAndroidVersion(t.Result);
-            });
-        });
-    }
-
     private void RefreshLocation()
     {
         if (FileActions.IsDriveViewVisible)
-            RefreshDrives(true);
+            FileActionLogic.RefreshDrives(true);
         else
             _navigateToPath(CurrentPath);
     }
 
     private void DriveViewNav()
     {
-        ClearExplorer(false);
+        FileActionLogic.ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
 
         NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
@@ -1087,51 +812,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return _navigateToPath(realPath, bfNavigated);
     }
 
-    private void UpdateInstallersCount()
-    {
-        var countTask = Task.Run(() => ADBService.CountPackages(DevicesObject.Current.ID));
-        countTask.ContinueWith((t) => Dispatcher.Invoke(() =>
-        {
-            if (!t.IsCanceled && DevicesObject.Current is not null)
-            {
-                var temp = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Temp);
-                ((VirtualDriveViewModel)temp)?.SetItemsCount((long)t.Result);
-            }
-        }));
-    }
-
-    private void UpdatePackages(bool updateExplorer = false)
-    {
-        FileActions.ListingInProgress = true;
-
-        var version = DevicesObject.Current.AndroidVersion;
-        var packageTask = Task.Run(() => ShellFileOperation.GetPackages(CurrentADBDevice, Settings.ShowSystemPackages, version is not null && version >= MIN_PKG_UID_ANDROID_VER));
-
-        packageTask.ContinueWith((t) =>
-        {
-            if (t.IsCanceled)
-                return;
-
-            Dispatcher.Invoke(() =>
-            {
-                Packages = t.Result;
-                if (updateExplorer)
-                {
-                    ExplorerGrid.ItemsSource = Packages;
-                    FilterHiddenFiles();
-                }
-
-                if (!updateExplorer && DevicesObject.Current is not null)
-                {
-                    var package = DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
-                    ((VirtualDriveViewModel)package)?.SetItemsCount(Packages.Count);
-                }
-
-                FileActions.ListingInProgress = false;
-            });
-        });
-    }
-
     private void ListDevices(IEnumerable<LogicalDevice> devices)
     {
         RuntimeSettings.LastServerResponse = DateTime.Now;
@@ -1144,7 +824,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (!DevicesObject.DevicesChanged(deviceVMs))
             return;
 
-        DeviceListSetup(deviceVMs);
+        DeviceHelper.DeviceListSetup(deviceVMs);
 
         if (!Settings.AutoRoot)
             return;
@@ -1184,7 +864,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 try
                 {
-                    Dispatcher.Invoke(() => RefreshDrives(true));
+                    Dispatcher.Invoke(() => FileActionLogic.RefreshDrives(true));
                 }
                 catch (Exception)
                 { }
@@ -1246,7 +926,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
-        FileActions.PasteEnabled = IsPasteEnabled();
+        FileActions.PasteEnabled = FileActionLogic.IsPasteEnabled();
         FileActions.PushPackageEnabled = Settings.EnableApk;
         FileActions.InstallPackageEnabled = FileActions.IsTemp;
         FileActions.UninstallPackageEnabled = false;
@@ -1317,8 +997,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             if (FileActions.IsAppDrive)
             {
-                UpdatePackages(true);
-                UpdateFileActions();
+                FileActionLogic.UpdatePackages(true);
+                FileActionLogic.UpdateFileActions();
                 return true;
             }
 
@@ -1328,9 +1008,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActions.DeleteAction.Value = S_DELETE_ACTION;
         }
 
-        ExplorerGrid.ItemsSource = DirList.FileList;
-        FilterHiddenFiles();
-        UpdateFileActions();
+        RuntimeSettings.ExplorerSource = DirList.FileList;
+        FileActionLogic.UpdateFileActions();
         return true;
     }
 
@@ -1349,11 +1028,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         else if (location is NavHistory.SpecialLocation.DriveView)
         {
             FileActions.IsRecycleBin = false;
-            UnfocusPathBox();
-            RefreshDrives();
+            RuntimeSettings.IsPathBoxFocused = false;
+            FileActionLogic.RefreshDrives();
             DriveViewNav();
 
-            UpdateFileActions();
+            FileActionLogic.UpdateFileActions();
         }
     }
 
@@ -1381,7 +1060,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else if (key == Key.Delete && FileActions.DeleteEnabled)
         {
-            DeleteFiles();
+            FileActionLogic.DeleteFiles();
         }
         else if (key is Key.Up or Key.Down)
         {
@@ -1490,109 +1169,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return true;
     }
 
-    private void PullFiles(bool quick = false)
-    {
-        int itemsCount = SelectedFiles.Count();
-        ShellObject path;
-
-        if (quick)
-        {
-            path = ShellObject.FromParsingName(Settings.DefaultFolder);
-        }
-        else
-        {
-            var dialog = new CommonOpenFileDialog()
-            {
-                IsFolderPicker = true,
-                Multiselect = false,
-                DefaultDirectory = Settings.DefaultFolder,
-                Title = S_ITEMS_DESTINATION(itemsCount > 1, ExplorerGrid.SelectedItem),
-            };
-
-            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-                return;
-
-            path = dialog.FileAsShellObject;
-        }
-
-        var dirPath = new FilePath(path);
-
-        if (!Directory.Exists(path.ParsingName))
-        {
-            try
-            {
-                Directory.CreateDirectory(path.ParsingName);
-            }
-            catch (Exception e)
-            {
-                DialogService.ShowMessage(e.Message, S_DEST_ERR, DialogService.DialogIcon.Critical);
-                return;
-            }
-        }
-
-        foreach (FileClass item in ExplorerGrid.SelectedItems)
-        {
-            FileOpQ.AddOperation(new FilePullOperation(Dispatcher, CurrentADBDevice, item, dirPath));
-        }
-    }
-
-    private void PushItems(bool isFolderPicker, bool isContextMenu)
-    {
-        FilePath targetPath;
-        if (isContextMenu && SelectedFiles.Count() == 1)
-            targetPath = (FilePath)ExplorerGrid.SelectedItem;
-        else
-            targetPath = new(CurrentPath);
-
-        var dialog = new CommonOpenFileDialog()
-        {
-            IsFolderPicker = isFolderPicker,
-            Multiselect = true,
-            DefaultDirectory = Settings.DefaultFolder,
-            Title = S_PUSH_BROWSE_TITLE(isFolderPicker, targetPath.FullPath == CurrentPath ? "" : targetPath.FullName),
-        };
-
-        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-            return;
-
-        foreach (var item in dialog.FilesAsShellObject)
-        {
-            var pushOpeartion = new FilePushOperation(Dispatcher, CurrentADBDevice, new FilePath(item), targetPath);
-            pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
-            FileOpQ.AddOperation(pushOpeartion);
-        }
-    }
-
-    private void PushOpeartion_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        var pushOperation = sender as FilePushOperation;
-
-        // If operation completed now and current path is where the new file was pushed to and it is not shown yet
-        if ((e.PropertyName == "Status") &&
-            (pushOperation.Status == FileOperation.OperationStatus.Completed) &&
-            (pushOperation.TargetPath.FullPath == CurrentPath) &&
-            (!DirList.FileList.Any(f => f.FullName == pushOperation.FilePath.FullName)))
-        {
-            DirList.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath));
-        }
-    }
-
-    private void TestCurrentOperation()
-    {
-        //fileOperationQueue.Clear();
-        //fileOperationQueue.AddOperation(InProgressTestOperation.CreateProgressStart(Dispatcher, CurrentADBDevice, "File.exe"));
-        //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFileInProgress(Dispatcher, CurrentADBDevice, "File.exe"));
-        //fileOperationQueue.AddOperation(InProgressTestOperation.CreateFolderInProgress(Dispatcher, CurrentADBDevice, "Folder"));
-    }
-
-    private void TestDevices()
-    {
-        //ConnectTimer.IsEnabled = false;
-
-        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new PairingService("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") { MdnsType = ServiceDevice.ServiceType.PairingCode } });
-        //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "device") });
-    }
-
     private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
@@ -1614,134 +1190,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private async void ConnectNewDevice()
-    {
-        var dev = (NewDeviceViewModel)RuntimeSettings.ConnectNewDevice;
-        await Task.Run(() =>
-        {
-            try
-            {
-                ADBService.ConnectNetworkDevice(dev.ConnectAddress);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains(S_FAILED_CONN + dev.ConnectAddress) && dev.Type is AbstractDevice.DeviceType.New && ((NewDeviceViewModel)RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
-                {
-                    DevicesObject.NewDevice.EnablePairing();
-                }
-                else
-                    Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical));
-
-                return false;
-            }
-        }).ContinueWith((t) =>
-        {
-            if (t.IsCanceled)
-                return;
-
-            Dispatcher.Invoke(() =>
-            {
-                if (t.Result)
-                {
-                    string newDeviceAddress = "";
-                    if (RuntimeSettings.ConnectNewDevice.Type is AbstractDevice.DeviceType.New)
-                    {
-                        if (Settings.SaveDevices)
-                            DevicesObject.AddHistoryDevice((HistoryDeviceViewModel)dev);
-
-                        newDeviceAddress = dev.ConnectAddress;
-                        ((NewDeviceViewModel)RuntimeSettings.ConnectNewDevice).ClearDevice();
-                    }
-                    else
-                    {
-                        newDeviceAddress = ((HistoryDeviceViewModel)RuntimeSettings.ConnectNewDevice).ConnectAddress;
-
-                        // In case user has changed the port of the history device
-                        if (Settings.SaveDevices)
-                            DevicesObject.StoreHistoryDevices();
-                    }
-
-
-                    DeviceHelper.CollapseDevices();
-                    DeviceListSetup(newDeviceAddress);
-                }
-
-                RuntimeSettings.ConnectNewDevice = null;
-                RuntimeSettings.IsManualPairingInProgress = false;
-            });
-        });
-    }
-
-    private async void PairNewDevice()
-    {
-        var dev = (NewDeviceViewModel)RuntimeSettings.ConnectNewDevice;
-        await Task.Run(() =>
-        {
-            try
-            {
-                ADBService.PairNetworkDevice(dev.PairingAddress, dev.PairingCode);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical));
-                return false;
-            }
-        }).ContinueWith((t) =>
-        {
-            if (t.IsCanceled)
-                return;
-
-            Dispatcher.Invoke(() =>
-            {
-                if (t.Result)
-                    ConnectNewDevice();
-
-                RuntimeSettings.ConnectNewDevice = null;
-                RuntimeSettings.IsManualPairingInProgress = false;
-            });
-        });
-    }
-
-    private void ClearExplorer(bool clearDevice = true)
-    {
-        DirList?.FileList?.Clear();
-        Packages.Clear();
-        FileActions.PushFilesFoldersEnabled =
-        FileActions.PullEnabled =
-        FileActions.DeleteEnabled =
-        FileActions.RenameEnabled =
-        FileActions.HomeEnabled =
-        FileActions.NewEnabled =
-        FileActions.PasteEnabled =
-        FileActions.UninstallVisible =
-        FileActions.CutEnabled =
-        FileActions.CopyEnabled =
-        FileActions.IsExplorerVisible =
-        FileActions.PackageActionsEnabled =
-        FileActions.IsCopyItemPathEnabled =
-        FileActions.UpdateModifiedEnabled =
-        FileActions.ParentEnabled = false;
-
-        FileActions.PushPackageEnabled = Settings.EnableApk;
-
-        FileActions.ExplorerFilter = "";
-
-        if (clearDevice)
-        {
-            CurrentDisplayNames.Clear();
-            CurrentPath = null;
-            CurrentDeviceDetailsPanel.DataContext = null;
-            FileActions.PushPackageEnabled = false;
-
-            NavigationBox.Path = null;
-            NavigationBox.Mode = Controls.NavigationBox.ViewMode.None;
-        }
-
-        FilterFileActions();
-    }
-
     private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         var point = Mouse.GetPosition(ExplorerGrid);
@@ -1749,7 +1197,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             e.Handled = true;
 
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, true);
-        UpdateFileActions();
+        FileActionLogic.UpdateFileActions();
     }
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1856,47 +1304,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         collectionView.SortDescriptions.Add(new SortDescription(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
     }
 
-    private void RefreshDrives(bool asyncClasify = false)
-    {
-        if (DevicesObject.Current is null)
-            return;
-        
-        if (!asyncClasify && DevicesObject.Current.Drives?.Count > 0 && !FileActions.IsExplorerVisible)
-            asyncClasify = true;
-
-        var dispatcher = Dispatcher;
-        var driveTask = Task.Run(() =>
-        {
-            if (CurrentADBDevice is null)
-                return null;
-
-            var drives = CurrentADBDevice.GetDrives();
-
-            if (DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
-                TrashHelper.UpdateRecycledItemsCount();
-
-            if (DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
-                UpdateInstallersCount();
-
-            if (DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
-                UpdatePackages();
-
-            return drives;
-        });
-        driveTask.ContinueWith((t) =>
-        {
-            if (t.IsCanceled || t.Result is null)
-                return;
-
-            dispatcher.Invoke(async () =>
-            {
-                var update = await DevicesObject.Current?.UpdateDrives(await t, dispatcher, asyncClasify);
-                if (update is true)
-                    FilterDrives();
-            });
-        });
-    }
-
     private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
         if (sender is ScrollViewer sv)
@@ -1921,7 +1328,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        UnfocusPathBox();
+        RuntimeSettings.IsPathBoxFocused = false;
         DriveHelper.ClearSelectedDrives();
     }
 
@@ -2120,70 +1527,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Storage.StoreValue(checkbox.Name, checkbox.DataContext);
     }
 
-    private async void DeleteFiles()
-    {
-        IEnumerable<FileClass> itemsToDelete;
-        if (FileActions.IsRecycleBin && !SelectedFiles.Any())
-        {
-            itemsToDelete = DirList.FileList.Where(f => !RECYCLE_INDEX_PATHS.Contains(f.FullPath));
-        }
-        else
-        {
-            itemsToDelete = DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
-                    ? SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder) : SelectedFiles;
-        }
-
-        string deletedString;
-        if (itemsToDelete.Count() == 1)
-            deletedString = FileHelper.DisplayName(itemsToDelete.First());
-        else
-        {
-            deletedString = $"{itemsToDelete.Count()} ";
-            if (itemsToDelete.All(item => item.IsDirectory))
-                deletedString += "folders";
-            else if (itemsToDelete.All(item => !item.IsDirectory))
-                deletedString += "files";
-            else
-                deletedString += "items";
-        }
-
-        var result = await DialogService.ShowConfirmation(
-            S_DELETE_CONF(FileActions.IsRecycleBin, deletedString),
-            S_DEL_CONF_TITLE,
-            S_DELETE_ACTION,
-            checkBoxText: Settings.EnableRecycle && !FileActions.IsRecycleBin ? S_PERM_DEL : "",
-            icon: DialogService.DialogIcon.Delete);
-
-        if (result.Item1 is not ContentDialogResult.Primary)
-            return;
-
-        if (!FileActions.IsRecycleBin && Settings.EnableRecycle && !result.Item2)
-        {
-            ShellFileOperation.MoveItems(CurrentADBDevice, itemsToDelete, RECYCLE_PATH, CurrentPath, DirList.FileList, Dispatcher, DevicesObject.Current);
-        }
-        else
-        {
-            ShellFileOperation.DeleteItems(CurrentADBDevice, itemsToDelete, DirList.FileList, Dispatcher);
-
-            if (FileActions.IsRecycleBin)
-            {
-                TrashHelper.EnableRecycleButtons(DirList.FileList.Except(itemsToDelete));
-                if (!SelectedFiles.Any() && DirList.FileList.Any(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
-                {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(CurrentADBDevice, DirList.FileList.Where(item => RECYCLE_INDEX_PATHS.Contains(item.FullPath))));
-                }
-            }
-        }
-    }
-
     private void BeginRename()
     {
         var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
 
         cell.IsEditing = !cell.IsEditing;
     }
-
-    
 
     private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
     {
@@ -2192,43 +1541,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         textBox.Focus();
     }
 
-    
-
     private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
     {
-        Rename(sender as TextBox);
-    }
-
-    private void Rename(TextBox textBox)
-    {
-        FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
-        var name = FileHelper.DisplayName(textBox);
-        if (file.IsTemp)
-        {
-            if (string.IsNullOrEmpty(textBox.Text))
-            {
-                DirList.FileList.Remove(file);
-                return;
-            }
-            try
-            {
-                CreateNewItem(file, textBox.Text);
-            }
-            catch (Exception e)
-            {
-                if (e is NotImplementedException)
-                    throw;
-            }
-        }
-        else if (!string.IsNullOrEmpty(textBox.Text) && textBox.Text != name)
-        {
-            try
-            {
-                FileHelper.RenameFile(textBox.Text, file);
-            }
-            catch (Exception)
-            { }
-        }
+        FileActionLogic.Rename(sender as TextBox);
     }
 
     private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
@@ -2275,7 +1590,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else
         {
-            UnfocusPathBox();
+            RuntimeSettings.IsPathBoxFocused = false;   
             var row = DataGridRow.GetRowContainingElement(cell);
             var current = row.GetIndex();
 
@@ -2368,65 +1683,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         (sender as TextBox).FilterString(INVALID_ANDROID_CHARS);
     }
 
-    private void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
-    {
-        FileHelper.ClearCutFiles();
-        FileActions.PasteState = isCopy ? FileClass.CutType.Copy : FileClass.CutType.Cut;
-
-        var itemsToCut = DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
-                    ? items.Where(file => file.Type is FileType.File or FileType.Folder) : items;
-
-        foreach (var item in itemsToCut)
-        {
-            item.CutState = FileActions.PasteState;
-        }
-
-        CutItems.AddRange(itemsToCut);
-
-        FileActions.CopyEnabled = !isCopy;
-        FileActions.CutEnabled = isCopy;
-
-        FileActions.PasteEnabled = IsPasteEnabled();
-        FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
-
-        FilterFileActions();
-    }
-
-    private async void PasteFiles()
-    {
-        var firstSelectedFile = SelectedFiles.Any() ? SelectedFiles.First() : null;
-        var targetName = "";
-        var targetPath = "";
-
-        if (SelectedFiles.Count() != 1 || (FileActions.PasteState is FileClass.CutType.Copy && CutItems[0].Relation(firstSelectedFile) is RelationType.Self))
-        {
-            targetPath = CurrentPath;
-            targetName = CurrentPath[CurrentPath.LastIndexOf('/')..];
-        }
-        else
-        {
-            targetPath = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
-            targetName = FileHelper.DisplayName((FilePath)ExplorerGrid.SelectedItem);
-        }
-
-        var pasteItems = CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
-        await Task.Run(() => ShellFileOperation.MoveItems(FileActions.PasteState is FileClass.CutType.Copy,
-                                                          targetPath,
-                                                          pasteItems,
-                                                          targetName,
-                                                          DirList.FileList,
-                                                          Dispatcher,
-                                                          CurrentADBDevice,
-                                                          CurrentPath));
-
-        if (FileActions.PasteState is FileClass.CutType.Cut)
-            FileHelper.ClearCutFiles(pasteItems);
-
-        FileActions.PasteEnabled = IsPasteEnabled();
-
-        FilterFileActions();
-    }
-
     private void NewItem(bool isFolder)
     {
         var namePrefix = S_NEW_ITEM(isFolder);
@@ -2442,54 +1698,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             cell.IsEditing = true;
     }
 
-    private void CreateNewItem(FileClass file, string newName)
-    {
-        file.UpdatePath($"{CurrentPath}{(CurrentPath == "/" ? "" : "/")}{newName}");
-
-        if (Settings.ShowExtensions)
-            file.UpdateType();
-
-        try
-        {
-            if (file.Type is FileType.Folder)
-                ShellFileOperation.MakeDir(CurrentADBDevice, file.FullPath);
-            else if (file.Type is FileType.File)
-                ShellFileOperation.MakeFile(CurrentADBDevice, file.FullPath);
-            else
-                throw new NotSupportedException();
-        }
-        catch (Exception e)
-        {
-            DialogService.ShowMessage(e.Message, S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical);
-            DirList.FileList.Remove(file);
-            throw;
-        }
-
-        file.IsTemp = false;
-        file.ModifiedTime = DateTime.Now;
-        if (file.Type is FileType.File)
-            file.Size = 0;
-
-        var index = DirList.FileList.IndexOf(file);
-        DirList.FileList.Remove(file);
-        DirList.FileList.Insert(index, file);
-        ExplorerGrid.SelectedItem = file;
-    }
-
     private void ExplorerGrid_PreviewKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Delete)
         {
             e.Handled = true;
             if (FileActions.DeleteEnabled)
-                DeleteFiles();
+                FileActionLogic.DeleteFiles();
         }
-    }
-
-    private void CopyItemPath()
-    {
-        var path = FileActions.IsAppDrive ? ((Package)ExplorerGrid.SelectedItem).Name : ((FilePath)ExplorerGrid.SelectedItem).FullPath;
-        Clipboard.SetText(path);
     }
 
     private void ClearLogButton_Click(object sender, RoutedEventArgs e)
@@ -2506,79 +1722,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
     {
         RefreshDevices();
-    }
-
-    private void RestoreItems()
-    {
-        var restoreItems = (!SelectedFiles.Any() ? DirList.FileList : SelectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-        string[] existingItems = Array.Empty<string>();
-        List<FileClass> existingFiles = new();
-        bool merge = false;
-
-        var restoreTask = Task.Run(() =>
-        {
-            existingItems = ADBService.FindFiles(CurrentADBDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
-            if (existingItems?.Any() is true)
-            {
-                if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
-                    merge = true;
-
-                existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
-            }
-
-            foreach (var item in restoreItems)
-            {
-                if (existingItems.Contains(item.FullName))
-                    return;
-
-                if (restoreItems.Count(file => file.FullName == item.FullName && file.TrashIndex.OriginalPath == item.TrashIndex.OriginalPath) > 1)
-                {
-                    existingItems = existingItems.Append(item.FullName).ToArray();
-                    existingFiles.Add(item);
-                    if (item.IsDirectory)
-                        merge = true;
-                }
-            }
-        });
-
-        restoreTask.ContinueWith((t) =>
-        {
-            App.Current.Dispatcher.BeginInvoke(async () =>
-            {
-                if (existingItems.Length is int count and > 0)
-                {
-                    var result = await DialogService.ShowConfirmation(
-                        S_CONFLICT_ITEMS(count),
-                        S_RESTORE_CONF_TITLE,
-                        primaryText: S_MERGE_REPLACE(merge),
-                        secondaryText: count == restoreItems.Count() ? "" : "Skip",
-                        cancelText: "Cancel",
-                        icon: DialogService.DialogIcon.Exclamation);
-
-                    if (result.Item1 is ContentDialogResult.None)
-                    {
-                        return;
-                    }
-
-                    if (result.Item1 is ContentDialogResult.Secondary)
-                    {
-                        restoreItems = existingFiles.Count != count
-                            ? restoreItems.Where(item => !existingItems.Contains(item.FullName))
-                            : restoreItems.Except(existingFiles);
-                    }
-                }
-
-                ShellFileOperation.MoveItems(device: CurrentADBDevice,
-                                         items: restoreItems,
-                                         targetPath: null,
-                                         currentPath: CurrentPath,
-                                         fileList: DirList.FileList,
-                                         dispatcher: Dispatcher);
-
-                if (!SelectedFiles.Any())
-                    TrashHelper.EnableRecycleButtons();
-            });
-        });
     }
 
     private void DataGridRow_Unselected(object sender, RoutedEventArgs e)
@@ -2650,79 +1793,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         e.Handled = true;
     }
 
-    private void InstallPackages()
-    {
-        var packages = SelectedFiles;
-
-        Task.Run(() =>
-        {
-            ShellFileOperation.InstallPackages(CurrentADBDevice, packages, Dispatcher);
-        });
-    }
-
-    private async void UninstallPackages()
-    {
-        var pkgs = SelectedPackages;
-        var files = SelectedFiles;
-
-        var result = await DialogService.ShowConfirmation(
-            S_REM_APK(!FileActions.IsAppDrive, FileActions.IsAppDrive ? pkgs.Count() : files.Count()),
-            S_CONF_UNI_TITLE,
-            "Uninstall",
-        icon: DialogService.DialogIcon.Exclamation);
-
-        if (result.Item1 is not ContentDialogResult.Primary)
-            return;
-
-        var packageTask = await Task.Run(() =>
-        {
-            if (FileActions.IsAppDrive)
-                return pkgs.Select(pkg => pkg.Name);
-
-            return files.Select(item => ShellFileOperation.GetPackageName(CurrentADBDevice, item.FullPath));
-        });
-
-        ShellFileOperation.UninstallPackages(CurrentADBDevice, packageTask, Dispatcher, Packages);
-    }
-
-    private void CopyToTemp()
-    {
-        _ = ShellFileOperation.MoveItems(true, TEMP_PATH, SelectedFiles, FileHelper.DisplayName(SelectedFiles.First()), DirList.FileList, Dispatcher, CurrentADBDevice, CurrentPath);
-    }
-
-    private void PushPackages()
-    {
-        var dialog = new CommonOpenFileDialog()
-        {
-            IsFolderPicker = false,
-            Multiselect = true,
-            DefaultDirectory = Settings.DefaultFolder,
-            Title = S_INSTALL_APK,
-        };
-        dialog.Filters.Add(new("Android Package", string.Join(';', INSTALL_APK.Select(name => name[1..]))));
-
-        if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
-            return;
-
-        Task.Run(() => ShellFileOperation.PushPackages(CurrentADBDevice, dialog.FilesAsShellObject, Dispatcher, FileActions.IsAppDrive));
-    }
-
-    private void DefaultFolderSetButton_Click(object sender, RoutedEventArgs e)
-    {
-        var dialog = new CommonOpenFileDialog()
-        {
-            IsFolderPicker = true,
-            Multiselect = false,
-        };
-        if (Settings.DefaultFolder != "")
-            dialog.DefaultDirectory = Settings.DefaultFolder;
-
-        if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-        {
-            Settings.DefaultFolder = dialog.FileName;
-        }
-    }
-
     private async void ResetSettingsButton_Click(object sender, RoutedEventArgs e)
     {
         var result = await DialogService.ShowConfirmation(
@@ -2758,12 +1828,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void UpdatedModifiedDates()
-    {
-        var items = SelectedFiles;
-        Task.Run(() => ShellFileOperation.ChangeDateFromName(CurrentADBDevice, items, DirList.FileList, Dispatcher));
-    }
-
     private void MainWin_StateChanged(object sender, EventArgs e)
     {
         SearchBoxMaxWidth();
@@ -2774,7 +1838,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.Key is Key.Escape)
         {
             FileActions.ExplorerFilter = "";
-            UnfocusPathBox();
+            RuntimeSettings.IsPathBoxFocused = false;
         }
     }
 
@@ -2791,36 +1855,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
 
         writeTask.ContinueWith((t) => Dispatcher.Invoke(() => FileActions.OriginalEditorText = FileActions.EditorText));
-    }
-
-    private void OpenEditor()
-    {
-        if (FileActions.IsEditorOpen)
-        {
-            FileActions.IsEditorOpen = false;
-            return;
-        }
-        FileActions.IsEditorOpen = true;
-
-        FileActions.EditorFilePath = SelectedFiles.First().FullPath;
-
-        var readTask = Task.Run(() =>
-        {
-            var text = "";
-            try
-            {
-                text = ShellFileOperation.ReadAllText(CurrentADBDevice, FileActions.EditorFilePath);
-            }
-            catch (Exception)
-            { }
-            return text;
-        });
-
-        readTask.ContinueWith((t) => Dispatcher.Invoke(() =>
-        {
-            FileActions.EditorText =
-            FileActions.OriginalEditorText = t.Result;
-        }));
     }
 
     private void CloseEditorButton_Click(object sender, RoutedEventArgs e)

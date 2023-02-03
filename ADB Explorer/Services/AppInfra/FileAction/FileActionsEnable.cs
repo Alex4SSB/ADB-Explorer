@@ -379,6 +379,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref explorerFilter, value);
     }
 
+    private object itemToSelect = null;
+    public object ItemToSelect
+    {
+        get => itemToSelect;
+        set => Set(ref itemToSelect, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<string> CopyPathAction = new();

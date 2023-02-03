@@ -830,6 +830,7 @@
                     <ui:SimpleStackPanel
                         x:Name="CurrentDeviceDetailsPanel"
                         VerticalAlignment="Center"
+                        DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentBatteryContext}"
                         Orientation="Horizontal"
                         Spacing="6">
                         <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />

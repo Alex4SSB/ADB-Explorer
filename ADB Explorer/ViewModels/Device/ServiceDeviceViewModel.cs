@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -41,7 +42,7 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
         Device = service;
 
         PairCommand = new(() => IsPairingCodeValid && device.Status is DeviceStatus.Unauthorized,
-                          () => Data.RuntimeSettings.DeviceToPair = this);
+                          () => _ = DeviceHelper.PairService(this));
     }
 
     /// <summary>

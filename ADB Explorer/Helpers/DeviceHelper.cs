@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AbstractDevice;
 
@@ -128,7 +129,7 @@ public static class DeviceHelper
             throw new NotImplementedException();
         }
 
-        Data.RuntimeSettings.DeviceToRemove = device;
+        RemoveDevice(device);
     }
 
     public static DeviceAction RemoveDeviceCommand(DeviceViewModel device) => new(
@@ -155,7 +156,9 @@ public static class DeviceHelper
         await Task.Run(() => device.EnableRoot(!rootEnabled));
 
         if (device.Root is RootStatus.Forbidden)
-            Data.RuntimeSettings.RootAttemptForbidden = true;
+        {
+            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_ROOT_FORBID, Strings.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical));
+        }
     }
 
     public static DeviceAction ConnectDeviceCommand(NewDeviceViewModel device) => new(
@@ -191,9 +194,9 @@ public static class DeviceHelper
             if (device is LogicalDeviceViewModel ui && ui.IsOpen)
                 return true;
 
-            if (device is LogicalDeviceViewModel && device.Type is AbstractDevice.DeviceType.Service)
+            if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service)
             {
-                if (device.Status is AbstractDevice.DeviceStatus.Offline)
+                if (device.Status is DeviceStatus.Offline)
                 {
                     // if a logical service is offline, and we have one of its services - hide the logical service
                     return !Data.DevicesObject.ServiceDeviceViewModels.Any(s => s.IpAddress == device.IpAddress);
@@ -201,15 +204,15 @@ public static class DeviceHelper
 
                 // if there's a logical service and a remote device with the same IP - hide the logical service
                 return !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
-                                                        && l.Type is AbstractDevice.DeviceType.Remote or AbstractDevice.DeviceType.Local
-                                                        && l.Status is AbstractDevice.DeviceStatus.Ok);
+                                                        && l.Type is DeviceType.Remote or DeviceType.Local
+                                                        && l.Status is DeviceStatus.Ok);
             }
 
-            if (device is LogicalDeviceViewModel && device.Type is AbstractDevice.DeviceType.Remote)
+            if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
             {
                 // if a remote device is also connected by USB and both are authorized - hide the remote device
-                return !Data.DevicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is AbstractDevice.DeviceType.Local
-                    && usb.Status is AbstractDevice.DeviceStatus.Ok
+                return !Data.DevicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is DeviceType.Local
+                    && usb.Status is DeviceStatus.Ok
                     && usb.IpAddress == device.IpAddress);
             }
 
@@ -227,7 +230,7 @@ public static class DeviceHelper
                     return false;
 
                 // if there's any online logical device with the IP of a pairing service - hide the pairing service
-                if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not AbstractDevice.DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
+                if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
                     return false;
 
                 // if there's any QR service with the IP of a code pairing service - hide the code pairing service
@@ -312,14 +315,253 @@ public static class DeviceHelper
         // To make sure value changes to true
         Data.RuntimeSettings.CollapseDevices = false;
         Data.RuntimeSettings.CollapseDevices = true;
+
+        Data.RuntimeSettings.IsPathBoxFocused = false;
     }
 
     public static void UpdateDevicesRootAccess()
     {
-        foreach (var device in Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is AbstractDevice.RootStatus.Unchecked))
+        foreach (var device in Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is RootStatus.Unchecked))
         {
             bool root = ADBService.WhoAmI(device.ID);
-            App.Current.Dispatcher.Invoke(() => device.SetRootStatus(root ? AbstractDevice.RootStatus.Enabled : AbstractDevice.RootStatus.Unchecked));
+            App.Current.Dispatcher.Invoke(() => device.SetRootStatus(root ? RootStatus.Enabled : RootStatus.Unchecked));
         }
+    }
+
+    public static async void PairNewDevice()
+    {
+        var dev = (NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice;
+        await Task.Run(() =>
+        {
+            try
+            {
+                ADBService.PairNetworkDevice(dev.PairingAddress, dev.PairingCode);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical));
+                return false;
+            }
+        }).ContinueWith((t) =>
+        {
+            if (t.IsCanceled)
+                return;
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (t.Result)
+                    ConnectNewDevice();
+
+                Data.RuntimeSettings.ConnectNewDevice = null;
+                Data.RuntimeSettings.IsManualPairingInProgress = false;
+            });
+        });
+    }
+
+    public static async void ConnectNewDevice()
+    {
+        var dev = (NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice;
+        await Task.Run(() =>
+        {
+            try
+            {
+                ADBService.ConnectNetworkDevice(dev.ConnectAddress);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains(Strings.S_FAILED_CONN + dev.ConnectAddress)
+                    && dev.Type is DeviceType.New
+                    && ((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
+                {
+                    Data.DevicesObject.NewDevice.EnablePairing();
+                }
+                else
+                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical));
+
+                return false;
+            }
+        }).ContinueWith((t) =>
+        {
+            if (t.IsCanceled)
+                return;
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                if (t.Result)
+                {
+                    string newDeviceAddress = "";
+                    if (Data.RuntimeSettings.ConnectNewDevice.Type is DeviceType.New)
+                    {
+                        if (Data.Settings.SaveDevices)
+                            Data.DevicesObject.AddHistoryDevice((HistoryDeviceViewModel)dev);
+
+                        newDeviceAddress = dev.ConnectAddress;
+                        ((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).ClearDevice();
+                    }
+                    else
+                    {
+                        newDeviceAddress = ((HistoryDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).ConnectAddress;
+
+                        // In case user has changed the port of the history device
+                        if (Data.Settings.SaveDevices)
+                            Data.DevicesObject.StoreHistoryDevices();
+                    }
+
+                    CollapseDevices();
+                    DeviceListSetup(newDeviceAddress);
+                }
+
+                Data.RuntimeSettings.ConnectNewDevice = null;
+                Data.RuntimeSettings.IsManualPairingInProgress = false;
+            });
+        });
+    }
+
+    public static void DeviceListSetup(string selectedAddress = "")
+    {
+        Task.Run(() => ADBService.GetDevices()).ContinueWith((t) => App.Current.Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
+    }
+
+    public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
+    {
+        var init = !Data.DevicesObject.UpdateDevices(devices);
+        Data.RuntimeSettings.FilterDevices = true;
+
+        if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)
+        {
+            DriveHelper.ClearDrives();
+            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+        }
+
+        if (!Data.DevicesObject.DevicesAvailable())
+        {
+            FileActionLogic.ClearExplorer();
+            NavHistory.Reset();
+            DriveHelper.ClearDrives();
+            return;
+        }
+
+        if (Data.DevicesObject.DevicesAvailable(true))
+            return;
+
+        if (!Data.Settings.AutoOpen)
+        {
+            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+
+            FileActionLogic.ClearExplorer();
+            Data.FileActions.IsExplorerVisible = false;
+            NavHistory.Reset();
+            return;
+        }
+
+        if (!Data.DevicesObject.SetOpenDevice(selectedAddress))
+            return;
+
+        if (!Data.RuntimeSettings.IsDevicesViewEnabled)
+            Data.RuntimeSettings.IsDevicesPaneOpen = false;
+
+        Data.DevicesObject.SetOpenDevice(Data.DevicesObject.Current);
+        Data.CurrentADBDevice = new(Data.DevicesObject.Current);
+        Data.RuntimeSettings.InitLister = true;
+        if (init)
+            InitDevice();
+    }
+
+    public static void InitDevice()
+    {
+        SetAndroidVersion();
+        FileActionLogic.RefreshDrives(true);
+
+        FolderHelper.CombineDisplayNames();
+        Data.RuntimeSettings.DriveViewNav = true;
+        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+
+        FileHelper.ClearCutFiles();
+        Data.RuntimeSettings.FilterDrives = true;
+
+        Data.RuntimeSettings.CurrentBatteryContext = Data.DevicesObject.Current;
+        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk;
+
+        FileActionLogic.UpdateFileActions();
+
+#if DEBUG
+        FileOpHelper.TestCurrentOperation();
+#endif
+
+        AdbHelper.VerifyProgressRedirection();
+    }
+
+    public static void TestDevices()
+    {
+        //ConnectTimer.IsEnabled = false;
+
+        //DevicesObject.UpdateServices(new List<ServiceDevice>() { new PairingService("sdfsdfdsf_adb-tls-pairing._tcp.", "192.168.1.20", "5555") { MdnsType = ServiceDevice.ServiceType.PairingCode } });
+        //DevicesObject.UpdateDevices(new List<LogicalDevice>() { LogicalDevice.New("Test", "test.ID", "device") });
+    }
+
+    public static void SetAndroidVersion()
+    {
+        var versionTask = Task.Run(async () => await Data.CurrentADBDevice.GetAndroidVersion());
+        versionTask.ContinueWith((t) =>
+        {
+            if (t.IsCanceled)
+                return;
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                Data.DevicesObject.Current.SetAndroidVersion(t.Result);
+            });
+        });
+    }
+
+    public static void ConnectDevice(DeviceViewModel device)
+    {
+        Data.RuntimeSettings.IsManualPairingInProgress = true;
+
+        if (device is NewDeviceViewModel newDevice && newDevice.IsPairingEnabled)
+            PairNewDevice();
+        else
+            ConnectNewDevice();
+    }
+
+    public static void RemoveDevice(DeviceViewModel device)
+    {
+        switch (device)
+        {
+            case LogicalDeviceViewModel logical:
+                if (logical.IsOpen)
+                {
+                    DriveHelper.ClearDrives();
+                    FileActionLogic.ClearExplorer();
+                    NavHistory.Reset();
+                    Data.FileActions.IsExplorerVisible = false;
+                    Data.CurrentADBDevice = null;
+                    Data.DirList = null;
+                    Data.RuntimeSettings.DeviceToOpen = null;
+                }
+
+                Data.DevicesObject.UIList.Remove(device);
+                Data.RuntimeSettings.FilterDevices = true;
+                DeviceListSetup();
+                break;
+            case HistoryDeviceViewModel hist:
+                Data.DevicesObject.RemoveHistoryDevice(hist);
+                break;
+            default:
+                throw new NotSupportedException();
+        }
+    }
+
+    public static void OpenDevice(LogicalDeviceViewModel device)
+    {
+        Data.DevicesObject.SetOpenDevice(device);
+        Data.RuntimeSettings.InitLister = true;
+        FileActionLogic.ClearExplorer();
+        NavHistory.Reset();
+        InitDevice();
+
+        Data.RuntimeSettings.IsDevicesPaneOpen = false;
     }
 }
