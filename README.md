@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="ADB Explorer Logo" src="icons/Store_icon_v2.png" width="150px" />
+  <img alt="ADB Explorer Logo" src="icons/Store_icon_2023.png" width="150px" />
   <h1 align="center">ADB Explorer</h1>
 </p>
 
