@@ -59,7 +59,18 @@
                     Orientation="Horizontal"
                     Spacing="6">
                     <ui:FontIcon Glyph="&#xE7EF;" Style="{StaticResource RootIconStyle}" />
-                    <ui:FontIcon Glyph="&#xE838;" Style="{StaticResource DeviceOpenIconStyle}" />
+                    <ui:FontIcon Glyph="&#xE838;">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource DeviceHeaderIcon}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOpen}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="ToolTip" Value="Currently Browsing" />
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
                     <views:CompactBatteryControl DataContext="{Binding Battery}" />
                 </ui:SimpleStackPanel>
             </Grid>

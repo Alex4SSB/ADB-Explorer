@@ -54,26 +54,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DeviceStatusFontSizeStyle"
-        BasedOn="{StaticResource DeviceHeaderIcon}"
-        TargetType="ui:FontIcon">
-        <Setter Property="FontSize" Value="28" />
-        <Setter Property="ToolTip" Value="{Binding Tooltip}" />
-    </Style>
-    <Style
-        x:Key="DeviceStatusIconStyle"
-        BasedOn="{StaticResource DeviceStatusFontSizeStyle}"
-        TargetType="ui:FontIcon">
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Bottom" />
-        <Setter Property="Glyph" Value="&#xEBFE;" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="Offline">
-                <Setter Property="Glyph" Value="&#xEBFD;" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="Transparent" />
     </Style>
@@ -157,116 +137,6 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DeviceNameTextBlockStyle"
-        BasedOn="{StaticResource TooltipTextBlockStyle}"
-        TargetType="TextBlock">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="LogicalDeviceNameStyle"
-        BasedOn="{StaticResource DeviceNameTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Name}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsOpen}" Value="True">
-                <Setter Property="FontWeight" Value="Bold" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
-                <Setter Property="Text" Value="[Unauthorized]" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Emulator">
-                <Setter Property="Text" Value="{Binding ID}" />
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Type}" Value="Service" />
-                    <Condition Binding="{Binding Name}" Value="" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Text" Value="[Service]" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <ResourceDictionary x:Key="ContextMenuStyles">
-        <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem" />
-        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-            <Setter Property="FontSize" Value="16" />
-        </Style>
-        <Style TargetType="StackPanel">
-            <Setter Property="Orientation" Value="Horizontal" />
-        </Style>
-    </ResourceDictionary>
-    <ResourceDictionary x:Key="ContextSubMenuStyles">
-        <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem" />
-        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-            <Setter Property="FontSize" Value="16" />
-        </Style>
-        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock" />
-        <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-            <Setter Property="Margin" Value="0,-6" />
-        </Style>
-    </ResourceDictionary>
-    <ResourceDictionary x:Key="TopMenuStyles">
-        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
-            <Setter Property="FontSize" Value="20" />
-        </Style>
-        <Style TargetType="StackPanel">
-            <Setter Property="Orientation" Value="Horizontal" />
-            <Setter Property="Margin" Value="0,2" />
-        </Style>
-        <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
-            <Setter Property="Margin" Value="6,0,0,0" />
-        </Style>
-    </ResourceDictionary>
-    <ContextMenu x:Key="FileOpHeaderContextMenu" Resources="{StaticResource ContextSubMenuStyles}">
-        <MenuItem>
-            <MenuItem.Header>
-                <CheckBox
-                    x:Name="FileOpContextOpTypeCheckBox"
-                    Content="Operation Type"
-                    IsChecked="True" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem>
-            <MenuItem.Header>
-                <CheckBox
-                    x:Name="FileOpContextFileNameCheckBox"
-                    Content="File Name"
-                    IsChecked="True" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem>
-            <MenuItem.Header>
-                <CheckBox
-                    x:Name="FileOpContextProgressCheckBox"
-                    Content="Progress"
-                    IsChecked="True" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem>
-            <MenuItem.Header>
-                <CheckBox
-                    x:Name="FileOpContextSourceCheckBox"
-                    Content="Source"
-                    IsChecked="True" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem>
-            <MenuItem.Header>
-                <CheckBox
-                    x:Name="FileOpContextDestCheckBox"
-                    Content="Destination"
-                    IsChecked="True" />
-            </MenuItem.Header>
-        </MenuItem>
-    </ContextMenu>
     <Style x:Key="BaseRowStyle" TargetType="DataGridRow">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
         <Setter Property="Visibility" Value="Visible" />
@@ -353,24 +223,6 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="Height" Value="0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="DeviceOpenIconStyle"
-        BasedOn="{StaticResource DeviceHeaderIcon}"
-        TargetType="ui:FontIcon">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsOpen}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="ToolTip" Value="Currently Browsing" />
-    </Style>
-    <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="Ok">
-                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -539,84 +391,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-
-    <Style x:Key="ContextMenuSeparatorStyle" TargetType="Separator">
-        <Setter Property="Margin" Value="-18,4,12,4" />
-        <Setter Property="Background" Value="{DynamicResource SeparatorForeground}" />
-    </Style>
-    <Style
-        x:Key="Separator1Style"
-        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
-        TargetType="Separator">
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PullEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="Separator2Style"
-        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
-        TargetType="Separator">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextNewEnabled}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PasteEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="Separator3Style"
-        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
-        TargetType="Separator">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="Separator4Style"
-        BasedOn="{StaticResource ContextMenuSeparatorStyle}"
-        TargetType="Separator">
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CutEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PasteEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RenameEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=UninstallPackageEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=RestoreEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PackageActionsEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=DeleteEnabled}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ContextPushPackagesEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Center" />
@@ -655,49 +429,6 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
             </MultiDataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="SettingsToggleStyle"
-        BasedOn="{StaticResource ToggleButtonStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="TextElement.FontSize" Value="20" />
-        <Setter Property="TextElement.FontFamily" Value="Segoe MDL2 Assets" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="TextElement.FontFamily" Value="{StaticResource SymbolThemeFontFamily}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="SortedSettingsButtonStyle"
-        BasedOn="{StaticResource SettingsToggleStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Search View" />
-        <Setter Property="Content" Value="&#xE721;" />
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="&#xE711;" />
-                <Setter Property="ToolTip" Value="Exit Search" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ExpandGroupsButtonStyle"
-        BasedOn="{StaticResource SettingsToggleStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Expand All" />
-        <Setter Property="Content" Value="&#xE169;" />
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="&#xE16A;" />
-                <Setter Property="ToolTip" Value="Collapse All" />
-            </Trigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <DataTemplate x:Key="FileIconTemplate">
@@ -763,20 +494,6 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=ServerUnresponsive}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ContextMenuCopyPathStyle"
-        BasedOn="{StaticResource AdbMenuItemStyle}"
-        TargetType="MenuItem">
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContextMenu}, Path=(helpers:SelectionHelper.MenuType)}" Value="Context" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=CopyPathEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="SearchIndicatorBorderStyle" TargetType="Border">

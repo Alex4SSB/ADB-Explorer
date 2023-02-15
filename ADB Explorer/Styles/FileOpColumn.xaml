@@ -1,0 +1,24 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:models="clr-namespace:ADB_Explorer.Models">
+    <DataTemplate x:Key="FileOpColConfigTemplate">
+        <CheckBox
+            Margin="0,-6"
+            Content="{Binding Name}"
+            IsChecked="{Binding IsChecked}"
+            IsEnabled="{Binding IsEnabled}"
+            Style="{StaticResource CheckBoxStyle}" />
+    </DataTemplate>
+    <ContextMenu
+        x:Key="FileOpHeaderContextMenu"
+        ItemContainerStyle="{StaticResource AdbMenuItemStyle}"
+        ItemTemplate="{StaticResource FileOpColConfigTemplate}"
+        ItemsSource="{Binding Source={x:Static Member=models:FileOpColumns.List}}" />
+    <Style
+        x:Key="FileOpColumnHeaderStyle"
+        BasedOn="{StaticResource DataGridColumnHeaderStyle}"
+        TargetType="DataGridColumnHeader">
+        <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
+    </Style>
+</ResourceDictionary>

@@ -7,6 +7,46 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:views="clr-namespace:ADB_Explorer.Views">
     <Style
+        x:Key="DeviceStatusFontSizeStyle"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
+        TargetType="ui:FontIcon">
+        <Setter Property="FontSize" Value="28" />
+        <Setter Property="ToolTip" Value="{Binding Tooltip}" />
+    </Style>
+    <Style
+        x:Key="DeviceStatusIconStyle"
+        BasedOn="{StaticResource DeviceStatusFontSizeStyle}"
+        TargetType="ui:FontIcon">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Bottom" />
+        <Setter Property="Glyph" Value="&#xEBFE;" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Offline">
+                <Setter Property="Glyph" Value="&#xEBFD;" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DeviceNameTextBlockStyle"
+        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Ok">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
         x:Key="PairingBoxStyle"
         BasedOn="{StaticResource NumericTextBoxStyle}"
         TargetType="TextBox">

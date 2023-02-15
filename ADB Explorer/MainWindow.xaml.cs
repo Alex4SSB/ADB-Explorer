@@ -675,103 +675,33 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         _ => throw new NotSupportedException(),
     };
 
-    private IEnumerable<CheckBox> FileOpContextItems
-    {
-        get
-        {
-            var items = ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items;
-            return from MenuItem item in ((ContextMenu)FindResource("FileOpHeaderContextMenu")).Items
-                   let checkbox = item.Header as CheckBox
-                   select checkbox;
-        }
-    }
-
     private void InitFileOpColumns() => Dispatcher.Invoke(() =>
     {
-        var fileOpContext = FindResource("FileOpHeaderContextMenu") as ContextMenu;
-        foreach (var item in fileOpContext.Items)
+        FileOpColumns.Init();
+
+        FileOpColumns.List.ForEach(col => col.Column = GetColumnFromType(col.Type));
+
+        DataGridColumn GetColumnFromType(FileOpColumnConfig.ColumnType columnType) => columnType switch
         {
-            var checkbox = ((MenuItem)item).Header as CheckBox;
-            checkbox.Click += ColumnCheckbox_Click;
-
-            var config = Storage.Retrieve<FileOpColumn>(checkbox.Name);
-            if (config is null)
-                continue;
-
-            var column = GetCheckboxColumn(checkbox);
-            checkbox.DataContext = config;
-            checkbox.IsChecked = config.IsVisible;
-            column.Width = config.Width;
-            column.Visibility = Visible(config.IsVisible);
-            column.DisplayIndex = config.Index;
-        }
-
-        EnableContextItems();
-    });
-
-    private DataGridColumn GetCheckboxColumn(CheckBox checkBox)
-    {
-        return checkBox.Name.Split("FileOpContext")[1].Split("CheckBox")[0] switch
-        {
-            "OpType" => OpTypeColumn,
-            "FileName" => FileNameColumn,
-            "Progress" => ProgressColumn,
-            "Source" => SourceColumn,
-            "Dest" => DestColumn,
+            FileOpColumnConfig.ColumnType.OpType => OpTypeColumn,
+            FileOpColumnConfig.ColumnType.FileName => FileNameColumn,
+            FileOpColumnConfig.ColumnType.Progress => ProgressColumn,
+            FileOpColumnConfig.ColumnType.Source => SourceColumn,
+            FileOpColumnConfig.ColumnType.Dest => DestColumn,
             _ => throw new NotSupportedException(),
         };
-    }
+    });
 
-    private string ColumnName(DataGridColumn column)
+    private FileOpColumnConfig.ColumnType GetColumnType(DataGridColumn column)
     {
-        if (column == OpTypeColumn) return "OpTypeColumn";
-        if (column == FileNameColumn) return "FileNameColumn";
-        if (column == ProgressColumn) return "ProgressColumn";
-        if (column == SourceColumn) return "SourceColumn";
-        if (column == DestColumn) return "DestColumn";
+        if (column == OpTypeColumn) return FileOpColumnConfig.ColumnType.OpType;
+        if (column == FileNameColumn) return FileOpColumnConfig.ColumnType.FileName;
+        if (column == ProgressColumn) return FileOpColumnConfig.ColumnType.Progress;
+        if (column == SourceColumn) return FileOpColumnConfig.ColumnType.Source;
+        if (column == DestColumn) return FileOpColumnConfig.ColumnType.Dest;
 
-        return "";
+        throw new NotSupportedException();
     }
-
-    private CheckBox GetColumnCheckbox(DataGridColumn column)
-    {
-        return FileOpContextItems.First(cb => cb.Name == $"FileOpContext{ColumnName(column).Split("Column")[0]}CheckBox");
-    }
-
-    private void EnableContextItems()
-    {
-        var visibleColumns = FileOpContextItems.Count(cb => cb.IsChecked == true);
-        foreach (var checkbox in FileOpContextItems)
-        {
-            checkbox.IsEnabled = visibleColumns > 1 ? true : checkbox.IsChecked == false;
-        }
-    }
-
-    private void ColumnCheckbox_Click(object sender, RoutedEventArgs e)
-    {
-        var checkbox = sender as CheckBox;
-        var column = GetCheckboxColumn(checkbox);
-
-        column.Visibility = Visible(checkbox.IsChecked);
-        if (checkbox.DataContext is FileOpColumn config)
-        {
-            config.IsVisible = checkbox.IsChecked;
-        }
-        else
-        {
-            checkbox.DataContext = CreateColumnConfig(column);
-        }
-
-        Storage.StoreValue(checkbox.Name, checkbox.DataContext);
-        EnableContextItems();
-    }
-
-    private static FileOpColumn CreateColumnConfig(DataGridColumn column) => new FileOpColumn()
-    {
-        Index = column.DisplayIndex,
-        IsVisible = column.Visibility == Visibility.Visible,
-        Width = column.ActualWidth,
-    };
 
     private void RefreshLocation()
     {
@@ -1494,18 +1424,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.Column is not DataGridColumn column)
             return;
 
-        var checkbox = GetColumnCheckbox(column);
+        var col = FileOpColumns.List.Find(col => col.Type == GetColumnType(column));
+        if (col?.Column is null)
+            return;
 
-        if (checkbox.DataContext is FileOpColumn config)
-        {
-            config.Index = column.DisplayIndex;
-        }
-        else
-        {
-            checkbox.DataContext = CreateColumnConfig(column);
-        }
-
-        Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+        col.Index = column.DisplayIndex;
     }
 
     private void DataGridColumnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1513,18 +1436,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (((DataGridColumnHeader)sender).Column is not DataGridColumn column)
             return;
 
-        var checkbox = GetColumnCheckbox(column);
+        var col = FileOpColumns.List.Find(col => col.Type == GetColumnType(column));
+        if (col?.Column is null)
+            return;
 
-        if (checkbox.DataContext is FileOpColumn config)
-        {
-            config.Width = e.NewSize.Width;
-        }
-        else
-        {
-            checkbox.DataContext = CreateColumnConfig(column);
-        }
-
-        Storage.StoreValue(checkbox.Name, checkbox.DataContext);
+        col.Width = column.ActualWidth;
     }
 
     private void BeginRename()

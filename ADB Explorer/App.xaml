@@ -32,6 +32,7 @@
                 <ResourceDictionary Source="Styles\Drive.xaml" />
                 <ResourceDictionary Source="Styles\Device.xaml" />
                 <ResourceDictionary Source="Styles\FileOp.xaml" />
+                <ResourceDictionary Source="Styles\FileOpColumn.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
