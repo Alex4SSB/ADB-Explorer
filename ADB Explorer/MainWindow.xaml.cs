@@ -680,6 +680,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileOpColumns.Init();
 
         FileOpColumns.List.ForEach(col => col.Column = GetColumnFromType(col.Type));
+        foreach (var item in FileOpColumns.List)
+        {
+            var column = GetColumnFromType(item.Type);
+            item.Column = column;
+
+            if (item.Icon is null)
+                column.Header = item.Name;
+            else
+            {
+                column.Header = new FontIcon()
+                {
+                    Glyph = item.Icon,
+                    ToolTip = item.Name,
+                };
+            }
+        }
 
         DataGridColumn GetColumnFromType(FileOpColumnConfig.ColumnType columnType) => columnType switch
         {

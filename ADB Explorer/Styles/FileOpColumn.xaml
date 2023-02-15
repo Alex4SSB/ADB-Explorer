@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:models="clr-namespace:ADB_Explorer.Models">
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
     <DataTemplate x:Key="FileOpColConfigTemplate">
         <CheckBox
             Margin="0,-6"
@@ -20,5 +21,10 @@
         BasedOn="{StaticResource DataGridColumnHeaderStyle}"
         TargetType="DataGridColumnHeader">
         <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
+        <Style.Resources>
+            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                <Setter Property="Margin" Value="-7,0" />
+            </Style>
+        </Style.Resources>
     </Style>
 </ResourceDictionary>

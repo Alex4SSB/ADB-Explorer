@@ -691,38 +691,12 @@
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn
                                         x:Name="OpTypeColumn"
-                                        Width="30"
                                         CanUserResize="False"
-                                        CellTemplate="{StaticResource OperationIconTemplate}">
-                                        <DataGridTemplateColumn.HeaderStyle>
-                                            <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader">
-                                                <Setter Property="ToolTip" Value="Operation" />
-                                            </Style>
-                                        </DataGridTemplateColumn.HeaderStyle>
-                                        <DataGridTemplateColumn.Header>
-                                            <ui:FontIcon Margin="-7,0" Glyph="&#xE8AF;" />
-                                        </DataGridTemplateColumn.Header>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn
-                                        x:Name="FileNameColumn"
-                                        Width="250"
-                                        CellTemplate="{StaticResource FileOpFileNameTemplate}"
-                                        Header="File Name" />
-                                    <DataGridTemplateColumn
-                                        x:Name="ProgressColumn"
-                                        MinWidth="180"
-                                        CellTemplate="{StaticResource FileOpProgressTemplate}"
-                                        Header="Progress" />
-                                    <DataGridTemplateColumn
-                                        x:Name="SourceColumn"
-                                        Width="200"
-                                        CellTemplate="{StaticResource FileOpSourcePathTemplate}"
-                                        Header="Source" />
-                                    <DataGridTemplateColumn
-                                        x:Name="DestColumn"
-                                        Width="200"
-                                        CellTemplate="{StaticResource FileOpTargetPathTemplate}"
-                                        Header="Destination" />
+                                        CellTemplate="{StaticResource OperationIconTemplate}" />
+                                    <DataGridTemplateColumn x:Name="FileNameColumn" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
+                                    <DataGridTemplateColumn x:Name="ProgressColumn" CellTemplate="{StaticResource FileOpProgressTemplate}" />
+                                    <DataGridTemplateColumn x:Name="SourceColumn" CellTemplate="{StaticResource FileOpSourcePathTemplate}" />
+                                    <DataGridTemplateColumn x:Name="DestColumn" CellTemplate="{StaticResource FileOpTargetPathTemplate}" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Border
