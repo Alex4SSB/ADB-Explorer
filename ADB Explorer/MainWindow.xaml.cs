@@ -227,13 +227,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused is null
                         ? NavigationBox.Mode is Controls.NavigationBox.ViewMode.Breadcrumbs
                         : RuntimeSettings.IsPathBoxFocused.Value);
+
+                    RuntimeSettings.IsSearchBoxFocused = false;
                     break;
 
-                case nameof(AppRuntimeSettings.Filter):
-                    if (SearchBox.IsFocused)
-                        FileOperationsSplitView.Focus();
-                    else
+                case nameof(AppRuntimeSettings.IsSearchBoxFocused):
+                    if (RuntimeSettings.IsSearchBoxFocused)
                         SearchBox.Focus();
+                    else
+                        FileOperationsSplitView.Focus();
                     break;
 
                 case nameof(AppRuntimeSettings.ExplorerSource):
@@ -404,6 +406,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
         {
             UnfinishedBlock.Visible(DirList.IsProgressVisible);
+            NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
         }
         else if (e.PropertyName == nameof(DirectoryLister.InProgress))
         {
@@ -607,6 +610,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         RuntimeSettings.IsPathBoxFocused = false;
+        
     }
 
     private void LaunchSequence()
@@ -1807,5 +1811,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void MdnsCheckBox_Click(object sender, RoutedEventArgs e)
     {
         UpdateMdns();
+    }
+
+    private void GridSplitter_DragStarted(object sender, DragStartedEventArgs e)
+    {
+        NavigationBox.Refresh();
     }
 }

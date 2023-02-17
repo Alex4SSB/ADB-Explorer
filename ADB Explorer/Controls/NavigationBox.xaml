@@ -45,11 +45,10 @@
             VerticalAlignment="Stretch"
             Background="Transparent"
             Foreground="{StaticResource NavigationBarProgressBrush}"
-            IsHitTestVisible="False"
-            IsIndeterminate="True">
+            IsHitTestVisible="False">
             <ui:ProgressBar.Style>
                 <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
-                    <Setter Property="Visibility" Value="Collapsed" />
+                    <Setter Property="IsIndeterminate" Value="False" />
                     <Setter Property="CornerRadius" Value="4,4,2,2" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
@@ -60,7 +59,7 @@
                                 <Condition Binding="{Binding Mode}" Value="Breadcrumbs" />
                                 <Condition Binding="{Binding IsLoadingProgressVisible}" Value="True" />
                             </MultiDataTrigger.Conditions>
-                            <Setter Property="Visibility" Value="Visible" />
+                            <Setter Property="IsIndeterminate" Value="True" />
                         </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>

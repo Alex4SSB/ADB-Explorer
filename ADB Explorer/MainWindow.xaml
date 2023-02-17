@@ -191,7 +191,7 @@
                             VerticalAlignment="Stretch"
                             Background="Transparent"
                             Cursor="SizeWE"
-                            FocusVisualStyle="{x:Null}" />
+                            FocusVisualStyle="{x:Null}" DragStarted="GridSplitter_DragStarted" />
                         <Grid
                             Grid.Column="3"
                             Margin="0,6,6,6"

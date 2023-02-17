@@ -1,13 +1,12 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public class DirectoryLister : INotifyPropertyChanged
+public class DirectoryLister : ViewModelBase
 {
-    public event PropertyChangedEventHandler PropertyChanged;
-
     public ADBService.AdbDevice Device { get; }
     public ObservableList<FileClass> FileList { get; }
 
@@ -15,21 +14,21 @@ public class DirectoryLister : INotifyPropertyChanged
     public string CurrentPath
     {
         get => currentPath;
-        private set => SetField(ref currentPath, value);
+        private set => Set(ref currentPath, value);
     }
 
     private bool inProgress;
     public bool InProgress
     { 
         get => inProgress;
-        private set => SetField(ref inProgress, value);
+        private set => Set(ref inProgress, value);
     }
 
-    private bool isProgressVisible;
+    private bool isProgressVisible = false;
     public bool IsProgressVisible
     {
         get => isProgressVisible;
-        private set => SetField(ref isProgressVisible, value);
+        private set => Set(ref isProgressVisible, value);
     }
 
     private Dispatcher Dispatcher { get; }
@@ -41,17 +40,6 @@ public class DirectoryLister : INotifyPropertyChanged
     private Func<FileClass, FileClass> FileManipulator { get; }
 
     private ConcurrentQueue<FileStat> currentFileQueue;
-
-    protected void OnPropertyChanged(string propertyName)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
-        field = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
 
     public DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null)
     {
@@ -88,7 +76,7 @@ public class DirectoryLister : INotifyPropertyChanged
         ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(StopDirectoryList), CurrentCancellationToken.Token);
         
-        Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => { IsProgressVisible = InProgress; }), CurrentCancellationToken.Token);
+        Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
 
         ScheduleUpdate();
     }

@@ -30,7 +30,7 @@ internal static class AppActions
             "Up"),
         new(FileAction.FileActionType.Filter,
             () => Data.FileActions.HomeEnabled,
-            () => Data.RuntimeSettings.Filter = true,
+            () => Data.RuntimeSettings.IsSearchBoxFocused ^= true,
             "Filter",
             new(Key.F, ModifierKeys.Control)),
         new(FileAction.FileActionType.OpenDevices,

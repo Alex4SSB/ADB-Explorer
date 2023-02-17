@@ -73,16 +73,6 @@ public partial class NavigationBox : UserControl
         DependencyProperty.Register("Breadcrumbs", typeof(List<MenuItem>),
           typeof(NavigationBox), new PropertyMetadata(null));
 
-    public string DriveIcon
-    {
-        get => (string)GetValue(DriveIconProperty);
-        set => SetValue(DriveIconProperty, value);
-    }
-
-    public static readonly DependencyProperty DriveIconProperty =
-        DependencyProperty.Register("DriveIcon", typeof(string),
-          typeof(NavigationBox), new PropertyMetadata(null));
-
     public bool IsLoadingProgressVisible
     {
         get => (bool)GetValue(IsLoadingProgressVisibleProperty);
@@ -198,16 +188,19 @@ public partial class NavigationBox : UserControl
         if (excessLength > 0)
         {
             int i = 0;
-            while (excessLength >= 0 && Breadcrumbs.Count - excessButtons.Count > 1)
+            while (excessLength >= 0 && Breadcrumbs.Count - excessButtons.Count > 0)
             {
+                var path = TextHelper.GetAltObject(Breadcrumbs[i]).ToString();
+                var drives = Data.DevicesObject.Current.Drives.Where(drive => drive.Path == path);
+                var icon = "\uE8B7";
+                if (drives.Any())
+                    icon = drives.First().DriveIcon;
+
                 excessButtons.Add(Breadcrumbs[i]);
                 Breadcrumbs[i].ContextMenu = null;
                 Breadcrumbs[i].Height = double.NaN;
                 Breadcrumbs[i].Padding = new(10, 4, 10, 4);
-                Breadcrumbs[i].Icon = new FontIcon()
-                {
-                    Glyph = string.IsNullOrEmpty(DriveIcon) ? "\uE8B7" : DriveIcon,
-                };
+                Breadcrumbs[i].Icon = new FontIcon() { Glyph = icon };
 
                 Breadcrumbs[i].Margin = Data.Settings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
                 ControlHelper.SetCornerRadius(Breadcrumbs[i], new(Data.Settings.UseFluentStyles ? 4 : 0));

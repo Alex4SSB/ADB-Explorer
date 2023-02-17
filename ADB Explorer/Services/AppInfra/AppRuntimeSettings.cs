@@ -226,6 +226,17 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
+    private bool isSearchBoxFocused = false;
+    public bool IsSearchBoxFocused
+    {
+        get => isSearchBoxFocused;
+        set
+        {
+            if (!Set(ref isSearchBoxFocused, value))
+                OnPropertyChanged();
+        }
+    }
+
     #region Event-only properties
 
     public bool NewFolder { get => false; set => OnPropertyChanged(); }
@@ -233,7 +244,6 @@ public class AppRuntimeSettings : ViewModelBase
     public bool Rename { get => false; set => OnPropertyChanged(); }
     public bool SelectAll { get => false; set => OnPropertyChanged(); }
     public bool Refresh { get => false; set => OnPropertyChanged(); }
-    public bool Filter { get => false; set => OnPropertyChanged(); }
     public bool FilterDrives { get => false; set => OnPropertyChanged(); }
     public bool FilterDevices { get => false; set => OnPropertyChanged(); }
     public bool FilterActions { get => false; set => OnPropertyChanged(); }

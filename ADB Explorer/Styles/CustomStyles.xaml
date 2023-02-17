@@ -767,6 +767,5 @@
         <Setter Property="MenuPadding" Value="4" />
         <Setter Property="Height" Value="32" />
         <Setter Property="DisplayNames" Value="{Binding Source={x:Static Member=models:Data.CurrentDisplayNames}}" />
-        <Setter Property="IsLoadingProgressVisible" Value="{Binding Source={x:Static Member=models:Data.DirList}, Path=IsProgressVisible}" />
     </Style>
 </ResourceDictionary>
