@@ -437,6 +437,9 @@ public static class DeviceHelper
 
         if (!Data.DevicesObject.DevicesAvailable())
         {
+            Data.CutItems.Clear();
+            Data.FileActions.PasteState = FileClass.CutType.None;
+
             FileActionLogic.ClearExplorer();
             NavHistory.Reset();
             DriveHelper.ClearDrives();
