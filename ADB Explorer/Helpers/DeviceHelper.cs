@@ -435,31 +435,12 @@ public static class DeviceHelper
             Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
         }
 
-        if (!Data.DevicesObject.DevicesAvailable())
-        {
-            Data.CutItems.Clear();
-            Data.FileActions.PasteState = FileClass.CutType.None;
-
-            FileActionLogic.ClearExplorer();
-            NavHistory.Reset();
-            DriveHelper.ClearDrives();
-            return;
-        }
-
         if (Data.DevicesObject.DevicesAvailable(true))
             return;
 
-        if (!Data.Settings.AutoOpen)
-        {
-            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+        DisconnectDevice();
 
-            FileActionLogic.ClearExplorer();
-            Data.FileActions.IsExplorerVisible = false;
-            NavHistory.Reset();
-            return;
-        }
-
-        if (!Data.DevicesObject.SetOpenDevice(selectedAddress))
+        if (!Data.Settings.AutoOpen || !Data.DevicesObject.SetOpenDevice(selectedAddress))
             return;
 
         if (!Data.RuntimeSettings.IsDevicesViewEnabled)
@@ -470,6 +451,20 @@ public static class DeviceHelper
         Data.RuntimeSettings.InitLister = true;
         if (init)
             InitDevice();
+
+        static void DisconnectDevice()
+        {
+            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+
+            Data.CutItems.Clear();
+            Data.FileActions.PasteState = FileClass.CutType.None;
+
+            FileActionLogic.ClearExplorer();
+            Data.FileActions.IsExplorerVisible = false;
+
+            NavHistory.Reset();
+            DriveHelper.ClearDrives();
+        }
     }
 
     public static void InitDevice()

@@ -321,6 +321,17 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="ItemsCountContainerStyle" TargetType="StackPanel">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Hidden" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="SelectedItemsStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
         <Setter Property="Margin" Value="0,4" />

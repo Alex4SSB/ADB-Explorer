@@ -734,7 +734,10 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <StackPanel Margin="8,0" Orientation="Horizontal">
+                <StackPanel
+                    Margin="8,0"
+                    Orientation="Horizontal"
+                    Style="{StaticResource ItemsCountContainerStyle}">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                         <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
                         <TextBlock Text=" item" />

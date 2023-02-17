@@ -285,17 +285,15 @@ public class Devices : AbstractDevice
 
     public bool SetOpenDevice(LogicalDeviceViewModel device)
     {
-        if (device is not null)
-        {
-            if (!Data.RuntimeSettings.DeviceToOpen.Equals(device))
-                Data.RuntimeSettings.DeviceToOpen = device;
+        if (Data.RuntimeSettings.DeviceToOpen is null && device is null)
+            return false;
 
-            OnPropertyChanged(nameof(AppTitle));
+        if (!Data.RuntimeSettings.DeviceToOpen.Equals(device))
+            Data.RuntimeSettings.DeviceToOpen = device;
 
-            return true;
-        }
+        OnPropertyChanged(nameof(AppTitle));
 
-        return false;
+        return device is not null;
     }
 
     #endregion
