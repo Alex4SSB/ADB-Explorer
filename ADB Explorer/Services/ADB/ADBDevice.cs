@@ -216,6 +216,12 @@ public partial class ADBService
 
         public string TranslateDevicePath(string path)
         {
+            if (path.StartsWith('~'))
+                path = path.Length == 1 ? "/" : path[1..];
+
+            if (path.StartsWith("//"))
+                path = path[1..];
+
             int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, EscapeAdbShellString(path), "&&", "pwd");
             if (exitCode != 0)
             {

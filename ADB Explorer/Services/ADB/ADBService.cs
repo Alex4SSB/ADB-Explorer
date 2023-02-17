@@ -174,7 +174,7 @@ public partial class ADBService
                 _ => new string(c, 1)
             }));
 
-        return $"{quotes}{(result.StartsWith("\\~") ? result[1..] : result)}{quotes}";
+        return $"{quotes}{result}{quotes}";
     }
 
     public static string EscapeAdbString(string str)
