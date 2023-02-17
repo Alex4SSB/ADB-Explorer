@@ -148,7 +148,11 @@ public class LogicalDeviceViewModel : DeviceViewModel
         SetStatus(other.Status);
     }
 
-    public void EnableRoot(bool enable) => Device.EnableRoot(enable);
+    public void EnableRoot(bool enable)
+    {
+        Device.EnableRoot(enable);
+        OnPropertyChanged(nameof(Root));
+    }
 
     public bool SetRootStatus(RootStatus status)
     {
