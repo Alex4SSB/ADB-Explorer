@@ -365,8 +365,8 @@ internal class FileActionsEnable : ViewModelBase
         }
     }
 
-    private string editorFilePath;
-    public string EditorFilePath
+    private FileClass editorFilePath;
+    public FileClass EditorFilePath
     {
         get => editorFilePath;
         set => Set(ref editorFilePath, value);

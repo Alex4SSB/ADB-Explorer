@@ -1187,6 +1187,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ResizeDetailedView();
         EnableSplitViewAnimation();
         SearchBoxMaxWidth();
+
+        Size maximizedSize = new(SystemParameters.MaximizedPrimaryScreenWidth, SystemParameters.MaximizedPrimaryScreenHeight);
+        if (e.NewSize != maximizedSize && e.PreviousSize != maximizedSize)
+            FileActions.IsEditorOpen = false;
     }
 
     private void SearchBoxMaxWidth() => RuntimeSettings.MaxSearchBoxWidth = WindowState switch
@@ -1780,17 +1784,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void SaveReaderTextButton_Click(object sender, RoutedEventArgs e)
     {
-        var file = SelectedFiles.First();
-        string text = FileActions.EditorText;
-
-        var writeTask = Task.Run(() =>
-        {
-            ShellFileOperation.SilentDelete(CurrentADBDevice, file);
-
-            ShellFileOperation.WriteLine(CurrentADBDevice, file.FullPath, ADBService.EscapeAdbShellString(text.Replace("\r", ""), '\''));
-        });
-
-        writeTask.ContinueWith((t) => Dispatcher.Invoke(() => FileActions.OriginalEditorText = FileActions.EditorText));
+        FileActionLogic.SaveEditorText();
     }
 
     private void CloseEditorButton_Click(object sender, RoutedEventArgs e)

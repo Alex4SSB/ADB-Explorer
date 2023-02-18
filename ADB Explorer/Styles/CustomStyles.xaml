@@ -547,6 +547,7 @@
         TargetType="Border">
         <Setter Property="BorderBrush" Value="{DynamicResource CheckboxBorderNormal}" />
         <Setter Property="Padding" Value="1,1,0,0" />
+        <Setter Property="Background" Value="{DynamicResource ContentDialogCommandBackground}" />
         <Setter Property="Margin" Value="0,0,0,-10" />
         <Setter Property="BorderThickness" Value="1" />
         <Style.Triggers>
@@ -575,7 +576,7 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Padding" Value="5,5,6,6" />
         <Setter Property="Margin" Value="2,0,6,0" />
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorFilePath}" />
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorFilePath.FullPath, Mode=OneWay}" />
     </Style>
     <Style
         x:Key="SaveEditorTextButtonStyle"

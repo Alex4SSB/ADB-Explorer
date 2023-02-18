@@ -78,21 +78,21 @@ internal static class FileActionLogic
 
     public static void OpenEditor()
     {
-        if (Data.FileActions.IsEditorOpen)
+        if (Data.FileActions.IsEditorOpen && Data.FileActions.EditorFilePath.Equals(Data.SelectedFiles.First()))
         {
             Data.FileActions.IsEditorOpen = false;
             return;
         }
         Data.FileActions.IsEditorOpen = true;
 
-        Data.FileActions.EditorFilePath = Data.SelectedFiles.First().FullPath;
+        Data.FileActions.EditorFilePath = Data.SelectedFiles.First();
 
         var readTask = Task.Run(() =>
         {
             var text = "";
             try
             {
-                text = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, Data.FileActions.EditorFilePath);
+                text = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, Data.FileActions.EditorFilePath.FullPath);
             }
             catch (Exception)
             { }
@@ -103,6 +103,26 @@ internal static class FileActionLogic
         {
             Data.FileActions.EditorText =
             Data.FileActions.OriginalEditorText = t.Result;
+        }));
+    }
+
+    public static void SaveEditorText()
+    {
+        string text = Data.FileActions.EditorText;
+
+        var writeTask = Task.Run(() =>
+        {
+            ShellFileOperation.SilentDelete(Data.CurrentADBDevice, Data.FileActions.EditorFilePath);
+
+            ShellFileOperation.WriteLine(Data.CurrentADBDevice, Data.FileActions.EditorFilePath.FullPath, ADBService.EscapeAdbShellString(text.Replace("\r", ""), '\''));
+        });
+
+        writeTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
+        {
+            Data.FileActions.OriginalEditorText = Data.FileActions.EditorText;
+
+            if (Data.FileActions.EditorFilePath.ParentPath == Data.CurrentPath)
+                Data.RuntimeSettings.Refresh = true;
         }));
     }
 

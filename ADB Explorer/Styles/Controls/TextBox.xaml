@@ -54,21 +54,7 @@
                                     MinHeight="{TemplateBinding MinHeight}"
                                     ui:ValidationHelper.IsTemplateValidationAdornerSite="True"
                                     Background="{TemplateBinding Background}"
-                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}">
-                                    <Grid>
-                                        <Border
-                                            x:Name="UpperBorder"
-                                            BorderBrush="{DynamicResource AdbTextBoxUpperBorder}"
-                                            BorderThickness="1,1,1,0"
-                                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                                        <Border
-                                            x:Name="LowerBorder"
-                                            helpers:StyleHelper.AltBorderBrush="{TemplateBinding helpers:StyleHelper.AltBorderBrush}"
-                                            BorderBrush="{DynamicResource AdbTextBoxLowerBorder}"
-                                            BorderThickness="0,0,0,1"
-                                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
-                                    </Grid>
-                                </Border>
+                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
                                 <ScrollViewer
                                     x:Name="PART_ContentHost"
                                     Grid.Row="1"
@@ -86,6 +72,32 @@
                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                     Style="{DynamicResource ScrollViewerStyle}"
                                     VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" />
+                                <Border
+                                    x:Name="OuterBorder"
+                                    Grid.Row="1"
+                                    Grid.RowSpan="1"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    MinWidth="{TemplateBinding MinWidth}"
+                                    MinHeight="{TemplateBinding MinHeight}"
+                                    ui:ValidationHelper.IsTemplateValidationAdornerSite="True"
+                                    Background="Transparent"
+                                    CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}"
+                                    IsHitTestVisible="False">
+                                    <Grid>
+                                        <Border
+                                            x:Name="UpperBorder"
+                                            BorderBrush="{DynamicResource AdbTextBoxUpperBorder}"
+                                            BorderThickness="1,1,1,0"
+                                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                        <Border
+                                            x:Name="LowerBorder"
+                                            helpers:StyleHelper.AltBorderBrush="{TemplateBinding helpers:StyleHelper.AltBorderBrush}"
+                                            BorderBrush="{DynamicResource AdbTextBoxLowerBorder}"
+                                            BorderThickness="0,0,0,1"
+                                            CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
+                                    </Grid>
+                                </Border>
                                 <TextBlock
                                     x:Name="PlaceholderTextContentPresenter"
                                     Grid.Row="1"
