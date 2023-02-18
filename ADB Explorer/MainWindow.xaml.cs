@@ -558,8 +558,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
         }
 
-        SelectedFiles = FileActions.IsAppDrive ? null : ExplorerGrid.SelectedItems.OfType<FileClass>();
-        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : null;
+        SelectedFiles = FileActions.IsAppDrive ? Enumerable.Empty<FileClass>() : ExplorerGrid.SelectedItems.OfType<FileClass>();
+        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : Enumerable.Empty<Package>();
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
 
         if (SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))

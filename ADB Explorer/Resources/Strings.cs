@@ -93,8 +93,33 @@ public static class Strings
     public static string S_MERGE_REPLACE(bool merge) =>
         $"{(merge ? "Merge or " : "")}Replace";
 
-    public static string S_REM_APK(bool apk, int count) =>
-        $"The following will be removed:\n{count} {(apk ? "APK" : "package")}{(count > 1 ? "s" : "")}";
+    public static string S_REM_APK(System.Collections.IEnumerable objects)
+    {
+        var count = 0;
+        var name = "";
+        bool apk = false;
+
+        if (objects is IEnumerable<Package> packages)
+        {
+            apk = true;
+
+            count = packages.Count();
+            if (count == 1)
+                name = packages.First().Name;
+        }
+        else if (objects is IEnumerable<FileClass> files)
+        {
+            count = files.Count();
+            if (count == 1)
+                name = files.First().DisplayName;
+        }
+        else
+            throw new ArgumentException("Only packages and files are accepted");
+
+        var result = count > 1 ? $"{count} {(apk ? "APK" : "package")}s" : name;
+
+        return $"The following will be removed:\n{result}";
+    }
 
     public static string S_REM_DEVICE(DeviceViewModel device) =>
         $"Are you sure you want to {(device.Type is AbstractDevice.DeviceType.Emulator ? "kill this emulator" : "remove this device")}?";

@@ -15,7 +15,7 @@ internal static class FileActionLogic
         var files = Data.SelectedFiles;
 
         var result = await DialogService.ShowConfirmation(
-        Strings.S_REM_APK(!Data.FileActions.IsAppDrive, Data.FileActions.IsAppDrive ? pkgs.Count() : files.Count()),
+        Strings.S_REM_APK(Data.FileActions.IsAppDrive ? pkgs : files),
         Strings.S_CONF_UNI_TITLE,
             "Uninstall",
         icon: DialogService.DialogIcon.Exclamation);
