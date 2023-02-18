@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.Services;
 
@@ -97,11 +98,15 @@ public class FileMoveOperation : FileOperation
                             newFile.UpdatePath(fullTargetPath);
                             newFile.ModifiedTime = dateModified;
                             fileList.Add(newFile);
+
+                            Data.FileActions.ItemToSelect = newFile;
                         }
                         else
                         {
                             FilePath.UpdatePath(fullTargetPath);
                             fileList.Add((FileClass)FilePath);
+
+                            Data.FileActions.ItemToSelect = FilePath;
                         }
                     }
                     else if (FilePath.ParentPath == currentPath && OperationName is not OperationType.Copy)
@@ -111,11 +116,7 @@ public class FileMoveOperation : FileOperation
 
                     if (OperationName is OperationType.Recycle or OperationType.Restore)
                     {
-                        ((FileClass)FilePath).CutState = FileClass.CutType.None;
-                        if (Data.CutItems.Contains((FileClass)FilePath))
-                            Data.CutItems.Remove((FileClass)FilePath);
-
-                        ((FileClass)FilePath).TrashIndex = null;
+                        FileActionLogic.RemoveFile((FileClass)FilePath);
                     }
                 });
             }

@@ -414,6 +414,21 @@ internal static class FileActionLogic
         }
     }
 
+    public static void RemoveFile(FileClass file)
+    {
+        file.CutState = FileClass.CutType.None;
+        if (Data.CutItems.Contains(file))
+        {
+            Data.CutItems.Remove(file);
+            if (!Data.CutItems.Any())
+                Data.FileActions.PasteState = FileClass.CutType.None;
+
+            UpdateFileActions();
+        }
+
+        file.TrashIndex = null;
+    }
+
     public static void RefreshDrives(bool asyncClasify = false)
     {
         if (Data.DevicesObject.Current is null)

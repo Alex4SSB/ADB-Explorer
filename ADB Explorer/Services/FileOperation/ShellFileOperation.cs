@@ -71,7 +71,7 @@ public static class ShellFileOperation
             foreach (var item in items)
             {
                 var targetName = item.FullName;
-                if (item.ParentPath == targetPath)
+                if (currentPath == targetPath)
                 {
                     targetName = $"{((FileClass)item).NoExtName}{FileClass.ExistingIndexes(fileList, ((FileClass)item).NoExtName, isCopy)}{((FileClass)item).Extension}";
                 }

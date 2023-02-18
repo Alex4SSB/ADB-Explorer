@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.Services;
 
@@ -36,8 +37,7 @@ public class FileDeleteOperation : FileOperation
             {
                 Dispatcher.Invoke(() =>
                 {
-                    ((FileClass)FilePath).CutState = FileClass.CutType.None;
-                    Data.CutItems.Remove((FileClass)FilePath);
+                    FileActionLogic.RemoveFile((FileClass)FilePath);
 
                     fileList.Remove((FileClass)FilePath);
                 });
