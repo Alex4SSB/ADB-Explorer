@@ -266,6 +266,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.DriveViewNav):
                     DriveViewNav();
                     break;
+
+                case nameof(AppRuntimeSettings.GroupsExpanded):
+                    SettingsAboutExpander.IsExpanded = RuntimeSettings.GroupsExpanded;
+                    break;
             }
         });
     }

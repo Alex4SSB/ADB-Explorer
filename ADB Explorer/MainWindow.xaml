@@ -1234,10 +1234,7 @@
                                         MouseMove="SortedSettings_MouseMove"
                                         Style="{StaticResource SortedSettingsListView}" />
                                     <Separator />
-                                    <Expander
-                                        x:Name="SettingsAboutExpander"
-                                        Header="About"
-                                        IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded}">
+                                    <Expander x:Name="SettingsAboutExpander" Header="About">
                                         <Expander.Style>
                                             <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                                                 <Style.Triggers>
