@@ -112,4 +112,43 @@ public static class ExpanderHelper
             typeof(object),
             typeof(ExpanderHelper),
             null);
+
+    public static bool GetIsHeaderToggleExternal(UIElement control) =>
+        (bool)control.GetValue(IsHeaderToggleExternalProperty);
+
+    public static void SetIsHeaderToggleExternal(UIElement control, bool value) =>
+        control.SetValue(IsHeaderToggleExternalProperty, value);
+
+    public static readonly DependencyProperty IsHeaderToggleExternalProperty =
+        DependencyProperty.RegisterAttached(
+            "IsHeaderToggleExternal",
+            typeof(bool),
+            typeof(ExpanderHelper),
+            null);
+
+    public static bool GetIsHeaderPressed(UIElement control) =>
+        (bool)control.GetValue(IsHeaderPressedProperty);
+
+    public static void SetIsHeaderPressed(UIElement control, bool value) =>
+        control.SetValue(IsHeaderPressedProperty, value);
+
+    public static readonly DependencyProperty IsHeaderPressedProperty =
+        DependencyProperty.RegisterAttached(
+            "IsHeaderPressed",
+            typeof(bool),
+            typeof(ExpanderHelper),
+            null);
+
+    public static bool GetIsHeaderMouseOver(UIElement control) =>
+        (bool)control.GetValue(IsHeaderMouseOverProperty);
+
+    public static void SetIsHeaderMouseOver(UIElement control, bool value) =>
+        control.SetValue(IsHeaderMouseOverProperty, value);
+
+    public static readonly DependencyProperty IsHeaderMouseOverProperty =
+        DependencyProperty.RegisterAttached(
+            "IsHeaderMouseOver",
+            typeof(bool),
+            typeof(ExpanderHelper),
+            null);
 }

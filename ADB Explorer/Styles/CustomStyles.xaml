@@ -507,39 +507,16 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="SearchIndicatorBorderStyle" TargetType="Border">
-        <Setter Property="Background" Value="{StaticResource SystemControlHighlightAccentBrush}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
-                <Setter Property="CornerRadius" Value="3,0,0,3" />
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
-            </MultiDataTrigger>
-            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
-                <Setter Property="Background" Value="Transparent" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="SearchIndicatorIconStyle"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
-                <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-                <Setter Property="Opacity" Value="0.7" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
-                <Setter Property="Opacity" Value="1" />
-            </DataTrigger>
-        </Style.Triggers>
+    <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
+        <Setter Property="ui:ControlHelper.PlaceholderText" Value="Filter" />
+        <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
+        <Setter Property="Icon" Value="&#xE71C;" />
+        <Setter Property="IsActive" Value="{Binding ElementName=MainWin, Path=IsActive, Mode=OneWay}" />
+        <Setter Property="IsEnabled" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}" />
+        <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}" />
+        <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
+        <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />
     </Style>
     <Style
         x:Key="EditorControlsBorderStyle"

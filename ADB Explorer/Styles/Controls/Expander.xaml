@@ -108,6 +108,13 @@
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Right" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="CornerRadius" Value="5,0,0,5" />
+            </MultiDataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
     </Style>
@@ -121,6 +128,13 @@
                 <Setter Property="CornerRadius" Value="5,5,0,0" />
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Right" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="CornerRadius" Value="5,0,0,5" />
+            </MultiDataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
     </Style>
@@ -135,6 +149,13 @@
                 <Setter Property="Background" Value="{DynamicResource DeviceConnectionPanelBackground}" />
                 <Setter Property="BorderBrush" Value="{DynamicResource DeviceConnectionPanelBorder}" />
             </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=ExpandDirection}" Value="Right" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="CornerRadius" Value="0,5,5,0" />
+            </MultiDataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False" />
@@ -266,6 +287,7 @@
                                 MinWidth="0"
                                 MinHeight="0"
                                 Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
                                 CornerRadius="{Binding ElementName=HeaderUpperBorder, Path=CornerRadius}"
                                 SnapsToDevicePixels="True">
                                 <Grid>
@@ -275,6 +297,8 @@
                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
                                         ui:FocusVisualHelper.FocusVisualMargin="-3"
                                         ui:FocusVisualHelper.UseSystemFocusVisuals="True"
+                                        Background="Transparent"
+                                        BorderBrush="Transparent"
                                         Content="{TemplateBinding Header}"
                                         ContentTemplate="{TemplateBinding HeaderTemplate}"
                                         ContentTemplateSelector="{TemplateBinding HeaderTemplateSelector}"
@@ -306,11 +330,6 @@
                                 BorderThickness="0,1,0,1"
                                 Style="{StaticResource ExpanderHeaderUpperBorderStyle}" />
                             <Border
-                                x:Name="HeaderLowerBorder"
-                                BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
-                                BorderThickness="0,0,0,1"
-                                Style="{StaticResource ExpanderHeaderLowerBorderStyle}" />
-                            <Border
                                 x:Name="HeaderSideBorder"
                                 BorderBrush="{DynamicResource DeviceConnectionPanelBorder}"
                                 BorderThickness="1,0,1,0"
@@ -325,9 +344,10 @@
                             <StackPanel x:Name="ExpandSite" VerticalAlignment="Top">
                                 <StackPanel.Margin>
                                     <MultiBinding Converter="{StaticResource marginConverter}">
-                                        <Binding ElementName="ExpanderContent" Path="ActualHeight" />
                                         <Binding Path="(helpers:ExpanderHelper.ExpansionProgress)" RelativeSource="{RelativeSource AncestorType=Expander, Mode=FindAncestor}" />
                                         <Binding Path="ExpandDirection" RelativeSource="{RelativeSource AncestorType=Expander, Mode=FindAncestor}" />
+                                        <Binding ElementName="ExpanderContent" Path="ActualHeight" />
+                                        <Binding ElementName="ExpanderContent" Path="ActualWidth" />
                                     </MultiBinding>
                                 </StackPanel.Margin>
                                 <StackPanel x:Name="ExpanderContent">
@@ -342,6 +362,21 @@
                         </Border>
                     </DockPanel>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="ExpandDirection" Value="Right">
+                            <Setter TargetName="ContentBorder" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="HeaderArea" Property="DockPanel.Dock" Value="Left" />
+                            <Setter TargetName="ContentBorder" Property="BorderThickness" Value="0,1,1,1" />
+                        </Trigger>
+                        <Trigger Property="ExpandDirection" Value="Up">
+                            <Setter TargetName="ContentBorder" Property="DockPanel.Dock" Value="Top" />
+                            <Setter TargetName="HeaderArea" Property="DockPanel.Dock" Value="Bottom" />
+                            <Setter TargetName="ContentBorder" Property="BorderThickness" Value="1,1,1,0" />
+                        </Trigger>
+                        <Trigger Property="ExpandDirection" Value="Left">
+                            <Setter TargetName="ContentBorder" Property="DockPanel.Dock" Value="Left" />
+                            <Setter TargetName="HeaderArea" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="ContentBorder" Property="BorderThickness" Value="1,1,0,1" />
+                        </Trigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsAnimated}" Value="True" />
@@ -376,15 +411,48 @@
                             <Setter TargetName="ContentPresenter" Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=Padding}" />
                             <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Hidden" />
                         </Trigger>
-                        <Trigger Property="IsExpanded" Value="True">
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsExpanded" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="False" />
+                            </MultiTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
-                        </Trigger>
-                        <Trigger SourceName="HeaderSite" Property="IsMouseOver" Value="True">
-                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsExpanded" Value="True" />
+                                <Condition Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Opacity" Value="{StaticResource AccentButtonBackgroundPressedOpacity}" />
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="False" />
+                                <Condition SourceName="HeaderSite" Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0" />
                             <Setter TargetName="HeaderUpperBorder" Property="BorderBrush" Value="{DynamicResource ExpanderUpperBorderMouseOver}" />
-                            <Setter TargetName="HeaderLowerBorder" Property="BorderBrush" Value="{DynamicResource ExpanderLowerBorderMouseOver}" />
                             <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="{DynamicResource ExpanderSideBorderMouseOver}" />
+                        </MultiTrigger>
+                        <Trigger Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="HeaderUpperBorder" Property="BorderBrush" Value="Transparent" />
+                            <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="Transparent" />
                         </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderToggleExternal)}" Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderToggleExternal)}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="HeaderBorder" Property="Opacity" Value="{StaticResource AccentButtonBackgroundMouseOverOpacity}" />
+                        </MultiDataTrigger>
                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
                             <Setter TargetName="HeaderBottomSite" Property="Margin" Value="1,0,1,1" />
                         </DataTrigger>
@@ -421,11 +489,16 @@
                         <Trigger Property="helpers:ExpanderHelper.IsContentCollapsed" Value="True">
                             <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
-                            <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
-                            <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Visible" />
                         </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsContentCollapsed)}" Value="True" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ExpandDirection}" Value="Down" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderVisible)}" Value="False">
                             <Setter TargetName="HeaderArea" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="ContentBorder" Property="BorderThickness" Value="0" />
@@ -439,10 +512,15 @@
                             <Setter TargetName="ContentPresenter" Property="Margin" Value="0" />
                             <Setter TargetName="ContentBorder" Property="Visibility" Value="Hidden" />
                             <Setter TargetName="HeaderUpperBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
-                            <Setter TargetName="HeaderLowerBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                         </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=HeaderSite, Path=IsPressed}" Value="True">
+                            <Setter Property="helpers:ExpanderHelper.IsHeaderPressed" Value="True" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True">
+                            <Setter Property="helpers:ExpanderHelper.IsHeaderMouseOver" Value="True" />
+                        </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -465,6 +543,7 @@
         <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CW" />
         <Setter Property="helpers:ExpanderHelper.IsListItem" Value="False" />
         <Setter Property="helpers:ExpanderHelper.IsHeaderVisible" Value="True" />
+        <Setter Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="False" />
         <Setter Property="ExpandDirection" Value="Down" />
         <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
         <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />

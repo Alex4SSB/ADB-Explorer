@@ -14,7 +14,8 @@ public partial class LogicalDriveControl : UserControl
 
     private void Button_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        ((DriveViewModel)((Button)sender).DataContext).BrowseCommand.Execute();
+        if (((Button)sender).DataContext is DriveViewModel drive)
+            drive.BrowseCommand.Execute();
     }
 
     private void Button_PreviewMouseUp(object sender, MouseButtonEventArgs e)

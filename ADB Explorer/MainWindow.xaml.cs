@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Converters;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
@@ -75,11 +76,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CommandLog.CollectionChanged += CommandLog_CollectionChanged;
         FileOpQ.PropertyChanged += FileOperationQueue_PropertyChanged;
         FileActions.PropertyChanged += FileActions_PropertyChanged;
-        SettingsSearchBox.GotFocus += SettingsSearchBox_FocusChanged;
-        SettingsSearchBox.LostFocus += SettingsSearchBox_FocusChanged;
         DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
         DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
-
+        
         var versionTask = AdbHelper.CheckAdbVersion();
         versionTask.ContinueWith((t) =>
         {
@@ -225,17 +224,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.IsPathBoxFocused):
                     IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused is null
-                        ? NavigationBox.Mode is Controls.NavigationBox.ViewMode.Breadcrumbs
+                        ? NavigationBox.Mode is NavigationBox.ViewMode.Breadcrumbs
                         : RuntimeSettings.IsPathBoxFocused.Value);
 
-                    RuntimeSettings.IsSearchBoxFocused = false;
+                    RuntimeSettings.AutoHideSearchBox = true;
                     break;
 
                 case nameof(AppRuntimeSettings.IsSearchBoxFocused):
-                    if (RuntimeSettings.IsSearchBoxFocused)
-                        SearchBox.Focus();
-                    else
+                    if (!RuntimeSettings.IsSearchBoxFocused)
                         FileOperationsSplitView.Focus();
+                    break;
+
+                case nameof(AppRuntimeSettings.AutoHideSearchBox):
+                    if (Width < MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
+                        RuntimeSettings.IsSearchBoxFocused = false;
+
+                    FileOperationsSplitView.Focus();
                     break;
 
                 case nameof(AppRuntimeSettings.ExplorerSource):
@@ -277,11 +281,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ClearNavBox()
     {
         NavigationBox.Path = null;
-        NavigationBox.Mode = Controls.NavigationBox.ViewMode.None;
+        NavigationBox.Mode = NavigationBox.ViewMode.None;
     }
 
     private void SettingsSearchBox_FocusChanged(object sender, RoutedEventArgs e)
     {
+        if (SettingsSearchBox.IsFocused)
+            RuntimeSettings.IsOperationsViewOpen = false;
+
         if (!Settings.DisableAnimation)
             Settings.IsAnimated = !SettingsSearchBox.IsFocused;
     }
@@ -500,16 +507,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         void _focusPathBox()
         {
-            NavigationBox.Mode = Controls.NavigationBox.ViewMode.Path;
+            NavigationBox.Mode = NavigationBox.ViewMode.Path;
         }
 
         void _unfocusPathBox()
         {
-            if (NavigationBox.Mode is Controls.NavigationBox.ViewMode.None)
+            if (NavigationBox.Mode is NavigationBox.ViewMode.None)
                 return;
 
             NavigationBox.UnfocusTarget = FileOperationsSplitView;
-            NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
+            NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         }
     }
 
@@ -624,9 +631,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             Height = height * WINDOW_HEIGHT_RATIO;
             Width = Height / WINDOW_WIDTH_RATIO;
-
-            if (RuntimeSettings.MaxSearchBoxWidth >= DEFAULT_MAX_SEARCH_WIDTH)
-                SearchColumn.Width = new(DEFAULT_MAX_SEARCH_WIDTH);
         });
 
         LoadSettings();
@@ -762,6 +766,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.IsExplorerVisible = true;
         FileActions.HomeEnabled = true;
         RuntimeSettings.BrowseDrive = null;
+
+        if (Width > MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
+            RuntimeSettings.IsSearchBoxFocused = true;
 
         return _navigateToPath(realPath, bfNavigated);
     }
@@ -1197,12 +1204,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActions.IsEditorOpen = false;
     }
 
-    private void SearchBoxMaxWidth() => RuntimeSettings.MaxSearchBoxWidth = WindowState switch
+    private void SearchBoxMaxWidth()
     {
-        WindowState.Maximized => SystemParameters.PrimaryScreenWidth * WIDE_WINDOW_SEARCH_WIDTH,
-        WindowState.Normal when Width > MIN_WINDOW_WIDTH_FOR_SEARCH_RATIO => Width * WIDE_WINDOW_SEARCH_WIDTH,
-        _ => Width * MAX_SEARCH_WIDTH_RATIO,
-    };
+        RuntimeSettings.MaxSearchBoxWidth = WindowState switch
+        {
+            WindowState.Maximized => SystemParameters.PrimaryScreenWidth * MAX_SEARCH_WIDTH_RATIO,
+            _ => Width * MAX_SEARCH_WIDTH_RATIO,
+        };
+
+        RuntimeSettings.AutoHideSearchBox = true;
+        SearchBox.Refresh();
+    }
 
     private void EnableSplitViewAnimation()
     {
@@ -1777,15 +1789,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SearchBoxMaxWidth();
     }
 
-    private void SearchBox_KeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key is Key.Escape)
-        {
-            FileActions.ExplorerFilter = "";
-            RuntimeSettings.IsPathBoxFocused = false;
-        }
-    }
-
     private void SaveReaderTextButton_Click(object sender, RoutedEventArgs e)
     {
         FileActionLogic.SaveEditorText();
@@ -1794,11 +1797,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void CloseEditorButton_Click(object sender, RoutedEventArgs e)
     {
         FileActions.IsEditorOpen = false;
-    }
-
-    private void SettingsSearchBox_GotFocus(object sender, RoutedEventArgs e)
-    {
-        RuntimeSettings.IsOperationsViewOpen = false;
     }
 
     private void SortedSettings_MouseMove(object sender, MouseEventArgs e)
@@ -1811,7 +1809,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         UpdateMdns();
     }
 
-    private void GridSplitter_DragStarted(object sender, DragStartedEventArgs e)
+    private void NavigationBox_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         NavigationBox.Refresh();
     }

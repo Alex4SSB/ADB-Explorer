@@ -164,57 +164,25 @@
             <Grid Grid.Row="1">
                 <StackPanel Margin="0,4,0,2">
                     <Separator />
-                    <Grid>
+                    <Grid Margin="6,2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition
-                                x:Name="SearchColumn"
-                                Width="Auto"
-                                MinWidth="100"
-                                MaxWidth="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
                         </Grid.ColumnDefinitions>
                         <Menu
                             x:Name="NavigationToolBar"
-                            Margin="7,0,0,0"
+                            Margin="0,0,6,0"
                             Style="{StaticResource ToolBarStyle}" />
                         <controls:NavigationBox
                             x:Name="NavigationBox"
                             Grid.Column="1"
-                            Margin="6,6,0,6" />
-                        <GridSplitter
+                            SizeChanged="NavigationBox_SizeChanged" />
+                        <controls:SearchBox
+                            x:Name="SearchBox"
                             Grid.Column="2"
-                            Width="6"
-                            Margin="0,6"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Stretch"
-                            Background="Transparent"
-                            Cursor="SizeWE"
-                            FocusVisualStyle="{x:Null}" DragStarted="GridSplitter_DragStarted" />
-                        <Grid
-                            Grid.Column="3"
-                            Margin="0,6,6,6"
-                            ClipToBounds="True">
-                            <TextBox
-                                x:Name="SearchBox"
-                                Padding="36,5,6,6"
-                                d:Background="LightGray"
-                                ui:ControlHelper.PlaceholderText="Filter"
-                                IsEnabled="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}"
-                                KeyDown="SearchBox_KeyDown"
-                                Style="{StaticResource TextBoxFluentStyle}"
-                                Text="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            <Border
-                                Margin="0,1,0,1"
-                                HorizontalAlignment="Left"
-                                Style="{StaticResource SearchIndicatorBorderStyle}">
-                                <ui:FontIcon
-                                    Margin="6,0"
-                                    Glyph="&#xE71C;"
-                                    Style="{StaticResource SearchIndicatorIconStyle}" />
-                            </Border>
-                        </Grid>
+                            Height="34"
+                            Style="{StaticResource SearchBoxStyle}" />
                     </Grid>
                 </StackPanel>
                 <ui:ProgressBar
@@ -1204,7 +1172,8 @@
                                         MinHeight="31"
                                         Padding="30,5,6,6"
                                         ui:ControlHelper.PlaceholderText="Search Settings"
-                                        GotFocus="SettingsSearchBox_GotFocus"
+                                        GotFocus="SettingsSearchBox_FocusChanged"
+                                        LostFocus="SettingsSearchBox_FocusChanged"
                                         Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                     <ui:FontIcon
                                         Margin="6,0,0,0"

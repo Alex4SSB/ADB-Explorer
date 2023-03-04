@@ -70,7 +70,7 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref searchText, value);
     }
 
-    private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_MAX_SEARCH_WIDTH;
+    private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
     public double MaxSearchBoxWidth
     {
         get => maxSearchBoxWidth;
@@ -250,6 +250,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool ClearNavBox { get => false; set => OnPropertyChanged(); }
     public bool InitLister { get => false; set => OnPropertyChanged(); }
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
+    public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

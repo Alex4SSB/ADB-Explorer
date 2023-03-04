@@ -101,9 +101,9 @@ public static class AdbExplorerConst
     public static readonly double WINDOW_WIDTH_RATIO = 0.56;
 
     public static readonly double MAX_SEARCH_WIDTH_RATIO = 0.4;
-    public static readonly double DEFAULT_MAX_SEARCH_WIDTH = 300;
-    public static readonly double MIN_WINDOW_WIDTH_FOR_SEARCH_RATIO = 800;
-    public static readonly double WIDE_WINDOW_SEARCH_WIDTH = 0.6;
+    public static readonly double DEFAULT_SEARCH_WIDTH = 200;
+    public static readonly double MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE = 800;
+    public static readonly double MIN_SEARCH_WIDTH = 100;
 
     public static readonly string APP_SETTINGS_FILE = "App.txt";
 

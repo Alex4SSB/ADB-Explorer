@@ -4,18 +4,38 @@ public class MarginConverter : IMultiValueConverter
 {
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        var isUp = values.Length == 3 && values[2] is ExpandDirection and ExpandDirection.Up;
+        // arg 0 - ExpansionProgress
+        // arg 1 - ExpandDirection
+        // arg 2 - ContentHeight
+        // arg 3 - ContentWidth
 
-        if (values[0] is double size && values[1] is double factor)
+        if (values.Length < 4)
+            throw new ArgumentException("This function requires 4 arguments.");
+        else if (values[0] is not double || values[1] is not ExpandDirection || values[2] is not double || values[3] is not double)
+            throw new ArgumentException("Provided arguments are not of correct format.");
+
+        var expansionProgress = (double)values[0];
+        var expandDirection = (ExpandDirection)values[1];
+        var contentHeight = (double)values[2];
+        var contentWidth = (double)values[3];
+
+        var size = expandDirection switch
         {
-            var result = -size * (1 - factor);
-            var marginAbove = isUp ? 0 : result;
-            var marginBelow = isUp ? result : 0;
+            ExpandDirection.Down or ExpandDirection.Up => contentHeight,
+            ExpandDirection.Left or ExpandDirection.Right => contentWidth,
+            _ => throw new NotSupportedException(),
+        };
 
-            return new Thickness(0, marginAbove, 0, marginBelow);
-        }
+        var result = -size * (1 - expansionProgress);
 
-        return new Thickness(0, 0, 0, 0);
+        return expandDirection switch
+        {
+            ExpandDirection.Down => new Thickness(0, result, 0, 0),
+            ExpandDirection.Up => new Thickness(0, 0, 0, result),
+            ExpandDirection.Left => new Thickness(0, 0, result, 0),
+            ExpandDirection.Right => new Thickness(result, 0, 0, 0),
+            _ => throw new NotSupportedException(),
+        };
     }
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
