@@ -70,14 +70,28 @@ internal static class AdbHelper
                     File.WriteAllBytes(newPath, Properties.Resources.AdbProgressRedirection);
                     Data.ProgressRedirectionPath = newPath;
                 }
-
+                
                 return;
             }
             catch (Exception e)
             {
-                App.Current.Dispatcher.Invoke(() =>
+                App.Current.Dispatcher.Invoke(async () =>
                 {
-                    DialogService.ShowMessage(Strings.S_MISSING_REDIRECTION(e.Message), Strings.S_MISSING_REDIRECTION_TITLE, DialogService.DialogIcon.Critical);
+                    if (Data.Settings.IsFirstRun)
+                    {
+                        Data.Settings.IsFirstRun = false;
+                        var dialogTask = await DialogService.ShowConfirmation(Strings.S_FIRST_RUN_SETUP,
+                                                                        Strings.S_FIRST_RUN_TITLE,
+                                                                        "Restart Now",
+                                                                        cancelText: "Restart Later",
+                                                                        icon: DialogService.DialogIcon.Exclamation);
+
+                        if (dialogTask.Item1 is ContentDialogResult.Primary)
+                            SettingsHelper.ResetAppAction();
+                    }
+                    else
+                        DialogService.ShowMessage(Strings.S_MISSING_REDIRECTION(e.Message), Strings.S_MISSING_REDIRECTION_TITLE, DialogService.DialogIcon.Critical);
+
                     Data.FileActions.PushPullEnabled = false;
                 });
             }

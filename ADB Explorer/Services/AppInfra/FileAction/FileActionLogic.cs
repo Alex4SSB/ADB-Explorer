@@ -269,7 +269,7 @@ internal static class FileActionLogic
             case 0:
                 return !(Data.CutItems[0].ParentPath == Data.CurrentPath && Data.FileActions.PasteState is FileClass.CutType.Cut);
             case 1:
-                if (isKeyboard && Data.FileActions.PasteState is FileClass.CutType.Copy && Data.CutItems[0].Relation(Data.SelectedFiles.First()) is RelationType.Self)
+                if (isKeyboard && Data.FileActions.PasteState is FileClass.CutType.Copy && Data.CutItems[0].RelationFrom(Data.SelectedFiles.First()) is RelationType.Self)
                     return true;
 
                 var item = Data.SelectedFiles.First();
@@ -291,7 +291,7 @@ internal static class FileActionLogic
         var targetName = "";
         var targetPath = "";
 
-        if (Data.SelectedFiles.Count() != 1 || (Data.FileActions.PasteState is FileClass.CutType.Copy && Data.CutItems[0].Relation(firstSelectedFile) is RelationType.Self))
+        if (Data.SelectedFiles.Count() != 1 || (firstSelectedFile is not null && !firstSelectedFile.IsDirectory))
         {
             targetPath = Data.CurrentPath;
             targetName = Data.CurrentPath[Data.CurrentPath.LastIndexOf('/')..];
@@ -437,14 +437,13 @@ internal static class FileActionLogic
     public static void RemoveFile(FileClass file)
     {
         file.CutState = FileClass.CutType.None;
-        if (Data.CutItems.Contains(file))
-        {
-            Data.CutItems.Remove(file);
-            if (!Data.CutItems.Any())
-                Data.FileActions.PasteState = FileClass.CutType.None;
 
-            UpdateFileActions();
-        }
+        Data.CutItems.RemoveAll(cutItem => cutItem.RelationFrom(file) is RelationType.Ancestor or RelationType.Self);
+
+        if (!Data.CutItems.Any())
+            Data.FileActions.PasteState = FileClass.CutType.None;
+
+        UpdateFileActions();
 
         file.TrashIndex = null;
     }

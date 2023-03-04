@@ -121,7 +121,11 @@ public class FilePath : ViewModelBase
         _ => throw new NotSupportedException(),
     };
 
-    public RelationType Relation(FilePath other) => Relation(other.FullPath);
+    /// <summary>
+    /// Returns the relation of the <paramref name="other"/> file to <see langword="this"/> file.<br />
+    /// Example: File.RelationFrom(File.Parent) = Ancestor
+    /// </summary>
+    public RelationType RelationFrom(FilePath other) => Relation(other.FullPath);
 
     public RelationType Relation(string other)
     {

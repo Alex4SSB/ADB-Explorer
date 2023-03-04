@@ -26,6 +26,8 @@ public static class Strings
     public const string S_RESET_SETTINGS = "All app settings will be reset upon closing the app.\nThis cannot be undone. Are you sure?";
     public const string S_RESET_SETTINGS_TITLE = "Reset App Settings";
     public const string S_MISSING_REDIRECTION_TITLE = "Missing Progress Redirection";
+    public const string S_FIRST_RUN_SETUP = "The app needs to restart to complete first run setup.\nUntil then, push and pull operations are not available.";
+    public const string S_FIRST_RUN_TITLE = "First Run Setup";
     public const string S_NO_DEVICES_TITLE = " - NO CONNECTED DEVICES";
     public const string S_NEW_VERSION_TITLE = "New App Version";
     public const string S_NAV_ERR_TITLE = "Navigation Error";

@@ -275,6 +275,13 @@ public class AppSettings : INotifyPropertyChanged
 
     #endregion theme
 
+    private bool isFirstRun;
+    public bool IsFirstRun
+    {
+        get => Get(ref isFirstRun, true);
+        set => Set(ref isFirstRun, value);
+    }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public static bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
