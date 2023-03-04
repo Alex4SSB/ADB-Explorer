@@ -5,7 +5,7 @@
     <TargetFramework>net6.0-windows10.0.22621.0</TargetFramework>
     <RootNamespace>ADB_Explorer</RootNamespace>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>adb_explorer_icon_v5_icons8_combined.ico</ApplicationIcon>
+    <ApplicationIcon>app_icon_2023_combined.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>AnyCPU;x64</Platforms>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
@@ -22,6 +22,10 @@
   <PropertyGroup>
   	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="app_icon_2023_combined.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.4" />
@@ -55,13 +59,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </ProjectReference>
   </ItemGroup>
-  
+
   <ItemGroup>
-    <Resource Include="adb_explorer_icon_v4_icons8_inverted.png" />
+  	 <Resource Include="app_icon_black_2023_256px.png" />
   </ItemGroup>
-  
+	
   <ItemGroup>
-    <None Update="adb_explorer_icon_v5_icons8_combined.ico">
+    <None Update="app_icon_2023_combined.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

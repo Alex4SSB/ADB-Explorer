@@ -121,9 +121,6 @@
   <data name="AdbProgressRedirection" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AdbProgressRedirection;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="adb_explorer_icon_v4_icons8_combined" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\adb_explorer_icon_v4_icons8_combined.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
   <data name="APK_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\APK_format_icon_2014-2019_.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

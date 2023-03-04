@@ -1295,7 +1295,7 @@
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Image Width="150">
                         <Image.Source>
-                            <BitmapImage DecodePixelWidth="256" UriSource="adb_explorer_icon_v4_icons8_inverted.png" />
+                            <BitmapImage DecodePixelWidth="256" UriSource="app_icon_black_2023_256px.png" />
                         </Image.Source>
                     </Image>
                     <TextBlock
