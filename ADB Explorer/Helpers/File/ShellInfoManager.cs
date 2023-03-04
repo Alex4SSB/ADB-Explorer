@@ -24,7 +24,7 @@ public static class ShellInfoManager
         public string szTypeName;
     };
 
-    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+    [DllImport("Shell32.dll")]
     private static extern IntPtr SHGetFileInfo(
         string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
 

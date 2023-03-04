@@ -1243,7 +1243,7 @@
                                                     <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
                                                         <Setter Property="HorizontalAlignment" Value="Stretch" />
                                                         <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" Value="{x:Null}">
+                                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=IsAppDeployed}" Value="True">
                                                                 <Setter Property="Visibility" Value="Collapsed" />
                                                             </DataTrigger>
                                                         </Style.Triggers>

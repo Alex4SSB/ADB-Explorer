@@ -75,9 +75,7 @@ internal static class SettingsHelper
 
     public static void SetSymbolFont()
     {
-
         Application.Current.Resources["SymbolThemeFontFamily"] = App.Current.FindResource(Data.Settings.UseFluentStyles ? "FluentSymbolThemeFontFamily" : "AltSymbolThemeFontFamily");
-        // new FontFamily(Data.Settings.UseFluentStyles ? "Segoe Fluent Icons, Segoe MDL2 Assets" : "Segoe MDL2 Assets");
     }
 
     public static async void SplashScreenTask()
@@ -89,7 +87,7 @@ internal static class SettingsHelper
 
     public static void CheckForUpdates()
     {
-        if (!Data.Settings.CheckForUpdates)
+        if (Data.Settings.IsAppDeployed || !Data.Settings.CheckForUpdates)
             return;
 
         var version = Task.Run(() => Network.LatestAppRelease());

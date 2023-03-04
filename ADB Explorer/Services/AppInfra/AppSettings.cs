@@ -188,7 +188,7 @@ public class AppSettings : INotifyPropertyChanged
     /// </summary>
     public bool CheckForUpdates
     {
-        get => !IsAppDeployed && Get(ref checkForUpdates, true);
+        get => Get(ref checkForUpdates, true);
         set => Set(ref checkForUpdates, value);
     }
 
@@ -275,7 +275,7 @@ public class AppSettings : INotifyPropertyChanged
 
     #endregion theme
 
-    public static bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
+    public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public static bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
 
