@@ -65,6 +65,7 @@ public static class AdbExplorerConst
     public static readonly TimeSpan SERVER_RESPONSE_TIMEOUT = TimeSpan.FromMilliseconds(13000);
     public static readonly TimeSpan MDNS_DOWN_RESPONSE_TIME = TimeSpan.FromMilliseconds(12000);
     public static readonly TimeSpan SERVICE_DISPLAY_DELAY = TimeSpan.FromMilliseconds(2000);
+    public static readonly TimeSpan EMPTY_FOLDER_NOTICE_DELAY = TimeSpan.FromMilliseconds(1500);
 
     public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
     public static readonly sbyte MIN_PKG_UID_ANDROID_VER = 9;

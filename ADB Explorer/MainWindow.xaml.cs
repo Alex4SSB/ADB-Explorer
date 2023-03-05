@@ -421,7 +421,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else if (e.PropertyName == nameof(DirectoryLister.InProgress))
         {
-            FileActions.ListingInProgress = DirList.InProgress;
+            Task.Run(() =>
+            {
+                Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
+                Dispatcher.Invoke(() => FileActions.ListingInProgress = DirList.InProgress);
+            });
 
             if (DirList.InProgress)
                 return;
