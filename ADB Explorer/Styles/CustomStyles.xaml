@@ -513,7 +513,6 @@
         <Setter Property="Icon" Value="&#xE71C;" />
         <Setter Property="IsActive" Value="{Binding ElementName=MainWin, Path=IsActive, Mode=OneWay}" />
         <Setter Property="IsEnabled" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}" />
-        <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}" />
         <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
         <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
         <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />

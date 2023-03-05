@@ -239,7 +239,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     if (Width < MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
                         RuntimeSettings.IsSearchBoxFocused = false;
 
-                    FileOperationsSplitView.Focus();
+                    if (NavigationBox.Mode is not NavigationBox.ViewMode.Path)
+                        FileOperationsSplitView.Focus();
                     break;
 
                 case nameof(AppRuntimeSettings.ExplorerSource):

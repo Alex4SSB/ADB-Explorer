@@ -47,7 +47,7 @@ internal static class MainToolBar
             {
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), "\uE8B7"),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), "\uE8A5"),
-                new SubMenuSeparator(() => true),
+                new SubMenuSeparator(() => Data.FileActions.PushPackageEnabled),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushPackages), "\uE7B8"),
             }),
         new MenuSeparator(),

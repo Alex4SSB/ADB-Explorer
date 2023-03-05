@@ -101,4 +101,11 @@ public partial class App : Application
         if (sender is TextBox tb)
             tb.SelectAll();
     }
+
+    private void Application_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+    {
+        // Handle error 0x800401D0 (CLIPBRD_E_CANT_OPEN) - global WPF issue
+        if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
+            e.Handled = true;
+    }
 }

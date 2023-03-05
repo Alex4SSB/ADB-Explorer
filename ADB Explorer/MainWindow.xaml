@@ -182,6 +182,7 @@
                             x:Name="SearchBox"
                             Grid.Column="2"
                             Height="34"
+                            IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSearchBoxFocused, Mode=TwoWay}"
                             Style="{StaticResource SearchBoxStyle}" />
                     </Grid>
                 </StackPanel>

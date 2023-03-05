@@ -515,12 +515,12 @@
                             <Setter TargetName="HeaderSideBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                             <Setter TargetName="HeaderBorder" Property="CornerRadius" Value="{Binding ElementName=DummyBorder, Path=CornerRadius}" />
                         </MultiDataTrigger>
-                        <DataTrigger Binding="{Binding ElementName=HeaderSite, Path=IsPressed}" Value="True">
+                        <Trigger SourceName="HeaderSite" Property="IsPressed" Value="True">
                             <Setter Property="helpers:ExpanderHelper.IsHeaderPressed" Value="True" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding ElementName=HeaderSite, Path=IsMouseOver}" Value="True">
+                        </Trigger>
+                        <Trigger SourceName="HeaderSite" Property="IsMouseOver" Value="True">
                             <Setter Property="helpers:ExpanderHelper.IsHeaderMouseOver" Value="True" />
-                        </DataTrigger>
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
