@@ -464,22 +464,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void StoreClosingValues()
     {
-        Storage.StoreValue(SystemVals.windowMaximized, WindowState == WindowState.Maximized);
+        Storage.StoreValue(AppSettings.SystemVals.windowMaximized, WindowState == WindowState.Maximized);
 
         var detailedVisible = RuntimeSettings.IsOperationsViewOpen && Settings.ShowExtendedView;
-        Storage.StoreValue(SystemVals.detailedVisible, detailedVisible);
+        Storage.StoreValue(AppSettings.SystemVals.detailedVisible, detailedVisible);
         if (detailedVisible)
-            Storage.StoreValue(SystemVals.detailedHeight, FileOpDetailedGrid.Height);
+            Storage.StoreValue(AppSettings.SystemVals.detailedHeight, FileOpDetailedGrid.Height);
     }
 
     private void SetTheme()
     {
-        SetTheme(Settings.Theme is AppTheme.windowsDefault
+        SetTheme(Settings.Theme is AppSettings.AppTheme.windowsDefault
             ? themeService.WindowsTheme
             : ThemeManager.Current.ApplicationTheme.Value);
     }
 
-    private void SetTheme(AppTheme theme) => SetTheme(AppThemeToActual(theme));
+    private void SetTheme(AppSettings.AppTheme theme) => SetTheme(AppThemeToActual(theme));
 
     private void SetTheme(ApplicationTheme theme) => Dispatcher.Invoke(() =>
     {
@@ -540,10 +540,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case FileType.File:
                     switch (Settings.DoubleClick)
                     {
-                        case DoubleClickAction.pull when Settings.IsPullOnDoubleClickEnabled:
+                        case AppSettings.DoubleClickAction.pull when Settings.IsPullOnDoubleClickEnabled:
                             FileActionLogic.PullFiles(true);
                             break;
-                        case DoubleClickAction.edit when FileActions.EditFileEnabled:
+                        case AppSettings.DoubleClickAction.edit when FileActions.EditFileEnabled:
                             FileActionLogic.OpenEditor();
                             break;
                         default:
@@ -684,11 +684,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             RenderOptions.ProcessRenderMode = RenderMode.Default;
     });
 
-    private ApplicationTheme AppThemeToActual(AppTheme appTheme) => appTheme switch
+    private ApplicationTheme AppThemeToActual(AppSettings.AppTheme appTheme) => appTheme switch
     {
-        AppTheme.light => ApplicationTheme.Light,
-        AppTheme.dark => ApplicationTheme.Dark,
-        AppTheme.windowsDefault => themeService.WindowsTheme,
+        AppSettings.AppTheme.light => ApplicationTheme.Light,
+        AppSettings.AppTheme.dark => ApplicationTheme.Dark,
+        AppSettings.AppTheme.windowsDefault => themeService.WindowsTheme,
         _ => throw new NotSupportedException(),
     };
 
@@ -1434,15 +1434,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Window_SourceInitialized(object sender, EventArgs e)
     {
-        if (Storage.RetrieveBool(SystemVals.windowMaximized) == true)
+        if (Storage.RetrieveBool(AppSettings.SystemVals.windowMaximized) == true)
             WindowState = WindowState.Maximized;
 
-        if (Storage.RetrieveBool(SystemVals.detailedVisible) is bool and true)
+        if (Storage.RetrieveBool(AppSettings.SystemVals.detailedVisible) is bool and true)
         {
             RuntimeSettings.IsOperationsViewOpen = true;
         }
 
-        if (double.TryParse(Storage.RetrieveValue(SystemVals.detailedHeight)?.ToString(), out double detailedHeight))
+        if (double.TryParse(Storage.RetrieveValue(AppSettings.SystemVals.detailedHeight)?.ToString(), out double detailedHeight))
         {
             FileOpDetailedGrid.Height = detailedHeight;
             ResizeDetailedView();

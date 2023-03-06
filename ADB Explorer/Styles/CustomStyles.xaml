@@ -7,7 +7,6 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
-    <converters:EnumToBooleanConverter x:Key="ThemeConverter" EnumType="models:AppTheme" />
     <converters:DoubleEquals x:Key="DoubleEquals" />
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
     <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">

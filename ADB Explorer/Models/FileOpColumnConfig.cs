@@ -128,13 +128,26 @@ public class FileOpColumnConfig : ViewModelBase
         Name = name;
         Icon = icon;
 
+        bool isChecked = true;
+        int index = -1;
+        double width = defaultWidth;
+
         if (Retrieve() is string storage && storage.Count(c => c == ',') == 2)
         {
             var split = storage.Split(',');
-            IsChecked = !bool.TryParse(split[0], out bool isChecked) || isChecked; // default is true
-            Index = int.TryParse(split[1], out int index) ? index : -1;
-            Width = double.TryParse(split[2], out double width) ? width : defaultWidth;
+            if (!bool.TryParse(split[0], out isChecked))
+                isChecked = true;
+
+            if (!int.TryParse(split[1], out index))
+                index = -1;
+
+            if (!double.TryParse(split[2], out width))
+                width = defaultWidth;
         }
+
+        IsChecked = isChecked;
+        Index = index;
+        Width = width;
 
         FileOpColumns.CheckedColumnsCount.PropertyChanged += (object sender, PropertyChangedEventArgs<int> e) => OnPropertyChanged(nameof(IsEnabled));
     }

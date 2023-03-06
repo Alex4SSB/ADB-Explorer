@@ -54,7 +54,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("File Double Click", new()
             {
-                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() { { DoubleClickAction.none, "None" }, { DoubleClickAction.pull, "Pull To Default Folder" }, { DoubleClickAction.edit, "Open In Editor" } }),
+                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() { { AppSettings.DoubleClickAction.none, "None" }, { AppSettings.DoubleClickAction.pull, "Pull To Default Folder" }, { AppSettings.DoubleClickAction.edit, "Open In Editor" } }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Working Directories", new()
@@ -78,7 +78,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("Theme", new()
             {
-                new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() { { AppTheme.light, "Light" }, { AppTheme.dark, "Dark" }, { AppTheme.windowsDefault, "Windows Default" } }),
+                new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() { { AppSettings.AppTheme.light, "Light" }, { AppSettings.AppTheme.dark, "Dark" }, { AppSettings.AppTheme.windowsDefault, "Windows Default" } }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Graphics", new()
@@ -254,7 +254,7 @@ public class EnumSetting : AbstractSetting
 
 public class ThemeSetting : EnumSetting
 {
-    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppTheme, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.AppTheme, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
         : base(valueProp, description, groupName, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
@@ -263,7 +263,7 @@ public class ThemeSetting : EnumSetting
 
 public class DoubleClickSetting : EnumSetting
 {
-    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<DoubleClickAction, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.DoubleClickAction, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
         : base(valueProp, description, groupName, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));

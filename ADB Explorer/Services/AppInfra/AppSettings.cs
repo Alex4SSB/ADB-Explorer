@@ -4,6 +4,27 @@ namespace ADB_Explorer.Services;
 
 public class AppSettings : INotifyPropertyChanged
 {
+    public enum SystemVals
+    {
+        windowMaximized,
+        detailedVisible,
+        detailedHeight,
+    }
+
+    public enum AppTheme
+    {
+        windowsDefault,
+        light,
+        dark,
+    }
+
+    public enum DoubleClickAction
+    {
+        pull,
+        edit,
+        none,
+    }
+
     #region paths
 
     private string defaultFolder;
