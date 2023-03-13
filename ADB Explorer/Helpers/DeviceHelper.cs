@@ -373,7 +373,7 @@ public static class DeviceHelper
             {
                 if (ex.Message.Contains(Strings.S_FAILED_CONN + dev.ConnectAddress)
                     && dev.Type is DeviceType.New
-                    && ((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
+                    && !((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
                 {
                     Data.DevicesObject.NewDevice.EnablePairing();
                 }
@@ -392,17 +392,19 @@ public static class DeviceHelper
                 if (t.Result)
                 {
                     string newDeviceAddress = "";
-                    if (Data.RuntimeSettings.ConnectNewDevice.Type is DeviceType.New)
+                    var newDevice = Data.RuntimeSettings.ConnectNewDevice is null ? Data.DevicesObject.NewDevice : Data.RuntimeSettings.ConnectNewDevice;
+
+                    if (newDevice.Type is DeviceType.New)
                     {
                         if (Data.Settings.SaveDevices)
-                            Data.DevicesObject.AddHistoryDevice((HistoryDeviceViewModel)dev);
+                            Data.DevicesObject.AddHistoryDevice(HistoryDeviceViewModel.New(dev));
 
                         newDeviceAddress = dev.ConnectAddress;
-                        ((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).ClearDevice();
+                        ((NewDeviceViewModel)newDevice).ClearDevice();
                     }
-                    else
+                    else if (newDevice.Type is DeviceType.History)
                     {
-                        newDeviceAddress = ((HistoryDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).ConnectAddress;
+                        newDeviceAddress = ((HistoryDeviceViewModel)newDevice).ConnectAddress;
 
                         // In case user has changed the port of the history device
                         if (Data.Settings.SaveDevices)

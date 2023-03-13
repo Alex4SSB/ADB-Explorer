@@ -29,6 +29,12 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
     }
 
+    public static HistoryDeviceViewModel New(NewDeviceViewModel device) => new(new HistoryDevice()
+    {
+        IpAddress = device.IpAddress,
+        ConnectPort = device.ConnectPort
+    });
+
     public static HistoryDeviceViewModel New(StorageDevice device) => new(new HistoryDevice()
     {
         DeviceName = device.DeviceName,
@@ -62,5 +68,13 @@ public class StorageDevice
         DeviceName = device.DeviceName;
         IpAddress = device.IpAddress;
         ConnectPort = device.ConnectPort;
+    }
+
+    [JsonConstructor]
+    public StorageDevice(string deviceName, string ipAddress, string connectPort)
+    {
+        DeviceName = deviceName;
+        IpAddress = ipAddress;
+        ConnectPort = connectPort;
     }
 }

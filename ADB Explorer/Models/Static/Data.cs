@@ -40,7 +40,7 @@ internal static class Data
 
     public static string ProgressRedirectionPath { get; set; } = "AdbProgressRedirection.exe";
 
-    public static Devices DevicesObject { get; set; } = new();
+    public static Devices DevicesObject { get; set; }
 
     public static MDNS MdnsService { get; set; } = new();
 

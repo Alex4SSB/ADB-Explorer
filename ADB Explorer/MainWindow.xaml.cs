@@ -61,6 +61,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
 
+        DevicesObject = new();
+        DevicesList.ItemsSource = DevicesObject.UIList;
+
         FileOpQ = new(this.Dispatcher);
         Task launchTask = Task.Run(() => LaunchSequence());
 

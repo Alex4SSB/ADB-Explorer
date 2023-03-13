@@ -20,4 +20,12 @@ public class HistoryDevice : NewDevice
         IpAddress = device.IpAddress;
         ConnectPort = device.ConnectPort;
     }
+
+    [JsonConstructor]
+    public HistoryDevice(string ipAddress, string connectPort, string deviceName = "")
+    {
+        DeviceName = deviceName;
+        IpAddress = ipAddress;
+        ConnectPort = connectPort;
+    }
 }
