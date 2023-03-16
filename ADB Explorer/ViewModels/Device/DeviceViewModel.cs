@@ -106,7 +106,7 @@ public abstract class DeviceViewModel : AbstractDevice
         if (IpAddress != ipAddress)
         {
             Device.IpAddress = ipAddress;
-
+            OnPropertyChanged(nameof(IpAddress));
             OnPropertyChanged(nameof(IsIpAddressValid));
 
             return true;
@@ -184,6 +184,7 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
         if (Device.PairingPort != port)
         {
             Device.PairingPort = port;
+            OnPropertyChanged(nameof(PairingPort));
             OnPropertyChanged(nameof(IsPairingPortValid));
 
             return true;

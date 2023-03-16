@@ -94,6 +94,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         if (ConnectPort != port)
         {
             Device.ConnectPort = port;
+            OnPropertyChanged(nameof(ConnectPort));
             OnPropertyChanged(nameof(IsConnectPortValid));
 
             return true;
