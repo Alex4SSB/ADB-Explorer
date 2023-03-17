@@ -752,9 +752,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActionLogic.ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
 
-        NavigationBox.Mode = Controls.NavigationBox.ViewMode.Breadcrumbs;
+        NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         NavigationBox.Path = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
-
+        
         DriveList.ItemsSource = DevicesObject.Current.Drives;
 
         if (DriveList.SelectedIndex > -1)

@@ -159,12 +159,13 @@ public partial class NavigationBox : UserControl
 
         expectedLength += (tempButtons.Count - 1) * ControlSize.GetWidth(CreatePathArrow());
 
+        // Refresh optimization - do not overwrite breadcrumbs unnecessarily
         int i = 0;
         for (; i < Breadcrumbs.Count && i < tempButtons.Count; i++)
         {
             var oldB = Breadcrumbs[i];
             var newB = tempButtons[i];
-            if (oldB.Header.ToString() != newB.Header.ToString() ||
+            if (((TextBlock)oldB.Header).Text != ((TextBlock)newB.Header).Text ||
                 TextHelper.GetAltObject(oldB).ToString() != TextHelper.GetAltObject(newB).ToString())
             {
                 break;
