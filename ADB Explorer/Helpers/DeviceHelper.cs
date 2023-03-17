@@ -456,6 +456,8 @@ public static class DeviceHelper
 
         static void DisconnectDevice()
         {
+            CollapseDevices();
+
             Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
 
             Data.CutItems.Clear();
