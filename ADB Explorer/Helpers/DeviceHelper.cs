@@ -11,7 +11,7 @@ public static class DeviceHelper
 {
     public static DeviceStatus GetStatus(string status) => status switch
     {
-        "device" or "recovery" => DeviceStatus.Ok,
+        "device" or "recovery" or "sideload" => DeviceStatus.Ok,
         "offline" => DeviceStatus.Offline,
         "unauthorized" or "authorizing" => DeviceStatus.Unauthorized,
         _ => throw new NotImplementedException(),
@@ -20,6 +20,8 @@ public static class DeviceHelper
     public static DeviceType GetType(string id, string status)
     {
         if (status == "recovery")
+            return DeviceType.Recovery;
+        else if (status == "sideload")
             return DeviceType.Sideload;
         else if (id.Contains("._adb-tls-"))
             return DeviceType.Service;
@@ -146,7 +148,9 @@ public static class DeviceHelper
             });
 
     public static DeviceAction ToggleRootDeviceCommand(LogicalDeviceViewModel device) => new(
-        () => device.Root is not RootStatus.Forbidden && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
+        () => device.Root is not RootStatus.Forbidden
+            && device.Status is DeviceStatus.Ok
+            && device.Type is not DeviceType.Sideload and not DeviceType.Recovery,
         () => ToggleRootAction(device));
 
     private static async void ToggleRootAction(LogicalDeviceViewModel device)

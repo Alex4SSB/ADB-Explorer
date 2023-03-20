@@ -56,7 +56,7 @@ public class LogicalDevice : Device
         var deviceType = DeviceHelper.GetType(id, status);
         var deviceStatus = DeviceHelper.GetStatus(status);
         var ip = deviceType is DeviceType.Remote ? id.Split(':')[0] : "";
-        var rootStatus = deviceType is DeviceType.Sideload
+        var rootStatus = deviceType is DeviceType.Recovery
             ? RootStatus.Enabled
             : RootStatus.Unchecked;
 

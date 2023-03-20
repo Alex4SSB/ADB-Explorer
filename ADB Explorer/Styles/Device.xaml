@@ -292,7 +292,10 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+            <Style
+                x:Key="DeviceActionsMenuItemStyle"
+                BasedOn="{StaticResource AdbMenuItemStyle}"
+                TargetType="MenuItem">
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Style.Triggers>
@@ -301,6 +304,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
+            <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem" />
         </Menu.Resources>
         <Menu.Style>
             <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
@@ -321,6 +325,15 @@
                 <ui:FontIcon Margin="-4" Glyph="&#xE712;" />
             </MenuItem.Header>
             <MenuItem Header="Root Access">
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Type}" Value="Sideload">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </MenuItem.Style>
                 <MenuItem.Icon>
                     <ui:FontIcon Glyph="&#xE7EF;" />
                 </MenuItem.Icon>
@@ -344,7 +357,7 @@
                                 <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Sideload">
+                                <DataTrigger Binding="{Binding Type}" Value="Recovery">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -358,7 +371,7 @@
                                 <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
-                                <DataTrigger Binding="{Binding Type}" Value="Sideload">
+                                <DataTrigger Binding="{Binding Type}" Value="Recovery">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>

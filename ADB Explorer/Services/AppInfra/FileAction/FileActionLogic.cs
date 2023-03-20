@@ -463,6 +463,15 @@ internal static class FileActionLogic
 
             var drives = Data.CurrentADBDevice.GetDrives();
 
+            if (Data.DevicesObject.Current.Type is AbstractDevice.DeviceType.Recovery)
+            {
+                foreach (var item in Data.DevicesObject.Current.Drives.OfType<VirtualDriveViewModel>())
+                {
+                    item.SetItemsCount(item.Type is AbstractDrive.DriveType.Package ? -1 : null);
+                }
+            }
+            else
+            {
             if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
                 TrashHelper.UpdateRecycledItemsCount();
 
@@ -471,6 +480,7 @@ internal static class FileActionLogic
 
             if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
                 UpdatePackages();
+            }
 
             return drives;
         });

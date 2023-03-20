@@ -17,6 +17,9 @@
                 <DataTrigger Binding="{Binding ChargeState}" Value="Unknown">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Level}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Style>

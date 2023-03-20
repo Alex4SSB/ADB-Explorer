@@ -22,22 +22,6 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="Transparent" />
             </MultiDataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Trash">
-                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource TrashDriveAltBorder}" />
-            </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Type}" Value="Trash" />
-                    <Condition Binding="{Binding ItemsCount}" Value="-1" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Gray" />
-            </MultiDataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Temp">
-                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource TempDriveAltBorder}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Package">
-                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource NewDeviceAltBorder}" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style

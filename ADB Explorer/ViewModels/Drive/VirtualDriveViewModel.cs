@@ -11,7 +11,7 @@ class VirtualDriveViewModel : DriveViewModel
         set => Set(ref drive, value);
     }
 
-    public long ItemsCount => Drive.ItemsCount;
+    public long? ItemsCount => Drive.ItemsCount;
 
     
     public VirtualDriveViewModel(VirtualDrive drive) : base(drive)
@@ -19,9 +19,9 @@ class VirtualDriveViewModel : DriveViewModel
         Drive = drive;
     }
 
-    public void SetItemsCount(int count) => SetItemsCount((long)count);
+    public void SetItemsCount(int? count) => SetItemsCount((long?)count);
 
-    public void SetItemsCount(long newCount)
+    public void SetItemsCount(long? newCount)
     {
         if (Drive.ItemsCount != newCount)
         {
@@ -29,7 +29,7 @@ class VirtualDriveViewModel : DriveViewModel
             OnPropertyChanged(nameof(ItemsCount));
         }
 
-        DriveEnabled = ItemsCount >= 0;
+        DriveEnabled = ItemsCount != -1;
     }
 
     public override string ToString() => $"{Type}";

@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019"
@@ -12,8 +13,25 @@
     <Button
         KeyUp="Button_KeyUp"
         MouseDoubleClick="Button_MouseDoubleClick"
-        PreviewMouseUp="Button_PreviewMouseUp"
-        Style="{StaticResource DriveItemStyle}">
+        PreviewMouseUp="Button_PreviewMouseUp">
+        <Button.Style>
+            <Style BasedOn="{StaticResource DriveItemStyle}" TargetType="Button">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Type}" Value="Trash">
+                        <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource TrashDriveAltBorder}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="Temp">
+                        <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource TempDriveAltBorder}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Type}" Value="Package">
+                        <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{DynamicResource NewDeviceAltBorder}" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding ItemsCount}" Value="-1">
+                        <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Gray" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Button.Style>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -44,7 +62,18 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="{Binding ItemsCount}" />
+                        <TextBlock>
+                            <TextBlock.Style>
+                                <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
+                                    <Setter Property="Text" Value="{Binding ItemsCount}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ItemsCount}" Value="{x:Null}">
+                                            <Setter Property="Text" Value="??" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                         <TextBlock>
                             <TextBlock.Style>
                                 <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
@@ -74,16 +103,20 @@
                             </TextBlock.Style>
                         </TextBlock>
                     </StackPanel>
-                    <TextBlock Text="Empty">
+                    <TextBlock>
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
+                                <Setter Property="Text" Value="Empty" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ItemsCount}" Value="0">
                                         <Setter Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding ItemsCount}" Value="-1">
                                         <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Type}" Value="Package">
+                                        <Setter Property="Text" Value="??" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

@@ -70,7 +70,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
                 DeviceType.Remote => "WiFi",
                 DeviceType.Emulator => "Emulator",
                 DeviceType.Service => "mDNS Service",
-                DeviceType.Sideload => "USB (Recovery)",
+                DeviceType.Recovery => "USB (Recovery)",
+                DeviceType.Sideload => "USB (Sideload)",
                 _ => throw new NotImplementedException(),
             };
 
@@ -105,7 +106,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
     {
         Device = device;
 
-        BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok,
+        BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrosweDeviceAction(this));
 
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);

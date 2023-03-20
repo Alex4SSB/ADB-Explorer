@@ -296,7 +296,11 @@ public partial class ADBService
                                 line => line.Split(':')[0].Trim('[', ']', ' '),
                                 line => line.Split(':')[1].Trim('[', ']', ' '));
                     }
+                    else
+                        props = new Dictionary<string, string>();
+
                 }
+
                 return props;
             }
         }

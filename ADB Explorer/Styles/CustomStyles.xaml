@@ -396,7 +396,7 @@
     <Style x:Key="RecoveryRootStatusStyle" TargetType="TextBlock">
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Type}" Value="Sideload">
+            <DataTrigger Binding="{Binding Type}" Value="Recovery">
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>

@@ -8,7 +8,7 @@ namespace ADB_Explorer.Models
             new(@"^(?<Mode>[0-9a-f]+) (?<Size>[0-9a-f]+) (?<Time>[0-9a-f]+) (?<Name>[^/]+?)\r?$",
                       RegexOptions.IgnoreCase);
 
-        public static readonly Regex RE_DEVICE_NAME = new(@"^(?<id>[\w.:-]+?) +(?<status>unauthorized|device|offline|authorizing|recovery)(?: +.*(?:model:(?<model>\w+)))?(?: +.*(?:device:(?<device>\w+)))?",
+        public static readonly Regex RE_DEVICE_NAME = new(@"^(?<id>[\w.:-]+?) +(?<status>unauthorized|device|offline|authorizing|recovery|sideload)(?: +.*(?:model:(?<model>\w+)))?(?: +.*(?:device:(?<device>\w+)))?",
             RegexOptions.Multiline);
 
         public static readonly Regex RE_FILE_SYNC_PROGRESS =

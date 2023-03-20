@@ -9,6 +9,7 @@ public abstract class AbstractDevice : ViewModelBase
         Service,
         Local,
         Remote,
+        Recovery,
         Sideload,
         Emulator,
         History,
