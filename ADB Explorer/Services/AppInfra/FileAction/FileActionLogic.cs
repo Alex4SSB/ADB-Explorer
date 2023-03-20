@@ -2,7 +2,6 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
-using System.IO;
 using static ADB_Explorer.Converters.FileTypeClass;
 
 namespace ADB_Explorer.Services.AppInfra;
@@ -559,7 +558,7 @@ internal static class FileActionLogic
         Data.FileActions.UpdateModifiedEnabled =
         Data.FileActions.ParentEnabled = false;
 
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk;
+        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
 
         Data.FileActions.ExplorerFilter = "";
 
@@ -619,11 +618,20 @@ internal static class FileActionLogic
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
 
-        Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk && Data.SelectedFiles.Any() && Data.SelectedFiles.All(file => file.IsInstallApk) && !Data.FileActions.IsRecycleBin;
+        Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
+                                                 && Data.SelectedFiles.Any()
+                                                 && Data.SelectedFiles.All(file => file.IsInstallApk)
+                                                 && !Data.FileActions.IsRecycleBin
+                                                 && !(Data.DevicesObject?.Current?.Type is AbstractDevice.DeviceType.Recovery
+                                                    && Data.FileActions.IsTemp);
+
         Data.FileActions.IsCopyItemPathEnabled = Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
 
         Data.FileActions.ContextNewEnabled = !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin;
-        Data.FileActions.SubmenuUninstallEnabled = Data.FileActions.IsTemp && Data.SelectedFiles.Any() && Data.SelectedFiles.All(file => file.IsInstallApk);
+        Data.FileActions.SubmenuUninstallEnabled = Data.FileActions.IsTemp
+            && Data.SelectedFiles.Any()
+            && Data.SelectedFiles.All(file => file.IsInstallApk)
+            && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
 
         Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin && Data.SelectedFiles.Any() && Data.SelectedFiles.All(file => file.Type is FileType.File && !file.IsApk);
 

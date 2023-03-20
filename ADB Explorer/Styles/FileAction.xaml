@@ -229,15 +229,27 @@
             <DataTrigger Binding="{Binding IconIsText}" Value="True">
                 <Setter Property="Icon" Value="{StaticResource IconTextBlock}" />
             </DataTrigger>
-            <!--  Special case for empty trash context menu item  -->
-            <DataTrigger Binding="{Binding Icon}" Value="&#xF141;">
+            <DataTrigger Binding="{Binding Action.Name}" Value="EmptyTrash">
                 <Setter Property="IsEnabled" Value="False" />
             </DataTrigger>
-            <!--  Special case for push packages menu item  -->
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Icon}" Value="&#xE7B8;" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=PushPackageVisible}" Value="False" />
+                    <Condition Binding="{Binding Action.Name}" Value="ContextPushPackages" />
+                    <Condition Binding="{Binding Action.Command.IsEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Action.Name}" Value="PushPackages" />
+                    <Condition Binding="{Binding Action.Command.IsEnabled}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Action.Name}" Value="Package" />
+                    <Condition Binding="{Binding Action.Command.IsEnabled}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Collapsed" />
             </MultiDataTrigger>

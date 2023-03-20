@@ -488,7 +488,7 @@ public static class DeviceHelper
         Data.RuntimeSettings.FilterDrives = true;
 
         Data.RuntimeSettings.CurrentBatteryContext = Data.DevicesObject.Current;
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk;
+        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
         FileActionLogic.UpdateFileActions();
 

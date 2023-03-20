@@ -106,7 +106,7 @@ internal static class MainToolBar
                 new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), @"\\.."),
                 new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
                 new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
-                new SubMenuSeparator(() => Data.FileActions.PushPackageVisible),
+                new SubMenuSeparator(() => Data.FileActions.PackageActionsEnabled),
                 new SubMenu(
                     AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     "\uE7B8",

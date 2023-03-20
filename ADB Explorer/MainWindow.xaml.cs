@@ -400,7 +400,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     return;
 
                 FilterDrives();
-                FileActions.PushPackageEnabled = Settings.EnableApk;
+                FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
 
                 if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
                     FileActionLogic.RefreshDrives(true);
@@ -896,8 +896,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
         FileActions.PasteEnabled = FileActionLogic.IsPasteEnabled();
-        FileActions.PushPackageEnabled = Settings.EnableApk;
-        FileActions.InstallPackageEnabled = FileActions.IsTemp;
+        FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
+        FileActions.InstallPackageEnabled = FileActions.IsTemp && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
         FileActions.ContextPushPackagesEnabled =
         FileActions.UninstallVisible = FileActions.IsAppDrive;
