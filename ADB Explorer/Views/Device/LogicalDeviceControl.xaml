@@ -71,7 +71,18 @@
                             </Style>
                         </ui:FontIcon.Style>
                     </ui:FontIcon>
-                    <views:CompactBatteryControl DataContext="{Binding Battery}" />
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOpen}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <views:CompactBatteryControl DataContext="{Binding Battery}" />
+                    </Grid>
                 </ui:SimpleStackPanel>
             </Grid>
         </Expander.Header>

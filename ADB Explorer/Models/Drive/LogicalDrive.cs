@@ -32,7 +32,7 @@ public class LogicalDrive : Drive
         set => Set(ref usageP, value);
     }
 
-    public string ID => Path[(Path.LastIndexOf('/') + 1)..];
+    public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
 
 
     public LogicalDrive(string size = "", string used = "", string available = "", sbyte usageP = -1, string path = "", bool isMMC = false, bool isEmulator = false)
