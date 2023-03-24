@@ -328,7 +328,13 @@ public static class DeviceHelper
         foreach (var device in Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is RootStatus.Unchecked))
         {
             bool root = ADBService.WhoAmI(device.ID);
-            App.Current.Dispatcher.Invoke(() => device.SetRootStatus(root ? RootStatus.Enabled : RootStatus.Unchecked));
+            bool rootDisabled = Data.DevicesObject.RootDevices.Contains(device.ID);
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                return device.SetRootStatus(root ? RootStatus.Enabled
+                    : rootDisabled ? RootStatus.Disabled
+                        : RootStatus.Unchecked);
+            });
         }
     }
 

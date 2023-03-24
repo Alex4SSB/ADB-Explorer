@@ -293,7 +293,10 @@ public partial class ADBService
     public static bool Unroot(Device device)
     {
         ExecuteDeviceAdbCommand(device.ID, "unroot", out string stdout, out string stderr);
-        return stdout.Contains("restarting adbd as non root");
+        var result = stdout.Contains("restarting adbd as non root");
+        DevicesObject.UpdateDeviceRoot(device.ID, result);
+
+        return result;
     }
 
     public static bool WhoAmI(string deviceId)

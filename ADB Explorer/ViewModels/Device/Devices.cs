@@ -18,6 +18,8 @@ public class Devices : AbstractDevice
 
     public DateTime LastUpdate { get; set; }
 
+    public List<string> RootDevices { get; protected set; } = new();
+
     #endregion
 
     #region Read only lists
@@ -217,6 +219,20 @@ public class Devices : AbstractDevice
 
     #region General device handling
 
+    public void UpdateDeviceRoot(string deviceID, bool isRootStateKnown)
+    {
+        if (isRootStateKnown)
+        {
+            if (!RootDevices.Contains(deviceID))
+                RootDevices.Add(deviceID);
+        }
+        else
+        {
+            if (RootDevices.Contains(deviceID))
+                RootDevices.Remove(deviceID);
+        }
+    }
+
     public void UpdateHistoryNames()
     {
         if (UpdateHistoryNames(UIList))
@@ -253,8 +269,6 @@ public class Devices : AbstractDevice
         var result = false;
         foreach (var item in devices.OfType<LogicalDeviceViewModel>().Where(d => d.Type is DeviceType.Service or DeviceType.Local && !d.IsIpAddressValid))
         {
-            result = true;
-
             if (item.Type is DeviceType.Service)
             {
                 var service = devices.Where(d => d is ServiceDeviceViewModel srv && (srv.ID == item.ID || srv.ID == item.BaseID) && srv.IsIpAddressValid);
@@ -265,7 +279,7 @@ public class Devices : AbstractDevice
                 }
             }
 
-            await Task.Run(() => ADBService.AdbDevice.GetDeviceIp(item));
+            await Task.Run(() => result |= ADBService.AdbDevice.GetDeviceIp(item));
         }
 
         return result;
