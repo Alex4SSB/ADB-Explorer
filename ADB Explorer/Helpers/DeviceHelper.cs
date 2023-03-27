@@ -167,7 +167,11 @@ public static class DeviceHelper
 
     public static DeviceAction ConnectDeviceCommand(NewDeviceViewModel device) => new(
         () => {
-            if (!device.IsIpAddressValid || !device.IsConnectPortValid)
+            if (!device.IsConnectPortValid)
+                return false;
+
+            if ((!device.IsIpAddressValid && device.IsHostNameActive is false)
+            || (!device.IsHostNameValid && device.IsHostNameActive is true))
                 return false;
 
             if (device is not null and not HistoryDeviceViewModel

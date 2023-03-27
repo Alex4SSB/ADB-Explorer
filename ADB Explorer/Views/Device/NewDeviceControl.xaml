@@ -9,8 +9,9 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:NewDeviceViewModel}"
+    d:Width="200"
     mc:Ignorable="d">
-    <Expander>
+    <Expander d:IsExpanded="True">
         <Expander.Style>
             <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
                 <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
@@ -58,17 +59,66 @@
         <Grid Style="{StaticResource DeviceContentGridStyle}">
             <ui:SimpleStackPanel Spacing="8">
                 <ui:SimpleStackPanel.Resources>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Style
+                        x:Key="NewDeviceFontIconStyle"
+                        BasedOn="{StaticResource GlyphFont}"
+                        TargetType="ui:FontIcon">
                         <Setter Property="Margin" Value="-1,0,4,0" />
                     </Style>
+                    <Style BasedOn="{StaticResource NewDeviceFontIconStyle}" TargetType="ui:FontIcon" />
                 </ui:SimpleStackPanel.Resources>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition />
+                        <ColumnDefinition>
+                            <ColumnDefinition.Style>
+                                <Style TargetType="ColumnDefinition">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=IpBox, Path=Visibility}" Value="Collapsed">
+                                            <Setter Property="Width" Value="0" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ColumnDefinition.Style>
+                        </ColumnDefinition>
+                        <ColumnDefinition>
+                            <ColumnDefinition.Style>
+                                <Style TargetType="ColumnDefinition">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=HostNameBox, Path=Visibility}" Value="Collapsed">
+                                            <Setter Property="Width" Value="0" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ColumnDefinition.Style>
+                        </ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE774;" ToolTip="IP Address" />
-                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDeviceIpBoxStyle}" />
+                    <ui:FontIcon Glyph="&#xE774;">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource NewDeviceFontIconStyle}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsHostNameActive}" Value="True">
+                                        <Setter Property="ToolTip" Value="Host Name" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsHostNameActive}" Value="False">
+                                        <Setter Property="ToolTip" Value="IP Address" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <controls:MaskedTextBox
+                        x:Name="IpBox"
+                        Grid.Column="1"
+                        GotFocus="IpBox_GotFocus"
+                        LostFocus="IpBox_LostFocus"
+                        Style="{StaticResource NewDeviceIpBoxStyle}" />
+                    <controls:MaskedTextBox
+                        x:Name="HostNameBox"
+                        Grid.Column="2"
+                        GotFocus="HostNameBox_GotFocus"
+                        LostFocus="IpBox_LostFocus"
+                        Style="{StaticResource NewDeviceHostNameBoxStyle}" />
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -169,7 +169,7 @@ public abstract class PairingDeviceViewModel : DeviceViewModel
 
     public bool IsPairingCodeValid => !string.IsNullOrWhiteSpace(PairingCode) && PairingCode.Length == 6;
 
-    public string PairingAddress => $"{IpAddress}:{PairingPort}";
+    public virtual string PairingAddress => $"{IpAddress}:{PairingPort}";
 
     #endregion
 

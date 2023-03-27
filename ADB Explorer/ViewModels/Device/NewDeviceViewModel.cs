@@ -22,6 +22,13 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         set => Set(ref isPairingEnabled, value);
     }
 
+    private bool? isHostNameActive = null;
+    public bool? IsHostNameActive
+    {
+        get => isHostNameActive;
+        set => Set(ref isHostNameActive, value);
+    }
+
     private string uiPairingCode;
     public string UIPairingCode
     {
@@ -43,7 +50,17 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         set => SetConnectPort(value);
     }
 
-    public string ConnectAddress => $"{IpAddress}:{ConnectPort}";
+    public string HostName
+    {
+        get => Device.HostName;
+        set => SetHostName(value);
+    }
+
+    public bool IsHostNameValid => !string.IsNullOrWhiteSpace(HostName);
+
+    public string ConnectAddress => $"{(IsHostNameActive is true ? HostName : IpAddress)}:{ConnectPort}";
+
+    public override string PairingAddress => $"{(IsHostNameActive is true ? HostName : IpAddress)}:{PairingPort}";
 
     public bool IsConnectPortValid => !string.IsNullOrWhiteSpace(ConnectPort)
                                       && ushort.TryParse(ConnectPort, out ushort res)
@@ -68,7 +85,8 @@ public class NewDeviceViewModel : PairingDeviceViewModel
             return !(string.IsNullOrEmpty(device.IpAddress)
                     && string.IsNullOrEmpty(device.ConnectPort)
                     && string.IsNullOrEmpty(device.PairingPort)
-                    && string.IsNullOrEmpty(device.PairingCode));
+                    && string.IsNullOrEmpty(device.PairingCode)
+                    && string.IsNullOrEmpty(device.HostName));
         },
         () => ClearDevice());
     }
@@ -78,8 +96,11 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         SetIpAddress();
         SetConnectPort();
         SetPairingPort();
+        SetHostName();
+
         UIPairingCode = "";
         IsPairingEnabled = false;
+        IsHostNameActive = null;
     }
 
     public void EnablePairing()
@@ -98,6 +119,18 @@ public class NewDeviceViewModel : PairingDeviceViewModel
             OnPropertyChanged(nameof(IsConnectPortValid));
 
             return true;
+        }
+
+        return false;
+    }
+
+    public bool SetHostName(string name = "")
+    {
+        if (HostName != name)
+        {
+            Device.HostName = name; 
+            OnPropertyChanged(nameof(HostName));
+            OnPropertyChanged(nameof(IsHostNameValid));
         }
 
         return false;
