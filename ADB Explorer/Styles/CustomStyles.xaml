@@ -744,4 +744,75 @@
         <Setter Property="Height" Value="32" />
         <Setter Property="DisplayNames" Value="{Binding Source={x:Static Member=models:Data.CurrentDisplayNames}}" />
     </Style>
+    <Style
+        x:Key="LogTextBoxStyle"
+        BasedOn="{StaticResource TextBoxFluentStyle}"
+        TargetType="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+        <Setter Property="IsReadOnly" Value="True" />
+        <Setter Property="FontSize" Value="18" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="LogToggleButtonStyle"
+        BasedOn="{StaticResource ToggleButtonStyle}"
+        TargetType="ToggleButton">
+        <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen, Mode=TwoWay}" />
+        <Setter Property="ToolTip" Value="Command Log" />
+        <Setter Property="Padding" Value="0" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
+        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Visible" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding ElementName=NavigationBox, Path=Mode}" Value="None">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="LogControlsPanelStyle" TargetType="ui:SimpleStackPanel">
+        <Setter Property="Spacing" Value="4" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="PauseLogButtonStyle"
+        BasedOn="{StaticResource ToggleButtonStyle}"
+        TargetType="ToggleButton">
+        <Setter Property="ToolTip" Value="Pause Log Updates" />
+        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsLogPaused, Mode=TwoWay}" />
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="ToolTip" Value="Log Updates Are Paused" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
