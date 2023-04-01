@@ -347,17 +347,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         foreach (Log item in e.NewItems)
         {
-            if (Dispatcher.HasShutdownStarted)
+            if (Dispatcher.HasShutdownStarted || RuntimeSettings.IsLogPaused is true)
                 return;
 
             Dispatcher.Invoke(() =>
             {
-                if (PauseAutoScrollButton.IsChecked == false)
-                {
-                    LogTextBox.Text += $"{item}\n";
-                    LogTextBox.CaretIndex = LogTextBox.Text.Length;
-                    LogTextBox.ScrollToEnd();
-                }
+                LogTextBox.Text += $"{item}\n";
+                LogTextBox.CaretIndex = LogTextBox.Text.Length;
+                LogTextBox.ScrollToEnd();
             });
         }
     }

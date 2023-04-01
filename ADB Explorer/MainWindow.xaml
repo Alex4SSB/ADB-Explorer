@@ -411,7 +411,7 @@
                                 IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Grid x:Name="FileReaderGrid">
+                    <Grid>
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -481,47 +481,14 @@
                             Cursor="SizeWE"
                             FocusVisualStyle="{x:Null}" />
                     </Grid>
-                    <TextBox
-                        x:Name="LogTextBox"
-                        FontFamily="{StaticResource ConsoleFont}"
-                        FontSize="18"
-                        Foreground="White"
-                        IsReadOnly="True"
-                        TextWrapping="Wrap">
-                        <TextBox.Style>
-                            <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=CommandLogButton, Path=IsChecked}" Value="True">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBox.Style>
-                    </TextBox>
-                    <ui:SimpleStackPanel
-                        Margin="6"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        Spacing="4"
-                        Visibility="{Binding ElementName=LogTextBox, Path=Visibility}">
-                        <ToggleButton x:Name="PauseAutoScrollButton">
-                            <ToggleButton.Style>
-                                <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
-                                    <Setter Property="ToolTip" Value="Pause Log Updates" />
-                                    <Style.Triggers>
-                                        <Trigger Property="IsChecked" Value="True">
-                                            <Setter Property="ToolTip" Value="Log Updates Are Paused" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ToggleButton.Style>
+                    <TextBox x:Name="LogTextBox" Style="{StaticResource LogTextBoxStyle}" />
+                    <ui:SimpleStackPanel Margin="6" Style="{StaticResource LogControlsPanelStyle}">
+                        <ToggleButton Style="{StaticResource PauseLogButtonStyle}">
                             <ui:FontIcon Glyph="&#xE769;" />
                         </ToggleButton>
                         <Button Click="ClearLogButton_Click" ToolTip="Clear Command Log">
                             <Button.Style>
                                 <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                                    <Setter Property="IsEnabled" Value="True" />
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding ElementName=LogTextBox, Path=Text.Count}" Value="0">
                                             <Setter Property="IsEnabled" Value="False" />
@@ -532,26 +499,7 @@
                             <ui:FontIcon Margin="1,1,-1,-1" Glyph="&#xE894;" />
                         </Button>
                     </ui:SimpleStackPanel>
-                    <Grid Margin="0,40" DataContext="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
-                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
-                                            <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
-                                            <Condition Binding="{Binding ElementName=LogTextBox, Path=Visibility}" Value="Collapsed" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </MultiDataTrigger>
-                                    <DataTrigger Binding="{Binding ElementName=NavigationBox, Path=Mode}" Value="None">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
+                    <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                         <Grid>
                             <Grid.Style>
                                 <Style TargetType="Grid">
@@ -821,22 +769,7 @@
                             </TextBlock>
                         </StackPanel>
                     </ui:SimpleStackPanel>
-                    <ToggleButton
-                        x:Name="CommandLogButton"
-                        Margin="6,0,-3,0"
-                        Padding="0"
-                        ToolTip="Command Log">
-                        <ToggleButton.Style>
-                            <Style BasedOn="{StaticResource ToggleButtonStyle}" TargetType="ToggleButton">
-                                <Setter Property="Visibility" Value="Visible" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
-                                        <Setter Property="IsChecked" Value="False" />
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ToggleButton.Style>
+                    <ToggleButton Margin="6,0,-3,0" Style="{StaticResource LogToggleButtonStyle}">
                         <ui:FontIcon Glyph="&#xE756;" />
                     </ToggleButton>
                 </StackPanel>

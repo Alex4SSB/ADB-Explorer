@@ -237,6 +237,20 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
+    private bool isLogOpen = false;
+    public bool IsLogOpen
+    {
+        get => isLogOpen;
+        set => Set(ref isLogOpen, value);
+    }
+
+    private bool? isLogPaused = false;
+    public bool? IsLogPaused
+    {
+        get => isLogPaused;
+        set => Set(ref isLogPaused, value);
+    }
+
     #region Event-only properties
 
     public bool NewFolder { get => false; set => OnPropertyChanged(); }
