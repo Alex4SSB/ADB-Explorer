@@ -22,13 +22,6 @@ public class NewDeviceViewModel : PairingDeviceViewModel
         set => Set(ref isPairingEnabled, value);
     }
 
-    private bool? isHostNameActive = null;
-    public bool? IsHostNameActive
-    {
-        get => isHostNameActive;
-        set => Set(ref isHostNameActive, value);
-    }
-
     private string uiPairingCode;
     public string UIPairingCode
     {
@@ -58,9 +51,9 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
     public bool IsHostNameValid => !string.IsNullOrWhiteSpace(HostName);
 
-    public string ConnectAddress => $"{(IsHostNameActive is true ? HostName : IpAddress)}:{ConnectPort}";
+    public string ConnectAddress => $"{(string.IsNullOrEmpty(HostName) ? IpAddress : HostName)}:{ConnectPort}";
 
-    public override string PairingAddress => $"{(IsHostNameActive is true ? HostName : IpAddress)}:{PairingPort}";
+    public override string PairingAddress => $"{(string.IsNullOrEmpty(HostName) ? IpAddress : HostName)}:{PairingPort}";
 
     public bool IsConnectPortValid => !string.IsNullOrWhiteSpace(ConnectPort)
                                       && ushort.TryParse(ConnectPort, out ushort res)
@@ -77,7 +70,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
     public NewDeviceViewModel(NewDevice device) : base(device)
     {
         Device = device;
-
+        
         ConnectCommand = DeviceHelper.ConnectDeviceCommand(this);
 
         ClearCommand = new(() =>
@@ -89,6 +82,14 @@ public class NewDeviceViewModel : PairingDeviceViewModel
                     && string.IsNullOrEmpty(device.HostName));
         },
         () => ClearDevice());
+
+        PropertyChanged += NewDeviceViewModel_PropertyChanged;
+    }
+
+    private void NewDeviceViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(IpAddress))
+            HostName = IsIpAddressValid ? null : IpAddress;
     }
 
     public void ClearDevice()
@@ -100,7 +101,6 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
         UIPairingCode = "";
         IsPairingEnabled = false;
-        IsHostNameActive = null;
     }
 
     public void EnablePairing()

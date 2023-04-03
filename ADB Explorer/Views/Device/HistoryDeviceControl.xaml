@@ -10,7 +10,7 @@
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:HistoryDeviceViewModel}"
     mc:Ignorable="d">
-    <Expander>
+    <Expander d:IsExpanded="True">
         <Expander.Style>
             <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
                 <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
@@ -79,12 +79,31 @@
                         Margin="0,-5"
                         VerticalAlignment="Top"
                         Style="{StaticResource BlueDotTextBlockStyle}" />
-                    <TextBlock Text="IP Address" />
+                    <TextBlock>
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="IP Address" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
+                                        <Setter Property="Text" Value="Host Name" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </ui:SimpleStackPanel>
-                <TextBox
-                    IsReadOnly="True"
-                    Style="{StaticResource NumericTextBoxStyle}"
-                    Text="{Binding IpAddress}" />
+                <TextBox IsReadOnly="True">
+                    <TextBox.Style>
+                        <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                            <Setter Property="Text" Value="{Binding IpAddress}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
+                                    <Setter Property="Text" Value="{Binding HostName}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
                 <ui:SimpleStackPanel
                     Margin="4,0"
                     Orientation="Horizontal"

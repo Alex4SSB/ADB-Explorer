@@ -29,18 +29,36 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
     }
 
-    public static HistoryDeviceViewModel New(NewDeviceViewModel device) => new(new HistoryDevice()
+    public static HistoryDeviceViewModel New(NewDeviceViewModel device)
     {
-        IpAddress = device.IpAddress,
-        ConnectPort = device.ConnectPort
-    });
+        if (!device.IsIpAddressValid)
+            device.IpAddress = "";
 
-    public static HistoryDeviceViewModel New(StorageDevice device) => new(new HistoryDevice()
+        return new(new HistoryDevice()
+        {
+            IpAddress = device.IpAddress,
+            HostName = device.HostName,
+            ConnectPort = device.ConnectPort
+        });
+    }
+
+    public static HistoryDeviceViewModel New(StorageDevice device)
     {
-        DeviceName = device.DeviceName,
-        IpAddress = device.IpAddress,
-        ConnectPort = device.ConnectPort
-    });
+        HistoryDeviceViewModel historyDevice = new(new HistoryDevice()
+        {
+            DeviceName = device.DeviceName,
+            IpAddress = device.IpAddress,
+            ConnectPort = device.ConnectPort
+        });
+
+        if (!historyDevice.IsIpAddressValid)
+        {
+            historyDevice.HostName = historyDevice.IpAddress;
+            historyDevice.IpAddress = "";
+        }
+
+        return historyDevice;
+    }
 
     public StorageDevice GetStorage() => new(this);
 
@@ -66,7 +84,7 @@ public class StorageDevice
     public StorageDevice(HistoryDeviceViewModel device)
     {
         DeviceName = device.DeviceName;
-        IpAddress = device.IpAddress;
+        IpAddress = device.IsIpAddressValid ? device.IpAddress : device.HostName;
         ConnectPort = device.ConnectPort;
     }
 

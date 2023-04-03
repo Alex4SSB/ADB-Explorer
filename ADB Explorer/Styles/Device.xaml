@@ -99,60 +99,25 @@
         BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
         TargetType="controls:MaskedTextBox">
         <Setter Property="Text" Value="{Binding IpAddress, Mode=TwoWay}" />
-        <Setter Property="ValidationType" Value="SeparateFormat" />
-        <Setter Property="Separator" Value="." />
-        <Setter Property="MaxNumber" Value="255" />
-        <Setter Property="MaxSeparators" Value="3" />
         <Setter Property="ControlStyle">
             <Setter.Value>
                 <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" IP Address" />
+                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" IP Address / Host Name" />
                     <Setter Property="Padding" Value="4,5,0,6" />
                     <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsIpAddressValid}" Value="False" />
+                    <Condition Binding="{Binding IsHostNameValid}" Value="False" />
+                </MultiDataTrigger.Conditions>
                 <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
-            </DataTrigger>
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
                 <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsHostNameActive}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsHostNameActive}" Value="{x:Null}">
-                <Setter Property="Margin" Value="0,0,3,0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="NewDeviceHostNameBoxStyle"
-        BasedOn="{StaticResource NewDeviceMaskedTextBoxStyle}"
-        TargetType="controls:MaskedTextBox">
-        <Setter Property="Text" Value="{Binding HostName, Mode=TwoWay}" />
-        <Setter Property="ControlStyle">
-            <Setter.Value>
-                <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                    <Setter Property="ui:ControlHelper.PlaceholderText" Value=" Host Name" />
-                    <Setter Property="Padding" Value="4,5,0,6" />
-                    <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
-                </Style>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsHostNameValid}" Value="False">
-                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="Red" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsPairingEnabled}" Value="True">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsHostNameActive}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding IsHostNameActive}" Value="{x:Null}">
-                <Setter Property="Margin" Value="3,0,0,0" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -246,7 +211,6 @@
                     <Condition Binding="{Binding IsPairingEnabled}" Value="False" />
                     <Condition Binding="{Binding IsIpAddressValid}" Value="True" />
                     <Condition Binding="{Binding IsConnectPortValid}" Value="True" />
-                    <Condition Binding="{Binding IsHostNameActive}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="IsEnabled" Value="True" />
             </MultiDataTrigger>
@@ -255,7 +219,6 @@
                     <Condition Binding="{Binding IsPairingEnabled}" Value="False" />
                     <Condition Binding="{Binding IsHostNameValid}" Value="True" />
                     <Condition Binding="{Binding IsConnectPortValid}" Value="True" />
-                    <Condition Binding="{Binding IsHostNameActive}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="IsEnabled" Value="True" />
             </MultiDataTrigger>
@@ -266,7 +229,6 @@
                     <Condition Binding="{Binding IsConnectPortValid}" Value="True" />
                     <Condition Binding="{Binding IsPairingCodeValid}" Value="True" />
                     <Condition Binding="{Binding IsPairingPortValid}" Value="True" />
-                    <Condition Binding="{Binding IsHostNameActive}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="IsEnabled" Value="True" />
             </MultiDataTrigger>
@@ -277,7 +239,6 @@
                     <Condition Binding="{Binding IsConnectPortValid}" Value="True" />
                     <Condition Binding="{Binding IsPairingCodeValid}" Value="True" />
                     <Condition Binding="{Binding IsPairingPortValid}" Value="True" />
-                    <Condition Binding="{Binding IsHostNameActive}" Value="True" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="IsEnabled" Value="True" />
             </MultiDataTrigger>

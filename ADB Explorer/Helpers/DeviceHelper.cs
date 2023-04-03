@@ -170,8 +170,7 @@ public static class DeviceHelper
             if (!device.IsConnectPortValid)
                 return false;
 
-            if ((!device.IsIpAddressValid && device.IsHostNameActive is false)
-            || (!device.IsHostNameValid && device.IsHostNameActive is true))
+            if (!device.IsIpAddressValid && !device.IsHostNameValid)
                 return false;
 
             if (device is not null and not HistoryDeviceViewModel
