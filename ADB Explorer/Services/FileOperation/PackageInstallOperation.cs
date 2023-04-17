@@ -42,26 +42,36 @@ public class PackageInstallOperation : FileOperation
 
         Status = OperationStatus.InProgress;
         cancelTokenSource = new CancellationTokenSource();
-        var args = new string[2];
+        var args = new string[1];
+        int index = 0;
         
         // install (pm / adb)
         if (string.IsNullOrEmpty(PackageName))
         {
-            args[0] = "install";
-            args[1] = FilePath.FullPath;
+            if (!pushPackage)
+            {
+                args = new string[4];
+                args[0] = "install";
+                args[1] = "-r";
+                args[2] = "-d";
+                index = 3;
+            }
+            args[index] = FilePath.FullPath;
         }
         // uninstall
         else
         {
+            args = new string[2];
             args[0] = "uninstall";
             args[1] = PackageName;
+            index = 1;
         }
 
-        args[1] = ADBService.EscapeAdbShellString(args[1]);
+        args[index] = ADBService.EscapeAdbShellString(args[index]);
         operationTask = Task.Run(() =>
         {
             return pushPackage
-                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out _, out _, args[1])
+                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out _, out _, args)
                 : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out _, out _, args);
         });
 
