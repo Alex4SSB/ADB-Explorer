@@ -18,6 +18,8 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
 
     public override string Tooltip => "Saved Device";
 
+    public bool IsDeviceNameValid => !string.IsNullOrEmpty(DeviceName);
+
     #endregion
 
     public DeviceAction RemoveCommand { get; }
@@ -31,13 +33,10 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
 
     public static HistoryDeviceViewModel New(NewDeviceViewModel device)
     {
-        if (!device.IsIpAddressValid)
-            device.IpAddress = "";
-
         return new(new HistoryDevice()
         {
-            IpAddress = device.IpAddress,
-            HostName = device.HostName,
+            IpAddress = device.IsIpAddressValid ? device.IpAddress : null,
+            HostName = device.IsIpAddressValid ? null : device.HostName,
             ConnectPort = device.ConnectPort
         });
     }
@@ -54,7 +53,6 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
         if (!historyDevice.IsIpAddressValid)
         {
             historyDevice.HostName = historyDevice.IpAddress;
-            historyDevice.IpAddress = "";
         }
 
         return historyDevice;

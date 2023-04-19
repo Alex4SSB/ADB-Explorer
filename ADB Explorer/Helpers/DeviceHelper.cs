@@ -25,7 +25,7 @@ public static class DeviceHelper
             return DeviceType.Sideload;
         else if (id.Contains("._adb-tls-"))
             return DeviceType.Service;
-        else if (id.Contains('.'))
+        else if (id.Contains(':'))
             return DeviceType.Remote;
         else if (id.Contains("emulator"))
             return DeviceType.Emulator;
@@ -223,11 +223,11 @@ public static class DeviceHelper
                     && usb.IpAddress == device.IpAddress);
             }
 
-            if (device is HistoryDeviceViewModel)
+            if (device is HistoryDeviceViewModel hist)
             {
                 // if there's any device with the IP of a history device - hide the history device
-                return Data.Settings.SaveDevices && !Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == device.IpAddress)
-                        && !Data.DevicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == device.IpAddress);
+                return Data.Settings.SaveDevices && !Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == hist.IpAddress || logical.IpAddress == hist.HostName)
+                        && !Data.DevicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == hist.IpAddress || service.IpAddress == hist.HostName);
             }
 
             if (device is ServiceDeviceViewModel service)

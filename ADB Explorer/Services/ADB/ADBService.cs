@@ -63,7 +63,7 @@ public partial class ADBService
     public static Process StartCommandProcess(string file, string cmd, Encoding encoding, params string[] args)
     {
         var cmdProcess = new Process();
-        var arguments = $"{cmd} {string.Join(' ', args)}";
+        var arguments = $"{cmd} {string.Join(' ', args.Where(arg => !string.IsNullOrEmpty(arg)))}";
 
         InitProcess(cmdProcess);
         cmdProcess.StartInfo.FileName = file;

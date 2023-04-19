@@ -50,10 +50,17 @@
                             <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
                                 <Setter Property="Text" Value="{Binding DeviceName}" />
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding DeviceName}" Value="{x:Null}">
+                                    <DataTrigger Binding="{Binding IsDeviceNameValid}" Value="False">
                                         <Setter Property="Text" Value="{Binding IpAddress}" />
                                         <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
                                     </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsIpAddressValid}" Value="False" />
+                                            <Condition Binding="{Binding IsDeviceNameValid}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Text" Value="{Binding HostName}" />
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>
