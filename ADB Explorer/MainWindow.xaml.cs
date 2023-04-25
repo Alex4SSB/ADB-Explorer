@@ -1681,9 +1681,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
-    {
-        RefreshDevices();
-    }
+        => Task.Run(() => RefreshDevices());
 
     private void DataGridRow_Unselected(object sender, RoutedEventArgs e)
     {
