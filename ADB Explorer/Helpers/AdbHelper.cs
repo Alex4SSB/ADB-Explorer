@@ -56,11 +56,11 @@ internal static class AdbHelper
 
     public static void VerifyProgressRedirection() => Task.Run(() =>
     {
-        if (!File.Exists($"{Environment.CurrentDirectory}\\{Data.ProgressRedirectionPath}"))
+        if (!File.Exists($"{Environment.CurrentDirectory}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}"))
         {
             try
             {
-                string newPath = $"{Data.IsolatedStorageLocation}\\{Data.ProgressRedirectionPath}";
+                string newPath = $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
                 if (File.Exists(newPath))
                 {
                     Data.ProgressRedirectionPath = newPath;

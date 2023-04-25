@@ -2,6 +2,8 @@
 
 public static class AdbExplorerConst
 {
+    public static readonly string PROGRESS_REDIRECTION_PATH = "AdbProgressRedirection.exe";
+
     public static readonly string DEFAULT_PATH = "/sdcard";
     public static readonly string TEMP_PATH = "/data/local/tmp";
     public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";

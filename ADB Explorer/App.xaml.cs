@@ -15,7 +15,7 @@ public partial class App : Application
         try
         {
             using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE, FileMode.Open, storage);
-            Data.IsolatedStorageLocation = Path.GetDirectoryName(stream.GetType().GetField("_fullPath", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).GetValue(stream).ToString());
+            Data.IsolatedStorageLocation = Path.GetDirectoryName(stream.GetType().GetField("_fullPath", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(stream).ToString());
 
             if (Keyboard.IsKeyDown(Key.LeftCtrl))
             {

@@ -38,7 +38,7 @@ internal static class Data
 
     public static string IsolatedStorageLocation { get; set; } = "";
 
-    public static string ProgressRedirectionPath { get; set; } = "AdbProgressRedirection.exe";
+    public static string ProgressRedirectionPath { get; set; } = AdbExplorerConst.PROGRESS_REDIRECTION_PATH;
 
     public static Devices DevicesObject { get; set; }
 
