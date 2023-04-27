@@ -125,4 +125,25 @@ internal static class AdbHelper
             Data.MdnsService.State = MDNS.MdnsState.Disabled;
         }
     });
+
+    public static bool SilentPull(Device device, FilePath file, string windowsPath) 
+        => 0 == ADBService.ExecuteAdbCommand("pull",
+                                             out _,
+                                             out _,
+                                             new[]
+                                             {
+                                                 "-a",
+                                                 ADBService.EscapeAdbString(file.FullPath),
+                                                 ADBService.EscapeAdbString(windowsPath)
+                                             });
+
+    public static bool SilentPush(Device device, string windowsPath, string androidPath)
+        => 0 == ADBService.ExecuteAdbCommand("push",
+            out _,
+            out _,
+            new[]
+            {
+                ADBService.EscapeAdbString(windowsPath),
+                ADBService.EscapeAdbString(androidPath)
+            });
 }

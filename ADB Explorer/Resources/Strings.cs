@@ -61,6 +61,10 @@ public static class Strings
     public const string S_PUSH_PKG = "Install Packages";
     public const string S_NEW_DEVICE_TIP = "Pair and/or connect a WiFi device (without using mDNS)";
     public const string S_RESTART_APP = "Restart app for changes to take effect";
+    public const string S_READ_FILE_ERROR_TITLE = "Error Reading File";
+    public const string S_READ_FILE_ERROR = "Could not pull file in order to read it.";
+    public const string S_WRITE_FILE_ERROR_TITLE = "Error Writing File";
+    public const string S_WRITE_FILE_ERROR = "Could not push file back to device.";
 
 
     public static string S_MISSING_REDIRECTION(string exception) =>

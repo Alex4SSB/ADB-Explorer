@@ -7,7 +7,8 @@ namespace ADB_Explorer;
 /// </summary>
 public partial class App : Application
 {
-    
+    private string tempFilesPath => $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}";
+
     private void Application_Startup(object sender, StartupEventArgs e)
     {
         // Restore application-scope property from isolated storage
@@ -36,6 +37,14 @@ public partial class App : Application
                     Properties[keyValue[0]] = keyValue[1];
                 }
             }
+
+            Task.Run(() =>
+            {
+                if (!Directory.Exists(tempFilesPath))
+                    Directory.CreateDirectory(tempFilesPath);
+                else
+                    CleanTempFiles();
+            });
         }
         catch // FileNotFoundException ex
         {
@@ -54,6 +63,7 @@ public partial class App : Application
     private void Application_Exit(object sender, ExitEventArgs e)
     {
         WriteSettings();
+        Task.Run(() => CleanTempFiles());
     }
 
     private void WriteSettings()
@@ -74,6 +84,19 @@ public partial class App : Application
         {
             writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })};");
         }
+    }
+
+    private void CleanTempFiles()
+    {
+        try
+        {
+            foreach (var file in Directory.GetFiles(tempFilesPath))
+            {
+                File.Delete(file);
+            }
+        }
+        catch (Exception)
+        { }
     }
 
     private void SelectivelyIgnoreMouseButton(object sender, MouseButtonEventArgs e)

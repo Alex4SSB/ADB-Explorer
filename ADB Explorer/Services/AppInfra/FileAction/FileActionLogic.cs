@@ -77,7 +77,7 @@ internal static class FileActionLogic
 
     public static void OpenEditor()
     {
-        if (Data.FileActions.IsEditorOpen && Data.FileActions.EditorFilePath.Equals(Data.SelectedFiles.First()))
+        if (!Data.FileActions.EditFileEnabled || Data.FileActions.IsEditorOpen && Data.FileActions.EditorFilePath.Equals(Data.SelectedFiles.First()))
         {
             Data.FileActions.IsEditorOpen = false;
             return;
@@ -88,14 +88,21 @@ internal static class FileActionLogic
 
         var readTask = Task.Run(() =>
         {
-            var text = "";
             try
             {
-                text = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, Data.FileActions.EditorFilePath.FullPath);
+                string windowsPath = $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}\\{Data.FileActions.EditorFilePath.FullName}";
+                if (AdbHelper.SilentPull(Data.CurrentADBDevice, Data.FileActions.EditorFilePath, windowsPath))
+                    return File.ReadAllText(windowsPath);
+                else
+                    throw new Exception(Strings.S_READ_FILE_ERROR);
             }
-            catch (Exception)
-            { }
-            return text;
+            catch (Exception e)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                    DialogService.ShowMessage(e.Message, Strings.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation));
+
+                return "";
+            }
         });
 
         readTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
@@ -111,13 +118,30 @@ internal static class FileActionLogic
 
         var writeTask = Task.Run(() =>
         {
-            ShellFileOperation.SilentDelete(Data.CurrentADBDevice, Data.FileActions.EditorFilePath);
+            try
+            {
+                string windowsPath = $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}\\{Data.FileActions.EditorFilePath.FullName}";
+                File.WriteAllText(windowsPath, Data.FileActions.EditorText);
 
-            ShellFileOperation.WriteLine(Data.CurrentADBDevice, Data.FileActions.EditorFilePath.FullPath, ADBService.EscapeAdbShellString(text.Replace("\r", ""), '\''));
+                if (AdbHelper.SilentPush(Data.CurrentADBDevice, windowsPath, Data.FileActions.EditorFilePath.FullPath))
+                    return true;
+                else
+                    throw new Exception(Strings.S_WRITE_FILE_ERROR);
+            }
+            catch (Exception e)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                    DialogService.ShowMessage(e.Message, Strings.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation));
+
+                return false;
+            }
         });
 
         writeTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
         {
+            if (!t.Result)
+                return;
+
             Data.FileActions.OriginalEditorText = Data.FileActions.EditorText;
 
             if (Data.FileActions.EditorFilePath.ParentPath == Data.CurrentPath)
