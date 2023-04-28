@@ -441,20 +441,11 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
-                                        <ui:SimpleStackPanel
-                                            Margin="4"
-                                            Orientation="Horizontal"
-                                            Spacing="6">
-                                            <Button
-                                                x:Name="CloseEditorButton"
-                                                Click="CloseEditorButton_Click"
-                                                Style="{StaticResource AccentButtonStyle}"
-                                                ToolTip="Close Editor">
-                                                <ui:FontIcon Glyph="&#xE711;" Style="{StaticResource DisabledButtonGlyphStyle}" />
-                                            </Button>
-                                            <Button Click="SaveReaderTextButton_Click" Style="{StaticResource SaveEditorTextButtonStyle}" />
-                                        </ui:SimpleStackPanel>
-                                        <TextBox Grid.Column="1" Style="{StaticResource EditorFilePathStyle}" />
+                                        <ListView Margin="4" Style="{StaticResource EditorControlsPanelStyle}" />
+                                        <TextBox
+                                            Grid.Column="1"
+                                            MinHeight="30"
+                                            Style="{StaticResource EditorFilePathStyle}" />
                                     </Grid>
                                 </Border>
                                 <TextBox Grid.Row="1" Style="{StaticResource EditorTextBoxStyle}" />

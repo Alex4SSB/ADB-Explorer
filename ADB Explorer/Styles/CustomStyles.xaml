@@ -553,23 +553,6 @@
         <Setter Property="Margin" Value="2,0,6,0" />
         <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorFilePath.FullPath, Mode=OneWay}" />
     </Style>
-    <Style
-        x:Key="SaveEditorTextButtonStyle"
-        BasedOn="{StaticResource AccentButtonStyle}"
-        TargetType="Button">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="Content">
-            <Setter.Value>
-                <ui:FontIcon Glyph="&#xE74E;" Style="{StaticResource DisabledButtonGlyphStyle}" />
-            </Setter.Value>
-        </Setter>
-        <Setter Property="ToolTip" Value="Save Changes" />
-        <Setter Property="VerticalAlignment" Value="Stretch" />
-    </Style>
     <Style x:Key="EditorGridStyle" TargetType="Grid">
         <Setter Property="Margin" Value="0,0,0,10" />
         <Style.Triggers>

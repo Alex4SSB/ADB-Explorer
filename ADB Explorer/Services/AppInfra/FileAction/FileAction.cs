@@ -150,6 +150,16 @@ internal static class AppActions
             () => FileActionLogic.OpenEditor(),
             "Open In Editor",
             new(Key.E, ModifierKeys.Control)),
+        new(FileAction.FileActionType.CloseEditor,
+            () => true,
+            () => FileActionLogic.OpenEditor(),
+            "Close Editor",
+            new(Key.E, ModifierKeys.Control)),
+        new(FileAction.FileActionType.SaveEditor,
+            () => Data.FileActions.IsEditorTextChanged,
+            () => FileActionLogic.SaveEditorText(),
+            "Save Changes",
+            new(Key.S, ModifierKeys.Control)),
         new(FileAction.FileActionType.Install,
             () => Data.FileActions.InstallPackageEnabled,
             () => FileActionLogic.InstallPackages(),
@@ -273,6 +283,8 @@ internal class FileAction : ViewModelBase
         OpenSettings,
         HideSettings,
         OpenFileOps,
+        CloseEditor,
+        SaveEditor,
     }
 
     public FileActionType Name { get; }

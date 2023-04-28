@@ -317,4 +317,50 @@
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsPaneMenu.List}}" />
     </Style>
+    <Style
+        x:Key="EditorControlsPanelStyle"
+        BasedOn="{StaticResource ListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel
+                        Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
+                        ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
+                        ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:EditorControls.List}}" />
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Button>
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
+                                <Setter Property="ToolTip" Value="{Binding Tooltip}" />
+                                <Setter Property="Command" Value="{Binding Action.Command.Command}" />
+                            </Style>
+                        </Button.Style>
+                        <ui:FontIcon FontSize="{Binding IconSize}" Glyph="{Binding Icon}" />
+                    </Button>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="Margin" Value="4" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <ContentPresenter />
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

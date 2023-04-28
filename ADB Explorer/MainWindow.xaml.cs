@@ -1792,16 +1792,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SearchBoxMaxWidth();
     }
 
-    private void SaveReaderTextButton_Click(object sender, RoutedEventArgs e)
-    {
-        FileActionLogic.SaveEditorText();
-    }
-
-    private void CloseEditorButton_Click(object sender, RoutedEventArgs e)
-    {
-        FileActions.IsEditorOpen = false;
-    }
-
     private void SortedSettings_MouseMove(object sender, MouseEventArgs e)
     {
         SortedSettings.Focus();
