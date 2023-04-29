@@ -436,6 +436,7 @@
                         </MultiTrigger>
                         <Trigger Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="True">
                             <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="ContentBorder" Property="BorderThickness" Value="0" />
                             <Setter TargetName="HeaderUpperBorder" Property="BorderBrush" Value="Transparent" />
                             <Setter TargetName="HeaderSideBorder" Property="BorderBrush" Value="Transparent" />
                         </Trigger>

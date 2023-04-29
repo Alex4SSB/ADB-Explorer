@@ -168,6 +168,7 @@
             </Expander.Header>
             <TextBox
                 x:Name="ContentBox"
+                Margin="0,1,1,1"
                 ui:ControlHelper.PlaceholderText="{Binding (ui:ControlHelper.PlaceholderText)}"
                 KeyDown="ContentBox_KeyDown"
                 Loaded="ContentBox_Loaded"
