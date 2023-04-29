@@ -764,7 +764,7 @@
                     <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
                     <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
                     <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Visible" />
             </MultiDataTrigger>
