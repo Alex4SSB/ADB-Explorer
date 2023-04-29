@@ -251,6 +251,7 @@ internal static class EditorControls
         new ActionAccentButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
             "\uE711"),
         new ActionAccentButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor),
-            "\uE74E"),
+            "\uE74E",
+            animation: StyleHelper.ContentAnimation.Bounce),
     };
 }

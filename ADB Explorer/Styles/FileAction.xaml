@@ -329,6 +329,9 @@
                 <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
                     <Setter Property="ToolTip" Value="{Binding Tooltip}" />
                     <Setter Property="Command" Value="{Binding Action.Command.Command}" />
+                    <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
+                    <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
+                    <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
                 </Style>
             </Button.Style>
             <ui:FontIcon FontSize="{Binding IconSize}" Glyph="{Binding Icon}" />
@@ -340,6 +343,9 @@
                 <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
                     <Setter Property="ToolTip" Value="{Binding Tooltip}" />
                     <Setter Property="Command" Value="{Binding Action.Command.Command}" />
+                    <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
+                    <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
+                    <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
                 </Style>
             </Button.Style>
             <ui:FontIcon FontSize="{Binding IconSize}" Glyph="{Binding Icon}" />

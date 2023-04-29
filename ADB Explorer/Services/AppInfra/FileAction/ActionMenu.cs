@@ -6,30 +6,6 @@ namespace ADB_Explorer.Services;
 
 internal abstract class ActionBase : ViewModelBase
 {
-    public FileAction Action { get; }
-
-    public string Icon { get; }
-
-    public int IconSize { get; }
-
-    public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
-
-    protected ActionBase(FileAction action, string icon, int iconSize)
-    {
-        if (this is not SubMenu)
-            StyleHelper.VerifyIcon(ref icon);
-
-        Action = action;
-        Icon = icon;
-        IconSize = iconSize;
-    }
-
-    protected ActionBase()
-    { }
-}
-
-internal abstract class ActionMenu : ActionBase
-{
     public enum AnimationSource
     {
         None,
@@ -38,40 +14,46 @@ internal abstract class ActionMenu : ActionBase
         External,
     }
 
-    #region Full properties
+    private bool activateAnimation = false;
 
-    public IEnumerable<SubMenu> Children { get; }
-    
+    public FileAction Action { get; }
+
+    public string Icon { get; }
+
+    public int IconSize { get; }
+
     public StyleHelper.ContentAnimation Animation { get; }
 
     public AnimationSource ActionAnimationSource { get; }
 
-    private bool activateAnimation = false;
     public bool ActivateAnimation
     {
         get => activateAnimation;
         set => Set(ref activateAnimation, value);
     }
 
-    #endregion
+    public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
 
     public bool AnimateOnClick => ActionAnimationSource is AnimationSource.Click;
 
-    protected ActionMenu(FileAction fileAction,
+    protected ActionBase(FileAction action,
                          string icon,
-                         IEnumerable<SubMenu> children = null,
+                         int iconSize,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                         int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command)
-        : base(fileAction, icon, iconSize)
     {
+        if (this is not SubMenu)
+            StyleHelper.VerifyIcon(ref icon);
+
+        Action = action;
+        Icon = icon;
+        IconSize = iconSize;
         Animation = animation;
-        Children = children;
         ActionAnimationSource = animationSource;
 
         if (animationSource is AnimationSource.Command)
         {
-            ((CommandHandler)fileAction.Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
+            ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
             {
                 if (!Data.Settings.IsAnimated)
                     return;
@@ -80,6 +62,25 @@ internal abstract class ActionMenu : ActionBase
                 Task.Delay(200).ContinueWith((t) => ActivateAnimation = false);
             };
         }
+    }
+
+    protected ActionBase()
+    { }
+}
+
+internal abstract class ActionMenu : ActionBase
+{
+    public IEnumerable<SubMenu> Children { get; }
+
+    protected ActionMenu(FileAction fileAction,
+                         string icon,
+                         IEnumerable<SubMenu> children = null,
+                         StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                         int iconSize = 18,
+                         AnimationSource animationSource = AnimationSource.Command)
+        : base(fileAction, icon, iconSize, animation, animationSource)
+    {
+        Children = children;
     }
 
     protected ActionMenu()
@@ -251,14 +252,14 @@ internal class SubMenuSeparator : SubMenu
 
 internal class ActionButton : ActionBase
 {
-    public ActionButton(FileAction action, string icon, int iconSize = 16)
-        : base(action, icon, iconSize)
+    public ActionButton(FileAction action, string icon, int iconSize = 16, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
+        : base(action, icon, iconSize, animation)
     { }
 }
 
 internal class ActionAccentButton : ActionButton
 {
-    public ActionAccentButton(FileAction action, string icon, int iconSize = 16)
-        : base(action, icon, iconSize)
+    public ActionAccentButton(FileAction action, string icon, int iconSize = 16, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
+        : base(action, icon, iconSize, animation)
     { }
 }
