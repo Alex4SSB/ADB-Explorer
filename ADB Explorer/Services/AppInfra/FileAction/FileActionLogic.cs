@@ -262,7 +262,7 @@ internal static class FileActionLogic
         Data.FileActions.ItemToSelect = file;
     }
 
-    public static bool IsPasteEnabled(bool ignoreSelected = false, bool isKeyboard = false)
+    public static bool IsPasteEnabled(bool isKeyboard = false)
     {
         // Explorer view but not trash or app drive
         if (Data.FileActions.IsPasteStateVisible)
@@ -286,7 +286,7 @@ internal static class FileActionLogic
         if (Data.CutItems.Count == 1 && Data.CutItems[0].Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self)
             return false;
 
-        var selected = ignoreSelected ? 0 : Data.SelectedFiles?.Count();
+        var selected = isKeyboard & Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
         switch (selected)
         {
             case 0:
@@ -360,7 +360,7 @@ internal static class FileActionLogic
         Data.FileActions.CutEnabled = isCopy;
 
         Data.FileActions.PasteEnabled = IsPasteEnabled();
-        Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
+        Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
     }
 
     public static void Rename(TextBox textBox)
@@ -643,7 +643,7 @@ internal static class FileActionLogic
 
         Data.FileActions.CopyEnabled = !Data.FileActions.IsRecycleBin && Data.FileActions.IsRegularItem && !Data.SelectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
         Data.FileActions.PasteEnabled = IsPasteEnabled();
-        Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true, true);
+        Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
         Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
                                                  && Data.SelectedFiles.Any()
