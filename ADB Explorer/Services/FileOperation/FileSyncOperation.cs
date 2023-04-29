@@ -143,7 +143,12 @@ public abstract class FileSyncOperation : FileOperation
         waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
         cancelTokenSource = new CancellationTokenSource();
 
-        operationTask = Task.Run(() => adbMethod(TargetPath.FullPath, FilePath.FullPath, ref waitingProgress, cancelTokenSource.Token), cancelTokenSource.Token);
+        string target = OperationName is OperationType.Push ? $"{TargetPath.FullPath}/{FilePath.FullName}" : TargetPath.FullPath;
+
+        operationTask = Task.Run(() =>
+        {
+            return adbMethod(target, FilePath.FullPath, ref waitingProgress, cancelTokenSource.Token);
+        }, cancelTokenSource.Token);
 
         operationTask.ContinueWith((t) => progressPollTimer.Stop());
 
