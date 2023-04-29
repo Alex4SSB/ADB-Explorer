@@ -45,6 +45,15 @@ internal class FileHelper
         return !IsHiddenRecycleItem(fileClass);
     };
 
+    public static Predicate<object> PkgFilter() => pkg =>
+    {
+        if (pkg is not Package)
+            return false;
+        
+        return string.IsNullOrEmpty(Data.FileActions.ExplorerFilter)
+            || pkg.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase);
+    };
+
     public static bool IsHiddenRecycleItem(FileClass file)
     {
         if (AdbExplorerConst.RECYCLE_PATHS.Contains(file.FullPath))

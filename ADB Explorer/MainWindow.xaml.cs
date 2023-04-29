@@ -248,7 +248,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.ExplorerSource):
                     ExplorerGrid.ItemsSource = RuntimeSettings.ExplorerSource;
-                    FilterHiddenFiles();
+                    FilterExplorerItems();
                     break;
 
                 case nameof(AppRuntimeSettings.FilterDrives):
@@ -309,7 +309,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else if (e.PropertyName == nameof(FileActionsEnable.ExplorerFilter))
         {
-            FilterHiddenFiles();
+            FilterExplorerItems();
         }
         else if (e.PropertyName == nameof(FileActionsEnable.ItemToSelect) && FileActions.ItemToSelect is not null)
         {
@@ -374,14 +374,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 AdbHelper.EnableMdns();
                 break;
             case nameof(AppSettings.ShowHiddenItems):
-                FilterHiddenFiles();
+                FilterExplorerItems();
                 break;
             case nameof(AppSettings.ShowSystemPackages):
                 if (DevicesObject.Current is null)
                     return;
 
                 if (FileActions.IsExplorerVisible)
-                    FilterHiddenFiles();
+                    FilterExplorerItems();
                 else
                     FileActionLogic.UpdatePackages();
                 break;
@@ -1307,7 +1307,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DriveHelper.ClearSelectedDrives();
     }
 
-    private void FilterHiddenFiles()
+    private void FilterExplorerItems()
     {
         //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
@@ -1321,7 +1321,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (FileActions.IsAppDrive)
         {
             collectionView.Filter = Settings.ShowSystemPackages
-                ? new(pkg => pkg.ToString().Contains(FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
+                ? new(FileHelper.PkgFilter())
                 : new(pkg => ((Package)pkg).Type is Package.PackageType.User);
 
             ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
