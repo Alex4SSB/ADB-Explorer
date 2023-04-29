@@ -515,7 +515,10 @@ internal static class FileActionLogic
             App.Current.Dispatcher.Invoke(async () =>
             {
                 if (await Data.DevicesObject.Current?.UpdateDrives(await t, App.Current.Dispatcher, asyncClasify))
+                {
                     Data.RuntimeSettings.FilterDrives = true;
+                    FolderHelper.CombineDisplayNames();
+                }
             });
         });
     }
