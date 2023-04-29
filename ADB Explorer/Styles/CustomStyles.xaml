@@ -798,4 +798,20 @@
             </Trigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="ListViewItemContainerStyle" TargetType="ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListViewItem">
+                    <ContentPresenter />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <ItemsPanelTemplate x:Key="HorizontalListViewPanelTemplate">
+        <WrapPanel
+            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
+            ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
+            ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
+    </ItemsPanelTemplate>
 </ResourceDictionary>

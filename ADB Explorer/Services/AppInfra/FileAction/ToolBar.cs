@@ -246,9 +246,11 @@ internal static class SettingsPaneMenu
 
 internal static class EditorControls
 {
-    public static ObservableList<ActionMenu> List { get; } = new()
+    public static ObservableList<ActionButton> List { get; } = new()
     {
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor), "\uE711"),
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor), "\uE74E"),
+        new ActionAccentButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
+            "\uE711"),
+        new ActionAccentButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor),
+            "\uE74E"),
     };
 }

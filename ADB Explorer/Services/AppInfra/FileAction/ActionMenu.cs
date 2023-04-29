@@ -4,7 +4,31 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-internal abstract class ActionMenu : ViewModelBase
+internal abstract class ActionBase : ViewModelBase
+{
+    public FileAction Action { get; }
+
+    public string Icon { get; }
+
+    public int IconSize { get; }
+
+    public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
+
+    protected ActionBase(FileAction action, string icon, int iconSize)
+    {
+        if (this is not SubMenu)
+            StyleHelper.VerifyIcon(ref icon);
+
+        Action = action;
+        Icon = icon;
+        IconSize = iconSize;
+    }
+
+    protected ActionBase()
+    { }
+}
+
+internal abstract class ActionMenu : ActionBase
 {
     public enum AnimationSource
     {
@@ -16,12 +40,6 @@ internal abstract class ActionMenu : ViewModelBase
 
     #region Full properties
 
-    public FileAction Action { get; }
-
-    public string Icon { get; }
-
-    public int IconSize { get; }
-    
     public IEnumerable<SubMenu> Children { get; }
     
     public StyleHelper.ContentAnimation Animation { get; }
@@ -39,28 +57,21 @@ internal abstract class ActionMenu : ViewModelBase
 
     public bool AnimateOnClick => ActionAnimationSource is AnimationSource.Click;
 
-    public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
-
     protected ActionMenu(FileAction fileAction,
                          string icon,
                          IEnumerable<SubMenu> children = null,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command)
+        : base(fileAction, icon, iconSize)
     {
-        if (this is not SubMenu)
-            StyleHelper.VerifyIcon(ref icon);
-
-        Icon = icon;
         Animation = animation;
-        IconSize = iconSize;
         Children = children;
         ActionAnimationSource = animationSource;
-        Action = fileAction;
 
         if (animationSource is AnimationSource.Command)
         {
-            ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
+            ((CommandHandler)fileAction.Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
             {
                 if (!Data.Settings.IsAnimated)
                     return;
@@ -235,5 +246,19 @@ internal class SubMenuSeparator : SubMenu
 
     public SubMenuSeparator(Func<bool> canExecute)
         : base(new(FileAction.FileActionType.None, canExecute, () => { }), "")
+    { }
+}
+
+internal class ActionButton : ActionBase
+{
+    public ActionButton(FileAction action, string icon, int iconSize = 16)
+        : base(action, icon, iconSize)
+    { }
+}
+
+internal class ActionAccentButton : ActionButton
+{
+    public ActionAccentButton(FileAction action, string icon, int iconSize = 16)
+        : base(action, icon, iconSize)
     { }
 }

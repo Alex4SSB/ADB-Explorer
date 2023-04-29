@@ -72,24 +72,13 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <ItemsPanelTemplate x:Key="DrivePanelTemplate">
-        <WrapPanel
-            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
-            ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
-            ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
-    </ItemsPanelTemplate>
-    <Style x:Key="DriveContainerStyle" TargetType="ListViewItem">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+    <Style
+        x:Key="DriveContainerStyle"
+        BasedOn="{StaticResource ListViewItemContainerStyle}"
+        TargetType="ListViewItem">
         <Setter Property="Margin" Value="5" />
         <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
         <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ListViewItem">
-                    <ContentPresenter />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
     </Style>
     <DataTemplate x:Key="LogicalDriveTemplate">
         <views:LogicalDriveControl />
@@ -107,7 +96,7 @@
         TargetType="ListView">
         <Setter Property="Margin" Value="10,10,10,0" />
         <Setter Property="SelectionMode" Value="Single" />
-        <Setter Property="ItemsPanel" Value="{StaticResource DrivePanelTemplate}" />
+        <Setter Property="ItemsPanel" Value="{StaticResource HorizontalListViewPanelTemplate}" />
         <Setter Property="ItemTemplateSelector" Value="{StaticResource DriveTemplateSelector}" />
         <Setter Property="ItemContainerStyle" Value="{StaticResource DriveContainerStyle}" />
     </Style>
