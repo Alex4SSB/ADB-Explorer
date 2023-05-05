@@ -496,7 +496,7 @@ public static class DeviceHelper
         FileHelper.ClearCutFiles();
         Data.RuntimeSettings.FilterDrives = true;
 
-        Data.RuntimeSettings.CurrentBatteryContext = Data.DevicesObject.Current;
+        Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;
         Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
         FileActionLogic.UpdateFileActions();

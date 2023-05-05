@@ -756,7 +756,9 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
-        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}" />
         <Setter Property="Visibility" Value="Collapsed" />
         <Style.Triggers>
             <MultiDataTrigger>
@@ -770,6 +772,32 @@
             </MultiDataTrigger>
             <DataTrigger Binding="{Binding ElementName=NavigationBox, Path=Mode}" Value="None">
                 <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="EmptyFolderAltPromptStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                <Setter Property="Text" Value="This folder is empty." />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <Setter Property="Text" Value="Unable to get list." />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
+                <Setter Property="Text" Value="No items match current filter." />
             </DataTrigger>
         </Style.Triggers>
     </Style>

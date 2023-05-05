@@ -593,7 +593,7 @@ internal static class FileActionLogic
         {
             Data.CurrentDisplayNames.Clear();
             Data.CurrentPath = null;
-            Data.RuntimeSettings.CurrentBatteryContext = null;
+            Data.RuntimeSettings.CurrentDevice = null;
             Data.FileActions.PushPackageEnabled = false;
 
             Data.RuntimeSettings.ClearNavBox = true;

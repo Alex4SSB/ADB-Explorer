@@ -491,70 +491,18 @@
                         </Button>
                     </ui:SimpleStackPanel>
                     <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
-                        <Grid>
-                            <Grid.Style>
-                                <Style TargetType="Grid">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Grid.Style>
-                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top">
-                                <StackPanel.Style>
-                                    <Style TargetType="StackPanel">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </StackPanel.Style>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="This folder " />
-                                    <TextBlock FontStyle="Italic" Text="looks" />
-                                    <TextBlock Text=" empty" />
-                                </StackPanel>
-                                <TextBlock
-                                    HorizontalAlignment="Center"
-                                    FontSize="10"
-                                    Text="... to the naked eye" />
+                        <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="This folder " />
+                                <TextBlock FontStyle="Italic" Text="looks" />
+                                <TextBlock Text=" empty" />
                             </StackPanel>
                             <TextBlock
                                 HorizontalAlignment="Center"
-                                VerticalAlignment="Top"
-                                Text="This folder is empty.">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </Grid>
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Top"
-                            Text="Unable to get list.">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                                FontSize="10"
+                                Text="... to the naked eye" />
+                        </StackPanel>
+                        <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
                     </Grid>
                 </Grid>
             </Border>
@@ -715,7 +663,7 @@
                     <ui:SimpleStackPanel
                         x:Name="CurrentDeviceDetailsPanel"
                         VerticalAlignment="Center"
-                        DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentBatteryContext}"
+                        DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}"
                         Orientation="Horizontal"
                         Spacing="6">
                         <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />
