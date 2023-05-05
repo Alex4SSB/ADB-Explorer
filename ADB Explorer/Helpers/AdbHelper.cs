@@ -90,7 +90,7 @@ internal static class AdbHelper
                             SettingsHelper.ResetAppAction();
                     }
                     else
-                        DialogService.ShowMessage(Strings.S_MISSING_REDIRECTION(e.Message), Strings.S_MISSING_REDIRECTION_TITLE, DialogService.DialogIcon.Critical);
+                        DialogService.ShowMessage(Strings.S_MISSING_REDIRECTION(e.Message), Strings.S_MISSING_REDIRECTION_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
 
                     Data.FileActions.PushPullEnabled = false;
                 });

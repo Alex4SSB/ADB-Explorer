@@ -64,67 +64,90 @@
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <ScrollViewer
-                                                    x:Name="ContentScrollViewer"
-                                                    Margin="{DynamicResource ContentDialogContentScrollViewerMargin}"
-                                                    HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                                                    IsTabStop="False"
-                                                    VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="Auto" />
-                                                            <RowDefinition Height="*" />
-                                                        </Grid.RowDefinitions>
-                                                        <ContentControl
-                                                            x:Name="Title"
-                                                            Margin="{DynamicResource ContentDialogTitleMargin}"
-                                                            HorizontalAlignment="Left"
-                                                            VerticalAlignment="Top"
-                                                            Content="{TemplateBinding Title}"
-                                                            ContentTemplate="{TemplateBinding TitleTemplate}"
-                                                            FontFamily="{DynamicResource {x:Static SystemFonts.MessageFontFamilyKey}}"
-                                                            FontSize="20"
-                                                            FontWeight="Normal"
-                                                            Foreground="{TemplateBinding Foreground}"
-                                                            IsTabStop="False"
-                                                            SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                                                            <ContentControl.Template>
-                                                                <ControlTemplate TargetType="ContentControl">
-                                                                    <ui:ContentPresenterEx
-                                                                        Margin="{TemplateBinding Padding}"
-                                                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                                                        Content="{TemplateBinding Content}"
-                                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                        TextWrapping="Wrap" />
-                                                                </ControlTemplate>
-                                                            </ContentControl.Template>
-                                                        </ContentControl>
-                                                        <Grid Grid.Row="1">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="Auto" />
-                                                                <ColumnDefinition />
-                                                            </Grid.ColumnDefinitions>
-                                                            <ui:FontIcon
-                                                                Margin="0,8,8,0"
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition />
+                                                        <RowDefinition Height="Auto" />
+                                                    </Grid.RowDefinitions>
+                                                    <ScrollViewer
+                                                        x:Name="ContentScrollViewer"
+                                                        Margin="{DynamicResource ContentDialogContentScrollViewerMargin}"
+                                                        HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                                        IsTabStop="False"
+                                                        VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="Auto" />
+                                                                <RowDefinition Height="*" />
+                                                            </Grid.RowDefinitions>
+                                                            <ContentControl
+                                                                x:Name="Title"
+                                                                Margin="{DynamicResource ContentDialogTitleMargin}"
+                                                                HorizontalAlignment="Left"
                                                                 VerticalAlignment="Top"
-                                                                FontSize="28"
-                                                                Glyph="{TemplateBinding helpers:TextHelper.AltText}" />
-                                                            <ui:ContentPresenterEx
-                                                                x:Name="Content"
-                                                                Grid.Column="1"
-                                                                Margin="0,8,0,0"
-                                                                VerticalAlignment="Bottom"
-                                                                Content="{TemplateBinding Content}"
-                                                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                                                TextElement.FontFamily="{DynamicResource ContentControlThemeFontFamily}"
-                                                                TextElement.FontSize="{DynamicResource ControlContentThemeFontSize}"
-                                                                TextElement.Foreground="{TemplateBinding Foreground}"
-                                                                TextWrapping="Wrap" />
+                                                                Content="{TemplateBinding Title}"
+                                                                ContentTemplate="{TemplateBinding TitleTemplate}"
+                                                                FontFamily="{DynamicResource {x:Static SystemFonts.MessageFontFamilyKey}}"
+                                                                FontSize="20"
+                                                                FontWeight="Normal"
+                                                                Foreground="{TemplateBinding Foreground}"
+                                                                IsTabStop="False"
+                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                                                                <ContentControl.Template>
+                                                                    <ControlTemplate TargetType="ContentControl">
+                                                                        <ui:ContentPresenterEx
+                                                                            Margin="{TemplateBinding Padding}"
+                                                                            HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                                            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                            Content="{TemplateBinding Content}"
+                                                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                            TextWrapping="Wrap" />
+                                                                    </ControlTemplate>
+                                                                </ContentControl.Template>
+                                                            </ContentControl>
+                                                            <Grid Grid.Row="1">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition />
+                                                                </Grid.ColumnDefinitions>
+                                                                <ui:FontIcon
+                                                                    Margin="0,8,8,0"
+                                                                    VerticalAlignment="Top"
+                                                                    FontSize="28"
+                                                                    Glyph="{TemplateBinding helpers:DialogHelper.DialogIcon}" />
+                                                                <ui:ContentPresenterEx
+                                                                    x:Name="Content"
+                                                                    Grid.Column="1"
+                                                                    Margin="0,8,0,0"
+                                                                    VerticalAlignment="Bottom"
+                                                                    Content="{TemplateBinding Content}"
+                                                                    ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                                    TextElement.FontFamily="{DynamicResource ContentControlThemeFontFamily}"
+                                                                    TextElement.FontSize="{DynamicResource ControlContentThemeFontSize}"
+                                                                    TextElement.Foreground="{TemplateBinding Foreground}"
+                                                                    TextWrapping="Wrap" />
+                                                            </Grid>
                                                         </Grid>
-                                                    </Grid>
-                                                </ScrollViewer>
+                                                    </ScrollViewer>
+                                                    <ui:FontIcon
+                                                        Grid.Row="1"
+                                                        Margin="0,10,-20,-18"
+                                                        HorizontalAlignment="Right"
+                                                        VerticalAlignment="Bottom"
+                                                        Glyph="&#xF0E3;"
+                                                        ToolTip="Message copied to clipboard">
+                                                        <ui:FontIcon.Style>
+                                                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:ContentDialog}, Path=(helpers:DialogHelper.IsClipboardIconVisible)}" Value="False">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </ui:FontIcon.Style>
+                                                    </ui:FontIcon>
+                                                </Grid>
                                             </Border>
                                             <Grid
                                                 x:Name="CommandSpace"
@@ -434,7 +457,8 @@
 
     <Style BasedOn="{StaticResource DefaultContentDialogStyle}" TargetType="ui:ContentDialog">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="helpers:TextHelper.AltText" Value="" />
+        <Setter Property="helpers:DialogHelper.DialogIcon" Value="" />
+        <Setter Property="helpers:DialogHelper.IsClipboardIconVisible" Value="False" />
         <Style.Resources>
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Style.Triggers>

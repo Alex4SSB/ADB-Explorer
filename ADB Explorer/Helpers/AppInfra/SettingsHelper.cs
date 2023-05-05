@@ -65,7 +65,7 @@ internal static class SettingsHelper
 
             if (message != "")
             {
-                DialogService.ShowMessage(message, Strings.S_FAIL_OVERRIDE_TITLE, DialogService.DialogIcon.Exclamation);
+                DialogService.ShowMessage(message, Strings.S_FAIL_OVERRIDE_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
                 return;
             }
 

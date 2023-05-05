@@ -99,7 +99,7 @@ internal static class FileActionLogic
             catch (Exception e)
             {
                 App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation));
+                    DialogService.ShowMessage(e.Message, Strings.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
                 return "";
             }
@@ -131,7 +131,7 @@ internal static class FileActionLogic
             catch (Exception e)
             {
                 App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation));
+                    DialogService.ShowMessage(e.Message, Strings.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
                 return false;
             }
@@ -246,7 +246,7 @@ internal static class FileActionLogic
         }
         catch (Exception e)
         {
-            DialogService.ShowMessage(e.Message, Strings.S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical);
+            DialogService.ShowMessage(e.Message, Strings.S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
             Data.DirList.FileList.Remove(file);
             throw;
         }
@@ -750,7 +750,7 @@ internal static class FileActionLogic
             }
             catch (Exception e)
             {
-                DialogService.ShowMessage(e.Message, Strings.S_DEST_ERR, DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(e.Message, Strings.S_DEST_ERR, DialogService.DialogIcon.Critical, copyToClipboard: true);
                 return;
             }
         }

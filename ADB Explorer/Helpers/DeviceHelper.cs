@@ -108,7 +108,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
                 return;
             }
         }
@@ -120,7 +120,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical);
+                DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
                 return;
             }
         }
@@ -161,7 +161,7 @@ public static class DeviceHelper
 
         if (device.Root is RootStatus.Forbidden)
         {
-            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_ROOT_FORBID, Strings.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical));
+            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_ROOT_FORBID, Strings.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
         }
     }
 
@@ -309,7 +309,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical));
+                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
 
@@ -353,7 +353,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical));
+                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
         }).ContinueWith((t) =>
@@ -391,7 +391,7 @@ public static class DeviceHelper
                     Data.DevicesObject.NewDevice.EnablePairing();
                 }
                 else
-                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical));
+                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
 
                 return false;
             }

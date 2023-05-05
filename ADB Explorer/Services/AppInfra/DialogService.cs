@@ -28,7 +28,7 @@ public static class DialogService
 
     private static readonly ContentDialog windowDialog = new();
 
-    public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true, bool hidePanes = true)
+    public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true, bool hidePanes = true, bool copyToClipboard = false)
     {
         if (censorContent)
         {
@@ -38,7 +38,10 @@ public static class DialogService
             }
         }
 
-        ShowDialog(content, title, icon, hidePanes);
+        if (copyToClipboard)
+            Clipboard.SetText(content);
+
+        ShowDialog(content, title, icon, hidePanes, copyToClipboard);
     }
 
     private static void HidePanes()
@@ -47,13 +50,14 @@ public static class DialogService
         Data.RuntimeSettings.IsDevicesPaneOpen = false;
     }
 
-    public static void ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true)
+    public static void ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true, bool copyToClipboard = false)
     {
         windowDialog.Content = content;
         windowDialog.Title = title;
         windowDialog.PrimaryButtonText = null;
         windowDialog.CloseButtonText = "Ok";
-        TextHelper.SetAltText(windowDialog, Icon(icon));
+        DialogHelper.SetDialogIcon(windowDialog, Icon(icon));
+        DialogHelper.SetIsClipboardIconVisible(windowDialog, copyToClipboard);
 
         if (hidePanes)
             HidePanes();
@@ -125,7 +129,7 @@ public static class DialogService
         windowDialog.DefaultButton = ContentDialogButton.Primary;
         windowDialog.SecondaryButtonText = secondaryText;
         windowDialog.CloseButtonText = cancelText;
-        TextHelper.SetAltText(windowDialog, Icon(icon));
+        DialogHelper.SetDialogIcon(windowDialog, Icon(icon));
 
         if (hidePanes)
             HidePanes();

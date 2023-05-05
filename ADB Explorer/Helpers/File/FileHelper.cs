@@ -70,7 +70,7 @@ internal class FileHelper
         var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Data.Settings.ShowExtensions ? "" : file.Extension)}";
         if (Data.DirList.FileList.Any(file => file.FullName == newName))
         {
-            DialogService.ShowMessage(Strings.S_PATH_EXIST(newPath), Strings.S_RENAME_CONF_TITLE, DialogService.DialogIcon.Exclamation);
+            DialogService.ShowMessage(Strings.S_PATH_EXIST(newPath), Strings.S_RENAME_CONF_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
             return;
         }
 
@@ -80,7 +80,7 @@ internal class FileHelper
         }
         catch (Exception e)
         {
-            DialogService.ShowMessage(e.Message, Strings.S_RENAME_ERR_TITLE, DialogService.DialogIcon.Critical);
+            DialogService.ShowMessage(e.Message, Strings.S_RENAME_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
             throw;
         }
 
