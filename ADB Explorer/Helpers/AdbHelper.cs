@@ -112,7 +112,7 @@ internal static class AdbHelper
         });
     }
 
-    public static void EnableMdns() => App.Current.Dispatcher.Invoke(() =>
+    public static void EnableMdns() => App.Current.Dispatcher.Invoke(async () =>
     {
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
         if (Data.Settings.EnableMdns)
@@ -121,6 +121,18 @@ internal static class AdbHelper
         }
         else
         {
+            if (Data.MdnsService.State is MDNS.MdnsState.Running)
+            {
+                var result = await DialogService.ShowConfirmation(Strings.S_DISABLE_MDNS,
+                                                                  Strings.S_DISABLE_MDNS_TITLE,
+                                                                  "Restart ADB Now",
+                                                                  cancelText: "Restart Later",
+                                                                  icon: DialogService.DialogIcon.Informational);
+
+                if (result.Item1 is ContentDialogResult.Primary)
+                    ADBService.KillAdbServer();
+            }
+
             Data.QrClass = null;
             Data.MdnsService.State = MDNS.MdnsState.Disabled;
         }

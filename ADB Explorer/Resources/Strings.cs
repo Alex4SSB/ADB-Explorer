@@ -65,6 +65,8 @@ public static class Strings
     public const string S_READ_FILE_ERROR = "Could not pull file in order to read it.";
     public const string S_WRITE_FILE_ERROR_TITLE = "Error Writing File";
     public const string S_WRITE_FILE_ERROR = "Could not push file back to device.";
+    public const string S_DISABLE_MDNS = "ADB server needs to be restarted in order to disable mDNS.";
+    public const string S_DISABLE_MDNS_TITLE = "Disable mDNS";
 
 
     public static string S_MISSING_REDIRECTION(string exception) =>
