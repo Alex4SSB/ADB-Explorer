@@ -130,6 +130,7 @@ public static class DialogService
         windowDialog.SecondaryButtonText = secondaryText;
         windowDialog.CloseButtonText = cancelText;
         DialogHelper.SetDialogIcon(windowDialog, Icon(icon));
+        DialogHelper.SetIsClipboardIconVisible(windowDialog, false);
 
         if (hidePanes)
             HidePanes();

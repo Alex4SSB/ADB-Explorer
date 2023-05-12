@@ -9,6 +9,7 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:HistoryDeviceViewModel}"
+    d:Width="200"
     mc:Ignorable="d">
     <Expander d:IsExpanded="True">
         <Expander.Style>
@@ -77,63 +78,84 @@
             </Border>
         </Expander.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
-            <ui:SimpleStackPanel Spacing="6">
-                <ui:SimpleStackPanel
-                    Margin="4,0"
-                    Orientation="Horizontal"
-                    Spacing="6">
-                    <TextBlock
-                        Margin="0,-5"
-                        VerticalAlignment="Top"
-                        Style="{StaticResource BlueDotTextBlockStyle}" />
-                    <TextBlock>
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Text" Value="IP Address" />
+            <ui:SimpleStackPanel Style="{StaticResource NewDeviceStackPanelStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE774;" ToolTip="IP Address / Host Name" />
+                    <TextBox
+                        Grid.Column="1"
+                        Padding="4,5,0,6"
+                        d:Background="LightGray"
+                        IsReadOnly="True">
+                        <TextBox.Style>
+                            <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                                <Setter Property="Text" Value="{Binding IpAddress}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
-                                        <Setter Property="Text" Value="Host Name" />
+                                        <Setter Property="Text" Value="{Binding HostName}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                </ui:SimpleStackPanel>
-                <TextBox IsReadOnly="True">
-                    <TextBox.Style>
-                        <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
-                            <Setter Property="Text" Value="{Binding IpAddress}" />
+                        </TextBox.Style>
+                    </TextBox>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE177;" ToolTip="Port" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
+                </Grid>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Separator">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
-                                    <Setter Property="Text" Value="{Binding HostName}" />
+                                <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </TextBox.Style>
-                </TextBox>
-                <ui:SimpleStackPanel
-                    Margin="4,0"
-                    Orientation="Horizontal"
-                    Spacing="6">
-                    <TextBlock
-                        Margin="0,-5"
-                        VerticalAlignment="Top"
-                        Style="{StaticResource BlueDotTextBlockStyle}" />
-                    <TextBlock Text="Port" />
-                </ui:SimpleStackPanel>
-                <Grid>
+                    </Grid.Resources>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <controls:MaskedTextBox Style="{StaticResource MaskedPortBoxStyle}" />
+                    <Separator />
                     <Button
                         Grid.Column="1"
-                        Margin="8,0,2,0"
-                        Padding="14,5,14,6"
-                        HorizontalAlignment="Stretch"
-                        Command="{Binding ConnectCommand.Command}"
-                        Content="Connect" />
+                        Margin="4,0"
+                        Style="{StaticResource ConnectNewDeviceButtonStyle}" />
+                    <Separator Grid.Column="2" />
+                </Grid>
+                <Grid Style="{StaticResource NewDevicePairingGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="Pairing Code" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
+                </Grid>
+                <Grid Style="{StaticResource NewDevicePairingGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid Margin="-1,0,4,0">
+                        <ui:FontIcon
+                            Margin="0"
+                            Glyph="&#xE177;"
+                            ToolTip="Pairing Port" />
+                        <ui:FontIcon
+                            Glyph="&#xEA21;"
+                            Style="{StaticResource NewDevicePairingPortAsteriskStyle}"
+                            ToolTip="Pairing Port" />
+                    </Grid>
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
                 </Grid>
             </ui:SimpleStackPanel>
         </Grid>

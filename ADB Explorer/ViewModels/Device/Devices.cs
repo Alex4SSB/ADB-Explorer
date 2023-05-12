@@ -20,6 +20,8 @@ public class Devices : AbstractDevice
 
     public List<string> RootDevices { get; protected set; } = new();
 
+    public NewDeviceViewModel CurrentNewDevice { get; set; }
+
     #endregion
 
     #region Read only lists
@@ -34,8 +36,6 @@ public class Devices : AbstractDevice
 
     public LogicalDeviceViewModel Current => LogicalDeviceViewModels?.FirstOrDefault(device => device.IsOpen)
         ?? Data.RuntimeSettings.DeviceToOpen;
-
-    public NewDeviceViewModel NewDevice => UIList.OfType<NewDeviceViewModel>().First();
 
     public int Count => UIList.Count(d => d.DeviceExists);
 

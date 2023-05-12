@@ -57,12 +57,7 @@
             </Grid>
         </Expander.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
-            <ui:SimpleStackPanel Spacing="8">
-                <ui:SimpleStackPanel.Resources>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                        <Setter Property="Margin" Value="-1,0,4,0" />
-                    </Style>
-                </ui:SimpleStackPanel.Resources>
+            <ui:SimpleStackPanel Style="{StaticResource NewDeviceStackPanelStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -116,7 +111,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Margin="-1,0,4,0">
                         <ui:FontIcon
-                            Margin="0,0,0,0"
+                            Margin="0"
                             Glyph="&#xE177;"
                             ToolTip="Pairing Port" />
                         <ui:FontIcon

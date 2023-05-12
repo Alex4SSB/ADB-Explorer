@@ -173,7 +173,7 @@ public static class DeviceHelper
             if (!device.IsIpAddressValid && !device.IsHostNameValid)
                 return false;
 
-            if (device is not null and not HistoryDeviceViewModel
+            if (device is not null
                 && device.IsPairingEnabled
                 && (!device.IsPairingCodeValid || !device.IsPairingPortValid))
                 return false;
@@ -385,10 +385,9 @@ public static class DeviceHelper
             catch (Exception ex)
             {
                 if (ex.Message.Contains(Strings.S_FAILED_CONN + dev.ConnectAddress)
-                    && dev.Type is DeviceType.New
                     && !((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
                 {
-                    Data.DevicesObject.NewDevice.EnablePairing();
+                    Data.DevicesObject.CurrentNewDevice.EnablePairing();
                 }
                 else
                     App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
@@ -405,7 +404,7 @@ public static class DeviceHelper
                 if (t.Result)
                 {
                     string newDeviceAddress = "";
-                    var newDevice = Data.RuntimeSettings.ConnectNewDevice is null ? Data.DevicesObject.NewDevice : Data.RuntimeSettings.ConnectNewDevice;
+                    var newDevice = Data.RuntimeSettings.ConnectNewDevice is null ? Data.DevicesObject.CurrentNewDevice : Data.RuntimeSettings.ConnectNewDevice;
 
                     if (newDevice.Type is DeviceType.New)
                     {
@@ -534,6 +533,7 @@ public static class DeviceHelper
     public static void ConnectDevice(DeviceViewModel device)
     {
         Data.RuntimeSettings.IsManualPairingInProgress = true;
+        Data.DevicesObject.CurrentNewDevice = (NewDeviceViewModel)device;
 
         if (device is NewDeviceViewModel newDevice && newDevice.IsPairingEnabled)
             PairNewDevice();

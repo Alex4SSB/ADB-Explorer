@@ -467,4 +467,12 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="NewDeviceStackPanelStyle" TargetType="ui:SimpleStackPanel">
+        <Style.Resources>
+            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                <Setter Property="Margin" Value="-1,0,4,0" />
+            </Style>
+        </Style.Resources>
+        <Setter Property="Spacing" Value="8" />
+    </Style>
 </ResourceDictionary>
