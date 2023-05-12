@@ -5,16 +5,12 @@ namespace ADB_Explorer.Services;
 
 public static class ShellFileOperation
 {
-    public static void SilentDelete(ADBService.AdbDevice device, FilePath item) => SilentDelete(device, new List<FilePath>() { item });
-
-    public static void SilentDelete(ADBService.AdbDevice device, string fullPath)
-    {
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, "-rf", ADBService.EscapeAdbShellString(fullPath));
-    }
-
     public static void SilentDelete(ADBService.AdbDevice device, IEnumerable<FilePath> items)
+        => SilentDelete(device, items.Select(item => item.FullPath).ToArray());
+
+    public static void SilentDelete(ADBService.AdbDevice device, params string[] items)
     {
-        var args = new[] { "-rf" }.Concat(GetEscapedPaths(items)).ToArray();
+        var args = new[] { "-rf" }.Concat(items.Select(item => ADBService.EscapeAdbShellString(item))).ToArray();
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, args);
     }
 
@@ -60,7 +56,7 @@ public static class ShellFileOperation
         {
             foreach (var item in items)
             {
-                if (AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath))
+                if (((FileClass)item).Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
                     continue;
 
                 Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList));
@@ -135,8 +131,6 @@ public static class ShellFileOperation
 
         return stdout;
     }
-
-    public static IEnumerable<string> GetEscapedPaths(IEnumerable<FilePath> items) => items.Select(item => ADBService.EscapeAdbShellString(item.FullPath)).ToArray();
 
     public static async Task MoveItems(bool isCopy,
                                        string targetPath,

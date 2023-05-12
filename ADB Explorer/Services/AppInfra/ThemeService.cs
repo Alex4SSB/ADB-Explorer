@@ -1,6 +1,8 @@
-﻿namespace ADB_Explorer.Services;
+﻿using ADB_Explorer.ViewModels;
 
-internal class ThemeService : INotifyPropertyChanged
+namespace ADB_Explorer.Services;
+
+internal class ThemeService : ViewModelBase
 {
     //https://medium.com/southworks/handling-dark-light-modes-in-wpf-3f89c8a4f2db
 
@@ -18,11 +20,7 @@ internal class ThemeService : INotifyPropertyChanged
 
             return windowsTheme.Value;
         }
-        set
-        {
-            windowsTheme = value;
-            NotifyPropertyChanged();
-        }
+        set => Set(ref windowsTheme, value);
     }
 
     public void WatchTheme()
@@ -47,10 +45,6 @@ internal class ThemeService : INotifyPropertyChanged
         using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
         return (key?.GetValue(RegistryValueName)) is int and < 1 ? ApplicationTheme.Dark : ApplicationTheme.Light;
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 internal static class MonitorInfo

@@ -316,6 +316,15 @@ public partial class ADBService
         return ulong.TryParse(stdout, out var count) ? count : 0;
     }
 
+    public static string[] FindFilesInPath(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
+    {
+        string[] args = PrepFindArgs(path, includeNames, excludeNames, false);
+
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, args);
+
+        return stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+    }
+
     public static string[] FindFiles(string deviceID, IEnumerable<string> paths)
     {
         ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
@@ -364,7 +373,7 @@ public partial class ADBService
 
     public static long CountRecycle(string deviceID)
     {
-        return (long)CountFiles(deviceID, RECYCLE_PATH, excludeNames: RECYCLE_INDEXES);
+        return (long)CountFiles(deviceID, RECYCLE_PATH, excludeNames: new[] { "*" + RECYCLE_INDEX_SUFFIX });
     }
 
     public static ulong CountPackages(string deviceID)

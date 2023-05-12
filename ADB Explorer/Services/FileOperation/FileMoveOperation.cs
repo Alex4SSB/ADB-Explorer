@@ -14,6 +14,7 @@ public class FileMoveOperation : FileOperation
     private string fullTargetPath;
     private readonly string currentPath;
     private string recycleName;
+    private string indexerPath;
     private DateTime? dateModified;
 
     public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false)
@@ -56,6 +57,7 @@ public class FileMoveOperation : FileOperation
                 recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
                 fullTargetPath = $"{targetParent}{recycleName}";
                 dateModified = ((FileClass)FilePath).ModifiedTime;
+                indexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{recycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
             }
             else
                 fullTargetPath = $"{targetParent}{targetName}";
@@ -82,7 +84,7 @@ public class FileMoveOperation : FileOperation
                 {
                     case OperationType.Recycle:
                         var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
-                        ShellFileOperation.WriteLine(Device, AdbExplorerConst.RECYCLE_INDEX_PATH, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
+                        ShellFileOperation.WriteLine(Device, indexerPath, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
                         break;
                     default:
                         break;
@@ -118,11 +120,14 @@ public class FileMoveOperation : FileOperation
                     {
                         FileActionLogic.RemoveFile((FileClass)FilePath);
                     }
+
+                    if (OperationName is OperationType.Restore)
+                        ShellFileOperation.SilentDelete(Device, indexerPath);
                 });
             }
             else if (OperationName is OperationType.Recycle)
             {
-                ShellFileOperation.SilentDelete(Device, fullTargetPath);
+                ShellFileOperation.SilentDelete(Device, fullTargetPath, indexerPath);
             }
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);

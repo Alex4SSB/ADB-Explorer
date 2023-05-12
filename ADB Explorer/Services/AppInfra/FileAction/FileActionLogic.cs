@@ -216,6 +216,15 @@ internal static class FileActionLogic
                                          fileList: Data.DirList.FileList,
                                          dispatcher: App.Current.Dispatcher);
 
+                var remainingItems = Data.DirList.FileList.Except(restoreItems);
+                TrashHelper.EnableRecycleButtons(remainingItems);
+
+                // Clear all remaining files if none of them are indexed
+                if (!remainingItems.Any(item => item.TrashIndex is not null))
+                {
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.CurrentADBDevice, remainingItems));
+                }
+
                 if (!Data.SelectedFiles.Any())
                     TrashHelper.EnableRecycleButtons();
             });
@@ -400,7 +409,7 @@ internal static class FileActionLogic
         IEnumerable<FileClass> itemsToDelete;
         if (Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any())
         {
-            itemsToDelete = Data.DirList.FileList.Where(f => !AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(f.FullPath));
+            itemsToDelete = Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX);
         }
         else
         {
@@ -448,10 +457,13 @@ internal static class FileActionLogic
 
             if (Data.FileActions.IsRecycleBin)
             {
-                TrashHelper.EnableRecycleButtons(Data.DirList.FileList.Except(itemsToDelete));
-                if (!Data.SelectedFiles.Any() && Data.DirList.FileList.Any(item => AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath)))
+                var remainingItems = Data.DirList.FileList.Except(itemsToDelete);
+                TrashHelper.EnableRecycleButtons(remainingItems);
+
+                // Clear all remaining files if none of them are indexed
+                if (!remainingItems.Any(item => item.TrashIndex is not null))
                 {
-                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.CurrentADBDevice, Data.DirList.FileList.Where(item => AdbExplorerConst.RECYCLE_INDEX_PATHS.Contains(item.FullPath))));
+                    _ = Task.Run(() => ShellFileOperation.SilentDelete(Data.CurrentADBDevice, remainingItems));
                 }
             }
         }

@@ -434,7 +434,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (FileActions.IsRecycleBin)
             {
                 TrashHelper.EnableRecycleButtons();
-                TrashHelper.UpdateIndexerFile();
             }
 
             if (string.IsNullOrEmpty(prevPath))
@@ -923,37 +922,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (FileActions.IsRecycleBin)
         {
             FileActions.ListingInProgress = true;
-            var recycleTask = Task.Run(() =>
-            {
-                string text = "";
-                try
-                {
-                    text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_PATH);
-                    if (string.IsNullOrEmpty(text))
-                        throw new Exception();
-                }
-                catch (Exception)
-                {
-                    try
-                    {
-                        text = ShellFileOperation.ReadAllText(CurrentADBDevice, RECYCLE_INDEX_BACKUP_PATH);
-                    }
-                    catch (Exception)
-                    { }
-                }
-
-                if (!string.IsNullOrEmpty(text))
-                {
-                    var lines = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var item in lines)
-                    {
-                        if (!RecycleIndex.Any(indexer => indexer.ToString() == item))
-                            RecycleIndex.Add(new TrashIndexer(item));
-                    }
-                }
-            });
-
-            recycleTask.ContinueWith((t) => DirList.Navigate(realPath));
+            TrashHelper.ParseIndexers().ContinueWith((t) => DirList.Navigate(realPath));
 
             DateColumn.Header = S_DATE_DEL_COL;
             FileActions.DeleteAction.Value = S_EMPTY_TRASH;
@@ -981,7 +950,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NavigateToLocation(object location, bool bfNavigated = false)
     {
-        RecycleIndex.Clear();
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
 
         if (location is string path)

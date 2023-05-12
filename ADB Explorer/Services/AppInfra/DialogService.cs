@@ -32,10 +32,7 @@ public static class DialogService
     {
         if (censorContent)
         {
-            foreach (var item in AdbExplorerConst.RECYCLE_PATHS)
-            {
-                content = content.Replace(item, "Recycle Bin");
-            }
+            content = content.Replace(AdbExplorerConst.RECYCLE_PATH, "Recycle Bin");
         }
 
         if (copyToClipboard)
@@ -115,10 +112,7 @@ public static class DialogService
 
         if (censorContent)
         {
-            foreach (var item in AdbExplorerConst.RECYCLE_PATHS)
-            {
-                content = content.Replace(item, "Recycle Bin");
-            }
+            content = content.Replace(AdbExplorerConst.RECYCLE_PATH, "Recycle Bin");
         }
 
         InitContent(content, checkBoxText);

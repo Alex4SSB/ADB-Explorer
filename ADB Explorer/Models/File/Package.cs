@@ -1,6 +1,8 @@
-﻿namespace ADB_Explorer.Models;
+﻿using ADB_Explorer.ViewModels;
 
-public class Package : INotifyPropertyChanged
+namespace ADB_Explorer.Models;
+
+public class Package : ViewModelBase
 {
     public enum PackageType
     {
@@ -61,21 +63,4 @@ public class Package : INotifyPropertyChanged
     {
         return $"{Name}\n{Type}\n{Uid}\n{Version}";
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-        {
-            return false;
-        }
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

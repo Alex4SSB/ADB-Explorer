@@ -1,6 +1,8 @@
-﻿namespace ADB_Explorer.Models;
+﻿using ADB_Explorer.ViewModels;
 
-public class TrashIndexer : INotifyPropertyChanged
+namespace ADB_Explorer.Models;
+
+public class TrashIndexer : ViewModelBase
 {
     private string recycleName;
     public string RecycleName
@@ -24,6 +26,8 @@ public class TrashIndexer : INotifyPropertyChanged
     }
 
     public string ModifiedTimeString => DateModified?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+
+    public string IndexerPath => $"{AdbExplorerConst.RECYCLE_PATH}/.{RecycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
 
     public string ParentPath
     {
@@ -63,20 +67,4 @@ public class TrashIndexer : INotifyPropertyChanged
     {
         return $"{RecycleName}|{OriginalPath}|{DateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT)}";
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-        {
-            return false;
-        }
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

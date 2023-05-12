@@ -41,6 +41,11 @@ public class FileDeleteOperation : FileOperation
 
                     fileList.Remove((FileClass)FilePath);
                 });
+
+                if (((FileClass)FilePath).TrashIndex is TrashIndexer indexer)
+                {
+                    ShellFileOperation.SilentDelete(Device, indexer.IndexerPath);
+                }
             }
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
