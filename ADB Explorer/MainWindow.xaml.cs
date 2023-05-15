@@ -396,11 +396,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 if (DevicesObject.Current is null)
                     return;
 
-                FilterDrives();
-                FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
+                FileActionLogic.UpdateFileActions();
 
                 if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
+                {
                     FileActionLogic.RefreshDrives(true);
+                    FilterDrives();
+                }
+
                 break;
             case nameof(AppSettings.SaveDevices):
                 if (Settings.SaveDevices && !DevicesObject.HistoryDeviceViewModels.Any())
