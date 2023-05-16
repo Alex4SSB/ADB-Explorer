@@ -1,8 +1,9 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public abstract class FileOperation : INotifyPropertyChanged
+public abstract class FileOperation : ViewModelBase
 {
     public enum OperationStatus
     {
@@ -32,11 +33,12 @@ public abstract class FileOperation : INotifyPropertyChanged
         get => operationType;
         protected set
         {
-            Set(ref operationType, value);
-
-            OpIcon = new(value);
-            OnPropertyChanged(nameof(CompletedStatsVisible));
-            OnPropertyChanged(nameof(FinishedIconVisible));
+            if (Set(ref operationType, value))
+            {
+                OpIcon = new(value);
+                OnPropertyChanged(nameof(CompletedStatsVisible));
+                OnPropertyChanged(nameof(FinishedIconVisible));
+            }
         }
     }
 
@@ -51,15 +53,14 @@ public abstract class FileOperation : INotifyPropertyChanged
         get => status;
         protected set
         {
-            if (Dispatcher != null && !Dispatcher.CheckAccess())
+            App.Current.Dispatcher.Invoke(() =>
             {
-                Dispatcher.Invoke(() => Status = value);
-                return;
-            }
-
-            Set(ref status, value);
-            OnPropertyChanged(nameof(CompletedStatsVisible));
-            OnPropertyChanged(nameof(FinishedIconVisible));
+                if (Set(ref status, value))
+                {
+                    OnPropertyChanged(nameof(CompletedStatsVisible));
+                    OnPropertyChanged(nameof(FinishedIconVisible));
+                }
+            });
         }
     }
 
@@ -75,16 +76,7 @@ public abstract class FileOperation : INotifyPropertyChanged
     public object StatusInfo
     {
         get => statusInfo;
-        protected set
-        {
-            if (Dispatcher != null && !Dispatcher.CheckAccess())
-            {
-                Dispatcher.Invoke(() => StatusInfo = value);
-                return;
-            }
-
-            Set(ref statusInfo, value);
-        }
+        protected set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
     }
 
     public FilePath TargetPath { get; set; }
@@ -99,21 +91,6 @@ public abstract class FileOperation : INotifyPropertyChanged
 
     public abstract void Start();
     public abstract void Cancel();
-
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-        {
-            return;
-        }
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-    }
-
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
 
 public class OperationIcon

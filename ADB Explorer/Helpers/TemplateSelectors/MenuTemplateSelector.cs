@@ -4,6 +4,7 @@ namespace ADB_Explorer.Helpers;
 
 internal class MenuTemplateSelector : DataTemplateSelector
 {
+    public DataTemplate CompoundIconMenuTemplate { get; set; }
     public DataTemplate IconMenuTemplate { get; set; }
     public DataTemplate AnimatedNotifyTemplate { get; set; }
     public DataTemplate DynamicAltTextTemplate { get; set; }
@@ -12,21 +13,21 @@ internal class MenuTemplateSelector : DataTemplateSelector
     public DataTemplate SubMenuTemplate { get; set; }
     public DataTemplate SubMenuSeparatorTemplate { get; set; }
     public DataTemplate AltObjectTemplate { get; set; }
-    public DataTemplate AltIconSubMenuTemplate { get; set; }
+    public DataTemplate CompoundIconSubMenuTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container)
     {
         return item switch
         {
             SubMenuSeparator => SubMenuSeparatorTemplate,
-            AltIconSubMenu => AltIconSubMenuTemplate,
+            CompoundIconSubMenu => CompoundIconSubMenuTemplate,
             MenuSeparator => SeparatorTemplate,
             AnimatedNotifyMenu => AnimatedNotifyTemplate,
             SubMenu or string => SubMenuTemplate,
             AltTextMenu => DynamicAltTextTemplate,
-            AltIconMenu => AltIconTemplate,
             IconMenu => IconMenuTemplate,
             AltObjectMenu => AltObjectTemplate,
+            CompoundIconMenu => CompoundIconMenuTemplate,
             _ => throw new NotSupportedException(),
         };
     }
@@ -41,22 +42,23 @@ internal class MenuStyleSelector : StyleSelector
     public Style AltIconStyle { get; set; }
     public Style SubMenuStyle { get; set; }
     public Style SubMenuSeparatorStyle { get; set; }
-    public Style AltIconSubMenuStyle { get; set; }
+    public Style CompoundIconSubMenuStyle { get; set; }
     public Style AltObjectStyle { get; set; }
+    public Style CompoundIconMenuStyle { get; set; }
 
     public override Style SelectStyle(object item, DependencyObject container)
     {
         return item switch
         {
             SubMenuSeparator => SubMenuSeparatorStyle,
-            AltIconSubMenu => AltIconSubMenuStyle,
+            CompoundIconSubMenu => CompoundIconSubMenuStyle,
             MenuSeparator => SeparatorStyle,
             AnimatedNotifyMenu => AnimatedNotifyStyle,
             SubMenu or string => SubMenuStyle,
             AltTextMenu => DynamicAltTextStyle,
-            AltIconMenu => AltIconStyle,
             IconMenu => IconMenuStyle,
             AltObjectMenu => AltObjectStyle,
+            CompoundIconMenu => CompoundIconMenuStyle,
             _ => throw new NotSupportedException(),
         };
     }

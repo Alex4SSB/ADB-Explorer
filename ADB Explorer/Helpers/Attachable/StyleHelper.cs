@@ -152,5 +152,5 @@ public static class StyleHelper
     }
 
     public static bool IsFontIcon(string icon) =>
-        icon.Length == 1 && char.GetUnicodeCategory(icon, 0) is UnicodeCategory.PrivateUse;
+        icon is null || (icon.Length == 1 && char.GetUnicodeCategory(icon, 0) is UnicodeCategory.PrivateUse);
 }

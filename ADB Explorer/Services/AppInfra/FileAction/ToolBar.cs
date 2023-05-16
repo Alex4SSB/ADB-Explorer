@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
@@ -35,15 +36,13 @@ internal static class MainToolBar
             Data.DevicesObject.ObservableCount,
             "\uE8CC"),
         new MenuSeparator(),
-        new AltIconMenu(
+        new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            "\uE8EA",
-            altIcon: "\uE974"),
-        new AltIconMenu(
+            new PullIcon()),
+         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
-            "\uE8EA",
-            altIcon: "\uE973",
-            children: new SubMenu[]
+            new PushIcon(),
+            new SubMenu[]
             {
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), "\uE8B7"),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), "\uE8A5"),
@@ -124,14 +123,12 @@ internal static class MainToolBar
 internal static class ExplorerContextMenu
 {
     public static ObservableList<SubMenu> List { get; } = new() {
-        new AltIconSubMenu(
+        new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            "\uE8EA",
-            altIcon: "\uE974"),
-        new AltIconSubMenu(
+            new PullIcon(-5)),
+        new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
-            "\uE8EA",
-            altIcon: "\uE973",
+            new PushIcon(-5),
             children: new SubMenu[]
             {
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), "\uE8B7"),

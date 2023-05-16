@@ -184,25 +184,17 @@ internal class AnimatedNotifyMenu : DynamicAltTextMenu
     { }
 }
 
-internal class AltIconMenu : ActionMenu
+internal class CompoundIconMenu : ActionMenu
 {
-    public string AltIcon { get; }
+    public UserControl CompoundIcon { get; }
 
-    public int AltIconSize { get; }
-
-    public AltIconMenu(FileAction fileAction,
-                       string icon,
-                       string altIcon,
-                       int iconSize = 18,
-                       int altIconSize = 14,
+    public CompoundIconMenu(FileAction fileAction,
+                       UserControl icon,
                        IEnumerable<SubMenu> children = null,
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
-        : base(fileAction, icon, children, animation, iconSize)
+        : base(fileAction, null, children, animation)
     {
-        StyleHelper.VerifyIcon(ref altIcon);
-
-        AltIcon = altIcon;
-        AltIconSize = altIconSize;
+        CompoundIcon = icon;
     }
 }
 
@@ -220,24 +212,16 @@ internal class SubMenu : ActionMenu
     }
 }
 
-internal class AltIconSubMenu : SubMenu
+internal class CompoundIconSubMenu : SubMenu
 {
-    public string AltIcon { get; }
+    public UserControl CompoundIcon { get; }
 
-    public int AltIconSize { get; }
-
-    public AltIconSubMenu(FileAction fileAction,
-                          string icon,
-                          string altIcon,
-                          IEnumerable<SubMenu> children = null,
-                          int iconSize = 16,
-                          int altIconSize = 12)
-        : base(fileAction, icon, children, iconSize: iconSize)
+    public CompoundIconSubMenu(FileAction fileAction,
+                          UserControl icon,
+                          IEnumerable<SubMenu> children = null)
+        : base(fileAction, null, children)
     {
-        StyleHelper.VerifyIcon(ref altIcon);
-
-        AltIcon = altIcon;
-        AltIconSize = altIconSize;
+        CompoundIcon = icon;
     }
 }
 

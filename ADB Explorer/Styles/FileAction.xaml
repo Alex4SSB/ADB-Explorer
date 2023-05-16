@@ -60,20 +60,6 @@
         x:Key="MenuIcon"
         x:Shared="False"
         Style="{StaticResource MenuIconStyle}" />
-    <Grid
-        x:Key="AltIconSubMenuPanel"
-        Margin="-3,0,-4,0"
-        x:Shared="False">
-        <ui:FontIcon
-            HorizontalAlignment="Left"
-            Glyph="{Binding Icon}"
-            Style="{StaticResource MenuIconStyle}" />
-        <ui:FontIcon
-            Margin="11,0,0,0"
-            FontSize="{Binding AltIconSize}"
-            Glyph="{Binding AltIcon}"
-            Style="{StaticResource DisabledGlyphStyle}" />
-    </Grid>
     <TextBlock
         x:Key="IconTextBlock"
         x:Shared="False"
@@ -95,19 +81,6 @@
                 Style="{StaticResource DisabledTextBlockStyle}"
                 Text="{Binding AltText}" />
         </Grid>
-    </DataTemplate>
-    <DataTemplate x:Key="AltIconMenuTemplate">
-        <ui:SimpleStackPanel
-            Margin="-5,0"
-            HorizontalAlignment="Center"
-            Orientation="Horizontal"
-            Spacing="-4">
-            <ui:FontIcon Glyph="{Binding Icon}" Style="{StaticResource MenuIconStyle}" />
-            <ui:FontIcon
-                FontSize="{Binding AltIconSize}"
-                Glyph="{Binding AltIcon}"
-                Style="{StaticResource DisabledGlyphStyle}" />
-        </ui:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="DynamicAltTextTemplate">
         <Grid>
@@ -136,12 +109,15 @@
             BorderBrush="{StaticResource MenuSeparatorColor}"
             BorderThickness="1,0,0,0" />
     </DataTemplate>
+    <DataTemplate x:Key="CompoundIconMenuTemplate">
+        <ContentPresenter Content="{Binding CompoundIcon}" />
+    </DataTemplate>
     <helpers:MenuTemplateSelector
         x:Key="MenuTemplateSelector"
-        AltIconSubMenuTemplate="{x:Null}"
-        AltIconTemplate="{StaticResource AltIconMenuTemplate}"
         AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
         AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
+        CompoundIconMenuTemplate="{StaticResource CompoundIconMenuTemplate}"
+        CompoundIconSubMenuTemplate="{x:Null}"
         DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
@@ -170,10 +146,6 @@
         TargetType="MenuItem">
         <Setter Property="ToolTipService.IsEnabled" Value="{Binding IsTooltipVisible}" />
     </Style>
-    <Style
-        x:Key="AltIconMenuStyle"
-        BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="MenuItem" />
     <Style
         x:Key="AnimatedNotifyStyle"
         BasedOn="{StaticResource IconMenuStyle}"
@@ -256,17 +228,17 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="AltIconSubMenuItemStyle"
+        x:Key="CompoundIconSubMenuStyle"
         BasedOn="{StaticResource SubMenuItemStyle}"
         TargetType="MenuItem">
-        <Setter Property="Icon" Value="{StaticResource AltIconSubMenuPanel}" />
+        <Setter Property="Icon" Value="{Binding CompoundIcon}" />
     </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"
-        AltIconStyle="{StaticResource AltIconMenuStyle}"
-        AltIconSubMenuStyle="{StaticResource AltIconSubMenuItemStyle}"
         AltObjectStyle="{StaticResource AltObjectMenuStyle}"
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
+        CompoundIconMenuStyle="{StaticResource IconMenuStyle}"
+        CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"
