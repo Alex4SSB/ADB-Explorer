@@ -312,54 +312,10 @@
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="OperationIconTemplate">
-        <Grid Margin="0,0,6,0">
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
-                    <Setter Property="ToolTip" Value="{Binding OperationName}" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding OperationName}" Value="Install">
-                            <Setter Property="ToolTip" Value="Uninstall" />
-                        </DataTrigger>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding OperationName}" Value="Install" />
-                                <Condition Binding="{Binding PackageName}" Value="{x:Null}" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="ToolTip" Value="Install" />
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <ui:FontIcon>
-                <ui:FontIcon.Style>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                        <Setter Property="Glyph" Value="{Binding OpIcon.PrimaryIcon}" />
-                        <Setter Property="HorizontalAlignment" Value="{Binding OpIcon.PrimaryAlignment}" />
-                    </Style>
-                </ui:FontIcon.Style>
-            </ui:FontIcon>
-            <ui:FontIcon>
-                <ui:FontIcon.Style>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                        <Setter Property="Glyph" Value="{Binding OpIcon.SecondaryIcon}" />
-                        <Setter Property="Margin" Value="{Binding OpIcon.SecondaryMargin}" />
-                        <Setter Property="FontSize" Value="{Binding OpIcon.SecondarySize}" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding OperationName}" Value="Install">
-                                <Setter Property="Glyph" Value="&#xECC9;" />
-                            </DataTrigger>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding OperationName}" Value="Install" />
-                                    <Condition Binding="{Binding PackageName}" Value="{x:Null}" />
-                                </MultiDataTrigger.Conditions>
-                                <Setter Property="Glyph" Value="&#xE896;" />
-                            </MultiDataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ui:FontIcon.Style>
-            </ui:FontIcon>
-        </Grid>
+        <ContentPresenter
+            Margin="0,0,6,0"
+            HorizontalAlignment="Right"
+            Content="{Binding OpIcon}"
+            ToolTip="{Binding Tooltip}" />
     </DataTemplate>
 </ResourceDictionary>

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
@@ -15,8 +16,22 @@ public class PackageInstallOperation : FileOperation
     public string PackageName
     {
         get => packageName;
-        set => Set(ref packageName, value);
+        set
+        {
+            if (Set(ref packageName, value))
+            {
+                OnPropertyChanged(nameof(IsUninstall));
+                OnPropertyChanged(nameof(Tooltip));
+                OnPropertyChanged(nameof(OpIcon));
+            }
+        }
     }
+
+    public bool IsUninstall => !string.IsNullOrEmpty(PackageName);
+
+    public override string Tooltip => IsUninstall ? "Uninstall" : "Install";
+
+    public override object OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    ADBService.AdbDevice adbDevice,
@@ -44,9 +59,16 @@ public class PackageInstallOperation : FileOperation
         cancelTokenSource = new CancellationTokenSource();
         var args = new string[1];
         int index = 0;
-        
+
+        if (IsUninstall)
+        {
+            args = new string[2];
+            args[0] = "uninstall";
+            args[1] = PackageName;
+            index = 1;
+        }
         // install (pm / adb)
-        if (string.IsNullOrEmpty(PackageName))
+        else
         {
             if (!pushPackage)
             {
@@ -57,14 +79,6 @@ public class PackageInstallOperation : FileOperation
                 index = 3;
             }
             args[index] = FilePath.FullPath;
-        }
-        // uninstall
-        else
-        {
-            args = new string[2];
-            args[0] = "uninstall";
-            args[1] = PackageName;
-            index = 1;
         }
 
         args[index] = ADBService.EscapeAdbShellString(args[index]);

@@ -243,4 +243,7 @@
     <Style TargetType="GridSplitter">
         <Setter Property="IsTabStop" Value="False" />
     </Style>
+    <Style TargetType="ContentPresenter">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+    </Style>
 </ResourceDictionary>
