@@ -56,7 +56,7 @@ internal class FileHelper
 
     public static bool IsHiddenRecycleItem(FileClass file)
     {
-        if (file.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
+        if (file.FullPath == AdbExplorerConst.RECYCLE_PATH || file.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
             return true;
         
         if (!string.IsNullOrEmpty(Data.FileActions.ExplorerFilter) && !file.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
