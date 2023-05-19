@@ -1,17 +1,18 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Services.ADBService.AdbDevice;
 
 namespace ADB_Explorer.Helpers;
 
 public class InProgressTestOperation : FileOperation
 {
-    private FileSyncOperation.InProgressInfo info;
+    private readonly InProgSyncProgressViewModel info;
 
     private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
         base(dispatcher, adbDevice, new FilePath(filePath))
     {
-        this.info = new FileSyncOperation.InProgressInfo(adbInfo);
+        info = new(adbInfo);
     }
 
     public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
@@ -56,12 +57,12 @@ public class InProgressTestOperation : FileOperation
     public override void Cancel()
     {
         Status = OperationStatus.Canceled;
-        StatusInfo = null;
+        StatusInfo = new CanceledOpProgressViewModel();
     }
 
     public void Fail(string errorMsg)
     {
         Status = OperationStatus.Failed;
-        StatusInfo = errorMsg;
+        StatusInfo = new FailedOpProgressViewModel(errorMsg);
     }
 }

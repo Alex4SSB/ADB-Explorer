@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -48,6 +49,7 @@ public class FileMoveOperation : FileOperation
         }
 
         Status = OperationStatus.InProgress;
+        StatusInfo = new InProgShellProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
 
         operationTask = Task.Run(() =>
@@ -76,7 +78,7 @@ public class FileMoveOperation : FileOperation
         {
             var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
             Status = operationStatus;
-            StatusInfo = null;
+            StatusInfo = new CompletedShellProgressViewModel();
 
             if (operationStatus is OperationStatus.Completed)
             {
@@ -135,13 +137,13 @@ public class FileMoveOperation : FileOperation
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Canceled;
-            StatusInfo = null;
+            StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
-            StatusInfo = t.Exception.InnerException.Message;
+            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 

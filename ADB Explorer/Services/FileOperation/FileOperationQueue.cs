@@ -294,7 +294,7 @@ public class FileOperationQueue : ViewModelBase
 
         if ((e.PropertyName == "StatusInfo") &&
             (CurrentOperation.Status == FileOperation.OperationStatus.InProgress) &&
-            (CurrentOperation.StatusInfo is FileSyncOperation.InProgressInfo status) &&
+            (CurrentOperation.StatusInfo is InProgSyncProgressViewModel status) &&
             (status.TotalPercentage is int percentage))
         {
             UpdateProgress(percentage);

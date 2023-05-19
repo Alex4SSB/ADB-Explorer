@@ -57,16 +57,6 @@
         <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style
-        x:Key="FileOpProgressStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
-                <Setter Property="IsIndeterminate" Value="True" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="NumericTextBoxStyle"
         BasedOn="{StaticResource TextBoxFluentStyle}"
         TargetType="TextBox">

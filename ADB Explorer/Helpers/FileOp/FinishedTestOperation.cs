@@ -1,17 +1,18 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Services.ADBService.AdbDevice;
 
 namespace ADB_Explorer.Helpers;
 
 public class CompletedTestOperation : FileOperation
 {
-    private FileSyncOperation.CompletedInfo info;
+    private readonly CompletedSyncProgressViewModel info;
 
     private CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, AdbSyncStatsInfo adbInfo) :
         base(dispatcher, adbDevice, filePath)
     {
-        this.info = new FileSyncOperation.CompletedInfo(adbInfo);
+        info = new(adbInfo);
     }
 
     public static CompletedTestOperation CreateFileCompleted(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
@@ -81,6 +82,6 @@ public class CompletedTestOperation : FileOperation
     public override void Cancel()
     {
         Status = OperationStatus.Canceled;
-        StatusInfo = null;
+        StatusInfo = new CanceledOpProgressViewModel();
     }
 }

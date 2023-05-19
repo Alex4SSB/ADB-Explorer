@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -31,7 +32,7 @@ public class PackageInstallOperation : FileOperation
 
     public override string Tooltip => IsUninstall ? "Uninstall" : "Install";
 
-    public override object OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
+    public override FrameworkElement OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    ADBService.AdbDevice adbDevice,
@@ -56,7 +57,9 @@ public class PackageInstallOperation : FileOperation
         }
 
         Status = OperationStatus.InProgress;
+        StatusInfo = new InProgShellProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
+
         var args = new string[1];
         int index = 0;
 
@@ -82,21 +85,22 @@ public class PackageInstallOperation : FileOperation
         }
 
         args[index] = ADBService.EscapeAdbShellString(args[index]);
+
+        string stdout = "", stderr = "";
         operationTask = Task.Run(() =>
         {
             return pushPackage
-                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out _, out _, args)
-                : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out _, out _, args);
+                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out stdout, out stderr, args)
+                : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out stdout, out stderr, args);
         });
 
         operationTask.ContinueWith((t) =>
         {
-            var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
-            Status = operationStatus;
-            StatusInfo = null;
-
-            if (operationStatus is OperationStatus.Completed)
+            Status = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
+            
+            if (Status is OperationStatus.Completed)
             {
+                StatusInfo = new CompletedShellProgressViewModel();
                 Dispatcher.Invoke(() =>
                 {
                     if (packageList is not null)
@@ -105,18 +109,21 @@ public class PackageInstallOperation : FileOperation
                         Data.FileActions.RefreshPackages = true;
                 });
             }
+            else
+                StatusInfo = new FailedOpProgressViewModel(string.IsNullOrEmpty(stderr) ? stdout : stderr);
+
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Canceled;
-            StatusInfo = null;
+            StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
-            StatusInfo = t.Exception.InnerException.Message;
+            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 

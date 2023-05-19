@@ -15,22 +15,19 @@ internal class MenuTemplateSelector : DataTemplateSelector
     public DataTemplate AltObjectTemplate { get; set; }
     public DataTemplate CompoundIconSubMenuTemplate { get; set; }
 
-    public override DataTemplate SelectTemplate(object item, DependencyObject container)
+    public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
     {
-        return item switch
-        {
-            SubMenuSeparator => SubMenuSeparatorTemplate,
-            CompoundIconSubMenu => CompoundIconSubMenuTemplate,
-            MenuSeparator => SeparatorTemplate,
-            AnimatedNotifyMenu => AnimatedNotifyTemplate,
-            SubMenu or string => SubMenuTemplate,
-            AltTextMenu => DynamicAltTextTemplate,
-            IconMenu => IconMenuTemplate,
-            AltObjectMenu => AltObjectTemplate,
-            CompoundIconMenu => CompoundIconMenuTemplate,
-            _ => throw new NotSupportedException(),
-        };
-    }
+        SubMenuSeparator => SubMenuSeparatorTemplate,
+        CompoundIconSubMenu => CompoundIconSubMenuTemplate,
+        MenuSeparator => SeparatorTemplate,
+        AnimatedNotifyMenu => AnimatedNotifyTemplate,
+        SubMenu or string => SubMenuTemplate,
+        AltTextMenu => DynamicAltTextTemplate,
+        IconMenu => IconMenuTemplate,
+        AltObjectMenu => AltObjectTemplate,
+        CompoundIconMenu => CompoundIconMenuTemplate,
+        _ => throw new NotSupportedException(),
+    };
 }
 
 internal class MenuStyleSelector : StyleSelector
@@ -46,20 +43,17 @@ internal class MenuStyleSelector : StyleSelector
     public Style AltObjectStyle { get; set; }
     public Style CompoundIconMenuStyle { get; set; }
 
-    public override Style SelectStyle(object item, DependencyObject container)
+    public override Style SelectStyle(object item, DependencyObject container) => item switch
     {
-        return item switch
-        {
-            SubMenuSeparator => SubMenuSeparatorStyle,
-            CompoundIconSubMenu => CompoundIconSubMenuStyle,
-            MenuSeparator => SeparatorStyle,
-            AnimatedNotifyMenu => AnimatedNotifyStyle,
-            SubMenu or string => SubMenuStyle,
-            AltTextMenu => DynamicAltTextStyle,
-            IconMenu => IconMenuStyle,
-            AltObjectMenu => AltObjectStyle,
-            CompoundIconMenu => CompoundIconMenuStyle,
-            _ => throw new NotSupportedException(),
-        };
-    }
+        SubMenuSeparator => SubMenuSeparatorStyle,
+        CompoundIconSubMenu => CompoundIconSubMenuStyle,
+        MenuSeparator => SeparatorStyle,
+        AnimatedNotifyMenu => AnimatedNotifyStyle,
+        SubMenu or string => SubMenuStyle,
+        AltTextMenu => DynamicAltTextStyle,
+        IconMenu => IconMenuStyle,
+        AltObjectMenu => AltObjectStyle,
+        CompoundIconMenu => CompoundIconMenuStyle,
+        _ => throw new NotSupportedException(),
+    };
 }

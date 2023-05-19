@@ -1,8 +1,29 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+    <Style
+        x:Key="CompletedOperationsProgressStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource DoubleEquals}, ConverterParameter=100, Path=Value}" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="FileOpProgressStyle"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
+        TargetType="ui:ProgressBar">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                <Setter Property="IsIndeterminate" Value="True" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <DataTemplate x:Key="FileOpFileNameTemplate">
         <Grid Margin="4,0,0,0">
             <Grid.RowDefinitions>
@@ -144,172 +165,125 @@
             </TextBlock.Style>
         </TextBlock>
     </DataTemplate>
-    <Style
-        x:Key="CompletedOperationsProgressStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource DoubleEquals}, ConverterParameter=100, Path=Value}" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <DataTemplate x:Key="FileOpProgressTemplate">
+    <DataTemplate x:Key="WaitingOpProgressTemplate" />
+    <DataTemplate x:Key="InProgSyncProgressTemplate">
         <Grid Margin="4,0">
-            <Grid>
-                <Grid.Resources>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="FontWeight" Value="Bold" />
-                    </Style>
-                </Grid.Resources>
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed" />
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontWeight" Value="Bold" />
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay}" />
+            <ui:ProgressBar Grid.Row="1" Value="{Binding CurrentFilePercentage, Mode=OneWay}">
+                <ui:ProgressBar.Style>
+                    <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                                <Setter Property="Visibility" Value="Visible" />
+                            <DataTrigger Binding="{Binding CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </Grid.Style>
-                <Grid.RowDefinitions>
-                    <RowDefinition />
-                    <RowDefinition />
-                </Grid.RowDefinitions>
+                </ui:ProgressBar.Style>
+            </ui:ProgressBar>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
+                <TextBlock Text="%" />
+            </StackPanel>
+            <StackPanel
+                Grid.Row="1"
+                Grid.Column="1"
+                Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Margin="4,0,0,0" Text="{Binding CurrentFilePercentage, Mode=OneWay}" />
+                <TextBlock Text="%" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="InProgShellProgressTemplate">
+        <ui:ProgressBar
+            Margin="4,0"
+            IsIndeterminate="True"
+            Style="{StaticResource FluentProgressBarStyle}" />
+    </DataTemplate>
+    <DataTemplate x:Key="CompletedSyncProgressTemplate">
+        <Grid Margin="4,0">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
-                <ui:ProgressBar Grid.Row="1" Value="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}">
-                    <ui:ProgressBar.Style>
-                        <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="Visibility" Value="Visible" />
-                        </Style>
-                    </ui:ProgressBar.Style>
-                </ui:ProgressBar>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="Visibility" Value="Visible" />
-                        </Style>
-                    </StackPanel.Style>
-                    <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.TotalPercentage, Mode=OneWay}" />
-                    <TextBlock Text="%" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Row="1"
+                <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding FileCountCompletedRate, Mode=OneWay}" />
+                <TextBlock
                     Grid.Column="1"
-                    Orientation="Horizontal">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" Value="{x:Null}">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="Visibility" Value="Visible" />
-                        </Style>
-                    </StackPanel.Style>
-                    <TextBlock Margin="4,0,0,0" Text="{Binding StatusInfo.CurrentFilePercentage, Mode=OneWay}" />
-                    <TextBlock Text="%" />
-                </StackPanel>
+                    Margin="4,0"
+                    Text="{Binding FileCountCompletedString}"
+                    TextTrimming="CharacterEllipsis" />
             </Grid>
-            <Grid>
-                <Grid>
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding CompletedStatsVisible}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding StatusInfo.FileCountCompletedString}" Value="0 of 0">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </Style>
-                    </Grid.Style>
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding StatusInfo.FileCountCompletedRate, Mode=OneWay}" />
-                        <TextBlock
-                            Grid.Column="1"
-                            Margin="4,0"
-                            Text="{Binding StatusInfo.FileCountCompletedString}"
-                            TextTrimming="CharacterEllipsis" />
-                    </Grid>
-                    <TextBlock
-                        Grid.Row="1"
-                        Style="{StaticResource InvisibleTextBlockStyle}"
-                        Text="{Binding StatusInfo, Converter={StaticResource CompletedStatsConverter}}"
-                        TextTrimming="CharacterEllipsis" />
-                </Grid>
-                <Grid>
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding FinishedIconVisible}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                                <MultiDataTrigger>
-                                    <MultiDataTrigger.Conditions>
-                                        <Condition Binding="{Binding Status}" Value="Completed" />
-                                        <Condition Binding="{Binding StatusInfo.FileCountCompletedString}" Value="0 of 0" />
-                                    </MultiDataTrigger.Conditions>
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </MultiDataTrigger>
-                            </Style.Triggers>
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </Style>
-                    </Grid.Style>
-                    <ui:SimpleStackPanel Orientation="Horizontal" Spacing="4">
-                        <ui:FontIcon Glyph="&#xF13D;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
-                        <ui:FontIcon Glyph="&#xF13E;">
-                            <ui:FontIcon.Style>
-                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ui:FontIcon.Style>
-                        </ui:FontIcon>
-                        <TextBlock Text="{Binding Status}" />
-                    </ui:SimpleStackPanel>
-                </Grid>
-            </Grid>
+            <TextBlock
+                Grid.Row="1"
+                Style="{StaticResource InvisibleTextBlockStyle}"
+                Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext, Converter={StaticResource CompletedStatsConverter}}"
+                TextTrimming="CharacterEllipsis" />
         </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="CompletedShellProgressTemplate">
+        <Grid Margin="4,0">
+            <ui:FontIcon Margin="0,0,4,0" Glyph="&#xF13E;" />
+            <TextBlock Text="{Binding Name}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="CanceledOpProgressTemplate">
+        <Grid Margin="4,0">
+            <ui:FontIcon Margin="0,0,4,0" Glyph="&#xF13D;" />
+            <TextBlock Text="{Binding Name}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="FailedOpProgressTemplate">
+        <Grid Margin="4,0">
+            <ui:FontIcon Margin="0,0,4,0" Glyph="&#xF13D;" />
+            <TextBlock Text="{Binding Name}" />
+        </Grid>
+    </DataTemplate>
+    <helpers:FileOpProgressTemplateSelector
+        x:Key="FileOpProgressTemplateSelector"
+        CanceledOpProgressTemplate="{StaticResource CanceledOpProgressTemplate}"
+        CompletedShellProgressTemplate="{StaticResource CompletedShellProgressTemplate}"
+        CompletedSyncProgressTemplate="{StaticResource CompletedSyncProgressTemplate}"
+        FailedOpProgressTemplate="{StaticResource FailedOpProgressTemplate}"
+        InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
+        InProgSyncProgressTemplate="{StaticResource InProgSyncProgressTemplate}"
+        WaitingOpProgressTemplate="{StaticResource WaitingOpProgressTemplate}" />
+    <DataTemplate x:Key="FileOpProgressTemplate">
+        <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="OperationIconTemplate">
         <ContentPresenter

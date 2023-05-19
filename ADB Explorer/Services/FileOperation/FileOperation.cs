@@ -28,6 +28,8 @@ public abstract class FileOperation : ViewModelBase
         Update,
     }
 
+    #region Notifiable Properties
+
     private OperationType operationType;
     public OperationType OperationName
     {
@@ -37,18 +39,9 @@ public abstract class FileOperation : ViewModelBase
             if (Set(ref operationType, value))
             {
                 OnPropertyChanged(nameof(OpIcon));
-                OnPropertyChanged(nameof(CompletedStatsVisible));
-                OnPropertyChanged(nameof(FinishedIconVisible));
             }
         }
     }
-
-    public virtual string Tooltip => $"{OperationName}";
-
-    public Dispatcher Dispatcher { get; }
-
-    public ADBService.AdbDevice Device { get; }
-    public FilePath FilePath { get; }
 
     private OperationStatus status;
     public OperationStatus Status
@@ -56,24 +49,36 @@ public abstract class FileOperation : ViewModelBase
         get => status;
         protected set
         {
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                if (Set(ref status, value))
-                {
-                    OnPropertyChanged(nameof(CompletedStatsVisible));
-                    OnPropertyChanged(nameof(FinishedIconVisible));
-                }
-            });
+            Dispatcher.Invoke(() => Set(ref status, value));
         }
     }
 
-    public bool CompletedStatsVisible => Status is OperationStatus.Completed
-                                         && OperationName is OperationType.Push or OperationType.Pull;
+    private FileOpProgressViewModel statusInfo = new WaitingOpProgressViewModel();
+    public FileOpProgressViewModel StatusInfo
+    {
+        get => statusInfo;
+        protected set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
+    }
 
-    public bool FinishedIconVisible => ((OperationName is not OperationType.Push and not OperationType.Pull) || Status is OperationStatus.Canceled or OperationStatus.Failed)
-                                       && Status is not OperationStatus.InProgress and not OperationStatus.Waiting;
+    #endregion
 
-    public virtual object OpIcon => OperationName switch
+    #region Base Properties
+
+    public Dispatcher Dispatcher { get; }
+
+    public ADBService.AdbDevice Device { get; }
+
+    public FilePath FilePath { get; }
+
+    public FilePath TargetPath { get; protected set; }
+
+    #endregion
+
+    #region Read-only Properties
+
+    public virtual string Tooltip => $"{OperationName}";
+
+    public virtual FrameworkElement OpIcon => OperationName switch
     {
         OperationType.Pull => new PullIcon(),
         OperationType.Push => new PushIcon(),
@@ -83,18 +88,11 @@ public abstract class FileOperation : ViewModelBase
         OperationType.Copy => new FontIcon() { Glyph = "\uE8C8" },
         OperationType.Restore => new FontIcon() { Glyph = "\uE845" },
         OperationType.Update => new FontIcon() { Glyph = "\uE787" },
-        OperationType.Install => null,
+        OperationType.Install => null, // gets overridden
         _ => throw new NotSupportedException(),
     };
 
-    private object statusInfo;
-    public object StatusInfo
-    {
-        get => statusInfo;
-        protected set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
-    }
-
-    public FilePath TargetPath { get; set; }
+    #endregion
 
     public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath)
     {
@@ -105,5 +103,6 @@ public abstract class FileOperation : ViewModelBase
     }
 
     public abstract void Start();
+
     public abstract void Cancel();
 }

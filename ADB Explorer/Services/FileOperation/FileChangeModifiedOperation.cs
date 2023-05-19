@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -23,6 +24,7 @@ public class FileChangeModifiedOperation : FileOperation
         }
 
         Status = OperationStatus.InProgress;
+        StatusInfo = new InProgShellProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
 
         operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "touch", out _, out _, new[] { "-m", "-t", newDate.ToString("yyyyMMddHHmm.ss"), ADBService.EscapeAdbShellString(FilePath.FullPath) }));
@@ -31,26 +33,22 @@ public class FileChangeModifiedOperation : FileOperation
         {
             var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
             Status = operationStatus;
-            StatusInfo = null;
+            StatusInfo = new CompletedShellProgressViewModel();
 
-            Dispatcher.Invoke(() =>
-            {
-                //fileList.Find(file => file.FullPath == FilePath.fullp).ModifiedTime = newDate;
-                ((FileClass)FilePath).ModifiedTime = newDate;
-            });
+            Dispatcher.Invoke(() => ((FileClass)FilePath).ModifiedTime = newDate);
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Canceled;
-            StatusInfo = null;
+            StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
-            StatusInfo = t.Exception.InnerException.Message;
+            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 

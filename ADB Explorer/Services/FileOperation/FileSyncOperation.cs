@@ -1,6 +1,6 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Services.ADBService.AdbDevice;
 
@@ -19,95 +19,6 @@ public abstract class FileSyncOperation : FileOperation
     private CancellationTokenSource cancelTokenSource;
     private ConcurrentQueue<AdbSyncProgressInfo> waitingProgress;
     private System.Timers.Timer progressPollTimer;
-
-    public class InProgressInfo
-    {
-        private AdbSyncProgressInfo adbInfo;
-
-        public InProgressInfo()
-        {
-            this.adbInfo = null;
-        }
-
-        public InProgressInfo(AdbSyncProgressInfo adbInfo)
-        {
-            this.adbInfo = adbInfo;
-        }
-
-        public int? TotalPercentage => adbInfo?.TotalPercentage;
-        public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
-        public UInt64? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
-        public string CurrentFilePath => adbInfo?.CurrentFile;
-        public string CurrentFileName => Path.GetFileName(CurrentFilePath);
-        public string CurrentFileNameWithoutExtension => Path.GetFileNameWithoutExtension(CurrentFilePath);
-
-        public string TotalProgress
-        {
-            get
-            {
-                return TotalPercentage.HasValue ? $"{TotalPercentage.Value}%" : "?";
-            }
-        }
-
-        public string CurrentFileProgress
-        {
-            get
-            {
-                return CurrentFilePercentage.HasValue       ? $"{CurrentFilePercentage.Value}%" :
-                       CurrentFileBytesTransferred.HasValue ? UnitConverter.ToSize(CurrentFileBytesTransferred.Value)
-                                                            : string.Empty;
-            }
-        }
-    }
-
-    public class CompletedInfo
-    {
-        private AdbSyncStatsInfo adbInfo;
-
-        public CompletedInfo(AdbSyncStatsInfo adbInfo)
-        {
-            this.adbInfo = adbInfo;
-        }
-
-        public UInt64 FilesTransferred => adbInfo.FilesTransferred;
-        public UInt64 FilesSkipped => adbInfo.FilesSkipped;
-        public decimal? AverageRateMBps => adbInfo.AverageRate;
-        public UInt64? TotalBytes => adbInfo.TotalBytes;
-        public decimal? TotalSeconds => adbInfo.TotalTime;
-        public int FileCountCompletedRate => (int)((float)FilesTransferred / (FilesTransferred + FilesSkipped) * 100.0);
-
-        public string FileCountCompletedString
-        {
-            get
-            {
-                return $"{FilesTransferred} of {FilesTransferred + FilesSkipped}";
-            }
-        }
-
-        public string AverageRateString
-        {
-            get
-            {
-                return AverageRateMBps.HasValue ? $"{UnitConverter.ToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : string.Empty;
-            }
-        }
-
-        public string TotalSize
-        {
-            get
-            {
-                return TotalBytes.HasValue ? UnitConverter.ToSize(TotalBytes.Value) : string.Empty;
-            }
-        }
-
-        public string TotalTime
-        {
-            get
-            {
-                return TotalSeconds.HasValue ? UnitConverter.ToTime(TotalSeconds.Value) : string.Empty;
-            }
-        }
-    }
 
     public FileSyncOperation(
         Dispatcher dispatcher,
@@ -139,7 +50,7 @@ public abstract class FileSyncOperation : FileOperation
         }
 
         Status = OperationStatus.InProgress;
-        StatusInfo = new InProgressInfo();
+        StatusInfo = new InProgSyncProgressViewModel();
         waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
         cancelTokenSource = new CancellationTokenSource();
 
@@ -155,19 +66,25 @@ public abstract class FileSyncOperation : FileOperation
         operationTask.ContinueWith((t) => 
         {
             Status = OperationStatus.Completed;
-            StatusInfo = t.Result is not null ? new CompletedInfo(t.Result) : null;
+            if (t.Result is null)
+                StatusInfo = null;
+            else if (t.Result.FilesTransferred + t.Result.FilesSkipped < 1)
+                StatusInfo = new CompletedShellProgressViewModel();
+            else
+                StatusInfo = new CompletedSyncProgressViewModel(t.Result);
+
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Canceled;
-            StatusInfo = null;
+            StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
-            StatusInfo = t.Exception.InnerException.Message;
+            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
 
         progressPollTimer.Start();
@@ -188,7 +105,7 @@ public abstract class FileSyncOperation : FileOperation
         var currProgress = waitingProgress.DequeueAllExisting().LastOrDefault();
         if ((Status == OperationStatus.InProgress) && (currProgress != null))
         {
-            StatusInfo = new InProgressInfo(currProgress);
+            StatusInfo = new InProgSyncProgressViewModel(currProgress);
         }
     }
 }

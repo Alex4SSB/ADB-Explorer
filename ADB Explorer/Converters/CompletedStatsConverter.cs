@@ -1,4 +1,4 @@
-﻿using static ADB_Explorer.Services.FileSyncOperation;
+﻿using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Converters;
 
@@ -7,7 +7,7 @@ internal class CompletedStatsConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         var result = "";
-        if (value is not CompletedInfo info)
+        if (value is not CompletedSyncProgressViewModel info)
             return result;
 
         if (string.IsNullOrEmpty(info.TotalSize))
