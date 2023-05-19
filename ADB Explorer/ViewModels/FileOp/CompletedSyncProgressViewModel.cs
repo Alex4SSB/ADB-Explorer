@@ -13,9 +13,13 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
     }
 
     public UInt64 FilesTransferred => adbInfo.FilesTransferred;
+
     public UInt64 FilesSkipped => adbInfo.FilesSkipped;
+
     public decimal? AverageRateMBps => adbInfo.AverageRate;
+
     public UInt64? TotalBytes => adbInfo.TotalBytes;
+
     public decimal? TotalSeconds => adbInfo.TotalTime;
 
     public int FileCountCompletedRate => (int)((float)FilesTransferred / (FilesTransferred + FilesSkipped) * 100.0);

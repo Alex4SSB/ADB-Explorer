@@ -18,10 +18,15 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
     }
 
     public int? TotalPercentage => adbInfo?.TotalPercentage;
+
     public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
+
     public UInt64? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
+
     public string CurrentFilePath => adbInfo?.CurrentFile;
+
     public string CurrentFileName => Path.GetFileName(CurrentFilePath);
+
     public string CurrentFileNameWithoutExtension => Path.GetFileNameWithoutExtension(CurrentFilePath);
 
     public string TotalProgress => TotalPercentage.HasValue ? $"{TotalPercentage.Value}%" : "?";

@@ -24,7 +24,41 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <DataTemplate x:Key="FileOpFileNameTemplate">
+    <Style
+        x:Key="FileOpFileNamesTextBlockStyle"
+        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
+                <Setter Property="Text" Value="{Binding FilePath.FullName}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                <Setter Property="FontWeight" Value="Bold" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="FileOpFileNameFolderIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Margin" Value="0,0,4,0" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Glyph" Value="&#xE8b7;" />
+    </Style>
+    <DataTemplate x:Key="UninstallOpFileNameTemplate">
+        <TextBlock
+            Margin="4,0,0,0"
+            Style="{StaticResource FileOpFileNamesTextBlockStyle}"
+            Text="{Binding PackageName}" />
+    </DataTemplate>
+    <DataTemplate x:Key="FolderCompletedOpFileNameTemplate">
+        <StackPanel Margin="4,0,0,0" Orientation="Horizontal">
+            <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+            <TextBlock Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+        </StackPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="FolderInProgOpFileNameTemplate">
         <Grid Margin="4,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -34,44 +68,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ui:FontIcon
-                Margin="0,0,4,0"
-                FontSize="16"
-                Glyph="&#xE8b7;">
-                <ui:FontIcon.Style>
-                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                        <Setter Property="Visibility" Value="Collapsed" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ui:FontIcon.Style>
-            </ui:FontIcon>
-            <TextBlock Grid.Column="1" TextTrimming="CharacterEllipsis">
-                <TextBlock.Style>
-                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
-                        <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
-                        <Setter Property="FontWeight" Value="Regular" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
-                                <Setter Property="Text" Value="{Binding FilePath.FullName}" />
-                            </DataTrigger>
-                            <MultiDataTrigger>
-                                <MultiDataTrigger.Conditions>
-                                    <Condition Binding="{Binding OperationName}" Value="Install" />
-                                    <Condition Binding="{Binding FilePath}" Value="{x:Null}" />
-                                </MultiDataTrigger.Conditions>
-                                <Setter Property="Text" Value="{Binding PackageName}" />
-                            </MultiDataTrigger>
-                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                                <Setter Property="FontWeight" Value="Bold" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
+            <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+            <TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
             <TextBlock
                 Grid.Row="1"
                 Margin="0,-3,0,0"
@@ -81,29 +79,18 @@
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
                             <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>
-                        <Setter Property="Visibility" Value="Visible" />
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="1"
-                TextTrimming="CharacterEllipsis">
+            <TextBlock Grid.Row="1" Grid.Column="1">
                 <TextBlock.Style>
                     <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Visible" />
+                        <Setter Property="FontWeight" Value="Bold" />
                         <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
-                        <Setter Property="FontWeight" Value="Regular" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
                                 <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileName}" />
@@ -111,20 +98,23 @@
                             <DataTrigger Binding="{Binding StatusInfo.CurrentFileName}" Value="{x:Null}">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding FilePath.IsDirectory}" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Status}" Value="Completed">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                                <Setter Property="FontWeight" Value="Bold" />
-                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
         </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="RegularOpFileNameTemplate">
+        <TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+    </DataTemplate>
+    <helpers:FileOpFileNameTemplateSelector
+        x:Key="FileOpFileNameTemplateSelector"
+        FolderCompletedOpFileNameTemplate="{StaticResource FolderCompletedOpFileNameTemplate}"
+        FolderInProgOpFileNameTemplate="{StaticResource FolderInProgOpFileNameTemplate}"
+        RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
+        UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
+    <DataTemplate x:Key="FileOpFileNameTemplate">
+        <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
         <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
