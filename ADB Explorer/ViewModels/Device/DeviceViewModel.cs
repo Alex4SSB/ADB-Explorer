@@ -20,7 +20,7 @@ public abstract class DeviceViewModel : AbstractDevice
         get => deviceSelected;
         set
         {
-            if (Set(ref deviceSelected, value) && this is LogicalDeviceViewModel)
+            if (Set(ref deviceSelected, value) && this is LogicalDeviceViewModel && Status is DeviceStatus.Ok)
                 Data.RuntimeSettings.SelectedDevicesCount += value ? 1 : -1;
         }
     }

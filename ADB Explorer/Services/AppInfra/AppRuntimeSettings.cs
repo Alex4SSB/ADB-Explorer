@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 using System.Collections;
 
@@ -249,6 +250,13 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => isLogPaused;
         set => Set(ref isLogPaused, value);
+    }
+
+    private string appTitle = $"{Properties.Resources.AppDisplayName}{Strings.S_NO_DEVICES_TITLE}";
+    public string AppTitle
+    {
+        get => appTitle;
+        set => Set(ref appTitle, value);
     }
 
     #region Event-only properties

@@ -12,7 +12,7 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:views="clr-namespace:ADB_Explorer.Views"
     x:Name="MainWin"
-    Title="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=AppTitle}"
+    Title="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AppTitle}"
     Width="800"
     Height="450"
     MinWidth="605"

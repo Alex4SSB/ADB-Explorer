@@ -628,7 +628,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
         RuntimeSettings.IsPathBoxFocused = false;
-        
     }
 
     private void LaunchSequence()
