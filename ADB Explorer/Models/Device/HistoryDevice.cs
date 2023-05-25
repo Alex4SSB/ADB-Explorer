@@ -22,7 +22,7 @@ public class HistoryDevice : NewDevice
     }
 
     [JsonConstructor]
-    public HistoryDevice(string ipAddress, string connectPort, string deviceName = "")
+    public HistoryDevice(string ipAddress, string connectPort, string deviceName = "") : this()
     {
         DeviceName = deviceName;
         IpAddress = ipAddress;
