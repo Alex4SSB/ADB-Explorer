@@ -15,6 +15,9 @@ namespace ADB_Explorer.Models
             new(@"^\[ *(?<TotalPercentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPercentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$",
                       RegexOptions.Multiline);
 
+        public static readonly Regex RE_FILE_SYNC_ERROR =
+            new(@"^adb: error: (?<Message>.*?) +$", RegexOptions.Multiline);
+
         public static readonly Regex RE_FILE_SYNC_STATS =
             new(@"^(?<TargetPath>.+?): (?<TotalTransferred>\d+) files? (?>pulled|pushed), (?<TotalSkipped>\d+) skipped\.(?> (?<AverageRate>\d+(?>\.\d+)?) MB\/s \((?<TotalBytes>\d+) bytes in (?<TotalTime>\d+(?>\.\d+)?)s\))? *$",
                       RegexOptions.Multiline);

@@ -245,23 +245,28 @@
                 TextTrimming="CharacterEllipsis" />
         </Grid>
     </DataTemplate>
+    <Style x:Key="CompletedIconProgressPanelStyle" TargetType="ui:SimpleStackPanel">
+        <Setter Property="Orientation" Value="Horizontal" />
+        <Setter Property="Spacing" Value="4" />
+        <Setter Property="Margin" Value="4,0" />
+    </Style>
     <DataTemplate x:Key="CompletedShellProgressTemplate">
-        <Grid Margin="4,0">
-            <ui:FontIcon Margin="0,0,4,0" Glyph="&#xF13E;" />
+        <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
+            <ui:FontIcon Glyph="&#xF13E;" />
             <TextBlock Text="{Binding Name}" />
-        </Grid>
+        </ui:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="CanceledOpProgressTemplate">
-        <Grid Margin="4,0">
-            <ui:FontIcon Margin="0,0,4,0" Glyph="&#xF13D;" />
+        <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
+            <ui:FontIcon Glyph="&#xF13D;" />
             <TextBlock Text="{Binding Name}" />
-        </Grid>
+        </ui:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="FailedOpProgressTemplate">
-        <Grid Margin="4,0">
-            <ui:FontIcon Margin="0,0,4,0" Glyph="&#xF13D;" />
+        <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
+            <ui:FontIcon Glyph="&#xF13D;" />
             <TextBlock Text="{Binding Name}" />
-        </Grid>
+        </ui:SimpleStackPanel>
     </DataTemplate>
     <helpers:FileOpProgressTemplateSelector
         x:Key="FileOpProgressTemplateSelector"

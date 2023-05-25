@@ -12,6 +12,7 @@
     </UserControl.Resources>
     <ui:SimpleStackPanel
         Margin="-5,0"
+        d:Spacing="-5"
         DataContext="{Binding ElementName=Icon}"
         Orientation="Horizontal"
         Spacing="{Binding Spacing}">

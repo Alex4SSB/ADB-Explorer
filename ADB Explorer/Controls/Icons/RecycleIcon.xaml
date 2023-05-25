@@ -15,6 +15,5 @@
             Margin="0,0,-26,-15"
             FontSize="20"
             Glyph="&#xF143;" />
-        <ui:FontIcon Glyph="&#xE7B8;" Margin="0,0,-50,0"/>
     </Grid>
 </UserControl>

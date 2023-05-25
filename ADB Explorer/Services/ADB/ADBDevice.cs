@@ -148,7 +148,7 @@ public partial class ADBService
                 operationArgs,
                 EscapeAdbString(sourcePath),
                 EscapeAdbString(targetPath));
-
+            
             // Each line should be a progress update (but sometimes the output can be weird)
             string lastStdoutLine = null;
             foreach (string stdoutLine in stdout)
@@ -157,6 +157,12 @@ public partial class ADBService
                 var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS.Match(stdoutLine);
                 if (!progressMatch.Success)
                 {
+                    var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR.Match(stdoutLine);
+                    if (errorMatch.Success)
+                    {
+                        var message = errorMatch.Groups["Message"].Value;
+                    }
+
                     continue;
                 }
 
