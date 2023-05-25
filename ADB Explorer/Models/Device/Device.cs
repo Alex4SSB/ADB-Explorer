@@ -11,6 +11,7 @@ public abstract class AbstractDevice : ViewModelBase
         Remote,
         Recovery,
         Sideload,
+        WSA,
         Emulator,
         History,
         New,

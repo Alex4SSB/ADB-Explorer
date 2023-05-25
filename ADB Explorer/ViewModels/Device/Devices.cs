@@ -22,6 +22,8 @@ public class Devices : AbstractDevice
 
     public NewDeviceViewModel CurrentNewDevice { get; set; }
 
+    public string WsaPort { get; set; }
+
     #endregion
 
     #region Read only lists

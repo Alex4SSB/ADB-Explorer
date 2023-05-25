@@ -52,6 +52,7 @@ public abstract class DeviceViewModel : AbstractDevice
         DeviceType.Sideload => "\uE67A",
         DeviceType.New => "\uE710",
         DeviceType.History => "\uE823",
+        DeviceType.WSA => "\uE78A",
         _ => throw new NotImplementedException(),
     };
 

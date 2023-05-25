@@ -69,10 +69,11 @@ public class LogicalDeviceViewModel : DeviceViewModel
                 DeviceType.Local => "USB",
                 DeviceType.Remote => "WiFi",
                 DeviceType.Emulator => "Emulator",
+                DeviceType.WSA => "WSA",
                 DeviceType.Service => "mDNS Service",
                 DeviceType.Recovery => "USB (Recovery)",
                 DeviceType.Sideload => "USB (Sideload)",
-                _ => throw new NotImplementedException(),
+                _ => throw new NotSupportedException(),
             };
 
             result += Device.Status switch
@@ -80,7 +81,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
                 DeviceStatus.Ok => "",
                 DeviceStatus.Offline => " - Offline",
                 DeviceStatus.Unauthorized => " - Unauthorized",
-                _ => throw new NotImplementedException(),
+                _ => throw new NotSupportedException(),
             };
 
             return result;

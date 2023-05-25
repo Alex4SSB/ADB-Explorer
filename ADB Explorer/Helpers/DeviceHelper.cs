@@ -26,7 +26,12 @@ public static class DeviceHelper
         else if (id.Contains("._adb-tls-"))
             return DeviceType.Service;
         else if (id.Contains(':'))
+        {
+            if (AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(id.Split(':')[0]))
+                return DeviceType.WSA;
+
             return DeviceType.Remote;
+        }
         else if (id.Contains("emulator"))
             return DeviceType.Emulator;
         else
@@ -322,6 +327,7 @@ public static class DeviceHelper
         // To make sure value changes to true
         Data.RuntimeSettings.CollapseDevices = false;
         Data.RuntimeSettings.CollapseDevices = true;
+        Data.RuntimeSettings.SelectedDevicesCount = 0;
 
         Data.RuntimeSettings.IsPathBoxFocused = false;
     }
@@ -583,8 +589,15 @@ public static class DeviceHelper
         Data.RuntimeSettings.IsDevicesPaneOpen = false;
     }
 
+    private static DateTime lastWsaDiscovery = DateTime.MinValue;
     public static void ConnectWsaDevice()
     {
+        if (Data.DevicesObject.UIList.Any(dev => dev.Type is DeviceType.WSA)
+            || DateTime.Now - lastWsaDiscovery > AdbExplorerConst.WSA_DISCOVERY_DELAY)
+            return;
+
+        lastWsaDiscovery = DateTime.Now;
+
         var wsaIp = Network.GetWsaIp();
         if (wsaIp is null)
             return;
@@ -609,14 +622,14 @@ public static class DeviceHelper
             return;
 
         var netstatIp = match.Groups["IP"].Value;
-        var wsaPort = match.Groups["Port"].Value;
+        Data.DevicesObject.WsaPort = match.Groups["Port"].Value;
         if (!AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(netstatIp))
             return;
 
         Data.DevicesObject.CurrentNewDevice = new(new())
         {
             IpAddress = AdbExplorerConst.WIN_LOOPBACK_ADDRESS,
-            ConnectPort = wsaPort
+            ConnectPort = Data.DevicesObject.WsaPort,
         };
         Data.DevicesObject.CurrentNewDevice.ConnectCommand.Execute();
     }

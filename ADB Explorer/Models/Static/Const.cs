@@ -110,4 +110,5 @@ public static class AdbExplorerConst
     public static readonly string WSA_PROCESS_NAME = "WsaClient";
     public static readonly string WIN_LOOPBACK_ADDRESS = "127.0.0.1";
     public static readonly string[] LOOPBACK_ADDRESSES = { WIN_LOOPBACK_ADDRESS, "0.0.0.0" };
+    public static readonly TimeSpan WSA_DISCOVERY_DELAY = TimeSpan.FromSeconds(10);
 }
