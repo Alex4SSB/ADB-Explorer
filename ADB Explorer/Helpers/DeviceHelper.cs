@@ -384,6 +384,9 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
+                if (AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(dev.IpAddress))
+                    return true;
+
                 if (ex.Message.Contains(Strings.S_FAILED_CONN + dev.ConnectAddress)
                     && !((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
                 {
@@ -578,5 +581,43 @@ public static class DeviceHelper
         InitDevice();
 
         Data.RuntimeSettings.IsDevicesPaneOpen = false;
+    }
+
+    public static void ConnectWsaDevice()
+    {
+        var wsaIp = Network.GetWsaIp();
+        if (wsaIp is null)
+            return;
+
+        var processes = Process.GetProcessesByName(AdbExplorerConst.WSA_PROCESS_NAME);
+        if (processes?.Length < 1)
+            return;
+
+        var wsaPid = processes.First().Id;
+        var retCode = ADBService.ExecuteCommand("cmd.exe",
+                                                "/C",
+                                                out string stdout,
+                                                out _,
+                                                Encoding.UTF8,
+                                                new[] { "\"netstat", "-n", "-a", "-o", "|", "findstr", $"{wsaPid}\"" });
+
+        if (retCode != 0)
+            return;
+
+        var match = AdbRegEx.RE_NETSTAT_TCP_SOCK.Match(stdout);
+        if (match.Groups?.Count < 2)
+            return;
+
+        var netstatIp = match.Groups["IP"].Value;
+        var wsaPort = match.Groups["Port"].Value;
+        if (!AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(netstatIp))
+            return;
+
+        Data.DevicesObject.CurrentNewDevice = new(new())
+        {
+            IpAddress = AdbExplorerConst.WIN_LOOPBACK_ADDRESS,
+            ConnectPort = wsaPort
+        };
+        Data.DevicesObject.CurrentNewDevice.ConnectCommand.Execute();
     }
 }

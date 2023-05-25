@@ -85,18 +85,15 @@ internal static class SettingsHelper
         App.Current.Dispatcher.Invoke(() => Data.RuntimeSettings.IsSplashScreenVisible = false);
     }
 
-    public static void CheckForUpdates()
+    public static async void CheckForUpdates()
     {
         if (Data.Settings.IsAppDeployed || !Data.Settings.CheckForUpdates)
             return;
 
-        var version = Task.Run(() => Network.LatestAppRelease());
-        version.ContinueWith((t) =>
-        {
-            if (t.Result is null || t.Result <= Data.AppVersion)
-                return;
+        var version = await Network.LatestAppReleaseAsync();
+        if (version is null || version <= Data.AppVersion)
+            return;
 
-            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_NEW_VERSION(t.Result), Strings.S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
-        });
+        App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_NEW_VERSION(version), Strings.S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
     }
 }

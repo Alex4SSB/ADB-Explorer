@@ -46,5 +46,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex RE_DEVICE_WLAN_INET =
             new(@"inet (?<IP>[\d.]+)");
+
+        public static readonly Regex RE_NETSTAT_TCP_SOCK =
+            new(@"^ *TCP +(?<IP>[\d.]+):(?<Port>[\d]+)", RegexOptions.Multiline);
     }
 }

@@ -1,14 +1,18 @@
-﻿namespace ADB_Explorer.Services;
+﻿using ADB_Explorer.Models;
+using System.Net.Http;
+using System.Net.NetworkInformation;
+
+namespace ADB_Explorer.Services;
 
 public static class Network
 {
-    private static readonly WebClient Client = new WebClient() { Headers = new() { "User-Agent: Unity web player" } };
+    private static readonly HttpClient Client = new();
 
-    public static string GetRequest(Uri url)
+    public static async Task<string> GetRequestAsync(Uri url)
     {
         try
         {
-            return Client.DownloadString(url);
+            return await Client.GetStringAsync(url);
         }
         catch (Exception)
         {
@@ -16,9 +20,11 @@ public static class Network
         }
     }
 
-    public static Version LatestAppRelease()
+    public static async Task<Version> LatestAppReleaseAsync()
     {
-        var response = GetRequest(Resources.Links.REPO_RELEASES_URL);
+        Client.DefaultRequestHeaders.Add("User-Agent", "Unity web player");
+
+        var response = await GetRequestAsync(Resources.Links.REPO_RELEASES_URL);
         if (response is null)
             return null;
 
@@ -29,5 +35,22 @@ public static class Network
 
         var ver = json[0]["tag_name"].ToString().TrimStart('v');
         return new(ver);
+    }
+
+    public static string GetWsaIp()
+    {
+        var wsaInterface = NetworkInterface.GetAllNetworkInterfaces().Where(net => net.Name.Contains(AdbExplorerConst.WSA_INTERFACE_NAME));
+        if (!wsaInterface.Any())
+            return null;
+
+        var addresses = wsaInterface.First().GetIPProperties().UnicastAddresses;
+        if (!addresses.Any())
+            return null;
+
+        var ipv4 = addresses.Where(add => add.Address.AddressFamily is System.Net.Sockets.AddressFamily.InterNetwork);
+        if (!ipv4.Any())
+            return null;
+        
+        return ipv4.First().Address.ToString();
     }
 }

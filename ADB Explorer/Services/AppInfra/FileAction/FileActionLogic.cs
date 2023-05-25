@@ -483,13 +483,13 @@ internal static class FileActionLogic
         file.TrashIndex = null;
     }
 
-    public static void RefreshDrives(bool asyncClasify = false)
+    public static void RefreshDrives(bool asyncClassify = false)
     {
         if (Data.DevicesObject.Current is null)
             return;
 
-        if (!asyncClasify && Data.DevicesObject.Current.Drives?.Count > 0 && !Data.FileActions.IsExplorerVisible)
-            asyncClasify = true;
+        if (!asyncClassify && Data.DevicesObject.Current.Drives?.Count > 0 && !Data.FileActions.IsExplorerVisible)
+            asyncClassify = true;
 
         var driveTask = Task.Run(() =>
         {
@@ -526,7 +526,7 @@ internal static class FileActionLogic
 
             App.Current.Dispatcher.Invoke(async () =>
             {
-                if (await Data.DevicesObject.Current?.UpdateDrives(await t, App.Current.Dispatcher, asyncClasify))
+                if (await Data.DevicesObject.Current?.UpdateDrives(await t, App.Current.Dispatcher, asyncClassify))
                 {
                     Data.RuntimeSettings.FilterDrives = true;
                     FolderHelper.CombineDisplayNames();

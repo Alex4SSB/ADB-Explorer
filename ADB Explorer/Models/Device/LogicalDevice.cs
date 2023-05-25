@@ -91,13 +91,13 @@ public class LogicalDevice : Device
     /// Update <see cref="Device"/> with new drives
     /// </summary>
     /// <param name="drives">The new drives to be assigned</param>
-    /// <param name="asyncClasify"><see langword="true"/> to update only after fully acquiring all information</param>
-    public async Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClasify = false)
+    /// <param name="asyncClassify"><see langword="true"/> to update only after fully acquiring all information</param>
+    public async Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false)
     {
         bool collectionChanged;
 
         // MMC and OTG drives are searched for and only then UI is updated with all changes
-        if (asyncClasify)
+        if (asyncClassify)
         {
             collectionChanged = await UpdateExtensionDrivesAsync(drives, dispatcher);
         }

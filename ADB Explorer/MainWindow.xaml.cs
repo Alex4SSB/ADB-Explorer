@@ -848,6 +848,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
 
+        Task.Run(() => DeviceHelper.ConnectWsaDevice());
+
         if (!RuntimeSettings.IsDevicesPaneOpen)
             return;
 

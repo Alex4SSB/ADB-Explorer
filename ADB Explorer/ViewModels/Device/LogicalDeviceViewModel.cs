@@ -170,7 +170,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public void UpdateBattery() => Device.UpdateBattery();
 
-    public Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClasify = false) => Device.UpdateDrives(drives, dispatcher, asyncClasify);
+    public Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false) => Device.UpdateDrives(drives, dispatcher, asyncClassify);
 
     #endregion
 }
