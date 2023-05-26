@@ -415,7 +415,7 @@ public static class DeviceHelper
                     string newDeviceAddress = "";
                     var newDevice = Data.RuntimeSettings.ConnectNewDevice is null ? Data.DevicesObject.CurrentNewDevice : Data.RuntimeSettings.ConnectNewDevice;
 
-                    if (newDevice.Type is DeviceType.New)
+                    if (newDevice.Type is DeviceType.New && !AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(newDevice.IpAddress))
                     {
                         if (Data.Settings.SaveDevices)
                             Data.DevicesObject.AddHistoryDevice(HistoryDeviceViewModel.New(dev));
@@ -593,7 +593,7 @@ public static class DeviceHelper
     public static void ConnectWsaDevice()
     {
         if (Data.DevicesObject.UIList.Any(dev => dev.Type is DeviceType.WSA)
-            || DateTime.Now - lastWsaDiscovery > AdbExplorerConst.WSA_DISCOVERY_DELAY)
+            || DateTime.Now - lastWsaDiscovery < AdbExplorerConst.WSA_DISCOVERY_DELAY)
             return;
 
         lastWsaDiscovery = DateTime.Now;
