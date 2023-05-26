@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Converters.FileTypeClass;
 
@@ -298,7 +299,7 @@ public partial class ADBService
                     if (exitCode == 0)
                     {
                         props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(
-                            l => l[0] == '[' && l[^1] == ']').ToDictionary(
+                            l => l[0] == '[' && l[^1] == ']').TryToDictionary(
                                 line => line.Split(':')[0].Trim('[', ']', ' '),
                                 line => line.Split(':')[1].Trim('[', ']', ' '));
                     }
