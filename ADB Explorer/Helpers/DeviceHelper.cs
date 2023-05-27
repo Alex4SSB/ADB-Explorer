@@ -3,6 +3,7 @@ using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using System.Net.NetworkInformation;
 using static ADB_Explorer.Models.AbstractDevice;
 
 namespace ADB_Explorer.Helpers;
@@ -612,7 +613,7 @@ public static class DeviceHelper
                                                 out string stdout,
                                                 out _,
                                                 Encoding.UTF8,
-                                                new[] { "\"netstat", "-n", "-a", "-o", "|", "findstr", $"{wsaPid}\"" });
+                                                new[] { "\"netstat", "-nao", "|", "findstr", $"{wsaPid}\"" });
 
         if (retCode != 0)
             return;

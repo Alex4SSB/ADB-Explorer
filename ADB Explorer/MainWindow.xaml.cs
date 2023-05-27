@@ -1308,6 +1308,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
             collectionView.SortDescriptions.Clear();
+            collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
             collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
             collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
         }
@@ -1621,13 +1622,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var namePrefix = S_NEW_ITEM(isFolder);
         var index = FileClass.ExistingIndexes(DirList.FileList, namePrefix);
 
-        FileClass newItem = new($"{namePrefix}{index}", CurrentPath, isFolder ? FileType.Folder : FileType.File, isTemp: true);
+        var fileName = $"{namePrefix}{index}";
+        FileClass newItem = new(fileName, $"{CurrentPath}/{fileName}", isFolder ? FileType.Folder : FileType.File, isTemp: true);
         DirList.FileList.Insert(0, newItem);
 
         ExplorerGrid.ScrollIntoView(newItem);
         ExplorerGrid.SelectedItem = newItem;
+        
         var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-        if (cell is not null)
+        if (cell is null)
+            FileActionLogic.CreateNewItem(newItem);
+        else
             cell.IsEditing = true;
     }
 
@@ -1714,6 +1719,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         e.Column.SortDirection = sortDirection;
 
         collectionView.SortDescriptions.Clear();
+        collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
         collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(sortDirection)));
 
         if (e.Column.SortMemberPath != nameof(FileClass.FullName))

@@ -237,9 +237,10 @@ internal static class FileActionLogic
         Clipboard.SetText(path);
     }
 
-    public static void CreateNewItem(FileClass file, string newName)
+    public static void CreateNewItem(FileClass file, string newName = null)
     {
-        file.UpdatePath($"{Data.CurrentPath}{(Data.CurrentPath == "/" ? "" : "/")}{newName}");
+        if (!string.IsNullOrEmpty(newName))
+            file.UpdatePath($"{Data.CurrentPath}{(Data.CurrentPath == "/" ? "" : "/")}{newName}");
 
         if (Data.Settings.ShowExtensions)
             file.UpdateType();
