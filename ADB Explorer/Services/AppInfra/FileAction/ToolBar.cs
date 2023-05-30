@@ -102,19 +102,18 @@ internal static class MainToolBar
             iconSize: 20,
             children: new SubMenu[]
             {
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), @"\\.."),
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), @"\\.."),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
                 new SubMenuSeparator(() => Data.FileActions.PackageActionsEnabled),
-                new SubMenu(
-                    AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     "\uE7B8",
                     children: new SubMenu[]
                     {
-                        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), "\uE896"),
-                        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), "\uE25B"),
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), "\uE896"),
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), "\uE25B"),
                         new SubMenuSeparator(() => true),
-                        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), "\uF413"),
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), "\uF413"),
                     }),
             }),
     };
@@ -164,8 +163,8 @@ internal static class ExplorerContextMenu
             "\uE712",
             children: new SubMenu[]
             {
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
             }),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall), "\uE25B"),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore), "\uE845"),
@@ -185,10 +184,10 @@ internal static class ExplorerContextMenu
             "\uE7B8",
             children: new SubMenu[]
             {
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), "\uE896"),
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), "\uE25B"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), "\uE896"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), "\uE25B"),
                 new SubMenuSeparator(() => true),
-                new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), "\uF413"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), "\uF413"),
             }),
         new SubMenuSeparator(
             () => (Data.FileActions.CutEnabled

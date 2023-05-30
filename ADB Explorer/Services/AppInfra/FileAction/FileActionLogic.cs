@@ -652,9 +652,10 @@ internal static class FileActionLogic
 
         Data.FileActions.RenameEnabled = !Data.FileActions.IsRecycleBin && Data.SelectedFiles.Count() == 1 && Data.FileActions.IsRegularItem;
 
-        Data.FileActions.CutEnabled = !Data.SelectedFiles.All(file => file.CutState is FileClass.CutType.Cut) && Data.FileActions.IsRegularItem;
+        var allSelectedAreCut = Data.SelectedFiles.Any() && Data.CutItems.All(item => Data.SelectedFiles.Contains(item)) && Data.CutItems.Count == Data.SelectedFiles.Count();
+        Data.FileActions.CutEnabled = Data.SelectedFiles.Any() && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Cut) && Data.FileActions.IsRegularItem;
+        Data.FileActions.CopyEnabled = Data.SelectedFiles.Any() && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Copy) && Data.FileActions.IsRegularItem && !Data.FileActions.IsRecycleBin;
 
-        Data.FileActions.CopyEnabled = !Data.FileActions.IsRecycleBin && Data.FileActions.IsRegularItem && !Data.SelectedFiles.All(file => file.CutState is FileClass.CutType.Copy);
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
@@ -663,7 +664,7 @@ internal static class FileActionLogic
                                                  && Data.SelectedFiles.All(file => file.IsInstallApk)
                                                  && !Data.FileActions.IsRecycleBin
                                                  && !(Data.DevicesObject?.Current?.Type is AbstractDevice.DeviceType.Recovery
-                                                    && Data.FileActions.IsTemp);
+                                                 && Data.FileActions.IsTemp);
 
         Data.FileActions.IsCopyItemPathEnabled = Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
 
