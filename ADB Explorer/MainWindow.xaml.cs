@@ -55,6 +55,31 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private string prevPath = "";
 
+    private bool IsInEditMode
+    {
+        get
+        {
+            if (FileActions.IsAppDrive)
+                return false;
+
+            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            return cell switch
+            {
+                null => false,
+                _ => cell.IsEditing
+            };
+        }
+        set
+        {
+            var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            if (cell is not null)
+            {
+                cell.IsEditing = value;
+                FileActions.IsExplorerEditing = value;
+            }
+        }
+    }
+
     public MainWindow()
     {
         InitializeComponent();
@@ -211,7 +236,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.Rename):
-                    BeginRename();
+                    IsInEditMode ^= true;
                     break;
 
                 case nameof(AppRuntimeSettings.SelectAll):
@@ -529,7 +554,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && SelectedFiles.Count() == 1 && !IsInEditMode())
+        if (e.ChangedButton == MouseButton.Left && !FileActions.IsAppDrive && SelectedFiles.Count() == 1 && !IsInEditMode)
             DoubleClick(ExplorerGrid.SelectedItem);
     }
 
@@ -986,7 +1011,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var key = e.Key;
         if (key == Key.Enter)
         {
-            if (IsInEditMode())
+            if (IsInEditMode)
                 return;
 
             if (ExplorerGrid.SelectedItems.Count == 1 && ExplorerGrid.SelectedItem is FilePath file && file.IsDirectory)
@@ -1012,21 +1037,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         e.Handled = true;
     }
-
-    private bool IsInEditMode()
-    {
-        if (FileActions.IsAppDrive)
-            return false;
-
-        var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-        return cell switch
-        {
-            null => false,
-            _ => cell.IsEditing
-        };
-    }
-
-    private void IsInEditMode(bool isEditing) => CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]).IsEditing = isEditing;
 
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
@@ -1094,7 +1104,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     ExplorerGrid.SingleSelect(key);
                 break;
             case Key.Enter:
-                if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode())
+                if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode)
                     return false;
 
                 if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
@@ -1155,8 +1165,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             || point.X > actualRowWidth
             || point.X > DataGridContentWidth)
         {
-            if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode())
-                IsInEditMode(false);
+            if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode)
+                IsInEditMode = false;
 
             ExplorerGrid.UnselectAll();
 
@@ -1461,13 +1471,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         col.Width = column.ActualWidth;
     }
 
-    private void BeginRename()
-    {
-        var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-
-        cell.IsEditing = !cell.IsEditing;
-    }
-
     private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
     {
         var textBox = sender as TextBox;
@@ -1485,9 +1488,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
         var textBox = sender as TextBox;
 
-        if (e.Key == Key.Enter)
-            e.Handled = true;
-        else if (e.Key == Key.Escape)
+        if (e.Key is Key.Escape or Key.F2)
         {
             var name = FileHelper.DisplayName(textBox);
             if (string.IsNullOrEmpty(name))
@@ -1499,11 +1500,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 textBox.Text = FileHelper.DisplayName(sender as TextBox);
             }
         }
-        else
+        else if (e.Key != Key.Enter)
             return;
 
+        e.Handled = true;
+
         if (ExplorerGrid.SelectedCells.Count > 0)
+        {
             cell.IsEditing = false;
+            FileActions.IsExplorerEditing = false;
+        }
     }
 
     private void NameColumnCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -1582,7 +1588,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     Dispatcher.Invoke(() =>
                     {
                         if (e.LeftButton == MouseButtonState.Released && SelectedFiles.Count() == 1)
+                        {
                             cell.IsEditing = true;
+                            FileActions.IsExplorerEditing = true;
+                        }
                     });
                 });
             }
@@ -1629,11 +1638,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ExplorerGrid.ScrollIntoView(newItem);
         ExplorerGrid.SelectedItem = newItem;
         
-        var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-        if (cell is null)
+        IsInEditMode = true;
+        if (!IsInEditMode) // in case cell was not acquired
             FileActionLogic.CreateNewItem(newItem);
-        else
-            cell.IsEditing = true;
     }
 
     private void ExplorerGrid_PreviewKeyDown(object sender, KeyEventArgs e)

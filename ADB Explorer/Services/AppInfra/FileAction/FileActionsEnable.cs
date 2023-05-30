@@ -386,6 +386,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref itemToSelect, value);
     }
 
+    private bool isExplorerEditing = false;
+    public bool IsExplorerEditing
+    {
+        get => isExplorerEditing;
+        set => Set(ref isExplorerEditing, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<string> CopyPathAction = new();
