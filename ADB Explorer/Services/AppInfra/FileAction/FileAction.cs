@@ -145,7 +145,7 @@ internal static class AppActions
             () => FileActionLogic.CutFiles(Data.SelectedFiles),
             "Cut",
             Gestures[FileActionType.Cut]),
-         new(FileActionType.KeyboardCopy,
+        new(FileActionType.KeyboardCopy,
             () => Data.FileActions.CopyEnabled && !Data.FileActions.IsExplorerEditing,
             () => FileActionLogic.CutFiles(Data.SelectedFiles, true),
             "Copy",

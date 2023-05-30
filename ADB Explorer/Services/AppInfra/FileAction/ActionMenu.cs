@@ -18,6 +18,8 @@ internal abstract class ActionBase : ViewModelBase
 
     public FileAction Action { get; }
 
+    public FileAction AltAction { get; }
+
     public string Icon { get; }
 
     public int IconSize { get; }
@@ -40,7 +42,8 @@ internal abstract class ActionBase : ViewModelBase
                          string icon,
                          int iconSize,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                         AnimationSource animationSource = AnimationSource.Command)
+                         AnimationSource animationSource = AnimationSource.Command,
+                         FileAction altAction = null)
     {
         if (this is not SubMenu)
             StyleHelper.VerifyIcon(ref icon);
@@ -50,22 +53,28 @@ internal abstract class ActionBase : ViewModelBase
         IconSize = iconSize;
         Animation = animation;
         ActionAnimationSource = animationSource;
+        AltAction = altAction;
 
         if (animationSource is AnimationSource.Command)
         {
-            ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
-            {
-                if (!Data.Settings.IsAnimated)
-                    return;
+            ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += OnExecute_PropertyChanged;
 
-                ActivateAnimation = true;
-                Task.Delay(200).ContinueWith((t) => ActivateAnimation = false);
-            };
+            if (AltAction is not null)
+                ((CommandHandler)AltAction.Command.Command).OnExecute.PropertyChanged += OnExecute_PropertyChanged;
         }
     }
 
     protected ActionBase()
     { }
+
+    private void OnExecute_PropertyChanged(object sender, PropertyChangedEventArgs<bool> e)
+    {
+        if (!Data.Settings.IsAnimated)
+            return;
+
+        ActivateAnimation = true;
+        Task.Delay(200).ContinueWith((t) => ActivateAnimation = false);
+    }
 }
 
 internal abstract class ActionMenu : ActionBase
@@ -77,8 +86,9 @@ internal abstract class ActionMenu : ActionBase
                          IEnumerable<SubMenu> children = null,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          int iconSize = 18,
-                         AnimationSource animationSource = AnimationSource.Command)
-        : base(fileAction, icon, iconSize, animation, animationSource)
+                         AnimationSource animationSource = AnimationSource.Command,
+                         FileAction altAction = null)
+        : base(fileAction, icon, iconSize, animation, animationSource, altAction)
     {
         Children = children;
     }
@@ -115,8 +125,9 @@ internal class AltTextMenu : ActionMenu
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                        int iconSize = 18,
                        AnimationSource animationSource = AnimationSource.Command,
-                       bool isTooltipVisible = true)
-        : base(fileAction, icon, children, animation, iconSize, animationSource)
+                       bool isTooltipVisible = true,
+                       FileAction altAction = null)
+        : base(fileAction, icon, children, animation, iconSize, animationSource, altAction)
     {
         if (children is not null && children.Any())
             altText = fileAction.Description;
@@ -133,8 +144,9 @@ internal class DynamicAltTextMenu : AltTextMenu
                               string icon,
                               StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                               int iconSize = 20,
-                              AnimationSource animationSource = AnimationSource.Command)
-        : base(fileAction, icon, altText, animation: animation, iconSize: iconSize, animationSource: animationSource)
+                              AnimationSource animationSource = AnimationSource.Command,
+                              FileAction altAction = null)
+        : base(fileAction, icon, altText, animation: animation, iconSize: iconSize, animationSource: animationSource, altAction: altAction)
     {
         altText.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => AltText = e.NewValue;
     }
@@ -142,8 +154,8 @@ internal class DynamicAltTextMenu : AltTextMenu
 
 internal class AltObjectMenu : ActionMenu
 {
-    public AltObjectMenu(FileAction fileAction, string icon)
-        : base(fileAction, icon)
+    public AltObjectMenu(FileAction fileAction, string icon, FileAction altAction = null)
+        : base(fileAction, icon, altAction: altAction)
     { }
 }
 
@@ -161,8 +173,9 @@ internal class IconMenu : ActionMenu
                     StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                     int iconSize = 16,
                     ObservableProperty<bool> selectionBar = null,
-                    IEnumerable<SubMenu> children = null)
-        : base(fileAction, icon, children, animation, iconSize: iconSize)
+                    IEnumerable<SubMenu> children = null,
+                    FileAction altAction = null)
+        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction)
     {
         if (selectionBar is not null)
         {
@@ -179,8 +192,9 @@ internal class AnimatedNotifyMenu : DynamicAltTextMenu
                               string icon,
                               StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.Pulsate,
                               int iconSize = 18,
-                              AnimationSource animationSource = AnimationSource.External)
-        : base(fileAction, altText, icon, animation, iconSize, animationSource)
+                              AnimationSource animationSource = AnimationSource.External,
+                              FileAction altAction = null)
+        : base(fileAction, altText, icon, animation, iconSize, animationSource, altAction)
     { }
 }
 
@@ -191,8 +205,9 @@ internal class CompoundIconMenu : ActionMenu
     public CompoundIconMenu(FileAction fileAction,
                        UserControl icon,
                        IEnumerable<SubMenu> children = null,
-                       StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
-        : base(fileAction, null, children, animation)
+                       StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                       FileAction altAction = null)
+        : base(fileAction, null, children, animation, altAction: altAction)
     {
         CompoundIcon = icon;
     }
@@ -205,8 +220,8 @@ internal class SubMenu : ActionMenu
     protected SubMenu()
     { }
 
-    public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16)
-        : base(fileAction, icon, children, iconSize: iconSize)
+    public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null)
+        : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction)
     {
         IconIsText = !StyleHelper.IsFontIcon(icon);
     }
@@ -218,8 +233,9 @@ internal class CompoundIconSubMenu : SubMenu
 
     public CompoundIconSubMenu(FileAction fileAction,
                           UserControl icon,
-                          IEnumerable<SubMenu> children = null)
-        : base(fileAction, null, children)
+                          IEnumerable<SubMenu> children = null,
+                          FileAction altAction = null)
+        : base(fileAction, null, children, altAction: altAction)
     {
         CompoundIcon = icon;
     }
@@ -236,14 +252,22 @@ internal class SubMenuSeparator : SubMenu
 
 internal class ActionButton : ActionBase
 {
-    public ActionButton(FileAction action, string icon, int iconSize = 16, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
-        : base(action, icon, iconSize, animation)
+    public ActionButton(FileAction action,
+                        string icon,
+                        int iconSize = 16,
+                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                        FileAction altAction = null)
+        : base(action, icon, iconSize, animation, altAction: altAction)
     { }
 }
 
 internal class ActionAccentButton : ActionButton
 {
-    public ActionAccentButton(FileAction action, string icon, int iconSize = 16, StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
-        : base(action, icon, iconSize, animation)
+    public ActionAccentButton(FileAction action,
+                              string icon,
+                              int iconSize = 16,
+                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                              FileAction altAction = null)
+        : base(action, icon, iconSize, animation, altAction: altAction)
     { }
 }
