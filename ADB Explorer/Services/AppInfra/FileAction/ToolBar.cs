@@ -127,7 +127,7 @@ internal static class ExplorerContextMenu
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new PullIcon(-5)),
         new CompoundIconSubMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
             new PushIcon(-5),
             children: new SubMenu[]
             {
@@ -136,7 +136,7 @@ internal static class ExplorerContextMenu
             }),
         new SubMenuSeparator(() => Data.FileActions.PullEnabled || Data.FileActions.ContextPushEnabled),
         new SubMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.New),
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextNew),
             "\uECC8",
             children: new SubMenu[]
             {
