@@ -71,6 +71,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         set
         {
+
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
             if (cell is not null)
             {
@@ -1032,6 +1033,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             else
                 ExplorerGrid.SingleSelect(key);
         }
+        else if (key is Key.F2)
+        {
+            AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
+        }
         else
             return;
 
@@ -1499,6 +1504,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 textBox.Text = FileHelper.DisplayName(sender as TextBox);
             }
+
+            AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
         }
         else if (e.Key != Key.Enter)
             return;
