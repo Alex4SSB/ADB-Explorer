@@ -124,6 +124,7 @@
             BasedOn="{StaticResource BaseCellStyle}"
             TargetType="{x:Type DataGridCell}">
             <EventSetter Event="RequestBringIntoView" Handler="DataGridCell_RequestBringIntoView" />
+            <EventSetter Event="PreviewMouseDown" Handler="DataGridCell_PreviewMouseDown" />
         </Style>
         <Style
             x:Key="RowStyle"
@@ -229,6 +230,7 @@
                         KeyboardNavigation.TabNavigation="Once"
                         MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
+                        MouseMove="ExplorerGrid_MouseMove"
                         PreviewKeyDown="ExplorerGrid_PreviewKeyDown"
                         RowStyle="{StaticResource RowStyle}"
                         SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
@@ -411,6 +413,16 @@
                                 IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
+                    <Canvas
+                        x:Name="ExplorerCanvas"
+                        Grid.Row="2"
+                        PreviewMouseUp="ExplorerCanvas_PreviewMouseUp">
+                        <Border
+                            x:Name="SelectionRect"
+                            MouseMove="ExplorerGrid_MouseMove"
+                            Style="{StaticResource SelectionBorderStyle}"
+                            Visibility="Collapsed" />
+                    </Canvas>
                     <Grid>
                         <Grid.Style>
                             <Style TargetType="Grid">

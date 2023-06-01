@@ -55,6 +55,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private string prevPath = "";
 
+    private Point MouseDownPoint;
+
     private bool IsInEditMode
     {
         get
@@ -1156,6 +1158,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
         var point = e.GetPosition(ExplorerGrid);
+        MouseDownPoint = point;
         var actualRowWidth = 0.0;
         int selectionIndex;
 
@@ -1528,6 +1531,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (cell.IsEditing)
             return;
 
+        MouseDownPoint = e.GetPosition(ExplorerGrid);
         e.Handled = true;
         clickCount = e.ClickCount;
 
@@ -1797,5 +1801,65 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void NavigationBox_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         NavigationBox.Refresh();
+    }
+
+    private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
+    {
+        var point = e.GetPosition(ExplorerCanvas);
+        if (e.LeftButton == MouseButtonState.Released)
+        {
+            SelectionRect.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        SelectionRect.Visibility = Visibility.Visible;
+        if (point.Y > MouseDownPoint.Y)
+        {
+            Canvas.SetTop(SelectionRect, MouseDownPoint.Y);
+        }
+        else
+        {
+            Canvas.SetTop(SelectionRect, point.Y);
+        }
+        if (point.X > MouseDownPoint.X)
+        {
+            Canvas.SetLeft(SelectionRect, MouseDownPoint.X);
+        }
+        else
+        {
+            Canvas.SetLeft(SelectionRect, point.X);
+        }
+
+        SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
+        SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
+
+        SelectRows();
+    }
+
+    private void SelectRows()
+    {
+        Rect selection = new(Canvas.GetLeft(SelectionRect),
+                             Canvas.GetTop(SelectionRect),
+                             SelectionRect.Width,
+                             SelectionRect.Height);
+
+        for (int i = 0; i < ExplorerGrid.ItemContainerGenerator.Items.Count; i++)
+        {
+            if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow row)
+                continue;
+
+            Rect rowRect = new(row.TranslatePoint(new(), ExplorerGrid), row.DesiredSize);
+            row.IsSelected = rowRect.IntersectsWith(selection);
+        }
+    }
+
+    private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        MouseDownPoint = e.GetPosition(ExplorerGrid);
+    }
+
+    private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        SelectionRect.Visibility = Visibility.Collapsed;
     }
 }

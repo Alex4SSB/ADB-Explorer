@@ -117,6 +117,9 @@
     <Color x:Key="DarkTrashDriveAltBorder">#FFFF4500</Color>
     <Color x:Key="LightTrashDriveAltBorder">#FFEB3324</Color>
 
+    <SolidColorBrush x:Key="SelectionRectangleFill" Color="#6B2E86D8" />
+    <SolidColorBrush x:Key="SelectionRectangleBorderBrush" Color="#FF3399FF" />
+
     <ResourceDictionary x:Key="DynamicBrushes">
         <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
         <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />

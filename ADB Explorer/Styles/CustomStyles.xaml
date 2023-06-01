@@ -832,4 +832,9 @@
             ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
             ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
     </ItemsPanelTemplate>
+    <Style x:Key="SelectionBorderStyle" TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
+        <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
 </ResourceDictionary>
