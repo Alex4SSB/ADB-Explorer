@@ -118,13 +118,13 @@ public static class ShellFileOperation
         }
     }
 
-    public static string ReadAllText(ADBService.AdbDevice device, string fullPath)
+    public static string ReadAllText(ADBService.AdbDevice device, params string[] paths)
     {
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                                 "cat",
                                                                 out string stdout,
                                                                 out string stderr,
-                                                                ADBService.EscapeAdbShellString(fullPath));
+                                                                paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
 
         if (exitCode != 0)
             throw new Exception(stderr);

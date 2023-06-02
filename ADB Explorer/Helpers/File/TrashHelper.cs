@@ -35,21 +35,14 @@ internal static class TrashHelper
     public static Task ParseIndexers() => Task.Run(() =>
     {
         Data.RecycleIndex.Clear();
-        var indexers = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID, AdbExplorerConst.RECYCLE_PATH, new[] { "*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX });
 
-        foreach (var item in indexers)
-        {
-            var text = "";
-            try
-            {
-                text = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, item);
-            }
-            catch (Exception)
-            {
-                continue;
-            }
+        var indexers = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID,
+                                                  AdbExplorerConst.RECYCLE_PATH,
+                                                  new[] { "*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX });
 
-            Data.RecycleIndex.Add(new(text));
-        }
+        var lines = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, indexers).Split(new[] { '\r', '\n' },
+                                                                                          StringSplitOptions.RemoveEmptyEntries);
+
+        lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
     });
 }
