@@ -33,22 +33,7 @@ public class FilePath : ViewModelBase
         protected set => Set(ref fullPath, value);
     }
 
-    public string ParentPath
-    {
-        get
-        {
-            int originalIndex = FullPath.LastIndexOf(PathSeparator());
-            Index index;
-            if (originalIndex == 0)
-                index = 1;
-            else if (originalIndex < 0)
-                index = ^0;
-            else
-                index = originalIndex;
-
-            return FullPath[..index];
-        }
-    }
+    public string ParentPath => FullPath[..LastSeparatorIndex(FullPath, PathSeparator())];
 
     private string fullName;
     public string FullName
@@ -139,6 +124,18 @@ public class FilePath : ViewModelBase
             return RelationType.Ancestor;
 
         return RelationType.Unrelated;
+    }
+
+    public static Index LastSeparatorIndex(string path, char separator = '/')
+    {
+        int originalIndex = path.LastIndexOf(separator);
+
+        return originalIndex switch
+        {
+            0 => 1,
+            < 0 => ^0,
+            _ => originalIndex,
+        };
     }
 
     public override string ToString()

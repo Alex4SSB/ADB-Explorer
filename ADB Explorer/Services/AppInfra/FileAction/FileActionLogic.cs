@@ -515,7 +515,7 @@ internal static class FileActionLogic
                 UpdateInstallersCount();
 
             if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
-                UpdatePackages();
+                UpdatePackagesCount();
             }
 
             return drives;
@@ -547,6 +547,23 @@ internal static class FileActionLogic
                 ((VirtualDriveViewModel)temp)?.SetItemsCount((long)t.Result);
             }
         }));
+    }
+
+    public static void UpdatePackagesCount()
+    {
+        var packageTask = Task.Run(() => ShellFileOperation.GetPackagesCount(Data.CurrentADBDevice));
+
+        packageTask.ContinueWith((t) =>
+        {
+            if (t.IsCanceled || t.Result is null || Data.DevicesObject.Current is null)
+                return;
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                var package = Data.DevicesObject.Current.Drives.Find(d => d.Type is AbstractDrive.DriveType.Package);
+                ((VirtualDriveViewModel)package)?.SetItemsCount((int?)t.Result);
+            });
+        });
     }
 
     public static void UpdatePackages(bool updateExplorer = false)

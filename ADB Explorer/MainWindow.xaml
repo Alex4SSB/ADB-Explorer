@@ -1036,10 +1036,7 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <ToggleButton
-                                    x:Name="SettingsToggle"
-                                    Margin="0,0,6,0"
-                                    Style="{StaticResource SortedSettingsButtonStyle}" />
+                                <ToggleButton Margin="0,0,6,0" Style="{StaticResource SortedSettingsButtonStyle}" />
                                 <ToggleButton Grid.Column="1" Style="{StaticResource ExpandGroupsButtonStyle}" />
                                 <Grid Grid.Column="1">
                                     <Grid.Style>

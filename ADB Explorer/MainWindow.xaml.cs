@@ -916,8 +916,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CurrentPath = realPath;
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin) : realPath;
-
-        ParentPath = CurrentADBDevice.TranslateDeviceParentPath(CurrentPath);
+        ParentPath = CurrentPath[..FilePath.LastSeparatorIndex(CurrentPath)];
 
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
         FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);

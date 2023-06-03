@@ -246,6 +246,15 @@ public static class ShellFileOperation
         }
     }
 
+    public static ulong? GetPackagesCount(ADBService.AdbDevice device)
+    {
+        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, new[] { "list", "packages", "|", "wc", "-l" });
+        if (result != 0 || !ulong.TryParse(stdout, out ulong value))
+            return null;
+
+        return value;
+    }
+
     public static ObservableList<Package> GetPackages(ADBService.AdbDevice device, bool includeSystem = true, bool optionalParams = true)
     {
         // More package-specific info can be acquired using dumpsys package [package_name]
@@ -258,6 +267,7 @@ public static class ShellFileOperation
 
         if (includeSystem)
         {
+            // get system packages
             var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, args);
 
             if (systemExitCode == 0)
@@ -265,6 +275,7 @@ public static class ShellFileOperation
         }
 
         args[2] = "-3";
+        // get user packages
         var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, args);
 
         if (userExitCode == 0)

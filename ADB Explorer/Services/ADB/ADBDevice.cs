@@ -69,9 +69,6 @@ public partial class ADBService
 
         public void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
         {
-            // Get real path
-            path = TranslateDevicePath(path);
-
             // Execute adb ls to get file list
             var stdout = ExecuteDeviceAdbCommandAsync(ID, "ls", cancellationToken, EscapeAdbString(path));
             foreach (string stdoutLine in stdout)
@@ -237,8 +234,6 @@ public partial class ADBService
             return stdout.TrimEnd(LINE_SEPARATORS);
         }
 
-        public string TranslateDeviceParentPath(string path) => TranslateDevicePath(ConcatPaths(path, PARENT_DIR));
-
         public List<LogicalDrive> GetDrives()
         {
             List<LogicalDrive> drives = new();
@@ -285,7 +280,7 @@ public partial class ADBService
             if (exitCode != 0)
                 return null;
 
-            return re.Matches(stdout).Select(m => new LogicalDrive(m.Groups, isEmulator: ID.Contains("emulator"), forcePath: args[0] == "/" ? "/" : ""));
+            return re.Matches(stdout).Select(m => new LogicalDrive(m.Groups, isEmulator: Type is DeviceType.Emulator, forcePath: args[0] == "/" ? "/" : ""));
         }
 
         private Dictionary<string, string> props;
