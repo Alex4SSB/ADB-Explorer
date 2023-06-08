@@ -1,5 +1,5 @@
 ﻿using ADB_Explorer.Converters;
-using static ADB_Explorer.Services.ADBService.AdbDevice;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 

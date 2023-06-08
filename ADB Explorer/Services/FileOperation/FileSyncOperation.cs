@@ -1,8 +1,6 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AdbExplorerConst;
-using static ADB_Explorer.Services.ADBService.AdbDevice;
 
 namespace ADB_Explorer.Services;
 
@@ -11,14 +9,14 @@ public abstract class FileSyncOperation : FileOperation
     public delegate AdbSyncStatsInfo FileSyncMethod(
         string targetPath,
         string sourcePath,
-        ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+        ref ConcurrentQueue<FileOpProgressInfo> progressUpdates,
         CancellationToken cancellationToken);
 
-    private FileSyncMethod adbMethod;
+    private readonly FileSyncMethod adbMethod;
     private Task<AdbSyncStatsInfo> operationTask;
     private CancellationTokenSource cancelTokenSource;
-    private ConcurrentQueue<AdbSyncProgressInfo> waitingProgress;
-    private System.Timers.Timer progressPollTimer;
+    private ConcurrentQueue<FileOpProgressInfo> progressUpdates;
+    private readonly System.Timers.Timer progressPollTimer;
 
     public FileSyncOperation(
         Dispatcher dispatcher,
@@ -51,14 +49,14 @@ public abstract class FileSyncOperation : FileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgSyncProgressViewModel();
-        waitingProgress = new ConcurrentQueue<AdbSyncProgressInfo>();
+        progressUpdates = new ConcurrentQueue<FileOpProgressInfo>();
         cancelTokenSource = new CancellationTokenSource();
 
         string target = OperationName is OperationType.Push ? $"{TargetPath.FullPath}/{FilePath.FullName}" : TargetPath.FullPath;
 
         operationTask = Task.Run(() =>
         {
-            return adbMethod(target, FilePath.FullPath, ref waitingProgress, cancelTokenSource.Token);
+            return adbMethod(target, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token);
         }, cancelTokenSource.Token);
 
         operationTask.ContinueWith((t) => progressPollTimer.Stop());
@@ -102,10 +100,10 @@ public abstract class FileSyncOperation : FileOperation
 
     private void ProgressPollTimerHandler(object sender, System.Timers.ElapsedEventArgs e)
     {
-        var currProgress = waitingProgress.DequeueAllExisting().LastOrDefault();
+        var currProgress = progressUpdates.LastOrDefault();
         if ((Status == OperationStatus.InProgress) && (currProgress != null))
         {
-            StatusInfo = new InProgSyncProgressViewModel(currProgress);
+            StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)currProgress);
         }
     }
 }

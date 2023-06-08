@@ -27,33 +27,10 @@ public partial class ADBService
             ID = other.ID;
         }
 
-        public AdbDevice(LogicalDevice other)
-        {
-            ID = other.ID;
-        }
-
         private const string CURRENT_DIR = ".";
         private const string PARENT_DIR = "..";
         private static readonly string[] SPECIAL_DIRS = { CURRENT_DIR, PARENT_DIR };
         private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
-
-        public class AdbSyncProgressInfo
-        {
-            public string CurrentFile { get; set; }
-            public int? TotalPercentage { get; set; }
-            public int? CurrentFilePercentage { get; set; }
-            public UInt64? CurrentFileBytesTransferred { get; set; }
-        }
-
-        public class AdbSyncStatsInfo
-        {
-            public string TargetPath { get; set; }
-            public UInt64 FilesTransferred { get; set; }
-            public UInt64 FilesSkipped { get; set; }
-            public decimal? AverageRate { get; set; }
-            public UInt64? TotalBytes { get; set; }
-            public decimal? TotalTime { get; set; }
-        }
 
         private enum UnixFileMode : UInt32
         {
@@ -115,14 +92,14 @@ public partial class ADBService
         public AdbSyncStatsInfo PullFile(
             string targetPath,
             string sourcePath,
-            ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+            ref ConcurrentQueue<FileOpProgressInfo> progressUpdates,
             CancellationToken cancellationToken) =>
             DoFileSync("pull", "-a", targetPath, sourcePath, ref progressUpdates, cancellationToken);
 
         public AdbSyncStatsInfo PushFile(
             string targetPath,
             string sourcePath,
-            ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+            ref ConcurrentQueue<FileOpProgressInfo> progressUpdates,
             CancellationToken cancellationToken) =>
             DoFileSync("push", "", targetPath, sourcePath, ref progressUpdates, cancellationToken);
 
@@ -131,7 +108,7 @@ public partial class ADBService
             string operationArgs,
             string targetPath,
             string sourcePath,
-            ref ConcurrentQueue<AdbSyncProgressInfo> progressUpdates,
+            ref ConcurrentQueue<FileOpProgressInfo> progressUpdates,
             CancellationToken cancellationToken)
         {
             // Execute adb file sync operation
@@ -153,69 +130,27 @@ public partial class ADBService
             {
                 lastStdoutLine = stdoutLine;
                 var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS.Match(stdoutLine);
-                if (!progressMatch.Success)
+
+                if (progressMatch.Success)
+                    progressUpdates.Enqueue(new AdbSyncProgressInfo(progressMatch));
+                else
                 {
                     var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR.Match(stdoutLine);
                     if (errorMatch.Success)
                     {
-                        var message = errorMatch.Groups["Message"].Value;
+                        progressUpdates.Enqueue(new SyncErrorInfo(errorMatch));
                     }
-
-                    continue;
                 }
-
-                var currFile = progressMatch.Groups["CurrentFile"].Value;
-
-                string totalPercentageRaw = progressMatch.Groups["TotalPercentage"].Value;
-                int? totalPercentage = totalPercentageRaw.EndsWith("%") ? int.Parse(totalPercentageRaw.TrimEnd('%')) : null;
-
-                int? currPercentage = null;
-                if (progressMatch.Groups["CurrentPercentage"].Success)
-                {
-                    string currPercentageRaw = progressMatch.Groups["CurrentPercentage"].Value;
-                    currPercentage = currPercentageRaw.EndsWith("%") ? int.Parse(currPercentageRaw.TrimEnd('%')) : null;
-                }
-
-                UInt64? currBytes =
-                    progressMatch.Groups["CurrentBytes"].Success ?
-                    UInt64.Parse(progressMatch.Groups["CurrentBytes"].Value) : null;
-
-                progressUpdates.Enqueue(new AdbSyncProgressInfo
-                {
-                    TotalPercentage = totalPercentage,
-                    CurrentFile = currFile,
-                    CurrentFilePercentage = currPercentage,
-                    CurrentFileBytesTransferred = currBytes
-                });
             }
 
-            if (lastStdoutLine == null)
-            {
+            if (lastStdoutLine is null)
                 return null;
-            }
 
             var match = AdbRegEx.RE_FILE_SYNC_STATS.Match(lastStdoutLine);
             if (!match.Success)
-            {
                 return null;
-            }
 
-            var path = match.Groups["TargetPath"].Value;
-            UInt64 totalTransferred = UInt64.Parse(match.Groups["TotalTransferred"].Value);
-            UInt64 totalSkipped = UInt64.Parse(match.Groups["TotalSkipped"].Value);
-            decimal? averageRate = match.Groups["AverageRate"].Success ? decimal.Parse(match.Groups["AverageRate"].Value, CultureInfo.InvariantCulture) : null;
-            UInt64? totalBytes = match.Groups["TotalBytes"].Success ? UInt64.Parse(match.Groups["TotalBytes"].Value) : null;
-            decimal? totalTime = match.Groups["TotalTime"].Success ? decimal.Parse(match.Groups["TotalTime"].Value, CultureInfo.InvariantCulture) : null;
-
-            return new AdbSyncStatsInfo
-            {
-                TargetPath = path,
-                FilesTransferred = totalTransferred,
-                FilesSkipped = totalSkipped,
-                AverageRate = averageRate,
-                TotalBytes = totalBytes,
-                TotalTime = totalTime
-            };
+            return new AdbSyncStatsInfo(match);
         }
 
         public string TranslateDevicePath(string path)

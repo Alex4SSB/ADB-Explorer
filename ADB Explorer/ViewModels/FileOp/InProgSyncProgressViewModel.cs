@@ -1,5 +1,5 @@
 ﻿using ADB_Explorer.Converters;
-using static ADB_Explorer.Services.ADBService.AdbDevice;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -7,7 +7,7 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
 {
     private readonly AdbSyncProgressInfo adbInfo = null;
 
-    public InProgSyncProgressViewModel() : base(Services.FileOperation.OperationStatus.InProgress)
+    public InProgSyncProgressViewModel() : base(FileOperation.OperationStatus.InProgress)
     {
         
     }
