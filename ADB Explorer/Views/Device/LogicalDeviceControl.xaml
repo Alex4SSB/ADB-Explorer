@@ -121,9 +121,9 @@
                         Style="{DynamicResource DisabledButtonGlyphStyle}" />
                 </Button>
                 <Button
-                    Padding="14,5,14,6"
                     Command="{Binding BrowseCommand.Command}"
-                    Content="Browse" />
+                    Content="Browse"
+                    Style="{StaticResource DeviceTextButtonStyle}" />
             </ui:SimpleStackPanel>
         </Grid>
     </Expander>

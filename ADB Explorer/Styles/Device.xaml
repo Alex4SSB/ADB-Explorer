@@ -195,8 +195,14 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="ConnectNewDeviceButtonStyle"
+        x:Key="DeviceTextButtonStyle"
         BasedOn="{StaticResource ButtonStyle}"
+        TargetType="Button">
+        <Setter Property="Width" Value="74" />
+    </Style>
+    <Style
+        x:Key="ConnectNewDeviceButtonStyle"
+        BasedOn="{StaticResource DeviceTextButtonStyle}"
         TargetType="Button">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Content" Value="Connect" />
@@ -274,12 +280,16 @@
     <DataTemplate x:Key="HistoryDeviceTemplate">
         <views:HistoryDeviceControl />
     </DataTemplate>
+    <DataTemplate x:Key="WsaPkgDeviceTemplate">
+        <views:WsaPkgDeviceControl />
+    </DataTemplate>
     <helpers:DeviceTemplateSelector
         x:Key="DeviceTemplateSelector"
         HistoryDeviceTemplate="{StaticResource HistoryDeviceTemplate}"
         LogicalDeviceTemplate="{StaticResource LogicalDeviceTemplate}"
         NewDeviceTemplate="{StaticResource NewDeviceTemplate}"
-        ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}" />
+        ServiceDeviceTemplate="{StaticResource ServiceDeviceTemplate}"
+        WsaPkgDeviceTemplate="{StaticResource WsaPkgDeviceTemplate}" />
     <Style
         x:Key="DeviceContainerStyle"
         BasedOn="{StaticResource StretchListViewItem}"

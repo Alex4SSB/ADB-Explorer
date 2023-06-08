@@ -670,6 +670,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         LoadSettings();
         InitFileOpColumns();
 
+        DeviceHelper.UpdateWsaPkgStatus();
+
         SettingsHelper.CheckForUpdates();
     }
 
@@ -866,7 +868,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
 
             if (RuntimeSettings.IsDevicesPaneOpen)
+            {
                 DeviceHelper.UpdateDevicesRootAccess();
+
+                DeviceHelper.UpdateWsaPkgStatus();
+            }
 
             connectTimerMutex.ReleaseMutex();
         });

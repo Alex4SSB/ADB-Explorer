@@ -19,7 +19,6 @@ global using System.IO;
 global using System.IO.IsolatedStorage;
 global using System.Linq;
 global using System.Management;
-global using System.Net;
 global using System.Reflection;
 global using System.Runtime.CompilerServices;
 global using System.Runtime.InteropServices;

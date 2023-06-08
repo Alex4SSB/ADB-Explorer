@@ -303,6 +303,13 @@ public class AppSettings : INotifyPropertyChanged
         set => Set(ref isFirstRun, value);
     }
 
+    private bool showLaunchWsaMessage;
+    public bool ShowLaunchWsaMessage
+    {
+        get => Get(ref showLaunchWsaMessage, true);
+        set => Set(ref showLaunchWsaMessage, value);
+    }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public static bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;

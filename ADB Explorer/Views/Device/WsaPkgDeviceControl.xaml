@@ -1,0 +1,57 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.WsaPkgDeviceControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:WsaPkgDeviceViewModel}"
+    d:Width="200"
+    mc:Ignorable="d">
+    <Expander>
+        <Expander.Style>
+            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
+                <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
+                    <Setter.Value>
+                        <Border BorderBrush="{DynamicResource NewDeviceAltBorder}" BorderThickness="0,1" />
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+                        <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
+                            <Setter.Value>
+                                <ui:ProgressBar
+                                    Foreground="{DynamicResource NewDeviceAltBorder}"
+                                    IsIndeterminate="True"
+                                    Style="{StaticResource ExpanderHeaderProgressBarStyle}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Expander.Style>
+        <Expander.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="4"
+                    Style="{StaticResource DeviceNameTextBlockStyle}"
+                    Text="WSA App" />
+            </Grid>
+        </Expander.Header>
+        <Grid Style="{StaticResource DeviceContentGridStyle}">
+            <Button
+                HorizontalAlignment="Right"
+                Command="{Binding LaunchWsaCommand.Command}"
+                Content="Launch"
+                Style="{StaticResource DeviceTextButtonStyle}" />
+        </Grid>
+    </Expander>
+</UserControl>

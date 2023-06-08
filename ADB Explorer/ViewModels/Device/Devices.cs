@@ -48,6 +48,7 @@ public class Devices : AbstractDevice
     public Devices()
     {
         UIList.Add(new NewDeviceViewModel(new()));
+        UIList.Add(new WsaPkgDeviceViewModel(new()));
 
         if (Data.Settings.SaveDevices)
             RetrieveHistoryDevices();

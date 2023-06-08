@@ -65,7 +65,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
     public DeviceAction ConnectCommand { get; }
 
-    public DeviceAction ClearCommand { get; private set; }
+    public DeviceAction ClearCommand { get; }
 
     public NewDeviceViewModel(NewDevice device) : base(device)
     {

@@ -67,6 +67,8 @@ public static class Strings
     public const string S_WRITE_FILE_ERROR = "Could not push file back to device.";
     public const string S_DISABLE_MDNS = "ADB server needs to be restarted in order to disable mDNS.";
     public const string S_DISABLE_MDNS_TITLE = "Disable mDNS";
+    public const string S_WSA_PKG_TIP = "Launch WSA in background";
+    public const string S_WSA_LAUNCH = "Select Launch if ADB is already authorized in WSA.\nTo approve ADB, open WSA advanced settings.";
 
 
     public static string S_MISSING_REDIRECTION(string exception) =>

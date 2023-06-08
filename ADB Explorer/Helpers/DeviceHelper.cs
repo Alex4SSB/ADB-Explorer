@@ -3,7 +3,7 @@ using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
-using System.Net.NetworkInformation;
+using Windows.Management.Deployment;
 using static ADB_Explorer.Models.AbstractDevice;
 
 namespace ADB_Explorer.Helpers;
@@ -188,6 +188,30 @@ public static class DeviceHelper
         },
         () => Data.RuntimeSettings.ConnectNewDevice = device);
 
+    public static DeviceAction LaunchWsa(WsaPkgDeviceViewModel device) => new(
+        () => device.Status is DeviceStatus.Ok,
+        async () =>
+        {
+            if (Data.Settings.ShowLaunchWsaMessage)
+            {
+                var result = await DialogService.ShowConfirmation(Strings.S_WSA_LAUNCH,
+                                                                  "WSA Launch",
+                                                                  "Launch",
+                                                                  checkBoxText: "Do Not Show This Again.",
+                                                                  icon: DialogService.DialogIcon.Exclamation,
+                                                                  censorContent: false);
+
+                Data.Settings.ShowLaunchWsaMessage = !result.Item2;
+
+                if (result.Item1 is not ContentDialogResult.Primary)
+                    return;
+            }
+
+            device.SetLastLaunch();
+            device.SetStatus(DeviceStatus.Unauthorized);
+            Process.Start($"{AdbExplorerConst.WSA_PROCESS_NAME}.exe");
+        });
+
     public static void FilterDevices(ICollectionView collectionView)
     {
         if (collectionView is null)
@@ -252,6 +276,23 @@ public static class DeviceHelper
                                                               && qr.IpAddress == service.IpAddress))
                     return false;
             }
+
+            if (device is WsaPkgDeviceViewModel wsaPkg)
+            {
+                // if WSA is not installed - hide it
+                if (wsaPkg.Status is DeviceStatus.Offline)
+                    return false;
+
+                // if an online logical WSA device exists, the WSA package is hidden
+                if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Type is DeviceType.WSA && logical.Status is not DeviceStatus.Offline))
+                    return false;
+            }
+
+            // if there's an offline WSA device - hide it
+            if (device is LogicalDeviceViewModel logical
+                && logical.Type is DeviceType.WSA
+                && logical.Status is DeviceStatus.Offline)
+                return false;
 
             return true;
         };
@@ -590,30 +631,28 @@ public static class DeviceHelper
         Data.RuntimeSettings.IsDevicesPaneOpen = false;
     }
 
-    private static DateTime lastWsaDiscovery = DateTime.MinValue;
     public static void ConnectWsaDevice()
     {
-        if (Data.DevicesObject.UIList.Any(dev => dev.Type is DeviceType.WSA)
-            || DateTime.Now - lastWsaDiscovery < AdbExplorerConst.WSA_DISCOVERY_DELAY)
+        if (Data.DevicesObject.UIList.OfType<WsaPkgDeviceViewModel>().Any(wsa => wsa.Status is not DeviceStatus.Unauthorized))
             return;
 
-        lastWsaDiscovery = DateTime.Now;
+        if (Data.DevicesObject.LogicalDeviceViewModels.Any(dev => dev.Type is DeviceType.WSA && dev.Status is not DeviceStatus.Offline))
+            return;
+
+        var wsaPid = GetWsaPid();
+        if (wsaPid is null)
+            return;
 
         var wsaIp = Network.GetWsaIp();
         if (wsaIp is null)
             return;
 
-        var processes = Process.GetProcessesByName(AdbExplorerConst.WSA_PROCESS_NAME);
-        if (processes?.Length < 1)
-            return;
-
-        var wsaPid = processes.First().Id;
         var retCode = ADBService.ExecuteCommand("cmd.exe",
                                                 "/C",
                                                 out string stdout,
                                                 out _,
                                                 Encoding.UTF8,
-                                                new[] { "\"netstat", "-nao", "|", "findstr", $"{wsaPid}\"" });
+                                                new[] { "\"netstat", "-nao", "|", "findstr", $"{wsaPid.Value}\"" });
 
         if (retCode != 0)
             return;
@@ -633,5 +672,41 @@ public static class DeviceHelper
             ConnectPort = Data.DevicesObject.WsaPort,
         };
         Data.DevicesObject.CurrentNewDevice.ConnectCommand.Execute();
+    }
+
+    public static int? GetWsaPid() =>
+        Process.GetProcessesByName(AdbExplorerConst.WSA_PROCESS_NAME).FirstOrDefault()?.Id;
+
+    private static bool IsWsaInstalled() =>
+        new PackageManager().FindPackagesForUser("")?.Any(pkg => pkg.DisplayName == AdbExplorerConst.WSA_PACKAGE_NAME)
+        is true;
+
+    public static void UpdateWsaPkgStatus()
+    {
+        var wsa = Data.DevicesObject.UIList.OfType<WsaPkgDeviceViewModel>().FirstOrDefault();
+        if (wsa is null)
+            return;
+
+        if (Data.DevicesObject.LogicalDeviceViewModels.Any(dev => dev.Type is DeviceType.WSA && dev.Status is not DeviceStatus.Offline))
+            return;
+
+        if (DateTime.Now - wsa.LastLaunch < AdbExplorerConst.WSA_LAUNCH_DELAY)
+            return;
+
+        DeviceStatus newStatus;
+        var oldStatus = wsa.Status;
+
+        if (GetWsaPid() is not null)
+            newStatus = DeviceStatus.Unauthorized;
+        else if (IsWsaInstalled())
+            newStatus = DeviceStatus.Ok;
+        else
+            newStatus = DeviceStatus.Offline;
+
+        if (newStatus != oldStatus)
+        {
+            App.Current.Dispatcher.Invoke(() => wsa.SetStatus(newStatus));
+            Data.RuntimeSettings.FilterDevices = true;
+        }
     }
 }

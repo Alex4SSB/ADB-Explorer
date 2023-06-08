@@ -8,6 +8,7 @@ public class DeviceTemplateSelector : DataTemplateSelector
     public DataTemplate ServiceDeviceTemplate { get; set; }
     public DataTemplate NewDeviceTemplate { get; set; }
     public DataTemplate HistoryDeviceTemplate { get; set; }
+    public DataTemplate WsaPkgDeviceTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
     {
@@ -15,6 +16,7 @@ public class DeviceTemplateSelector : DataTemplateSelector
         ServiceDeviceViewModel => ServiceDeviceTemplate,
         HistoryDeviceViewModel => HistoryDeviceTemplate,
         NewDeviceViewModel => NewDeviceTemplate,
+        WsaPkgDeviceViewModel => WsaPkgDeviceTemplate,
         _ => throw new NotImplementedException(),
     };
 }
