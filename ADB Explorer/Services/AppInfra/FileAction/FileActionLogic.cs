@@ -2,7 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
-using static ADB_Explorer.Converters.FileTypeClass;
+using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services.AppInfra;
 
@@ -72,7 +72,7 @@ internal static class FileActionLogic
     public static void UpdateModifiedDates()
     {
         var items = Data.SelectedFiles;
-        Task.Run(() => ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, items, Data.DirList.FileList, App.Current.Dispatcher));
+        Task.Run(() => ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, items, App.Current.Dispatcher));
     }
 
     public static void OpenEditor()
@@ -722,9 +722,9 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        foreach (var item in dialog.FilesAsShellObject)
+        foreach (var item in dialog.FilesAsShellObject.Select(file => new FilePath(file) as SyncFile))
         {
-            var pushOpeartion = new FilePushOperation(App.Current.Dispatcher, Data.CurrentADBDevice, new FilePath(item), targetPath);
+            var pushOpeartion = new FilePushOperation(App.Current.Dispatcher, Data.CurrentADBDevice, item, (SyncFile)targetPath);
             pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOpeartion);
         }
@@ -771,7 +771,7 @@ internal static class FileActionLogic
             path = dialog.FileAsShellObject;
         }
 
-        var dirPath = new FilePath(path);
+        var dirPath = new FilePath(path) as SyncFile;
 
         if (!Directory.Exists(path.ParsingName))
         {
@@ -786,9 +786,9 @@ internal static class FileActionLogic
             }
         }
 
-        foreach (FileClass item in Data.SelectedFiles)
+        foreach (var item in Data.SelectedFiles.Cast<FilePath>())
         {
-            Data.FileOpQ.AddOperation(new FilePullOperation(App.Current.Dispatcher, Data.CurrentADBDevice, item, dirPath));
+            Data.FileOpQ.AddOperation(new FilePullOperation(App.Current.Dispatcher, Data.CurrentADBDevice, (SyncFile)item, dirPath));
         }
     }
 }

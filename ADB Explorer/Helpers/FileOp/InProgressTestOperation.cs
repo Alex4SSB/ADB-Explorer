@@ -9,7 +9,7 @@ public class InProgressTestOperation : FileOperation
     private readonly InProgSyncProgressViewModel info;
 
     private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
-        base(dispatcher, adbDevice, new FilePath(filePath))
+        base(dispatcher, adbDevice, new SyncFile(filePath))
     {
         info = new(adbInfo);
     }

@@ -5,7 +5,7 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class FileMoveOperation : FileOperation
+public class FileMoveOperation : AbstractShellFileOperation
 {
     private Task operationTask;
     private CancellationTokenSource cancelTokenSource;
@@ -18,19 +18,19 @@ public class FileMoveOperation : FileOperation
     private string indexerPath;
     private DateTime? dateModified;
 
-    public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false)
+    public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false)
         : base(dispatcher, adbDevice, filePath)
     {
         if (isCopy)
             OperationName = OperationType.Copy;
         else if (targetParent == AdbExplorerConst.RECYCLE_PATH)
             OperationName = OperationType.Recycle;
-        else if (((FileClass)filePath).TrashIndex is not null)
+        else if (filePath.TrashIndex is not null)
             OperationName = OperationType.Restore;
         else
             OperationName = OperationType.Move;
 
-        TargetPath = new(targetParent, fileType: Converters.FileTypeClass.FileType.Folder);
+        TargetPath = new(targetParent, fileType: AbstractFile.FileType.Folder);
 
         if (!targetParent.EndsWith('/'))
             targetParent += '/';
@@ -58,7 +58,7 @@ public class FileMoveOperation : FileOperation
             {
                 recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
                 fullTargetPath = $"{targetParent}{recycleName}";
-                dateModified = ((FileClass)FilePath).ModifiedTime;
+                dateModified = FilePath.ModifiedTime;
                 indexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{recycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
             }
             else
@@ -98,7 +98,7 @@ public class FileMoveOperation : FileOperation
                     {
                         if (OperationName is OperationType.Copy)
                         {
-                            FileClass newFile = new((FileClass)FilePath);
+                            FileClass newFile = new(FilePath);
                             newFile.UpdatePath(fullTargetPath);
                             newFile.ModifiedTime = dateModified;
                             fileList.Add(newFile);
@@ -108,19 +108,19 @@ public class FileMoveOperation : FileOperation
                         else
                         {
                             FilePath.UpdatePath(fullTargetPath);
-                            fileList.Add((FileClass)FilePath);
+                            fileList.Add(FilePath);
 
                             Data.FileActions.ItemToSelect = FilePath;
                         }
                     }
                     else if (FilePath.ParentPath == currentPath && OperationName is not OperationType.Copy)
                     {
-                        fileList.Remove((FileClass)FilePath);
+                        fileList.Remove(FilePath);
                     }
 
                     if (OperationName is OperationType.Recycle or OperationType.Restore)
                     {
-                        FileActionLogic.RemoveFile((FileClass)FilePath);
+                        FileActionLogic.RemoveFile(FilePath);
                     }
 
                     if (OperationName is OperationType.Restore)

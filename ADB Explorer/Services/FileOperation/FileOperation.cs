@@ -68,9 +68,9 @@ public abstract class FileOperation : ViewModelBase
 
     public ADBService.AdbDevice Device { get; }
 
-    public FilePath FilePath { get; }
+    public virtual FilePath FilePath { get; }
 
-    public FilePath TargetPath { get; protected set; }
+    public SyncFile TargetPath { get; protected set; }
 
     #endregion
 

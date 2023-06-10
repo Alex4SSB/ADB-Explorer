@@ -5,13 +5,14 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class FileDeleteOperation : FileOperation
+public class FileDeleteOperation : AbstractShellFileOperation
 {
     private Task operationTask;
     private CancellationTokenSource cancelTokenSource;
     private readonly ObservableList<FileClass> fileList;
 
-    public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath path, ObservableList<FileClass> fileList) : base(dispatcher, adbDevice, path)
+    public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass path, ObservableList<FileClass> fileList)
+        : base(dispatcher, adbDevice, path)
     {
         OperationName = OperationType.Delete;
         this.fileList = fileList;
@@ -40,12 +41,12 @@ public class FileDeleteOperation : FileOperation
             {
                 Dispatcher.Invoke(() =>
                 {
-                    FileActionLogic.RemoveFile((FileClass)FilePath);
+                    FileActionLogic.RemoveFile(FilePath);
 
-                    fileList.Remove((FileClass)FilePath);
+                    fileList.Remove(FilePath);
                 });
 
-                if (((FileClass)FilePath).TrashIndex is TrashIndexer indexer)
+                if (FilePath.TrashIndex is TrashIndexer indexer)
                 {
                     ShellFileOperation.SilentDelete(Device, indexer.IndexerPath);
                 }

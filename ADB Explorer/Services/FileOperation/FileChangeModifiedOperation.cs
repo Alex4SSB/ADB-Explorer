@@ -4,13 +4,14 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class FileChangeModifiedOperation : FileOperation
+public class FileChangeModifiedOperation : AbstractShellFileOperation
 {
     private Task operationTask;
     private CancellationTokenSource cancelTokenSource;
     private readonly DateTime newDate;
 
-    public FileChangeModifiedOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, ObservableList<FileClass> fileList, DateTime newDate) : base(dispatcher, adbDevice, filePath)
+    public FileChangeModifiedOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, DateTime newDate)
+        : base(dispatcher, adbDevice, filePath)
     {
         OperationName = OperationType.Update;
         this.newDate = newDate;
@@ -35,7 +36,7 @@ public class FileChangeModifiedOperation : FileOperation
             Status = operationStatus;
             StatusInfo = new CompletedShellProgressViewModel();
 
-            Dispatcher.Invoke(() => ((FileClass)FilePath).ModifiedTime = newDate);
+            Dispatcher.Invoke(() => FilePath.ModifiedTime = newDate);
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 

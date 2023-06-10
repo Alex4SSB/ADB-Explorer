@@ -5,7 +5,7 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class PackageInstallOperation : FileOperation
+public class PackageInstallOperation : AbstractShellFileOperation
 {
     private Task operationTask;
     private CancellationTokenSource cancelTokenSource;
@@ -36,7 +36,7 @@ public class PackageInstallOperation : FileOperation
 
     public PackageInstallOperation(Dispatcher dispatcher,
                                    ADBService.AdbDevice adbDevice,
-                                   FilePath path = null,
+                                   FileClass path = null,
                                    string packageName = null,
                                    ObservableList<Package> packageList = null,
                                    bool pushPackage = false,

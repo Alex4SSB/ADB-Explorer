@@ -23,7 +23,7 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
 
     public UInt64? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
 
-    public string CurrentFilePath => adbInfo?.CurrentFile;
+    public string CurrentFilePath => adbInfo?.AndroidPath;
 
     public string CurrentFileName => Path.GetFileName(CurrentFilePath);
 

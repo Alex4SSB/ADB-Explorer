@@ -76,7 +76,7 @@ internal class FileHelper
 
         try
         {
-            ShellFileOperation.MoveItem(Data.CurrentADBDevice, file, newPath);
+            ShellFileOperation.SilentMove(Data.CurrentADBDevice, file, newPath);
         }
         catch (Exception e)
         {

@@ -9,7 +9,7 @@ public class CompletedTestOperation : FileOperation
 {
     private readonly CompletedSyncProgressViewModel info;
 
-    private CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath, AdbSyncStatsInfo adbInfo) :
+    private CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, SyncFile filePath, AdbSyncStatsInfo adbInfo) :
         base(dispatcher, adbDevice, filePath)
     {
         info = new(adbInfo);
@@ -22,14 +22,14 @@ public class CompletedTestOperation : FileOperation
         => new(
             dispatcher, 
             adbDevice, 
-            new(folderPath, "", FileTypeClass.FileType.Folder, null), 
+            new(folderPath, AbstractFile.FileType.Folder), 
             new(folderPath, 10, 0, 2.3m, 3141592653589, 123));
 
     public static CompletedTestOperation CreateFileSkipped(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
         => new(dispatcher, adbDevice, new(filePath), new(filePath, 0, 1, 0m, 0, 0));
     
     public static CompletedTestOperation CreateFolderPartiallySkipped(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string folderPath)
-        => new(dispatcher, adbDevice, new(folderPath, "", FileTypeClass.FileType.Folder, null), new(folderPath, 7, 3, 2.3m, 3141592653589, 123));
+        => new(dispatcher, adbDevice, new(folderPath, AbstractFile.FileType.Folder), new(folderPath, 7, 3, 2.3m, 3141592653589, 123));
 
     public override void Start()
     {

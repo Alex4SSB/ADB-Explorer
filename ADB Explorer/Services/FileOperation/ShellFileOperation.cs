@@ -3,6 +3,17 @@ using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
 
+public abstract class AbstractShellFileOperation : FileOperation
+{
+    public override FileClass FilePath { get; }
+
+    public AbstractShellFileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath)
+        : base(dispatcher, adbDevice, filePath)
+    {
+        FilePath = filePath;
+    }
+}
+
 public static class ShellFileOperation
 {
     public static void SilentDelete(ADBService.AdbDevice device, IEnumerable<FilePath> items)
@@ -14,7 +25,7 @@ public static class ShellFileOperation
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, args);
     }
 
-    public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, ObservableList<FileClass> fileList, Dispatcher dispatcher)
+    public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, ObservableList<FileClass> fileList, Dispatcher dispatcher)
     {
         foreach (var item in items)
         {
@@ -22,9 +33,9 @@ public static class ShellFileOperation
         }
     }
 
-    public static bool MoveItem(ADBService.AdbDevice device, FilePath item, string targetPath) => MoveItem(device, item.FullPath, targetPath);
+    public static bool SilentMove(ADBService.AdbDevice device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
 
-    public static bool MoveItem(ADBService.AdbDevice device, string fullPath, string targetPath, bool throwOnError = true)
+    public static bool SilentMove(ADBService.AdbDevice device, string fullPath, string targetPath, bool throwOnError = true)
     {
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mv", out string stdout, out string stderr, new[] { ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath) });
 
@@ -36,7 +47,7 @@ public static class ShellFileOperation
         return exitCode == 0;
     }
 
-    public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FilePath> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, bool isCopy = false)
+    public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, bool isCopy = false)
     {
         if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
         {
@@ -56,10 +67,10 @@ public static class ShellFileOperation
         {
             foreach (var item in items)
             {
-                if (((FileClass)item).Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
+                if (item.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
                     continue;
 
-                Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, ((FileClass)item).TrashIndex.ParentPath, item.FullName, currentPath, fileList));
+                Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, item.TrashIndex.ParentPath, item.FullName, currentPath, fileList));
             }
         }
         else
@@ -69,7 +80,7 @@ public static class ShellFileOperation
                 var targetName = item.FullName;
                 if (currentPath == targetPath)
                 {
-                    targetName = $"{((FileClass)item).NoExtName}{FileClass.ExistingIndexes(fileList, ((FileClass)item).NoExtName, isCopy)}{((FileClass)item).Extension}";
+                    targetName = $"{item.NoExtName}{FileClass.ExistingIndexes(fileList, item.NoExtName, isCopy)}{item.Extension}";
                 }
                 Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, isCopy));
             }
@@ -232,9 +243,9 @@ public static class ShellFileOperation
 
     public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellObject> items, Dispatcher dispatcher, bool isPackagePath = false)
     {
-        foreach (var item in items)
+        foreach (var item in items.Select(file => new FilePath(file) as FileClass))
         {
-            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, new(item), pushPackage: true, isPackagePath: isPackagePath)));
+            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, item, pushPackage: true, isPackagePath: isPackagePath)));
         }
     }
 
@@ -284,7 +295,7 @@ public static class ShellFileOperation
         return packages;
     }
 
-    public static void ChangeDateFromName(ADBService.AdbDevice device, IEnumerable<FilePath> items, ObservableList<FileClass> fileList, Dispatcher dispatcher)
+    public static void ChangeDateFromName(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
         foreach (var item in items)
         {
@@ -310,9 +321,9 @@ public static class ShellFileOperation
             else
                 continue;
 
-            if (((FileClass)item).ModifiedTime is DateTime modified && modified > nameDate)
+            if (item.ModifiedTime is DateTime modified && modified > nameDate)
             {
-                dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new FileChangeModifiedOperation(dispatcher, device, item, fileList, nameDate)));
+                dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new FileChangeModifiedOperation(dispatcher, device, item, nameDate)));
             }
         }
     }

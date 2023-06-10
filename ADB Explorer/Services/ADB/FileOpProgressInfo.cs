@@ -1,7 +1,10 @@
-﻿namespace ADB_Explorer.Services;
+﻿using ADB_Explorer.ViewModels;
 
-public abstract class FileOpProgressInfo
+namespace ADB_Explorer.Services;
+
+public abstract class FileOpProgressInfo : ViewModelBase
 {
+    public string AndroidPath { get; protected set; }
 
 }
 
@@ -9,22 +12,33 @@ public class SyncErrorInfo : FileOpProgressInfo
 {
     public string Message { get; }
 
+    public string WindowsPath { get; }
+
     public SyncErrorInfo(Match match)
     {
         Message = match.Groups["Message"].Value;
+
+        if (match.Groups["AndroidPath"].Success)
+            AndroidPath = match.Groups["AndroidPath"].Value;
+        else if (match.Groups["AndroidPath1"].Success)
+            AndroidPath = match.Groups["AndroidPath1"].Value;
+
+        if (match.Groups["WindowsPath"].Success)
+            WindowsPath = match.Groups["WindowsPath"].Value;
+        else if (match.Groups["WindowsPath1"].Success)
+            WindowsPath = match.Groups["WindowsPath1"].Value;
     }
 }
 
 public class AdbSyncProgressInfo : FileOpProgressInfo
 {
-    public string CurrentFile { get; }
     public int? TotalPercentage { get; }
     public int? CurrentFilePercentage { get; }
     public UInt64? CurrentFileBytesTransferred { get; }
 
     public AdbSyncProgressInfo(Match match)
     {
-        CurrentFile = match.Groups["CurrentFile"].Value;
+        AndroidPath = match.Groups["CurrentFile"].Value;
 
         if (match.Groups["TotalPercentage"].Success)
         {
@@ -43,7 +57,7 @@ public class AdbSyncProgressInfo : FileOpProgressInfo
 
     public AdbSyncProgressInfo(string currentFile, int? totalPercentage, int? currentFilePercentage, ulong? currentFileBytesTransferred)
     {
-        CurrentFile = currentFile;
+        AndroidPath = currentFile;
         TotalPercentage = totalPercentage;
         CurrentFilePercentage = currentFilePercentage;
         CurrentFileBytesTransferred = currentFileBytesTransferred;
@@ -52,7 +66,7 @@ public class AdbSyncProgressInfo : FileOpProgressInfo
 
 public class AdbSyncStatsInfo
 {
-    public string TargetPath { get; }
+    public string SourcePath { get; }
     public UInt64 FilesTransferred { get; }
     public UInt64 FilesSkipped { get; }
     public decimal? AverageRate { get; }
@@ -61,7 +75,7 @@ public class AdbSyncStatsInfo
 
     public AdbSyncStatsInfo(Match match)
     {
-        TargetPath = match.Groups["TargetPath"].Value;
+        SourcePath = match.Groups["SourcePath"].Value;
         FilesTransferred = UInt64.Parse(match.Groups["TotalTransferred"].Value);
         FilesSkipped = UInt64.Parse(match.Groups["TotalSkipped"].Value);
         AverageRate = match.Groups["AverageRate"].Success ? decimal.Parse(match.Groups["AverageRate"].Value, CultureInfo.InvariantCulture) : null;
@@ -71,7 +85,7 @@ public class AdbSyncStatsInfo
 
     public AdbSyncStatsInfo(string targetPath, ulong filesTransferred, ulong filesSkipped, decimal? averageRate, ulong? totalBytes, decimal? totalTime)
     {
-        TargetPath = targetPath;
+        SourcePath = targetPath;
         FilesTransferred = filesTransferred;
         FilesSkipped = filesSkipped;
         AverageRate = averageRate;

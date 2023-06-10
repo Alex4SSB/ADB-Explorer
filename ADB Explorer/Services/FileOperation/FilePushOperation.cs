@@ -4,6 +4,6 @@ namespace ADB_Explorer.Services;
 
 public class FilePushOperation : FileSyncOperation
 {
-    public FilePushOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath sourcePath, FilePath targetPath)
+    public FilePushOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, SyncFile sourcePath, SyncFile targetPath)
         : base(dispatcher, OperationType.Push, adbDevice.PushFile, adbDevice, sourcePath, targetPath) {}
 }

@@ -1,27 +1,43 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.ViewModels;
-using static ADB_Explorer.Converters.FileTypeClass;
+﻿using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Services.ADBService;
 
 namespace ADB_Explorer.Models;
 
-public enum PathType
+public abstract class AbstractFile : ViewModelBase
 {
-    Android,
-    Windows,
+    public enum FilePathType
+    {
+        Android,
+        Windows,
+    }
+
+    public enum RelationType
+    {
+        Ancestor,
+        Descendant,
+        Self,
+        Unrelated,
+    }
+
+    public enum FileType
+    {
+        Socket = 0,
+        File = 1,
+        BlockDevice = 2,
+        Folder = 3,
+        CharDevice = 4,
+        FIFO = 5,
+        Unknown = 6,
+    }
+
+    private static readonly string[] names =
+        { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown" };
+    public static string GetFileTypeName(FileType type) => names[(int)type];
 }
 
-public enum RelationType
+public class FilePath : AbstractFile
 {
-    Ancestor,
-    Descendant,
-    Self,
-    Unrelated,
-}
-
-public class FilePath : ViewModelBase
-{
-    public PathType PathType { get; protected set; }
+    public FilePathType PathType { get; protected set; }
 
     protected bool IsRegularFile { private get; set; }
     public bool IsDirectory { get; protected set; }
@@ -53,12 +69,10 @@ public class FilePath : ViewModelBase
     }
 
     public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
-
-    public readonly AdbDevice Device; // will be left null for PC
     
     public FilePath(ShellObject windowsPath)
     {
-        PathType = PathType.Windows;
+        PathType = FilePathType.Windows;
 
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.Name;
@@ -68,17 +82,14 @@ public class FilePath : ViewModelBase
 
     public FilePath(string androidPath,
                     string fullName = "",
-                    FileType fileType = FileType.File,
-                    AdbDevice device = null)
+                    FileType fileType = FileType.File)
     {
-        PathType = PathType.Android;
+        PathType = FilePathType.Android;
 
         FullPath = androidPath;
         FullName = string.IsNullOrEmpty(fullName) ? GetFullName(androidPath) : fullName;
         IsDirectory = fileType == FileType.Folder;
         IsRegularFile = fileType == FileType.File;
-
-        Device = device;
     }
 
     public virtual void UpdatePath(string androidPath)
@@ -99,10 +110,10 @@ public class FilePath : ViewModelBase
 
     private char PathSeparator() => PathSeparator(PathType);
 
-    private static char PathSeparator(PathType pathType) => pathType switch
+    private static char PathSeparator(FilePathType pathType) => pathType switch
     {
-        PathType.Windows => '\\',
-        PathType.Android => '/',
+        FilePathType.Windows => '\\',
+        FilePathType.Android => '/',
         _ => throw new NotSupportedException(),
     };
 

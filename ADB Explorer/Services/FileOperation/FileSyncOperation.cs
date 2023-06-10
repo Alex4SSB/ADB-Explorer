@@ -1,6 +1,6 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
-using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Services;
 
@@ -9,35 +9,29 @@ public abstract class FileSyncOperation : FileOperation
     public delegate AdbSyncStatsInfo FileSyncMethod(
         string targetPath,
         string sourcePath,
-        ref ConcurrentQueue<FileOpProgressInfo> progressUpdates,
+        ref ObservableList<FileOpProgressInfo> progressUpdates,
         CancellationToken cancellationToken);
 
     private readonly FileSyncMethod adbMethod;
     private Task<AdbSyncStatsInfo> operationTask;
     private CancellationTokenSource cancelTokenSource;
-    private ConcurrentQueue<FileOpProgressInfo> progressUpdates;
-    private readonly System.Timers.Timer progressPollTimer;
+    private ObservableList<FileOpProgressInfo> progressUpdates;
+
+    public override SyncFile FilePath { get; }
 
     public FileSyncOperation(
         Dispatcher dispatcher,
         OperationType operationName,
         FileSyncMethod adbMethod,
         ADBService.AdbDevice adbDevice,
-        FilePath sourcePath,
-        FilePath targetPath) : base(dispatcher, adbDevice, sourcePath)
+        SyncFile sourcePath,
+        SyncFile targetPath) : base(dispatcher, adbDevice, sourcePath)
     {
         OperationName = operationName;
-        TargetPath = targetPath;
         this.adbMethod = adbMethod;
 
-        // Configure progress polling timer
-        progressPollTimer = new()
-        {
-            Interval = SYNC_PROG_UPDATE_INTERVAL.TotalMilliseconds,
-            AutoReset = true
-        };
-
-        progressPollTimer.Elapsed += ProgressPollTimerHandler;
+        FilePath = sourcePath;
+        TargetPath = targetPath;
     }
 
     public override void Start()
@@ -49,8 +43,10 @@ public abstract class FileSyncOperation : FileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgSyncProgressViewModel();
-        progressUpdates = new ConcurrentQueue<FileOpProgressInfo>();
         cancelTokenSource = new CancellationTokenSource();
+
+        progressUpdates = new();
+        progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
 
         string target = OperationName is OperationType.Push ? $"{TargetPath.FullPath}/{FilePath.FullName}" : TargetPath.FullPath;
 
@@ -59,7 +55,7 @@ public abstract class FileSyncOperation : FileOperation
             return adbMethod(target, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token);
         }, cancelTokenSource.Token);
 
-        operationTask.ContinueWith((t) => progressPollTimer.Stop());
+        operationTask.ContinueWith((t) => progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged);
 
         operationTask.ContinueWith((t) => 
         {
@@ -84,8 +80,17 @@ public abstract class FileSyncOperation : FileOperation
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
+    }
 
-        progressPollTimer.Start();
+    private void ProgressUpdates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (Status is not OperationStatus.InProgress)
+            return;
+
+        if (progressUpdates.LastOrDefault() is var currProgress and not null)
+        {
+            StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)currProgress);
+        }
     }
 
     public override void Cancel()
@@ -96,14 +101,5 @@ public abstract class FileSyncOperation : FileOperation
         }
 
         cancelTokenSource.Cancel();
-    }
-
-    private void ProgressPollTimerHandler(object sender, System.Timers.ElapsedEventArgs e)
-    {
-        var currProgress = progressUpdates.LastOrDefault();
-        if ((Status == OperationStatus.InProgress) && (currProgress != null))
-        {
-            StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)currProgress);
-        }
     }
 }

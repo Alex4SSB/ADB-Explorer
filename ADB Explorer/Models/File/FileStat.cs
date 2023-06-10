@@ -1,6 +1,4 @@
-﻿using static ADB_Explorer.Converters.FileTypeClass;
-
-namespace ADB_Explorer.Models;
+﻿namespace ADB_Explorer.Models;
 
 public class FileStat : FilePath
 {

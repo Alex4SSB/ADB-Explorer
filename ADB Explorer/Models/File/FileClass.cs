@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using System.Drawing;
-using static ADB_Explorer.Converters.FileTypeClass;
 using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Models;
@@ -240,7 +239,7 @@ public class FileClass : FileStat
             FileType.File => IsLink ? "Link" : GetTypeName(FullName),
             FileType.Folder => IsLink ? "Link" : "Folder",
             FileType.Unknown => "",
-            _ => Type.Name(),
+            _ => GetFileTypeName(Type),
         };
     }
 
