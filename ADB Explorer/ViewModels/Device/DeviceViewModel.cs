@@ -67,7 +67,7 @@ public abstract class DeviceViewModel : AbstractDevice
     /// <summary>
     /// Specifies whether the <see cref="Device"/> is (still) a real device - not offline, and not New or History
     /// </summary>
-    public bool DeviceExists => Type is not DeviceType.New and not DeviceType.History && Status is not DeviceStatus.Offline;
+    public virtual bool DeviceExists => Status is not DeviceStatus.Offline;
 
     public bool IsIpAddressValid => !string.IsNullOrWhiteSpace(IpAddress)
                                     && IpAddress.Count(c => c == '.') == 3

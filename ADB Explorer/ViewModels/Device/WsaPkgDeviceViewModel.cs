@@ -19,6 +19,8 @@ public class WsaPkgDeviceViewModel : DeviceViewModel
 
     public override string Tooltip => Strings.S_WSA_PKG_TIP;
 
+    public override bool DeviceExists => false;
+
     public WsaPkgDeviceViewModel(WsaPkgDevice device) : base(device)
     {
         Device = device;

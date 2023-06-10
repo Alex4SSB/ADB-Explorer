@@ -61,6 +61,8 @@ public class NewDeviceViewModel : PairingDeviceViewModel
 
     public override string Tooltip => Strings.S_NEW_DEVICE_TIP;
 
+    public override bool DeviceExists => false;
+
     #endregion
 
     public DeviceAction ConnectCommand { get; }

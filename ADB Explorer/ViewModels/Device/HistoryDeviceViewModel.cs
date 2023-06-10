@@ -18,6 +18,8 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
 
     public override string Tooltip => "Saved Device";
 
+    public override bool DeviceExists => false;
+
     public bool IsDeviceNameValid => !string.IsNullOrEmpty(DeviceName);
 
     #endregion
