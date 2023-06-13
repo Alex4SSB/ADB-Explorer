@@ -87,6 +87,11 @@ public abstract class FileSyncOperation : FileOperation
         if (Status is not OperationStatus.InProgress)
             return;
 
+        if (FilePath.PathType is AbstractFile.FilePathType.Android)
+            FilePath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
+        else
+            TargetPath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
+
         if (progressUpdates.LastOrDefault() is var currProgress and not null)
         {
             StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)currProgress);

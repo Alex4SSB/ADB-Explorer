@@ -332,6 +332,9 @@ public class FileClass : FileStat
 
         return base.Set(ref storage, value, propertyName);
     }
+
+    public static explicit operator SyncFile(FileClass self)
+        => new(self.FullPath, self.Type);
 }
 
 public class FileNameSort : IComparable

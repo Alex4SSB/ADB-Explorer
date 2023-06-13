@@ -705,11 +705,11 @@ internal static class FileActionLogic
     {
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
-        FilePath targetPath;
+        SyncFile targetPath;
         if (isContextMenu && Data.SelectedFiles.Count() == 1)
-            targetPath = Data.SelectedFiles.First();
+            targetPath = (SyncFile)Data.SelectedFiles.First();
         else
-            targetPath = new(Data.CurrentPath);
+            targetPath = new(Data.CurrentPath, FileType.Folder);
 
         var dialog = new CommonOpenFileDialog()
         {
@@ -722,9 +722,9 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        foreach (var item in dialog.FilesAsShellObject.Select(file => new FilePath(file) as SyncFile))
+        foreach (var item in dialog.FilesAsShellObject.Select(file => new SyncFile(file)))
         {
-            var pushOpeartion = new FilePushOperation(App.Current.Dispatcher, Data.CurrentADBDevice, item, (SyncFile)targetPath);
+            var pushOpeartion = new FilePushOperation(App.Current.Dispatcher, Data.CurrentADBDevice, item, targetPath);
             pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOpeartion);
         }
@@ -771,7 +771,7 @@ internal static class FileActionLogic
             path = dialog.FileAsShellObject;
         }
 
-        var dirPath = new FilePath(path) as SyncFile;
+        SyncFile dirPath = new(path);
 
         if (!Directory.Exists(path.ParsingName))
         {
@@ -786,7 +786,7 @@ internal static class FileActionLogic
             }
         }
 
-        foreach (var item in Data.SelectedFiles.Cast<FilePath>())
+        foreach (var item in Data.SelectedFiles)
         {
             Data.FileOpQ.AddOperation(new FilePullOperation(App.Current.Dispatcher, Data.CurrentADBDevice, (SyncFile)item, dirPath));
         }

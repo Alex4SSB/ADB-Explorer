@@ -39,7 +39,7 @@ public class FilePath : AbstractFile
 {
     public FilePathType PathType { get; protected set; }
 
-    protected bool IsRegularFile { private get; set; }
+    protected bool IsRegularFile { get; set; }
     public bool IsDirectory { get; protected set; }
 
     private string fullPath;
@@ -92,6 +92,8 @@ public class FilePath : AbstractFile
         IsRegularFile = fileType == FileType.File;
     }
 
+    protected FilePath() { }
+
     public virtual void UpdatePath(string androidPath)
     {
         FullPath = androidPath;
@@ -138,16 +140,14 @@ public class FilePath : AbstractFile
     }
 
     public static Index LastSeparatorIndex(string path, char separator = '/')
-    {
-        int originalIndex = path.LastIndexOf(separator);
+        => IndexAdjust(path.LastIndexOf(separator));
 
-        return originalIndex switch
-        {
-            0 => 1,
-            < 0 => ^0,
-            _ => originalIndex,
-        };
-    }
+    protected static Index IndexAdjust(int originalIndex) => originalIndex switch
+    {
+        0 => 1,
+        < 0 => ^0,
+        _ => originalIndex,
+    };
 
     public override string ToString()
     {
