@@ -145,6 +145,49 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
+    public static ScrollViewer GetChildScrollViewer(DataGrid control)
+    {
+        var sv = control.GetValue(ChildScrollViewerProperty) as ScrollViewer;
+
+        if (sv is null
+            && VisualTreeHelper.GetChild(control, 0) is Border border
+            && border.Child is ScrollViewer scroller)
+        {
+            control.SetValue(ChildScrollViewerProperty, scroller);
+            return scroller;
+        }
+
+        return sv;
+    }
+
+    public static readonly DependencyProperty ChildScrollViewerProperty =
+        DependencyProperty.RegisterAttached(
+            "ChildScrollViewer",
+            typeof(ScrollViewer),
+            typeof(StyleHelper),
+            null);
+
+    public static ItemsPresenter GetChildItemsPresenter(DataGrid control)
+    {
+        var cp = control.GetValue(ChildItemsPresenterProperty) as ItemsPresenter;
+        if (cp is null
+            && GetChildScrollViewer(control) is ScrollViewer sv
+            && sv.Content is ItemsPresenter presenter)
+        {
+            control.SetValue(ChildItemsPresenterProperty, presenter);
+            return presenter;
+        }
+
+        return cp;
+    }
+
+    public static readonly DependencyProperty ChildItemsPresenterProperty =
+        DependencyProperty.RegisterAttached(
+            "ChildItemsPresenter",
+            typeof(ItemsPresenter),
+            typeof(StyleHelper),
+            null);
+
     public static void VerifyIcon(ref string icon)
     {
         if (!IsFontIcon(icon))

@@ -1,8 +1,9 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class AppSettings : INotifyPropertyChanged
+public class AppSettings : ViewModelBase
 {
     public enum SystemVals
     {
@@ -321,8 +322,7 @@ public class AppSettings : INotifyPropertyChanged
     public bool WindowLoaded { get; set; } = false;
 
 
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
+    protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))
         {
@@ -336,8 +336,8 @@ public class AppSettings : INotifyPropertyChanged
 
         return true;
     }
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    protected virtual T Get<T>(ref T storage, T defaultValue, [CallerMemberName] string propertyName = null)
+
+    private static T Get<T>(ref T storage, T defaultValue, [CallerMemberName] string propertyName = null)
     {
         if (storage is null || storage.Equals(default(T)))
         {

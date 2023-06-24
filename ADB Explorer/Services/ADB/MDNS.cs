@@ -1,8 +1,9 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class MDNS : INotifyPropertyChanged
+public class MDNS : ViewModelBase
 {
     public MDNS()
     {
@@ -66,18 +67,4 @@ public class MDNS : INotifyPropertyChanged
             ? timePassed / AdbExplorerConst.MDNS_DOWN_RESPONSE_TIME * 100
             : 100;
     }
-
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
-    {
-        if (Equals(storage, value))
-            return false;
-
-        storage = value;
-        OnPropertyChanged(propertyName);
-
-        return true;
-    }
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }

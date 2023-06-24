@@ -21,10 +21,7 @@ public class SyncFile : FilePath
 
     }
 
-    private SyncFile ()
-    {
-
-    }
+    public void AddUpdates(params FileOpProgressInfo[] newUpdates) => AddUpdates(newUpdates.Where(o => o is not null));
 
     public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
     {
@@ -42,14 +39,13 @@ public class SyncFile : FilePath
             if (file is null)
             {
                 bool isDir = !group.Key.Equals(group.First().AndroidPath);
-                file = new()
-                {
-                    FullPath = group.Key,
-                    IsDirectory = isDir,
-                    IsRegularFile = !isDir,
-                };
+                file = new(group.Key, isDir ? FileType.Folder : FileType.File);
 
-                Children.Add(file);
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    Children.Add(file);
+                    OnPropertyChanged(nameof(Children));
+                });
             }
 
             file.AddUpdates(group);

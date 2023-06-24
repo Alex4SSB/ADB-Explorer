@@ -92,8 +92,6 @@ public class FilePath : AbstractFile
         IsRegularFile = fileType == FileType.File;
     }
 
-    protected FilePath() { }
-
     public virtual void UpdatePath(string androidPath)
     {
         FullPath = androidPath;

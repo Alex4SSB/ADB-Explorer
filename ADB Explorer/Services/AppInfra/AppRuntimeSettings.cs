@@ -259,6 +259,18 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref appTitle, value);
     }
 
+    public static bool IsDebug
+    {
+        get
+        {
+#if DEBUG
+            return true;
+#else
+            return false;
+#endif
+        }
+    }
+
     #region Event-only properties
 
     public bool NewFolder { get => false; set => OnPropertyChanged(); }

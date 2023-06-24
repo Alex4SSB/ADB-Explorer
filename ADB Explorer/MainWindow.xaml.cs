@@ -26,26 +26,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private int clickCount = 0;
     private int firstSelectedRow = -1;
 
-    private ItemsPresenter _explorerContentPresenter;
-    private ItemsPresenter ExplorerContentPresenter
-    {
-        get
-        {
-            if (_explorerContentPresenter is null
-                && VisualTreeHelper.GetChild(ExplorerGrid, 0) is Border border
-                && border.Child is ScrollViewer scroller
-                && scroller.Content is ItemsPresenter presenter)
-            {
-                _explorerContentPresenter = presenter;
-            }
-
-            return _explorerContentPresenter;
-        }
-    }
-
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight");
     private double ScrollContentPresenterMargin => ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top;
-    private double DataGridContentWidth => ExplorerContentPresenter is null ? 0 : ExplorerContentPresenter.ActualWidth;
+    private double DataGridContentWidth
+        => StyleHelper.GetChildItemsPresenter(ExplorerGrid) is ItemsPresenter presenter ? presenter.ActualWidth : 0;
 
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -130,7 +114,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
 
 #if DEBUG
-        FileOpHelper.TestCurrentOperation();
+        //FileOpHelper.TestCurrentOperation();
         DeviceHelper.TestDevices();
 #endif
 
@@ -1173,7 +1157,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         if (point.Y > (ExplorerGrid.Items.Count * ExplorerGrid.MinRowHeight + ColumnHeaderHeight)
-            || point.Y > (ExplorerGrid.ActualHeight - ExplorerContentPresenter.ActualHeight % ExplorerGrid.MinRowHeight)
+            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % ExplorerGrid.MinRowHeight)
             || point.Y < ColumnHeaderHeight + ScrollContentPresenterMargin
             || point.X > actualRowWidth
             || point.X > DataGridContentWidth)
@@ -1276,11 +1260,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        if (sender is ScrollViewer sv)
+        ScrollViewer scroller = sender switch
         {
-            sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta);
-            e.Handled = true;
-        }
+            ScrollViewer sv => sv,
+            DataGrid dg => StyleHelper.GetChildScrollViewer(dg),
+            _ => throw new NotSupportedException(),
+        };
+
+        scroller.ScrollToVerticalOffset(scroller.VerticalOffset - e.Delta);
+        e.Handled = true;
     }
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
@@ -1866,5 +1854,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         SelectionRect.Visibility = Visibility.Collapsed;
+    }
+
+    private void MenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        FileOpHelper.TestCurrentOperation();
     }
 }

@@ -548,14 +548,12 @@
                             </Grid.ColumnDefinitions>
                             <DataGrid
                                 x:Name="CurrentOperationDetailedDataGrid"
-                                AutoGenerateColumns="False"
-                                CanUserDeleteRows="False"
                                 CellStyle="{StaticResource DataGridCellStyle}"
                                 ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
                                 ColumnHeaderStyle="{StaticResource FileOpHeaderResizeStyle}"
-                                FocusVisualStyle="{x:Null}"
-                                HeadersVisibility="Column"
-                                ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}">
+                                ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}"
+                                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                                Style="{StaticResource DetailedFileOpGridStyle}">
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn
                                         x:Name="OpTypeColumn"
@@ -582,6 +580,22 @@
                                 <StaticResource ResourceKey="FileOpStopMenu" />
                                 <StaticResource ResourceKey="FileOpRemoveMenu" />
                                 <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
+                                <Menu>
+                                    <Menu.Style>
+                                        <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Menu.Style>
+                                    <MenuItem Click="MenuItem_Click">
+                                        <MenuItem.Header>
+                                            <ui:FontIcon Glyph="&#xE14A;" />
+                                        </MenuItem.Header>
+                                    </MenuItem>
+                                </Menu>
                             </WrapPanel>
                         </Grid>
                     </Grid>

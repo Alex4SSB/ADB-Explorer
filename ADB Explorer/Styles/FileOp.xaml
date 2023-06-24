@@ -1,9 +1,12 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019">
+    <converters:TreeViewIndentConverter x:Key="TreeViewIndentConverter" />
+    <converters:FileOpTreeStatusConverter x:Key="FileOpTreeStatusConverter" />
     <Style
         x:Key="CompletedOperationsProgressStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
@@ -252,19 +255,28 @@
     </Style>
     <DataTemplate x:Key="CompletedShellProgressTemplate">
         <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <ui:FontIcon Glyph="&#xF13E;" />
+            <ui:FontIcon
+                FontWeight="Bold"
+                Foreground="{DynamicResource NewDeviceAltBorder}"
+                Glyph="&#xF13E;" />
             <TextBlock Text="{Binding Name}" />
         </ui:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="CanceledOpProgressTemplate">
         <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <ui:FontIcon Glyph="&#xF13D;" />
+            <ui:FontIcon
+                FontWeight="Bold"
+                Foreground="{DynamicResource TrashDriveAltBorder}"
+                Glyph="&#xF13D;" />
             <TextBlock Text="{Binding Name}" />
         </ui:SimpleStackPanel>
     </DataTemplate>
     <DataTemplate x:Key="FailedOpProgressTemplate">
         <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <ui:FontIcon Glyph="&#xF13D;" />
+            <ui:FontIcon
+                FontWeight="Bold"
+                Foreground="{DynamicResource TrashDriveAltBorder}"
+                Glyph="&#xF13D;" />
             <TextBlock Text="{Binding Name}" />
         </ui:SimpleStackPanel>
     </DataTemplate>
@@ -287,4 +299,68 @@
             Content="{Binding OpIcon}"
             ToolTip="{Binding Tooltip}" />
     </DataTemplate>
+    <HierarchicalDataTemplate x:Key="FileOpTreeFolderTemplate" ItemsSource="{Binding Children}">
+        <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation), Converter={StaticResource TreeViewIndentConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <StackPanel Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation)}" Orientation="Horizontal">
+                <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                <TextBlock Style="{StaticResource FileNameTextBlockStyle}" Text="{Binding FullName}" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Text="{Binding Children, Converter={StaticResource FileOpTreeStatusConverter}}" />
+        </Grid>
+    </HierarchicalDataTemplate>
+    <HierarchicalDataTemplate x:Key="FileOpTreeFileTemplate">
+        <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation), Converter={StaticResource TreeViewIndentConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation)}"
+                Style="{StaticResource FileNameTextBlockStyle}"
+                Text="{Binding FullName}" />
+            <ui:SimpleStackPanel
+                Grid.Column="1"
+                Orientation="Horizontal"
+                Spacing="4">
+                <ui:FontIcon>
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="FontWeight" Value="Bold" />
+                            <Setter Property="Glyph" Value="&#xF13D;" />
+                            <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Completed">
+                                    <Setter Property="Glyph" Value="&#xF13E;" />
+                                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
+                <TextBlock x:Name="FileStatus" Text="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}}" />
+            </ui:SimpleStackPanel>
+        </Grid>
+    </HierarchicalDataTemplate>
+    <helpers:FileOpTreeTemplateSelector
+        x:Key="FileOpTreeTemplateSelector"
+        FileOpTreeFileTemplate="{StaticResource FileOpTreeFileTemplate}"
+        FileOpTreeFolderTemplate="{StaticResource FileOpTreeFolderTemplate}" />
+    <DataTemplate x:Key="FileOpRowDetailTemplate">
+        <TreeView ItemTemplateSelector="{StaticResource FileOpTreeTemplateSelector}" ItemsSource="{Binding FilePath.Children}" />
+    </DataTemplate>
+    <Style
+        x:Key="DetailedFileOpGridStyle"
+        BasedOn="{StaticResource ExplorerGridStyle}"
+        TargetType="DataGrid">
+        <Setter Property="AutoGenerateColumns" Value="False" />
+        <Setter Property="CanUserDeleteRows" Value="False" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HeadersVisibility" Value="Column" />
+        <Setter Property="RowDetailsTemplate" Value="{StaticResource FileOpRowDetailTemplate}" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+    </Style>
 </ResourceDictionary>

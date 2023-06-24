@@ -92,8 +92,12 @@
         </Style.Resources>
     </Style>
     <Style
-        x:Key="ExplorerGridCellStyle"
+        x:Key="FileNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock" />
+    <Style
+        x:Key="ExplorerGridCellStyle"
+        BasedOn="{StaticResource FileNameTextBlockStyle}"
         TargetType="TextBlock">
         <Setter Property="Margin" Value="4,0" />
         <Setter Property="FontSize" Value="13" />

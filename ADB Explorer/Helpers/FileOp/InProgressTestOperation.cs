@@ -8,10 +8,13 @@ public class InProgressTestOperation : FileOperation
 {
     private readonly InProgSyncProgressViewModel info;
 
+    public override SyncFile FilePath { get; }
+
     private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
-        base(dispatcher, adbDevice, new SyncFile(filePath))
+        base(dispatcher, adbDevice, new(filePath))
     {
         info = new(adbInfo);
+        FilePath = new SyncFile(filePath, adbInfo.CurrentFilePercentage.HasValue ? AbstractFile.FileType.Folder : AbstractFile.FileType.File);
     }
 
     public static InProgressTestOperation CreateProgressStart(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
@@ -45,5 +48,13 @@ public class InProgressTestOperation : FileOperation
     {
         Status = OperationStatus.Failed;
         StatusInfo = new FailedOpProgressViewModel(errorMsg);
+    }
+
+    public void UpdateStatus(FileOpProgressInfo update)
+    {
+        if (update is SyncErrorInfo)
+            return;
+
+        StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)update);
     }
 }
