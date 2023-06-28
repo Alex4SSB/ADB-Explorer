@@ -287,6 +287,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isWindowLoaded, value);
     }
 
+    private bool isExplorerLoaded = false;
+    public bool IsExplorerLoaded
+    {
+        get => isExplorerLoaded;
+        set => Set(ref isExplorerLoaded, value);
+    }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;

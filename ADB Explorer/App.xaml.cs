@@ -63,7 +63,7 @@ public partial class App : Application
     private void Application_Exit(object sender, ExitEventArgs e)
     {
         WriteSettings();
-        Task.Run(() => CleanTempFiles());
+        Task.Run(CleanTempFiles);
     }
 
     private void WriteSettings()

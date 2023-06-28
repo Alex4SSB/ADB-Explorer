@@ -115,8 +115,8 @@ public partial class ADBService
             var stdout = ExecuteCommandAsync(
                 Data.ProgressRedirectionPath,
                 ADB_PATH,
-                cancellationToken,
                 Encoding.Unicode,
+                cancellationToken,
                 "-s",
                 ID,
                 opertation,
@@ -269,12 +269,12 @@ public partial class ADBService
         public static void Reboot(string deviceId, string arg)
         {
             if (ExecuteDeviceAdbCommand(deviceId, "reboot", out string stdout, out string stderr, arg) != 0)
-                throw new Exception(stderr);
+                throw new Exception(string.IsNullOrEmpty(stderr) ? stdout : stderr);
         }
 
         public static bool GetDeviceIp(DeviceViewModel device)
         {
-            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out string stderr, new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
+            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
                 return false;
 
             var match = AdbRegEx.RE_DEVICE_WLAN_INET.Match(stdout);

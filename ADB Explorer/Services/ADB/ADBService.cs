@@ -105,7 +105,7 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> ExecuteCommandAsync(
-        string file, string cmd, CancellationToken cancellationToken, Encoding encoding, params string[] args)
+        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
         
@@ -123,7 +123,7 @@ public partial class ADBService
                 stdoutLineTask = cmdProcess.StandardOutput.ReadLineAsync();
                 stdoutLineTask.Wait(cancellationToken);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 cmdProcess.Kill();
                 throw;
@@ -138,7 +138,7 @@ public partial class ADBService
             stderrTask.Wait(cancellationToken);
             stderr = stderrTask.Result;
         }
-        catch (OperationCanceledException e)
+        catch (OperationCanceledException)
         {
             cmdProcess.Kill();
             throw;
@@ -153,7 +153,7 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
-        ExecuteCommandAsync(ADB_PATH, cmd, cancellationToken, Encoding.UTF8, args);
+        ExecuteCommandAsync(ADB_PATH, cmd, Encoding.UTF8, cancellationToken, args);
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {
@@ -208,7 +208,7 @@ public partial class ADBService
 
     public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");
     public static void ConnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("connect", fullAddress);
-    public static void DisonnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");
+    public static void DisconnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("disconnect", $"{host}:{port}");
     public static void DisconnectNetworkDevice(string fullAddress) => NetworkDeviceOperation("disconnect", fullAddress);
 
     public static void PairNetworkDevice(string fullAddress, string pairingCode) => NetworkDeviceOperation("pair", fullAddress, pairingCode);
@@ -286,13 +286,13 @@ public partial class ADBService
 
     public static bool Root(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "root", out string stdout, out string stderr);
+        ExecuteDeviceAdbCommand(device.ID, "root", out string stdout, out _);
         return !stdout.Contains("cannot run as root");
     }
 
     public static bool Unroot(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "unroot", out string stdout, out string stderr);
+        ExecuteDeviceAdbCommand(device.ID, "unroot", out string stdout, out _);
         var result = stdout.Contains("restarting adbd as non root");
         DevicesObject.UpdateDeviceRoot(device.ID, result);
 

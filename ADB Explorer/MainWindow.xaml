@@ -131,7 +131,6 @@
             BasedOn="{StaticResource BaseRowStyle}"
             TargetType="DataGridRow">
             <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}" />
-            <EventSetter Event="Unselected" Handler="DataGridRow_Unselected" />
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />

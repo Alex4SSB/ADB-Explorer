@@ -89,7 +89,7 @@ public class Devices : AbstractDevice
         if (devices is null)
             return;
 
-        var items = legacy ? ((List<HistoryDevice>)devices).Select(s => new HistoryDeviceViewModel(s)) : ((List<StorageDevice>)devices).Select(s => HistoryDeviceViewModel.New(s));
+        var items = legacy ? ((List<HistoryDevice>)devices).Select(s => new HistoryDeviceViewModel(s)) : ((List<StorageDevice>)devices).Select(HistoryDeviceViewModel.New);
         uiList.AddRange(items);
     }
 

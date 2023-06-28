@@ -325,7 +325,7 @@ public static class DeviceHelper
         if (services is null)
             return;
 
-        var viewModels = services.Select(s => ServiceDeviceViewModel.New(s));
+        var viewModels = services.Select(ServiceDeviceViewModel.New);
 
         if (Data.DevicesObject.ServicesChanged(viewModels))
         {
@@ -486,7 +486,7 @@ public static class DeviceHelper
 
     public static void DeviceListSetup(string selectedAddress = "")
     {
-        Task.Run(() => ADBService.GetDevices()).ContinueWith((t) => App.Current.Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
+        Task.Run(ADBService.GetDevices).ContinueWith((t) => App.Current.Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
     }
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
@@ -568,7 +568,7 @@ public static class DeviceHelper
 
     public static void SetAndroidVersion()
     {
-        var versionTask = Task.Run(async () => await Data.CurrentADBDevice.GetAndroidVersion());
+        var versionTask = Task.Run(Data.CurrentADBDevice.GetAndroidVersion);
         versionTask.ContinueWith((t) =>
         {
             if (t.IsCanceled)

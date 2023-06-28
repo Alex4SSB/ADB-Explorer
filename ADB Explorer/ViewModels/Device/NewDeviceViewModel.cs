@@ -83,7 +83,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
                     && string.IsNullOrEmpty(device.PairingCode)
                     && string.IsNullOrEmpty(device.HostName));
         },
-        () => ClearDevice());
+        ClearDevice);
 
         PropertyChanged += NewDeviceViewModel_PropertyChanged;
     }

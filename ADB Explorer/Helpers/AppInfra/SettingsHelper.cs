@@ -96,4 +96,51 @@ internal static class SettingsHelper
 
         App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_NEW_VERSION(version), Strings.S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
     }
+
+    public static void ShowAndroidRobotLicense()
+    {
+        HyperlinkButton ccLink = new()
+        {
+            Content = Strings.S_CC_NAME,
+            ToolTip = Links.L_CC_LIC,
+            NavigateUri = Links.L_CC_LIC,
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        HyperlinkButton apacheLink = new()
+        {
+            Content = Strings.S_APACHE_NAME,
+            ToolTip = Links.L_APACHE_LIC,
+            NavigateUri = Links.L_APACHE_LIC,
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        apacheLink.SetValue(Grid.ColumnProperty, 1);
+
+        SimpleStackPanel stack = new()
+        {
+            Spacing = 8,
+            Children =
+            {
+                new TextBlock()
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    Text = Strings.S_ANDROID_ROBOT_LIC,
+                },
+                new TextBlock()
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    Text = Strings.S_APK_ICON_LIC,
+                },
+                new Grid()
+                {
+                    ColumnDefinitions = { new(), new() },
+                    Children = { ccLink, apacheLink },
+                },
+            },
+        };
+
+        App.Current.Dispatcher.Invoke(() =>
+        {
+            DialogService.ShowDialog(stack, Strings.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
+        });
+    }
 }

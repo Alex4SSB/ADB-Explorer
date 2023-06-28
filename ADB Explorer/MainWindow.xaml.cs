@@ -77,7 +77,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DevicesList.ItemsSource = DevicesObject.UIList;
 
         FileOpQ = new(this.Dispatcher);
-        Task launchTask = Task.Run(() => LaunchSequence());
+        Task launchTask = Task.Run(LaunchSequence);
 
         ConnectTimer.Interval = CONNECT_TIMER_INIT;
         ConnectTimer.Tick += ConnectTimer_Tick;
@@ -463,7 +463,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void ThemeService_PropertyChanged(object sender, PropertyChangedEventArgs e) =>
-        Dispatcher.Invoke(() => SetTheme());
+        Dispatcher.Invoke(SetTheme);
 
     
 
@@ -575,6 +575,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (ExplorerGrid.SelectedItems.Count > 0 && !RuntimeSettings.IsExplorerLoaded)
+        {
+            ExplorerGrid.UnselectAll();
+            return;
+        }
+
         if (!SelectionHelper.GetSelectionInProgress(ExplorerGrid))
         {
             if (ExplorerGrid.SelectedItems.Count == 1)
@@ -669,7 +675,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void LoadSettings()
     {
-        Dispatcher.Invoke(() => SettingsHelper.SetSymbolFont());
+        Dispatcher.Invoke(SettingsHelper.SetSymbolFont);
 
         SetTheme(Settings.Theme);
         SetRenderMode();
@@ -787,6 +793,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.HomeEnabled = true;
         RuntimeSettings.BrowseDrive = null;
 
+        Task.Delay(EXPLORER_NAV_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
+
         if (Width > MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
             RuntimeSettings.IsSearchBoxFocused = true;
 
@@ -866,12 +874,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Dispatcher.BeginInvoke(new Action<IEnumerable<LogicalDevice>>(ListDevices), ADBService.GetDevices()).Wait();
 
-        Task.Run(() => DeviceHelper.ConnectWsaDevice());
+        Task.Run(DeviceHelper.ConnectWsaDevice);
 
         if (!RuntimeSettings.IsDevicesPaneOpen)
             return;
 
-        Dispatcher.Invoke(() => DevicesObject.UpdateLogicalIp());
+        Dispatcher.Invoke(DevicesObject.UpdateLogicalIp);
 
         if (MdnsService.State is MDNS.MdnsState.Running)
             Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(DeviceHelper.ListServices), WiFiPairingService.GetServices()).Wait();
@@ -1669,56 +1677,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)
-        => Task.Run(() => RefreshDevices());
-
-    private void DataGridRow_Unselected(object sender, RoutedEventArgs e)
-    {
-        ControlHelper.SetCornerRadius(e.OriginalSource as DataGridRow, new(RuntimeSettings.UseFluentStyles ? 2 : 0));
-    }
+        => Task.Run(RefreshDevices);
 
     private void AndroidRobotLicense_Click(object sender, RoutedEventArgs e)
-    {
-        HyperlinkButton ccLink = new()
-        {
-            Content = S_CC_NAME,
-            ToolTip = L_CC_LIC,
-            NavigateUri = L_CC_LIC,
-            HorizontalAlignment = HorizontalAlignment.Center,
-        };
-        HyperlinkButton apacheLink = new()
-        {
-            Content = S_APACHE_NAME,
-            ToolTip = L_APACHE_LIC,
-            NavigateUri = L_APACHE_LIC,
-            HorizontalAlignment = HorizontalAlignment.Center,
-        };
-        apacheLink.SetValue(Grid.ColumnProperty, 1);
-
-        SimpleStackPanel stack = new()
-        {
-            Spacing = 8,
-            Children =
-            {
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = S_ANDROID_ROBOT_LIC,
-                },
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = S_APK_ICON_LIC,
-                },
-                new Grid()
-                {
-                    ColumnDefinitions = { new(), new() },
-                    Children = { ccLink, apacheLink },
-                },
-            },
-        };
-
-        DialogService.ShowDialog(stack, S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
-    }
+        => SettingsHelper.ShowAndroidRobotLicense();
 
     private void ExplorerGrid_Sorting(object sender, DataGridSortingEventArgs e)
     {
@@ -1799,7 +1761,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
     {
         var point = e.GetPosition(ExplorerCanvas);
-        if (e.LeftButton == MouseButtonState.Released)
+        if (e.LeftButton == MouseButtonState.Released || !RuntimeSettings.IsExplorerLoaded)
         {
             SelectionRect.Visibility = Visibility.Collapsed;
             return;

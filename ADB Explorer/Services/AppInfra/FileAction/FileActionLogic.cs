@@ -613,6 +613,7 @@ internal static class FileActionLogic
         Data.FileActions.PackageActionsEnabled =
         Data.FileActions.IsCopyItemPathEnabled =
         Data.FileActions.UpdateModifiedEnabled =
+        Data.RuntimeSettings.IsExplorerLoaded =
         Data.FileActions.ParentEnabled = false;
 
         Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;

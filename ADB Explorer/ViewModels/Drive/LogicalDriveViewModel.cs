@@ -30,7 +30,7 @@ class LogicalDriveViewModel : DriveViewModel
     public void SetParams(LogicalDrive other)
     {
         var updatedParams = Drive.SetDriveParams(other.Size, other.Used, other.Available, other.UsageP);
-        updatedParams.ForEach(p => OnPropertyChanged(p));
+        updatedParams.ForEach(OnPropertyChanged);
     }
 
     public void SetExtension(bool isMMC = true) => SetType(isMMC ? DriveType.Expansion : DriveType.External);
