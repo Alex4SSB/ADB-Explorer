@@ -83,7 +83,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("Graphics", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: appSettings.GetProperty(nameof(Settings.HideForceFluent))),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: appSettings.GetProperty(nameof(RuntimeSettings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration", "Graphics"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
                                 "Disable Animations",

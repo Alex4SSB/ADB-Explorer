@@ -141,7 +141,7 @@
         <Setter Property="Foreground" Value="{ui:ThemeResource SystemControlBackgroundBaseHighBrush}" />
 
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
                 <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
                 <Setter Property="helpers:StyleHelper.BeginAnimation" Value="False" />
@@ -437,13 +437,13 @@
                             </MultiTrigger.EnterActions>
                         </MultiTrigger>
 
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                             <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
                             <Setter Property="BorderBrush" Value="{StaticResource DarkFluentAccentButtonBorderBrush}" />
                         </DataTrigger>
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
@@ -470,7 +470,7 @@
             </Setter.Value>
         </Setter>
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisualRoundedStyle}" />
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
                 <Setter Property="BorderThickness" Value="1" />

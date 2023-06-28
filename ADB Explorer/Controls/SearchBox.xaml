@@ -41,7 +41,7 @@
                     <Style.Triggers>
 
                         <!--  PADDING, MARGIN: Non-Fluent Style  -->
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
                             <Setter Property="Margin" Value="0,-1,0,0" />
                             <Setter Property="Padding" Value="0,0,-1,-1" />
                         </DataTrigger>
@@ -55,7 +55,7 @@
                         <!--  BACKGROUND, BORDER: Dark Theme, Checked  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
                             <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorLight2Brush}" />
@@ -64,7 +64,7 @@
                         <!--  BACKGROUND, BORDER: Light Theme, Checked  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
@@ -74,7 +74,7 @@
                         <!--  BORDER: Dark Theme, Unchecked. BACKGROUND: Unchecked  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding IsFiltered}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundNormal}" />
@@ -84,7 +84,7 @@
                         <!--  BORDER: Light Theme, Unchecked  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
                                 <Condition Binding="{Binding IsFiltered}" Value="False" />
                             </MultiDataTrigger.Conditions>
@@ -94,7 +94,7 @@
                         <!--  BACKGORUND: Unchecked, Mouse Over  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderMouseOver)}" Value="True" />
                                 <Condition Binding="{Binding IsFiltered}" Value="False" />
                             </MultiDataTrigger.Conditions>
@@ -104,7 +104,7 @@
                         <!--  Unchecked, Pressed  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsHeaderPressed)}" Value="True" />
                                 <Condition Binding="{Binding IsFiltered}" Value="False" />
                             </MultiDataTrigger.Conditions>
@@ -115,7 +115,7 @@
                         <!--  BORDER, BACKGROUND: Disabled  -->
                         <MultiDataTrigger>
                             <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                 <Condition Binding="{Binding IsEnabled}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
@@ -177,7 +177,7 @@
                 <TextBox.Style>
                     <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                                 <Setter Property="ui:ControlHelper.CornerRadius" Value="0,5,5,0" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding ElementName=Expander, Path=(helpers:ExpanderHelper.IsContentCollapsed)}" Value="False">

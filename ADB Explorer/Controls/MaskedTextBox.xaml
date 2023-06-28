@@ -26,7 +26,7 @@
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                     <Setter Property="BorderBrush" Value="{Binding ElementName=TextBoxControl, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                         <DataTrigger Binding="{Binding ElementName=TextBoxControl, Path=IsFocused}" Value="True">

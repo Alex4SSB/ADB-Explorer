@@ -195,9 +195,9 @@ public class Battery : ViewModelBase
         get
         {
             if (ChargeState == ChargingState.Unknown || Level is null)
-                return AppSettings.Is22H2 ? "\uEC02" : "\uF608";
+                return Data.RuntimeSettings.Is22H2 ? "\uEC02" : "\uF608";
 
-            var level = AppSettings.Is22H2 ? 0xEBA0 : 0xF5F2;
+            var level = Data.RuntimeSettings.Is22H2 ? 0xEBA0 : 0xF5F2;
             if (ChargeState == ChargingState.Charging)
                 level += 11;
 

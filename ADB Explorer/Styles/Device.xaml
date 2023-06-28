@@ -263,7 +263,7 @@
         TargetType="ui:FontIcon">
         <Setter Property="Margin" Value="0,4,0,0" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=HideForceFluent}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=HideForceFluent}" Value="True">
                 <Setter Property="Margin" Value="10,8,-10,0" />
             </DataTrigger>
         </Style.Triggers>
@@ -315,7 +315,7 @@
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                         <Setter Property="Height" Value="32" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -327,7 +327,7 @@
                 <Setter Property="Height" Value="30" />
                 <Setter Property="VerticalAlignment" Value="Center" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                         <Setter Property="Height" Value="32" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -342,7 +342,7 @@
                     <DataTrigger Binding="{Binding Status}" Value="Ok">
                         <Setter Property="IsEnabled" Value="True" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                         <Setter Property="Height" Value="32" />
                     </DataTrigger>
                 </Style.Triggers>
@@ -454,7 +454,7 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SelectedDevicesCount}" Value="0">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=IsWin11}" Value="True">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsWin11}" Value="True">
                 <Setter Property="CornerRadius" Value="0,0,7,0" />
             </DataTrigger>
         </Style.Triggers>

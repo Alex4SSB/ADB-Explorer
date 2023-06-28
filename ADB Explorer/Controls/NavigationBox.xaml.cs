@@ -203,8 +203,8 @@ public partial class NavigationBox : UserControl
                 Breadcrumbs[i].Padding = new(10, 4, 10, 4);
                 Breadcrumbs[i].Icon = new FontIcon() { Glyph = icon };
 
-                Breadcrumbs[i].Margin = Data.Settings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
-                ControlHelper.SetCornerRadius(Breadcrumbs[i], new(Data.Settings.UseFluentStyles ? 4 : 0));
+                Breadcrumbs[i].Margin = Data.RuntimeSettings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
+                ControlHelper.SetCornerRadius(Breadcrumbs[i], new(Data.RuntimeSettings.UseFluentStyles ? 4 : 0));
 
                 excessLength -= ControlSize.GetWidth(Breadcrumbs[i]);
 
@@ -289,7 +289,7 @@ public partial class NavigationBox : UserControl
         button.Padding = new(8, 0, 8, 0);
         button.Margin = new(0);
 
-        ControlHelper.SetCornerRadius(button, new(Data.Settings.UseFluentStyles ? 3 : 0));
+        ControlHelper.SetCornerRadius(button, new(Data.RuntimeSettings.UseFluentStyles ? 3 : 0));
 
         BreadcrumbMenu.Items.Add(button);
     }

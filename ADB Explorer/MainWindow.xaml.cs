@@ -122,7 +122,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             SettingsHelper.SplashScreenTask();
             Task.WaitAll(launchTask, versionTask);
-            Settings.WindowLoaded = true;
+            RuntimeSettings.IsWindowLoaded = true;
         });
     }
 
@@ -1673,7 +1673,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_Unselected(object sender, RoutedEventArgs e)
     {
-        ControlHelper.SetCornerRadius(e.OriginalSource as DataGridRow, new(Settings.UseFluentStyles ? 2 : 0));
+        ControlHelper.SetCornerRadius(e.OriginalSource as DataGridRow, new(RuntimeSettings.UseFluentStyles ? 2 : 0));
     }
 
     private void AndroidRobotLicense_Click(object sender, RoutedEventArgs e)

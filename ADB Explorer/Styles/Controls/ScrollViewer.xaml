@@ -160,7 +160,7 @@
 
     <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="False" />
             </DataTrigger>
         </Style.Triggers>

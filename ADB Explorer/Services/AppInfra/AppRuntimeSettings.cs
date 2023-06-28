@@ -8,6 +8,15 @@ namespace ADB_Explorer.Services;
 
 public class AppRuntimeSettings : ViewModelBase
 {
+    public AppRuntimeSettings()
+    {
+        Data.Settings.PropertyChanged += (object sender, PropertyChangedEventArgs e) =>
+        {
+            if (e.PropertyName == nameof(Data.Settings.ForceFluentStyles))
+                OnPropertyChanged(nameof(UseFluentStyles));
+        };
+    }
+
     public bool ResetAppSettings { get; set; } = false;
 
     private bool isSettingsPaneOpen = false;
@@ -259,7 +268,7 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref appTitle, value);
     }
 
-    public static bool IsDebug
+    public bool IsDebug
     {
         get
         {
@@ -270,6 +279,23 @@ public class AppRuntimeSettings : ViewModelBase
 #endif
         }
     }
+
+    private bool isWindowLoaded = false;
+    public bool IsWindowLoaded
+    {
+        get => isWindowLoaded;
+        set => Set(ref isWindowLoaded, value);
+    }
+
+    public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
+
+    public bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
+
+    public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
+
+    public bool HideForceFluent => !IsWin11;
+
+    public bool UseFluentStyles => IsWin11 || Data.Settings.ForceFluentStyles;
 
     #region Event-only properties
 

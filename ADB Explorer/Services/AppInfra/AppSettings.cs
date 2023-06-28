@@ -225,14 +225,8 @@ public class AppSettings : ViewModelBase
     public bool ForceFluentStyles
     {
         get => Get(ref forceFluentStyles, false);
-        set
-        {
-            if (Set(ref forceFluentStyles, value))
-                OnPropertyChanged(nameof(UseFluentStyles));
-        }
+        set => Set(ref forceFluentStyles, value);
     }
-
-    public bool UseFluentStyles => IsWin11 || ForceFluentStyles;
 
     private bool swRender;
     /// <summary>
@@ -269,7 +263,7 @@ public class AppSettings : ViewModelBase
         {
             var value = Get(ref disableAnimation, false);
 
-            if (!WindowLoaded)
+            if (!Data.RuntimeSettings.IsWindowLoaded)
                 IsAnimated = !disableAnimation;
 
             return value;
@@ -310,17 +304,6 @@ public class AppSettings : ViewModelBase
         get => Get(ref showLaunchWsaMessage, true);
         set => Set(ref showLaunchWsaMessage, value);
     }
-
-    public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
-
-    public static bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
-
-    public static bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
-
-    public bool HideForceFluent => !IsWin11;
-
-    public bool WindowLoaded { get; set; } = false;
-
 
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {

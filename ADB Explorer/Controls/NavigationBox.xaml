@@ -51,7 +51,7 @@
                     <Setter Property="IsIndeterminate" Value="False" />
                     <Setter Property="CornerRadius" Value="4,4,2,2" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
                             <Setter Property="CornerRadius" Value="0" />
                         </DataTrigger>
                         <MultiDataTrigger>

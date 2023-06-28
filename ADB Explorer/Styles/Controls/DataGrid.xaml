@@ -375,16 +375,16 @@
                                         <MultiDataTrigger>
                                             <MultiDataTrigger.Conditions>
                                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ScrollViewerHelper.AutoHideScrollBars)}" Value="True" />
-                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True" />
+                                                <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                                             </MultiDataTrigger.Conditions>
                                             <Setter TargetName="PART_VerticalScrollBar" Property="ui:ScrollBarHelper.IndicatorMode" Value="None" />
                                             <Setter TargetName="PART_HorizontalScrollBar" Property="ui:ScrollBarHelper.IndicatorMode" Value="None" />
                                         </MultiDataTrigger>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="True">
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                                             <Setter TargetName="ColumnHeadersAndRowsSeparator" Property="Height" Value="0" />
                                             <Setter TargetName="PART_ScrollContentPresenter" Property="Margin" Value="{StaticResource DataGridScrollContentPresenterMargin}" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UseFluentStyles}" Value="False">
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
                                             <Setter TargetName="ColumnHeadersAndRowsSeparator" Property="Height" Value="1" />
                                             <Setter TargetName="PART_ScrollContentPresenter" Property="Margin" Value="0" />
                                         </DataTrigger>
