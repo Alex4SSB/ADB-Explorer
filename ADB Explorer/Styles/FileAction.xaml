@@ -118,6 +118,7 @@
         AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
         CompoundIconMenuTemplate="{StaticResource CompoundIconMenuTemplate}"
         CompoundIconSubMenuTemplate="{x:Null}"
+        DualActionButtonTemplate="{StaticResource IconMenuTemplate}"
         DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
@@ -239,6 +240,7 @@
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
         CompoundIconMenuStyle="{StaticResource IconMenuStyle}"
         CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
+        DualActionButtonStyle="{StaticResource IconMenuStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"
@@ -340,5 +342,24 @@
         BasedOn="{StaticResource ButtonListStyle}"
         TargetType="ListView">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:EditorControls.List}}" />
+    </Style>
+    <Style
+        x:Key="FileOpControlsPanelStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="ItemsControl.ItemsSource" Value="{Binding Source={x:Static Member=services:FileOpControls.List}}" />
+    </Style>
+    <Style
+        x:Key="DetailedFileOpControlsStyle"
+        BasedOn="{StaticResource FileOpControlsPanelStyle}"
+        TargetType="Menu">
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Vertical" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>

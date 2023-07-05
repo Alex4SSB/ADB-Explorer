@@ -32,93 +32,14 @@
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <CollectionViewSource x:Key="FileListView" Source="{Binding Source={x:Static Member=models:Data.DirList}, Path=FileList}" />
+        <ContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
+        <ContextMenu x:Key="PathButtonsMenu" Style="{StaticResource PathBoxContextMenuStyle}" />
         <Style
             x:Key="FileOpHeaderResizeStyle"
             BasedOn="{StaticResource FileOpColumnHeaderStyle}"
             TargetType="DataGridColumnHeader">
             <EventSetter Event="SizeChanged" Handler="DataGridColumnHeader_SizeChanged" />
         </Style>
-        <ContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
-        <Menu
-            x:Key="FileOpStopMenu"
-            x:Shared="False"
-            Style="{StaticResource StopFileOpMenuStyle}">
-            <MenuItem Click="StopFileOperations_Click">
-                <MenuItem.Style>
-                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
-                        <Setter Property="Header">
-                            <Setter.Value>
-                                <ui:FontIcon Glyph="&#xE71A;" />
-                            </Setter.Value>
-                        </Setter>
-                        <Setter Property="ToolTip" Value="Stop" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsActive, NotifyOnTargetUpdated=True}" Value="False">
-                                <Setter Property="Header">
-                                    <Setter.Value>
-                                        <ui:FontIcon Glyph="&#xE768;" />
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="ToolTip" Value="Resume" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </MenuItem.Style>
-            </MenuItem>
-        </Menu>
-        <Menu
-            x:Key="FileOpRemoveMenu"
-            x:Shared="False"
-            FlowDirection="LeftToRight">
-            <Menu.Style>
-                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                    <Setter Property="IsEnabled" Value="True" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding ElementName=CurrentOperationDetailedDataGrid, Path=Items.Count}" Value="0">
-                            <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Menu.Style>
-            <MenuItem ToolTip="Remove Operations">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xE711;" />
-                </MenuItem.Header>
-                <MenuItem Click="RemovePending_Click" Header="Pending">
-                    <MenuItem.Icon>
-                        <ui:FontIcon Glyph="&#xECC5;" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Click="RemoveCompleted_Click" Header="Completed">
-                    <MenuItem.Icon>
-                        <ui:FontIcon Glyph="&#xE930;" />
-                    </MenuItem.Icon>
-                </MenuItem>
-                <MenuItem Click="RemovePendingAndCompleted_Click" Header="All">
-                    <MenuItem.Icon>
-                        <ui:FontIcon Glyph="&#xECC9;" />
-                    </MenuItem.Icon>
-                </MenuItem>
-            </MenuItem>
-        </Menu>
-        <Menu x:Key="FileOpDefaultFolderMenu" x:Shared="False">
-            <Menu.Style>
-                <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=DefaultFolder}" Value="">
-                            <Setter Property="IsEnabled" Value="False" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                    <Setter Property="IsEnabled" Value="True" />
-                </Style>
-            </Menu.Style>
-            <MenuItem Click="OpenDefaultFolder_Click" ToolTip="Open Default Folder">
-                <MenuItem.Header>
-                    <ui:FontIcon Glyph="&#xED25;" />
-                </MenuItem.Header>
-            </MenuItem>
-        </Menu>
-        <ContextMenu x:Key="PathButtonsMenu" Style="{StaticResource PathBoxContextMenuStyle}" />
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
@@ -568,34 +489,11 @@
                                 Grid.Column="1"
                                 BorderBrush="Gray"
                                 BorderThickness="1,0,0,0" />
-                            <WrapPanel
+                            <Menu
+                                x:Name="FileOpControlsMenu"
                                 Grid.Column="1"
                                 Margin="1,0,0,0"
-                                FlowDirection="RightToLeft"
-                                Orientation="Vertical">
-                                <WrapPanel.Resources>
-                                    <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
-                                </WrapPanel.Resources>
-                                <StaticResource ResourceKey="FileOpStopMenu" />
-                                <StaticResource ResourceKey="FileOpRemoveMenu" />
-                                <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
-                                <Menu>
-                                    <Menu.Style>
-                                        <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </Menu.Style>
-                                    <MenuItem Click="MenuItem_Click">
-                                        <MenuItem.Header>
-                                            <ui:FontIcon Glyph="&#xE14A;" />
-                                        </MenuItem.Header>
-                                    </MenuItem>
-                                </Menu>
-                            </WrapPanel>
+                                Style="{StaticResource DetailedFileOpControlsStyle}" />
                         </Grid>
                     </Grid>
                 </Expander.Content>
@@ -775,25 +673,14 @@
                                 VerticalAlignment="Center"
                                 FontSize="24"
                                 Text="File Operations" />
-                            <Menu HorizontalAlignment="Right">
-                                <MenuItem Click="FileOperationsButton_Click" ToolTip="Hide">
-                                    <MenuItem.Header>
-                                        <ui:FontIcon Glyph="&#xE761;" Style="{DynamicResource GlyphFont}" />
-                                    </MenuItem.Header>
-                                </MenuItem>
-                            </Menu>
+                            <!--<Menu HorizontalAlignment="Right">
+                                compact file operations hide button was here
+                            </Menu>-->
                             <Border
                                 Grid.Row="1"
                                 Margin="0,0,0,6"
                                 BorderBrush="Gray">
-                                <WrapPanel FlowDirection="LeftToRight" Orientation="Horizontal">
-                                    <WrapPanel.Resources>
-                                        <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon" />
-                                    </WrapPanel.Resources>
-                                    <StaticResource ResourceKey="FileOpStopMenu" />
-                                    <StaticResource ResourceKey="FileOpRemoveMenu" />
-                                    <StaticResource ResourceKey="FileOpDefaultFolderMenu" />
-                                </WrapPanel>
+                                <Menu x:Name="CompactFileOpControlsMenu" Style="{StaticResource FileOpControlsPanelStyle}" />
                             </Border>
                             <Grid Grid.Row="2">
                                 <Grid.Style>

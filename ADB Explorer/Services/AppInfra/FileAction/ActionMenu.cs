@@ -20,7 +20,12 @@ internal abstract class ActionBase : ViewModelBase
 
     public FileAction AltAction { get; }
 
-    public string Icon { get; }
+    private string icon = "";
+    public string Icon
+    {
+        get => icon;
+        protected set => Set(ref icon, value);
+    }
 
     public int IconSize { get; }
 
@@ -270,4 +275,16 @@ internal class ActionAccentButton : ActionButton
                               FileAction altAction = null)
         : base(action, icon, iconSize, animation, altAction: altAction)
     { }
+}
+
+internal class DualActionButton : IconMenu
+{
+    public DualActionButton(FileAction action,
+                            ObservableProperty<string> icon,
+                            int iconSize = 20,
+                            StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None)
+        : base(action, icon, animation, iconSize)
+    {
+        icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
+    }
 }

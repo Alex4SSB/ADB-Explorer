@@ -112,6 +112,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         UpperProgressBar.DataContext = FileOpQ;
         CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
+        UpdateFileOp();
 
 #if DEBUG
         //FileOpHelper.TestCurrentOperation();
@@ -336,20 +337,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void FileOperationQueue_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(FileOperationQueue.IsActive) or nameof(FileOperationQueue.AnyFailedOperations) or nameof(FileOpQ.Progress))
+        if (FileOperationQueue.NotifyProperties.Contains(e.PropertyName))
+            UpdateFileOp();
+    }
+
+    private void UpdateFileOp()
+    {
+        FileActionLogic.UpdateFileOpControls();
+        FileOpControlsMenu.Items.Refresh();
+
+        if (FileOpQ.AnyFailedOperations)
+            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
+        else if (FileOpQ.IsActive)
         {
-            if (FileOpQ.AnyFailedOperations)
-                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
-            else if (FileOpQ.IsActive)
-            {
-                if (FileOpQ.Progress == 0)
-                    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
-                else
-                    TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
-            }
+            if (FileOpQ.Progress == 0)
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Indeterminate;
             else
-                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
+                TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Normal;
         }
+        else
+            TaskbarItemInfo.ProgressState = TaskbarItemProgressState.None;
     }
 
     private void CommandLog_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -1232,11 +1239,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void FileOperationsButton_Click(object sender, RoutedEventArgs e)
-    {
-        RuntimeSettings.IsOperationsViewOpen = !RuntimeSettings.IsOperationsViewOpen;
-    }
-
     private void FilterDrives()
     {
         var collectionView = CollectionViewSource.GetDefaultView(DriveList.ItemsSource);
@@ -1395,34 +1397,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void UpdateQrClass() => PairingQrImage.Source = QrClass.Image;
-
-    private void RemovePending_Click(object sender, RoutedEventArgs e)
-    {
-        FileOpQ.ClearPending();
-    }
-
-    private void RemoveCompleted_Click(object sender, RoutedEventArgs e)
-    {
-        FileOpQ.ClearCompleted();
-    }
-
-    private void OpenDefaultFolder_Click(object sender, RoutedEventArgs e)
-    {
-        Process.Start("explorer.exe", Settings.DefaultFolder);
-    }
-
-    private void RemovePendingAndCompleted_Click(object sender, RoutedEventArgs e)
-    {
-        FileOpQ.Clear();
-    }
-
-    private void StopFileOperations_Click(object sender, RoutedEventArgs e)
-    {
-        if (FileOpQ.IsActive)
-            FileOpQ.Stop();
-        else
-            FileOpQ.Start();
-    }
 
     private void Window_SourceInitialized(object sender, EventArgs e)
     {

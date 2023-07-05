@@ -87,6 +87,8 @@ public class FileOperationQueue : ViewModelBase
 
     private readonly Mutex mutex = new Mutex();
 
+    public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
+
     #endregion
 
     private double currOperationLastProgress = 0;

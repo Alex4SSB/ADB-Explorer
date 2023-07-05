@@ -255,3 +255,32 @@ internal static class EditorControls
             animation: StyleHelper.ContentAnimation.Bounce),
     };
 }
+
+internal static class FileOpControls
+{
+    public static ObservableList<ActionBase> List { get; } = new()
+    {
+        new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpStop),
+            Data.FileActions.FileOpStopIcon),
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
+            "\uE711",
+            iconSize: 20,
+            children: new SubMenu[]
+            {
+                new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemovePending),
+                    "\uECC5"),
+                new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemoveCompleted),
+                    "\uE930"),
+                new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemoveAll),
+                    "\uECC9"),
+            }),
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpDefaultFolder),
+            "\uED25",
+            iconSize: 20),
+#if DEBUG
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpTestNext),
+            "\uE14A",
+            iconSize: 20),
+#endif
+    };
+}

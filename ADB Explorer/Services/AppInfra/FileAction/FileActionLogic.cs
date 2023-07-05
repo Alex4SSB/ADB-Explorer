@@ -792,4 +792,24 @@ internal static class FileActionLogic
             Data.FileOpQ.AddOperation(new FilePullOperation(App.Current.Dispatcher, Data.CurrentADBDevice, (SyncFile)item, dirPath));
         }
     }
+
+    public static void ToggleFileOpQ()
+    {
+        if (Data.FileOpQ.IsActive)
+            Data.FileOpQ.Stop();
+        else
+            Data.FileOpQ.Start();
+    }
+
+    public static void UpdateFileOpControls()
+    {
+        Data.FileActions.FileOpStopAction.Value = Data.FileOpQ.IsActive ? "Stop" : "Resume";
+        Data.FileActions.FileOpStopIcon.Value = Data.FileOpQ.IsActive ? "\uE71A" : "\uE768";
+        Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations;
+
+        Data.FileActions.IsFileOpRemoveCompletedEnabled = Data.FileOpQ.Operations.Any(op => op.Status
+            is not FileOperation.OperationStatus.Waiting
+            and not FileOperation.OperationStatus.InProgress);
+        Data.FileActions.IsFileOpRemovePendingEnabled = Data.FileOpQ.Operations.Any(op => op.Status is FileOperation.OperationStatus.Waiting);
+    }
 }

@@ -289,6 +289,41 @@ internal static class AppActions
             Strings.S_FILE_OP_TOOLTIP,
             new(Key.D9, ModifierKeys.Alt),
             true),
+        new(FileActionType.FileOpStop,
+            () => Data.FileActions.IsFileOpStopEnabled,
+            FileActionLogic.ToggleFileOpQ,
+            Data.FileActions.FileOpStopAction),
+        new(FileActionType.FileOpRemove,
+            () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
+            () => { },
+            "Remove Operations"),
+
+# pragma warning disable IDE0200
+        // Passing non-static methods as delegates here causes a runtime exception
+
+        new(FileActionType.FileOpRemovePending,
+            () => Data.FileActions.IsFileOpRemovePendingEnabled,
+            () => Data.FileOpQ.ClearPending(),
+            "Pending"),
+        new(FileActionType.FileOpRemoveCompleted,
+            () => Data.FileActions.IsFileOpRemoveCompletedEnabled,
+            () => Data.FileOpQ.ClearCompleted(),
+            "Completed"),
+        new(FileActionType.FileOpRemoveAll,
+            () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
+            () => Data.FileOpQ.Clear(),
+            "All"),
+
+#pragma warning restore IDE0200
+
+        new(FileActionType.FileOpDefaultFolder,
+            () => !string.IsNullOrEmpty(Data.Settings.DefaultFolder),
+            () => Process.Start("explorer.exe", Data.Settings.DefaultFolder),
+            "Open Default Folder"),
+        new(FileActionType.FileOpTestNext,
+            () => true,
+            FileOpHelper.TestCurrentOperation,
+            "Next Test"),
     };
 
     public static List<KeyBinding> Bindings =>
@@ -368,6 +403,13 @@ internal class FileAction : ViewModelBase
         OpenFileOps,
         CloseEditor,
         SaveEditor,
+        FileOpStop,
+        FileOpRemove,
+        FileOpRemovePending,
+        FileOpRemoveCompleted,
+        FileOpRemoveAll,
+        FileOpDefaultFolder,
+        FileOpTestNext,
     }
 
     public FileActionType Name { get; }

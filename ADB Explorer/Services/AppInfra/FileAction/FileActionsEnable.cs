@@ -393,6 +393,27 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isExplorerEditing, value);
     }
 
+    private bool isFileOpStopEnabled = false;
+    public bool IsFileOpStopEnabled
+    {
+        get => isFileOpStopEnabled;
+        set => Set(ref isFileOpStopEnabled, value);
+    }
+
+    private bool isFileOpRemovePendingEnabled = false;
+    public bool IsFileOpRemovePendingEnabled
+    {
+        get => isFileOpRemovePendingEnabled;
+        set => Set(ref isFileOpRemovePendingEnabled, value);
+    }
+
+    private bool isFileOpRemoveCompletedEnabled = false;
+    public bool IsFileOpRemoveCompletedEnabled
+    {
+        get => isFileOpRemoveCompletedEnabled;
+        set => Set(ref isFileOpRemoveCompletedEnabled, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<string> CopyPathAction = new();
@@ -408,6 +429,10 @@ internal class FileActionsEnable : ViewModelBase
     public ObservableProperty<bool> IsCutState = new();
 
     public ObservableProperty<bool> IsCopyState = new();
+
+    public ObservableProperty<string> FileOpStopIcon = new();
+
+    public ObservableProperty<string> FileOpStopAction = new();
 
     #endregion
 
