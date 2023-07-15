@@ -444,7 +444,7 @@ internal class FileAction : ViewModelBase
             }
 
             string key = Gesture.Key.ToString();
-            if (key.Length > 1 && key[0] == 'D')
+            if (key.Length > 1 && key[0] == 'D' && char.IsDigit(key[1]))
                 key = key[1..];
 
             result += key;
