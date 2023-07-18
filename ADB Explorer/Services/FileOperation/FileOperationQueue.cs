@@ -71,9 +71,9 @@ public class FileOperationQueue : ViewModelBase
 
     #region Read only properties
 
-    public Dispatcher Dispatcher { get; }
-
     public ObservableList<FileOperation> Operations { get; } = new();
+
+    public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
 
     public bool HasIncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
 
@@ -85,17 +85,13 @@ public class FileOperationQueue : ViewModelBase
 
     public bool AnyFailedOperations => Operations.Any(op => op.Status is FileOperation.OperationStatus.Failed);
 
-    private readonly Mutex mutex = new Mutex();
-
-    public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
-
     #endregion
 
     private double currOperationLastProgress = 0;
+    private readonly Mutex mutex = new Mutex();
 
-    public FileOperationQueue(Dispatcher dispatcher)
+    public FileOperationQueue()
     {
-        Dispatcher = dispatcher;
         Operations.CollectionChanged += Operations_CollectionChanged;
     }
 

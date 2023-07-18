@@ -261,10 +261,12 @@ internal static class FileOpControls
     public static ObservableList<ActionBase> List { get; } = new()
     {
         new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpStop),
-            Data.FileActions.FileOpStopIcon),
+            Data.FileActions.FileOpStopIcon,
+            padding: 10),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
             "\uE711",
             iconSize: 20,
+            padding: 10,
             children: new SubMenu[]
             {
                 new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemovePending),
@@ -276,11 +278,13 @@ internal static class FileOpControls
             }),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpDefaultFolder),
             "\uED25",
-            iconSize: 20),
+            iconSize: 20,
+            padding: 10),
 #if DEBUG
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpTestNext),
             "\uE14A",
-            iconSize: 20),
+            iconSize: 20,
+            padding: 10),
 #endif
     };
 }

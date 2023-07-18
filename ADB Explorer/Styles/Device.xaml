@@ -437,25 +437,11 @@
         x:Key="DevicesListStyle"
         BasedOn="{StaticResource SplitViewBorderStyle}"
         TargetType="Border">
-        <Setter Property="BorderThickness" Value="0,1,0,0" />
-        <Setter Property="Padding" Value="0,0,1,0" />
-        <Setter Property="BorderBrush" Value="Gray" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SelectedDevicesCount}" Value="0">
-                <Setter Property="BorderThickness" Value="0,1,1,0" />
-                <Setter Property="Padding" Value="0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="DevicesRedBorderStyle" TargetType="Border">
+        <Setter Property="BorderThickness" Value="0,1,1,0" />
         <Setter Property="BorderBrush" Value="Red" />
-        <Setter Property="BorderThickness" Value="1" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SelectedDevicesCount}" Value="0">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsWin11}" Value="True">
-                <Setter Property="CornerRadius" Value="0,0,7,0" />
+                <Setter Property="BorderBrush" Value="Gray" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

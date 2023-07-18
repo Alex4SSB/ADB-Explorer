@@ -862,9 +862,6 @@
                     </ScrollViewer>
                 </Border>
             </ui:SplitView.Pane>
-            <ui:SplitView.Content>
-                <Border Style="{StaticResource DevicesRedBorderStyle}" />
-            </ui:SplitView.Content>
         </ui:SplitView>
         <ui:SplitView
             x:Name="SettingsSplitView"

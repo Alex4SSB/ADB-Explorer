@@ -165,7 +165,8 @@
                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                 ContentSource="Header"
                 RecognizesAccessKey="True"
-                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                TextElement.Foreground="{TemplateBinding Foreground}" />
         </Grid>
         <ControlTemplate.Triggers>
             <!--  Click animation  -->
@@ -276,14 +277,74 @@
                     <BeginStoryboard Storyboard="{StaticResource PulsatingBackgroundStoryBoard}" />
                 </MultiTrigger.EnterActions>
             </MultiTrigger>
-            <Trigger Property="IsMouseOver" Value="True">
+
+            <!--  BACKGROUND: Dark Theme, Checked. FOREGROUND: Checked  -->
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{ui:ThemeResource SystemControlBackgroundAltHighBrush}" />
+            </Trigger>
+
+            <!--  BACKGROUND: Light Theme, Checked  -->
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light">
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </DataTrigger>
+
+            <!--  BACKGROUND, FOREGROUND: Unchecked  -->
+            <Trigger Property="IsChecked" Value="False">
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackground}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            </Trigger>
+
+            <!--  BACKGORUND: Unchecked, Mouse Over  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
-                <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPointerOver}" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
+            </MultiTrigger>
+
+            <!--  BACKGORUND (OPACITY): Checked, Mouse Over  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Opacity" Value="{StaticResource AccentButtonBackgroundMouseOverOpacity}" />
+            </MultiTrigger>
+
+            <!--  Unchecked, Pressed  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPressed}" />
-                <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPressed}" />
-            </Trigger>
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </MultiTrigger>
+
+            <!--  BACKGORUND (OPACITY), FOREGROUND: Checked, Pressed  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Opacity" Value="{StaticResource AccentButtonBackgroundPressedOpacity}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground">
+                    <Setter.Value>
+                        <SolidColorBrush Opacity="{StaticResource AccentButtonForegroundPressedOrDisabledOpacity}" Color="{ui:ThemeResource SystemAltHighColor}" />
+                    </Setter.Value>
+                </Setter>
+            </MultiTrigger>
+
+            <!--  BACKGROUND: Disabled, Checked  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsEnabled" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+            </MultiTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 

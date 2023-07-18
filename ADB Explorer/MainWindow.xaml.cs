@@ -76,7 +76,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DevicesObject = new();
         DevicesList.ItemsSource = DevicesObject.UIList;
 
-        FileOpQ = new(this.Dispatcher);
+        FileOpQ = new();
         Task launchTask = Task.Run(LaunchSequence);
 
         ConnectTimer.Interval = CONNECT_TIMER_INIT;

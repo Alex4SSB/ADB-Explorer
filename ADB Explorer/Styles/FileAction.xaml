@@ -135,7 +135,8 @@
         x:Key="IconMenuStyle"
         BasedOn="{StaticResource BaseMenuItemStyle}"
         TargetType="MenuItem">
-        <Setter Property="MinWidth" Value="42" />
+        <Setter Property="MinWidth" Value="40" />
+        <Setter Property="Padding" Value="{Binding Padding}" />
         <Setter Property="ToolTip" Value="{Binding Tooltip}" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
         <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
@@ -353,6 +354,7 @@
         x:Key="DetailedFileOpControlsStyle"
         BasedOn="{StaticResource FileOpControlsPanelStyle}"
         TargetType="Menu">
+        <Setter Property="Padding" Value="2" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="ItemsPanel">
             <Setter.Value>
