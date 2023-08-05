@@ -23,6 +23,27 @@ internal static class AppActions
         { FileActionType.OpenSettings, new(Key.D0, ModifierKeys.Alt) },
     };
 
+    public static List<ToggleMenu> ToggleActions { get; } = new()
+    {
+        new(FileActionType.FileOpStop,
+            () => Data.FileActions.IsFileOpStopEnabled,
+            "Resume",
+            "\uE768",
+            FileActionLogic.ToggleFileOpQ,
+            "Stop",
+            "\uE71A",
+            padding: 10),
+        new(FileActionType.FileOpPastView,
+            () => Data.FileActions.IsExplorerVisible,
+            "Show Current Operations",
+            "\uF16A",
+            FileActionLogic.TogglePastView,
+            "Show Previous Operations",
+            "\uE9D5",
+            padding: 10,
+            checkBackground: (SolidColorBrush)App.Current.FindResource("HistoryDeviceBottomBorderBrush"))
+    };
+
     public static List<FileAction> List { get; } = new()
     {
         new(FileActionType.Home,
@@ -289,10 +310,7 @@ internal static class AppActions
             Strings.S_FILE_OP_TOOLTIP,
             new(Key.D9, ModifierKeys.Alt),
             true),
-        new(FileActionType.FileOpStop,
-            () => Data.FileActions.IsFileOpStopEnabled,
-            FileActionLogic.ToggleFileOpQ,
-            Data.FileActions.FileOpStopAction),
+        ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,
         new(FileActionType.FileOpRemove,
             () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
             () => { },
@@ -324,6 +342,7 @@ internal static class AppActions
             () => true,
             FileOpHelper.TestCurrentOperation,
             "Next Test"),
+        ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpPastView).FileAction,
     };
 
     public static List<KeyBinding> Bindings =>
@@ -410,6 +429,7 @@ internal class FileAction : ViewModelBase
         FileOpRemoveAll,
         FileOpDefaultFolder,
         FileOpTestNext,
+        FileOpPastView,
     }
 
     public FileActionType Name { get; }

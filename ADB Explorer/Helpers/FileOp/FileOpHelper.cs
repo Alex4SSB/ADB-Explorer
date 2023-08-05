@@ -31,7 +31,7 @@ internal class FileOpHelper
 
     public static void TestCurrentOperation()
     {
-        if (Data.FileOpQ.Operations.Any())
+        if (Data.FileOpQ.Operations.Count > 0)
         {
             var op = Data.FileOpQ.Operations.First() as InProgressTestOperation;
             op.FilePath.AddUpdates(updates[i]);

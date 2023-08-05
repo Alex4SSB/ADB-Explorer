@@ -254,7 +254,7 @@ public partial class NavigationBox : UserControl
 
     private void AddExcessButton(List<MenuItem> excessButtons = null)
     {
-        if (excessButtons is not null && !excessButtons.Any())
+        if (excessButtons is not null && excessButtons.Count == 0)
             return;
 
         var button = CreateExcessButton();

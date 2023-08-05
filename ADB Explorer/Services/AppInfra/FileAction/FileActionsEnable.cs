@@ -430,10 +430,6 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsCopyState = new();
 
-    public ObservableProperty<string> FileOpStopIcon = new();
-
-    public ObservableProperty<string> FileOpStopAction = new();
-
     #endregion
 
     #region read only

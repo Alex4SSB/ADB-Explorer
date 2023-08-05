@@ -132,6 +132,19 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
+    public static Brush GetCheckBackground(UIElement control) =>
+    (Brush)control.GetValue(CheckBackgroundProperty);
+
+    public static void SetCheckBackground(UIElement control, Brush value) =>
+        control.SetValue(CheckBackgroundProperty, value);
+
+    public static readonly DependencyProperty CheckBackgroundProperty =
+        DependencyProperty.RegisterAttached(
+            "CheckBackground",
+            typeof(Brush),
+            typeof(StyleHelper),
+            null);
+
     public static string GetThreeStateGlyph(CheckBox control) =>
         (string)control.GetValue(ThreeStateGlyphProperty);
 

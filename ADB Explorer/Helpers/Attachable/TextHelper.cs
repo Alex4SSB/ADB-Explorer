@@ -179,7 +179,7 @@ public static class TextHelper
             }
         }
 
-        if (maxNumber > 9 && specialChars.Any() && output.Any())
+        if (maxNumber > 9 && specialChars.Length > 0 && output.Length > 0)
         {
             if (output[^1] != specialChars[0])
             {

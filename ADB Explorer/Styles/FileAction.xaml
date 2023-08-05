@@ -112,13 +112,16 @@
     <DataTemplate x:Key="CompoundIconMenuTemplate">
         <ContentPresenter Content="{Binding CompoundIcon}" />
     </DataTemplate>
+    <DataTemplate x:Key="DualActionButtonTemplate">
+        <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
+    </DataTemplate>
     <helpers:MenuTemplateSelector
         x:Key="MenuTemplateSelector"
         AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
         AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
         CompoundIconMenuTemplate="{StaticResource CompoundIconMenuTemplate}"
         CompoundIconSubMenuTemplate="{x:Null}"
-        DualActionButtonTemplate="{StaticResource IconMenuTemplate}"
+        DualActionButtonTemplate="{StaticResource DualActionButtonTemplate}"
         DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
@@ -235,13 +238,21 @@
         TargetType="MenuItem">
         <Setter Property="Icon" Value="{Binding CompoundIcon}" />
     </Style>
+    <Style
+        x:Key="DualActionButtonStyle"
+        BasedOn="{StaticResource IconMenuStyle}"
+        TargetType="MenuItem">
+        <Setter Property="IsCheckable" Value="True" />
+        <Setter Property="IsChecked" Value="{Binding IsChecked}" />
+        <Setter Property="helpers:StyleHelper.CheckBackground" Value="{Binding CheckBackground}" />
+    </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"
         AltObjectStyle="{StaticResource AltObjectMenuStyle}"
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
         CompoundIconMenuStyle="{StaticResource IconMenuStyle}"
         CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
-        DualActionButtonStyle="{StaticResource IconMenuStyle}"
+        DualActionButtonStyle="{StaticResource DualActionButtonStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"

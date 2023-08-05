@@ -260,9 +260,8 @@ internal static class FileOpControls
 {
     public static ObservableList<ActionBase> List { get; } = new()
     {
-        new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpStop),
-            Data.FileActions.FileOpStopIcon,
-            padding: 10),
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpPastView).Button,
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button,
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
             "\uE711",
             iconSize: 20,

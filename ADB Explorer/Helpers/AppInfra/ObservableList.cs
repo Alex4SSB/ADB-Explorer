@@ -50,7 +50,7 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
 
     public T Find(Func<T, bool> predicate)
     {
-        if (!this.Any() || predicate is null)
+        if (Count == 0 || predicate is null)
             return default;
 
         if (this.Where(predicate) is IEnumerable<T> result && result.Any())

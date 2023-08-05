@@ -10,7 +10,7 @@ internal class FileHelper
 {
     public static FileClass ListerFileManipulator(FileClass item)
     {
-        if (Data.CutItems.Any() && (Data.CutItems[0].ParentPath == Data.DirList.CurrentPath))
+        if (Data.CutItems.Count > 0 && (Data.CutItems[0].ParentPath == Data.DirList.CurrentPath))
         {
             var cutItem = Data.CutItems.Where(f => f.FullPath == item.FullPath);
             if (cutItem.Any())

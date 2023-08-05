@@ -304,7 +304,7 @@ public class FileClass : FileStat
             indexes.Add(0);
 
         indexes.Sort();
-        if (!indexes.Any() || indexes[0] != 0)
+        if (indexes.Count == 0 || indexes[0] != 0)
             return "";
 
         var result = "";

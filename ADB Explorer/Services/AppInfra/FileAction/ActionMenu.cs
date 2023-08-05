@@ -285,13 +285,47 @@ internal class ActionAccentButton : ActionButton
 
 internal class DualActionButton : IconMenu
 {
+    private bool isChecked = false;
+    public bool IsChecked
+    {
+        get => isChecked;
+        set
+        {
+            if (Set(ref isChecked, value))
+                observableIsChecked.Value = value;
+        }
+    }
+
+    private readonly ObservableProperty<bool> observableIsChecked;
+
+    public Brush CheckBackground { get; }
+
     public DualActionButton(FileAction action,
-                            ObservableProperty<string> icon,
+                            string icon,
+                            ObservableProperty<bool> isChecked,
                             int iconSize = 20,
                             StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                            int padding = 12)
+                            int padding = 12,
+                            Brush checkBackground = null)
+        : base(action, icon, animation, iconSize, padding: padding)
+    {
+        observableIsChecked = isChecked;
+        IsChecked = isChecked;
+        CheckBackground = checkBackground;
+    }
+
+    public DualActionButton(FileAction action,
+                            ObservableProperty<string> icon,
+                            ObservableProperty<bool> isChecked,
+                            int iconSize = 20,
+                            StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                            int padding = 12,
+                            Brush checkBackground = null)
         : base(action, icon, animation, iconSize, padding: padding)
     {
         icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
+        observableIsChecked = isChecked;
+        IsChecked = isChecked;
+        CheckBackground = checkBackground;
     }
 }

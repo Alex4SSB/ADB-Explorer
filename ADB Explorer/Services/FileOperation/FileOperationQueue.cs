@@ -73,6 +73,8 @@ public class FileOperationQueue : ViewModelBase
 
     public ObservableList<FileOperation> Operations { get; } = new();
 
+    public ObservableList<FileOperation> PastOperations { get; } = new();
+
     public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
 
     public bool HasIncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);

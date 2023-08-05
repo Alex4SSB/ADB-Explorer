@@ -165,7 +165,7 @@ public static class ShellFileOperation
                 targetPath += "/";
 
             existingItems = ADBService.FindFiles(device.ID, pasteItems.Select(file => $"{targetPath}{file.FullName}"));
-            if (existingItems?.Any() is true)
+            if (existingItems?.Length > 0)
             {
                 existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
 

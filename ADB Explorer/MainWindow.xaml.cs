@@ -9,7 +9,6 @@ using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
-using static ADB_Explorer.Resources.Links;
 using static ADB_Explorer.Resources.Strings;
 
 namespace ADB_Explorer;
@@ -291,6 +290,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.GroupsExpanded):
                     SettingsAboutExpander.IsExpanded = RuntimeSettings.GroupsExpanded;
                     break;
+
+                case nameof(AppRuntimeSettings.RefreshFileOpControls):
+                    FileOpControlsMenu.Items.Refresh();
+                    break;
             }
         });
     }
@@ -344,7 +347,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void UpdateFileOp()
     {
         FileActionLogic.UpdateFileOpControls();
-        FileOpControlsMenu.Items.Refresh();
+        RuntimeSettings.RefreshFileOpControls = true;
 
         if (FileOpQ.AnyFailedOperations)
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
@@ -776,6 +779,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         FileActionLogic.ClearExplorer(false);
         FileActions.IsDriveViewVisible = true;
+        UpdateFileOp();
 
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         NavigationBox.Path = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
@@ -799,6 +803,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.IsExplorerVisible = true;
         FileActions.HomeEnabled = true;
         RuntimeSettings.BrowseDrive = null;
+
+        UpdateFileOp();
 
         Task.Delay(EXPLORER_NAV_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
 

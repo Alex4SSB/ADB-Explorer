@@ -159,7 +159,7 @@ internal static class FileActionLogic
         var restoreTask = Task.Run(() =>
         {
             existingItems = ADBService.FindFiles(Data.CurrentADBDevice.ID, restoreItems.Select(file => file.TrashIndex.OriginalPath));
-            if (existingItems?.Any() is true)
+            if (existingItems?.Length > 0)
             {
                 if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
                     merge = true;
@@ -476,7 +476,7 @@ internal static class FileActionLogic
 
         Data.CutItems.RemoveAll(cutItem => cutItem.RelationFrom(file) is RelationType.Ancestor or RelationType.Self);
 
-        if (!Data.CutItems.Any())
+        if (Data.CutItems.Count == 0)
             Data.FileActions.PasteState = FileClass.CutType.None;
 
         UpdateFileActions();
@@ -803,13 +803,19 @@ internal static class FileActionLogic
 
     public static void UpdateFileOpControls()
     {
-        Data.FileActions.FileOpStopAction.Value = Data.FileOpQ.IsActive ? "Stop" : "Resume";
-        Data.FileActions.FileOpStopIcon.Value = Data.FileOpQ.IsActive ? "\uE71A" : "\uE768";
-        Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations;
+        Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations && Data.FileActions.IsExplorerVisible;
 
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button.IsChecked =
+            !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;
+
+        Data.FileActions.IsFileOpRemovePendingEnabled = Data.FileOpQ.Operations.Any(op => op.Status is FileOperation.OperationStatus.Waiting);
         Data.FileActions.IsFileOpRemoveCompletedEnabled = Data.FileOpQ.Operations.Any(op => op.Status
             is not FileOperation.OperationStatus.Waiting
             and not FileOperation.OperationStatus.InProgress);
-        Data.FileActions.IsFileOpRemovePendingEnabled = Data.FileOpQ.Operations.Any(op => op.Status is FileOperation.OperationStatus.Waiting);
+    }
+
+    public static void TogglePastView()
+    {
+        Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 }
