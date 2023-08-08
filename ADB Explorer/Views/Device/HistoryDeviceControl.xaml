@@ -16,7 +16,7 @@
             <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
                 <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
                     <Setter.Value>
-                        <Border BorderBrush="{StaticResource HistoryDeviceBottomBorderBrush}" BorderThickness="0,1" />
+                        <Border BorderBrush="{DynamicResource HistoryDeviceBottomBorderBrush}" BorderThickness="0,1" />
                     </Setter.Value>
                 </Setter>
                 <Style.Triggers>
@@ -24,7 +24,7 @@
                         <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
                             <Setter.Value>
                                 <ui:ProgressBar
-                                    Foreground="{StaticResource HistoryDeviceBottomBorderBrush}"
+                                    Foreground="{DynamicResource HistoryDeviceBottomBorderBrush}"
                                     IsIndeterminate="True"
                                     Style="{StaticResource ExpanderHeaderProgressBarStyle}" />
                             </Setter.Value>

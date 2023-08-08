@@ -817,5 +817,6 @@ internal static class FileActionLogic
     public static void TogglePastView()
     {
         Data.RuntimeSettings.RefreshFileOpControls = true;
+        Data.RuntimeSettings.IsPastViewVisible ^= true;
     }
 }

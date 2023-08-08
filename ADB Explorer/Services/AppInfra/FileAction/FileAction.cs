@@ -41,7 +41,8 @@ internal static class AppActions
             "Show Previous Operations",
             "\uE9D5",
             padding: 10,
-            checkBackground: (SolidColorBrush)App.Current.FindResource("HistoryDeviceBottomBorderBrush"))
+            // Resources in nested dictionaries can't be found directly, only within that dictionary
+            checkBackground: (SolidColorBrush)((ResourceDictionary)Application.Current.Resources["DynamicBrushes"])["HistoryDeviceBottomBorderBrush"])
     };
 
     public static List<FileAction> List { get; } = new()

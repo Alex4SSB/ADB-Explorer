@@ -478,7 +478,13 @@
                                     <DataGridTemplateColumn
                                         x:Name="OpTypeColumn"
                                         CanUserResize="False"
-                                        CellTemplate="{StaticResource OperationIconTemplate}" />
+                                        CellTemplate="{StaticResource OperationIconTemplate}">
+                                        <DataGridTemplateColumn.HeaderStyle>
+                                            <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader">
+                                                <Setter Property="ContentTemplate" Value="{x:Null}" />
+                                            </Style>
+                                        </DataGridTemplateColumn.HeaderStyle>
+                                    </DataGridTemplateColumn>
                                     <DataGridTemplateColumn x:Name="FileNameColumn" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
                                     <DataGridTemplateColumn x:Name="ProgressColumn" CellTemplate="{StaticResource FileOpProgressTemplate}" />
                                     <DataGridTemplateColumn x:Name="SourceColumn" CellTemplate="{StaticResource FileOpSourcePathTemplate}" />

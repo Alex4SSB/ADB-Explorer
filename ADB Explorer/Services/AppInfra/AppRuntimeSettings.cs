@@ -294,6 +294,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isExplorerLoaded, value);
     }
 
+    private bool? isPastViewVisible = null;
+    public bool? IsPastViewVisible
+    {
+        get => isPastViewVisible;
+        set => Set(ref isPastViewVisible, value);
+    }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;

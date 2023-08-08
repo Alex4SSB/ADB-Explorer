@@ -45,13 +45,6 @@ public class FileOperationQueue : ViewModelBase
         set => Set(ref stopAfterFailure, value);
     }
 
-    private bool autoClear = true;
-    public bool AutoClear
-    {
-        get => autoClear;
-        set => Set(ref autoClear, value);
-    }
-
     private double progress = 0;
     public double Progress
     {
@@ -150,6 +143,24 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
+    public void MoveCompletedToPast()
+    {
+        try
+        {
+            mutex.WaitOne();
+
+            var completed = Operations.Where(op => op.Status is not FileOperation.OperationStatus.Waiting and not FileOperation.OperationStatus.InProgress);
+            PastOperations.AddRange(completed);
+
+            Operations.RemoveAll(completed);
+            CurrentOperationIndex = 0;
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
+    }
+
     public void ClearCompleted()
     {
         try
@@ -207,10 +218,7 @@ public class FileOperationQueue : ViewModelBase
         IsActive = true;
         UpdateProgress(0);
 
-        if (AutoClear)
-        {
-            ClearCompleted();
-        }
+        MoveCompletedToPast();
 
         MoveToNextOperation();
     }

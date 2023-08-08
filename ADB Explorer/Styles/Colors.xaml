@@ -104,7 +104,8 @@
 
     <SolidColorBrush x:Key="MenuSeparatorColor" Color="#FFB6BDC5" />
 
-    <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="#FFABA673" />
+    <Color x:Key="DarkHistoryDeviceBottomBorderBrush">#FFABA673</Color>
+    <Color x:Key="LightHistoryDeviceBottomBorderBrush">#FF7A7653</Color>
 
     <SolidColorBrush x:Key="NavigationBarProgressBrush" Color="#780078D7" />
 
@@ -172,5 +173,7 @@
         <SolidColorBrush x:Key="NewDeviceAltBorder" Color="{DynamicResource LightNewDeviceAltBorder}" />
         <SolidColorBrush x:Key="TempDriveAltBorder" Color="{DynamicResource LightTempDriveAltBorder}" />
         <SolidColorBrush x:Key="TrashDriveAltBorder" Color="{DynamicResource LightTrashDriveAltBorder}" />
+
+        <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="{DynamicResource LightHistoryDeviceBottomBorderBrush}" />
     </ResourceDictionary>
 </ResourceDictionary>

@@ -110,11 +110,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         AppActions.Bindings.ForEach(binding => InputBindings.Add(binding));
 
         UpperProgressBar.DataContext = FileOpQ;
-        CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
+        RuntimeSettings.IsPastViewVisible = false;
         UpdateFileOp();
 
 #if DEBUG
-        //FileOpHelper.TestCurrentOperation();
         DeviceHelper.TestDevices();
 #endif
 
@@ -293,6 +292,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.RefreshFileOpControls):
                     FileOpControlsMenu.Items.Refresh();
+                    break;
+
+                case nameof(AppRuntimeSettings.IsPastViewVisible):
+                    CurrentOperationDataGrid.ItemsSource = RuntimeSettings.IsPastViewVisible is true
+                        ? FileOpQ.PastOperations
+                        : FileOpQ.Operations;
                     break;
             }
         });
