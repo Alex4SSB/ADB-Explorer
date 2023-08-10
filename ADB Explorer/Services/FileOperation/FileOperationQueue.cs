@@ -161,6 +161,20 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
+    public void ClearPast()
+    {
+        try
+        {
+            mutex.WaitOne();
+
+            PastOperations.RemoveAll();
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
+    }
+
     public void ClearCompleted()
     {
         try

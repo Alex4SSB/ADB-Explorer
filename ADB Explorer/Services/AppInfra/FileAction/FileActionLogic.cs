@@ -808,15 +808,20 @@ internal static class FileActionLogic
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button.IsChecked =
             !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;
 
-        Data.FileActions.IsFileOpRemovePendingEnabled = Data.FileOpQ.Operations.Any(op => op.Status is FileOperation.OperationStatus.Waiting);
+        Data.FileActions.IsFileOpRemovePendingEnabled = Data.FileOpQ.Operations.Any(op => op.Status is FileOperation.OperationStatus.Waiting) && Data.RuntimeSettings.IsPastViewVisible is not true;
         Data.FileActions.IsFileOpRemoveCompletedEnabled = Data.FileOpQ.Operations.Any(op => op.Status
             is not FileOperation.OperationStatus.Waiting
-            and not FileOperation.OperationStatus.InProgress);
+            and not FileOperation.OperationStatus.InProgress)
+            && Data.RuntimeSettings.IsPastViewVisible is not true;
+
+        Data.FileActions.IsFileOpRemovePastEnabled = Data.FileOpQ.PastOperations.Any() && Data.RuntimeSettings.IsPastViewVisible is true;
     }
 
     public static void TogglePastView()
     {
         Data.RuntimeSettings.RefreshFileOpControls = true;
         Data.RuntimeSettings.IsPastViewVisible ^= true;
+
+        UpdateFileOpControls();
     }
 }

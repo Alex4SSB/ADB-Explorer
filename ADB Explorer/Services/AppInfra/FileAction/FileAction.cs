@@ -23,6 +23,12 @@ internal static class AppActions
         { FileActionType.OpenSettings, new(Key.D0, ModifierKeys.Alt) },
     };
 
+    public static readonly Dictionary<FileActionType, string> Icons = new()
+    {
+        { FileActionType.OpenFileOps, "\uF16A" },
+        { FileActionType.FileOpPastView, "\uE9D5" },
+    };
+
     public static List<ToggleMenu> ToggleActions { get; } = new()
     {
         new(FileActionType.FileOpStop,
@@ -36,10 +42,10 @@ internal static class AppActions
         new(FileActionType.FileOpPastView,
             () => Data.FileActions.IsExplorerVisible,
             "Show Current Operations",
-            "\uF16A",
+            Icons[FileActionType.OpenFileOps],
             FileActionLogic.TogglePastView,
             "Show Previous Operations",
-            "\uE9D5",
+            Icons[FileActionType.FileOpPastView],
             padding: 10,
             // Resources in nested dictionaries can't be found directly, only within that dictionary
             checkBackground: (SolidColorBrush)((ResourceDictionary)Application.Current.Resources["DynamicBrushes"])["HistoryDeviceBottomBorderBrush"])
@@ -313,7 +319,7 @@ internal static class AppActions
             true),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,
         new(FileActionType.FileOpRemove,
-            () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
+            () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled || Data.FileActions.IsFileOpRemovePastEnabled,
             () => { },
             "Remove Operations"),
 
@@ -332,6 +338,10 @@ internal static class AppActions
             () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
             () => Data.FileOpQ.Clear(),
             "All"),
+        new(FileActionType.FileOpRemovePast,
+            () => Data.FileActions.IsFileOpRemovePastEnabled,
+            () => Data.FileOpQ.ClearPast(),
+            "Previous"),
 
 #pragma warning restore IDE0200
 
@@ -427,6 +437,7 @@ internal class FileAction : ViewModelBase
         FileOpRemove,
         FileOpRemovePending,
         FileOpRemoveCompleted,
+        FileOpRemovePast,
         FileOpRemoveAll,
         FileOpDefaultFolder,
         FileOpTestNext,

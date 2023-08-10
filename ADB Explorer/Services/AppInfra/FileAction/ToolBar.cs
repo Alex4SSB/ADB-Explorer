@@ -227,7 +227,7 @@ internal static class SettingsMenu
 {
     public static ObservableList<ActionMenu> List { get; } = new()
     {
-        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps), "\uF16A"),
+        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps), AppActions.Icons[FileAction.FileActionType.OpenFileOps]),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
             "\uE713",
             iconSize: 18),
@@ -274,6 +274,9 @@ internal static class FileOpControls
                     "\uE930"),
                 new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemoveAll),
                     "\uECC9"),
+                new SubMenuSeparator(() => true),
+                new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemovePast),
+                    AppActions.Icons[FileAction.FileActionType.FileOpPastView]),
             }),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpDefaultFolder),
             "\uED25",
