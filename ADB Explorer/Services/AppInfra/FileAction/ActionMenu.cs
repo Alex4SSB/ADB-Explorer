@@ -29,8 +29,6 @@ internal abstract class ActionBase : ViewModelBase
 
     public int IconSize { get; }
 
-    public Thickness Padding { get; }
-
     public StyleHelper.ContentAnimation Animation { get; }
 
     public AnimationSource ActionAnimationSource { get; }
@@ -50,8 +48,7 @@ internal abstract class ActionBase : ViewModelBase
                          int iconSize,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          AnimationSource animationSource = AnimationSource.Command,
-                         FileAction altAction = null,
-                         int padding = 12)
+                         FileAction altAction = null)
     {
         if (this is not SubMenu)
             StyleHelper.VerifyIcon(ref icon);
@@ -62,7 +59,6 @@ internal abstract class ActionBase : ViewModelBase
         Animation = animation;
         ActionAnimationSource = animationSource;
         AltAction = altAction;
-        Padding = new(padding, 0, padding, 0);
 
         if (animationSource is AnimationSource.Command)
         {
@@ -96,9 +92,8 @@ internal abstract class ActionMenu : ActionBase
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command,
-                         FileAction altAction = null,
-                         int padding = 12)
-        : base(fileAction, icon, iconSize, animation, animationSource, altAction, padding)
+                         FileAction altAction = null)
+        : base(fileAction, icon, iconSize, animation, animationSource, altAction)
     {
         Children = children;
     }
@@ -184,9 +179,8 @@ internal class IconMenu : ActionMenu
                     int iconSize = 16,
                     ObservableProperty<bool> selectionBar = null,
                     IEnumerable<SubMenu> children = null,
-                    FileAction altAction = null,
-                    int padding = 12)
-        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, padding: padding)
+                    FileAction altAction = null)
+        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction)
     {
         if (selectionBar is not null)
         {
@@ -305,9 +299,8 @@ internal class DualActionButton : IconMenu
                             ObservableProperty<bool> isChecked,
                             int iconSize = 20,
                             StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                            int padding = 12,
                             Brush checkBackground = null)
-        : base(action, icon, animation, iconSize, padding: padding)
+        : base(action, icon, animation, iconSize)
     {
         observableIsChecked = isChecked;
         IsChecked = isChecked;
@@ -319,9 +312,8 @@ internal class DualActionButton : IconMenu
                             ObservableProperty<bool> isChecked,
                             int iconSize = 20,
                             StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                            int padding = 12,
                             Brush checkBackground = null)
-        : base(action, icon, animation, iconSize, padding: padding)
+        : base(action, icon, animation, iconSize)
     {
         icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
         observableIsChecked = isChecked;

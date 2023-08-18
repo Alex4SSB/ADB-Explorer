@@ -783,7 +783,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="LogControlsPanelStyle" TargetType="ui:SimpleStackPanel">
+    <!--<Style x:Key="LogControlsPanelStyle" TargetType="ui:SimpleStackPanel">
         <Setter Property="Spacing" Value="4" />
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Top" />
@@ -795,7 +795,7 @@
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
-    </Style>
+    </Style>-->
     <Style
         x:Key="PauseLogButtonStyle"
         BasedOn="{StaticResource ToggleButtonStyle}"
@@ -828,5 +828,17 @@
         <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
         <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
         <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <Style
+        x:Key="EditorTextChangedBorderStyle"
+        BasedOn="{StaticResource BorderStyle}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{StaticResource EditorTextChangedBrush}" />
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

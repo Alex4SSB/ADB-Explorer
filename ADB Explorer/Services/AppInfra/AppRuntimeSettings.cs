@@ -326,6 +326,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool DriveViewNav { get => false; set => OnPropertyChanged(); }
     public bool AutoHideSearchBox { get => false; set => OnPropertyChanged(); }
     public bool RefreshFileOpControls { get => false; set => OnPropertyChanged(); }
+    public bool ClearLogs { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

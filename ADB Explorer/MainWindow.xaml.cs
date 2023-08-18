@@ -299,6 +299,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                         ? FileOpQ.PastOperations
                         : FileOpQ.Operations;
                     break;
+
+                case nameof(AppRuntimeSettings.ClearLogs):
+                    ClearLogs();
+                    break;
             }
         });
     }
@@ -1648,11 +1652,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (FileActions.DeleteEnabled)
                 FileActionLogic.DeleteFiles();
         }
-    }
-
-    private void ClearLogButton_Click(object sender, RoutedEventArgs e)
-    {
-        ClearLogs();
     }
 
     private void ClearLogs()

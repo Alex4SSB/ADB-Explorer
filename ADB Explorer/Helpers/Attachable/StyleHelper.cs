@@ -106,19 +106,6 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static bool GetIsMouseSelectionVisible(MenuItem control) =>
-        (bool)control.GetValue(IsMouseSelectionVisibleProperty);
-
-    public static void SetIsMouseSelectionVisible(MenuItem control, bool value) =>
-        control.SetValue(IsMouseSelectionVisibleProperty, value);
-
-    public static readonly DependencyProperty IsMouseSelectionVisibleProperty =
-        DependencyProperty.RegisterAttached(
-            "IsMouseSelectionVisible",
-            typeof(bool),
-            typeof(StyleHelper),
-            null);
-
     public static Brush GetAltBorderBrush(UIElement control) =>
         (Brush)control.GetValue(AltBorderBrushProperty);
 
@@ -128,19 +115,6 @@ public static class StyleHelper
     public static readonly DependencyProperty AltBorderBrushProperty =
         DependencyProperty.RegisterAttached(
             "AltBorderBrush",
-            typeof(Brush),
-            typeof(StyleHelper),
-            null);
-
-    public static Brush GetCheckBackground(UIElement control) =>
-    (Brush)control.GetValue(CheckBackgroundProperty);
-
-    public static void SetCheckBackground(UIElement control, Brush value) =>
-        control.SetValue(CheckBackgroundProperty, value);
-
-    public static readonly DependencyProperty CheckBackgroundProperty =
-        DependencyProperty.RegisterAttached(
-            "CheckBackground",
             typeof(Brush),
             typeof(StyleHelper),
             null);

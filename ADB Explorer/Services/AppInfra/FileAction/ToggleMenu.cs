@@ -23,7 +23,6 @@ internal class ToggleMenu : ViewModelBase
                       string uncheckedDescription = "",
                       string uncheckedIcon = "",
                       KeyGesture gesture = null,
-                      int padding = 12,
                       Brush checkBackground = null)
     {
         uncheckedDescription = string.IsNullOrEmpty(uncheckedDescription) ? checkedDescription : uncheckedDescription;
@@ -34,7 +33,7 @@ internal class ToggleMenu : ViewModelBase
         Icon.Value = uncheckedIcon;
 
         FileAction = new(type, canExecute, action, Description, gesture, gesture is not null);
-        Button = new(FileAction, Icon, IsChecked, padding: padding, checkBackground: checkBackground);
+        Button = new(FileAction, Icon, IsChecked, checkBackground: checkBackground);
 
         IsChecked.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
         {

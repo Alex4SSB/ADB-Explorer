@@ -265,7 +265,6 @@ internal static class FileOpControls
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
             "\uE711",
             iconSize: 20,
-            padding: 10,
             children: new SubMenu[]
             {
                 new(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemovePending),
@@ -280,13 +279,22 @@ internal static class FileOpControls
             }),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpDefaultFolder),
             "\uED25",
-            iconSize: 20,
-            padding: 10),
+            iconSize: 20),
 #if DEBUG
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpTestNext),
             "\uE14A",
-            iconSize: 20,
-            padding: 10),
+            iconSize: 20),
 #endif
+    };
+}
+
+internal static class LogControls
+{
+    public static ObservableList<ActionBase> List { get; } = new()
+    {
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.PauseLogs).Button,
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ClearLogs),
+            "\uE894",
+            iconSize: 20)
     };
 }

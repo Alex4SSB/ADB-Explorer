@@ -280,7 +280,7 @@
 
             <!--  BACKGROUND, FOREGROUND: Checked, external check BG  -->
             <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="Background" Property="Background" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:StyleHelper.CheckBackground)}" />
+                <Setter TargetName="Background" Property="Background" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:MenuHelper.CheckBackground)}" />
                 <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{ui:ThemeResource SystemControlBackgroundAltHighBrush}" />
             </Trigger>
 
@@ -288,7 +288,7 @@
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsChecked" Value="True" />
-                    <Condition Property="helpers:StyleHelper.CheckBackground" Value="{x:Null}" />
+                    <Condition Property="helpers:MenuHelper.CheckBackground" Value="{x:Null}" />
                 </MultiTrigger.Conditions>
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </MultiTrigger>
@@ -297,7 +297,7 @@
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.CheckBackground)}" Value="{x:Null}" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.CheckBackground)}" Value="{x:Null}" />
                 </MultiDataTrigger.Conditions>
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
             </MultiDataTrigger>
@@ -525,7 +525,7 @@
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsHighlighted" Value="True" />
-                    <Condition Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                 </MultiTrigger.Conditions>
                 <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackgroundPointerOver}" />
                 <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushPointerOver}" />
@@ -539,7 +539,7 @@
             <MultiTrigger>
                 <MultiTrigger.Conditions>
                     <Condition Property="IsPressed" Value="True" />
-                    <Condition Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                 </MultiTrigger.Conditions>
                 <Setter TargetName="LayoutRoot" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackgroundPressed}" />
                 <Setter TargetName="LayoutRoot" Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrushPressed}" />
@@ -704,9 +704,9 @@
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
         <Setter Property="helpers:StyleHelper.BeginAnimation" Value="False" />
         <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="True" />
-        <Setter Property="helpers:StyleHelper.IsMouseSelectionVisible" Value="True" />
+        <Setter Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
         <Setter Property="helpers:StyleHelper.PressedForeground" Value="Transparent" />
-        <Setter Property="helpers:StyleHelper.CheckBackground" Value="{x:Null}" />
+        <Setter Property="helpers:MenuHelper.CheckBackground" Value="{x:Null}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MenuFlyoutItemRevealBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource MenuFlyoutItemRevealBorderThickness}" />
         <Setter Property="Foreground" Value="{DynamicResource MenuFlyoutItemForeground}" />

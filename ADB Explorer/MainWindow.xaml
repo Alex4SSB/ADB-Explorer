@@ -382,17 +382,7 @@
                                 </Border>
                                 <TextBox Grid.Row="1" Style="{StaticResource EditorTextBoxStyle}" />
                             </Grid>
-                            <Border BorderBrush="#FCCB58" BorderThickness="0,0,0,2">
-                                <Border.Style>
-                                    <Style BasedOn="{StaticResource BorderStyle}" TargetType="Border">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
-                            </Border>
+                            <Border Style="{StaticResource EditorTextChangedBorderStyle}" />
                         </Grid>
                         <GridSplitter
                             Grid.Column="1"
@@ -404,24 +394,27 @@
                             Cursor="SizeWE"
                             FocusVisualStyle="{x:Null}" />
                     </Grid>
-                    <TextBox x:Name="LogTextBox" Style="{StaticResource LogTextBoxStyle}" />
-                    <ui:SimpleStackPanel Margin="6" Style="{StaticResource LogControlsPanelStyle}">
-                        <ToggleButton Style="{StaticResource PauseLogButtonStyle}">
-                            <ui:FontIcon Glyph="&#xE769;" />
-                        </ToggleButton>
-                        <Button Click="ClearLogButton_Click" ToolTip="Clear Command Log">
-                            <Button.Style>
-                                <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=LogTextBox, Path=Text.Count}" Value="0">
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Button.Style>
-                            <ui:FontIcon Margin="1,1,-1,-1" Glyph="&#xE894;" />
-                        </Button>
-                    </ui:SimpleStackPanel>
+                    <Grid>
+                        <TextBox x:Name="LogTextBox" Style="{StaticResource LogTextBoxStyle}" />
+                        <!--<ui:SimpleStackPanel Margin="6" HorizontalAlignment="Right">
+                            <ToggleButton Style="{StaticResource PauseLogButtonStyle}">
+                                <ui:FontIcon Glyph="&#xE769;" />
+                            </ToggleButton>
+                            <Button ToolTip="Clear Command Log">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=LogTextBox, Path=Text.Count}" Value="0">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <ui:FontIcon Margin="1,1,-1,-1" Glyph="&#xE894;" />
+                            </Button>
+                        </ui:SimpleStackPanel>-->
+                        <Menu Margin="6" Style="{StaticResource LogControlsPanelStyle}" />
+                    </Grid>
                     <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                         <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
                             <StackPanel Orientation="Horizontal">

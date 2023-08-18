@@ -37,8 +37,7 @@ internal static class AppActions
             "\uE768",
             FileActionLogic.ToggleFileOpQ,
             "Stop",
-            "\uE71A",
-            padding: 10),
+            "\uE71A"),
         new(FileActionType.FileOpPastView,
             () => Data.FileActions.IsExplorerVisible,
             "Show Current Operations",
@@ -46,9 +45,14 @@ internal static class AppActions
             FileActionLogic.TogglePastView,
             "Show Previous Operations",
             Icons[FileActionType.FileOpPastView],
-            padding: 10,
             // Resources in nested dictionaries can't be found directly, only within that dictionary
-            checkBackground: (SolidColorBrush)((ResourceDictionary)Application.Current.Resources["DynamicBrushes"])["HistoryDeviceBottomBorderBrush"])
+            checkBackground: (SolidColorBrush)((ResourceDictionary)Application.Current.Resources["DynamicBrushes"])["HistoryDeviceBottomBorderBrush"]),
+        new(FileActionType.PauseLogs,
+            () => true,
+            "Log Updates Are Paused",
+            "\uE769",
+            () => Data.RuntimeSettings.IsLogPaused ^= true,
+            "Pause Log Updates"),
     };
 
     public static List<FileAction> List { get; } = new()
@@ -354,6 +358,11 @@ internal static class AppActions
             FileOpHelper.TestCurrentOperation,
             "Next Test"),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpPastView).FileAction,
+        ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,
+        new(FileActionType.ClearLogs,
+            () => Data.CommandLog.Count > 0,
+            () => Data.RuntimeSettings.ClearLogs = true,
+            "Clear Command Log"),
     };
 
     public static List<KeyBinding> Bindings =>
@@ -442,6 +451,8 @@ internal class FileAction : ViewModelBase
         FileOpDefaultFolder,
         FileOpTestNext,
         FileOpPastView,
+        PauseLogs,
+        ClearLogs,
     }
 
     public FileActionType Name { get; }
