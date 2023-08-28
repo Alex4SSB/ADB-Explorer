@@ -16,7 +16,7 @@ internal static class AdbHelper
         }
         else
         {
-            Data.RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion(Data.Settings.ManualAdbPath);
+            Data.RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion($"\"{Data.Settings.ManualAdbPath}\"");
             if (Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION)
                 return true;
         }

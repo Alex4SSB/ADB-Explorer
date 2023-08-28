@@ -390,7 +390,7 @@ public partial class ADBService
         string stdout = "";
         try
         {
-            exitCode = ExecuteCommand($"\"{adbPath}\"", "version", out stdout, out _, Encoding.UTF8);
+            exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8);
         }
         catch (Exception) { }
 
