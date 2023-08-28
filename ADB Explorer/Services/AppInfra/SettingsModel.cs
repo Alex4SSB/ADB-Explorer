@@ -83,7 +83,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("Graphics", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: appSettings.GetProperty(nameof(RuntimeSettings.HideForceFluent))),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: RuntimeSettings.GetType().GetProperty(nameof(RuntimeSettings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration", "Graphics"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
                                 "Disable Animations",
@@ -153,7 +153,7 @@ public abstract class AbstractSetting : ViewModelBase
     public string GroupName { get; private set; }
     public BaseAction[] Commands { get; private set; }
 
-    public Visibility Visibility => visibleProp is null || (bool)visibleProp.GetValue(Settings) ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility Visibility => visibleProp is null || (bool)visibleProp.GetValue(visibleProp.DeclaringType.Name is nameof(AppSettings) ? Settings : RuntimeSettings) ? Visibility.Visible : Visibility.Collapsed;
 
     protected AbstractSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
     {
@@ -162,8 +162,9 @@ public abstract class AbstractSetting : ViewModelBase
         Description = description;
         GroupName = groupName;
         Commands = commands;
-
+        
         Settings.PropertyChanged += Settings_PropertyChanged;
+        RuntimeSettings.PropertyChanged += Settings_PropertyChanged;
     }
 
     protected virtual void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
