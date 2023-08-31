@@ -254,8 +254,8 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isLogOpen, value);
     }
 
-    private bool? isLogPaused = false;
-    public bool? IsLogPaused
+    private bool isLogPaused = false;
+    public bool IsLogPaused
     {
         get => isLogPaused;
         set => Set(ref isLogPaused, value);

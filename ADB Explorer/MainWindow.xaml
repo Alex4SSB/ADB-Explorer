@@ -396,24 +396,10 @@
                     </Grid>
                     <Grid>
                         <TextBox x:Name="LogTextBox" Style="{StaticResource LogTextBoxStyle}" />
-                        <!--<ui:SimpleStackPanel Margin="6" HorizontalAlignment="Right">
-                            <ToggleButton Style="{StaticResource PauseLogButtonStyle}">
-                                <ui:FontIcon Glyph="&#xE769;" />
-                            </ToggleButton>
-                            <Button ToolTip="Clear Command Log">
-                                <Button.Style>
-                                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=LogTextBox, Path=Text.Count}" Value="0">
-                                                <Setter Property="IsEnabled" Value="False" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                                <ui:FontIcon Margin="1,1,-1,-1" Glyph="&#xE894;" />
-                            </Button>
-                        </ui:SimpleStackPanel>-->
-                        <Menu Margin="6" Style="{StaticResource LogControlsPanelStyle}" />
+                        <Menu
+                            x:Name="LogControlsPanel"
+                            Margin="18,6"
+                            Style="{StaticResource LogControlsPanelStyle}" />
                     </Grid>
                     <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                         <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">

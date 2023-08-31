@@ -16,7 +16,7 @@ public static class MenuHelper
             null);
 
     public static Brush GetCheckBackground(UIElement control) =>
-    (Brush)control.GetValue(CheckBackgroundProperty);
+        (Brush)control.GetValue(CheckBackgroundProperty);
 
     public static void SetCheckBackground(UIElement control, Brush value) =>
         control.SetValue(CheckBackgroundProperty, value);
@@ -29,7 +29,7 @@ public static class MenuHelper
             null);
 
     public static Thickness GetItemPadding(UIElement control) =>
-    (Thickness)control.GetValue(ItemPaddingProperty);
+        (Thickness)control.GetValue(ItemPaddingProperty);
 
     public static void SetItemPadding(UIElement control, Thickness value) =>
         control.SetValue(ItemPaddingProperty, value);
@@ -42,7 +42,7 @@ public static class MenuHelper
             null);
 
     public static Thickness GetItemMargin(UIElement control) =>
-    (Thickness)control.GetValue(ItemMarginProperty);
+        (Thickness)control.GetValue(ItemMarginProperty);
 
     public static void SetItemMargin(UIElement control, Thickness value) =>
         control.SetValue(ItemMarginProperty, value);
@@ -54,16 +54,16 @@ public static class MenuHelper
             typeof(MenuHelper),
             null);
 
-    public static bool GetIsButtonMenu(UIElement control) =>
-    (bool)control.GetValue(IsButtonMenuProperty);
+    public static bool? GetIsButtonMenu(UIElement control) =>
+        (bool?)control.GetValue(IsButtonMenuProperty);
 
-    public static void SetIsButtonMenu(UIElement control, bool value) =>
+    public static void SetIsButtonMenu(UIElement control, bool? value) =>
         control.SetValue(IsButtonMenuProperty, value);
 
     public static readonly DependencyProperty IsButtonMenuProperty =
         DependencyProperty.RegisterAttached(
             "IsButtonMenu",
-            typeof(bool),
+            typeof(bool?),
             typeof(MenuHelper),
             null);
 }

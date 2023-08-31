@@ -8,6 +8,9 @@ class MenuItemConverter : IValueConverter
         while (parent is not null and not Menu)
             parent = VisualTreeHelper.GetParent(parent);
 
+        if (parent is null)
+            return null;
+
         return parameter switch
         {
             "Padding" => Helpers.MenuHelper.GetItemPadding(parent as UIElement),

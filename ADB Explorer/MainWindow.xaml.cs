@@ -373,12 +373,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void CommandLog_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        if (e.NewItems is null)
+        if (e.NewItems is null || Dispatcher.HasShutdownStarted)
             return;
+        
+        if (e.OldItems is null || e.OldItems.Count < 1)
+            Dispatcher.Invoke(LogControlsPanel.Items.Refresh);
 
         foreach (Log item in e.NewItems)
         {
-            if (Dispatcher.HasShutdownStarted || RuntimeSettings.IsLogPaused is true)
+            if (Dispatcher.HasShutdownStarted || RuntimeSettings.IsLogPaused)
                 return;
 
             Dispatcher.Invoke(() =>

@@ -393,6 +393,7 @@
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="10,0" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />

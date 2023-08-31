@@ -55,6 +55,7 @@
     </Style>
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="False" />
     </Style>
     <Style
         x:Key="NumericTextBoxStyle"
@@ -781,31 +782,6 @@
             <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
                 <Setter Property="Text" Value="No items match current filter." />
             </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <!--<Style x:Key="LogControlsPanelStyle" TargetType="ui:SimpleStackPanel">
-        <Setter Property="Spacing" Value="4" />
-        <Setter Property="HorizontalAlignment" Value="Right" />
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>-->
-    <Style
-        x:Key="PauseLogButtonStyle"
-        BasedOn="{StaticResource ToggleButtonStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="ToolTip" Value="Pause Log Updates" />
-        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsLogPaused, Mode=TwoWay}" />
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="ToolTip" Value="Log Updates Are Paused" />
-            </Trigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="ListViewItemContainerStyle" TargetType="ListViewItem">
