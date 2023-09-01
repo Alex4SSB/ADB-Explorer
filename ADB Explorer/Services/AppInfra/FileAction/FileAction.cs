@@ -27,6 +27,10 @@ internal static class AppActions
     {
         { FileActionType.OpenFileOps, "\uF16A" },
         { FileActionType.FileOpPastView, "\uE9D5" },
+        { FileActionType.PushFolders, "\uE8B7" },
+        { FileActionType.NewFile, "\uE8A5" },
+        { FileActionType.Package, "\uE7B8" },
+        { FileActionType.New, "\uECC8" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } = new()

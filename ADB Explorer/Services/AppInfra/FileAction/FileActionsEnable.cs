@@ -93,13 +93,6 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref uninstallPackageEnabled, value);
     }
 
-    private bool uninstallVisible;
-    public bool UninstallVisible
-    {
-        get => uninstallVisible;
-        set => Set(ref uninstallVisible, value);
-    }
-
     private bool submenuUninstallEnabled;
     public bool SubmenuUninstallEnabled
     {
@@ -212,7 +205,8 @@ internal class FileActionsEnable : ViewModelBase
             if (Set(ref isRecycleBin, value))
             {
                 OnPropertyChanged(nameof(EmptyTrash));
-                OnPropertyChanged(nameof(NewMenuVisible));
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
+                IsRestoreMenuVisible.Value = value;
             }
         }
     }
@@ -224,7 +218,7 @@ internal class FileActionsEnable : ViewModelBase
         set
         {
             if (Set(ref isAppDrive, value))
-                OnPropertyChanged(nameof(NewMenuVisible));
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
         }
     }
 
@@ -242,7 +236,7 @@ internal class FileActionsEnable : ViewModelBase
         set
         {
             if (Set(ref isExplorerVisible, value))
-                OnPropertyChanged(nameof(NewMenuVisible));
+                IsNewMenuVisible.Value = !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
         }
     }
 
@@ -437,6 +431,12 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsCopyState = new();
 
+    public ObservableProperty<bool> IsNewMenuVisible = new() { Value = true };
+
+    public ObservableProperty<bool> IsRestoreMenuVisible = new() { Value = false };
+
+    public ObservableProperty<bool> IsUninstallVisible = new() { Value = false };
+
     #endregion
 
     #region read only
@@ -448,7 +448,6 @@ internal class FileActionsEnable : ViewModelBase
     public bool MoreEnabled => PackageActionsEnabled || IsCopyItemPathEnabled || UpdateModifiedEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
-    public bool NewMenuVisible => !IsExplorerVisible || (!IsRecycleBin && !IsAppDrive);
     public bool IsPasteStateVisible => IsExplorerVisible && !IsRecycleBin && !IsAppDrive;
     public bool IsEditorTextChanged => OriginalEditorText != EditorText;
 

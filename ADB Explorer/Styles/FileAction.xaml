@@ -135,6 +135,11 @@
         TargetType="MenuItem">
         <Setter Property="Command" Value="{Binding Action.Command.Command}" />
         <Setter Property="ItemsSource" Value="{Binding Children}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="BaseMenuItemStyle"

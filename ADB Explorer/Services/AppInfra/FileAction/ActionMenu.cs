@@ -14,8 +14,6 @@ internal abstract class ActionBase : ViewModelBase
         External,
     }
 
-    private bool activateAnimation = false;
-
     public FileAction Action { get; }
 
     public FileAction AltAction { get; }
@@ -33,10 +31,18 @@ internal abstract class ActionBase : ViewModelBase
 
     public AnimationSource ActionAnimationSource { get; }
 
+    private bool activateAnimation = false;
     public bool ActivateAnimation
     {
         get => activateAnimation;
         set => Set(ref activateAnimation, value);
+    }
+
+    private bool isVisible = true;
+    public bool IsVisible
+    {
+        get => isVisible;
+        private set => Set(ref isVisible, value);
     }
 
     public string Tooltip => $"{Action.Description}{(string.IsNullOrEmpty(Action.GestureString) ? "" : $" ({Action.GestureString})")}";
@@ -48,7 +54,8 @@ internal abstract class ActionBase : ViewModelBase
                          int iconSize,
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          AnimationSource animationSource = AnimationSource.Command,
-                         FileAction altAction = null)
+                         FileAction altAction = null,
+                         ObservableProperty<bool> isVisible = null)
     {
         if (this is not SubMenu)
             StyleHelper.VerifyIcon(ref icon);
@@ -59,13 +66,19 @@ internal abstract class ActionBase : ViewModelBase
         Animation = animation;
         ActionAnimationSource = animationSource;
         AltAction = altAction;
-
+        
         if (animationSource is AnimationSource.Command)
         {
             ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += OnExecute_PropertyChanged;
 
             if (AltAction is not null)
                 ((CommandHandler)AltAction.Command.Command).OnExecute.PropertyChanged += OnExecute_PropertyChanged;
+        }
+
+        if (isVisible is not null)
+        {
+            IsVisible = isVisible;
+            isVisible.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsVisible = e.NewValue;
         }
     }
 
@@ -92,8 +105,9 @@ internal abstract class ActionMenu : ActionBase
                          StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                          int iconSize = 18,
                          AnimationSource animationSource = AnimationSource.Command,
-                         FileAction altAction = null)
-        : base(fileAction, icon, iconSize, animation, animationSource, altAction)
+                         FileAction altAction = null,
+                         ObservableProperty<bool> isVisible = null)
+        : base(fileAction, icon, iconSize, animation, animationSource, altAction, isVisible)
     {
         Children = children;
     }
@@ -131,8 +145,9 @@ internal class AltTextMenu : ActionMenu
                        int iconSize = 18,
                        AnimationSource animationSource = AnimationSource.Command,
                        bool isTooltipVisible = true,
-                       FileAction altAction = null)
-        : base(fileAction, icon, children, animation, iconSize, animationSource, altAction)
+                       FileAction altAction = null,
+                       ObservableProperty<bool> isVisible = null)
+        : base(fileAction, icon, children, animation, iconSize, animationSource, altAction, isVisible: isVisible)
     {
         if (children is not null && children.Any())
             altText = fileAction.Description;
@@ -179,8 +194,9 @@ internal class IconMenu : ActionMenu
                     int iconSize = 16,
                     ObservableProperty<bool> selectionBar = null,
                     IEnumerable<SubMenu> children = null,
-                    FileAction altAction = null)
-        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction)
+                    FileAction altAction = null,
+                    ObservableProperty<bool> isVisible = null)
+        : base(fileAction, icon, children, animation, iconSize: iconSize, altAction: altAction, isVisible: isVisible)
     {
         if (selectionBar is not null)
         {
@@ -211,8 +227,9 @@ internal class CompoundIconMenu : ActionMenu
                        UserControl icon,
                        IEnumerable<SubMenu> children = null,
                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                       FileAction altAction = null)
-        : base(fileAction, null, children, animation, altAction: altAction)
+                       FileAction altAction = null,
+                       ObservableProperty<bool> isVisible = null)
+        : base(fileAction, null, children, animation, altAction: altAction, isVisible: isVisible)
     {
         CompoundIcon = icon;
     }
@@ -261,8 +278,9 @@ internal class ActionButton : ActionBase
                         string icon,
                         int iconSize = 16,
                         StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                        FileAction altAction = null)
-        : base(action, icon, iconSize, animation, altAction: altAction)
+                        FileAction altAction = null,
+                        ObservableProperty<bool> isVisible = null)
+        : base(action, icon, iconSize, animation, altAction: altAction, isVisible: isVisible)
     { }
 }
 
@@ -272,8 +290,9 @@ internal class ActionAccentButton : ActionButton
                               string icon,
                               int iconSize = 16,
                               StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                              FileAction altAction = null)
-        : base(action, icon, iconSize, animation, altAction: altAction)
+                              FileAction altAction = null,
+                              ObservableProperty<bool> isVisible = null)
+        : base(action, icon, iconSize, animation, altAction: altAction, isVisible: isVisible)
     { }
 }
 
@@ -295,25 +314,13 @@ internal class DualActionButton : IconMenu
     public Brush CheckBackground { get; }
 
     public DualActionButton(FileAction action,
-                            string icon,
-                            ObservableProperty<bool> isChecked,
-                            int iconSize = 20,
-                            StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                            Brush checkBackground = null)
-        : base(action, icon, animation, iconSize)
-    {
-        observableIsChecked = isChecked;
-        IsChecked = isChecked;
-        CheckBackground = checkBackground;
-    }
-
-    public DualActionButton(FileAction action,
                             ObservableProperty<string> icon,
                             ObservableProperty<bool> isChecked,
                             int iconSize = 20,
                             StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                            Brush checkBackground = null)
-        : base(action, icon, animation, iconSize)
+                            Brush checkBackground = null,
+                            ObservableProperty<bool> isVisible = null)
+        : base(action, icon, animation, iconSize, isVisible: isVisible)
     {
         icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
         observableIsChecked = isChecked;

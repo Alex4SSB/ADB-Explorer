@@ -606,7 +606,7 @@ internal static class FileActionLogic
         Data.FileActions.HomeEnabled =
         Data.FileActions.NewEnabled =
         Data.FileActions.PasteEnabled =
-        Data.FileActions.UninstallVisible =
+        Data.FileActions.IsUninstallVisible.Value =
         Data.FileActions.CutEnabled =
         Data.FileActions.CopyEnabled =
         Data.FileActions.IsExplorerVisible =

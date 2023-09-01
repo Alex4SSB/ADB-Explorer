@@ -272,6 +272,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.FilterActions):
                     FilterFileActions();
+                    FilterExplorerContextMenu();
                     break;
 
                 case nameof(AppRuntimeSettings.ClearNavBox):
@@ -344,6 +345,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         else if (e.PropertyName == nameof(FileActionsEnable.PasteEnabled))
         {
             FilterFileActions();
+            FilterExplorerContextMenu();
         }
     }
 
@@ -628,41 +630,28 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActionLogic.UpdateFileActions();
     }
 
-    private void FilterFileActions(bool filterContextMenu = true)
+    /// <summary>
+    /// Refresh file actions menu to update their ToolTips
+    /// </summary>
+    private void FilterFileActions() => MainToolBar.Items?.Refresh();
+
+    private void FilterExplorerContextMenu()
     {
-        var collectionView = CollectionViewSource.GetDefaultView(MainToolBar.ItemsSource);
+        var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ContextMenu.ItemsSource);
         if (collectionView is null)
             return;
 
         Predicate<object> predicate = m =>
-            ((ActionMenu)m).Icon switch
-            {
-                "\uECC8" => FileActions.NewMenuVisible,
-                "\uE845" => FileActions.IsRecycleBin,
-                "\uE25B" => FileActions.UninstallVisible,
-                _ => true,
-            };
+        {
+            var menu = m as SubMenu;
+
+            if (menu.Children is null)
+                return menu.Action.Command.IsEnabled;
+            else
+                return menu.Action.Command.IsEnabled && menu.Children.Any(child => child.Action.Command.IsEnabled);
+        };
 
         collectionView.Filter = new(predicate);
-
-        if (filterContextMenu)
-        {
-            var contextCollectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ContextMenu.ItemsSource);
-            if (contextCollectionView is null)
-                return;
-
-            Predicate<object> contextPredicate = m =>
-            {
-                var menu = m as SubMenu;
-
-                if (menu.Children is SubMenu[] list)
-                    return menu.Action.Command.IsEnabled && list.Any(child => child.Action.Command.IsEnabled);
-
-                return menu.Action.Command.IsEnabled;
-            };
-
-            contextCollectionView.Filter = new(contextPredicate);
-        }
     }
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -950,7 +939,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.InstallPackageEnabled = FileActions.IsTemp && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
         FileActions.ContextPushPackagesEnabled =
-        FileActions.UninstallVisible = FileActions.IsAppDrive;
+        FileActions.IsUninstallVisible.Value = FileActions.IsAppDrive;
 
         FileActions.PushFilesFoldersEnabled =
         FileActions.ContextNewEnabled =
