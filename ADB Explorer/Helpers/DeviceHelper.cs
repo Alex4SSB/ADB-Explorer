@@ -696,12 +696,19 @@ public static class DeviceHelper
         DeviceStatus newStatus;
         var oldStatus = wsa.Status;
 
-        if (GetWsaPid() is not null)
-            newStatus = DeviceStatus.Unauthorized;
-        else if (IsWsaInstalled())
+        if (oldStatus is DeviceStatus.Unauthorized && DateTime.Now - wsa.LastLaunch > AdbExplorerConst.WSA_CONNECT_TIMEOUT)
+        {
             newStatus = DeviceStatus.Ok;
+        }
         else
-            newStatus = DeviceStatus.Offline;
+        {
+            if (GetWsaPid() is not null)
+                newStatus = DeviceStatus.Unauthorized;
+            else if (IsWsaInstalled())
+                newStatus = DeviceStatus.Ok;
+            else
+                newStatus = DeviceStatus.Offline;
+        }
 
         if (newStatus != oldStatus)
         {
