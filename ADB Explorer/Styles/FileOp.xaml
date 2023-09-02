@@ -158,7 +158,9 @@
             </TextBlock.Style>
         </TextBlock>
     </DataTemplate>
-    <DataTemplate x:Key="WaitingOpProgressTemplate" />
+    <DataTemplate x:Key="WaitingOpProgressTemplate">
+        <TextBlock Margin="4,0" Text="Pending..." />
+    </DataTemplate>
     <DataTemplate x:Key="InProgSyncProgressTemplate">
         <Grid Margin="4,0">
             <Grid.Resources>
@@ -277,7 +279,8 @@
                 FontWeight="Bold"
                 Foreground="{DynamicResource TrashDriveAltBorder}"
                 Glyph="&#xF13D;" />
-            <TextBlock Text="{Binding Name}" />
+            <TextBlock Text="Error:" />
+            <TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Error}" />
         </ui:SimpleStackPanel>
     </DataTemplate>
     <helpers:FileOpProgressTemplateSelector
@@ -354,7 +357,7 @@
     </DataTemplate>
     <Style
         x:Key="DetailedFileOpGridStyle"
-        BasedOn="{StaticResource ExplorerGridStyle}"
+        BasedOn="{StaticResource BaseDataGridStyle}"
         TargetType="DataGrid">
         <Setter Property="AutoGenerateColumns" Value="False" />
         <Setter Property="CanUserDeleteRows" Value="False" />

@@ -78,7 +78,12 @@ public abstract class FileSyncOperation : FileOperation
         operationTask.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
+            if (string.IsNullOrEmpty(t.Exception.InnerException.Message))
+            {
+                StatusInfo = new FailedOpProgressViewModel(progressUpdates.OfType<SyncErrorInfo>().Last().Message);
+            }
+            else
+                StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
@@ -92,9 +97,9 @@ public abstract class FileSyncOperation : FileOperation
         else
             TargetPath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
 
-        if (progressUpdates.LastOrDefault() is var currProgress and not null)
+        if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
-            StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)currProgress);
+            StatusInfo = new InProgSyncProgressViewModel(currProgress);
         }
     }
 

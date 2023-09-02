@@ -31,10 +31,18 @@ public class SyncFile : FilePath
             return;
         }
 
+        foreach (var update in newUpdates)
+        {
+            if (string.IsNullOrEmpty(update.AndroidPath))
+                update.SetPathToCurrent();
+        }
+
         var groups = newUpdates.GroupBy(update => DirectChildPath(update.AndroidPath));
+        
         foreach (var group in groups)
         {
             SyncFile file = Children.FirstOrDefault(child => child.FullPath.Equals(group.Key));
+            
             
             if (file is null)
             {
@@ -54,7 +62,7 @@ public class SyncFile : FilePath
 
     public string DirectChildPath(string fullPath)
     {
-        if (!fullPath.Contains(FullPath) || fullPath.Length - FullPath.Length < 2)
+        if (fullPath is null || !fullPath.Contains(FullPath) || fullPath.Length - FullPath.Length < 2)
             return null;
 
         var index = NextSeparatorIndex(FullPath, fullPath);

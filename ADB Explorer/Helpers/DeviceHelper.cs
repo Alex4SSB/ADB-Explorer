@@ -5,6 +5,7 @@ using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using Windows.Management.Deployment;
 using static ADB_Explorer.Models.AbstractDevice;
+using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Helpers;
 
@@ -531,6 +532,17 @@ public static class DeviceHelper
 
             NavHistory.Reset();
             DriveHelper.ClearDrives();
+
+            if (Data.FileOpQ.Operations.Count > 0)
+            {
+                Data.FileOpQ.MoveOperationsToPast(true);
+                var pastOpAction = AppActions.ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpPastView);
+
+                if (!pastOpAction.IsChecked)
+                    pastOpAction.FileAction.Command.Execute();
+
+                Data.FileOpQ.IsActive = false;
+            }
         }
     }
 

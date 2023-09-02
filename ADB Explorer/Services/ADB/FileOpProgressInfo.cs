@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.ViewModels;
+﻿using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
@@ -6,6 +7,10 @@ public abstract class FileOpProgressInfo : ViewModelBase
 {
     public string AndroidPath { get; protected set; }
 
+    public void SetPathToCurrent()
+    {
+        AndroidPath = ((InProgSyncProgressViewModel)Data.FileOpQ.CurrentOperation.StatusInfo).CurrentFilePath;
+    }
 }
 
 public class SyncErrorInfo : FileOpProgressInfo

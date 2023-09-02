@@ -803,7 +803,7 @@ internal static class FileActionLogic
 
     public static void UpdateFileOpControls()
     {
-        Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations && Data.FileActions.IsExplorerVisible;
+        Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations && (Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible);
 
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button.IsChecked =
             !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;

@@ -111,6 +111,7 @@ public static class AdbExplorerConst
     public static readonly string[] LOOPBACK_ADDRESSES = { WIN_LOOPBACK_ADDRESS, "0.0.0.0" };
     public static readonly string WSA_PACKAGE_NAME = "Windows Subsystem for Android™";
     public static readonly TimeSpan WSA_LAUNCH_DELAY = TimeSpan.FromSeconds(2);
+    public static readonly TimeSpan WSA_CONNECT_TIMEOUT = TimeSpan.FromSeconds(8);
 
     public static readonly TimeSpan EXPLORER_NAV_DELAY = TimeSpan.FromMilliseconds(800);
 }

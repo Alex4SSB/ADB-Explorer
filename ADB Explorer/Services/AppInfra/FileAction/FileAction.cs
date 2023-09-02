@@ -43,7 +43,7 @@ internal static class AppActions
             "Stop",
             "\uE71A"),
         new(FileActionType.FileOpPastView,
-            () => Data.FileActions.IsExplorerVisible,
+            () => Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible,
             "Show Current Operations",
             Icons[FileActionType.OpenFileOps],
             FileActionLogic.TogglePastView,

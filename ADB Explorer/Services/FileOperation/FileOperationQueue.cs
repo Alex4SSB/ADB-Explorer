@@ -24,7 +24,7 @@ public class FileOperationQueue : ViewModelBase
     public bool IsActive
     {
         get => isActive;
-        private set
+        set
         {
             if (Set(ref isActive, value))
                 FileOpRingVisibility();
@@ -143,13 +143,17 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    public void MoveCompletedToPast()
+    public void MoveOperationsToPast(bool includeAll = false)
     {
         try
         {
             mutex.WaitOne();
 
-            var completed = Operations.Where(op => op.Status is not FileOperation.OperationStatus.Waiting and not FileOperation.OperationStatus.InProgress);
+            Func<FileOperation, bool> predicate = op =>
+                includeAll || op.Status is not FileOperation.OperationStatus.Waiting
+                                       and not FileOperation.OperationStatus.InProgress;
+
+            var completed = Operations.Where(predicate);
             PastOperations.AddRange(completed);
 
             Operations.RemoveAll(completed);
@@ -232,7 +236,7 @@ public class FileOperationQueue : ViewModelBase
         IsActive = true;
         UpdateProgress(0);
 
-        MoveCompletedToPast();
+        MoveOperationsToPast();
 
         MoveToNextOperation();
     }
