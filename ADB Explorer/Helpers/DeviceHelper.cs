@@ -702,7 +702,7 @@ public static class DeviceHelper
         if (Data.DevicesObject.LogicalDeviceViewModels.Any(dev => dev.Type is DeviceType.WSA && dev.Status is not DeviceStatus.Offline))
             return;
 
-        if (DateTime.Now - wsa.LastLaunch < AdbExplorerConst.WSA_LAUNCH_DELAY)
+        if (wsa.LastLaunch == DateTime.MaxValue || DateTime.Now - wsa.LastLaunch < AdbExplorerConst.WSA_LAUNCH_DELAY)
             return;
 
         DeviceStatus newStatus;
@@ -710,7 +710,14 @@ public static class DeviceHelper
 
         if (oldStatus is DeviceStatus.Unauthorized && DateTime.Now - wsa.LastLaunch > AdbExplorerConst.WSA_CONNECT_TIMEOUT)
         {
+            if (wsa.LastLaunch == DateTime.MinValue)
+            {
+                wsa.SetLastLaunch();
+                return;
+            }
+
             newStatus = DeviceStatus.Ok;
+            wsa.SetLastLaunch(DateTime.MaxValue);
         }
         else
         {
