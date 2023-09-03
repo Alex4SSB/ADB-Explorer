@@ -120,7 +120,7 @@
         <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
-        <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
+        <TextBlock Margin="4,0">
             <TextBlock.Style>
                 <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="FontWeight" Value="Regular" />
@@ -138,7 +138,7 @@
         </TextBlock>
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
-        <TextBlock Margin="4,0" TextTrimming="CharacterEllipsis">
+        <TextBlock Margin="4,0">
             <TextBlock.Style>
                 <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="FontWeight" Value="Regular" />
@@ -250,38 +250,45 @@
                 TextTrimming="CharacterEllipsis" />
         </Grid>
     </DataTemplate>
-    <Style x:Key="CompletedIconProgressPanelStyle" TargetType="ui:SimpleStackPanel">
-        <Setter Property="Orientation" Value="Horizontal" />
-        <Setter Property="Spacing" Value="4" />
+    <Style x:Key="CompletedIconProgressPanelStyle" TargetType="Grid">
         <Setter Property="Margin" Value="4,0" />
+        <Style.Resources>
+            <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock" />
+            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="Margin" Value="0,0,4,0" />
+            </Style>
+        </Style.Resources>
     </Style>
     <DataTemplate x:Key="CompletedShellProgressTemplate">
-        <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <ui:FontIcon
-                FontWeight="Bold"
-                Foreground="{DynamicResource NewDeviceAltBorder}"
-                Glyph="&#xF13E;" />
-            <TextBlock Text="{Binding Name}" />
-        </ui:SimpleStackPanel>
+        <Grid Style="{StaticResource CompletedIconProgressPanelStyle}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon Foreground="{DynamicResource NewDeviceAltBorder}" Glyph="&#xF13E;" />
+            <TextBlock Grid.Column="1" Text="{Binding Name}" />
+        </Grid>
     </DataTemplate>
     <DataTemplate x:Key="CanceledOpProgressTemplate">
-        <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <ui:FontIcon
-                FontWeight="Bold"
-                Foreground="{DynamicResource TrashDriveAltBorder}"
-                Glyph="&#xF13D;" />
-            <TextBlock Text="{Binding Name}" />
-        </ui:SimpleStackPanel>
+        <Grid Style="{StaticResource CompletedIconProgressPanelStyle}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon Foreground="{DynamicResource TrashDriveAltBorder}" Glyph="&#xF13D;" />
+            <TextBlock Grid.Column="1" Text="{Binding Name}" />
+        </Grid>
     </DataTemplate>
     <DataTemplate x:Key="FailedOpProgressTemplate">
-        <ui:SimpleStackPanel Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <ui:FontIcon
-                FontWeight="Bold"
-                Foreground="{DynamicResource TrashDriveAltBorder}"
-                Glyph="&#xF13D;" />
-            <TextBlock Text="Error:" />
-            <TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Error}" />
-        </ui:SimpleStackPanel>
+        <Grid Style="{StaticResource CompletedIconProgressPanelStyle}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon Foreground="{DynamicResource TrashDriveAltBorder}" Glyph="&#xF13D;" />
+            <TextBlock Grid.Column="1" Text="{Binding Error}" />
+        </Grid>
     </DataTemplate>
     <helpers:FileOpProgressTemplateSelector
         x:Key="FileOpProgressTemplateSelector"

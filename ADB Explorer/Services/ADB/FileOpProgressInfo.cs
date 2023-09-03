@@ -9,7 +9,11 @@ public abstract class FileOpProgressInfo : ViewModelBase
 
     public void SetPathToCurrent()
     {
-        AndroidPath = ((InProgSyncProgressViewModel)Data.FileOpQ.CurrentOperation.StatusInfo).CurrentFilePath;
+        string currentPath = ((InProgSyncProgressViewModel)Data.FileOpQ.CurrentOperation.StatusInfo).CurrentFilePath;
+        if (string.IsNullOrEmpty(currentPath))
+            currentPath = $"{Data.FileOpQ.CurrentOperation.TargetPath.FullPath}/{Data.FileOpQ.CurrentOperation.FilePath.FullName}";
+
+        AndroidPath = currentPath;
     }
 }
 

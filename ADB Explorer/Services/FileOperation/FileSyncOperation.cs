@@ -77,13 +77,12 @@ public abstract class FileSyncOperation : FileOperation
 
         operationTask.ContinueWith((t) =>
         {
+            string message = string.IsNullOrEmpty(t.Exception.InnerException.Message)
+                ? progressUpdates.OfType<SyncErrorInfo>().Last().Message
+                : t.Exception.InnerException.Message;
+
             Status = OperationStatus.Failed;
-            if (string.IsNullOrEmpty(t.Exception.InnerException.Message))
-            {
-                StatusInfo = new FailedOpProgressViewModel(progressUpdates.OfType<SyncErrorInfo>().Last().Message);
-            }
-            else
-                StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
+            StatusInfo = new FailedOpProgressViewModel($"Error: {message}");
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
