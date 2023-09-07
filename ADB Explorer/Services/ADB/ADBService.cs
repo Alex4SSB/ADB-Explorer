@@ -97,7 +97,7 @@ public partial class ADBService
     }
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args) =>
-        ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, System.Text.Encoding.UTF8, args);
+        ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, Encoding.UTF8, args);
 
     public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, params string[] args)
     {

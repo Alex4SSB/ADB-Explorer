@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.ViewModels;
-using static ADB_Explorer.Services.ADBService;
 
 namespace ADB_Explorer.Models;
 
@@ -75,6 +74,9 @@ public class FilePath : AbstractFile
         PathType = FilePathType.Windows;
 
         FullPath = windowsPath.ParsingName;
+        if (FullPath.StartsWith(@"\\"))
+            FullPath = FullPath[1..];
+
         FullName = windowsPath.Name;
         IsDirectory = windowsPath is ShellFolder;
         IsRegularFile = !IsDirectory;
@@ -92,10 +94,10 @@ public class FilePath : AbstractFile
         IsRegularFile = fileType == FileType.File;
     }
 
-    public virtual void UpdatePath(string androidPath)
+    public virtual void UpdatePath(string newPath)
     {
-        FullPath = androidPath;
-        FullName = GetFullName(androidPath);
+        FullPath = newPath;
+        FullName = GetFullName(newPath);
     }
 
     private string GetFullName(string fullPath) =>

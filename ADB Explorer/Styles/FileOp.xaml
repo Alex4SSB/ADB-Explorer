@@ -120,17 +120,13 @@
         <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
-        <TextBlock Margin="4,0">
+        <TextBlock Margin="4,0" Text="{Binding SourcePathString}">
             <TextBlock.Style>
                 <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="FontWeight" Value="Regular" />
-                    <Setter Property="Text" Value="{Binding FilePath.ParentPath}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Status}" Value="InProgress">
                             <Setter Property="FontWeight" Value="Bold" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding FilePath.ParentPath}" Value="{x:Static Member=models:AdbExplorerConst.RECYCLE_PATH}">
-                            <Setter Property="Text" Value="Recycle Bin" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -138,20 +134,13 @@
         </TextBlock>
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
-        <TextBlock Margin="4,0">
+        <TextBlock Margin="4,0" Text="{Binding TargetPathString}">
             <TextBlock.Style>
                 <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
                     <Setter Property="FontWeight" Value="Regular" />
-                    <Setter Property="Text" Value="{Binding TargetPath.FullPath}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Status}" Value="InProgress">
                             <Setter Property="FontWeight" Value="Bold" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding OperationName}" Value="Delete">
-                            <Setter Property="Text" Value="Permanent Deletion" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding OperationName}" Value="Recycle">
-                            <Setter Property="Text" Value="Recycle Bin" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

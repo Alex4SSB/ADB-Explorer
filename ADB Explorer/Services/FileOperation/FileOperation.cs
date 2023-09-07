@@ -76,6 +76,38 @@ public abstract class FileOperation : ViewModelBase
 
     #region Read-only Properties
 
+    public string SourcePathString
+    {
+        get
+        {
+            if (FilePath is null)
+                return "";
+
+            if (FilePath.ParentPath == AdbExplorerConst.RECYCLE_PATH)
+            {
+                return "Recycle Bin";
+            }
+
+            return $"{(FilePath.ParentPath.StartsWith(@"\") ? @"\" : "")}{FilePath.ParentPath}";
+        }
+    }
+
+    public string TargetPathString
+    {
+        get
+        {
+            if (TargetPath is null)
+                return "";
+
+            return OperationName switch
+            {
+                OperationType.Delete => "Permanent Deletion",
+                OperationType.Recycle => "Recycle Bin",
+                _ => $"{(TargetPath.FullPath.StartsWith(@"\") ? @"\" : "")}{TargetPath.FullPath}",
+            };
+        }
+    }
+
     public virtual string Tooltip => $"{OperationName}";
 
     public virtual FrameworkElement OpIcon => OperationName switch
