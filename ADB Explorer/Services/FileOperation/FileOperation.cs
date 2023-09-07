@@ -83,12 +83,9 @@ public abstract class FileOperation : ViewModelBase
             if (FilePath is null)
                 return "";
 
-            if (FilePath.ParentPath == AdbExplorerConst.RECYCLE_PATH)
-            {
-                return "Recycle Bin";
-            }
-
-            return $"{(FilePath.ParentPath.StartsWith(@"\") ? @"\" : "")}{FilePath.ParentPath}";
+            return FilePath.ParentPath == AdbExplorerConst.RECYCLE_PATH
+                ? "Recycle Bin"
+                : FilePath.ParentPath;
         }
     }
 
@@ -103,7 +100,7 @@ public abstract class FileOperation : ViewModelBase
             {
                 OperationType.Delete => "Permanent Deletion",
                 OperationType.Recycle => "Recycle Bin",
-                _ => $"{(TargetPath.FullPath.StartsWith(@"\") ? @"\" : "")}{TargetPath.FullPath}",
+                _ => TargetPath.FullPath,
             };
         }
     }

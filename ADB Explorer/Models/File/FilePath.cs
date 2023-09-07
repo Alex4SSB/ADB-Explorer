@@ -74,9 +74,6 @@ public class FilePath : AbstractFile
         PathType = FilePathType.Windows;
 
         FullPath = windowsPath.ParsingName;
-        if (FullPath.StartsWith(@"\\"))
-            FullPath = FullPath[1..];
-
         FullName = windowsPath.Name;
         IsDirectory = windowsPath is ShellFolder;
         IsRegularFile = !IsDirectory;

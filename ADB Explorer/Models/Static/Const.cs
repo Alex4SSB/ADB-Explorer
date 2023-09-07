@@ -81,7 +81,7 @@ public static class AdbExplorerConst
     public static readonly string LOOPBACK_IP = "0.0.0.0";
 
     public static readonly char[] ESCAPE_ADB_SHELL_CHARS = { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`' };
-    public static readonly char[] ESCAPE_ADB_CHARS = { '$', '`', '"', '\\' };
+    public static readonly char[] ESCAPE_ADB_CHARS = { '$', '`', '"' };
     public static readonly char[] INVALID_ANDROID_CHARS = { '"', '*', '/', ':', '<', '>', '?', '\\', '|' };
 
     public static readonly Version MIN_ADB_VERSION = new(31, 0, 2);
