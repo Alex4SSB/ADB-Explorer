@@ -28,10 +28,10 @@ public class WsaPkgDeviceViewModel : DeviceViewModel
         LaunchWsaCommand = DeviceHelper.LaunchWsa(this);
     }
 
-    public void SetLastLaunch()
+    public void SetLastLaunch(DateTime? newDate = null)
     {
-        Device.LastLaunch = DateTime.Now;
+        Device.LastLaunch = newDate is null ? DateTime.Now : newDate.Value;
         OnPropertyChanged(nameof(LastLaunch));
     }
-        
+
 }
