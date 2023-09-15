@@ -57,6 +57,21 @@ internal static class AppActions
             "\uE769",
             () => Data.RuntimeSettings.IsLogPaused ^= true,
             "Pause Log Updates"),
+        new(FileActionType.SortSettings,
+            () => true,
+            "Exit Search",
+            "\uE711",
+            FileActionLogic.ToggleSettingsSort,
+            "Search View",
+            "\uE721"),
+        new(FileActionType.ExpandSettings,
+            () => true,
+            "Collapse All",
+            "\uE16A",
+            FileActionLogic.ToggleSettingsExpand,
+            "Expand All",
+            "\uE169",
+            isVisible: Data.FileActions.IsExpandSettingsVisible),
     };
 
     public static List<FileAction> List { get; } = new()
@@ -370,7 +385,9 @@ internal static class AppActions
         new(FileActionType.ResetSettings,
             () => true,
             FileActionLogic.ResetAppSettings,
-            "Reset App Settings")
+            "Reset App Settings"),
+        ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
+        ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
     };
 
     public static List<KeyBinding> Bindings =>
@@ -462,6 +479,8 @@ internal class FileAction : ViewModelBase
         PauseLogs,
         ClearLogs,
         ResetSettings,
+        SortSettings,
+        ExpandSettings,
     }
 
     public FileActionType Name { get; }

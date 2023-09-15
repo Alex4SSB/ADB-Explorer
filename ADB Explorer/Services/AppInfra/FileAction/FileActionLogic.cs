@@ -839,4 +839,19 @@ internal static class FileActionLogic
 
         Data.RuntimeSettings.ResetAppSettings = true;
     }
+
+    public static void ToggleSettingsSort()
+    {
+        Data.RuntimeSettings.SortedView ^= true;
+        Data.FileActions.IsExpandSettingsVisible.Value ^= true;
+
+        Data.RuntimeSettings.RefreshSettingsControls = true;
+    }
+
+    public static void ToggleSettingsExpand()
+    {
+        Data.RuntimeSettings.GroupsExpanded ^= true;
+
+        Data.RuntimeSettings.RefreshSettingsControls = true;
+    }
 }

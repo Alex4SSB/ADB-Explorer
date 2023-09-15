@@ -304,6 +304,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.ClearLogs):
                     ClearLogs();
                     break;
+
+                case nameof(AppRuntimeSettings.RefreshSettingsControls):
+                    SettingsControlsMenu.Items.Refresh();
+                    break;
             }
         });
     }

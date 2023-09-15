@@ -16,37 +16,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="SortedSettingsButtonStyle"
-        BasedOn="{StaticResource SettingsToggleStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Search View" />
-        <Setter Property="Content" Value="&#xE721;" />
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="&#xE711;" />
-                <Setter Property="ToolTip" Value="Exit Search" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ExpandGroupsButtonStyle"
-        BasedOn="{StaticResource SettingsToggleStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="IsChecked" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Expand All" />
-        <Setter Property="Content" Value="&#xE169;" />
-        <Style.Triggers>
-            <Trigger Property="IsChecked" Value="True">
-                <Setter Property="Content" Value="&#xE16A;" />
-                <Setter Property="ToolTip" Value="Collapse All" />
-            </Trigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <DataTemplate x:Key="SettingsActionTemplate" DataType="services:SettingsAction">
         <Button
             Command="{Binding Command}"

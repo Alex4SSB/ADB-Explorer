@@ -437,6 +437,8 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsUninstallVisible = new() { Value = false };
 
+    public ObservableProperty<bool> IsExpandSettingsVisible = new() { Value = true };
+
     #endregion
 
     #region read only

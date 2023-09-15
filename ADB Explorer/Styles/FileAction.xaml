@@ -283,12 +283,17 @@
         x:Shared="False"
         BasedOn="{StaticResource MenuStyle}"
         TargetType="Menu">
-        <Setter Property="Margin" Value="7,0,0,0" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="ItemTemplateSelector" Value="{StaticResource MenuTemplateSelector}" />
         <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="0" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="12,0" />
+    </Style>
+    <Style
+        x:Key="MainToolBarStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="Margin" Value="7,0,0,0" />
     </Style>
     <Style
         x:Key="BaseContextMenuStyle"
@@ -379,5 +384,14 @@
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ResetSettings.List}}" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="8,6" />
+    </Style>
+    <Style
+        x:Key="SettingsControlsMenuStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsControls.List}}" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+        <Setter Property="helpers:MenuHelper.ItemPadding" Value="8,5,8,4" />
+        <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
     </Style>
 </ResourceDictionary>

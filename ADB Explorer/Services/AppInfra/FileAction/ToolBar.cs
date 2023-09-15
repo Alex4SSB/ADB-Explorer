@@ -312,3 +312,12 @@ internal static class ResetSettings
             new ResetSettingsIcon()),
     };
 }
+
+internal static class SettingsControls
+{
+    public static ObservableList<ActionBase> List { get; } = new()
+    {
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.SortSettings).Button,
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.ExpandSettings).Button,
+    };
+}
