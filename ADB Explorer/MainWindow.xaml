@@ -373,7 +373,7 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
-                                        <ListView Margin="4" Style="{StaticResource EditorControlsListStyle}" />
+                                        <Menu Margin="4" Style="{StaticResource EditorControlsMenuStyle}" />
                                         <TextBox
                                             Grid.Column="1"
                                             MinHeight="30"
@@ -382,7 +382,6 @@
                                 </Border>
                                 <TextBox Grid.Row="1" Style="{StaticResource EditorTextBoxStyle}" />
                             </Grid>
-                            <Border Style="{StaticResource EditorTextChangedBorderStyle}" />
                         </Grid>
                         <GridSplitter
                             Grid.Column="1"

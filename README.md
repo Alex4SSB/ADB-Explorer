@@ -21,3 +21,18 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 <a href="https://www.microsoft.com/store/apps/9PPGN2WM50QB">
       <img alt="Issues" width=300px src="https://get.microsoft.com/images/en-us%20light.svg" />
 </a>
+
+<br></br>
+<h2 align="left"/>App Files</h2>
+
+`...\AppData\Local\IsolatedStorage\...`
+
+Launch app while pressing L-Ctrl to open app files location which may contain:
+* App.txt - persistent settings file.
+* AdbProgressRedirection.exe - a pipe for getting progress updates while executing ADB push & pull commands.
+* TEMP - a folder to which edited files are transferred temporarily.
+
+The settings file contains user app settings as well as other settings not directly accessible.
+The file can be edited, but the format must be preserved.
+An unrecognized entry will be overwritten.
+The file can be deleted to restore app settings to their defaults.

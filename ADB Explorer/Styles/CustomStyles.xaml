@@ -525,6 +525,11 @@
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="AcceptsReturn" Value="True" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="True">
+                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{StaticResource EditorTextChangedBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="EditorFilePathStyle"
@@ -804,17 +809,5 @@
         <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
         <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
         <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style
-        x:Key="EditorTextChangedBorderStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource EditorTextChangedBrush}" />
-        <Setter Property="BorderThickness" Value="0,0,0,2" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
 </ResourceDictionary>
