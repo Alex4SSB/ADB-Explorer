@@ -517,21 +517,6 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="EditorTextBoxStyle"
-        BasedOn="{StaticResource TextBoxFluentStyle}"
-        TargetType="TextBox">
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-        <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-        <Setter Property="AcceptsReturn" Value="True" />
-        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="True">
-                <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{StaticResource EditorTextChangedBrush}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="EditorFilePathStyle"
         BasedOn="{StaticResource TooltipTextBoxStyle}"
         TargetType="TextBox">
@@ -552,6 +537,27 @@
     <Style x:Key="MaskedTextBoxStyle" TargetType="controls:MaskedTextBox">
         <Setter Property="ValidationType" Value="None" />
         <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />
+    </Style>
+    <Style
+        x:Key="EditorTextBoxStyle"
+        BasedOn="{StaticResource MaskedTextBoxStyle}"
+        TargetType="controls:MaskedTextBox">
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Setter Property="ControlStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
+                    <Setter Property="TextWrapping" Value="Wrap" />
+                    <Setter Property="AcceptsReturn" Value="True" />
+                    <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+                    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsEditorTextChanged}" Value="True">
+                            <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{StaticResource EditorTextChangedBrush}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Setter.Value>
+        </Setter>
     </Style>
     <Style
         x:Key="ExpanderHeaderProgressBarStyle"

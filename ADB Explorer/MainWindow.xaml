@@ -380,7 +380,7 @@
                                             Style="{StaticResource EditorFilePathStyle}" />
                                     </Grid>
                                 </Border>
-                                <TextBox Grid.Row="1" Style="{StaticResource EditorTextBoxStyle}" />
+                                <controls:MaskedTextBox Grid.Row="1" Style="{StaticResource EditorTextBoxStyle}" />
                             </Grid>
                         </Grid>
                         <GridSplitter
