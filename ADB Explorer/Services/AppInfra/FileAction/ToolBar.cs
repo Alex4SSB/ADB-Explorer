@@ -249,13 +249,15 @@ internal static class SettingsPaneMenu
 
 internal static class EditorControls
 {
-    public static ObservableList<ActionButton> List { get; } = new()
+    public static ObservableList<ActionBase> List { get; } = new()
     {
-        new ActionAccentButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
-            "\uE711"),
-        new ActionAccentButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor),
+        new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
+            "\uE711",
+            iconSize: 16),
+        new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor),
             "\uE74E",
-            animation: StyleHelper.ContentAnimation.Bounce),
+            animation: StyleHelper.ContentAnimation.Bounce,
+            iconSize: 16),
     };
 }
 

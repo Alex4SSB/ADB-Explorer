@@ -272,30 +272,6 @@ internal class SubMenuSeparator : SubMenu
     { }
 }
 
-internal class ActionButton : ActionBase
-{
-    public ActionButton(FileAction action,
-                        string icon,
-                        int iconSize = 16,
-                        StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                        FileAction altAction = null,
-                        ObservableProperty<bool> isVisible = null)
-        : base(action, icon, iconSize, animation, altAction: altAction, isVisible: isVisible)
-    { }
-}
-
-internal class ActionAccentButton : ActionButton
-{
-    public ActionAccentButton(FileAction action,
-                              string icon,
-                              int iconSize = 16,
-                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
-                              FileAction altAction = null,
-                              ObservableProperty<bool> isVisible = null)
-        : base(action, icon, iconSize, animation, altAction: altAction, isVisible: isVisible)
-    { }
-}
-
 internal class DualActionButton : IconMenu
 {
     private bool isChecked = false;
@@ -304,6 +280,12 @@ internal class DualActionButton : IconMenu
         get => isChecked;
         set
         {
+            if (observableIsChecked is null)
+            {
+                Set(ref isChecked, true);
+                return;
+            }
+
             if (Set(ref isChecked, value))
                 observableIsChecked.Value = value;
         }
@@ -313,6 +295,9 @@ internal class DualActionButton : IconMenu
 
     public Brush CheckBackground { get; }
 
+    /// <summary>
+    /// Toggle Button / Menu Item with modifiable background and dynamic icon
+    /// </summary>
     public DualActionButton(FileAction action,
                             ObservableProperty<string> icon,
                             ObservableProperty<bool> isChecked,
@@ -327,4 +312,21 @@ internal class DualActionButton : IconMenu
         IsChecked = isChecked;
         CheckBackground = checkBackground;
     }
+
+    /// <summary>
+    /// Accent Button / Menu Item with modifiable background
+    /// </summary>
+    public DualActionButton(FileAction action,
+                            string icon,
+                            StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                            int iconSize = 20,
+                            Brush checkBackground = null,
+                            ObservableProperty<bool> isVisible = null)
+        : base(action, icon, animation, iconSize, isVisible: isVisible)
+    {
+        IsChecked = true;
+        CheckBackground = checkBackground;
+    }
+}
+
 }

@@ -157,6 +157,11 @@
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
         <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
         <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
+        <Style.Triggers>
+            <Trigger Property="helpers:MenuHelper.IsButtonMenu" Value="True">
+                <Setter Property="MinWidth" Value="20" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
     <Style
         x:Key="DynamicAltTextStyle"
@@ -319,56 +324,13 @@
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsPaneMenu.List}}" />
     </Style>
     <Style
-        x:Key="EditorControlContainerStyle"
-        BasedOn="{StaticResource ListViewItemContainerStyle}"
-        TargetType="ListViewItem">
-        <Setter Property="Margin" Value="4" />
-    </Style>
-    <DataTemplate x:Key="ActionButtonTemplate">
-        <Button>
-            <Button.Style>
-                <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
-                    <Setter Property="ToolTip" Value="{Binding Tooltip}" />
-                    <Setter Property="Command" Value="{Binding Action.Command.Command}" />
-                    <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
-                    <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
-                    <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
-                </Style>
-            </Button.Style>
-            <ui:FontIcon FontSize="{Binding IconSize}" Glyph="{Binding Icon}" />
-        </Button>
-    </DataTemplate>
-    <DataTemplate x:Key="ActionAccentButtonTemplate">
-        <Button>
-            <Button.Style>
-                <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
-                    <Setter Property="ToolTip" Value="{Binding Tooltip}" />
-                    <Setter Property="Command" Value="{Binding Action.Command.Command}" />
-                    <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
-                    <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
-                    <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
-                </Style>
-            </Button.Style>
-            <ui:FontIcon FontSize="{Binding IconSize}" Glyph="{Binding Icon}" />
-        </Button>
-    </DataTemplate>
-    <helpers:ActionButtonTemplateSelector
-        x:Key="ActionButtonTemplateSelector"
-        AccentButtonTemplate="{StaticResource ActionAccentButtonTemplate}"
-        ButtonTemplate="{StaticResource ActionButtonTemplate}" />
-    <Style
-        x:Key="ButtonListStyle"
-        BasedOn="{StaticResource ListViewStyle}"
-        TargetType="ListView">
-        <Setter Property="ItemsPanel" Value="{StaticResource HorizontalListViewPanelTemplate}" />
-        <Setter Property="ItemContainerStyle" Value="{StaticResource EditorControlContainerStyle}" />
-        <Setter Property="ItemTemplateSelector" Value="{StaticResource ActionButtonTemplateSelector}" />
-    </Style>
-    <Style
-        x:Key="EditorControlsListStyle"
-        BasedOn="{StaticResource ButtonListStyle}"
-        TargetType="ListView">
+        x:Key="EditorControlsMenuStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:EditorControls.List}}" />
+        <Setter Property="helpers:MenuHelper.ItemMargin" Value="4" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+        <Setter Property="helpers:MenuHelper.ItemPadding" Value="9,6" />
     </Style>
     <Style
         x:Key="FileOpControlsPanelStyle"
@@ -397,7 +359,7 @@
         <Setter Property="HorizontalAlignment" Value="Right" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
-        <Setter Property="helpers:MenuHelper.ItemPadding" Value="10,0" />
+        <Setter Property="helpers:MenuHelper.ItemPadding" Value="9,7" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
