@@ -73,12 +73,8 @@ public static class AdbExplorerConst
 
     public static readonly UnicodeCategory[] UNICODE_ICONS = { UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned };
 
-    public static readonly SolidColorBrush QR_BACKGROUND = new(Colors.Transparent);
-    public static readonly SolidColorBrush QR_FOREGROUND = new(Color.FromRgb(40, 40, 40));
-
     public static readonly char[] ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
     public static readonly string PAIRING_SERVICE_PREFIX = "adbexplorer-";
-    public static readonly string LOOPBACK_IP = "0.0.0.0";
 
     public static readonly char[] ESCAPE_ADB_SHELL_CHARS = { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`' };
     public static readonly char[] ESCAPE_ADB_CHARS = { '$', '`', '"' };
@@ -107,8 +103,9 @@ public static class AdbExplorerConst
 
     public static readonly string WSA_INTERFACE_NAME = "WSLCore";
     public static readonly string WSA_PROCESS_NAME = "WsaClient";
+    public static readonly string LOOPBACK_IP = "0.0.0.0";
     public static readonly string WIN_LOOPBACK_ADDRESS = "127.0.0.1";
-    public static readonly string[] LOOPBACK_ADDRESSES = { WIN_LOOPBACK_ADDRESS, "0.0.0.0" };
+    public static readonly string[] LOOPBACK_ADDRESSES = { WIN_LOOPBACK_ADDRESS, LOOPBACK_IP };
     public static readonly string WSA_PACKAGE_NAME = "Windows Subsystem for Android™";
     public static readonly TimeSpan WSA_LAUNCH_DELAY = TimeSpan.FromSeconds(2);
     public static readonly TimeSpan WSA_CONNECT_TIMEOUT = TimeSpan.FromSeconds(8);

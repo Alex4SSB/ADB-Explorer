@@ -121,6 +121,9 @@
     <SolidColorBrush x:Key="SelectionRectangleFill" Color="#6B2E86D8" />
     <SolidColorBrush x:Key="SelectionRectangleBorderBrush" Color="#FF3399FF" />
 
+    <SolidColorBrush x:Key="QrBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="QrForegroundBrush" Color="#FF282828" />
+
     <SolidColorBrush x:Key="EditorTextChangedBrush">#FFFCCB58</SolidColorBrush>
 
     <ResourceDictionary x:Key="DynamicBrushes">

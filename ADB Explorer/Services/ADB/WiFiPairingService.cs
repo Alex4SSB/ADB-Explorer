@@ -19,8 +19,8 @@ public class PairingQrClass
         ServiceName = PAIRING_SERVICE_PREFIX + RandomString.GetUniqueKey(10);
         Password = RandomString.GetUniqueKey(12);
 
-        Background = QR_BACKGROUND;
-        Foreground = QR_FOREGROUND;
+        Background = (SolidColorBrush)App.Current.FindResource("QrBackgroundBrush");
+        Foreground = (SolidColorBrush)App.Current.FindResource("QrForegroundBrush");
     }
 }
 
@@ -29,7 +29,7 @@ public class WiFiPairingService
     /**
     * Format is "WIFI:T:ADB;S:service;P:password;;" (without the quotes)
     */
-    public static string CreatePairingString(string service, string password) 
+    public static string CreatePairingString(string service, string password)
     {
         return $"WIFI:T:ADB;S:{service};P:{password};;";
     }
@@ -47,7 +47,7 @@ public class WiFiPairingService
             var ipAddress = item.Groups["IpAddress"].Value;
             var port = item.Groups["Port"].Value;
 
-            if (ipAddress == LOOPBACK_IP)
+            if (LOOPBACK_ADDRESSES.Contains(ipAddress))
                 continue;
 
             ServiceDevice service = portType == "pairing"
