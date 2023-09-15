@@ -1679,21 +1679,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         e.Handled = true;
     }
 
-    private async void ResetSettingsButton_Click(object sender, RoutedEventArgs e)
-    {
-        var result = await DialogService.ShowConfirmation(
-                        S_RESET_SETTINGS,
-                        S_RESET_SETTINGS_TITLE,
-                        primaryText: "Confirm",
-                        cancelText: "Cancel",
-                        icon: DialogService.DialogIcon.Exclamation);
-
-        if (result.Item1 == ContentDialogResult.None)
-            return;
-
-        RuntimeSettings.ResetAppSettings = true;
-    }
-
     private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);

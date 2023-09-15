@@ -15,9 +15,11 @@ internal class MenuTemplateSelector : DataTemplateSelector
     public DataTemplate AltObjectTemplate { get; set; }
     public DataTemplate CompoundIconSubMenuTemplate { get; set; }
     public DataTemplate DualActionButtonTemplate { get; set; }
+    public DataTemplate CompoundDualActionTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
     {
+        CompoundDualAction => CompoundDualActionTemplate,
         DualActionButton => DualActionButtonTemplate,
         SubMenuSeparator => SubMenuSeparatorTemplate,
         CompoundIconSubMenu => CompoundIconSubMenuTemplate,
@@ -45,9 +47,11 @@ internal class MenuStyleSelector : StyleSelector
     public Style AltObjectStyle { get; set; }
     public Style CompoundIconMenuStyle { get; set; }
     public Style DualActionButtonStyle { get; set; }
+    public Style CompoundDualActionStyle { get; set; }
 
     public override Style SelectStyle(object item, DependencyObject container) => item switch
     {
+        CompoundDualAction => CompoundDualActionStyle,
         DualActionButton => DualActionButtonStyle,
         SubMenuSeparator => SubMenuSeparatorStyle,
         CompoundIconSubMenu => CompoundIconSubMenuStyle,

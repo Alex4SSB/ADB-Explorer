@@ -367,6 +367,10 @@ internal static class AppActions
             () => Data.CommandLog.Count > 0,
             () => Data.RuntimeSettings.ClearLogs = true,
             "Clear Command Log"),
+        new(FileActionType.ResetSettings,
+            () => true,
+            FileActionLogic.ResetAppSettings,
+            "Reset App Settings")
     };
 
     public static List<KeyBinding> Bindings =>
@@ -457,6 +461,7 @@ internal class FileAction : ViewModelBase
         FileOpPastView,
         PauseLogs,
         ClearLogs,
+        ResetSettings,
     }
 
     public FileActionType Name { get; }

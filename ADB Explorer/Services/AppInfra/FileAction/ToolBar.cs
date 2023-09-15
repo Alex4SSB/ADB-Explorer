@@ -8,7 +8,7 @@ internal static class NavigationToolBar
 {
     public static ObservableList<IconMenu> List { get; } = new() {
         new IconMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Home), 
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Home),
             "\uE80F",
             StyleHelper.ContentAnimation.Bounce,
             16,
@@ -301,5 +301,14 @@ internal static class LogControls
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ClearLogs),
             "\uE894",
             iconSize: 20)
+    };
+}
+
+internal static class ResetSettings
+{
+    public static ObservableList<ActionBase> List { get; } = new()
+    {
+        new CompoundDualAction(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ResetSettings),
+            new ResetSettingsIcon()),
     };
 }

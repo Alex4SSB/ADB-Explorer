@@ -121,6 +121,7 @@
         x:Key="MenuTemplateSelector"
         AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
         AnimatedNotifyTemplate="{StaticResource AnimatedNotifyTemplate}"
+        CompoundDualActionTemplate="{StaticResource CompoundIconMenuTemplate}"
         CompoundIconMenuTemplate="{StaticResource CompoundIconMenuTemplate}"
         CompoundIconSubMenuTemplate="{x:Null}"
         DualActionButtonTemplate="{StaticResource DualActionButtonTemplate}"
@@ -268,6 +269,7 @@
         x:Key="MenuStyleSelector"
         AltObjectStyle="{StaticResource AltObjectMenuStyle}"
         AnimatedNotifyStyle="{StaticResource AnimatedNotifyStyle}"
+        CompoundDualActionStyle="{StaticResource DualActionButtonStyle}"
         CompoundIconMenuStyle="{StaticResource IconMenuStyle}"
         CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
         DualActionButtonStyle="{StaticResource DualActionButtonStyle}"
@@ -369,5 +371,13 @@
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ResetAppSettingsMenuStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ResetSettings.List}}" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+        <Setter Property="helpers:MenuHelper.ItemPadding" Value="8,6" />
     </Style>
 </ResourceDictionary>

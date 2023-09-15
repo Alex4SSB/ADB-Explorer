@@ -14,10 +14,10 @@ internal static class FileActionLogic
         var files = Data.SelectedFiles;
 
         var result = await DialogService.ShowConfirmation(
-        Strings.S_REM_APK(Data.FileActions.IsAppDrive ? pkgs : files),
-        Strings.S_CONF_UNI_TITLE,
+            Strings.S_REM_APK(Data.FileActions.IsAppDrive ? pkgs : files),
+            Strings.S_CONF_UNI_TITLE,
             "Uninstall",
-        icon: DialogService.DialogIcon.Exclamation);
+            icon: DialogService.DialogIcon.Exclamation);
 
         if (result.Item1 is not ContentDialogResult.Primary)
             return;
@@ -508,14 +508,14 @@ internal static class FileActionLogic
             }
             else
             {
-            if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
-                TrashHelper.UpdateRecycledItemsCount();
+                if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Trash))
+                    TrashHelper.UpdateRecycledItemsCount();
 
-            if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
-                UpdateInstallersCount();
+                if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Temp))
+                    UpdateInstallersCount();
 
-            if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
-                UpdatePackagesCount();
+                if (Data.DevicesObject.Current.Drives.Any(d => d.Type is AbstractDrive.DriveType.Package))
+                    UpdatePackagesCount();
             }
 
             return drives;
@@ -823,5 +823,20 @@ internal static class FileActionLogic
         Data.RuntimeSettings.IsPastViewVisible ^= true;
 
         UpdateFileOpControls();
+    }
+
+    public static async void ResetAppSettings()
+    {
+        var result = await DialogService.ShowConfirmation(
+                        Strings.S_RESET_SETTINGS,
+                        Strings.S_RESET_SETTINGS_TITLE,
+                        primaryText: "Confirm",
+                        cancelText: "Cancel",
+                        icon: DialogService.DialogIcon.Exclamation);
+
+        if (result.Item1 == ContentDialogResult.None)
+            return;
+
+        Data.RuntimeSettings.ResetAppSettings = true;
     }
 }

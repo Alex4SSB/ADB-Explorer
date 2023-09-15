@@ -66,7 +66,7 @@ internal abstract class ActionBase : ViewModelBase
         Animation = animation;
         ActionAnimationSource = animationSource;
         AltAction = altAction;
-        
+
         if (animationSource is AnimationSource.Command)
         {
             ((CommandHandler)Action.Command.Command).OnExecute.PropertyChanged += OnExecute_PropertyChanged;
@@ -329,4 +329,20 @@ internal class DualActionButton : IconMenu
     }
 }
 
+internal class CompoundDualAction : DualActionButton
+{
+    public UserControl CompoundIcon { get; }
+
+    /// <summary>
+    /// Accent Button / Menu Item with modifiable background
+    /// </summary>
+    public CompoundDualAction(FileAction action,
+                              UserControl icon,
+                              StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                              Brush checkBackground = null,
+                              ObservableProperty<bool> isVisible = null)
+        : base(action, null, animation, checkBackground: checkBackground, isVisible: isVisible)
+    {
+        CompoundIcon = icon;
+    }
 }
