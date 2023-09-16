@@ -303,7 +303,13 @@ public class AppRuntimeSettings : ViewModelBase
 
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
-    public bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
+    public bool IsWin11 =>
+#if DEBUG
+        false;
+#else
+        Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
+#endif
+
 
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 

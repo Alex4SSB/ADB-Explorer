@@ -311,6 +311,16 @@
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.CheckBackground)}" Value="{x:Null}" />
                 </MultiDataTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorBrush}" />
+            </MultiDataTrigger>
+
+            <!--  BACKGROUND: Win10, Checked  -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.UseFluentStyles)}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.CheckBackground)}" Value="{x:Null}" />
+                </MultiDataTrigger.Conditions>
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
             </MultiDataTrigger>
 
