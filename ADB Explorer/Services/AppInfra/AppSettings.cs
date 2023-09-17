@@ -305,6 +305,18 @@ public class AppSettings : ViewModelBase
         set => Set(ref showLaunchWsaMessage, value);
     }
 
+    private ulong editorMaxFileSize;
+    public ulong EditorMaxFileSize
+    {
+        get
+        {
+            if (editorMaxFileSize == 0)
+                Set<ulong>(ref editorMaxFileSize, 300000);
+
+            return Get<ulong>(ref editorMaxFileSize, 300000);
+        }
+    }
+
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))
@@ -328,10 +340,9 @@ public class AppSettings : ViewModelBase
             {
                 Enum => Storage.RetrieveEnum<T>(propertyName),
                 bool => Storage.RetrieveBool(propertyName),
-                string => Storage.RetrieveValue(propertyName),
                 null when typeof(T) == typeof(string) => Storage.RetrieveValue(propertyName),
                 null when typeof(T) == typeof(bool?) => Storage.RetrieveBool(propertyName),
-                _ => throw new NotSupportedException(),
+                _ => Storage.RetrieveValue(propertyName),
             };
 
             storage = (T)(value is null ? defaultValue : value);

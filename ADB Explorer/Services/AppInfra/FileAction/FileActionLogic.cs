@@ -697,7 +697,8 @@ internal static class FileActionLogic
         Data.FileActions.EditFileEnabled = !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.Count() == 1
             && Data.SelectedFiles.First().Type is FileType.File
-            && !Data.SelectedFiles.First().IsApk;
+            && !Data.SelectedFiles.First().IsApk
+            && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
 
         Data.RuntimeSettings.FilterActions = true;
     }
