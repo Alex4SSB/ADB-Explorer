@@ -64,14 +64,14 @@ internal static class MainToolBar
             isVisible: Data.FileActions.IsNewMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut),
-            "\uE8C6",
+            AppActions.Icons[FileAction.FileActionType.Cut],
             StyleHelper.ContentAnimation.UpMarquee,
             18,
             Data.FileActions.IsCutState,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardCut)),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy),
-            "\uE8C8",
+            AppActions.Icons[FileAction.FileActionType.Copy],
             StyleHelper.ContentAnimation.Bounce,
             18,
             Data.FileActions.IsCopyState,
@@ -79,48 +79,48 @@ internal static class MainToolBar
         new DynamicAltTextMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste),
             Data.FileActions.CutItemsCount,
-            "\uE77F",
+            AppActions.Icons[FileAction.FileActionType.Paste],
             StyleHelper.ContentAnimation.Bounce,
             iconSize: 18,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardPaste)),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename),
-            "\uE8AC",
+            AppActions.Icons[FileAction.FileActionType.Rename],
             StyleHelper.ContentAnimation.Bounce,
             18),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore),
-            "\uE845",
+            AppActions.Icons[FileAction.FileActionType.Restore],
             iconSize: 18,
             isVisible: Data.FileActions.IsRestoreMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete),
-            "\uE74D",
+            AppActions.Icons[FileAction.FileActionType.Delete],
             iconSize: 18),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall),
-            "\uE25B",
+            AppActions.Icons[FileAction.FileActionType.Uninstall],
             StyleHelper.ContentAnimation.DownMarquee,
             18,
             isVisible: Data.FileActions.IsUninstallVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.More),
-            "\uE712",
+            AppActions.Icons[FileAction.FileActionType.More],
             iconSize: 20,
             children: new SubMenu[]
             {
                 new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
                 new SubMenuSeparator(() => Data.FileActions.PackageActionsEnabled),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     AppActions.Icons[FileAction.FileActionType.Package],
                     children: new SubMenu[]
                     {
-                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), "\uE896"),
-                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), "\uE25B"),
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icons[FileAction.FileActionType.Install]),
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), AppActions.Icons[FileAction.FileActionType.Uninstall]),
                         new SubMenuSeparator(() => true),
-                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), "\uF413"),
+                        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), AppActions.Icons[FileAction.FileActionType.CopyToTemp]),
                     }),
             }),
     };
@@ -160,21 +160,21 @@ internal static class ExplorerContextMenu
             || Data.FileActions.EditFileEnabled
             || Data.FileActions.UninstallPackageEnabled
             || Data.FileActions.RestoreEnabled)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), "\uE8C6"),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), "\uE8C8"),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), "\uE77F"),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), "\uE8AC"),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icons[FileAction.FileActionType.Cut]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), AppActions.Icons[FileAction.FileActionType.Copy]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), AppActions.Icons[FileAction.FileActionType.Paste]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icons[FileAction.FileActionType.Rename]),
         new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.More),
-            "\uE712",
+            AppActions.Icons[FileAction.FileActionType.More],
             children: new SubMenu[]
             {
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), "\uE787"),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), "\uE70F"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
             }),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall), "\uE25B"),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore), "\uE845"),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall), AppActions.Icons[FileAction.FileActionType.Uninstall]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore), AppActions.Icons[FileAction.FileActionType.Restore]),
         new SubMenuSeparator(
             () => (Data.FileActions.CutEnabled
             || Data.FileActions.CopyEnabled
@@ -191,10 +191,10 @@ internal static class ExplorerContextMenu
             AppActions.Icons[FileAction.FileActionType.Package],
             children: new SubMenu[]
             {
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), "\uE896"),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), "\uE25B"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icons[FileAction.FileActionType.Install]),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SubMenuUninstall), AppActions.Icons[FileAction.FileActionType.Uninstall]),
                 new SubMenuSeparator(() => true),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), "\uF413"),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), AppActions.Icons[FileAction.FileActionType.CopyToTemp]),
             }),
         new SubMenuSeparator(
             () => (Data.FileActions.CutEnabled
@@ -209,7 +209,7 @@ internal static class ExplorerContextMenu
             || Data.FileActions.PackageActionsEnabled)
             && (Data.FileActions.DeleteEnabled
             || Data.FileActions.ContextPushPackagesEnabled)),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete), "\uE74D"),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete), AppActions.Icons[FileAction.FileActionType.Delete]),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), AppActions.Icons[FileAction.FileActionType.Package]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EmptyTrash), "\uF141"),
     };
@@ -219,8 +219,8 @@ internal static class PathContextMenu
 {
     public static ObservableList<SubMenu> List { get; } = new()
     {
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EditCurrentPath), "\uE70F"),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyCurrentPath), "\uE8C8"),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EditCurrentPath), AppActions.Icons[FileAction.FileActionType.Edit]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyCurrentPath), AppActions.Icons[FileAction.FileActionType.Copy]),
         new SubMenuSeparator(() => true),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh), "\uE72C"),
     };
@@ -252,7 +252,7 @@ internal static class EditorControls
     public static ObservableList<ActionBase> List { get; } = new()
     {
         new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
-            "\uE711",
+            AppActions.Icons[FileAction.FileActionType.FileOpRemove],
             iconSize: 16),
         new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SaveEditor),
             "\uE74E",
@@ -268,7 +268,7 @@ internal static class FileOpControls
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpPastView).Button,
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button,
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
-            "\uE711",
+            AppActions.Icons[FileAction.FileActionType.FileOpRemove],
             iconSize: 20,
             children: new SubMenu[]
             {
@@ -299,7 +299,7 @@ internal static class LogControls
     {
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.PauseLogs).Button,
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ClearLogs),
-            "\uE894",
+            AppActions.Icons[FileAction.FileActionType.FileOpRemove],
             iconSize: 20)
     };
 }

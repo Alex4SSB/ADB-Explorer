@@ -31,6 +31,19 @@ internal static class AppActions
         { FileActionType.NewFile, "\uE8A5" },
         { FileActionType.Package, "\uE7B8" },
         { FileActionType.New, "\uECC8" },
+        { FileActionType.Cut, "\uE8C6" },
+        { FileActionType.Copy, "\uE8C8" },
+        { FileActionType.Paste, "\uE77F" },
+        { FileActionType.Rename, "\uE8AC" },
+        { FileActionType.Restore, "\uE845" },
+        { FileActionType.Delete, "\uE74D" },
+        { FileActionType.Uninstall, "\uE25B" },
+        { FileActionType.More, "\uE712" },
+        { FileActionType.UpdateModified, "\uE787" },
+        { FileActionType.Edit, "\uE70F" },
+        { FileActionType.Install, "\uE896" },
+        { FileActionType.CopyToTemp, "\uF413" },
+        { FileActionType.FileOpRemove, "\uE711" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } = new()
@@ -60,7 +73,7 @@ internal static class AppActions
         new(FileActionType.SortSettings,
             () => true,
             "Exit Search",
-            "\uE711",
+            Icons[FileActionType.FileOpRemove],
             FileActionLogic.ToggleSettingsSort,
             "Search View",
             "\uE721"),
