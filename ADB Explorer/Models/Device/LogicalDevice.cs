@@ -14,7 +14,7 @@ public class LogicalDevice : Device
     private string name;
     public string Name
     {
-        get => Type == DeviceType.Emulator ? ID : name;
+        get => name;
         set => Set(ref name, value);
     }
 

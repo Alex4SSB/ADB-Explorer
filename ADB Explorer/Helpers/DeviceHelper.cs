@@ -295,6 +295,12 @@ public static class DeviceHelper
                 && logical.Status is DeviceStatus.Offline)
                 return false;
 
+            if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
+            {
+                // if there are multiple logical devices of the same model, display their ID instead
+                logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name)) > 1;
+            }
+
             return true;
         };
 

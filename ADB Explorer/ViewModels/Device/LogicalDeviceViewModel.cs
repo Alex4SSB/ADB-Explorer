@@ -32,6 +32,13 @@ public class LogicalDeviceViewModel : DeviceViewModel
         private set => Set(ref androidVersion, value);
     }
 
+    private bool useIdForName = false;
+    public bool UseIdForName
+    {
+        get => useIdForName;
+        set => Set(ref useIdForName, value);
+    }
+
     public DateTime DiscoverTime { get; private set; }
 
     #endregion
@@ -46,7 +53,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
             if (string.IsNullOrEmpty(Device.Name) && DiscoverTime - DateTime.Now < AdbExplorerConst.SERVICE_DISPLAY_DELAY)
                 return " ";
 
-            return Device.Name;
+            return UseIdForName ? Device.ID : Device.Name;
         }
     }
 
@@ -106,6 +113,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
     public LogicalDeviceViewModel(LogicalDevice device) : base(device)
     {
         Device = device;
+        if (Device.Type is DeviceType.Emulator)
+            UseIdForName = true;
 
         BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
                             () => DeviceHelper.BrosweDeviceAction(this));
