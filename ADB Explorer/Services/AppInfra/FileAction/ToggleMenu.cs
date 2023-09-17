@@ -42,4 +42,13 @@ internal class ToggleMenu : ViewModelBase
             Icon.Value = e.NewValue ? checkedIcon : uncheckedIcon;
         };
     }
+
+    public void Toggle(bool? toggle = null)
+    {
+        if (toggle is null || IsChecked.Value != toggle.Value)
+        {
+            IsChecked.Value ^= true;
+            FileAction.Command.Execute();
+        }
+    }
 }

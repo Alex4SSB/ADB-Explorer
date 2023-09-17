@@ -72,6 +72,12 @@ internal static class AppActions
             "Expand All",
             "\uE169",
             isVisible: Data.FileActions.IsExpandSettingsVisible),
+        new(FileActionType.LogToggle,
+            () => true,
+            "Command Log",
+            "\uE756",
+            () => Data.RuntimeSettings.IsLogOpen ^= true,
+            isVisible: Data.FileActions.IsLogToggleVisible),
     };
 
     public static List<FileAction> List { get; } = new()
@@ -345,6 +351,7 @@ internal static class AppActions
             () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled || Data.FileActions.IsFileOpRemovePastEnabled,
             () => { },
             "Remove Operations"),
+        ToggleActions.Find(a => a.FileAction.Name is FileActionType.LogToggle).FileAction,
 
 # pragma warning disable IDE0200
         // Passing non-static methods as delegates here causes a runtime exception
@@ -481,6 +488,7 @@ internal class FileAction : ViewModelBase
         ResetSettings,
         SortSettings,
         ExpandSettings,
+        LogToggle,
     }
 
     public FileActionType Name { get; }

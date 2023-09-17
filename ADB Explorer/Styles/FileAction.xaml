@@ -368,14 +368,6 @@
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="9,7" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="ResetAppSettingsMenuStyle"
@@ -393,5 +385,13 @@
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="8,5,8,4" />
         <Setter Property="helpers:MenuHelper.ItemMargin" Value="3" />
+    </Style>
+    <Style
+        x:Key="LogToggleStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:LogToggle.List}}" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+        <Setter Property="helpers:MenuHelper.ItemPadding" Value="0" />
     </Style>
 </ResourceDictionary>

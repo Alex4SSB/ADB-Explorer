@@ -307,10 +307,12 @@ internal class DualActionButton : IconMenu
                             ObservableProperty<bool> isVisible = null)
         : base(action, icon, animation, iconSize, isVisible: isVisible)
     {
-        icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
         observableIsChecked = isChecked;
         IsChecked = isChecked;
         CheckBackground = checkBackground;
+
+        icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
+        observableIsChecked.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsChecked = e.NewValue;
     }
 
     /// <summary>

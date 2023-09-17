@@ -393,7 +393,7 @@
                             Cursor="SizeWE"
                             FocusVisualStyle="{x:Null}" />
                     </Grid>
-                    <Grid>
+                    <Grid Style="{StaticResource LogGridStyle}">
                         <TextBox x:Name="LogTextBox" Style="{StaticResource LogTextBoxStyle}" />
                         <Menu
                             x:Name="LogControlsPanel"
@@ -615,9 +615,7 @@
                             </TextBlock>
                         </StackPanel>
                     </ui:SimpleStackPanel>
-                    <ToggleButton Margin="6,0,-3,0" Style="{StaticResource LogToggleButtonStyle}">
-                        <ui:FontIcon Glyph="&#xE756;" />
-                    </ToggleButton>
+                    <Menu Margin="6,0,-3,0" Style="{StaticResource LogToggleStyle}" />
                 </StackPanel>
             </Grid>
         </Grid>

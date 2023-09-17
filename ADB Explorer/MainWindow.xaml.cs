@@ -426,8 +426,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     FileActionLogic.UpdatePackages();
                 break;
             case nameof(AppSettings.EnableLog):
+                FileActions.IsLogToggleVisible.Value = Settings.EnableLog;
+                
                 if (!Settings.EnableLog)
+                {
+                    AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.LogToggle).Toggle(false);
                     ClearLogs();
+                }
+
                 break;
             case nameof(AppSettings.SwRender):
                 SetRenderMode();
@@ -709,6 +715,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActionLogic.UpdateFileActions();
 
             FilterDevices();
+
+            FileActions.IsLogToggleVisible.Value = Settings.EnableLog;
         });
     }
 

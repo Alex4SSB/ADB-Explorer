@@ -321,3 +321,11 @@ internal static class SettingsControls
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.ExpandSettings).Button,
     };
 }
+
+internal static class LogToggle
+{
+    public static ObservableList<ActionBase> List { get; } = new()
+    {
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.LogToggle).Button,
+    };
+}

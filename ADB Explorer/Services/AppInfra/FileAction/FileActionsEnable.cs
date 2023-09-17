@@ -439,6 +439,8 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsExpandSettingsVisible = new() { Value = true };
 
+    public ObservableProperty<bool> IsLogToggleVisible = new() { Value = Data.Settings.EnableLog };
+
     #endregion
 
     #region read only

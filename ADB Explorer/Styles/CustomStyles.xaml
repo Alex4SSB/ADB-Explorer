@@ -730,21 +730,11 @@
         <Setter Property="FontSize" Value="18" />
         <Setter Property="TextWrapping" Value="Wrap" />
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style x:Key="LogGridStyle" TargetType="Grid">
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="LogToggleButtonStyle"
-        BasedOn="{StaticResource ToggleButtonStyle}"
-        TargetType="ToggleButton">
-        <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen, Mode=TwoWay}" />
-        <Setter Property="ToolTip" Value="Command Log" />
-        <Setter Property="Padding" Value="0" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableLog}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
