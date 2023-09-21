@@ -241,7 +241,17 @@ public class FileOperationQueue : ViewModelBase
         MoveToNextOperation();
     }
 
-    public void Stop() => CurrentOperation?.Cancel();
+    public void Stop()
+    {
+        if (CurrentOperation is null)
+            return;
+
+        var isPush = CurrentOperation.OperationName is FileOperation.OperationType.Push;
+        CurrentOperation.Cancel();
+        
+        if (isPush)
+            Data.RuntimeSettings.Refresh = true;
+    }
 
     public void Clear()
     {

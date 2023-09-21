@@ -114,8 +114,7 @@
                     LargeChange="0.001"
                     Maximum="1"
                     SmallChange="0.0001"
-                    Style="{StaticResource UpperProgressBarStyle}"
-                    Value="{Binding Progress, Mode=OneWay}" />
+                    Style="{StaticResource UpperProgressBarStyle}"/>
             </Grid>
             <Border
                 x:Name="GridBackgroundBlock"

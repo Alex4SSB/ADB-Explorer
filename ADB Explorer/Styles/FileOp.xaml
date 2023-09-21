@@ -56,13 +56,16 @@
             Text="{Binding PackageName}" />
     </DataTemplate>
     <DataTemplate x:Key="FolderCompletedOpFileNameTemplate">
-        <StackPanel Margin="4,0,0,0" Orientation="Horizontal">
+        <StackPanel
+            Margin="4,0,0,0"
+            DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}"
+            Orientation="Horizontal">
             <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
             <TextBlock Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
         </StackPanel>
     </DataTemplate>
-    <DataTemplate x:Key="FolderInProgOpFileNameTemplate">
-        <Grid Margin="4,0,0,0">
+    <DataTemplate x:Key="FolderInProgOpFileNameInnerTemplate">
+        <Grid Margin="4,0,0,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -106,6 +109,20 @@
                 </TextBlock.Style>
             </TextBlock>
         </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="FolderInProgOpFileNameTemplate">
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource FolderCompletedOpFileNameTemplate}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                            <Setter Property="ContentTemplate" Value="{StaticResource FolderInProgOpFileNameInnerTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
     </DataTemplate>
     <DataTemplate x:Key="RegularOpFileNameTemplate">
         <TextBlock Margin="4,0,0,0" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
@@ -165,8 +182,8 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay}" />
-            <ui:ProgressBar Grid.Row="1" Value="{Binding CurrentFilePercentage, Mode=OneWay}">
+            <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
+            <ui:ProgressBar Grid.Row="1" Value="{Binding CurrentFilePercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}">
                 <ui:ProgressBar.Style>
                     <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
                         <Style.Triggers>
