@@ -114,7 +114,7 @@
                     LargeChange="0.001"
                     Maximum="1"
                     SmallChange="0.0001"
-                    Style="{StaticResource UpperProgressBarStyle}"/>
+                    Style="{StaticResource UpperProgressBarStyle}" />
             </Grid>
             <Border
                 x:Name="GridBackgroundBlock"
@@ -466,6 +466,10 @@
                                     <DataGridTemplateColumn x:Name="ProgressColumn" CellTemplate="{StaticResource FileOpProgressTemplate}" />
                                     <DataGridTemplateColumn x:Name="SourceColumn" CellTemplate="{StaticResource FileOpSourcePathTemplate}" />
                                     <DataGridTemplateColumn x:Name="DestColumn" CellTemplate="{StaticResource FileOpTargetPathTemplate}" />
+                                    <DataGridTemplateColumn
+                                        x:Name="TimeColumn"
+                                        CellTemplate="{StaticResource FileOpTimeStampTemplate}"
+                                        SortMemberPath="StatusInfo.Time" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Border

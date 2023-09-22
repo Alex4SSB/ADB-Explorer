@@ -153,8 +153,12 @@ public class FileOperationQueue : ViewModelBase
                 includeAll || op.Status is not FileOperation.OperationStatus.Waiting
                                        and not FileOperation.OperationStatus.InProgress;
 
-            var completed = Operations.Where(predicate);
-            PastOperations.AddRange(completed);
+            var completed = Operations.Where(predicate).ToList();
+            
+            foreach (var op in completed)
+            {
+                PastOperations.Insert(0, op);
+            }
 
             Operations.RemoveAll(completed);
             CurrentOperationIndex = 0;

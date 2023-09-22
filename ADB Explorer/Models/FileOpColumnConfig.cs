@@ -17,6 +17,7 @@ public static class FileOpColumns
             new(FileOpColumnConfig.ColumnType.Progress, "Progress", 180),
             new(FileOpColumnConfig.ColumnType.Source, "Source", 200),
             new(FileOpColumnConfig.ColumnType.Dest, "Destination", 200),
+            new(FileOpColumnConfig.ColumnType.TimeStamp, "Added", 70),
         };
 
         UpdateCheckedColumns();
@@ -39,6 +40,7 @@ public class FileOpColumnConfig : ViewModelBase
         Progress,
         Source,
         Dest,
+        TimeStamp,
     }
 
     #region Full properties

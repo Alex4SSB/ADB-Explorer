@@ -28,16 +28,23 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="FileOpFileNamesTextBlockStyle"
+        x:Key="BoldInProgressTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                <Setter Property="FontWeight" Value="Bold" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="FileOpFileNamesTextBlockStyle"
+        BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
         TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding FilePath.NoExtName}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
                 <Setter Property="Text" Value="{Binding FilePath.FullName}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                <Setter Property="FontWeight" Value="Bold" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -137,32 +144,22 @@
         <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
-        <TextBlock Margin="4,0" Text="{Binding SourcePathString}">
-            <TextBlock.Style>
-                <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
-                    <Setter Property="FontWeight" Value="Regular" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                            <Setter Property="FontWeight" Value="Bold" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock
+            Margin="4,0"
+            Style="{StaticResource BoldInProgressTextBlockStyle}"
+            Text="{Binding SourcePathString}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
-        <TextBlock Margin="4,0" Text="{Binding TargetPathString}">
-            <TextBlock.Style>
-                <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
-                    <Setter Property="FontWeight" Value="Regular" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                            <Setter Property="FontWeight" Value="Bold" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBlock.Style>
-        </TextBlock>
+        <TextBlock
+            Margin="4,0"
+            Style="{StaticResource BoldInProgressTextBlockStyle}"
+            Text="{Binding TargetPathString}" />
+    </DataTemplate>
+    <DataTemplate x:Key="FileOpTimeStampTemplate">
+        <TextBlock
+            Margin="4,0"
+            Style="{StaticResource BoldInProgressTextBlockStyle}"
+            Text="{Binding StatusInfo.Time}" />
     </DataTemplate>
     <DataTemplate x:Key="WaitingOpProgressTemplate">
         <TextBlock Margin="4,0" Text="Pending..." />

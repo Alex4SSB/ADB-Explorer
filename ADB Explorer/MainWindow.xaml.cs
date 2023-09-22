@@ -765,6 +765,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileOpColumnConfig.ColumnType.Progress => ProgressColumn,
             FileOpColumnConfig.ColumnType.Source => SourceColumn,
             FileOpColumnConfig.ColumnType.Dest => DestColumn,
+            FileOpColumnConfig.ColumnType.TimeStamp => TimeColumn,
             _ => throw new NotSupportedException(),
         };
     });
@@ -776,6 +777,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (column == ProgressColumn) return FileOpColumnConfig.ColumnType.Progress;
         if (column == SourceColumn) return FileOpColumnConfig.ColumnType.Source;
         if (column == DestColumn) return FileOpColumnConfig.ColumnType.Dest;
+        if (column == TimeColumn) return FileOpColumnConfig.ColumnType.TimeStamp;
 
         throw new NotSupportedException();
     }
