@@ -7,7 +7,6 @@ namespace ADB_Explorer.Services;
 
 public class FileDeleteOperation : AbstractShellFileOperation
 {
-    private Task operationTask;
     private CancellationTokenSource cancelTokenSource;
     private readonly ObservableList<FileClass> fileList;
 
@@ -15,6 +14,7 @@ public class FileDeleteOperation : AbstractShellFileOperation
         : base(dispatcher, adbDevice, path)
     {
         OperationName = OperationType.Delete;
+
         this.fileList = fileList;
     }
 
@@ -28,17 +28,16 @@ public class FileDeleteOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
-        operationTask = Task.Run(() => ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", out _, out _, new[] { "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath) }));
 
-        operationTask.ContinueWith((t) =>
+        var task = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath)); 
+
+        task.ContinueWith((t) =>
         {
-            var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
-            Status = operationStatus;
-
-            StatusInfo = new CompletedShellProgressViewModel();
-
-            if (operationStatus is OperationStatus.Completed)
+            if (t.Result == "")
             {
+                Status = OperationStatus.Completed;
+                StatusInfo = new CompletedShellProgressViewModel();
+
                 Dispatcher.Invoke(() =>
                 {
                     FileActionLogic.RemoveFile(FilePath);
@@ -51,16 +50,28 @@ public class FileDeleteOperation : AbstractShellFileOperation
                     ShellFileOperation.SilentDelete(Device, indexer.IndexerPath);
                 }
             }
+            else
+            {
+                Status = OperationStatus.Failed;
+                var res = AdbRegEx.RE_SHELL_ERROR.Matches(t.Result);
+                var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, FilePath.FullPath));
+                TargetPath.AddUpdates(updates);
+
+                if (TargetPath.Children.Count > 0)
+                    StatusInfo = new FailedOpProgressViewModel($"({updates.Count()} Failed)");
+                else
+                    StatusInfo = new FailedOpProgressViewModel($"Error: {updates.Last().Message}");
+            }
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
-        operationTask.ContinueWith((t) =>
+        task.ContinueWith((t) =>
         {
             Status = OperationStatus.Canceled;
             StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
-        operationTask.ContinueWith((t) =>
+        task.ContinueWith((t) =>
         {
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);

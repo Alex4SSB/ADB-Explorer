@@ -570,7 +570,7 @@ public static class DeviceHelper
         FileActionLogic.UpdateFileActions();
 
 #if DEBUG
-        FileOpHelper.TestCurrentOperation();
+        FileOpTest.TestCurrentOperation();
 #endif
 
         AdbHelper.VerifyProgressRedirection();

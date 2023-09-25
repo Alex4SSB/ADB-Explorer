@@ -21,11 +21,17 @@ public class SyncFile : FilePath
 
     }
 
+    public SyncFile(FilePath fileClass)
+        : base(fileClass.FullPath, fileType: fileClass.IsDirectory ? FileType.Folder : FileType.File)
+    {
+
+    }
+
     public void AddUpdates(params FileOpProgressInfo[] newUpdates) => AddUpdates(newUpdates.Where(o => o is not null));
 
     public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
     {
-        if (!IsDirectory)
+        if (!IsDirectory || newUpdates.All(u => u.AndroidPath.Equals(FullPath)))
         {
             ProgressUpdates.AddRange(newUpdates);
             return;
@@ -39,10 +45,9 @@ public class SyncFile : FilePath
 
         var groups = newUpdates.GroupBy(update => DirectChildPath(update.AndroidPath));
         
-        foreach (var group in groups)
+        foreach (var group in groups.Where(g => g.Key is not null))
         {
             SyncFile file = Children.FirstOrDefault(child => child.FullPath.Equals(group.Key));
-            
             
             if (file is null)
             {

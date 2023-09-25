@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -11,22 +12,47 @@ public abstract class FileOpProgressInfo : ViewModelBase
     {
         string currentPath = ((InProgSyncProgressViewModel)Data.FileOpQ.CurrentOperation.StatusInfo).CurrentFilePath;
         if (string.IsNullOrEmpty(currentPath))
-            currentPath = $"{Data.FileOpQ.CurrentOperation.TargetPath.FullPath}/{Data.FileOpQ.CurrentOperation.FilePath.FullName}";
+            currentPath = FileHelper.ConcatPaths(Data.FileOpQ.CurrentOperation.TargetPath.FullPath, Data.FileOpQ.CurrentOperation.FilePath.FullName);
 
         AndroidPath = currentPath;
     }
 }
 
-public class SyncErrorInfo : FileOpProgressInfo
+public abstract class FileOpErrorInfo : FileOpProgressInfo
 {
-    public string Message { get; }
+    public string Message { get; protected set; }
 
+    protected FileOpErrorInfo(string message)
+    {
+        Message = message.TrimEnd('\r', '\n');
+    }
+}
+
+public class ShellErrorInfo : FileOpErrorInfo
+{
+    public ShellErrorInfo(Match match, string parentPath)
+        : base(match.Groups["Message"].Value)
+    {
+        AndroidPath = match.Groups["AndroidPath"].Value;
+
+        if (!AndroidPath.StartsWith('/'))
+            AndroidPath = FileHelper.ConcatPaths(parentPath, AndroidPath);
+    }
+
+    public ShellErrorInfo(string message, string androidPath)
+        : base(message)
+    {
+        AndroidPath = androidPath;
+    }
+}
+
+public class SyncErrorInfo : FileOpErrorInfo
+{
     public string WindowsPath { get; }
 
     public SyncErrorInfo(Match match)
+        : base(match.Groups["Message"].Value)
     {
-        Message = match.Groups["Message"].Value;
-
         if (match.Groups["AndroidPath"].Success)
             AndroidPath = match.Groups["AndroidPath"].Value;
         else if (match.Groups["AndroidPath1"].Success)

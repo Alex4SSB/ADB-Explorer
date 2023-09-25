@@ -394,7 +394,7 @@ internal static class AppActions
             "Open Default Folder"),
         new(FileActionType.FileOpTestNext,
             () => true,
-            FileOpHelper.TestCurrentOperation,
+            FileOpTest.TestCurrentOperation,
             "Next Test"),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpPastView).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,

@@ -165,6 +165,17 @@ public partial class ADBService
         return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
     }
 
+    public static async Task<string> ExecuteDeviceAdbShellCommand(string deviceId, string cmd, params string[] args)
+    {
+        string stdout = "", stderr = "";
+        var res = await Task.Run(() => ExecuteDeviceAdbShellCommand(deviceId, cmd, out stdout, out stderr, args));
+
+        if (res == 0)
+            return "";
+        else
+            return string.IsNullOrEmpty(stderr) ? stdout : stderr;
+    }
+
     public static string EscapeAdbShellString(string str, char quotes = '"')
     {
         var result = string.Concat(str.Select(c =>
@@ -187,11 +198,6 @@ public partial class ADBService
             }));
 
         return $"\"{result}\"";
-    }
-
-    private static string ConcatPaths(string path1, string path2)
-    {
-        return path1.TrimEnd('/') + '/' + path2.TrimStart('/');
     }
 
     public static IEnumerable<LogicalDevice> GetDevices()

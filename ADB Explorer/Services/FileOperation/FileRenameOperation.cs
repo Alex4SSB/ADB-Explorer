@@ -1,18 +1,21 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public class FileChangeModifiedOperation : AbstractShellFileOperation
+public class FileRenameOperation : AbstractShellFileOperation
 {
     private CancellationTokenSource cancelTokenSource;
-    private readonly DateTime newDate;
+    private string fullTargetPath;
 
-    public FileChangeModifiedOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, DateTime newDate)
+    public FileRenameOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, string targetPath)
         : base(dispatcher, adbDevice, filePath)
     {
-        OperationName = OperationType.Update;
-        this.newDate = newDate;
+        OperationName = OperationType.Rename;
+
+        TargetPath = new(FileHelper.ConcatPaths(FilePath.ParentPath, targetPath), fileType: AbstractFile.FileType.Folder);
+        fullTargetPath = targetPath;
     }
 
     public override void Start()
@@ -25,13 +28,10 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
-
-        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID,
-                                                                    "touch",
-                                                                    "-m",
-                                                                    "-t",
-                                                                    newDate.ToString("yyyyMMddHHmm.ss"),
-                                                                    ADBService.EscapeAdbShellString(FilePath.FullPath));
+        
+        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "mv",
+                ADBService.EscapeAdbShellString(FilePath.FullPath),
+                ADBService.EscapeAdbShellString(fullTargetPath));
 
         operationTask.ContinueWith((t) =>
         {
@@ -40,7 +40,12 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
                 Status = OperationStatus.Completed;
                 StatusInfo = new CompletedShellProgressViewModel();
 
-                Dispatcher.Invoke(() => FilePath.ModifiedTime = newDate);
+                Dispatcher.Invoke(() =>
+                {
+                    FilePath.UpdatePath(fullTargetPath);
+
+                    Data.FileActions.ItemToSelect = FilePath;
+                });
             }
             else
             {

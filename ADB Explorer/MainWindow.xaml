@@ -449,6 +449,7 @@
                                 ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
                                 ColumnHeaderStyle="{StaticResource FileOpHeaderResizeStyle}"
                                 ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}"
+                                KeyUp="CurrentOperationDetailedDataGrid_KeyUp"
                                 PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
                                 Style="{StaticResource DetailedFileOpGridStyle}">
                                 <DataGrid.Columns>
@@ -464,8 +465,14 @@
                                     </DataGridTemplateColumn>
                                     <DataGridTemplateColumn x:Name="FileNameColumn" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
                                     <DataGridTemplateColumn x:Name="ProgressColumn" CellTemplate="{StaticResource FileOpProgressTemplate}" />
-                                    <DataGridTemplateColumn x:Name="SourceColumn" CellTemplate="{StaticResource FileOpSourcePathTemplate}" />
-                                    <DataGridTemplateColumn x:Name="DestColumn" CellTemplate="{StaticResource FileOpTargetPathTemplate}" />
+                                    <DataGridTemplateColumn
+                                        x:Name="SourceColumn"
+                                        CellTemplate="{StaticResource FileOpSourcePathTemplate}"
+                                        SortMemberPath="SourcePathString" />
+                                    <DataGridTemplateColumn
+                                        x:Name="DestColumn"
+                                        CellTemplate="{StaticResource FileOpTargetPathTemplate}"
+                                        SortMemberPath="TargetPathString" />
                                     <DataGridTemplateColumn
                                         x:Name="TimeColumn"
                                         CellTemplate="{StaticResource FileOpTimeStampTemplate}"

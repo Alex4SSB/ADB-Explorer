@@ -4,7 +4,7 @@ public abstract class FileOpProgressViewModel : ViewModelBase
 {
     public DateTime TimeStamp { get; }
 
-    public string Time => TimeStamp.ToString("HH:mm:ss");
+    public string Time => TimeStamp.ToLongTimeString();
 
     public Services.FileOperation.OperationStatus Status { get; }
 

@@ -2,7 +2,6 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
-using System.IO;
 
 namespace ADB_Explorer.Helpers;
 
@@ -74,19 +73,27 @@ internal class FileHelper
             return;
         }
 
-        try
-        {
-            ShellFileOperation.SilentMove(Data.CurrentADBDevice, file, newPath);
-        }
-        catch (Exception e)
-        {
-            DialogService.ShowMessage(e.Message, Strings.S_RENAME_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
-            throw;
-        }
+        var op = ShellFileOperation.Rename(Data.CurrentADBDevice, file, newPath);
 
-        file.UpdatePath(newPath);
-        if (Data.Settings.ShowExtensions)
-            file.UpdateType();
+        var statusTask = Task.Run(() =>
+        {
+            while (op.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress)
+            { }
+
+            return op.Status;
+        });
+
+        statusTask.ContinueWith((t) =>
+        {
+            if (t.Result is FileOperation.OperationStatus.Completed && Data.Settings.ShowExtensions)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    file.UpdatePath(newPath);
+                    file.UpdateType();
+                });
+            }
+        });
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);
@@ -105,5 +112,10 @@ internal class FileHelper
         Data.CutItems.RemoveAll(list.ToList());
 
         Data.FileActions.PasteState = FileClass.CutType.None;
+    }
+
+    public static string ConcatPaths(string path1, string path2)
+    {
+        return $"{path1.TrimEnd('/')}/{path2.TrimStart('/')}";
     }
 }

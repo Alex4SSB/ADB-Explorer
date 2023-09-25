@@ -329,33 +329,33 @@
         <Grid Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation), Converter={StaticResource TreeViewIndentConverter}}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <TextBlock
                 Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation)}"
                 Style="{StaticResource FileNameTextBlockStyle}"
                 Text="{Binding FullName}" />
-            <ui:SimpleStackPanel
-                Grid.Column="1"
-                Orientation="Horizontal"
-                Spacing="4">
-                <ui:FontIcon>
-                    <ui:FontIcon.Style>
-                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                            <Setter Property="FontWeight" Value="Bold" />
-                            <Setter Property="Glyph" Value="&#xF13D;" />
-                            <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Completed">
-                                    <Setter Property="Glyph" Value="&#xF13E;" />
-                                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:FontIcon.Style>
-                </ui:FontIcon>
-                <TextBlock x:Name="FileStatus" Text="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}}" />
-            </ui:SimpleStackPanel>
+            <ui:FontIcon Grid.Column="1">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Glyph" Value="&#xF13D;" />
+                        <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Completed">
+                                <Setter Property="Glyph" Value="&#xF13E;" />
+                                <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+            <TextBlock
+                x:Name="FileStatus"
+                Grid.Column="2"
+                Margin="4,0,0,0"
+                Text="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}}" />
         </Grid>
     </HierarchicalDataTemplate>
     <helpers:FileOpTreeTemplateSelector
@@ -363,7 +363,7 @@
         FileOpTreeFileTemplate="{StaticResource FileOpTreeFileTemplate}"
         FileOpTreeFolderTemplate="{StaticResource FileOpTreeFolderTemplate}" />
     <DataTemplate x:Key="FileOpRowDetailTemplate">
-        <TreeView ItemTemplateSelector="{StaticResource FileOpTreeTemplateSelector}" ItemsSource="{Binding FilePath.Children}" />
+        <TreeView ItemTemplateSelector="{StaticResource FileOpTreeTemplateSelector}" ItemsSource="{Binding Children}" />
     </DataTemplate>
     <Style
         x:Key="DetailedFileOpGridStyle"

@@ -19,6 +19,8 @@ public abstract class FileSyncOperation : FileOperation
 
     public override SyncFile FilePath { get; }
 
+    public override ObservableList<SyncFile> Children => FilePath.Children;
+
     public FileSyncOperation(
         Dispatcher dispatcher,
         OperationType operationName,
@@ -48,7 +50,7 @@ public abstract class FileSyncOperation : FileOperation
         progressUpdates = new();
         progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
 
-        string target = OperationName is OperationType.Push ? $"{TargetPath.FullPath}/{FilePath.FullName}" : TargetPath.FullPath;
+        string target = OperationName is OperationType.Push ? FileHelper.ConcatPaths(TargetPath.FullPath, FilePath.FullName) : TargetPath.FullPath;
 
         operationTask = Task.Run(() =>
         {

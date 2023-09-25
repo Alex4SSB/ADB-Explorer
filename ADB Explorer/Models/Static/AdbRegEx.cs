@@ -20,6 +20,10 @@ namespace ADB_Explorer.Models
             new(@"^adb: error: (?<Message>(?:(?:'(?<WindowsPath>\w:(?:\\+[^\/']+)+)')|(?: (?<WindowsPath1>\w:(?:\\+[^\/:]+)+): )|(?:'(?<AndroidPath>(?:\/+[^']+)+)')|(?: (?<AndroidPath1>(?:\/+[^:]+)+): )|(?:.+?))*?) *$",
                 RegexOptions.Multiline);
 
+        public static readonly Regex RE_SHELL_ERROR =
+            new(@"^\w+: (?<Message>(?<AndroidPath>[^':]+):.*)$",
+                RegexOptions.Multiline);
+
         public static readonly Regex RE_FILE_SYNC_STATS =
             new(@"^(?<SourcePath>.+?): (?<TotalTransferred>\d+) files? (?>pulled|pushed), (?<TotalSkipped>\d+) skipped\.(?> (?<AverageRate>\d+(?>\.\d+)?) MB\/s \((?<TotalBytes>\d+) bytes in (?<TotalTime>\d+(?>\.\d+)?)s\))? *$",
                 RegexOptions.Multiline);

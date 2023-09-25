@@ -9,10 +9,13 @@ public class CompletedTestOperation : FileOperation
 {
     private readonly CompletedSyncProgressViewModel info;
 
-    private CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, SyncFile filePath, AdbSyncStatsInfo adbInfo) :
+    public override ObservableList<SyncFile> Children => TargetPath.Children;
+
+    public CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, SyncFile filePath, AdbSyncStatsInfo adbInfo) :
         base(dispatcher, adbDevice, filePath)
     {
         info = new(adbInfo);
+        TargetPath = filePath;
     }
 
     public static CompletedTestOperation CreateFileCompleted(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)

@@ -1037,7 +1037,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
     {
         var key = e.Key;
-        if (key == Key.Enter)
+        if (key is Key.Enter)
         {
             if (IsInEditMode)
                 return;
@@ -1506,7 +1506,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
         }
-        else if (e.Key != Key.Enter)
+        else if (e.Key is not Key.Enter)
             return;
 
         e.Handled = true;
@@ -1639,7 +1639,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var index = FileClass.ExistingIndexes(DirList.FileList, namePrefix);
 
         var fileName = $"{namePrefix}{index}";
-        FileClass newItem = new(fileName, $"{CurrentPath}/{fileName}", isFolder ? FileType.Folder : FileType.File, isTemp: true);
+        FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), isFolder ? FileType.Folder : FileType.File, isTemp: true);
         DirList.FileList.Insert(0, newItem);
 
         ExplorerGrid.ScrollIntoView(newItem);
@@ -1652,7 +1652,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Delete)
+        if (e.Key is Key.Delete)
         {
             e.Handled = true;
             if (FileActions.DeleteEnabled)
@@ -1795,6 +1795,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void MenuItem_Click(object sender, RoutedEventArgs e)
     {
-        FileOpHelper.TestCurrentOperation();
+        FileOpTest.TestCurrentOperation();
+    }
+
+    private void CurrentOperationDetailedDataGrid_KeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Escape)
+        {
+            ((DataGrid)sender).UnselectAll();
+        }
     }
 }

@@ -7,10 +7,13 @@ public abstract class AbstractShellFileOperation : FileOperation
 {
     public override FileClass FilePath { get; }
 
+    public override ObservableList<SyncFile> Children => TargetPath.Children;
+
     public AbstractShellFileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath)
         : base(dispatcher, adbDevice, filePath)
     {
         FilePath = filePath;
+        TargetPath = new(filePath);
     }
 }
 
@@ -31,6 +34,14 @@ public static class ShellFileOperation
         {
             Data.FileOpQ.AddOperation(new FileDeleteOperation(dispatcher, device, item, fileList));
         }
+    }
+
+    public static FileRenameOperation Rename(ADBService.AdbDevice device, FileClass item, string targetPath)
+    {
+        var fileOp = new FileRenameOperation(App.Current.Dispatcher, device, item, targetPath);
+        Data.FileOpQ.AddOperation(fileOp);
+
+        return fileOp;
     }
 
     public static bool SilentMove(ADBService.AdbDevice device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
@@ -308,13 +319,13 @@ public static class ShellFileOperation
             var time = match.Groups["Time"].Value;
             var dateTime = match.Groups["DnT"].Value;
 
-            if (DateOnly.TryParseExact(date, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out DateOnly res))
+            if (DateOnly.TryParseExact(date, "yyyyMMdd", null, DateTimeStyles.None, out DateOnly res))
             {
                 nameDate = res.ToDateTime(TimeOnly.MinValue);
-                if (TimeOnly.TryParseExact(time, "HHmmss", null, System.Globalization.DateTimeStyles.None, out TimeOnly timeRes))
+                if (TimeOnly.TryParseExact(time, "HHmmss", null, DateTimeStyles.None, out TimeOnly timeRes))
                     nameDate = res.ToDateTime(timeRes);
             }
-            else if (DateTime.TryParseExact(dateTime, "yyyy-MM-dd-HH-mm-ss", null, System.Globalization.DateTimeStyles.None, out DateTime dntRes))
+            else if (DateTime.TryParseExact(dateTime, "yyyy-MM-dd-HH-mm-ss", null, DateTimeStyles.None, out DateTime dntRes))
             {
                 nameDate = dntRes;
             }

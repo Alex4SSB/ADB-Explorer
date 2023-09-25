@@ -7,7 +7,7 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
 {
     private readonly AdbSyncStatsInfo adbInfo;
 
-    public CompletedSyncProgressViewModel(AdbSyncStatsInfo adbInfo) : base(Services.FileOperation.OperationStatus.Completed)
+    public CompletedSyncProgressViewModel(AdbSyncStatsInfo adbInfo) : base(FileOperation.OperationStatus.Completed)
     {
         this.adbInfo = adbInfo;
     }

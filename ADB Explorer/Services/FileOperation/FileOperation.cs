@@ -1,6 +1,8 @@
 ﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Services;
 
@@ -26,6 +28,7 @@ public abstract class FileOperation : ViewModelBase
         Restore,
         Install,
         Update,
+        Rename,
     }
 
     #region Notifiable Properties
@@ -70,11 +73,13 @@ public abstract class FileOperation : ViewModelBase
 
     public virtual FilePath FilePath { get; }
 
-    public SyncFile TargetPath { get; protected set; }
+    public virtual SyncFile TargetPath { get; protected set; }
 
     #endregion
 
     #region Read-only Properties
+
+    public virtual ObservableList<SyncFile> Children { get; protected set; }
 
     public string SourcePathString
     {
@@ -83,9 +88,12 @@ public abstract class FileOperation : ViewModelBase
             if (FilePath is null)
                 return "";
 
-            return FilePath.ParentPath == AdbExplorerConst.RECYCLE_PATH
-                ? "Recycle Bin"
-                : FilePath.ParentPath;
+            if (FilePath.ParentPath == AdbExplorerConst.RECYCLE_PATH)
+                return "Recycle Bin";
+            else if (OperationName is OperationType.Rename)
+                return FileHelper.ConcatPaths(FilePath.ParentPath, FilePath.DisplayName);
+            else
+                return FilePath.ParentPath;
         }
     }
 
@@ -113,11 +121,12 @@ public abstract class FileOperation : ViewModelBase
         OperationType.Push => new PushIcon(),
         OperationType.Recycle => new RecycleIcon(),
         OperationType.Move => new FontIcon() { Glyph = "\uE8DE" },
-        OperationType.Delete => new FontIcon() { Glyph = "\uE74D" },
-        OperationType.Copy => new FontIcon() { Glyph = "\uE8C8" },
-        OperationType.Restore => new FontIcon() { Glyph = "\uE845" },
-        OperationType.Update => new FontIcon() { Glyph = "\uE787" },
+        OperationType.Delete => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Delete] },
+        OperationType.Copy => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Copy] },
+        OperationType.Restore => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Restore] },
+        OperationType.Update => new FontIcon() { Glyph = AppActions.Icons[FileActionType.UpdateModified] },
         OperationType.Install => null, // gets overridden
+        OperationType.Rename => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Rename] },
         _ => throw new NotSupportedException(),
     };
 

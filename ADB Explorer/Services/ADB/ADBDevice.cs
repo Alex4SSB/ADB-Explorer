@@ -69,7 +69,7 @@ public partial class ADBService
                 output.Enqueue(new FileStat
                 (
                     fileName: name,
-                    path: ConcatPaths(path, name),
+                    path: FileHelper.ConcatPaths(path, name),
                     type: (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
                     {
                         UnixFileMode.S_IFSOCK => FileType.Socket,

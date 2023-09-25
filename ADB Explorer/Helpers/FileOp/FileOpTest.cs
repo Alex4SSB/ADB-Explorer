@@ -3,7 +3,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Helpers;
 
-internal class FileOpHelper
+internal class FileOpTest
 {
     private static int i = 0;
 
@@ -34,6 +34,12 @@ internal class FileOpHelper
         if (Data.FileOpQ.Operations.Count > 0)
         {
             var op = Data.FileOpQ.Operations.First() as InProgressTestOperation;
+            if (i == updates.Length)
+            {
+                Data.FileOpQ.RemoveOperation(op);
+                Data.FileOpQ.AddOperation(new CompletedTestOperation(App.Current.Dispatcher, Data.CurrentADBDevice, op.FilePath, new(op.FilePath.FullPath, (ulong)updates.Count(u => u is AdbSyncProgressInfo), (ulong)updates.Count(u => u is SyncErrorInfo), 1000000, 200, 2)));
+                return;
+            }
             op.FilePath.AddUpdates(updates[i]);
             op.UpdateStatus(updates[i++]);
 
