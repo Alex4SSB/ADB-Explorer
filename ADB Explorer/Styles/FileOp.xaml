@@ -319,10 +319,13 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StackPanel Margin="{Binding RelativeSource={RelativeSource AncestorType=TreeViewItem, Mode=FindAncestor}, Path=(ui:TreeViewItemHelper.Indentation)}" Orientation="Horizontal">
-                <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+                <ui:FontIcon Margin="-3,0,4,0" Style="{StaticResource FileOpFileNameFolderIconStyle}" />
                 <TextBlock Style="{StaticResource FileNameTextBlockStyle}" Text="{Binding FullName}" />
             </StackPanel>
-            <TextBlock Grid.Column="1" Text="{Binding Children, Converter={StaticResource FileOpTreeStatusConverter}}" />
+            <TextBlock
+                Grid.Column="1"
+                Margin="4,0,0,0"
+                Text="{Binding Children, Converter={StaticResource FileOpTreeStatusConverter}}" />
         </Grid>
     </HierarchicalDataTemplate>
     <HierarchicalDataTemplate x:Key="FileOpTreeFileTemplate">

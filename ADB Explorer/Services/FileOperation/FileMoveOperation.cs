@@ -7,7 +7,6 @@ namespace ADB_Explorer.Services;
 
 public class FileMoveOperation : AbstractShellFileOperation
 {
-    private Task operationTask;
     private CancellationTokenSource cancelTokenSource;
     private readonly ObservableList<FileClass> fileList;
     private string targetParent;
@@ -32,9 +31,6 @@ public class FileMoveOperation : AbstractShellFileOperation
 
         TargetPath = new(targetParent, fileType: AbstractFile.FileType.Folder);
 
-        if (!targetParent.EndsWith('/'))
-            targetParent += '/';
-
         this.fileList = fileList;
         this.targetParent = targetParent;
         this.targetName = targetName;
@@ -52,44 +48,36 @@ public class FileMoveOperation : AbstractShellFileOperation
         StatusInfo = new InProgShellProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
 
-        operationTask = Task.Run(() =>
+        if (OperationName is OperationType.Recycle)
         {
-            if (OperationName is OperationType.Recycle)
-            {
-                recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
-                fullTargetPath = $"{targetParent}{recycleName}";
-                dateModified = FilePath.ModifiedTime;
-                indexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{recycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
-            }
-            else
-                fullTargetPath = $"{targetParent}{targetName}";
-            
-            var command = OperationName is OperationType.Copy ? "cp" : "mv";
-            if (OperationName is OperationType.Copy)
-                dateModified = DateTime.Now;
+            recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
+            fullTargetPath = FileHelper.ConcatPaths(targetParent, recycleName);
+            dateModified = FilePath.ModifiedTime;
+            indexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{recycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
+        }
+        else
+            fullTargetPath = FileHelper.ConcatPaths(targetParent, targetName);
 
-            return ADBService.ExecuteDeviceAdbShellCommand(Device.ID, command, out _, out _, new[] {
-                OperationName is OperationType.Copy && FilePath.IsDirectory ? "-r" : "",
-                ADBService.EscapeAdbShellString(FilePath.FullPath),
-                ADBService.EscapeAdbShellString(fullTargetPath) });
-        });
+        var cmd = OperationName is OperationType.Copy ? "cp" : "mv";
+        var flag = OperationName is OperationType.Copy && FilePath.IsDirectory ? "-r" : "";
+        if (OperationName is OperationType.Copy)
+            dateModified = DateTime.Now;
+
+        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, cmd, flag,
+            ADBService.EscapeAdbShellString(FilePath.FullPath),
+            ADBService.EscapeAdbShellString(fullTargetPath));
 
         operationTask.ContinueWith((t) =>
         {
-            var operationStatus = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
-            Status = operationStatus;
-            StatusInfo = new CompletedShellProgressViewModel();
-
-            if (operationStatus is OperationStatus.Completed)
+            if (t.Result == "")
             {
-                switch (OperationName)
+                Status = OperationStatus.Completed;
+                StatusInfo = new CompletedShellProgressViewModel();
+
+                if (OperationName is OperationType.Recycle)
                 {
-                    case OperationType.Recycle:
-                        var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
-                        ShellFileOperation.WriteLine(Device, indexerPath, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
-                        break;
-                    default:
-                        break;
+                    var date = dateModified.HasValue ? dateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
+                    ShellFileOperation.WriteLine(Device, indexerPath, ADBService.EscapeAdbShellString($"{recycleName}|{FilePath.FullPath}|{date}"));
                 }
 
                 Dispatcher.Invoke(() =>
@@ -127,9 +115,23 @@ public class FileMoveOperation : AbstractShellFileOperation
                         ShellFileOperation.SilentDelete(Device, indexerPath);
                 });
             }
-            else if (OperationName is OperationType.Recycle)
+            else
             {
-                ShellFileOperation.SilentDelete(Device, fullTargetPath, indexerPath);
+                Status = OperationStatus.Failed;
+
+                var res = AdbRegEx.RE_SHELL_ERROR.Matches(t.Result);
+                var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, FilePath.FullPath));
+                TargetPath.AddUpdates(updates);
+
+                if (TargetPath.Children.Count > 0)
+                    StatusInfo = new FailedOpProgressViewModel($"({updates.Count()} Failed)");
+                else
+                    StatusInfo = new FailedOpProgressViewModel($"Error: {updates.Last().Message}");
+
+                if (OperationName is OperationType.Recycle)
+                {
+                    ShellFileOperation.SilentDelete(Device, fullTargetPath, indexerPath);
+                }
             }
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
