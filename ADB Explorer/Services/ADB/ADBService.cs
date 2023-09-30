@@ -181,24 +181,14 @@ public partial class ADBService
         var result = string.Concat(str.Select(c =>
             c switch
             {
-                var ch when ESCAPE_ADB_SHELL_CHARS.Contains(ch) => "\\" + ch,
+                var ch when ESCAPE_ADB_SHELL_CHARS.Contains(ch) => @"\" + ch,
                 _ => new string(c, 1)
             }));
 
         return $"{quotes}{result}{quotes}";
     }
 
-    public static string EscapeAdbString(string str)
-    {
-        var result = string.Concat(str.Select(c =>
-            c switch
-            {
-                var ch when ESCAPE_ADB_CHARS.Contains(ch) => "\\" + ch,
-                _ => new string(c, 1)
-            }));
-
-        return $"\"{result}\"";
-    }
+    public static string EscapeAdbString(string str) => $"\"{str}\"";
 
     public static IEnumerable<LogicalDevice> GetDevices()
     {
