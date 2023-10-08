@@ -2,8 +2,10 @@
 
 internal class CompletedShellProgressViewModel : FileOpProgressViewModel
 {
-    public CompletedShellProgressViewModel() : base(Services.FileOperation.OperationStatus.Completed)
-    {
+    public string Message { get; }
 
+    public CompletedShellProgressViewModel(string message = "Completed") : base(Services.FileOperation.OperationStatus.Completed)
+    {
+        Message = message;
     }
 }

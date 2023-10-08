@@ -57,9 +57,9 @@ public partial class ADBService
                 }
 
                 var name = match.Groups["Name"].Value;
-                var size = UInt64.Parse(match.Groups["Size"].Value, System.Globalization.NumberStyles.HexNumber);
-                var time = long.Parse(match.Groups["Time"].Value, System.Globalization.NumberStyles.HexNumber);
-                var mode = UInt32.Parse(match.Groups["Mode"].Value, System.Globalization.NumberStyles.HexNumber);
+                var size = UInt64.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
+                var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
+                var mode = UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
 
                 if (SPECIAL_DIRS.Contains(name))
                 {

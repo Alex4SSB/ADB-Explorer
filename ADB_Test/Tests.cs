@@ -1,9 +1,11 @@
 using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace ADB_Test
 {
@@ -143,6 +145,29 @@ namespace ADB_Test
 
             Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(ref badIcon1));
             Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(ref badIcon2));
+        }
+
+        [TestMethod]
+        public void HashTest()
+        {
+            var Adb_33_0_3_path = @"E:\Android_SDK\platform-tools_r33.0.3\adb.exe";
+            var Adb_33_0_3_hash = "3B0C0331799D69225E1BA24E6CB0DFAB";
+
+            var result = Security.CalculateWindowsFileHash(Adb_33_0_3_path);
+            Assert.AreEqual(Adb_33_0_3_hash, result);
+        }
+
+        [TestMethod]
+        public void ExtractRelativePathTest()
+        {
+            var fullPath = @"/sdcard/DCIM/New Folder 1/New File.txt";
+            var parent = @"/sdcard/DCIM/";
+
+            var result = FileHelper.ExtractRelativePath(fullPath, parent);
+            Assert.AreEqual("New Folder 1/New File.txt", result);
+
+            result = FileHelper.ExtractRelativePath(fullPath, parent[..^1]);
+            Assert.AreEqual("New Folder 1/New File.txt", result);
         }
     }
 }

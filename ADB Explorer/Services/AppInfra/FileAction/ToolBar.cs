@@ -285,6 +285,9 @@ internal static class FileOpControls
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpDefaultFolder),
             "\uED25",
             iconSize: 20),
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpValidate),
+            "\uE73E",
+            iconSize: 20),
 #if DEBUG
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpTestNext),
             "\uE14A",

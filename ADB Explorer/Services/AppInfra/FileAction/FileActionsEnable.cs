@@ -415,6 +415,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isFileOpRemovePastEnabled, value);
     }
 
+    private FileOperation selectedFileOp = null;
+    public FileOperation SelectedFileOp
+    {
+        get => selectedFileOp;
+        set => Set(ref selectedFileOp, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<string> CopyPathAction = new();

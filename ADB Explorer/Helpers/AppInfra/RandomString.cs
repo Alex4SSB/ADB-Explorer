@@ -7,12 +7,9 @@ public class RandomString
     public static string GetUniqueKey(int size)
     {
         byte[] data = new byte[4 * size];
-        using (var crypto = RandomNumberGenerator.Create())
-        {
-            crypto.GetBytes(data);
-        }
-
-        StringBuilder result = new StringBuilder();
+        RandomNumberGenerator.Create().GetBytes(data);
+        
+        StringBuilder result = new();
         for (int i = 0; i < size; i++)
         {
             var rnd = BitConverter.ToUInt32(data, i * 4);

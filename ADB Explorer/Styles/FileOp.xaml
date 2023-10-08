@@ -270,7 +270,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <ui:FontIcon Foreground="{DynamicResource NewDeviceAltBorder}" Glyph="&#xF13E;" />
-            <TextBlock Grid.Column="1" Text="{Binding Name}" />
+            <TextBlock Grid.Column="1" Text="{Binding Message}" />
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="CanceledOpProgressTemplate">
@@ -347,6 +347,10 @@
                         <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Completed">
+                                <Setter Property="Glyph" Value="&#xF13E;" />
+                                <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Validated">
                                 <Setter Property="Glyph" Value="&#xF13E;" />
                                 <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                             </DataTrigger>

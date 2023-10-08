@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 
@@ -9,7 +8,7 @@ public class CompletedTestOperation : FileOperation
 {
     private readonly CompletedSyncProgressViewModel info;
 
-    public override ObservableList<SyncFile> Children => TargetPath.Children;
+    public override SyncFile AndroidPath => TargetPath;
 
     public CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, SyncFile filePath, AdbSyncStatsInfo adbInfo) :
         base(dispatcher, adbDevice, filePath)
@@ -45,4 +44,13 @@ public class CompletedTestOperation : FileOperation
         Status = OperationStatus.Canceled;
         StatusInfo = new CanceledOpProgressViewModel();
     }
+
+    public override void ClearChildren()
+        => TargetPath.Children.Clear();
+
+    public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
+        => TargetPath.AddUpdates(newUpdates);
+
+    public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
+        => TargetPath.AddUpdates(newUpdates);
 }

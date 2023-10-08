@@ -1805,4 +1805,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ((DataGrid)sender).UnselectAll();
         }
     }
+
+    private void CurrentOperationDetailedDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (CurrentOperationDetailedDataGrid.SelectedItem is FileOperation fileOp && fileOp.OperationName
+            is FileOperation.OperationType.Push
+            or FileOperation.OperationType.Pull
+            or FileOperation.OperationType.Copy
+            && fileOp.Status is FileOperation.OperationStatus.Completed)
+        {
+            FileActions.SelectedFileOp = fileOp;
+        }
+        else
+            FileActions.SelectedFileOp = null;
+    }
 }

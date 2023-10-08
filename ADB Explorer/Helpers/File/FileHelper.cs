@@ -5,7 +5,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Helpers;
 
-internal class FileHelper
+public static class FileHelper
 {
     public static FileClass ListerFileManipulator(FileClass item)
     {
@@ -117,5 +117,16 @@ internal class FileHelper
     public static string ConcatPaths(string path1, string path2)
     {
         return $"{path1.TrimEnd('/')}/{path2.TrimStart('/')}";
+    }
+
+    public static string ExtractRelativePath(string fullPath, string parent)
+    {
+        var index = fullPath.IndexOf(parent);
+        
+        var result = index < 0
+            ? fullPath
+            : fullPath[parent.Length..];
+
+        return result.TrimStart('/', '\\');
     }
 }

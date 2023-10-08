@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using static ADB_Explorer.Converters.FileOpStatusConverter;
 
 namespace ADB_Explorer.Converters;
 
@@ -10,44 +11,63 @@ internal class FileOpTreeStatusConverter : IValueConverter
     {
         if (value is ObservableList<SyncFile> children)
         {
-            var total = children.Count;
-            int shellUpdates = 0;
-            var failed = CountFails(children, ref shellUpdates);
-            var completed = total - failed;
+            var (failed, type) = CountFails(children);
 
-            if (shellUpdates > 0)
-                return $"({failed} Failed)";
-            else
-                return $"({(failed > 0 ? $"{failed} Failed, " : "")}{completed} Completed)";
+            return StatusString(type, children.Count - failed, failed);
         }
         else if (value is ObservableList<FileOpProgressInfo> updates)
         {
-            var fail = updates.OfType<FileOpErrorInfo>();
-            return fail.Any() ? "Error: " + fail.Last().Message : "Completed";
+            return StatusString(updates.First().GetType(), message: updates.OfType<FileOpErrorInfo>().LastOrDefault()?.Message);
         }
         
         throw new NotSupportedException();
-
-        static int CountFails(ObservableList<SyncFile> children, ref int shellUpdates)
-        {
-            int total = 0;
-
-            foreach (var item in children.Where(c => c.Children.Count > 0))
-            {
-                if (CountFails(item.Children, ref shellUpdates) > 0)
-                    total++;
-            }
-
-            total += children.Count(c => c.Children.Count == 0 && c.ProgressUpdates.OfType<FileOpErrorInfo>().Any());
-
-            shellUpdates += children.Select(c => c.ProgressUpdates.OfType<ShellErrorInfo>().Count()).Sum();
-
-            return total;
-        }
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
         throw new NotImplementedException();
+    }
+}
+
+public static class FileOpStatusConverter
+{
+    public static string StatusString(Type type, int completed = 0, int failed = -1, string message = "")
+    {
+        if (!string.IsNullOrEmpty(message))
+            return $"Error: {message}";
+
+        var completedString = (type == typeof(HashFailInfo) || type == typeof(HashSuccessInfo))
+            ? "Validated" : "Completed";
+
+        if (failed == -1)
+            return completedString;
+
+        if (type == typeof(ShellErrorInfo))
+            return $"({failed} Failed)";
+
+        var failedString = failed > 0 ? $"{failed} Failed, " : "";
+        
+        return $"({failedString}{completed} {completedString})";
+    }
+
+    public static (int, Type) CountFails(ObservableList<SyncFile> children)
+    {
+        int total = 0;
+
+        foreach (var item in children.Where(c => c.Children.Count > 0))
+        {
+            if (CountFails(item.Children).Item1 > 0)
+                total++;
+        }
+
+        total += children.Count(c => c.Children.Count == 0 && c.ProgressUpdates.OfType<FileOpErrorInfo>().Any());
+
+        var type = typeof(SyncErrorInfo);
+        if (children.Any(c => c.ProgressUpdates.Any(u => u is ShellErrorInfo)))
+            type = typeof(ShellErrorInfo);
+        else if (children.Any(c => c.ProgressUpdates.Any(u => u is HashFailInfo or HashSuccessInfo)))
+            type = typeof(HashFailInfo);
+
+        return (total, type);
     }
 }

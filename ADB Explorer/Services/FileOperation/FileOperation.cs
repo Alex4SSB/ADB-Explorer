@@ -60,7 +60,7 @@ public abstract class FileOperation : ViewModelBase
     public FileOpProgressViewModel StatusInfo
     {
         get => statusInfo;
-        protected set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
+        set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
     }
 
     #endregion
@@ -79,7 +79,7 @@ public abstract class FileOperation : ViewModelBase
 
     #region Read-only Properties
 
-    public virtual ObservableList<SyncFile> Children { get; protected set; }
+    public ObservableList<SyncFile> Children => AndroidPath.Children;
 
     public string SourcePathString
     {
@@ -113,6 +113,19 @@ public abstract class FileOperation : ViewModelBase
         }
     }
 
+    public string FullTargetItemPath
+    {
+        get
+        {
+            if (TargetPath is null)
+                return "";
+
+            return FileHelper.ConcatPaths(TargetPath.FullPath, FilePath.FullName);
+        }
+    }
+
+    public abstract SyncFile AndroidPath { get; }
+
     public virtual string Tooltip => $"{OperationName}";
 
     public virtual FrameworkElement OpIcon => OperationName switch
@@ -143,4 +156,10 @@ public abstract class FileOperation : ViewModelBase
     public abstract void Start();
 
     public abstract void Cancel();
+
+    public abstract void ClearChildren();
+
+    public abstract void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates);
+
+    public abstract void AddUpdates(params FileOpProgressInfo[] newUpdates);
 }

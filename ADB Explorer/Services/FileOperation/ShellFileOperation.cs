@@ -7,7 +7,7 @@ public abstract class AbstractShellFileOperation : FileOperation
 {
     public override FileClass FilePath { get; }
 
-    public override ObservableList<SyncFile> Children => TargetPath.Children;
+    public override SyncFile AndroidPath => TargetPath;
 
     public AbstractShellFileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath)
         : base(dispatcher, adbDevice, filePath)
@@ -15,6 +15,15 @@ public abstract class AbstractShellFileOperation : FileOperation
         FilePath = filePath;
         TargetPath = new(filePath);
     }
+
+    public override void ClearChildren()
+        => TargetPath.Children.Clear();
+
+    public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
+        => TargetPath.AddUpdates(newUpdates);
+
+    public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
+        => TargetPath.AddUpdates(newUpdates);
 }
 
 public static class ShellFileOperation

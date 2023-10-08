@@ -27,7 +27,8 @@ public class SyncFile : FilePath
 
     }
 
-    public void AddUpdates(params FileOpProgressInfo[] newUpdates) => AddUpdates(newUpdates.Where(o => o is not null));
+    public void AddUpdates(params FileOpProgressInfo[] newUpdates)
+        => AddUpdates(newUpdates.Where(o => o is not null));
 
     public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
     {

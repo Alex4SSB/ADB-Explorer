@@ -17,7 +17,7 @@ namespace ADB_Explorer.Models
                 RegexOptions.Multiline);
 
         public static readonly Regex RE_FILE_SYNC_ERROR =
-            new(@"^adb: error: (?<Message>(?:(?:'(?<WindowsPath>\w:(?:\\+[^\/']+)+)')|(?: (?<WindowsPath1>\w:(?:\\+[^\/:]+)+): )|(?:'(?<AndroidPath>(?:\/+[^']+)+)')|(?: (?<AndroidPath1>(?:\/+[^:]+)+): )|(?:.+?))*?) *$",
+            new(@"^(adb: error: )*(?<Message>(?:(?:'(?<WindowsPath>\w:(?:\\+[^\/']+)+)')|(?: (?<WindowsPath1>\w:(?:\\+[^\/:]+)+): )|(?:'(?<AndroidPath>(?:\/+[^']+)+)')|(?: (?<AndroidPath1>(?:\/+[^:]+)+): )|(?:.+?))*?) *$",
                 RegexOptions.Multiline);
 
         public static readonly Regex RE_SHELL_ERROR =
@@ -58,5 +58,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex RE_NETSTAT_TCP_SOCK =
             new(@"^ *TCP +(?<IP>[\d.]+):(?<Port>[\d]+)", RegexOptions.Multiline);
+
+        public static readonly Regex RE_ANDROID_FIND_HASH =
+            new(@"^(?<Hash>\w+) +(?<Path>.+)$", RegexOptions.Multiline);
     }
 }

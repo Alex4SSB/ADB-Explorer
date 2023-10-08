@@ -28,6 +28,23 @@ public abstract class FileOpErrorInfo : FileOpProgressInfo
     }
 }
 
+public class HashFailInfo : FileOpErrorInfo
+{
+    public HashFailInfo(string androidPath, bool fileExists = true)
+        : base(fileExists ? "Content mismatch" : "Missing from target location")
+    {
+        AndroidPath = androidPath;
+    }
+}
+
+public class HashSuccessInfo : FileOpProgressInfo
+{
+    public HashSuccessInfo(string androidPath)
+    {
+        AndroidPath = androidPath;
+    }
+}
+
 public class ShellErrorInfo : FileOpErrorInfo
 {
     public ShellErrorInfo(Match match, string parentPath)
@@ -62,6 +79,9 @@ public class SyncErrorInfo : FileOpErrorInfo
             WindowsPath = match.Groups["WindowsPath"].Value;
         else if (match.Groups["WindowsPath1"].Success)
             WindowsPath = match.Groups["WindowsPath1"].Value;
+
+        if (Message.Contains(':'))
+            Message = Message.Split(':').Last().Trim();
     }
 }
 

@@ -408,6 +408,10 @@ internal static class AppActions
             "Reset App Settings"),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
+        new(FileActionType.FileOpValidate,
+            () => Data.FileActions.SelectedFileOp is not null,
+            Security.ValidateOperation,
+            "Validate Operation"),
     };
 
     public static List<KeyBinding> Bindings =>
@@ -502,6 +506,7 @@ internal class FileAction : ViewModelBase
         SortSettings,
         ExpandSettings,
         LogToggle,
+        FileOpValidate,
     }
 
     public FileActionType Name { get; }

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -19,7 +20,7 @@ public abstract class FileSyncOperation : FileOperation
 
     public override SyncFile FilePath { get; }
 
-    public override ObservableList<SyncFile> Children => FilePath.Children;
+    public override SyncFile AndroidPath => FilePath;
 
     public FileSyncOperation(
         Dispatcher dispatcher,
@@ -50,7 +51,7 @@ public abstract class FileSyncOperation : FileOperation
         progressUpdates = new();
         progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
 
-        string target = OperationName is OperationType.Push ? FileHelper.ConcatPaths(TargetPath.FullPath, FilePath.FullName) : TargetPath.FullPath;
+        string target = OperationName is OperationType.Push ? FullTargetItemPath : TargetPath.FullPath;
 
         operationTask = Task.Run(() =>
         {
@@ -84,7 +85,7 @@ public abstract class FileSyncOperation : FileOperation
                 : t.Exception.InnerException.Message;
 
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel($"Error: {message}");
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message));
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
@@ -113,4 +114,13 @@ public abstract class FileSyncOperation : FileOperation
 
         cancelTokenSource.Cancel();
     }
+
+    public override void ClearChildren()
+        => FilePath.Children.Clear();
+
+    public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
+        => FilePath.AddUpdates(newUpdates);
+
+    public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
+        => FilePath.AddUpdates(newUpdates);
 }

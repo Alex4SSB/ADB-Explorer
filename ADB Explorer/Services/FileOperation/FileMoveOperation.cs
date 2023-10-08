@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
@@ -121,12 +122,17 @@ public class FileMoveOperation : AbstractShellFileOperation
 
                 var res = AdbRegEx.RE_SHELL_ERROR.Matches(t.Result);
                 var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, FilePath.FullPath));
-                TargetPath.AddUpdates(updates);
+                AddUpdates(updates);
 
-                if (TargetPath.Children.Count > 0)
-                    StatusInfo = new FailedOpProgressViewModel($"({updates.Count()} Failed)");
-                else
-                    StatusInfo = new FailedOpProgressViewModel($"Error: {updates.Last().Message}");
+                var message = updates.Last().Message;
+                if (message.Contains(':'))
+                    message = message.Split(':').Last().TrimStart();
+
+                var errorString = FileOpStatusConverter.StatusString(typeof(ShellErrorInfo),
+                                                   failed: Children.Count > 0 ? updates.Count() : -1,
+                                                   message: message);
+
+                StatusInfo = new FailedOpProgressViewModel(errorString);
 
                 if (OperationName is OperationType.Recycle)
                 {

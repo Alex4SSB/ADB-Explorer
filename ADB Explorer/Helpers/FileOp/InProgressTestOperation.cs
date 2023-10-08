@@ -10,7 +10,7 @@ public class InProgressTestOperation : FileOperation
 
     public override SyncFile FilePath { get; }
 
-    public override ObservableList<SyncFile> Children => FilePath.Children;
+    public override SyncFile AndroidPath => FilePath;
 
     private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
         base(dispatcher, adbDevice, new(filePath))
@@ -59,4 +59,13 @@ public class InProgressTestOperation : FileOperation
 
         StatusInfo = new InProgSyncProgressViewModel((AdbSyncProgressInfo)update);
     }
+
+    public override void ClearChildren()
+        => FilePath.Children.Clear();
+
+    public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
+        => FilePath.AddUpdates(newUpdates);
+
+    public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
+        => FilePath.AddUpdates(newUpdates);
 }

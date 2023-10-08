@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
@@ -40,12 +41,12 @@ public class FileDeleteOperation : AbstractShellFileOperation
 
                 Dispatcher.Invoke(() =>
                 {
-                    FileActionLogic.RemoveFile(FilePath);
+                    FileActionLogic.RemoveFile(base.FilePath);
 
-                    fileList.Remove(FilePath);
+                    fileList.Remove(base.FilePath);
                 });
 
-                if (FilePath.TrashIndex is TrashIndexer indexer)
+                if (base.FilePath.TrashIndex is TrashIndexer indexer)
                 {
                     ShellFileOperation.SilentDelete(Device, indexer.IndexerPath);
                 }
@@ -54,13 +55,18 @@ public class FileDeleteOperation : AbstractShellFileOperation
             {
                 Status = OperationStatus.Failed;
                 var res = AdbRegEx.RE_SHELL_ERROR.Matches(t.Result);
-                var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, FilePath.FullPath));
-                TargetPath.AddUpdates(updates);
+                var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, base.FilePath.FullPath));
+                base.AddUpdates(updates);
 
-                if (TargetPath.Children.Count > 0)
-                    StatusInfo = new FailedOpProgressViewModel($"({updates.Count()} Failed)");
-                else
-                    StatusInfo = new FailedOpProgressViewModel($"Error: {updates.Last().Message}");
+                var message = updates.Last().Message;
+                if (message.Contains(':'))
+                    message = message.Split(':').Last().TrimStart();
+
+                var errorString = FileOpStatusConverter.StatusString(typeof(ShellErrorInfo),
+                                                   failed: Children.Count > 0 ? updates.Count() : -1,
+                                                   message: message);
+
+                StatusInfo = new FailedOpProgressViewModel(errorString);
             }
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
