@@ -21,6 +21,7 @@ internal static class AppActions
         { FileActionType.Uninstall, new(Key.F11, ModifierKeys.Shift) },
         { FileActionType.PushPackages, new(Key.I, ModifierKeys.Alt) },
         { FileActionType.OpenSettings, new(Key.D0, ModifierKeys.Alt) },
+        { FileActionType.Paste, new(Key.V, ModifierKeys.Control) },
     };
 
     public static readonly Dictionary<FileActionType, string> Icons = new()
@@ -230,13 +231,13 @@ internal static class AppActions
             () => Data.FileActions.IsKeyboardPasteEnabled && !Data.FileActions.IsExplorerEditing,
             FileActionLogic.PasteFiles,
             Data.FileActions.PasteAction,
-            new(Key.V, ModifierKeys.Control),
+            Gestures[FileActionType.Paste],
             true),
         new(FileActionType.Paste,
             () => Data.FileActions.PasteEnabled,
             FileActionLogic.PasteFiles,
             Data.FileActions.PasteAction,
-            new(Key.V, ModifierKeys.Control)),
+            Gestures[FileActionType.Paste]),
         new(FileActionType.Rename,
             () => Data.FileActions.RenameEnabled,
             () => Data.RuntimeSettings.Rename = true,
@@ -409,7 +410,7 @@ internal static class AppActions
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
         new(FileActionType.FileOpValidate,
-            () => Data.FileActions.SelectedFileOp is not null,
+            () => Data.FileActions.SelectedFileOp?.ValidationAllowed is true,
             Security.ValidateOperation,
             "Validate Operation"),
     };

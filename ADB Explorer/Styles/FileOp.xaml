@@ -265,12 +265,43 @@
     </Style>
     <DataTemplate x:Key="CompletedShellProgressTemplate">
         <Grid Style="{StaticResource CompletedIconProgressPanelStyle}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <ui:FontIcon Foreground="{DynamicResource NewDeviceAltBorder}" Glyph="&#xF13E;" />
-            <TextBlock Grid.Column="1" Text="{Binding Message}" />
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsValidationInProgress}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <ui:FontIcon Foreground="{DynamicResource NewDeviceAltBorder}" Glyph="&#xF13E;" />
+                <TextBlock Grid.Column="1" Text="{Binding Message}" />
+            </Grid>
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsValidationInProgress}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <TextBlock Margin="0,0,0,2" Text="Validating..." />
+                <ui:ProgressBar
+                    Grid.Row="1"
+                    IsIndeterminate="True"
+                    Style="{StaticResource FluentProgressBarStyle}" />
+            </Grid>
         </Grid>
     </DataTemplate>
     <DataTemplate x:Key="CanceledOpProgressTemplate">

@@ -20,7 +20,9 @@ public abstract class FileSyncOperation : FileOperation
 
     public override SyncFile FilePath { get; }
 
-    public override SyncFile AndroidPath => FilePath;
+    public override SyncFile AndroidPath => FilePath.PathType is AbstractFile.FilePathType.Android
+        ? FilePath
+        : TargetPath;
 
     public FileSyncOperation(
         Dispatcher dispatcher,
@@ -85,7 +87,7 @@ public abstract class FileSyncOperation : FileOperation
                 : t.Exception.InnerException.Message;
 
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message));
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
@@ -94,10 +96,7 @@ public abstract class FileSyncOperation : FileOperation
         if (Status is not OperationStatus.InProgress)
             return;
 
-        if (FilePath.PathType is AbstractFile.FilePathType.Android)
-            FilePath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
-        else
-            TargetPath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
+        AndroidPath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
 
         if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
@@ -116,11 +115,11 @@ public abstract class FileSyncOperation : FileOperation
     }
 
     public override void ClearChildren()
-        => FilePath.Children.Clear();
+        => AndroidPath.Children.Clear();
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => FilePath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates);
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => FilePath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates);
 }

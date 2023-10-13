@@ -64,7 +64,8 @@ public class FileDeleteOperation : AbstractShellFileOperation
 
                 var errorString = FileOpStatusConverter.StatusString(typeof(ShellErrorInfo),
                                                    failed: Children.Count > 0 ? updates.Count() : -1,
-                                                   message: message);
+                                                   message: message,
+                                                   total: true);
 
                 StatusInfo = new FailedOpProgressViewModel(errorString);
             }

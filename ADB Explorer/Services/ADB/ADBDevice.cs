@@ -138,9 +138,9 @@ public partial class ADBService
                 else
                 {
                     var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR.Match(stdoutLine);
-                    if (errorMatch.Success)
+                    if (errorMatch.Success && SyncErrorInfo.New(errorMatch) is SyncErrorInfo error)
                     {
-                        progressUpdates.Add(new SyncErrorInfo(errorMatch));
+                        progressUpdates.Add(error);
                     }
                 }
             }

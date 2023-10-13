@@ -143,6 +143,20 @@ public abstract class FileOperation : ViewModelBase
         _ => throw new NotSupportedException(),
     };
 
+    public bool ValidationAllowed
+    {
+        get
+        {
+            if (OperationName is not (OperationType.Push or OperationType.Pull or OperationType.Copy))
+                return false;
+
+            if (Status is not OperationStatus.Completed)
+                return false;
+
+            return !StatusInfo.IsValidationInProgress;
+        }
+    }
+
     #endregion
 
     public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath)
@@ -151,6 +165,12 @@ public abstract class FileOperation : ViewModelBase
         Device = adbDevice;
         FilePath = filePath;
         Status = OperationStatus.Waiting;
+    }
+
+    public void SetValidation(bool value)
+    {
+        StatusInfo.IsValidationInProgress = value;
+        OnPropertyChanged(nameof(ValidationAllowed));
     }
 
     public abstract void Start();

@@ -26,6 +26,11 @@ public abstract class FileOpErrorInfo : FileOpProgressInfo
     {
         Message = message.TrimEnd('\r', '\n');
     }
+
+    protected FileOpErrorInfo()
+    {
+
+    }
 }
 
 public class HashFailInfo : FileOpErrorInfo
@@ -65,23 +70,35 @@ public class ShellErrorInfo : FileOpErrorInfo
 
 public class SyncErrorInfo : FileOpErrorInfo
 {
-    public string WindowsPath { get; }
+    public string WindowsPath { get; protected set; }
 
-    public SyncErrorInfo(Match match)
-        : base(match.Groups["Message"].Value)
+    private SyncErrorInfo()
     {
+
+    }
+
+    public static SyncErrorInfo New(Match match)
+    {
+        SyncErrorInfo result = new();
+
         if (match.Groups["AndroidPath"].Success)
-            AndroidPath = match.Groups["AndroidPath"].Value;
+            result.AndroidPath = match.Groups["AndroidPath"].Value;
         else if (match.Groups["AndroidPath1"].Success)
-            AndroidPath = match.Groups["AndroidPath1"].Value;
+            result.AndroidPath = match.Groups["AndroidPath1"].Value;
 
         if (match.Groups["WindowsPath"].Success)
-            WindowsPath = match.Groups["WindowsPath"].Value;
+            result.WindowsPath = match.Groups["WindowsPath"].Value;
         else if (match.Groups["WindowsPath1"].Success)
-            WindowsPath = match.Groups["WindowsPath1"].Value;
+            result.WindowsPath = match.Groups["WindowsPath1"].Value;
 
-        if (Message.Contains(':'))
-            Message = Message.Split(':').Last().Trim();
+        if (string.IsNullOrEmpty(result.AndroidPath) && string.IsNullOrEmpty(result.WindowsPath))
+            return null;
+
+        result.Message = match.Groups["Message"].Value;
+        if (result.Message.Contains(':'))
+            result.Message = result.Message.Split(':').Last().Trim();
+
+        return result;
     }
 }
 

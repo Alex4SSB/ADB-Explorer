@@ -1808,15 +1808,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void CurrentOperationDetailedDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (CurrentOperationDetailedDataGrid.SelectedItem is FileOperation fileOp && fileOp.OperationName
-            is FileOperation.OperationType.Push
-            or FileOperation.OperationType.Pull
-            or FileOperation.OperationType.Copy
-            && fileOp.Status is FileOperation.OperationStatus.Completed)
+        if (CurrentOperationDetailedDataGrid.SelectedItem is FileOperation fileOp && fileOp.ValidationAllowed)
         {
             FileActions.SelectedFileOp = fileOp;
         }
+        else if (CurrentOperationDetailedDataGrid.Items[0] is FileOperation op && op.ValidationAllowed)
+        {
+            FileActions.SelectedFileOp = op;
+        }
         else
+        {
             FileActions.SelectedFileOp = null;
+        }
     }
 }

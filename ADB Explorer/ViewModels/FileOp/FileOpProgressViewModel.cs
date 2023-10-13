@@ -18,6 +18,13 @@ public abstract class FileOpProgressViewModel : ViewModelBase
         _ => throw new NotSupportedException(),
     };
 
+    private bool isValidationInProgress = false;
+    public bool IsValidationInProgress
+    {
+        get => isValidationInProgress;
+        set => Set(ref isValidationInProgress, value);
+    }
+
     public FileOpProgressViewModel(Services.FileOperation.OperationStatus status)
     {
         TimeStamp = DateTime.Now;

@@ -31,7 +31,7 @@ internal class FileOpTreeStatusConverter : IValueConverter
 
 public static class FileOpStatusConverter
 {
-    public static string StatusString(Type type, int completed = 0, int failed = -1, string message = "")
+    public static string StatusString(Type type, int completed = 0, int failed = -1, string message = "", bool total = false)
     {
         if (!string.IsNullOrEmpty(message))
             return $"Error: {message}";
@@ -47,7 +47,7 @@ public static class FileOpStatusConverter
 
         var failedString = failed > 0 ? $"{failed} Failed, " : "";
         
-        return $"({failedString}{completed} {completedString})";
+        return $"({(total ? "Total: " : "")}{failedString}{completed} {completedString})";
     }
 
     public static (int, Type) CountFails(ObservableList<SyncFile> children)

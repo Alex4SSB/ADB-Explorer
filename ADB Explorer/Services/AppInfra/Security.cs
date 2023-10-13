@@ -50,8 +50,9 @@ public static class Security
 
     public static async void ValidateOperation()
     {
-        var op = Data.FileActions.SelectedFileOp;
         IOrderedEnumerable<KeyValuePair<string, string>> source = null, target = null;
+        var op = Data.FileActions.SelectedFileOp;
+        op.SetValidation(true);
 
         await Task.Run(() =>
         {
@@ -94,9 +95,11 @@ public static class Security
                 fails++;
         }
 
-        var message = FileOpStatusConverter.StatusString(typeof(HashFailInfo), source.Count() - fails, fails);
+        var message = FileOpStatusConverter.StatusString(typeof(HashFailInfo), source.Count() - fails, fails, total: true);
         op.StatusInfo = fails > 0
             ? new FailedOpProgressViewModel(message)
             : new CompletedShellProgressViewModel(message);
+
+        op.SetValidation(false);
     }
 }
