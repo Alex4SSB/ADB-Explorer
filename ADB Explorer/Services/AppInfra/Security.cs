@@ -24,6 +24,14 @@ public static class Security
 
     public static Dictionary<string, string> CalculateWindowsFolderHash(string path, string parent = "")
     {
+        if (!Path.Exists(path))
+            return new();
+
+        if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+        {
+            return new() { { Path.GetFileName(path), CalculateWindowsFileHash(path) } };
+        }
+
         if (parent == "")
             parent = path;
 
@@ -39,7 +47,7 @@ public static class Security
     public static Dictionary<string, string> CalculateAndroidFolderHash(string path)
     {
         // find ./ -mindepth 1 -type f -exec md5sum {} \;
-        string[] args = { ADBService.EscapeAdbShellString(path), "-mindepth", "1", "-type", "f", "-exec", "md5sum", "{}", @"\;" };
+        string[] args = { ADBService.EscapeAdbShellString(path), "-type", "f", "-exec", "md5sum", "{}", @"\;" };
         ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out string stdout, out string stderr, args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH.Matches(stdout);
@@ -51,7 +59,7 @@ public static class Security
     public static async void ValidateOperation()
     {
         IOrderedEnumerable<KeyValuePair<string, string>> source = null, target = null;
-        var op = Data.FileActions.SelectedFileOp;
+        var op = Data.FileActions.SelectedFileOp.Value;
         op.SetValidation(true);
 
         await Task.Run(() =>
@@ -73,14 +81,14 @@ public static class Security
         
         op.ClearChildren();
         var fails = 0;
+        FileOpProgressInfo update = null;
 
         foreach (var item in source)
         {
             var key = item.Key;
             var other = target.Where(f => f.Key == item.Key);
-            FileOpProgressInfo update = null;
-
-            key = FileHelper.ConcatPaths(op.AndroidPath.FullPath, key);
+            
+            key = FileHelper.ConcatPaths(op.AndroidPath, key);
 
             if (!other.Any())
                 update = new HashFailInfo(key, false);
@@ -95,7 +103,16 @@ public static class Security
                 fails++;
         }
 
-        var message = FileOpStatusConverter.StatusString(typeof(HashFailInfo), source.Count() - fails, fails, total: true);
+        var message = "";
+        if (source.Count() == 1)
+        {
+            message = update is HashFailInfo fail ? "Validation error: " + fail.Message : "Validated";
+        }
+        else
+        {
+            message = FileOpStatusConverter.StatusString(typeof(HashFailInfo), source.Count() - fails, fails, total: true);
+        }
+        
         op.StatusInfo = fails > 0
             ? new FailedOpProgressViewModel(message)
             : new CompletedShellProgressViewModel(message);

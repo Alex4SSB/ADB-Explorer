@@ -46,7 +46,7 @@ public static class FileOpStatusConverter
             return $"({failed} Failed)";
 
         var failedString = failed > 0 ? $"{failed} Failed, " : "";
-        
+
         return $"({(total ? "Total: " : "")}{failedString}{completed} {completedString})";
     }
 

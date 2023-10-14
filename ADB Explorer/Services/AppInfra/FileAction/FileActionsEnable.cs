@@ -415,13 +415,6 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isFileOpRemovePastEnabled, value);
     }
 
-    private FileOperation selectedFileOp = null;
-    public FileOperation SelectedFileOp
-    {
-        get => selectedFileOp;
-        set => Set(ref selectedFileOp, value);
-    }
-
     #region Observable properties
 
     public ObservableProperty<string> CopyPathAction = new();
@@ -447,6 +440,8 @@ internal class FileActionsEnable : ViewModelBase
     public ObservableProperty<bool> IsExpandSettingsVisible = new() { Value = true };
 
     public ObservableProperty<bool> IsLogToggleVisible = new() { Value = Data.Settings.EnableLog };
+
+    public ObservableProperty<FileOperation> SelectedFileOp = new();
 
     #endregion
 

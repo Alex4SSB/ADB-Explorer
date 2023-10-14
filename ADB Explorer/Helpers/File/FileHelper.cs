@@ -114,13 +114,19 @@ public static class FileHelper
         Data.FileActions.PasteState = FileClass.CutType.None;
     }
 
-    public static string ConcatPaths(string path1, string path2)
+    public static string ConcatPaths(FilePath path1, string path2) => 
+        ConcatPaths(path1.FullPath, path2, path1.PathType is AbstractFile.FilePathType.Android ? '/' : '\\');
+
+    public static string ConcatPaths(string path1, string path2, char separator = '/')
     {
-        return $"{path1.TrimEnd('/')}/{path2.TrimStart('/')}";
+        return $"{path1.TrimEnd(AbstractFile.Separators)}{separator}{path2.TrimStart(AbstractFile.Separators)}";
     }
 
     public static string ExtractRelativePath(string fullPath, string parent)
     {
+        if (fullPath == parent)
+            return FilePath.GetFullName(fullPath);
+
         var index = fullPath.IndexOf(parent);
         
         var result = index < 0

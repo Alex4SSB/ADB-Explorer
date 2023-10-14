@@ -357,6 +357,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (FileOperationQueue.NotifyProperties.Contains(e.PropertyName))
             UpdateFileOp();
+
+        UpdateSelectedFileOp();
     }
 
     private void UpdateFileOp()
@@ -1793,11 +1795,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectionRect.Visibility = Visibility.Collapsed;
     }
 
-    private void MenuItem_Click(object sender, RoutedEventArgs e)
-    {
-        FileOpTest.TestCurrentOperation();
-    }
-
     private void CurrentOperationDetailedDataGrid_KeyUp(object sender, KeyEventArgs e)
     {
         if (e.Key is Key.Escape)
@@ -1808,13 +1805,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void CurrentOperationDetailedDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (CurrentOperationDetailedDataGrid.SelectedItem is FileOperation fileOp && fileOp.ValidationAllowed)
+        UpdateSelectedFileOp();
+    }
+
+    private void UpdateSelectedFileOp()
+    {
+        if (CurrentOperationDetailedDataGrid.SelectedItem is FileOperation fileOp)
         {
-            FileActions.SelectedFileOp = fileOp;
+            FileActions.SelectedFileOp.Value = fileOp;
         }
-        else if (CurrentOperationDetailedDataGrid.Items[0] is FileOperation op && op.ValidationAllowed)
+        else if (CurrentOperationDetailedDataGrid.Items[0] is FileOperation op)
         {
-            FileActions.SelectedFileOp = op;
+            FileActions.SelectedFileOp.Value = op;
         }
         else
         {

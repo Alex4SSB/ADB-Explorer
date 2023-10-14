@@ -55,9 +55,10 @@ public class SyncFile : FilePath
                 bool isDir = !group.Key.Equals(group.First().AndroidPath);
                 file = new(group.Key, isDir ? FileType.Folder : FileType.File);
 
-                App.Current.Dispatcher.Invoke(() =>
+                ExecuteInDispatcher(() =>
                 {
                     Children.Add(file);
+                    
                     OnPropertyChanged(nameof(Children));
                 });
             }

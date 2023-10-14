@@ -569,10 +569,6 @@ public static class DeviceHelper
 
         FileActionLogic.UpdateFileActions();
 
-#if DEBUG
-        FileOpTest.TestCurrentOperation();
-#endif
-
         AdbHelper.VerifyProgressRedirection();
     }
 

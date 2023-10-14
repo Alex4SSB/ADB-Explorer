@@ -52,7 +52,11 @@ public abstract class FileOperation : ViewModelBase
         get => status;
         protected set
         {
-            Dispatcher.Invoke(() => Set(ref status, value));
+            Dispatcher.Invoke(() =>
+            {
+                if (Set(ref status, value))
+                    OnPropertyChanged(nameof(ValidationAllowed));
+            });
         }
     }
 
@@ -120,7 +124,7 @@ public abstract class FileOperation : ViewModelBase
             if (TargetPath is null)
                 return "";
 
-            return FileHelper.ConcatPaths(TargetPath.FullPath, FilePath.FullName);
+            return FileHelper.ConcatPaths(TargetPath, FilePath.FullName);
         }
     }
 
@@ -171,6 +175,9 @@ public abstract class FileOperation : ViewModelBase
     {
         StatusInfo.IsValidationInProgress = value;
         OnPropertyChanged(nameof(ValidationAllowed));
+
+        if (Data.FileActions.SelectedFileOp.Value.Equals(this))
+            Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
     public abstract void Start();

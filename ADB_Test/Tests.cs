@@ -5,7 +5,7 @@ using ADB_Explorer.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 
 namespace ADB_Test
 {
@@ -168,6 +168,102 @@ namespace ADB_Test
 
             result = FileHelper.ExtractRelativePath(fullPath, parent[..^1]);
             Assert.AreEqual("New Folder 1/New File.txt", result);
+
+            result = FileHelper.ExtractRelativePath("New File.txt", "New File.txt");
+            Assert.AreEqual("New File.txt", result);
+        }
+
+        [TestMethod]
+        public void PullUpdatesTest()
+        {
+            const string updatesRaw = @"/sdcard/Download/DCIM/.duolingo-5-2-4.apk|0|0|
+/sdcard/Download/DCIM/.duolingo-5-2-4.apk|3|25|
+/sdcard/Download/DCIM/.duolingo-5-2-4.apk|6|42|
+/sdcard/Download/DCIM/.duolingo-5-2-4.apk|10|69|
+/sdcard/Download/DCIM/.duolingo-5-2-4.apk|12|81|
+/sdcard/Download/DCIM/com.android.chrome_89.0.4389.105-438910534_11lang_11feat_31174470a9b1266fa7d8c87e62ac9c88_apkmirror.com.apkm|16|8|
+/sdcard/Download/DCIM/com.android.chrome_89.0.4389.105-438910534_11lang_11feat_31174470a9b1266fa7d8c87e62ac9c88_apkmirror.com.apkm|17|27|
+/sdcard/Download/DCIM/com.android.chrome_89.0.4389.105-438910534_11lang_11feat_31174470a9b1266fa7d8c87e62ac9c88_apkmirror.com.apkm|18|44|
+/sdcard/Download/DCIM/com.android.chrome_89.0.4389.105-438910534_11lang_11feat_31174470a9b1266fa7d8c87e62ac9c88_apkmirror.com.apkm|20|63|
+/sdcard/Download/DCIM/com.android.chrome_89.0.4389.105-438910534_11lang_11feat_31174470a9b1266fa7d8c87e62ac9c88_apkmirror.com.apkm|21|81|
+/sdcard/Download/DCIM/com.android.chrome_89.0.4389.105-438910534_11lang_11feat_31174470a9b1266fa7d8c87e62ac9c88_apkmirror.com.apkm|23|99|
+/sdcard/Download/DCIM/root-checker-6-5-0.apk|24|18|
+/sdcard/Download/DCIM/root-checker-6-5-0.apk|25|38|
+/sdcard/Download/DCIM/root-checker-6-5-0.apk|27|56|
+/sdcard/Download/DCIM/root-checker-6-5-0.apk|28|77|
+/sdcard/Download/DCIM/mobisaver/397860000-398046fa4.jpg|31|2|
+/sdcard/Download/DCIM/mobisaver/397860000-398046fa4.jpg|32|29|
+/sdcard/Download/DCIM/mobisaver/397860000-398046fa4.jpg|33|54|
+/sdcard/Download/DCIM/mobisaver/397860000-398046fa4.jpg|35|81|
+/sdcard/Download/DCIM/New Folder/DSC_0001 - Copy 1.JPG|36|10|
+/sdcard/Download/DCIM/New Folder/DSC_0001 - Copy 1.JPG|38|42|
+/sdcard/Download/DCIM/New Folder/DSC_0001 - Copy 1.JPG|39|72|
+/sdcard/Download/DCIM/New Folder/DSC_0001.JPG|41|4|
+/sdcard/Download/DCIM/New Folder/DSC_0001.JPG|42|34|
+/sdcard/Download/DCIM/New Folder/DSC_0001.JPG|43|64|
+/sdcard/Download/DCIM/New Folder/DSC_0001.JPG|45|96|
+/sdcard/Download/DCIM/New Folder/DSC_0001_1 - Copy 1.JPG|46|46|
+/sdcard/Download/DCIM/New Folder/DSC_0001_1.JPG|48|1|
+/sdcard/Download/DCIM/New Folder/DSC_0001_1.JPG|49|53|
+/sdcard/Download/DCIM/New Folder/DSC_0002 - Copy 1.JPG|50|4|
+/sdcard/Download/DCIM/New Folder/DSC_0002 - Copy 1.JPG|52|35|
+/sdcard/Download/DCIM/New Folder/DSC_0002 - Copy 1.JPG|53|63|
+/sdcard/Download/DCIM/New Folder/DSC_0002 - Copy 1.JPG|54|92|
+/sdcard/Download/DCIM/New Folder/DSC_0002.JPG|56|24|
+/sdcard/Download/DCIM/New Folder/DSC_0002.JPG|57|53|
+/sdcard/Download/DCIM/New Folder/DSC_0002.JPG|59|82|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1 - Copy 1.JPG|60|10|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1 - Copy 1.JPG|62|33|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1 - Copy 1.JPG|63|55|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1 - Copy 1.JPG|64|80|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1.JPG|66|3|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1.JPG|67|27|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1.JPG|68|50|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1.JPG|70|72|
+/sdcard/Download/DCIM/New Folder/DSC_0002_1.JPG|71|97|
+/sdcard/Download/DCIM/New Folder/DSC_0003 - Copy 1.JPG|73|90|
+/sdcard/Download/DCIM/New Folder/DSC_0003.JPG|74|96|
+/sdcard/Download/DCIM/New Folder/DSC_0003_1 - Copy 1.JPG|75|43|
+/sdcard/Download/DCIM/New Folder/DSC_0003_1 - Copy 1.JPG|77|92|
+/sdcard/Download/DCIM/New Folder/DSC_0003_1.JPG|78|38|
+/sdcard/Download/DCIM/New Folder/DSC_0003_1.JPG|80|83|
+/sdcard/Download/DCIM/New Folder/DSC_0004 - Copy 1.JPG|81|50|
+/sdcard/Download/DCIM/New Folder/DSC_0004.JPG|83|24|
+/sdcard/Download/DCIM/New Folder/DSC_0004.JPG|84|94|
+/sdcard/Download/DCIM/New Folder/DSC_0004_1 - Copy 1.JPG|85|47|
+/sdcard/Download/DCIM/New Folder/DSC_0004_1 - Copy 1.JPG|87|95|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170303-173019.png|88|94|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170312-223158.png|89|35|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170321-183427.png|91|100|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170321-193051.png|92|67|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170321-211752.png|94|50|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170324-205213.png|95|77|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170401-135422.png|96|77|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170406-082707.png|98|11|
+/sdcard/Download/DCIM/New Folder 1/Screenshot_20170409-163142.png|99|54|";
+            var updatesStringRows = updatesRaw.Split('\n').Select(r => r.Split('|'));
+            var updates = updatesStringRows.Select(u => new AdbSyncProgressInfo(u[0], int.Parse(u[1]), int.Parse(u[2]), null));
+            SyncFile file = new("/sdcard/Download/DCIM", AbstractFile.FileType.Folder);
+
+            file.AddUpdates(updates);
+
+            Assert.IsTrue(file.Children.Count > 0);
+            Assert.IsTrue(file.Children.All(c => c.RelationFrom(file) is AbstractFile.RelationType.Ancestor));
+            Assert.AreEqual(0, file.Children.Count(c => c.ProgressUpdates.Any(u => u is SyncErrorInfo)));
+        }
+
+        [TestMethod]
+        public void GetFullNameTest()
+        {
+            Assert.AreEqual("adb.exe", FilePath.GetFullName(@"E:\Android_SDK\platform-tools_r33.0.3\adb.exe"));
+
+            Assert.AreEqual("root-checker-6-5-0.apk", FilePath.GetFullName(@"/sdcard/ASUS/root-checker-6-5-0.apk"));
+
+            Assert.AreEqual("root-checker-6-5-0.apk", FilePath.GetFullName(@"root-checker-6-5-0.apk"));
+
+            Assert.AreEqual("ASUS", FilePath.GetFullName(@"/sdcard/ASUS/"));
+
+            Assert.AreEqual("/", FilePath.GetFullName("/"));
         }
     }
 }

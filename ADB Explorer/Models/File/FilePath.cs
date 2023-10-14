@@ -31,7 +31,10 @@ public abstract class AbstractFile : ViewModelBase
 
     private static readonly string[] names =
         { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown" };
+
     public static string GetFileTypeName(FileType type) => names[(int)type];
+
+    public static readonly char[] Separators = new [] { '\\', '/' };
 }
 
 public class FilePath : AbstractFile
@@ -48,7 +51,7 @@ public class FilePath : AbstractFile
         protected set => Set(ref fullPath, value);
     }
 
-    public string ParentPath => FullPath[..LastSeparatorIndex(FullPath, PathSeparator())];
+    public string ParentPath => FullPath[..LastSeparatorIndex(FullPath)];
 
     private string fullName;
     public string FullName
@@ -97,23 +100,25 @@ public class FilePath : AbstractFile
         FullName = GetFullName(newPath);
     }
 
-    private string GetFullName(string fullPath) =>
-        fullPath[(fullPath.LastIndexOf(PathSeparator()) + 1)..];
+    public static string GetFullName(string fullPath)
+    {
+        if (fullPath.Length < 2)
+            return fullPath;
+
+        fullPath = fullPath.TrimEnd(Separators);
+        var index = LastSeparatorIndex(fullPath);
+
+        if (index.IsFromEnd)
+            return fullPath;
+
+        return fullPath[(index.Value + 1)..];
+    }
 
     private static bool HiddenOrWithoutExt(string fullName) => fullName.Count(c => c == '.') switch
     {
         0 => true,
         1 when fullName.StartsWith('.') => true,
         _ => false,
-    };
-
-    private char PathSeparator() => PathSeparator(PathType);
-
-    private static char PathSeparator(FilePathType pathType) => pathType switch
-    {
-        FilePathType.Windows => '\\',
-        FilePathType.Android => '/',
-        _ => throw new NotSupportedException(),
     };
 
     /// <summary>
@@ -136,8 +141,8 @@ public class FilePath : AbstractFile
         return RelationType.Unrelated;
     }
 
-    public static Index LastSeparatorIndex(string path, char separator = '/')
-        => IndexAdjust(path.LastIndexOf(separator));
+    public static Index LastSeparatorIndex(string path)
+        => IndexAdjust(path.LastIndexOfAny(Separators));
 
     protected static Index IndexAdjust(int originalIndex) => originalIndex switch
     {
