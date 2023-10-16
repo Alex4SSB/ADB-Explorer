@@ -139,6 +139,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ServerWatchdogTimer_Tick(object sender, EventArgs e)
     {
         RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
+
+        if (Settings.PollDevices
+            && MdnsService?.State is MDNS.MdnsState.Running
+            && DateTime.Now.Subtract(RuntimeSettings.LastServerResponse) > MDNS_FORCE_CONNECT_TIME)
+        {
+            MdnsService.State = MDNS.MdnsState.Disabled;
+            UpdateMdns();
+        }
     }
 
     private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
