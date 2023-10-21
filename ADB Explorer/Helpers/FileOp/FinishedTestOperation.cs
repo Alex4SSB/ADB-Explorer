@@ -11,7 +11,7 @@ public class CompletedTestOperation : FileOperation
     public override SyncFile AndroidPath => TargetPath;
 
     public CompletedTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, SyncFile filePath, AdbSyncStatsInfo adbInfo) :
-        base(dispatcher, adbDevice, filePath)
+        base(filePath, adbDevice, dispatcher)
     {
         info = new(adbInfo);
         TargetPath = filePath;

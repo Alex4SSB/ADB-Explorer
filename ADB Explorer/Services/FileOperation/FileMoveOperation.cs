@@ -8,34 +8,25 @@ namespace ADB_Explorer.Services;
 
 public class FileMoveOperation : AbstractShellFileOperation
 {
-    private CancellationTokenSource cancelTokenSource;
     private readonly ObservableList<FileClass> fileList;
-    private string targetParent;
-    private string targetName;
-    private string fullTargetPath;
-    private readonly string currentPath;
     private string recycleName;
     private string indexerPath;
     private DateTime? dateModified;
 
-    public FileMoveOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, string targetParent, string targetName, string currentPath, ObservableList<FileClass> fileList, bool isCopy = false)
-        : base(dispatcher, adbDevice, filePath)
+    public FileMoveOperation(FileClass filePath, SyncFile targetPath, ObservableList<FileClass> fileList, ADBService.AdbDevice adbDevice, Dispatcher dispatcher, bool isCopy = false)
+        : base(filePath, adbDevice, dispatcher)
     {
         if (isCopy)
             OperationName = OperationType.Copy;
-        else if (targetParent == AdbExplorerConst.RECYCLE_PATH)
+        else if (targetPath.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH))
             OperationName = OperationType.Recycle;
         else if (filePath.TrashIndex is not null)
             OperationName = OperationType.Restore;
         else
             OperationName = OperationType.Move;
 
-        TargetPath = new(targetParent, fileType: AbstractFile.FileType.Folder);
-
+        TargetPath = targetPath;
         this.fileList = fileList;
-        this.targetParent = targetParent;
-        this.targetName = targetName;
-        this.currentPath = currentPath;
     }
 
     public override void Start()
@@ -47,26 +38,23 @@ public class FileMoveOperation : AbstractShellFileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
-        cancelTokenSource = new CancellationTokenSource();
 
         if (OperationName is OperationType.Recycle)
         {
             recycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
-            fullTargetPath = FileHelper.ConcatPaths(targetParent, recycleName);
+            TargetPath.UpdatePath(FileHelper.ConcatPaths(TargetPath.ParentPath, recycleName));
             dateModified = FilePath.ModifiedTime;
             indexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{recycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
         }
-        else
-            fullTargetPath = FileHelper.ConcatPaths(targetParent, targetName);
 
         var cmd = OperationName is OperationType.Copy ? "cp" : "mv";
         var flag = OperationName is OperationType.Copy && FilePath.IsDirectory ? "-r" : "";
         if (OperationName is OperationType.Copy)
             dateModified = DateTime.Now;
 
-        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, cmd, flag,
+        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, CancelTokenSource.Token, cmd, flag,
             ADBService.EscapeAdbShellString(FilePath.FullPath),
-            ADBService.EscapeAdbShellString(fullTargetPath));
+            ADBService.EscapeAdbShellString(TargetPath.FullPath));
 
         operationTask.ContinueWith((t) =>
         {
@@ -83,12 +71,12 @@ public class FileMoveOperation : AbstractShellFileOperation
 
                 Dispatcher.Invoke(() =>
                 {
-                    if (TargetPath.FullPath == currentPath)
+                    if (TargetPath.ParentPath == Data.CurrentPath)
                     {
                         if (OperationName is OperationType.Copy)
                         {
                             FileClass newFile = new(FilePath);
-                            newFile.UpdatePath(fullTargetPath);
+                            newFile.UpdatePath(TargetPath.FullPath);
                             newFile.ModifiedTime = dateModified;
                             fileList.Add(newFile);
 
@@ -96,13 +84,13 @@ public class FileMoveOperation : AbstractShellFileOperation
                         }
                         else
                         {
-                            FilePath.UpdatePath(fullTargetPath);
+                            FilePath.UpdatePath(TargetPath.FullPath);
                             fileList.Add(FilePath);
 
                             Data.FileActions.ItemToSelect = FilePath;
                         }
                     }
-                    else if (FilePath.ParentPath == currentPath && OperationName is not OperationType.Copy)
+                    else if (FilePath.ParentPath == Data.CurrentPath && OperationName is not OperationType.Copy)
                     {
                         fileList.Remove(FilePath);
                     }
@@ -137,7 +125,7 @@ public class FileMoveOperation : AbstractShellFileOperation
 
                 if (OperationName is OperationType.Recycle)
                 {
-                    ShellFileOperation.SilentDelete(Device, fullTargetPath, indexerPath);
+                    ShellFileOperation.SilentDelete(Device, TargetPath.FullPath, indexerPath);
                 }
             }
 
@@ -154,15 +142,5 @@ public class FileMoveOperation : AbstractShellFileOperation
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
-    }
-
-    public override void Cancel()
-    {
-        if (Status != OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot cancel a deactivated operation!");
-        }
-
-        cancelTokenSource.Cancel();
     }
 }

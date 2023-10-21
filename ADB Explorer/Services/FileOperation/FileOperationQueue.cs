@@ -253,7 +253,7 @@ public class FileOperationQueue : ViewModelBase
         var isPush = CurrentOperation.OperationName is FileOperation.OperationType.Push;
         CurrentOperation.Cancel();
         
-        if (isPush)
+        if (isPush && !App.Current.Dispatcher.HasShutdownStarted)
             Data.RuntimeSettings.Refresh = true;
     }
 

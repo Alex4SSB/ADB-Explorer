@@ -12,10 +12,10 @@ public class FileOperationTemplateSelector : DataTemplateSelector
     {
         return item switch
         {
-            FilePullOperation => PullTemplate,
-            FilePushOperation => PushTemplate,
+            FileSyncOperation op when op.OperationName is FileOperation.OperationType.Pull => PullTemplate,
+            FileSyncOperation op when op.OperationName is FileOperation.OperationType.Push => PushTemplate,
             FileSyncOperation => SyncTemplate,
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
     }
 }

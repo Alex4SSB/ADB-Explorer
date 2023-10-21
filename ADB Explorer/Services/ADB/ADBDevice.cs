@@ -89,29 +89,14 @@ public partial class ADBService
             }
         }
 
-        public AdbSyncStatsInfo PullFile(
-            string targetPath,
-            string sourcePath,
-            ref ObservableList<FileOpProgressInfo> progressUpdates,
-            CancellationToken cancellationToken) =>
-            DoFileSync("pull", "-a", targetPath, sourcePath, ref progressUpdates, cancellationToken);
-
-        public AdbSyncStatsInfo PushFile(
-            string targetPath,
-            string sourcePath,
-            ref ObservableList<FileOpProgressInfo> progressUpdates,
-            CancellationToken cancellationToken) =>
-            DoFileSync("push", "", targetPath, sourcePath, ref progressUpdates, cancellationToken);
-
-        private AdbSyncStatsInfo DoFileSync(
-            string opertation,
-            string operationArgs,
-            string targetPath,
-            string sourcePath,
-            ref ObservableList<FileOpProgressInfo> progressUpdates,
+        public AdbSyncStatsInfo DoFileSync(
+            string cmd,
+            string arg,
+            string target,
+            string source,
+            ref ObservableList<FileOpProgressInfo> updates,
             CancellationToken cancellationToken)
         {
-            // Execute adb file sync operation
             var stdout = ExecuteCommandAsync(
                 Data.ProgressRedirectionPath,
                 ADB_PATH,
@@ -119,10 +104,10 @@ public partial class ADBService
                 cancellationToken,
                 "-s",
                 ID,
-                opertation,
-                operationArgs,
-                EscapeAdbString(sourcePath),
-                EscapeAdbString(targetPath));
+                cmd,
+                arg,
+                EscapeAdbString(source),
+                EscapeAdbString(target));
             
             // Each line should be a progress update (but sometimes the output can be weird)
             string lastStdoutLine = null;
@@ -134,13 +119,13 @@ public partial class ADBService
 
                 var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS.Match(stdoutLine);
                 if (progressMatch.Success)
-                    progressUpdates.Add(new AdbSyncProgressInfo(progressMatch));
+                    updates.Add(new AdbSyncProgressInfo(progressMatch));
                 else
                 {
                     var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR.Match(stdoutLine);
                     if (errorMatch.Success && SyncErrorInfo.New(errorMatch) is SyncErrorInfo error)
                     {
-                        progressUpdates.Add(error);
+                        updates.Add(error);
                     }
                 }
             }

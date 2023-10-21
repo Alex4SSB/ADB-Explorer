@@ -8,11 +8,10 @@ namespace ADB_Explorer.Services;
 
 public class FileDeleteOperation : AbstractShellFileOperation
 {
-    private CancellationTokenSource cancelTokenSource;
     private readonly ObservableList<FileClass> fileList;
 
     public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass path, ObservableList<FileClass> fileList)
-        : base(dispatcher, adbDevice, path)
+        : base(path, adbDevice, dispatcher)
     {
         OperationName = OperationType.Delete;
 
@@ -28,9 +27,8 @@ public class FileDeleteOperation : AbstractShellFileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
-        cancelTokenSource = new CancellationTokenSource();
 
-        var task = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "rm", "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath)); 
+        var task = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, CancelTokenSource.Token, "rm", "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath)); 
 
         task.ContinueWith((t) =>
         {
@@ -83,15 +81,5 @@ public class FileDeleteOperation : AbstractShellFileOperation
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
-    }
-
-    public override void Cancel()
-    {
-        if (Status != OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot cancel a deactivated operation!");
-        }
-
-        cancelTokenSource.Cancel();
     }
 }

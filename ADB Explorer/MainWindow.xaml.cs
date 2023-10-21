@@ -1822,7 +1822,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             FileActions.SelectedFileOp.Value = fileOp;
         }
-        else if (CurrentOperationDetailedDataGrid.Items[0] is FileOperation op)
+        else if (CurrentOperationDetailedDataGrid.Items.Count > 0 && CurrentOperationDetailedDataGrid.Items[0] is FileOperation op)
         {
             FileActions.SelectedFileOp.Value = op;
         }

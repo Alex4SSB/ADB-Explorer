@@ -71,7 +71,9 @@ public class FilePath : AbstractFile
     }
 
     public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
-    
+
+    public ShellObject ShellObject { get; set; } = null;
+
     public FilePath(ShellObject windowsPath)
     {
         PathType = FilePathType.Windows;
@@ -98,6 +100,8 @@ public class FilePath : AbstractFile
     {
         FullPath = newPath;
         FullName = GetFullName(newPath);
+
+        OnPropertyChanged(nameof(NoExtName));
     }
 
     public static string GetFullName(string fullPath)

@@ -55,7 +55,11 @@ public abstract class FileOperation : ViewModelBase
             Dispatcher.Invoke(() =>
             {
                 if (Set(ref status, value))
+                {
+                    CancelTokenSource = value is OperationStatus.InProgress ? new() : null;
+
                     OnPropertyChanged(nameof(ValidationAllowed));
+                }
             });
         }
     }
@@ -70,6 +74,8 @@ public abstract class FileOperation : ViewModelBase
     #endregion
 
     #region Base Properties
+
+    public CancellationTokenSource CancelTokenSource;
 
     public Dispatcher Dispatcher { get; }
 
@@ -112,19 +118,8 @@ public abstract class FileOperation : ViewModelBase
             {
                 OperationType.Delete => "Permanent Deletion",
                 OperationType.Recycle => "Recycle Bin",
-                _ => TargetPath.FullPath,
+                _ => TargetPath.ParentPath,
             };
-        }
-    }
-
-    public string FullTargetItemPath
-    {
-        get
-        {
-            if (TargetPath is null)
-                return "";
-
-            return FileHelper.ConcatPaths(TargetPath, FilePath.FullName);
         }
     }
 
@@ -163,7 +158,7 @@ public abstract class FileOperation : ViewModelBase
 
     #endregion
 
-    public FileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FilePath filePath)
+    public FileOperation(FilePath filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
     {
         Dispatcher = dispatcher;
         Device = adbDevice;
@@ -182,11 +177,19 @@ public abstract class FileOperation : ViewModelBase
 
     public abstract void Start();
 
-    public abstract void Cancel();
-
     public abstract void ClearChildren();
 
     public abstract void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates);
 
     public abstract void AddUpdates(params FileOpProgressInfo[] newUpdates);
+
+    public virtual void Cancel()
+    {
+        if (Status != OperationStatus.InProgress)
+        {
+            throw new Exception("Cannot cancel a deactivated operation!");
+        }
+
+        CancelTokenSource.Cancel();
+    }
 }

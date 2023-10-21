@@ -165,13 +165,15 @@ public partial class ADBService
         return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
     }
 
-    public static async Task<string> ExecuteDeviceAdbShellCommand(string deviceId, string cmd, params string[] args)
+    public static async Task<string> ExecuteDeviceAdbShellCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
     {
         string stdout = "", stderr = "";
-        var res = await Task.Run(() => ExecuteDeviceAdbShellCommand(deviceId, cmd, out stdout, out stderr, args));
+        var res = await Task.Run(() => ExecuteDeviceAdbShellCommand(deviceId, cmd, out stdout, out stderr, args), cancellationToken);
 
         if (res == 0)
             return "";
+        else if (cancellationToken.IsCancellationRequested)
+            return "Canceled";
         else
             return string.IsNullOrEmpty(stderr) ? stdout : stderr;
     }

@@ -398,7 +398,7 @@ internal static class FileActionLogic
         {
             try
             {
-                FileHelper.RenameFile(textBox.Text, file);
+                FileHelper.RenameFile(file, textBox.Text);
             }
             catch (Exception)
             { }
@@ -724,9 +724,12 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        foreach (var item in dialog.FilesAsShellObject.Select(file => new SyncFile(file)))
+        foreach (var item in dialog.FilesAsShellObject)
         {
-            var pushOpeartion = new FilePushOperation(App.Current.Dispatcher, Data.CurrentADBDevice, item, targetPath);
+            var source = new SyncFile(item) { ShellObject = item };
+            var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), item is ShellFolder ? FileType.Folder : FileType.File);
+
+            var pushOpeartion = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
             pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOpeartion);
         }
@@ -734,15 +737,16 @@ internal static class FileActionLogic
 
     private static void PushOpeartion_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        var pushOperation = sender as FilePushOperation;
+        var pushOperation = sender as FileSyncOperation;
 
         // If operation completed now and current path is where the new file was pushed to and it is not shown yet
-        if ((e.PropertyName == "Status") &&
-            (pushOperation.Status == FileOperation.OperationStatus.Completed) &&
-            (pushOperation.TargetPath.FullPath == Data.CurrentPath) &&
-            (!Data.DirList.FileList.Any(f => f.FullName == pushOperation.FilePath.FullName)))
+        if (e.PropertyName is nameof(FileSyncOperation.Status)
+            && pushOperation.Status is FileOperation.OperationStatus.Completed
+            && pushOperation.TargetPath.ParentPath == Data.CurrentPath
+            && !Data.DirList.FileList.Any(f => f.FullName == pushOperation.FilePath.FullName))
         {
-            Data.DirList.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath));
+            Data.DirList.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath.ShellObject));
+            pushOperation.FilePath.ShellObject = null;
         }
     }
 
@@ -790,7 +794,7 @@ internal static class FileActionLogic
 
         foreach (var item in Data.SelectedFiles)
         {
-            Data.FileOpQ.AddOperation(new FilePullOperation(App.Current.Dispatcher, Data.CurrentADBDevice, (SyncFile)item, dirPath));
+            Data.FileOpQ.AddOperation(FileSyncOperation.PullFile((SyncFile)item, dirPath, Data.CurrentADBDevice, App.Current.Dispatcher));
         }
     }
 

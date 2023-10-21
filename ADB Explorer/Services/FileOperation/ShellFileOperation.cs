@@ -9,8 +9,8 @@ public abstract class AbstractShellFileOperation : FileOperation
 
     public override SyncFile AndroidPath => TargetPath;
 
-    public AbstractShellFileOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath)
-        : base(dispatcher, adbDevice, filePath)
+    public AbstractShellFileOperation(FileClass filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+        : base(filePath, adbDevice, dispatcher)
     {
         FilePath = filePath;
         TargetPath = new(filePath);
@@ -45,9 +45,9 @@ public static class ShellFileOperation
         }
     }
 
-    public static FileRenameOperation Rename(ADBService.AdbDevice device, FileClass item, string targetPath)
+    public static FileRenameOperation Rename(FileClass item, string targetPath, ADBService.AdbDevice device)
     {
-        var fileOp = new FileRenameOperation(App.Current.Dispatcher, device, item, targetPath);
+        var fileOp = new FileRenameOperation(item, targetPath, device, App.Current.Dispatcher);
         Data.FileOpQ.AddOperation(fileOp);
 
         return fileOp;
@@ -78,7 +78,8 @@ public static class ShellFileOperation
                 {
                     foreach (var item in items)
                     {
-                        Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, item.FullName, currentPath, fileList));
+                        SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
+                        Data.FileOpQ.AddOperation(new FileMoveOperation(item, target, fileList, device, dispatcher));
                     }
                 });
             });
@@ -90,7 +91,8 @@ public static class ShellFileOperation
                 if (item.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
                     continue;
 
-                Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, item.TrashIndex.ParentPath, item.FullName, currentPath, fileList));
+                SyncFile target = new(FileHelper.ConcatPaths(item.TrashIndex.ParentPath, item.FullName));
+                Data.FileOpQ.AddOperation(new FileMoveOperation(item, target, fileList, device, dispatcher));
             }
         }
         else
@@ -102,7 +104,9 @@ public static class ShellFileOperation
                 {
                     targetName = $"{item.NoExtName}{FileClass.ExistingIndexes(fileList, item.NoExtName, isCopy)}{item.Extension}";
                 }
-                Data.FileOpQ.AddOperation(new FileMoveOperation(dispatcher, device, item, targetPath, targetName, currentPath, fileList, isCopy));
+
+                SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
+                Data.FileOpQ.AddOperation(new FileMoveOperation(item, target, fileList, device, dispatcher, isCopy));
             }
         }
     }
@@ -343,7 +347,7 @@ public static class ShellFileOperation
 
             if (item.ModifiedTime is DateTime modified && modified > nameDate)
             {
-                dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new FileChangeModifiedOperation(dispatcher, device, item, nameDate)));
+                dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new FileChangeModifiedOperation(item, nameDate, device, dispatcher)));
             }
         }
     }

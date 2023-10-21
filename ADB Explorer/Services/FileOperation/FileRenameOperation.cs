@@ -1,21 +1,16 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
 public class FileRenameOperation : AbstractShellFileOperation
 {
-    private CancellationTokenSource cancelTokenSource;
-    private string fullTargetPath;
-
-    public FileRenameOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, string targetPath)
-        : base(dispatcher, adbDevice, filePath)
+    public FileRenameOperation(FileClass filePath, string targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+        : base(filePath, adbDevice, dispatcher)
     {
         OperationName = OperationType.Rename;
 
-        TargetPath = new(FileHelper.ConcatPaths(FilePath.ParentPath, targetPath), fileType: AbstractFile.FileType.Folder);
-        fullTargetPath = targetPath;
+        TargetPath = new(targetPath, FilePath.Type);
     }
 
     public override void Start()
@@ -27,11 +22,13 @@ public class FileRenameOperation : AbstractShellFileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
-        cancelTokenSource = new CancellationTokenSource();
+        CancelTokenSource = new();
         
-        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "mv",
-                ADBService.EscapeAdbShellString(FilePath.FullPath),
-                ADBService.EscapeAdbShellString(fullTargetPath));
+        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID,
+            CancelTokenSource.Token,
+            "mv",
+            ADBService.EscapeAdbShellString(FilePath.FullPath),
+            ADBService.EscapeAdbShellString(TargetPath.FullPath));
 
         operationTask.ContinueWith((t) =>
         {
@@ -42,7 +39,7 @@ public class FileRenameOperation : AbstractShellFileOperation
 
                 Dispatcher.Invoke(() =>
                 {
-                    FilePath.UpdatePath(fullTargetPath);
+                    FilePath.UpdatePath(TargetPath.FullPath);
 
                     Data.FileActions.ItemToSelect = FilePath;
                 });
@@ -66,15 +63,5 @@ public class FileRenameOperation : AbstractShellFileOperation
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
-    }
-
-    public override void Cancel()
-    {
-        if (Status != OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot cancel a deactivated operation!");
-        }
-
-        cancelTokenSource.Cancel();
     }
 }

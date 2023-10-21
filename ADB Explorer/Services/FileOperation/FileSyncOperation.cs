@@ -5,15 +5,8 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-public abstract class FileSyncOperation : FileOperation
+public class FileSyncOperation : FileOperation
 {
-    public delegate AdbSyncStatsInfo FileSyncMethod(
-        string targetPath,
-        string sourcePath,
-        ref ObservableList<FileOpProgressInfo> progressUpdates,
-        CancellationToken cancellationToken);
-
-    private readonly FileSyncMethod adbMethod;
     private Task<AdbSyncStatsInfo> operationTask;
     private CancellationTokenSource cancelTokenSource;
     private ObservableList<FileOpProgressInfo> progressUpdates;
@@ -25,16 +18,13 @@ public abstract class FileSyncOperation : FileOperation
         : TargetPath;
 
     public FileSyncOperation(
-        Dispatcher dispatcher,
         OperationType operationName,
-        FileSyncMethod adbMethod,
-        ADBService.AdbDevice adbDevice,
         SyncFile sourcePath,
-        SyncFile targetPath) : base(dispatcher, adbDevice, sourcePath)
+        SyncFile targetPath,
+        ADBService.AdbDevice adbDevice,
+        Dispatcher dispatcher) : base(sourcePath, adbDevice, dispatcher)
     {
         OperationName = operationName;
-        this.adbMethod = adbMethod;
-
         FilePath = sourcePath;
         TargetPath = targetPath;
     }
@@ -53,12 +43,20 @@ public abstract class FileSyncOperation : FileOperation
         progressUpdates = new();
         progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
 
-        string target = OperationName is OperationType.Push ? FullTargetItemPath : TargetPath.FullPath;
+        string cmd = "", arg = "";
+        if (OperationName is OperationType.Push)
+        {
+            cmd = "push";
+        }
+        else
+        {
+            cmd = "pull";
+            arg = "-a";
+        }
 
         operationTask = Task.Run(() =>
-        {
-            return adbMethod(target, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token);
-        }, cancelTokenSource.Token);
+            Device.DoFileSync(cmd, arg, TargetPath.FullPath, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token),
+            cancelTokenSource.Token);
 
         operationTask.ContinueWith((t) => progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged);
 
@@ -122,4 +120,10 @@ public abstract class FileSyncOperation : FileOperation
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
         => AndroidPath.AddUpdates(newUpdates);
+
+    public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+        => new(OperationType.Pull, sourcePath, targetPath, adbDevice, dispatcher);
+
+    public static FileSyncOperation PushFile(SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+        => new(OperationType.Push, sourcePath, targetPath, adbDevice, dispatcher);
 }

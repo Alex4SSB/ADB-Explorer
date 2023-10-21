@@ -5,11 +5,10 @@ namespace ADB_Explorer.Services;
 
 public class FileChangeModifiedOperation : AbstractShellFileOperation
 {
-    private CancellationTokenSource cancelTokenSource;
     private readonly DateTime newDate;
 
-    public FileChangeModifiedOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass filePath, DateTime newDate)
-        : base(dispatcher, adbDevice, filePath)
+    public FileChangeModifiedOperation(FileClass filePath, DateTime newDate, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+        : base(filePath, adbDevice, dispatcher)
     {
         OperationName = OperationType.Update;
         this.newDate = newDate;
@@ -24,9 +23,9 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
-        cancelTokenSource = new CancellationTokenSource();
 
         var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID,
+                                                                    CancelTokenSource.Token,
                                                                     "touch",
                                                                     "-m",
                                                                     "-t",
@@ -61,15 +60,5 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
-    }
-
-    public override void Cancel()
-    {
-        if (Status != OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot cancel a deactivated operation!");
-        }
-
-        cancelTokenSource.Cancel();
     }
 }

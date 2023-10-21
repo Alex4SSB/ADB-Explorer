@@ -74,8 +74,8 @@ public static class Security
             () =>
             {
                 target = (op.TargetPath.PathType is AbstractFile.FilePathType.Android
-                    ? CalculateAndroidFolderHash(op.FullTargetItemPath)
-                    : CalculateWindowsFolderHash(op.FullTargetItemPath)).OrderBy(k => k.Key);
+                    ? CalculateAndroidFolderHash(op.TargetPath.FullPath)
+                    : CalculateWindowsFolderHash(op.TargetPath.FullPath)).OrderBy(k => k.Key);
             });
         });
         

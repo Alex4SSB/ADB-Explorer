@@ -39,6 +39,10 @@ public class FileClass : FileStat
         : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
     { }
 
+    public FileClass(FilePath other)
+        : this(other.FullName, other.FullPath, other.IsDirectory ? FileType.Folder : FileType.File)
+    { }
+
     public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
     (
         fileName: fileStat.FullName,
@@ -49,33 +53,12 @@ public class FileClass : FileStat
         isLink: fileStat.IsLink
     );
 
-    public static FileClass FromWindowsPath(FilePath androidTargetPath, FilePath windowsFilePath)
+    public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellObject windowsShellObject) =>
+        new(androidTargetPath)
     {
-        bool isDir = false;
-        ulong? fileSize = null;
-        DateTime? modifiedTime = null;
-        try
-        {
-            isDir = Directory.Exists(windowsFilePath.FullPath);
-            if (!isDir)
-            {
-                var fileInfo = new FileInfo(windowsFilePath.FullPath);
-                fileSize = (ulong)fileInfo.Length;
-                modifiedTime = fileInfo.LastWriteTime;
-            }
-            
-        }
-        catch (Exception) {}
-
-        return new FileClass
-        (
-            fileName: windowsFilePath.FullName,
-            path: androidTargetPath.FullPath + '/' + windowsFilePath.FullName,
-            type: isDir ? FileType.Folder : FileType.File,
-            size: fileSize,
-            modifiedTime: modifiedTime
-        );
-    }
+        Size = windowsShellObject.Properties.System.Size.Value,
+        ModifiedTime = windowsShellObject.Properties.System.DateModified.Value
+    };
 
     public override string ToString()
     {
@@ -107,6 +90,10 @@ public class FileClass : FileStat
 
     public bool IsHidden => FullName.StartsWith('.');
 
+    /// <summary>
+    /// Returns the extension (including the period ".") of a regular file.<br />
+    /// Returns an empty string if file has no extension, or is not a regular file.
+    /// </summary>
     public string Extension
     {
         get

@@ -7,8 +7,6 @@ namespace ADB_Explorer.Services;
 
 public class PackageInstallOperation : AbstractShellFileOperation
 {
-    private Task operationTask;
-    private CancellationTokenSource cancelTokenSource;
     private readonly ObservableList<Package> packageList;
     private bool pushPackage;
     private bool isPackagePath;
@@ -40,7 +38,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
                                    string packageName = null,
                                    ObservableList<Package> packageList = null,
                                    bool pushPackage = false,
-                                   bool isPackagePath = false) : base(dispatcher, adbDevice, path)
+                                   bool isPackagePath = false) : base(path, adbDevice, dispatcher)
     {
         OperationName = OperationType.Install;
         PackageName = packageName;
@@ -58,7 +56,6 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
-        cancelTokenSource = new CancellationTokenSource();
 
         var args = new string[1];
         int index = 0;
@@ -87,16 +84,16 @@ public class PackageInstallOperation : AbstractShellFileOperation
         args[index] = ADBService.EscapeAdbShellString(args[index]);
 
         string stdout = "", stderr = "";
-        operationTask = Task.Run(() =>
+        var operationTask = Task.Run(() =>
         {
             return pushPackage
                 ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out stdout, out stderr, args)
                 : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out stdout, out stderr, args);
-        });
+        }, CancelTokenSource.Token);
 
         operationTask.ContinueWith((t) =>
         {
-            Status = ((Task<int>)t).Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
+            Status = t.Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
             
             if (Status is OperationStatus.Completed)
             {
@@ -125,15 +122,5 @@ public class PackageInstallOperation : AbstractShellFileOperation
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(t.Exception.InnerException.Message);
         }, TaskContinuationOptions.OnlyOnFaulted);
-    }
-
-    public override void Cancel()
-    {
-        if (Status != OperationStatus.InProgress)
-        {
-            throw new Exception("Cannot cancel a deactivated operation!");
-        }
-
-        cancelTokenSource.Cancel();
     }
 }

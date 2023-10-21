@@ -13,7 +13,7 @@ public class InProgressTestOperation : FileOperation
     public override SyncFile AndroidPath => FilePath;
 
     private InProgressTestOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath, AdbSyncProgressInfo adbInfo) :
-        base(dispatcher, adbDevice, new(filePath))
+        base(new(filePath), adbDevice, dispatcher)
     {
         info = new(adbInfo);
         FilePath = new SyncFile(filePath, adbInfo.CurrentFilePercentage.HasValue ? AbstractFile.FileType.Folder : AbstractFile.FileType.File);

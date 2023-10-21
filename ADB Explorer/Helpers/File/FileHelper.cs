@@ -64,16 +64,19 @@ public static class FileHelper
         return false;
     }
 
-    public static void RenameFile(string newName, FileClass file)
+    public static void RenameFile(FileClass file, string newName)
     {
-        var newPath = $"{file.ParentPath}{(file.ParentPath.EndsWith('/') ? "" : "/")}{newName}{(Data.Settings.ShowExtensions ? "" : file.Extension)}";
-        if (Data.DirList.FileList.Any(file => file.FullName == newName))
+        var newPath = ConcatPaths(file.ParentPath, newName);
+        if (!Data.Settings.ShowExtensions)
+            newPath += file.Extension;
+
+        if (Data.DirList.FileList.Any(file => file.DisplayName == newName))
         {
-            DialogService.ShowMessage(Strings.S_PATH_EXIST(newPath), Strings.S_RENAME_CONF_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+            DialogService.ShowMessage(Strings.S_PATH_EXIST(newName), Strings.S_RENAME_CONF_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
             return;
         }
 
-        var op = ShellFileOperation.Rename(Data.CurrentADBDevice, file, newPath);
+        var op = ShellFileOperation.Rename(file, newPath, Data.CurrentADBDevice);
 
         var statusTask = Task.Run(() =>
         {

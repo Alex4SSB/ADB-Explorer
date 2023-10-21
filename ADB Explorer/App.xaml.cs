@@ -7,7 +7,17 @@ namespace ADB_Explorer;
 /// </summary>
 public partial class App : Application
 {
-    private string tempFilesPath => $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}";
+    private static string TempFilesPath => $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}";
+
+    public App()
+    {
+        Current.Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
+    }
+
+    private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
+    {
+        Data.FileOpQ.Stop();
+    }
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -40,8 +50,8 @@ public partial class App : Application
 
             Task.Run(() =>
             {
-                if (!Directory.Exists(tempFilesPath))
-                    Directory.CreateDirectory(tempFilesPath);
+                if (!Directory.Exists(TempFilesPath))
+                    Directory.CreateDirectory(TempFilesPath);
                 else
                     CleanTempFiles();
             });
@@ -90,7 +100,7 @@ public partial class App : Application
     {
         try
         {
-            foreach (var file in Directory.GetFiles(tempFilesPath))
+            foreach (var file in Directory.GetFiles(TempFilesPath))
             {
                 File.Delete(file);
             }

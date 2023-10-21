@@ -92,7 +92,7 @@ public static class Strings
         $"The following will be{(permanent ? " permanently" : "")} deleted:\n{deletedString}";
 
     public static string S_PATH_EXIST(string newPath) =>
-        $"{newPath} already exists";
+        $"{newPath} already exists in the current location";
 
     public static string S_NEW_ITEM(bool isFolder) =>
         $"New {(isFolder ? "Folder" : "File")}";
