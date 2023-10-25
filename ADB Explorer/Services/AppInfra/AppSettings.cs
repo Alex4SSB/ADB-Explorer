@@ -317,6 +317,27 @@ public class AppSettings : ViewModelBase
         }
     }
 
+    private string[] rootArgs;
+    public string[] RootArgs
+    {
+        get => Get(ref rootArgs, null);
+        set => Set(ref rootArgs, value);
+    }
+
+    private string[] unrootArgs;
+    public string[] UnrootArgs
+    {
+        get => Get(ref unrootArgs, null);
+        set => Set(ref unrootArgs, value);
+    }
+
+    private bool? unrootOnDisconnect;
+    public bool? UnrootOnDisconnect
+    {
+        get => Get(ref unrootOnDisconnect, null);
+        set => Set(ref unrootOnDisconnect, value);
+    }
+
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))

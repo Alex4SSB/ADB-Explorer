@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer;
 
@@ -8,16 +9,6 @@ namespace ADB_Explorer;
 public partial class App : Application
 {
     private static string TempFilesPath => $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}";
-
-    public App()
-    {
-        Current.Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
-    }
-
-    private void Dispatcher_ShutdownStarted(object sender, EventArgs e)
-    {
-        Data.FileOpQ.Stop();
-    }
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -40,7 +31,11 @@ public partial class App : Application
                 string[] keyValue = reader.ReadLine().TrimEnd(';').Split(':', 2);
                 try
                 {
-                    Properties[keyValue[0]] = JsonConvert.DeserializeObject(keyValue[1], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                    var jObj = JsonConvert.DeserializeObject(keyValue[1], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                    if (jObj is JArray jArr)
+                        Properties[keyValue[0]] = jArr.Values<string>().ToArray();
+                    else
+                        Properties[keyValue[0]] = jObj;
                 }
                 catch (Exception)
                 {
@@ -72,8 +67,12 @@ public partial class App : Application
 
     private void Application_Exit(object sender, ExitEventArgs e)
     {
+        Data.FileOpQ.Stop();
         WriteSettings();
         Task.Run(CleanTempFiles);
+
+        if (Data.Settings.UnrootOnDisconnect is true)
+            ADBService.Unroot(Data.CurrentADBDevice);
     }
 
     private void WriteSettings()
@@ -89,8 +88,11 @@ public partial class App : Application
 
         using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE, FileMode.Create, storage);
         using StreamWriter writer = new(stream);
+
         // Persist each application-scope property individually
-        foreach (string key in Properties.Keys)
+        foreach (string key in from string key in Properties.Keys
+                               orderby key
+                               select key)
         {
             writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })};");
         }

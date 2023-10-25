@@ -22,7 +22,14 @@ public class LogicalDeviceViewModel : DeviceViewModel
     public bool IsOpen
     {
         get => isOpen;
-        private set => Set(ref isOpen, value);
+        private set
+        {
+            if (Set(ref isOpen, value))
+            {
+                if (!value && Root is RootStatus.Enabled && Data.Settings.UnrootOnDisconnect is true)
+                    ADBService.Unroot(Device);
+            }
+        }
     }
 
     private byte? androidVersion = null;

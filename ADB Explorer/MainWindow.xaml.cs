@@ -728,6 +728,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             FileActions.IsLogToggleVisible.Value = Settings.EnableLog;
         });
+
+        Settings.RootArgs ??= new[] { "root" };
+        Settings.UnrootArgs ??= new[] { "unroot" };
+        Settings.UnrootOnDisconnect ??= false;
     }
 
     private void SetRenderMode() => Dispatcher.Invoke(() =>

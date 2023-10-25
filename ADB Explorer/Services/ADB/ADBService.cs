@@ -284,13 +284,13 @@ public partial class ADBService
 
     public static bool Root(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "root", out string stdout, out _);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, Settings.RootArgs);
         return !stdout.Contains("cannot run as root");
     }
 
     public static bool Unroot(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "unroot", out string stdout, out _);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, Settings.UnrootArgs);
         var result = stdout.Contains("restarting adbd as non root");
         DevicesObject.UpdateDeviceRoot(device.ID, result);
 
