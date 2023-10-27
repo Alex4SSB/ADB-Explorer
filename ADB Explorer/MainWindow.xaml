@@ -12,7 +12,6 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:views="clr-namespace:ADB_Explorer.Views"
     x:Name="MainWin"
-    Title="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AppTitle}"
     Width="800"
     Height="450"
     MinWidth="605"
@@ -28,6 +27,7 @@
     SourceInitialized="Window_SourceInitialized"
     StateChanged="MainWin_StateChanged"
     WindowStartupLocation="CenterScreen"
+    Style="{StaticResource WindowStyle}"
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
@@ -60,7 +60,7 @@
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo x:Name="TaskBarInfo" ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
     </Window.TaskbarItemInfo>
-    <Grid>
+    <Grid Margin="0,2,0,0">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

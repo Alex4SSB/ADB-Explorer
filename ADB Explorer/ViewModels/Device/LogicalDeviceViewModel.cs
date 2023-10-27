@@ -24,10 +24,13 @@ public class LogicalDeviceViewModel : DeviceViewModel
         get => isOpen;
         private set
         {
-            if (Set(ref isOpen, value))
+            if (Set(ref isOpen, value) && Root is RootStatus.Enabled)
             {
-                if (!value && Root is RootStatus.Enabled && Data.Settings.UnrootOnDisconnect is true)
+                if (!value && Data.Settings.UnrootOnDisconnect is true)
                     ADBService.Unroot(Device);
+
+                if (value)
+                    Data.RuntimeSettings.IsRootActive = true;
             }
         }
     }

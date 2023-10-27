@@ -293,6 +293,7 @@ public class Devices : AbstractDevice
             Data.RuntimeSettings.DeviceToOpen = device;
 
         Data.RuntimeSettings.AppTitle = UpdateAppTitle();
+        Data.RuntimeSettings.IsRootActive = device?.Root is RootStatus.Enabled;
 
         return device is not null;
     }

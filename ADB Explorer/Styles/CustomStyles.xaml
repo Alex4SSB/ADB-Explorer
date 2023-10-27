@@ -805,4 +805,12 @@
         <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style x:Key="WindowStyle" TargetType="Window" BasedOn="{StaticResource DefaultWindowStyle}">
+        <Setter Property="Title" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AppTitle}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRootActive}" Value="True">
+                <Setter Property="ui:TitleBar.Background" Value="OrangeRed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
