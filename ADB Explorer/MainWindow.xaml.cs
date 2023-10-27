@@ -1832,7 +1832,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else
         {
-            FileActions.SelectedFileOp = null;
+            FileActions.SelectedFileOp.Value = null;
         }
     }
 }
