@@ -441,7 +441,7 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsLogToggleVisible = new() { Value = Data.Settings.EnableLog };
 
-    public ObservableProperty<FileOperation> SelectedFileOp = new();
+    public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = Enumerable.Empty<FileOperation>() };
 
     #endregion
 

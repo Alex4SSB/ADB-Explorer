@@ -777,8 +777,6 @@ internal static class FileActionLogic
             path = dialog.FileAsShellObject;
         }
 
-        SyncFile dirPath = new(path);
-
         if (!Directory.Exists(path.ParsingName))
         {
             try
@@ -794,7 +792,10 @@ internal static class FileActionLogic
 
         foreach (var item in Data.SelectedFiles)
         {
-            Data.FileOpQ.AddOperation(FileSyncOperation.PullFile((SyncFile)item, dirPath, Data.CurrentADBDevice, App.Current.Dispatcher));
+            SyncFile target = new(path);
+            target.UpdatePath(FileHelper.ConcatPaths(target, item.FullName));
+
+            Data.FileOpQ.AddOperation(FileSyncOperation.PullFile((SyncFile)item, target, Data.CurrentADBDevice, App.Current.Dispatcher));
         }
     }
 

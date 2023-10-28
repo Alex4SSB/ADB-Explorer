@@ -171,7 +171,7 @@ public abstract class FileOperation : ViewModelBase
         StatusInfo.IsValidationInProgress = value;
         OnPropertyChanged(nameof(ValidationAllowed));
 
-        if (Data.FileActions.SelectedFileOp.Value.Equals(this))
+        if (Data.FileActions.SelectedFileOps.Value.Contains(this))
             Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 

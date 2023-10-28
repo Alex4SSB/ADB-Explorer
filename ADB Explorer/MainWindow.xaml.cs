@@ -307,6 +307,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     CurrentOperationDataGrid.ItemsSource = RuntimeSettings.IsPastViewVisible is true
                         ? FileOpQ.PastOperations
                         : FileOpQ.Operations;
+
+                    UpdateSelectedFileOp();
                     break;
 
                 case nameof(AppRuntimeSettings.ClearLogs):
@@ -1822,17 +1824,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateSelectedFileOp()
     {
-        if (CurrentOperationDetailedDataGrid.SelectedItem is FileOperation fileOp)
+        var selectedOps = CurrentOperationDetailedDataGrid.SelectedItems.OfType<FileOperation>();
+        if (!selectedOps.Any()
+            && !CurrentOperationDetailedDataGrid.Items.IsEmpty
+            && CurrentOperationDetailedDataGrid.Items[0] is FileOperation op)
         {
-            FileActions.SelectedFileOp.Value = fileOp;
+            selectedOps = new[] { op };
         }
-        else if (CurrentOperationDetailedDataGrid.Items.Count > 0 && CurrentOperationDetailedDataGrid.Items[0] is FileOperation op)
-        {
-            FileActions.SelectedFileOp.Value = op;
-        }
-        else
-        {
-            FileActions.SelectedFileOp.Value = null;
-        }
+
+        FileActions.SelectedFileOps.Value = selectedOps;
     }
 }

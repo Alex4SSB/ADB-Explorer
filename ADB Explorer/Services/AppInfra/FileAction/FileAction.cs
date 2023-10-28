@@ -410,9 +410,9 @@ internal static class AppActions
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
         new(FileActionType.FileOpValidate,
-            () => Data.FileActions.SelectedFileOp?.Value?.ValidationAllowed is true,
-            Security.ValidateOperation,
-            "Validate Operation"),
+            () => Data.FileActions.SelectedFileOps.Value.Any(op => op.ValidationAllowed),
+            Security.ValidateOps,
+            "Validate Operation(s)"),
     };
 
     public static List<KeyBinding> Bindings =>

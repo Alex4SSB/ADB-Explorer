@@ -56,10 +56,17 @@ public static class Security
             m => m.Groups["Hash"].Value.ToUpper());
     }
 
-    public static async void ValidateOperation()
+    public static void ValidateOps()
+    {
+        foreach (var item in Data.FileActions.SelectedFileOps.Value)
+        {
+            ValidateOperation(item);
+        }
+    }
+
+    public static async void ValidateOperation(FileOperation op)
     {
         IOrderedEnumerable<KeyValuePair<string, string>> source = null, target = null;
-        var op = Data.FileActions.SelectedFileOp.Value;
         op.SetValidation(true);
 
         await Task.Run(() =>
@@ -78,7 +85,7 @@ public static class Security
                     : CalculateWindowsFolderHash(op.TargetPath.FullPath)).OrderBy(k => k.Key);
             });
         });
-        
+
         op.ClearChildren();
         var fails = 0;
         FileOpProgressInfo update = null;
@@ -87,8 +94,10 @@ public static class Security
         {
             var key = item.Key;
             var other = target.Where(f => f.Key == item.Key);
-            
-            key = FileHelper.ConcatPaths(op.AndroidPath, key);
+
+            key = op.AndroidPath.IsDirectory 
+                ? FileHelper.ConcatPaths(op.AndroidPath, key)
+                : op.AndroidPath.FullPath;
 
             if (!other.Any())
                 update = new HashFailInfo(key, false);
@@ -112,7 +121,7 @@ public static class Security
         {
             message = FileOpStatusConverter.StatusString(typeof(HashFailInfo), source.Count() - fails, fails, total: true);
         }
-        
+
         op.StatusInfo = fails > 0
             ? new FailedOpProgressViewModel(message)
             : new CompletedShellProgressViewModel(message);
