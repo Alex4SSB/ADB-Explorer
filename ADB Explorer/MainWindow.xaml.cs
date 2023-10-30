@@ -368,7 +368,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (FileOperationQueue.NotifyProperties.Contains(e.PropertyName))
             UpdateFileOp();
 
+        if (e.PropertyName is nameof(FileOperationQueue.CurrentOperation))
+            RefreshFileOps();
+
         UpdateSelectedFileOp();
+    }
+
+    private void RefreshFileOps()
+    {
+        var collectionView = CollectionViewSource.GetDefaultView(CurrentOperationDetailedDataGrid.ItemsSource);
+        if (collectionView is null)
+            return;
+
+        collectionView.SortDescriptions.Clear();
+        collectionView.SortDescriptions.Add(new(nameof(FileOperation.Status), ListSortDirection.Ascending));
     }
 
     private void UpdateFileOp()

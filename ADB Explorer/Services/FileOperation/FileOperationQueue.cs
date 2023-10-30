@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -16,7 +15,10 @@ public class FileOperationQueue : ViewModelBase
         private set
         {
             if (Set(ref currentOperationIndex, value))
+            {
+                OnPropertyChanged(nameof(CurrentOperation));
                 UpdateProgress();
+            }
         }
     }
 

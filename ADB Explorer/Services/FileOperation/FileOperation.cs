@@ -10,11 +10,11 @@ public abstract class FileOperation : ViewModelBase
 {
     public enum OperationStatus
     {
-        Waiting,
         InProgress,
+        Waiting,
         Completed,
-        Canceled,
         Failed,
+        Canceled,
     }
 
     public enum OperationType
