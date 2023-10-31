@@ -308,6 +308,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isPastViewVisible, value);
     }
 
+    private string adbDiskUsage = null;
+    public string AdbDiskUsage
+    {
+        get => adbDiskUsage;
+        set => Set(ref adbDiskUsage, value);
+    }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public bool IsWin11 =>

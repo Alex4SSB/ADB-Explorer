@@ -140,6 +140,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
 
+        RuntimeSettings.AdbDiskUsage = FileOpQ.IsActive ? AdbHelper.GetAdbDiskUsage() : null;
+
         if (Settings.PollDevices
             && MdnsService?.State is MDNS.MdnsState.Running
             && DateTime.Now.Subtract(RuntimeSettings.LastServerResponse) > MDNS_FORCE_CONNECT_TIME)

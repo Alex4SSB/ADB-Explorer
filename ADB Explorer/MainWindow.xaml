@@ -26,8 +26,8 @@
     SizeChanged="Window_SizeChanged"
     SourceInitialized="Window_SourceInitialized"
     StateChanged="MainWin_StateChanged"
-    WindowStartupLocation="CenterScreen"
     Style="{StaticResource WindowStyle}"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Window.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
@@ -493,14 +493,9 @@
                     </Grid>
                 </Expander.Content>
             </Expander>
-            <Grid Grid.Row="3">
+            <Grid Grid.Row="3" Margin="6,0">
                 <Grid.Resources>
-                    <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
-                        <Setter Property="Margin" Value="8,6" />
-                    </Style>
-                    <Style x:Key="MarginedTextBlockStyle" TargetType="TextBlock">
-                        <Setter Property="Margin" Value="0,4" />
-                    </Style>
+                    <Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator" />
                     <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock" />
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -508,10 +503,7 @@
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <StackPanel
-                    Margin="8,0"
-                    Orientation="Horizontal"
-                    Style="{StaticResource ItemsCountContainerStyle}">
+                <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountContainerStyle}">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                         <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
                         <TextBlock Text=" item" />
@@ -526,20 +518,10 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock x:Name="UnfinishedBlock" Text=" *">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Setter Property="Cursor" Value="Arrow" />
-                                    <Style.Triggers>
-                                        <Trigger Property="Visibility" Value="Visible">
-                                            <Setter Property="Cursor" Value="AppStarting" />
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                        <Separator />
+                        <TextBlock
+                            x:Name="UnfinishedBlock"
+                            Style="{StaticResource UnfinishedTextblockStyle}"
+                            Text=" *" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <StackPanel.Style>
@@ -551,6 +533,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
+                        <Separator />
                         <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
                         <TextBlock Text=" item" />
                         <TextBlock Text="s">
@@ -567,65 +550,30 @@
                         <TextBlock Text=" selected" />
                         <TextBlock
                             x:Name="TotalSizeBlock"
-                            Margin="6,4,0,4"
+                            Margin="6,4"
                             Style="{StaticResource TotalSizeStyle}"
                             Text="{Binding ElementName=MainWin, Path=SelectedFilesTotalSize}" />
-                        <Separator />
                     </StackPanel>
                 </StackPanel>
                 <StackPanel
                     Grid.Column="2"
-                    Margin="6,0"
                     HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}"
                     Orientation="Horizontal">
-                    <ui:SimpleStackPanel
-                        x:Name="CurrentDeviceDetailsPanel"
-                        VerticalAlignment="Center"
-                        DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}"
-                        Orientation="Horizontal"
-                        Spacing="6">
-                        <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />
-                        <Separator Margin="2,6">
-                            <Separator.Style>
-                                <Style BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" TargetType="Separator">
-                                    <Setter Property="Margin" Value="8,6" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=CurrentDeviceBatteryIcon, Path=Visibility}" Value="Collapsed">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding ElementName=AndroidTextBlock, Path=Visibility}" Value="Collapsed">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Separator.Style>
-                        </Separator>
-                        <ui:FontIcon
-                            x:Name="UnsupportedAndroidIcon"
-                            Glyph="&#xE7BA;"
-                            Style="{DynamicResource UnsupportedIconStyle}"
-                            ToolTip="Limited Support" />
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock
-                                x:Name="AndroidTextBlock"
-                                Style="{StaticResource AndroidTextBlockStyle}"
-                                Text="Android " />
-                            <TextBlock x:Name="AndroidVersionBlock" Text="{Binding AndroidVersion}" />
-                            <TextBlock Text=" (Recovery)">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Margin" Value="0,4" />
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Type}" Value="Recovery">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
-                        </StackPanel>
-                    </ui:SimpleStackPanel>
+                    <StackPanel Orientation="Horizontal" Style="{StaticResource DiskUsagePanelStyle}">
+                        <TextBlock Text="ADB Disk Usage: " />
+                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbDiskUsage}" />
+                        <Separator Style="{StaticResource DiskUsageSeparatorStyle}" />
+                    </StackPanel>
+                    <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />
+                    <StackPanel Orientation="Horizontal" Style="{StaticResource AndroidTextBlockStyle}">
+                        <Separator Style="{StaticResource CurrentDeviceBatterySeparatorStyle}" />
+                        <ui:FontIcon Style="{DynamicResource UnsupportedIconStyle}" />
+                        <TextBlock Text="Android " />
+                        <TextBlock Text="{Binding AndroidVersion}" />
+                        <TextBlock Style="{StaticResource AndroidVersionRecoveryTextblockStyle}" Text=" (Recovery)" />
+                    </StackPanel>
                     <Menu Margin="6,0,-3,0" Style="{StaticResource LogToggleStyle}" />
                 </StackPanel>
             </Grid>

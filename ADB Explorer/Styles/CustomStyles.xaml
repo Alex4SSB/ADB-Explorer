@@ -351,16 +351,15 @@
         x:Key="UnsupportedIconStyle"
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
-        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="Glyph" Value="&#xE7BA;" />
+        <Setter Property="ToolTip" Value="Limited Support" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding AndroidVersionIncompatible}" Value="True">
-                <Setter Property="Visibility" Value="Visible" />
+            <DataTrigger Binding="{Binding AndroidVersionIncompatible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="AndroidTextBlockStyle" TargetType="TextBlock">
-        <Setter Property="Visibility" Value="Visible" />
-        <Setter Property="Margin" Value="0,4" />
+    <Style x:Key="AndroidTextBlockStyle" TargetType="StackPanel">
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -805,12 +804,78 @@
         <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
         <Setter Property="BorderThickness" Value="1" />
     </Style>
-    <Style x:Key="WindowStyle" TargetType="Window" BasedOn="{StaticResource DefaultWindowStyle}">
+    <Style
+        x:Key="WindowStyle"
+        BasedOn="{StaticResource DefaultWindowStyle}"
+        TargetType="Window">
         <Setter Property="Title" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AppTitle}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRootActive}" Value="True">
                 <Setter Property="ui:TitleBar.Background" Value="OrangeRed" />
             </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DiskUsagePanelStyle" TargetType="StackPanel">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbDiskUsage}" Value="{x:Null}">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="StatusBarSeparatorStyle"
+        BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
+        TargetType="Separator">
+        <Setter Property="Margin" Value="8,6" />
+    </Style>
+    <Style
+        x:Key="CurrentDeviceBatterySeparatorStyle"
+        BasedOn="{StaticResource StatusBarSeparatorStyle}"
+        TargetType="Separator">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=CurrentDeviceBatteryIcon, Path=Visibility}" Value="Collapsed">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DiskUsageSeparatorStyle"
+        BasedOn="{StaticResource StatusBarSeparatorStyle}"
+        TargetType="Separator">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding AndroidVersion}" Value="{x:Null}" />
+                    <Condition Binding="{Binding ElementName=CurrentDeviceBatteryIcon, Path=Visibility}" Value="Collapsed" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Collapsed" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="MarginedTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,4" />
+    </Style>
+    <Style
+        x:Key="AndroidVersionRecoveryTextblockStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Type}" Value="Recovery">
+                <Setter Property="Visibility" Value="Visible" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="UnfinishedTextblockStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Setter Property="Cursor" Value="Arrow" />
+        <Style.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="Cursor" Value="AppStarting" />
+            </Trigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

@@ -15,7 +15,7 @@ public partial class ADBService
         {
             if (adbPath == "")
             {
-                adbPath = Settings.ManualAdbPath is string path && !string.IsNullOrEmpty(path) ? $"\"{path}\"" : "adb";
+                adbPath = Settings.ManualAdbPath is string path && !string.IsNullOrEmpty(path) ? $"\"{path}\"" : ADB_PROCESS;
             }
             return adbPath;
         }

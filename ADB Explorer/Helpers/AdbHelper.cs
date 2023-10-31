@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
@@ -8,18 +9,13 @@ internal static class AdbHelper
 {
     public static Task<bool> CheckAdbVersion() => Task.Run(() =>
     {
-        if (string.IsNullOrEmpty(Data.Settings.ManualAdbPath))
-        {
-            Data.RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion("adb");
-            if (Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION)
-                return true;
-        }
-        else
-        {
-            Data.RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion($"\"{Data.Settings.ManualAdbPath}\"");
-            if (Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION)
-                return true;
-        }
+        string adbPath = string.IsNullOrEmpty(Data.Settings.ManualAdbPath)
+            ? AdbExplorerConst.ADB_PROCESS
+            : $"\"{Data.Settings.ManualAdbPath}\"";
+
+        Data.RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion(adbPath);
+        if (Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION)
+            return true;
 
         App.Current.Dispatcher.Invoke(() =>
         {
@@ -158,4 +154,25 @@ internal static class AdbHelper
                 ADBService.EscapeAdbString(windowsPath),
                 ADBService.EscapeAdbString(androidPath)
             });
+
+    public static int? GetAdbPid() =>
+        Process.GetProcessesByName(AdbExplorerConst.ADB_PROCESS).FirstOrDefault()?.Id;
+
+    private static ulong prevDiskUsage = 0;
+
+    public static string GetAdbDiskUsage()
+    {
+        var pid = GetAdbPid();
+        if (pid is null)
+            return null;
+
+        ulong? currentUsage = Storage.GetDiskUsage(pid.Value);
+        if (currentUsage is null)
+            return null;
+
+        string result = prevDiskUsage == 0 ? null : (currentUsage.Value - prevDiskUsage).ToSize(true) + "/s";
+        prevDiskUsage = currentUsage.Value;
+
+        return result;
+    }
 }
