@@ -105,6 +105,8 @@
                                     Grid.ColumnSpan="2"
                                     Margin="{TemplateBinding BorderThickness}"
                                     Padding="{TemplateBinding Padding}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
                                     Foreground="{TemplateBinding ui:ControlHelper.PlaceholderForeground}"
                                     IsHitTestVisible="False"
                                     Text="{TemplateBinding ui:ControlHelper.PlaceholderText}"

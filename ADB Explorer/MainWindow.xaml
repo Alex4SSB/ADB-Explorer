@@ -1003,10 +1003,7 @@
                 </Border>
             </ui:SplitView.Pane>
         </ui:SplitView>
-        <Border
-            x:Name="SplashScreen"
-            d:Visibility="Collapsed"
-            Style="{StaticResource SplashScreenStyle}">
+        <Border d:Visibility="Collapsed" Style="{StaticResource SplashScreenStyle}">
             <Grid>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Image Width="150">

@@ -45,7 +45,7 @@ public static class UISettings
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableApk)), "Enable APK Handling", "Drives & Features"),
             }),
             new SettingsSeparator(),
-            new SettingsGroup("File Behavior", new()
+            new SettingsGroup("Explorer", new()
             {
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), "Show File Name Extensions", "File Behavior"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowHiddenItems)), "Show Hidden Items", "File Behavior"),

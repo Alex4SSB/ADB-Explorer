@@ -1103,21 +1103,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Enter or Key.Up or Key.Down or Key.Left or Key.Right or Key.Escape or Key.Home or Key.End)
+        var NavKeys = new[] { Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End };
+
+        if (Keyboard.IsKeyDown(Key.LeftAlt)
+            || Keyboard.IsKeyDown(Key.RightAlt)
+            || !NavKeys.Contains(e.Key))
+            return;
+
+        bool handle = false;
+
+        if (FileActions.IsExplorerVisible)
         {
-            bool handle = false;
-
-            if (FileActions.IsExplorerVisible)
-            {
-                handle |= ExplorerGridKeyNavigation(e.Key);
-            }
-            else if (FileActions.IsDriveViewVisible)
-            {
-                handle |= DriveViewKeyNavigation(e.Key);
-            }
-
-            e.Handled = handle;
+            handle |= ExplorerGridKeyNavigation(e.Key);
         }
+        else if (FileActions.IsDriveViewVisible)
+        {
+            handle |= DriveViewKeyNavigation(e.Key);
+        }
+
+        e.Handled = handle;
     }
 
     private bool DriveViewKeyNavigation(Key key)
