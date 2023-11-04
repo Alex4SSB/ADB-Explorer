@@ -22,9 +22,13 @@ public partial class ADBService
 
     public class AdbDevice : Device
     {
+        public DeviceViewModel Device { get; private set; }
+
+        public override string ID => Device.ID;
+
         public AdbDevice(DeviceViewModel other)
         {
-            ID = other.ID;
+            Device = other;
         }
 
         private const string CURRENT_DIR = ".";

@@ -58,7 +58,7 @@ public abstract class Device : AbstractDevice
         set => Set(ref ipAddress, value);
     }
 
-    public string ID { get; protected set; }
+    public virtual string ID { get; protected set; }
 
     #endregion
 

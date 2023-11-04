@@ -148,7 +148,16 @@ public partial class ADBService
 
         if (cmdProcess.ExitCode != 0)
         {
-            throw new ProcessFailedException(cmdProcess.ExitCode, stderr);
+            if (cmd == "-s"
+                && ExecuteDeviceAdbCommand(args[0], "get-state", out _, out string error) != 0
+                && error.StartsWith("error: device"))
+            {
+                // device is disconnected
+                // return without throwing
+                // command results are no longer relevant and will be cleared by DeviceListSetup()
+            }
+            else
+                throw new ProcessFailedException(cmdProcess.ExitCode, stderr);
         }
     }
 
@@ -299,7 +308,7 @@ public partial class ADBService
 
     public static bool WhoAmI(string deviceId)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out _) != 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out string stderr) != 0)
             return false;
 
         return stdout.Trim() == "root";
