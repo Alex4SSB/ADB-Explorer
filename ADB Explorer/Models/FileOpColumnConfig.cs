@@ -18,6 +18,7 @@ public static class FileOpColumns
             new(FileOpColumnConfig.ColumnType.Source, "Source", 200),
             new(FileOpColumnConfig.ColumnType.Dest, "Destination", 200),
             new(FileOpColumnConfig.ColumnType.TimeStamp, "Added", 70),
+            new(FileOpColumnConfig.ColumnType.Device, "Device", 100, visibleByDefault: false),
         };
 
         UpdateCheckedColumns();
@@ -41,6 +42,7 @@ public class FileOpColumnConfig : ViewModelBase
         Source,
         Dest,
         TimeStamp,
+        Device,
     }
 
     #region Full properties
@@ -124,13 +126,13 @@ public class FileOpColumnConfig : ViewModelBase
 
     #endregion
 
-    public FileOpColumnConfig(ColumnType type, string name, double defaultWidth = 0, string icon = null)
+    public FileOpColumnConfig(ColumnType type, string name, double defaultWidth = 0, string icon = null, bool visibleByDefault = true)
     {
         Type = type;
         Name = name;
         Icon = icon;
 
-        bool isChecked = true;
+        bool isChecked = visibleByDefault;
         int index = -1;
         double width = defaultWidth;
 
@@ -138,7 +140,7 @@ public class FileOpColumnConfig : ViewModelBase
         {
             var split = storage.Split(',');
             if (!bool.TryParse(split[0], out isChecked))
-                isChecked = true;
+                isChecked = visibleByDefault;
 
             if (!int.TryParse(split[1], out index))
                 index = -1;

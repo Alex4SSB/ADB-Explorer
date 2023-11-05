@@ -13,7 +13,7 @@
         TargetType="ui:ProgressBar">
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource DoubleEquals}, ConverterParameter=100, Path=Value}" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+                <Setter Property="ShowError" Value="True" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -424,4 +424,31 @@
         <Setter Property="RowDetailsTemplate" Value="{StaticResource FileOpRowDetailTemplate}" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
     </Style>
+    <Style
+        x:Key="FileOpDeviceTextblockStyle"
+        BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding Name}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+                <Setter Property="Text" Value="[Unauthorized]" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="Emulator">
+                <Setter Property="Text" Value="{Binding ID}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Type}" Value="Service" />
+                    <Condition Binding="{Binding Name}" Value="" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Text" Value="[Service]" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <DataTemplate x:Key="FileOpDeviceColumnStyle">
+        <TextBlock
+            Margin="4,0"
+            DataContext="{Binding Device.Device}"
+            Style="{StaticResource FileOpDeviceTextblockStyle}" />
+    </DataTemplate>
 </ResourceDictionary>

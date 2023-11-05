@@ -797,6 +797,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileOpColumnConfig.ColumnType.Source => SourceColumn,
             FileOpColumnConfig.ColumnType.Dest => DestColumn,
             FileOpColumnConfig.ColumnType.TimeStamp => TimeColumn,
+            FileOpColumnConfig.ColumnType.Device => DeviceColumn,
             _ => throw new NotSupportedException(),
         };
     });
@@ -809,6 +810,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (column == SourceColumn) return FileOpColumnConfig.ColumnType.Source;
         if (column == DestColumn) return FileOpColumnConfig.ColumnType.Dest;
         if (column == TimeColumn) return FileOpColumnConfig.ColumnType.TimeStamp;
+        if (column == DeviceColumn) return FileOpColumnConfig.ColumnType.Device;
 
         throw new NotSupportedException();
     }

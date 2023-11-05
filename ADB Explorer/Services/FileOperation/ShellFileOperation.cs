@@ -17,13 +17,16 @@ public abstract class AbstractShellFileOperation : FileOperation
     }
 
     public override void ClearChildren()
-        => TargetPath.Children.Clear();
+    {
+        AndroidPath.Children.Clear();
+        AndroidPath.ProgressUpdates.Clear();
+    }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => TargetPath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates);
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => TargetPath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates);
 }
 
 public static class ShellFileOperation

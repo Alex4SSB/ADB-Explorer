@@ -61,11 +61,14 @@ public class InProgressTestOperation : FileOperation
     }
 
     public override void ClearChildren()
-        => FilePath.Children.Clear();
+    {
+        AndroidPath.Children.Clear();
+        AndroidPath.ProgressUpdates.Clear();
+    }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => FilePath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates);
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => FilePath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates);
 }

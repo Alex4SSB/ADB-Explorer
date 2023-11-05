@@ -491,6 +491,14 @@ public static class DeviceHelper
         });
     }
 
+    public static IEnumerable<LogicalDeviceViewModel> ReconnectFileOpDevice(IEnumerable<LogicalDeviceViewModel> devices)
+    {
+        var exceptDevices = devices.Where(d => Data.FileOpQ.PastOperations.Any(op => op.Device.ID == d.ID));
+        var fileOpDevices = Data.FileOpQ.PastOperations.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
+
+        return devices.Except(exceptDevices).AppendRange(fileOpDevices);
+    }
+
     public static void DeviceListSetup(string selectedAddress = "")
     {
         Task.Run(ADBService.GetDevices).ContinueWith((t) => App.Current.Dispatcher.Invoke(() => DeviceListSetup(t.Result.Select(l => new LogicalDeviceViewModel(l)), selectedAddress)));
@@ -498,6 +506,7 @@ public static class DeviceHelper
 
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
     {
+        devices = ReconnectFileOpDevice(devices);
         var init = !Data.DevicesObject.UpdateDevices(devices);
         Data.RuntimeSettings.FilterDevices = true;
 

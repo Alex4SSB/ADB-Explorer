@@ -113,7 +113,10 @@ public class FileSyncOperation : FileOperation
     }
 
     public override void ClearChildren()
-        => AndroidPath.Children.Clear();
+    {
+        AndroidPath.Children.Clear();
+        progressUpdates.Clear();
+    }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
         => AndroidPath.AddUpdates(newUpdates);

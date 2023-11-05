@@ -22,11 +22,11 @@ public partial class ADBService
 
     public class AdbDevice : Device
     {
-        public DeviceViewModel Device { get; private set; }
+        public LogicalDeviceViewModel Device { get; private set; }
 
         public override string ID => Device.ID;
 
-        public AdbDevice(DeviceViewModel other)
+        public AdbDevice(LogicalDeviceViewModel other)
         {
             Device = other;
         }
