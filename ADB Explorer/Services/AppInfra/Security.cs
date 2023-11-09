@@ -44,15 +44,15 @@ public static class Security
         return new(folderHashes.Concat(fileHashes));
     }
 
-    public static Dictionary<string, string> CalculateAndroidFolderHash(string path)
+    public static Dictionary<string, string> CalculateAndroidFolderHash(FilePath path, Device device)
     {
         // find ./ -mindepth 1 -type f -exec md5sum {} \;
-        string[] args = { ADBService.EscapeAdbShellString(path), "-type", "f", "-exec", "md5sum", "{}", @"\;" };
-        ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out string stdout, out string stderr, args);
+        string[] args = { ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;" };
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "find", out string stdout, out string stderr, args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH.Matches(stdout);
         return list.Where(m => m.Success).ToDictionary(
-            m => FileHelper.ExtractRelativePath(m.Groups["Path"].Value.TrimEnd('\r', '\n'), path), 
+            m => FileHelper.ExtractRelativePath(m.Groups["Path"].Value.TrimEnd('\r', '\n'), path.FullPath), 
             m => m.Groups["Hash"].Value.ToUpper());
     }
 
@@ -75,13 +75,13 @@ public static class Security
             () =>
             {
                 source = (op.FilePath.PathType is AbstractFile.FilePathType.Android
-                    ? CalculateAndroidFolderHash(op.FilePath.FullPath)
+                    ? CalculateAndroidFolderHash(op.FilePath, op.Device)
                     : CalculateWindowsFolderHash(op.FilePath.FullPath)).OrderBy(k => k.Key);
             },
             () =>
             {
                 target = (op.TargetPath.PathType is AbstractFile.FilePathType.Android
-                    ? CalculateAndroidFolderHash(op.TargetPath.FullPath)
+                    ? CalculateAndroidFolderHash(op.TargetPath, op.Device)
                     : CalculateWindowsFolderHash(op.TargetPath.FullPath)).OrderBy(k => k.Key);
             });
         });

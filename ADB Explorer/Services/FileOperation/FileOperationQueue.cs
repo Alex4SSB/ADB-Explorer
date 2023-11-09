@@ -145,15 +145,20 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    public void MoveOperationsToPast(bool includeAll = false)
+    public void MoveOperationsToPast(bool includeAll = false, DeviceViewModel device = null)
     {
         try
         {
             mutex.WaitOne();
 
-            Func<FileOperation, bool> predicate = op =>
-                includeAll || op.Status is not FileOperation.OperationStatus.Waiting
-                                       and not FileOperation.OperationStatus.InProgress;
+            Func<FileOperation, bool> predicate = op => {
+                if (device is not null && op.Device.ID == device.ID)
+                    return false;
+
+                return includeAll || op.Status
+                    is not FileOperation.OperationStatus.Waiting
+                    and not FileOperation.OperationStatus.InProgress;
+            };
 
             var completed = Operations.Where(predicate).ToList();
             

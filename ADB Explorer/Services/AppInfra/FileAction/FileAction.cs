@@ -57,7 +57,7 @@ internal static class AppActions
             "Stop",
             "\uE71A"),
         new(FileActionType.FileOpPastView,
-            () => Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible,
+            () => Data.FileOpQ.Operations.Count + Data.FileOpQ.PastOperations.Count > 0,
             "Show Current Operations",
             Icons[FileActionType.OpenFileOps],
             FileActionLogic.TogglePastView,
@@ -376,19 +376,35 @@ internal static class AppActions
 
         new(FileActionType.FileOpRemovePending,
             () => Data.FileActions.IsFileOpRemovePendingEnabled,
-            () => Data.FileOpQ.ClearPending(),
+            () =>
+            {
+                Data.FileOpQ.ClearPending();
+                FileActionLogic.UpdateFileOpControls();
+            },
             "Pending"),
         new(FileActionType.FileOpRemoveCompleted,
             () => Data.FileActions.IsFileOpRemoveCompletedEnabled,
-            () => Data.FileOpQ.ClearCompleted(),
+            () =>
+            {
+                Data.FileOpQ.ClearCompleted();
+                FileActionLogic.UpdateFileOpControls();
+            },
             "Completed"),
         new(FileActionType.FileOpRemoveAll,
             () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
-            () => Data.FileOpQ.Clear(),
+            () =>
+            {
+                Data.FileOpQ.Clear();
+                FileActionLogic.UpdateFileOpControls();
+            },
             "All"),
         new(FileActionType.FileOpRemovePast,
             () => Data.FileActions.IsFileOpRemovePastEnabled,
-            () => Data.FileOpQ.ClearPast(),
+            () =>
+            {
+                Data.FileOpQ.ClearPast();
+                FileActionLogic.UpdateFileOpControls();
+            },
             "Previous"),
 
 #pragma warning restore IDE0200

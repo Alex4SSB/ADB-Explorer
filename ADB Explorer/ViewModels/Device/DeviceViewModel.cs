@@ -126,6 +126,9 @@ public abstract class DeviceViewModel : AbstractDevice
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(StatusIcon));
 
+            if (status is DeviceStatus.Offline)
+                Data.FileOpQ.MoveOperationsToPast(true, this);
+
             return true;
         }
 

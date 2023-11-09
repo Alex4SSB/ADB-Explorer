@@ -172,9 +172,15 @@ public class Devices : AbstractDevice
         bool isCurrentTypeUpdated = false;
 
         // First remove all devices that no longer exist
-        self.RemoveAll(thisDevice => thisDevice is LogicalDeviceViewModel && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
+        var devicesToRemove = self.Where(thisDevice => thisDevice is LogicalDeviceViewModel && !other.Any(otherDevice => otherDevice.ID == thisDevice.ID));
+        foreach (var item in devicesToRemove)
+        {
+            // Set status as offline for file op mechanism
+            item.SetStatus(DeviceStatus.Offline);
+        }
+        self.RemoveAll(devicesToRemove);
 
-        // Then update existing devices' types and names
+        // Then update existing devices' statuses and names
         foreach (var item in other)
         {
             if (self?.Find(thisDevice => thisDevice.ID == item.ID) is LogicalDeviceViewModel device)

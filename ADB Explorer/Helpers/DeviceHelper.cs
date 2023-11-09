@@ -547,17 +547,6 @@ public static class DeviceHelper
 
             NavHistory.Reset();
             DriveHelper.ClearDrives();
-
-            if (Data.FileOpQ.Operations.Count > 0)
-            {
-                Data.FileOpQ.MoveOperationsToPast(true);
-                var pastOpAction = AppActions.ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpPastView);
-
-                if (!pastOpAction.IsChecked)
-                    pastOpAction.FileAction.Command.Execute();
-
-                Data.FileOpQ.IsActive = false;
-            }
         }
     }
 
@@ -576,6 +565,7 @@ public static class DeviceHelper
         Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;
         Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not DeviceType.Recovery;
 
+        Data.FileOpQ.MoveOperationsToPast();
         FileActionLogic.UpdateFileActions();
 
         AdbHelper.VerifyProgressRedirection();

@@ -737,16 +737,17 @@ internal static class FileActionLogic
 
     private static void PushOpeartion_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        var pushOperation = sender as FileSyncOperation;
+        var op = sender as FileSyncOperation;
 
         // If operation completed now and current path is where the new file was pushed to and it is not shown yet
         if (e.PropertyName is nameof(FileSyncOperation.Status)
-            && pushOperation.Status is FileOperation.OperationStatus.Completed
-            && pushOperation.TargetPath.ParentPath == Data.CurrentPath
-            && !Data.DirList.FileList.Any(f => f.FullName == pushOperation.FilePath.FullName))
+            && op.Status is FileOperation.OperationStatus.Completed
+            && op.Device.ID == Data.CurrentADBDevice.ID
+            && op.TargetPath.ParentPath == Data.CurrentPath
+            && !Data.DirList.FileList.Any(f => f.FullName == op.FilePath.FullName))
         {
-            Data.DirList.FileList.Add(FileClass.FromWindowsPath(pushOperation.TargetPath, pushOperation.FilePath.ShellObject));
-            pushOperation.FilePath.ShellObject = null;
+            Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject));
+            op.FilePath.ShellObject = null;
         }
     }
 

@@ -152,7 +152,8 @@ public abstract class FileOperation : ViewModelBase
             if (Status is not OperationStatus.Completed)
                 return false;
 
-            return !StatusInfo.IsValidationInProgress;
+            return !StatusInfo.IsValidationInProgress 
+                && Device.Device.Status is AbstractDevice.DeviceStatus.Ok;
         }
     }
 
