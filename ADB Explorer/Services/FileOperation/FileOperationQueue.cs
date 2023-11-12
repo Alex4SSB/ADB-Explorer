@@ -152,7 +152,7 @@ public class FileOperationQueue : ViewModelBase
             mutex.WaitOne();
 
             Func<FileOperation, bool> predicate = op => {
-                if (device is not null && op.Device.ID == device.ID)
+                if (device is not null && op.Device.ID != device.ID)
                     return false;
 
                 return includeAll || op.Status

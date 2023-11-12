@@ -23,4 +23,13 @@ internal static class ListHelper
             yield return item;
         }
     }
+
+    /// <summary>
+    /// Determines whether all elements of a sequence satisfy a condition
+    /// </summary>
+    /// <returns><see langword="true"/> if the source sequence contains any elements and every element passes the test in the specified predicate; otherwise, <see langword="false"/></returns>
+    public static bool AnyAll<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+    {
+        return source.Any() && source.All(predicate);
+    }
 }

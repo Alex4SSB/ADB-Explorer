@@ -38,21 +38,21 @@ public abstract class Device : AbstractDevice
     #region Full properties
 
     private DeviceType type;
-    public DeviceType Type
+    public virtual DeviceType Type
     {
         get => type;
         protected set => Set(ref type, value);
     }
 
     private DeviceStatus status;
-    public DeviceStatus Status
+    public virtual DeviceStatus Status
     {
         get => status;
         set => Set(ref status, value);
     }
 
     private string ipAddress;
-    public string IpAddress
+    public virtual string IpAddress
     {
         get => ipAddress;
         set => Set(ref ipAddress, value);

@@ -478,7 +478,10 @@
                                         x:Name="TimeColumn"
                                         CellTemplate="{StaticResource FileOpTimeStampTemplate}"
                                         SortMemberPath="StatusInfo.Time" />
-                                    <DataGridTemplateColumn x:Name="DeviceColumn" CellTemplate="{StaticResource FileOpDeviceColumnStyle}" />
+                                    <DataGridTemplateColumn
+                                        x:Name="DeviceColumn"
+                                        CellTemplate="{StaticResource FileOpDeviceColumnStyle}"
+                                        SortMemberPath="Device.Device.Name" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Border
