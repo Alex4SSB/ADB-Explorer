@@ -311,10 +311,9 @@ public class FileClass : FileStat
 
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
-        if (propertyName == "FileName" || propertyName == "Type" || propertyName == "IsLink")
+        if (propertyName is nameof(FullName) or nameof(Type) or nameof(IsLink))
         {
-            Icon = GetIcon();
-            TypeName = GetTypeName();
+            UpdateType();
         }
 
         return base.Set(ref storage, value, propertyName);

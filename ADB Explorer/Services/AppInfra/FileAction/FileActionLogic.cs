@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
@@ -860,5 +861,10 @@ internal static class FileActionLogic
         Data.RuntimeSettings.GroupsExpanded ^= true;
 
         Data.RuntimeSettings.RefreshSettingsControls = true;
+    }
+
+    public static void UpdateValidation()
+    {
+        Data.FileActions.ValidateAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
     }
 }

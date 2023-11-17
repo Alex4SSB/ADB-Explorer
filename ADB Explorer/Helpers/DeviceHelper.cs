@@ -3,10 +3,8 @@ using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
-using System.Linq;
 using Windows.Management.Deployment;
 using static ADB_Explorer.Models.AbstractDevice;
-using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Helpers;
 
@@ -500,7 +498,7 @@ public static class DeviceHelper
         // get the corresponding file op devices
         var fileOpDevices = Data.FileOpQ.PastOperations.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
 
-        return devices.Except(exceptDevices).AppendRange(fileOpDevices);
+        return devices.Except(exceptDevices, new LogicalDeviceViewModelEqualityComparer()).AppendRange(fileOpDevices.Distinct());
     }
 
     public static void DeviceListSetup(string selectedAddress = "")

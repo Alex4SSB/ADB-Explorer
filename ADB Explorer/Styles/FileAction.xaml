@@ -346,7 +346,7 @@
         <Setter Property="ItemsControl.ItemsSource" Value="{Binding Source={x:Static Member=services:FileOpControls.List}}" />
     </Style>
     <ItemsPanelTemplate x:Key="VerticalItemsPanel">
-        <WrapPanel Orientation="Vertical" />
+        <WrapPanel FlowDirection="RightToLeft" Orientation="Vertical" />
     </ItemsPanelTemplate>
     <Style
         x:Key="DetailedFileOpControlsStyle"

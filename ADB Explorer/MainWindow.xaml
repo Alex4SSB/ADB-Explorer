@@ -451,6 +451,7 @@
                                 ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}"
                                 KeyUp="CurrentOperationDetailedDataGrid_KeyUp"
                                 PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                                RowStyle="{StaticResource FileOpRowStyle}"
                                 SelectionChanged="CurrentOperationDetailedDataGrid_SelectionChanged"
                                 Style="{StaticResource DetailedFileOpGridStyle}">
                                 <DataGrid.Columns>

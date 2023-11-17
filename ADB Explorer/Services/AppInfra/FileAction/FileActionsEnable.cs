@@ -443,6 +443,8 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = Enumerable.Empty<FileOperation>() };
 
+    public ObservableProperty<string> ValidateAction = new();
+
     #endregion
 
     #region read only

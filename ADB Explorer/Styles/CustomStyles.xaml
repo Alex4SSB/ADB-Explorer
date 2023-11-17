@@ -94,6 +94,16 @@
         </Style.Resources>
     </Style>
     <Style
+        x:Key="DisabledTooltipTextBlockStyle"
+        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Gray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
         x:Key="FileNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
         TargetType="TextBlock" />

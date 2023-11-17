@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -8,11 +7,11 @@ public abstract class FileOpProgressInfo : ViewModelBase
 {
     public string AndroidPath { get; protected set; }
 
-    public void SetPathToCurrent()
+    public void SetPathToCurrent(FileOperation op)
     {
-        string currentPath = ((InProgSyncProgressViewModel)Data.FileOpQ.CurrentOperation.StatusInfo).CurrentFilePath;
+        string currentPath = ((InProgSyncProgressViewModel)op.StatusInfo).CurrentFilePath;
         if (string.IsNullOrEmpty(currentPath))
-            currentPath = FileHelper.ConcatPaths(Data.FileOpQ.CurrentOperation.TargetPath, Data.FileOpQ.CurrentOperation.FilePath.FullName);
+            currentPath = FileHelper.ConcatPaths(op.TargetPath, op.FilePath.FullName);
 
         AndroidPath = currentPath;
     }

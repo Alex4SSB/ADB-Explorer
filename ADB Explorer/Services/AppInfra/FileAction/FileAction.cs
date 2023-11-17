@@ -432,7 +432,7 @@ internal static class AppActions
         new(FileActionType.FileOpValidate,
             () => Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
             Security.ValidateOps,
-            "Validate Operation(s)"),
+            Data.FileActions.ValidateAction),
     };
 
     public static List<KeyBinding> Bindings =>

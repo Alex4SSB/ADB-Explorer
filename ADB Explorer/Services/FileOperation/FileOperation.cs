@@ -59,6 +59,8 @@ public abstract class FileOperation : ViewModelBase
                     CancelTokenSource = value is OperationStatus.InProgress ? new() : null;
 
                     OnPropertyChanged(nameof(ValidationAllowed));
+
+                    LastProgress = 0;
                 }
             });
         }
@@ -85,9 +87,13 @@ public abstract class FileOperation : ViewModelBase
 
     public virtual SyncFile TargetPath { get; protected set; }
 
+    public double LastProgress = 0.0;
+
     #endregion
 
     #region Read-only Properties
+
+    public string TypeOnDevice => $"{OperationName}@{Device.ID}";
 
     public ObservableList<SyncFile> Children => AndroidPath.Children;
 

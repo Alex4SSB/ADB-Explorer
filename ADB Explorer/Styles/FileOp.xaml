@@ -29,7 +29,7 @@
     </Style>
     <Style
         x:Key="BoldInProgressTextBlockStyle"
-        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        BasedOn="{StaticResource DisabledTooltipTextBlockStyle}"
         TargetType="TextBlock">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Status}" Value="InProgress">
@@ -101,7 +101,7 @@
             </TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="1">
                 <TextBlock.Style>
-                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                    <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock">
                         <Setter Property="FontWeight" Value="Bold" />
                         <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
                         <Style.Triggers>
@@ -230,6 +230,9 @@
     </DataTemplate>
     <DataTemplate x:Key="CompletedSyncProgressInnerTemplate">
         <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+            <Grid.Resources>
+                <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
+            </Grid.Resources>
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -248,7 +251,6 @@
             </Grid>
             <TextBlock
                 Grid.Row="1"
-                Style="{StaticResource InvisibleTextBlockStyle}"
                 Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext, Converter={StaticResource CompletedStatsConverter}}"
                 TextTrimming="CharacterEllipsis" />
         </Grid>
@@ -256,7 +258,7 @@
     <Style x:Key="CompletedIconProgressPanelStyle" TargetType="Grid">
         <Setter Property="Margin" Value="4,0" />
         <Style.Resources>
-            <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock" />
+            <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="Margin" Value="0,0,4,0" />
@@ -428,27 +430,35 @@
         x:Key="FileOpDeviceTextblockStyle"
         BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Name}" />
+        <Setter Property="Text" Value="{Binding Device.Device.Name}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Unauthorized">
                 <Setter Property="Text" Value="[Unauthorized]" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Emulator">
-                <Setter Property="Text" Value="{Binding ID}" />
+            <DataTrigger Binding="{Binding Device.Device.Type}" Value="Emulator">
+                <Setter Property="Text" Value="{Binding Device.Device.ID}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Type}" Value="Service" />
-                    <Condition Binding="{Binding Name}" Value="" />
+                    <Condition Binding="{Binding Device.Device.Type}" Value="Service" />
+                    <Condition Binding="{Binding Device.Device.Name}" Value="" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Text" Value="[Service]" />
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <DataTemplate x:Key="FileOpDeviceColumnStyle">
-        <TextBlock
-            Margin="4,0"
-            DataContext="{Binding Device.Device}"
-            Style="{StaticResource FileOpDeviceTextblockStyle}" />
+        <TextBlock Margin="4,0" Style="{StaticResource FileOpDeviceTextblockStyle}" />
     </DataTemplate>
+    <Style
+        x:Key="FileOpRowStyle"
+        BasedOn="{StaticResource DefaultDataGridRowStyle}"
+        TargetType="DataGridRow">
+        <Setter Property="IsEnabled" Value="False" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
