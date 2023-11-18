@@ -18,12 +18,14 @@ namespace ADB_Explorer.Models
 
         public static string StringFromLocation(SpecialLocation location) => $"[{Enum.GetName(typeof(SpecialLocation), location)}]";
 
-        public static SpecialLocation LocationFromString(string location)
+        public static SpecialLocation LocationFromString(object location)
         {
-            if (location.EndsWith(']') && location.StartsWith('[') && Enum.TryParse<SpecialLocation>(location.Trim('[', ']'), out var result))
+            if (location is string loc && loc.EndsWith(']') && loc.StartsWith('[') && Enum.TryParse<SpecialLocation>(loc.Trim('[', ']'), out var result))
             {
                 return result;
             }
+            else if (location is SpecialLocation special)
+                return special;
             else
                 return SpecialLocation.None;
         }

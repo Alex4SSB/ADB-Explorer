@@ -1,11 +1,17 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
 internal class FileActionsEnable : ViewModelBase
 {
+    public FileActionsEnable()
+    {
+        SelectedFileOps.PropertyChanged += (object sender, PropertyChangedEventArgs<IEnumerable<FileOperation>> e) => FileActionLogic.UpdateValidation();
+    }
+
     #region booleans
 
     private bool pushPullEnabled = true;
@@ -444,6 +450,8 @@ internal class FileActionsEnable : ViewModelBase
     public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = Enumerable.Empty<FileOperation>() };
 
     public ObservableProperty<string> ValidateAction = new();
+
+    public ObservableProperty<string> RemoveFileOpAction = new();
 
     #endregion
 

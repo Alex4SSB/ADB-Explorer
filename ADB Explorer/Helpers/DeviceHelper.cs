@@ -96,7 +96,6 @@ public static class DeviceHelper
 
     public static void BrosweDeviceAction(LogicalDeviceViewModel device)
     {
-        Data.CurrentADBDevice = new(device);
         Data.RuntimeSettings.DeviceToOpen = device;
     }
 
@@ -637,6 +636,7 @@ public static class DeviceHelper
 
     public static void OpenDevice(LogicalDeviceViewModel device)
     {
+        Data.CurrentADBDevice = new(device);
         Data.DevicesObject.SetOpenDevice(device);
         Data.RuntimeSettings.InitLister = true;
         FileActionLogic.ClearExplorer();

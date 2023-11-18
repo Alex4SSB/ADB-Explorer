@@ -165,12 +165,36 @@ public abstract class FileOperation : ViewModelBase
 
     #endregion
 
+    public BaseAction SourceAction { get; private set; }
+    public BaseAction TargetAction { get; private set; }
+
     public FileOperation(FilePath filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
     {
         Dispatcher = dispatcher;
         Device = adbDevice;
         FilePath = filePath;
         Status = OperationStatus.Waiting;
+
+        SourceAction = new(
+            () => FilePath.PathType is AbstractFile.FilePathType.Windows || Device.Status is AbstractDevice.DeviceStatus.Ok,
+            () => OpenLocation(FilePath));
+
+        TargetAction = new(
+            () => TargetPath.PathType is AbstractFile.FilePathType.Windows || (Device.Status is AbstractDevice.DeviceStatus.Ok && OperationName is not OperationType.Delete),
+            () => OpenLocation(TargetPath));
+    }
+
+    private void OpenLocation(FilePath file)
+    {
+        if (file.PathType is AbstractFile.FilePathType.Windows)
+            Process.Start("explorer.exe", file.ParentPath);
+        else
+        {
+            if (!Device.Device.IsOpen)
+                Data.RuntimeSettings.DeviceToOpen = Device.Device;
+
+            Data.RuntimeSettings.LocationToNavigate = file.ParentPath;
+        }
     }
 
     public void SetValidation(bool value)

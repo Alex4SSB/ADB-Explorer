@@ -208,9 +208,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             NavigateToPath(ParentPath);
                             break;
                         case not null:
-                            if (FileActions.IsDriveViewVisible
-                            && (RuntimeSettings.LocationToNavigate is NavHistory.SpecialLocation.DriveView
-                                || (RuntimeSettings.LocationToNavigate is string location && location == NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView))))
+                            if (FileActions.IsDriveViewVisible && NavHistory.LocationFromString(RuntimeSettings.LocationToNavigate) is NavHistory.SpecialLocation.DriveView)
                                 FileActionLogic.RefreshDrives(true);
                             else
                             {
@@ -363,14 +361,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             case nameof(FileActionsEnable.PasteEnabled):
                 FilterFileActions();
                 FilterExplorerContextMenu();
-                break;
-
-            case nameof(FileActionsEnable.ValidateAction):
-                RefreshFileOps();
-                break;
-
-            case nameof(FileActionsEnable.SelectedFileOps):
-                FileActionLogic.UpdateValidation();
                 break;
         }
     }
@@ -1052,14 +1042,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
 
-        if (location is string path)
-        {
-            if (!FileActions.IsExplorerVisible)
-                InitNavigation(path, bfNavigated);
-            else
-                NavigateToPath(path, bfNavigated);
-        }
-        else if (location is NavHistory.SpecialLocation.DriveView)
+        if (NavHistory.LocationFromString(location) is NavHistory.SpecialLocation.DriveView)
         {
             FileActions.IsRecycleBin = false;
             RuntimeSettings.IsPathBoxFocused = false;
@@ -1067,6 +1050,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             DriveViewNav();
 
             FileActionLogic.UpdateFileActions();
+        }
+        else if (location is string path)
+        {
+            if (!FileActions.IsExplorerVisible)
+                InitNavigation(path, bfNavigated);
+            else
+                NavigateToPath(path, bfNavigated);
         }
     }
 

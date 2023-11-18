@@ -132,50 +132,6 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    public void ClearPast()
-    {
-        try
-        {
-            mutex.WaitOne();
-
-            PastOperations.Clear();
-        }
-        finally
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
-    public void ClearCompleted()
-    {
-        try
-        {
-            mutex.WaitOne();
-
-            Operations.RemoveAll(op => op.Status
-                is not FileOperation.OperationStatus.Waiting
-                and not FileOperation.OperationStatus.InProgress);
-        }
-        finally
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
-    public void ClearPending()
-    {
-        try
-        {
-            mutex.WaitOne();
-
-            Operations.RemoveAll(op => op.Status is FileOperation.OperationStatus.Waiting);
-        }
-        finally 
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
     private void UpdateProgress()
     {
         var pending = Operations.Where(op => op.Status is FileOperation.OperationStatus.Waiting);
@@ -218,13 +174,6 @@ public class FileOperationQueue : ViewModelBase
         
         if (isPush && !App.Current.Dispatcher.HasShutdownStarted)
             Data.RuntimeSettings.Refresh = true;
-    }
-
-    public void Clear()
-    {
-        Stop();
-        ClearCompleted();
-        ClearPending();
     }
 
     private void MoveToCompleted(FileOperation op)

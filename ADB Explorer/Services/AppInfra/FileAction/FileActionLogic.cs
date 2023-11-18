@@ -865,6 +865,9 @@ internal static class FileActionLogic
 
     public static void UpdateValidation()
     {
+        Data.FileActions.RemoveFileOpAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
         Data.FileActions.ValidateAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
+
+        Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 }
