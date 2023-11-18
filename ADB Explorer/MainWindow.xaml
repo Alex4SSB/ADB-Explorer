@@ -511,18 +511,7 @@
                 <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountContainerStyle}">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                         <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
-                        <TextBlock Text=" item" />
-                        <TextBlock Text="s">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                        <TextBlock Style="{StaticResource ItemsCountSuffixStyle}" />
                         <TextBlock
                             x:Name="UnfinishedBlock"
                             Style="{StaticResource UnfinishedTextblockStyle}"
@@ -540,18 +529,7 @@
                         </StackPanel.Style>
                         <Separator />
                         <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
-                        <TextBlock Text=" item" />
-                        <TextBlock Text="s">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                        <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
                         <TextBlock Text=" selected" />
                         <TextBlock
                             x:Name="TotalSizeBlock"

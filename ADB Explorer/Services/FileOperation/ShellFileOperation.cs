@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 
 namespace ADB_Explorer.Services;
 
@@ -217,7 +218,7 @@ public static class ShellFileOperation
             if (existingItems.Length is int count and > 0)
             {
                 var result = await DialogService.ShowConfirmation(
-                    $"There {(count > 1 ? "are" : "is")} {count} conflicting item{(count > 1 ? "s" : "")} in {destination}",
+                    $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
                     "Paste Conflicts",
                     primaryText: primaryText,
                     secondaryText: count == pasteItems.Count() ? "" : "Skip",

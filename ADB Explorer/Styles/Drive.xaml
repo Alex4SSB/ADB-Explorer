@@ -63,15 +63,6 @@
     <Style x:Key="DriveItemsCountTextBlockStyle" TargetType="TextBlock">
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
-    <Style x:Key="ItemsCountStyle" TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
-        <Setter Property="Margin" Value="0,4" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=ItemsSource.Count}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style
         x:Key="DriveContainerStyle"
         BasedOn="{StaticResource ListViewItemContainerStyle}"

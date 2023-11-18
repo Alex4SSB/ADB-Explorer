@@ -2,14 +2,11 @@
 
 namespace ADB_Explorer.Converters;
 
-internal class PluralityConverter : IValueConverter
+internal static class PluralityConverter
 {
-    public static string Convert<T>(IEnumerable<T> value, string parameter = null) => (string)new PluralityConverter().Convert(value, typeof(T), parameter);
+    public static string Convert<T>(ObservableProperty<IEnumerable<T>> value, string parameter = null) => Convert(value.Value, parameter);
 
-    public static string Convert<T>(ObservableProperty<IEnumerable<T>> value, string parameter = null) => (string)new PluralityConverter().Convert(value.Value, typeof(T), parameter);
-
-
-    public object Convert(object value, Type targetType = null, object parameter = null, CultureInfo culture = null)
+    public static string Convert<T>(IEnumerable<T> value, string parameter = "")
     {
         int? count;
 
@@ -18,11 +15,6 @@ internal class PluralityConverter : IValueConverter
         else
             return null;
 
-        return (parameter is string ? parameter : "") + (count > 1 ? "s" : "");
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
+        return parameter + (count > 1 ? "s" : "");
     }
 }

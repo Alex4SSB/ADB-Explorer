@@ -246,4 +246,7 @@
     <Style TargetType="ContentPresenter">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
     </Style>
+    <Style x:Key="MarginedTextBlockStyle" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0,4" />
+    </Style>
 </ResourceDictionary>

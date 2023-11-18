@@ -289,7 +289,7 @@ internal static class FileActionLogic
             Data.FileActions.IsCutState.Value = false;
         }
 
-        Data.FileActions.PasteAction.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} Item{(Data.CutItems.Count > 1 ? "s" : "")}";
+        Data.FileActions.PasteAction.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} {PluralityConverter.Convert(Data.CutItems, "Item")}";
 
         if (Data.CutItems.Count < 1 || Data.FileActions.IsRecycleBin || !Data.FileActions.IsExplorerVisible)
             return false;
