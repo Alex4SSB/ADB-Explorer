@@ -753,12 +753,18 @@
                                             HorizontalAlignment="Center"
                                             Orientation="Horizontal"
                                             Spacing="10">
-                                            <Button Content="Kill Server" Style="{StaticResource AccentButtonStyle}">
+                                            <Button
+                                                Click="RestartAdbButton_Click"
+                                                Content="Kill Server"
+                                                Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="adb kill-server" />
                                                 </Button.ToolTip>
                                             </Button>
-                                            <Button Content="Kill Process" Style="{StaticResource AccentButtonStyle}">
+                                            <Button
+                                                Click="KillAdbButton_Click"
+                                                Content="Kill Process"
+                                                Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="taskkill /f /im &quot;adb.exe&quot;" />
                                                 </Button.ToolTip>

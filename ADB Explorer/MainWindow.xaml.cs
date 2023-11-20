@@ -1847,4 +1847,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         FileActions.SelectedFileOps.Value = CurrentOperationDetailedDataGrid.SelectedItems.OfType<FileOperation>();
     }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void KillAdbButton_Click(object sender, RoutedEventArgs e)
+    {
+        ADBService.KillAdbProcess();
+    }
 }
