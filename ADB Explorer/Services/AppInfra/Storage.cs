@@ -66,12 +66,16 @@ public static class Storage
     public static ulong? GetDiskUsage(int pid)
     {
         Process[] processes = Process.GetProcesses();
-
+        
         var process = processes.FirstOrDefault(p => p.Id == pid);
+        if (process is null)
+            return null;
+
         try
         {
             GetProcessIoCounters(process.Handle, out IO_COUNTERS counters);
-            return counters.OtherTransferCount;
+            
+            return counters.ReadTransferCount + counters.WriteTransferCount + counters.OtherTransferCount;
         }
         catch
         {
