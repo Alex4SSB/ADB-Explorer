@@ -5,7 +5,6 @@ using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using Windows.Management.Deployment;
 using static ADB_Explorer.Models.AbstractDevice;
-using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Helpers;
 
@@ -97,7 +96,6 @@ public static class DeviceHelper
 
     public static void BrosweDeviceAction(LogicalDeviceViewModel device)
     {
-        Data.CurrentADBDevice = new(device);
         Data.RuntimeSettings.DeviceToOpen = device;
     }
 
@@ -493,10 +491,13 @@ public static class DeviceHelper
 
     public static IEnumerable<LogicalDeviceViewModel> ReconnectFileOpDevice(IEnumerable<LogicalDeviceViewModel> devices)
     {
-        var exceptDevices = devices.Where(d => Data.FileOpQ.PastOperations.Any(op => op.Device.ID == d.ID));
+        // get the newly acquired devices with similar IDs to devices of the past file ops [the objects of] which also do not exist in the devices UI list
+        var exceptDevices = devices.Where(d => Data.FileOpQ.PastOperations.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device.Device)));
+
+        // get the corresponding file op devices
         var fileOpDevices = Data.FileOpQ.PastOperations.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
 
-        return devices.Except(exceptDevices).AppendRange(fileOpDevices);
+        return devices.Except(exceptDevices, new LogicalDeviceViewModelEqualityComparer()).AppendRange(fileOpDevices.Distinct());
     }
 
     public static void DeviceListSetup(string selectedAddress = "")
@@ -635,6 +636,7 @@ public static class DeviceHelper
 
     public static void OpenDevice(LogicalDeviceViewModel device)
     {
+        Data.CurrentADBDevice = new(device);
         Data.DevicesObject.SetOpenDevice(device);
         Data.RuntimeSettings.InitLister = true;
         FileActionLogic.ClearExplorer();

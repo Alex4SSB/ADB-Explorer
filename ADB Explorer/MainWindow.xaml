@@ -478,7 +478,10 @@
                                         x:Name="TimeColumn"
                                         CellTemplate="{StaticResource FileOpTimeStampTemplate}"
                                         SortMemberPath="StatusInfo.Time" />
-                                    <DataGridTemplateColumn x:Name="DeviceColumn" CellTemplate="{StaticResource FileOpDeviceColumnStyle}" />
+                                    <DataGridTemplateColumn
+                                        x:Name="DeviceColumn"
+                                        CellTemplate="{StaticResource FileOpDeviceColumnStyle}"
+                                        SortMemberPath="Device.Device.Name" />
                                 </DataGrid.Columns>
                             </DataGrid>
                             <Border
@@ -507,18 +510,7 @@
                 <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountContainerStyle}">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                         <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
-                        <TextBlock Text=" item" />
-                        <TextBlock Text="s">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                        <TextBlock Style="{StaticResource ItemsCountSuffixStyle}" />
                         <TextBlock
                             x:Name="UnfinishedBlock"
                             Style="{StaticResource UnfinishedTextblockStyle}"
@@ -536,18 +528,7 @@
                         </StackPanel.Style>
                         <Separator />
                         <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
-                        <TextBlock Text=" item" />
-                        <TextBlock Text="s">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+                        <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
                         <TextBlock Text=" selected" />
                         <TextBlock
                             x:Name="TotalSizeBlock"
@@ -772,12 +753,18 @@
                                             HorizontalAlignment="Center"
                                             Orientation="Horizontal"
                                             Spacing="10">
-                                            <Button Content="Kill Server" Style="{StaticResource AccentButtonStyle}">
+                                            <Button
+                                                Click="RestartAdbButton_Click"
+                                                Content="Kill Server"
+                                                Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="adb kill-server" />
                                                 </Button.ToolTip>
                                             </Button>
-                                            <Button Content="Kill Process" Style="{StaticResource AccentButtonStyle}">
+                                            <Button
+                                                Click="KillAdbButton_Click"
+                                                Content="Kill Process"
+                                                Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="taskkill /f /im &quot;adb.exe&quot;" />
                                                 </Button.ToolTip>

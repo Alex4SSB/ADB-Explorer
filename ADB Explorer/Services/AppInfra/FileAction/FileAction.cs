@@ -366,53 +366,10 @@ internal static class AppActions
             true),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,
         new(FileActionType.FileOpRemove,
-            () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled || Data.FileActions.IsFileOpRemovePastEnabled,
-            () => { },
-            "Remove Operations"),
+            () => Data.FileActions.SelectedFileOps.Value.Any(),
+            () => Data.FileOpQ.Operations.RemoveAll(Data.FileActions.SelectedFileOps.Value),
+            Data.FileActions.RemoveFileOpAction),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.LogToggle).FileAction,
-
-# pragma warning disable IDE0200
-        // Passing non-static methods as delegates here causes a runtime exception
-
-        new(FileActionType.FileOpRemovePending,
-            () => Data.FileActions.IsFileOpRemovePendingEnabled,
-            () =>
-            {
-                Data.FileOpQ.ClearPending();
-                FileActionLogic.UpdateFileOpControls();
-            },
-            "Pending"),
-        new(FileActionType.FileOpRemoveCompleted,
-            () => Data.FileActions.IsFileOpRemoveCompletedEnabled,
-            () =>
-            {
-                Data.FileOpQ.ClearCompleted();
-                FileActionLogic.UpdateFileOpControls();
-            },
-            "Completed"),
-        new(FileActionType.FileOpRemoveAll,
-            () => Data.FileActions.IsFileOpRemoveCompletedEnabled || Data.FileActions.IsFileOpRemovePendingEnabled,
-            () =>
-            {
-                Data.FileOpQ.Clear();
-                FileActionLogic.UpdateFileOpControls();
-            },
-            "All"),
-        new(FileActionType.FileOpRemovePast,
-            () => Data.FileActions.IsFileOpRemovePastEnabled,
-            () =>
-            {
-                Data.FileOpQ.ClearPast();
-                FileActionLogic.UpdateFileOpControls();
-            },
-            "Previous"),
-
-#pragma warning restore IDE0200
-
-        new(FileActionType.FileOpDefaultFolder,
-            () => !string.IsNullOrEmpty(Data.Settings.DefaultFolder),
-            () => Process.Start("explorer.exe", Data.Settings.DefaultFolder),
-            "Open Default Folder"),
         new(FileActionType.FileOpTestNext,
             () => true,
             FileOpTest.TestCurrentOperation,
@@ -430,9 +387,9 @@ internal static class AppActions
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
         new(FileActionType.FileOpValidate,
-            () => Data.FileActions.SelectedFileOps.Value.Any(op => op.ValidationAllowed),
+            () => Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
             Security.ValidateOps,
-            "Validate Operation(s)"),
+            Data.FileActions.ValidateAction),
     };
 
     public static List<KeyBinding> Bindings =>
@@ -514,11 +471,6 @@ internal class FileAction : ViewModelBase
         SaveEditor,
         FileOpStop,
         FileOpRemove,
-        FileOpRemovePending,
-        FileOpRemoveCompleted,
-        FileOpRemovePast,
-        FileOpRemoveAll,
-        FileOpDefaultFolder,
         FileOpTestNext,
         FileOpPastView,
         PauseLogs,

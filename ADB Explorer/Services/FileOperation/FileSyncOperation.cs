@@ -94,7 +94,7 @@ public class FileSyncOperation : FileOperation
         if (Status is not OperationStatus.InProgress)
             return;
 
-        AndroidPath.AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
+        AddUpdates(e.NewItems.Cast<FileOpProgressInfo>());
 
         if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
@@ -119,10 +119,10 @@ public class FileSyncOperation : FileOperation
     }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => AndroidPath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates, this);
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => AndroidPath.AddUpdates(newUpdates);
+        => AndroidPath.AddUpdates(newUpdates, this);
 
     public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
         => new(OperationType.Pull, sourcePath, targetPath, adbDevice, dispatcher);

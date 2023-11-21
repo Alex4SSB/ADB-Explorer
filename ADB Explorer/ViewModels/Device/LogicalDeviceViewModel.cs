@@ -194,3 +194,16 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     #endregion
 }
+
+public class LogicalDeviceViewModelEqualityComparer : IEqualityComparer<LogicalDeviceViewModel>
+{
+    public bool Equals(LogicalDeviceViewModel x, LogicalDeviceViewModel y)
+    {
+        return x.ID == y.ID && x.Status == y.Status;
+    }
+
+    public int GetHashCode([DisallowNull] LogicalDeviceViewModel obj)
+    {
+        return (obj.ID.GetHashCode() + obj.Status.GetHashCode()).GetHashCode();
+    }
+}

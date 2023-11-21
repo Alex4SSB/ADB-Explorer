@@ -90,11 +90,7 @@ public static class FileHelper
         {
             if (t.Result is FileOperation.OperationStatus.Completed && Data.Settings.ShowExtensions)
             {
-                App.Current.Dispatcher.Invoke(() =>
-                {
-                    file.UpdatePath(newPath);
-                    file.UpdateType();
-                });
+                App.Current.Dispatcher.Invoke(() => file.UpdatePath(newPath));
             }
         });
     }

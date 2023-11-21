@@ -94,6 +94,16 @@
         </Style.Resources>
     </Style>
     <Style
+        x:Key="DisabledTooltipTextBlockStyle"
+        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        TargetType="TextBlock">
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="Gray" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
         x:Key="FileNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
         TargetType="TextBlock" />
@@ -325,15 +335,28 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="SelectedItemsStyle" TargetType="TextBlock">
+    <Style
+        x:Key="SelectedItemsStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
-        <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=SelectedItems.Count}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
                 <Setter Property="Text" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="SelectedItemsSuffixStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value=" items" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
+                <Setter Property="Text" Value=" item" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -852,9 +875,6 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="MarginedTextBlockStyle" TargetType="TextBlock">
-        <Setter Property="Margin" Value="0,4" />
-    </Style>
     <Style
         x:Key="AndroidVersionRecoveryTextblockStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
@@ -876,6 +896,29 @@
             <Trigger Property="Visibility" Value="Visible">
                 <Setter Property="Cursor" Value="AppStarting" />
             </Trigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ItemsCountStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=ItemsSource.Count}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ItemsCountSuffixStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value=" items" />
+        <Setter Property="Margin" Value="0,4" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
+                <Setter Property="Text" Value=" item" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

@@ -29,12 +29,27 @@
     </Style>
     <Style
         x:Key="BoldInProgressTextBlockStyle"
-        BasedOn="{StaticResource TooltipTextBlockStyle}"
+        BasedOn="{StaticResource DisabledTooltipTextBlockStyle}"
         TargetType="TextBlock">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Status}" Value="InProgress">
                 <Setter Property="FontWeight" Value="Bold" />
             </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="BoldInProgressHyperTextStyle"
+        BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="TextDecorations" Value="Underline" />
+        <Setter Property="Foreground" Value="{DynamicResource FileOpHyperLinkBrush}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource HyperlinkButtonForegroundPointerOver}" />
+            </Trigger>
+            <Trigger Property="Text" Value="Permanent Deletion">
+                <Setter Property="TextDecorations" Value="None" />
+            </Trigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -101,7 +116,7 @@
             </TextBlock>
             <TextBlock Grid.Row="1" Grid.Column="1">
                 <TextBlock.Style>
-                    <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock">
+                    <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock">
                         <Setter Property="FontWeight" Value="Bold" />
                         <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
                         <Style.Triggers>
@@ -141,21 +156,45 @@
         RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
         UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
     <DataTemplate x:Key="FileOpFileNameTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
         <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
-        <TextBlock
+        <ui:HyperlinkButton
             Margin="4,0"
-            Style="{StaticResource BoldInProgressTextBlockStyle}"
-            Text="{Binding SourcePathString}" />
+            Command="{Binding SourceAction.Command}"
+            FocusVisualStyle="{x:Null}">
+            <ui:HyperlinkButton.Content>
+                <TextBlock Style="{StaticResource BoldInProgressHyperTextStyle}" Text="{Binding SourcePathString}" />
+            </ui:HyperlinkButton.Content>
+        </ui:HyperlinkButton>
     </DataTemplate>
     <DataTemplate x:Key="FileOpTargetPathTemplate">
-        <TextBlock
+        <ui:HyperlinkButton
             Margin="4,0"
-            Style="{StaticResource BoldInProgressTextBlockStyle}"
-            Text="{Binding TargetPathString}" />
+            Command="{Binding TargetAction.Command}"
+            FocusVisualStyle="{x:Null}">
+            <ui:HyperlinkButton.Content>
+                <TextBlock Style="{StaticResource BoldInProgressHyperTextStyle}" Text="{Binding TargetPathString}" />
+            </ui:HyperlinkButton.Content>
+        </ui:HyperlinkButton>
     </DataTemplate>
     <DataTemplate x:Key="FileOpTimeStampTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
         <TextBlock
             Margin="4,0"
             Style="{StaticResource BoldInProgressTextBlockStyle}"
@@ -230,6 +269,9 @@
     </DataTemplate>
     <DataTemplate x:Key="CompletedSyncProgressInnerTemplate">
         <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+            <Grid.Resources>
+                <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
+            </Grid.Resources>
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
@@ -248,7 +290,6 @@
             </Grid>
             <TextBlock
                 Grid.Row="1"
-                Style="{StaticResource InvisibleTextBlockStyle}"
                 Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext, Converter={StaticResource CompletedStatsConverter}}"
                 TextTrimming="CharacterEllipsis" />
         </Grid>
@@ -256,7 +297,7 @@
     <Style x:Key="CompletedIconProgressPanelStyle" TargetType="Grid">
         <Setter Property="Margin" Value="4,0" />
         <Style.Resources>
-            <Style BasedOn="{StaticResource TooltipTextBlockStyle}" TargetType="TextBlock" />
+            <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Setter Property="FontWeight" Value="Bold" />
                 <Setter Property="Margin" Value="0,0,4,0" />
@@ -344,9 +385,25 @@
         InProgSyncProgressTemplate="{StaticResource InProgSyncProgressTemplate}"
         WaitingOpProgressTemplate="{StaticResource WaitingOpProgressTemplate}" />
     <DataTemplate x:Key="FileOpProgressTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
         <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="OperationIconTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
         <ContentPresenter
             Margin="0,0,6,0"
             HorizontalAlignment="Right"
@@ -428,27 +485,32 @@
         x:Key="FileOpDeviceTextblockStyle"
         BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding Name}" />
+        <Setter Property="Text" Value="{Binding Device.Device.Name}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Unauthorized">
                 <Setter Property="Text" Value="[Unauthorized]" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Type}" Value="Emulator">
-                <Setter Property="Text" Value="{Binding ID}" />
+            <DataTrigger Binding="{Binding Device.Device.Type}" Value="Emulator">
+                <Setter Property="Text" Value="{Binding Device.Device.ID}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Type}" Value="Service" />
-                    <Condition Binding="{Binding Name}" Value="" />
+                    <Condition Binding="{Binding Device.Device.Type}" Value="Service" />
+                    <Condition Binding="{Binding Device.Device.Name}" Value="" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Text" Value="[Service]" />
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <DataTemplate x:Key="FileOpDeviceColumnStyle">
-        <TextBlock
-            Margin="4,0"
-            DataContext="{Binding Device.Device}"
-            Style="{StaticResource FileOpDeviceTextblockStyle}" />
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+        <TextBlock Margin="4,0" Style="{StaticResource FileOpDeviceTextblockStyle}" />
     </DataTemplate>
 </ResourceDictionary>

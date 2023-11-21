@@ -32,7 +32,7 @@ public partial class NavigationBox : UserControl
         {
             if (Path != value)
             {
-                PopulateButtons(value);
+                AddDevice(value);
             }
 
             SetValue(PathProperty, value);
@@ -125,7 +125,19 @@ public partial class NavigationBox : UserControl
 
     public Thickness MenuMargin => new(MenuPadding.Left, 0, 0, 0);
 
-    public void Refresh() => PopulateButtons(Path);
+    private void AddDevice(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return;
+
+        var driveView = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
+        if (path == driveView)
+            PopulateButtons(path);
+        else
+            PopulateButtons(driveView + path);
+    }
+
+    public void Refresh() => AddDevice(Path);
 
     private void PopulateButtons(string path)
     {
@@ -136,16 +148,20 @@ public partial class NavigationBox : UserControl
         List<MenuItem> tempButtons = new();
         List<string> pathItems = new();
 
-        var pairs = DisplayNames.Where(kv => path.StartsWith(kv.Key));
-        var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.First();
-        if (specialPair.Key != null)
+        if (path.StartsWith(NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView)))
         {
-            MenuItem button = CreatePathButton(specialPair);
-            tempButtons.Add(button);
-            pathItems.Add(specialPair.Key);
-            path = path[specialPair.Key.Length..].TrimStart('/');
-            expectedLength = ControlSize.GetWidth(button);
+            AddSpecialButton(ref path,
+                             ref expectedLength,
+                             ref tempButtons,
+                             ref pathItems,
+                             DisplayNames.FirstOrDefault(kv => path.StartsWith(kv.Key)),
+                             false);
         }
+
+        var pairs = DisplayNames.Where(kv => path.StartsWith(kv.Key));
+        var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.FirstOrDefault();
+        
+        AddSpecialButton(ref path, ref expectedLength, ref tempButtons, ref pathItems, specialPair);
 
         var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
         foreach (var dir in dirs)
@@ -175,6 +191,27 @@ public partial class NavigationBox : UserControl
         Breadcrumbs.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
 
         ConsolidateButtons(expectedLength);
+
+        void AddSpecialButton(ref string path,
+                              ref double expectedLength,
+                              ref List<MenuItem> tempButtons,
+                              ref List<string> pathItems,
+                              KeyValuePair<string, string> specialPair,
+                              bool trimStart = true)
+        {
+            if (specialPair.Key is null)
+                return;
+
+            MenuItem button = CreatePathButton(specialPair);
+            tempButtons.Add(button);
+            pathItems.Add(specialPair.Key);
+
+            path = path[specialPair.Key.Length..];
+            if (trimStart)
+                path = path.TrimStart();
+
+            expectedLength += ControlSize.GetWidth(button);
+        }
     }
 
     private void ConsolidateButtons(double expectedLength)

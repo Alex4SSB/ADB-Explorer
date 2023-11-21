@@ -155,24 +155,30 @@ internal static class AdbHelper
                 ADBService.EscapeAdbString(androidPath)
             });
 
-    public static int? GetAdbPid() =>
-        Process.GetProcessesByName(AdbExplorerConst.ADB_PROCESS).FirstOrDefault()?.Id;
+    public static IEnumerable<int> GetAdbPid() =>
+        Process.GetProcessesByName(AdbExplorerConst.ADB_PROCESS).Select(p => p.Id);
 
-    private static ulong prevDiskUsage = 0;
+    private static Dictionary<int, ulong> adbUsages = new();
 
     public static string GetAdbDiskUsage()
     {
-        var pid = GetAdbPid();
-        if (pid is null)
-            return null;
+        ulong totalUsage = 0;
 
-        ulong? currentUsage = Storage.GetDiskUsage(pid.Value);
-        if (currentUsage is null)
-            return null;
+        foreach (var pid in GetAdbPid())
+        {
+            var usage = Storage.GetDiskUsage(pid);
+            if (usage is null)
+                continue;
 
-        string result = prevDiskUsage == 0 ? null : (currentUsage.Value - prevDiskUsage).ToSize(true) + "/s";
-        prevDiskUsage = currentUsage.Value;
+            if (adbUsages.TryGetValue(pid, out ulong value))
+            {
+                totalUsage += usage.Value - value;
+                adbUsages[pid] = usage.Value;
+            }
+            else
+                adbUsages.Add(pid, usage.Value);
+        }
 
-        return result;
+        return totalUsage == 0 ? null : totalUsage.ToSize(true) + "/s";
     }
 }

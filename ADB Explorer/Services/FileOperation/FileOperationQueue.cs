@@ -8,20 +8,6 @@ public class FileOperationQueue : ViewModelBase
 {
     #region Full properties
 
-    private int currentOperationIndex = 0;
-    public int CurrentOperationIndex
-    {
-        get => currentOperationIndex;
-        private set
-        {
-            if (Set(ref currentOperationIndex, value))
-            {
-                OnPropertyChanged(nameof(CurrentOperation));
-                UpdateProgress();
-            }
-        }
-    }
-
     private bool isActive = false;
     public bool IsActive
     {
@@ -33,21 +19,7 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    private bool autoStart = true;
-    public bool AutoStart
-    {
-        get => autoStart;
-        set => Set(ref autoStart, value);
-    }
-
-    private bool stopAfterFailure = false;
-    public bool StopAfterFailure
-    {
-        get => stopAfterFailure;
-        set => Set(ref stopAfterFailure, value);
-    }
-
-    private double progress = 0;
+    private double progress = 0.0;
     public double Progress
     {
         get => progress;
@@ -70,11 +42,13 @@ public class FileOperationQueue : ViewModelBase
 
     public ObservableList<FileOperation> PastOperations { get; } = new();
 
+    public bool CurrentChanged { get => false; set => OnPropertyChanged(); }
+
     public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
 
-    public bool HasIncompleteOperations => CurrentOperation is not null || Operations.Any(op => op.Status == FileOperation.OperationStatus.Waiting);
-
-    public FileOperation CurrentOperation => (CurrentOperationIndex < TotalCount) ? Operations[CurrentOperationIndex] : null;
+    public bool HasIncompleteOperations => Operations.Any(op => op.Status
+        is FileOperation.OperationStatus.Waiting
+        or FileOperation.OperationStatus.InProgress);
 
     public int TotalCount => Operations.Count;
 
@@ -84,7 +58,6 @@ public class FileOperationQueue : ViewModelBase
 
     #endregion
 
-    private double currOperationLastProgress = 0;
     private readonly Mutex mutex = new Mutex();
 
     public FileOperationQueue()
@@ -101,10 +74,7 @@ public class FileOperationQueue : ViewModelBase
             Operations.Add(fileOp);
             OnPropertyChanged(nameof(HasIncompleteOperations));
 
-            if (AutoStart)
-            {
-                Start();
-            }
+            Start();
         } 
         finally
         {
@@ -118,26 +88,13 @@ public class FileOperationQueue : ViewModelBase
         {
             mutex.WaitOne();
 
-            if (CurrentOperation == fileOp)
+            if (fileOp.Status is FileOperation.OperationStatus.InProgress)
             {
-                CurrentOperation.Cancel();
+                fileOp.Cancel();
                 return;
             }
 
-            for (int i = 0; i < Operations.Count; i++)
-            {
-                if (Operations[i] == fileOp)
-                {
-                    Operations.RemoveAt(i);
-                    if (i <= CurrentOperationIndex)
-                    {
-                        CurrentOperationIndex--;
-                    }
-
-                    break;
-                }
-            }
-
+            Operations.Remove(fileOp);
         }
         finally
         {
@@ -152,7 +109,7 @@ public class FileOperationQueue : ViewModelBase
             mutex.WaitOne();
 
             Func<FileOperation, bool> predicate = op => {
-                if (device is not null && op.Device.ID == device.ID)
+                if (device is not null && op.Device.ID != device.ID)
                     return false;
 
                 return includeAll || op.Status
@@ -168,7 +125,6 @@ public class FileOperationQueue : ViewModelBase
             }
 
             Operations.RemoveAll(completed);
-            CurrentOperationIndex = 0;
         }
         finally
         {
@@ -176,113 +132,58 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
-    public void ClearPast()
+    private void UpdateProgress()
     {
-        try
-        {
-            mutex.WaitOne();
+        var pending = Operations.Where(op => op.Status is FileOperation.OperationStatus.Waiting);
+        var running = Operations.Where(op => op.Status is FileOperation.OperationStatus.InProgress);
 
-            PastOperations.RemoveAll();
-        }
-        finally
-        {
-            mutex.ReleaseMutex();
-        }
-    }
+        double done = TotalCount - pending.Count() - running.Count();
+        double current = running.Sum(op => op.LastProgress) / 100.0;
 
-    public void ClearCompleted()
-    {
-        try
-        {
-            mutex.WaitOne();
-
-            while (CurrentOperationIndex > 0)
-            {
-                Operations.RemoveAt(0);
-                --CurrentOperationIndex;
-            }
-        }
-        finally
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
-    public void ClearPending()
-    {
-        try
-        {
-            mutex.WaitOne();
-
-            while (TotalCount > (CurrentOperationIndex + 1))
-            {
-                Operations.RemoveAt(TotalCount - 1);
-            }
-        }
-        finally 
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
-    private void UpdateProgress(double? currentProgress = null)
-    {
-        if (currentProgress != null)
-        {
-            currOperationLastProgress = currentProgress.Value;
-        }
-        
-        Progress = ((double)CurrentOperationIndex + (currOperationLastProgress / 100.0)) / TotalCount;
+        Progress = (done + current) / TotalCount;
 
         FileOpRingVisibility();
     }
 
     public void Start()
     {
-        if (IsActive || (TotalCount == 0))
-        {
+        if (TotalCount < 1)
             return;
+
+        if (!IsActive)
+        {
+            IsActive = true;
+            MoveOperationsToPast();
         }
 
-        IsActive = true;
-        UpdateProgress(0);
-
-        MoveOperationsToPast();
-
         MoveToNextOperation();
+
+        UpdateProgress();
     }
 
     public void Stop()
     {
-        if (CurrentOperation is null)
-            return;
+        var runningOps = Operations.Where(op => op.Status is FileOperation.OperationStatus.InProgress);
+        var isPush = runningOps.Any(op => op.OperationName is FileOperation.OperationType.Push);
 
-        var isPush = CurrentOperation.OperationName is FileOperation.OperationType.Push;
-        CurrentOperation.Cancel();
+        foreach (var item in runningOps)
+        {
+            item.Cancel();
+        }
+        IsActive = false;
         
         if (isPush && !App.Current.Dispatcher.HasShutdownStarted)
             Data.RuntimeSettings.Refresh = true;
     }
 
-    public void Clear()
-    {
-        Stop();
-        ClearCompleted();
-        ClearPending();
-    }
-
-    private void MoveToCompleted()
+    private void MoveToCompleted(FileOperation op)
     {
         try
         {
             mutex.WaitOne();
 
-            if ((CurrentOperation != null) && (CurrentOperation.Status != FileOperation.OperationStatus.Waiting))
-            {
-                CurrentOperation.PropertyChanged -= CurrentOperation_PropertyChanged;
-                ++CurrentOperationIndex;
-                UpdateProgress(0);
-            }
+            op.PropertyChanged -= CurrentOperation_PropertyChanged;
+            UpdateProgress();
 
             OnPropertyChanged(nameof(HasIncompleteOperations));
             FileOpRingVisibility();
@@ -295,19 +196,29 @@ public class FileOperationQueue : ViewModelBase
 
     private void MoveToNextOperation()
     {
-        MoveToCompleted();
-
         try
         {
             mutex.WaitOne();
 
-            if (CurrentOperationIndex == TotalCount)
+            var pending = Operations.Where(op => op.Status is FileOperation.OperationStatus.Waiting);
+            if (pending.Any())
             {
-                return;
-            }
+                var groups = pending.GroupBy(op => op.TypeOnDevice);
+                foreach (var item in groups)
+                {
+                    if (Operations.Any(op => op.Status is FileOperation.OperationStatus.InProgress && op.TypeOnDevice == item.Key))
+                        continue;
 
-            CurrentOperation.PropertyChanged += CurrentOperation_PropertyChanged;
-            CurrentOperation.Start();
+                    item.First().PropertyChanged += CurrentOperation_PropertyChanged;
+                    item.First().Start();
+
+                    CurrentChanged = true;
+                }
+            }
+            else if (!Operations.Any(op => op.Status is FileOperation.OperationStatus.InProgress))
+            {
+                IsActive = false;
+            }
         }
         finally
         {
@@ -317,34 +228,23 @@ public class FileOperationQueue : ViewModelBase
 
     private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (CurrentOperation != sender)
+        var op = (FileOperation)sender;
+        
+        if (e.PropertyName is nameof(FileOperation.Status) && op.Status
+            is not FileOperation.OperationStatus.Waiting
+            and not FileOperation.OperationStatus.InProgress)
         {
-            return;
+            MoveToCompleted(op);
+            MoveToNextOperation();
         }
 
-        if ((e.PropertyName == "Status") &&
-            (CurrentOperation.Status != FileOperation.OperationStatus.Waiting) &&
-            (CurrentOperation.Status != FileOperation.OperationStatus.InProgress))
+        if (e.PropertyName is nameof(FileOperation.StatusInfo)
+            && op.Status is FileOperation.OperationStatus.InProgress
+            && op.StatusInfo is InProgSyncProgressViewModel status
+            && status.TotalPercentage is int percentage)
         {
-            if ((CurrentOperationIndex == (TotalCount - 1)) ||
-                (StopAfterFailure && (CurrentOperation.Status == FileOperation.OperationStatus.Failed)) ||
-                (CurrentOperation.Status == FileOperation.OperationStatus.Canceled))
-            {
-                MoveToCompleted();
-                IsActive = false;
-            }
-            else
-            {
-                MoveToNextOperation();
-            }
-        }
-
-        if ((e.PropertyName == "StatusInfo") &&
-            (CurrentOperation.Status == FileOperation.OperationStatus.InProgress) &&
-            (CurrentOperation.StatusInfo is InProgSyncProgressViewModel status) &&
-            (status.TotalPercentage is int percentage))
-        {
-            UpdateProgress(percentage);
+            op.LastProgress = percentage;
+            UpdateProgress();
         }
     }
 
@@ -355,9 +255,7 @@ public class FileOperationQueue : ViewModelBase
 
     private void Operations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        UpdateProgress();
-
         OnPropertyChanged(nameof(TotalCount));
-        FileOpRingVisibility();
+        UpdateProgress();
     }
 }

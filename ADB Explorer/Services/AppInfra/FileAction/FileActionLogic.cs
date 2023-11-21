@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
@@ -288,7 +289,7 @@ internal static class FileActionLogic
             Data.FileActions.IsCutState.Value = false;
         }
 
-        Data.FileActions.PasteAction.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} Item{(Data.CutItems.Count > 1 ? "s" : "")}";
+        Data.FileActions.PasteAction.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} {PluralityConverter.Convert(Data.CutItems, "Item")}";
 
         if (Data.CutItems.Count < 1 || Data.FileActions.IsRecycleBin || !Data.FileActions.IsExplorerVisible)
             return false;
@@ -860,5 +861,13 @@ internal static class FileActionLogic
         Data.RuntimeSettings.GroupsExpanded ^= true;
 
         Data.RuntimeSettings.RefreshSettingsControls = true;
+    }
+
+    public static void UpdateValidation()
+    {
+        Data.FileActions.RemoveFileOpAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
+        Data.FileActions.ValidateAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
+
+        Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 }

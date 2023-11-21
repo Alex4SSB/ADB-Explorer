@@ -30,7 +30,7 @@ public class SyncFile : FilePath
     public void AddUpdates(params FileOpProgressInfo[] newUpdates)
         => AddUpdates(newUpdates.Where(o => o is not null));
 
-    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
+    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation fileOp = null)
     {
         if (!IsDirectory || newUpdates.All(u => u.AndroidPath.Equals(FullPath)))
         {
@@ -38,11 +38,16 @@ public class SyncFile : FilePath
             return;
         }
 
-        foreach (var update in newUpdates)
+        if (fileOp is FileSyncOperation)
         {
-            if (string.IsNullOrEmpty(update.AndroidPath))
-                update.SetPathToCurrent();
+            foreach (var update in newUpdates)
+            {
+                if (string.IsNullOrEmpty(update.AndroidPath))
+                    update.SetPathToCurrent(fileOp);
+            }
         }
+        else
+            newUpdates = newUpdates.Where(u => !string.IsNullOrEmpty(u.AndroidPath));
 
         var groups = newUpdates.GroupBy(update => DirectChildPath(update.AndroidPath));
         

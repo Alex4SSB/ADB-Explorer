@@ -26,6 +26,12 @@ public partial class ADBService
 
         public override string ID => Device.ID;
 
+        public override DeviceType Type => Device.Type;
+
+        public override DeviceStatus Status => Device.Status;
+        
+        public override string IpAddress => Device.IpAddress;
+
         public AdbDevice(LogicalDeviceViewModel other)
         {
             Device = other;

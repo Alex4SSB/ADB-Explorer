@@ -208,9 +208,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             NavigateToPath(ParentPath);
                             break;
                         case not null:
-                            if (FileActions.IsDriveViewVisible
-                            && (RuntimeSettings.LocationToNavigate is NavHistory.SpecialLocation.DriveView
-                                || (RuntimeSettings.LocationToNavigate is string location && location == NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView))))
+                            if (FileActions.IsDriveViewVisible && NavHistory.LocationFromString(RuntimeSettings.LocationToNavigate) is NavHistory.SpecialLocation.DriveView)
                                 FileActionLogic.RefreshDrives(true);
                             else
                             {
@@ -341,27 +339,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void FileActions_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(FileActionsEnable.RefreshPackages) && FileActions.RefreshPackages)
+        switch (e.PropertyName)
         {
-            if (FileActions.IsAppDrive)
-            {
-                Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
-                FileActions.RefreshPackages = false;
-            }
-        }
-        else if (e.PropertyName == nameof(FileActionsEnable.ExplorerFilter))
-        {
-            FilterExplorerItems();
-        }
-        else if (e.PropertyName == nameof(FileActionsEnable.ItemToSelect) && FileActions.ItemToSelect is not null)
-        {
-            ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
-            ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
-        }
-        else if (e.PropertyName == nameof(FileActionsEnable.PasteEnabled))
-        {
-            FilterFileActions();
-            FilterExplorerContextMenu();
+            case nameof(FileActionsEnable.RefreshPackages) when FileActions.RefreshPackages:
+                if (FileActions.IsAppDrive)
+                {
+                    Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
+                    FileActions.RefreshPackages = false;
+                }
+                break;
+
+            case nameof(FileActionsEnable.ExplorerFilter):
+                FilterExplorerItems();
+                break;
+
+            case nameof(FileActionsEnable.ItemToSelect) when FileActions.ItemToSelect is not null:
+                ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
+                ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
+                break;
+
+            case nameof(FileActionsEnable.PasteEnabled):
+                FilterFileActions();
+                FilterExplorerContextMenu();
+                break;
         }
     }
 
@@ -369,8 +369,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (FileOperationQueue.NotifyProperties.Contains(e.PropertyName))
             UpdateFileOp();
-
-        if (e.PropertyName is nameof(FileOperationQueue.CurrentOperation))
+        
+        if (e.PropertyName is nameof(FileOperationQueue.CurrentChanged))
             RefreshFileOps();
 
         UpdateSelectedFileOp();
@@ -1042,14 +1042,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
 
-        if (location is string path)
-        {
-            if (!FileActions.IsExplorerVisible)
-                InitNavigation(path, bfNavigated);
-            else
-                NavigateToPath(path, bfNavigated);
-        }
-        else if (location is NavHistory.SpecialLocation.DriveView)
+        if (NavHistory.LocationFromString(location) is NavHistory.SpecialLocation.DriveView)
         {
             FileActions.IsRecycleBin = false;
             RuntimeSettings.IsPathBoxFocused = false;
@@ -1057,6 +1050,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             DriveViewNav();
 
             FileActionLogic.UpdateFileActions();
+        }
+        else if (location is string path)
+        {
+            if (!FileActions.IsExplorerVisible)
+                InitNavigation(path, bfNavigated);
+            else
+                NavigateToPath(path, bfNavigated);
         }
     }
 
@@ -1845,14 +1845,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateSelectedFileOp()
     {
-        var selectedOps = CurrentOperationDetailedDataGrid.SelectedItems.OfType<FileOperation>();
-        if (!selectedOps.Any()
-            && !CurrentOperationDetailedDataGrid.Items.IsEmpty
-            && CurrentOperationDetailedDataGrid.Items[0] is FileOperation op)
-        {
-            selectedOps = new[] { op };
-        }
+        FileActions.SelectedFileOps.Value = CurrentOperationDetailedDataGrid.SelectedItems.OfType<FileOperation>();
+    }
 
-        FileActions.SelectedFileOps.Value = selectedOps;
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+
+    }
+
+    private void KillAdbButton_Click(object sender, RoutedEventArgs e)
+    {
+        ADBService.KillAdbProcess();
     }
 }
