@@ -140,7 +140,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
 
-        RuntimeSettings.AdbDiskUsage = FileOpQ.IsActive ? AdbHelper.GetAdbDiskUsage() : null;
+        DiskUsageHelper.GetAdbDiskUsage();
 
         if (Settings.PollDevices
             && MdnsService?.State is MDNS.MdnsState.Running

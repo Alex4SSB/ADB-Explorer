@@ -543,9 +543,8 @@
                     VerticalAlignment="Center"
                     DataContext="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}"
                     Orientation="Horizontal">
-                    <StackPanel Orientation="Horizontal" Style="{StaticResource DiskUsagePanelStyle}">
-                        <TextBlock Text="ADB Disk Usage: " />
-                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbDiskUsage}" />
+                    <StackPanel Orientation="Horizontal">
+                        <controls:TransferIndicator Margin="0,1,0,0" Style="{StaticResource DiskUsageIconStyle}" />
                         <Separator Style="{StaticResource DiskUsageSeparatorStyle}" />
                     </StackPanel>
                     <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />

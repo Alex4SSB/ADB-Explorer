@@ -47,41 +47,4 @@ public static class Storage
             _ => null
         };
     }
-
-    #region Disk Usage
-
-    private struct IO_COUNTERS
-    {
-        public ulong ReadOperationCount;
-        public ulong WriteOperationCount;
-        public ulong OtherOperationCount;
-        public ulong ReadTransferCount;
-        public ulong WriteTransferCount;
-        public ulong OtherTransferCount;
-    }
-
-    [DllImport("kernel32.dll")]
-    private static extern bool GetProcessIoCounters(IntPtr ProcessHandle, out IO_COUNTERS IoCounters);
-
-    public static ulong? GetDiskUsage(int pid)
-    {
-        Process[] processes = Process.GetProcesses();
-        
-        var process = processes.FirstOrDefault(p => p.Id == pid);
-        if (process is null)
-            return null;
-
-        try
-        {
-            GetProcessIoCounters(process.Handle, out IO_COUNTERS counters);
-            
-            return counters.ReadTransferCount + counters.WriteTransferCount + counters.OtherTransferCount;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    #endregion
 }

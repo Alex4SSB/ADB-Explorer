@@ -112,4 +112,8 @@ public static class AdbExplorerConst
     public static readonly TimeSpan WSA_CONNECT_TIMEOUT = TimeSpan.FromSeconds(8);
 
     public static readonly TimeSpan EXPLORER_NAV_DELAY = TimeSpan.FromMilliseconds(800);
+
+    public static readonly ulong DISK_READ_THRESHOLD = 500000;
+    public static readonly ulong DISK_WRITE_THRESHOLD = 500000;
+    public static readonly ulong MAX_DISK_DISPLAY_RATE = 1000000000;
 }

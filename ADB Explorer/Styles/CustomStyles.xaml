@@ -838,13 +838,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DiskUsagePanelStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbDiskUsage}" Value="{x:Null}">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style
         x:Key="StatusBarSeparatorStyle"
         BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
@@ -920,5 +913,28 @@
                 <Setter Property="Text" Value=" item" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style x:Key="DiskUsageIconStyle" TargetType="controls:TransferIndicator">
+        <Setter Property="IsUpVisible" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAdbReadActive}" />
+        <Setter Property="IsDownVisible" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAdbWriteActive}" />
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <StackPanel>
+                    <TextBlock Text="ADB Disk Usage" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Read: " />
+                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbReadRate}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Write: " />
+                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbWriteRate}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Other: " />
+                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbOtherRate}" />
+                    </StackPanel>
+                </StackPanel>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>
