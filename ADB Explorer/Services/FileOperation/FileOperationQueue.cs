@@ -40,8 +40,6 @@ public class FileOperationQueue : ViewModelBase
 
     public ObservableList<FileOperation> Operations { get; } = new();
 
-    public ObservableList<FileOperation> PastOperations { get; } = new();
-
     public bool CurrentChanged { get => false; set => OnPropertyChanged(); }
 
     public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
@@ -50,7 +48,7 @@ public class FileOperationQueue : ViewModelBase
         is FileOperation.OperationStatus.Waiting
         or FileOperation.OperationStatus.InProgress);
 
-    public int TotalCount => Operations.Count;
+    public int TotalCount => Operations.Count(op => !op.IsPastOp);
 
     public string StringProgress => $"{Operations.Count(op => op.Status is FileOperation.OperationStatus.Completed)} / {TotalCount}";
 
@@ -117,14 +115,10 @@ public class FileOperationQueue : ViewModelBase
                     and not FileOperation.OperationStatus.InProgress;
             };
 
-            var completed = Operations.Where(predicate).ToList();
-            
-            foreach (var op in completed)
+            foreach (var op in Operations.Where(predicate))
             {
-                PastOperations.Insert(0, op);
+                op.IsPastOp = true;
             }
-
-            Operations.RemoveAll(completed);
         }
         finally
         {

@@ -110,7 +110,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         AppActions.Bindings.ForEach(binding => InputBindings.Add(binding));
 
         UpperProgressBar.DataContext = FileOpQ;
-        RuntimeSettings.IsPastViewVisible = false;
+        CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
         UpdateFileOp();
 
 #if DEBUG
@@ -303,14 +303,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     FileOpControlsMenu.Items.Refresh();
                     break;
 
-                case nameof(AppRuntimeSettings.IsPastViewVisible):
-                    CurrentOperationDataGrid.ItemsSource = RuntimeSettings.IsPastViewVisible is true
-                        ? FileOpQ.PastOperations
-                        : FileOpQ.Operations;
-
-                    UpdateSelectedFileOp();
-                    break;
-
                 case nameof(AppRuntimeSettings.ClearLogs):
                     ClearLogs();
                     break;
@@ -389,7 +381,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void UpdateFileOp()
     {
         FileActionLogic.UpdateFileOpControls();
-        RuntimeSettings.RefreshFileOpControls = true;
 
         if (FileOpQ.AnyFailedOperations)
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;

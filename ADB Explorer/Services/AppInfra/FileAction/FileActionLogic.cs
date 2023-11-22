@@ -811,26 +811,34 @@ internal static class FileActionLogic
 
     public static void UpdateFileOpControls()
     {
+        var changed = false;
+
         Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations && (Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible);
 
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button.IsChecked =
-            !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;
+        var opStopButton = AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button;
+        var opStopChecked = !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;
+        if (opStopButton.IsChecked != opStopChecked)
+        {
+            opStopButton.IsChecked = opStopChecked;
+            changed = true;
+        }
 
-        Data.FileActions.IsFileOpRemovePendingEnabled = Data.FileOpQ.Operations.Any(op => op.Status is FileOperation.OperationStatus.Waiting) && Data.RuntimeSettings.IsPastViewVisible is not true;
-        Data.FileActions.IsFileOpRemoveCompletedEnabled = Data.FileOpQ.Operations.Any(op => op.Status
-            is not FileOperation.OperationStatus.Waiting
-            and not FileOperation.OperationStatus.InProgress)
-            && Data.RuntimeSettings.IsPastViewVisible is not true;
+        var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
+        if (Data.FileActions.RemoveFileOpAction.Value != removeAction)
+        {
+            Data.FileActions.RemoveFileOpAction.Value = removeAction;
+            changed = true;
+        }
 
-        Data.FileActions.IsFileOpRemovePastEnabled = Data.FileOpQ.PastOperations.Any() && Data.RuntimeSettings.IsPastViewVisible is true;
-    }
+        var validateAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
+        if (Data.FileActions.ValidateAction.Value != validateAction)
+        {
+            Data.FileActions.ValidateAction.Value = validateAction;
+            changed = true;
+        }
 
-    public static void TogglePastView()
-    {
-        Data.RuntimeSettings.RefreshFileOpControls = true;
-        Data.RuntimeSettings.IsPastViewVisible ^= true;
-
-        UpdateFileOpControls();
+        if (changed)
+            Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
     public static async void ResetAppSettings()
@@ -861,13 +869,5 @@ internal static class FileActionLogic
         Data.RuntimeSettings.GroupsExpanded ^= true;
 
         Data.RuntimeSettings.RefreshSettingsControls = true;
-    }
-
-    public static void UpdateValidation()
-    {
-        Data.FileActions.RemoveFileOpAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
-        Data.FileActions.ValidateAction.Value = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
-
-        Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 }

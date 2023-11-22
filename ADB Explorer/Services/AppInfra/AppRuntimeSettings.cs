@@ -301,13 +301,6 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isExplorerLoaded, value);
     }
 
-    private bool? isPastViewVisible = null;
-    public bool? IsPastViewVisible
-    {
-        get => isPastViewVisible;
-        set => Set(ref isPastViewVisible, value);
-    }
-
     private string adbReadRate = null;
     public string AdbReadRate
     {

@@ -9,7 +9,7 @@ internal class FileActionsEnable : ViewModelBase
 {
     public FileActionsEnable()
     {
-        SelectedFileOps.PropertyChanged += (object sender, PropertyChangedEventArgs<IEnumerable<FileOperation>> e) => FileActionLogic.UpdateValidation();
+        SelectedFileOps.PropertyChanged += (object sender, PropertyChangedEventArgs<IEnumerable<FileOperation>> e) => FileActionLogic.UpdateFileOpControls();
     }
 
     #region booleans
@@ -398,27 +398,6 @@ internal class FileActionsEnable : ViewModelBase
     {
         get => isFileOpStopEnabled;
         set => Set(ref isFileOpStopEnabled, value);
-    }
-
-    private bool isFileOpRemovePendingEnabled = false;
-    public bool IsFileOpRemovePendingEnabled
-    {
-        get => isFileOpRemovePendingEnabled;
-        set => Set(ref isFileOpRemovePendingEnabled, value);
-    }
-
-    private bool isFileOpRemoveCompletedEnabled = false;
-    public bool IsFileOpRemoveCompletedEnabled
-    {
-        get => isFileOpRemoveCompletedEnabled;
-        set => Set(ref isFileOpRemoveCompletedEnabled, value);
-    }
-
-    private bool isFileOpRemovePastEnabled = false;
-    public bool IsFileOpRemovePastEnabled
-    {
-        get => isFileOpRemovePastEnabled;
-        set => Set(ref isFileOpRemovePastEnabled, value);
     }
 
     #region Observable properties

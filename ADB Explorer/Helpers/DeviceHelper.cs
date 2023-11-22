@@ -491,11 +491,13 @@ public static class DeviceHelper
 
     public static IEnumerable<LogicalDeviceViewModel> ReconnectFileOpDevice(IEnumerable<LogicalDeviceViewModel> devices)
     {
+        var pastOps = Data.FileOpQ.Operations.Where(op => op.IsPastOp);
+
         // get the newly acquired devices with similar IDs to devices of the past file ops [the objects of] which also do not exist in the devices UI list
-        var exceptDevices = devices.Where(d => Data.FileOpQ.PastOperations.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device.Device)));
+        var exceptDevices = devices.Where(d => pastOps.Any(op => op.Device.ID == d.ID && !Data.DevicesObject.UIList.Contains(op.Device.Device)));
 
         // get the corresponding file op devices
-        var fileOpDevices = Data.FileOpQ.PastOperations.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
+        var fileOpDevices = pastOps.Select(op => op.Device.Device).Where(d => exceptDevices.Any(e => e.ID == d.ID));
 
         return devices.Except(exceptDevices, new LogicalDeviceViewModelEqualityComparer()).AppendRange(fileOpDevices.Distinct());
     }

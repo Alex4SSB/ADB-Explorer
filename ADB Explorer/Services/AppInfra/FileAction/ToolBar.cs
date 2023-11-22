@@ -265,7 +265,6 @@ internal static class FileOpControls
 {
     public static ObservableList<ActionBase> List { get; } = new()
     {
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpPastView).Button,
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button,
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FileOpRemove),
             AppActions.Icons[FileAction.FileActionType.FileOpRemove],

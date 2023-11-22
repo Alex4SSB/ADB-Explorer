@@ -384,6 +384,16 @@
         InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
         InProgSyncProgressTemplate="{StaticResource InProgSyncProgressTemplate}"
         WaitingOpProgressTemplate="{StaticResource WaitingOpProgressTemplate}" />
+    <Style
+        x:Key="PrevOpIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsPastOp}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <DataTemplate x:Key="FileOpProgressTemplate">
         <DataTemplate.Triggers>
             <Trigger Property="Visibility" Value="Visible">
@@ -393,7 +403,22 @@
                 <Setter Property="IsEnabled" Value="True" />
             </DataTrigger>
         </DataTemplate.Triggers>
-        <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon
+                Margin="4,0"
+                Foreground="{DynamicResource HistoryDeviceBottomBorderBrush}"
+                Glyph="&#xE81C;"
+                Style="{StaticResource PrevOpIconStyle}"
+                ToolTip="Previous Operation" />
+            <ContentControl
+                Grid.Column="1"
+                Content="{Binding StatusInfo}"
+                ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
+        </Grid>
     </DataTemplate>
     <DataTemplate x:Key="OperationIconTemplate">
         <DataTemplate.Triggers>

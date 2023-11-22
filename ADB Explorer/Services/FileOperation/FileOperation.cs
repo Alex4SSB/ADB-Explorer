@@ -73,6 +73,13 @@ public abstract class FileOperation : ViewModelBase
         set => Dispatcher.Invoke(() => Set(ref statusInfo, value));
     }
 
+    private bool isPastOp = false;
+    public bool IsPastOp
+    {
+        get => isPastOp;
+        set => Set(ref isPastOp, value);
+    }
+
     #endregion
 
     #region Base Properties
