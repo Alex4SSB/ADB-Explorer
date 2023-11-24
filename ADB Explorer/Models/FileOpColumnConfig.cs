@@ -8,18 +8,45 @@ public static class FileOpColumns
 {
     public static void Init()
     {
-        CheckedColumnsCount = new();
-
-        List = new()
+        List<FileOpColumnConfig> tempList = new()
         {
-            new(FileOpColumnConfig.ColumnType.OpType, "Operation Type", 30, "\uE8AF"),
-            new(FileOpColumnConfig.ColumnType.FileName, "File Name", 250),
-            new(FileOpColumnConfig.ColumnType.Progress, "Progress", 180),
-            new(FileOpColumnConfig.ColumnType.Source, "Source", 200),
-            new(FileOpColumnConfig.ColumnType.Dest, "Destination", 200),
-            new(FileOpColumnConfig.ColumnType.TimeStamp, "Added", 70),
-            new(FileOpColumnConfig.ColumnType.Device, "Device", 100, visibleByDefault: false),
+            new(FileOpColumnConfig.ColumnType.OpType,
+                (DataTemplate)App.Current.FindResource("OperationIconTemplate"),
+                0,
+                30,
+                icon: "\uE8AF"),
+            new(FileOpColumnConfig.ColumnType.FileName,
+                (DataTemplate)App.Current.FindResource("FileOpFileNameTemplate"),
+                1,
+                250),
+            new(FileOpColumnConfig.ColumnType.Progress,
+                (DataTemplate)App.Current.FindResource("FileOpProgressTemplate"),
+                2,
+                180),
+            new(FileOpColumnConfig.ColumnType.Source,
+                (DataTemplate)App.Current.FindResource("FileOpSourcePathTemplate"),
+                3,
+                200,
+                sortPath: nameof(FileOperation.SourcePathString)),
+            new(FileOpColumnConfig.ColumnType.Dest,
+                (DataTemplate)App.Current.FindResource("FileOpTargetPathTemplate"),
+                4,
+                200,
+                sortPath: nameof(FileOperation.TargetPathString)),
+            new(FileOpColumnConfig.ColumnType.TimeStamp,
+                (DataTemplate)App.Current.FindResource("FileOpTimeStampTemplate"),
+                5,
+                70,
+                sortPath: $"{nameof(FileOperation.StatusInfo)}.{nameof(FileOperation.StatusInfo.Time)}"),
+            new(FileOpColumnConfig.ColumnType.Device,
+                (DataTemplate)App.Current.FindResource("FileOpDeviceColumnStyle"),
+                6,
+                100,
+                visibleByDefault: false,
+                sortPath: $"{nameof(FileOperation.Device)}.{nameof(FileOperation.Device.Device)}.{nameof(FileOperation.Device.Device.Name)}"),
         };
+
+        List = tempList.OrderBy(c => c.Index).ToList();
 
         UpdateCheckedColumns();
     }
@@ -27,9 +54,12 @@ public static class FileOpColumns
     public static void UpdateCheckedColumns() =>
         CheckedColumnsCount.Value = List.Count(col => col.IsChecked is true);
 
+    public static void UpdateColumnIndexes() =>
+        List.ForEach(c => c.Index = c.Column.DisplayIndex);
+
     public static List<FileOpColumnConfig> List { get; private set; } = new();
 
-    public static ObservableProperty<int> CheckedColumnsCount { get; set; }
+    public static ObservableProperty<int> CheckedColumnsCount { get; set; } = new();
 }
 
 public class FileOpColumnConfig : ViewModelBase
@@ -81,13 +111,13 @@ public class FileOpColumnConfig : ViewModelBase
         }
     }
 
-    private double width;
-    public double Width
+    private double columnWidth;
+    public double ColumnWidth
     {
-        get => width;
+        get => columnWidth;
         set
         {
-            if (Set(ref width, value))
+            if (Set(ref columnWidth, value))
             {
                 if (Column is not null)
                     Column.Width = value;
@@ -97,43 +127,100 @@ public class FileOpColumnConfig : ViewModelBase
         }
     }
 
-    private DataGridColumn column;
-    public DataGridColumn Column
-    {
-        get => column;
-        set
-        {
-            column = value;
-
-            Column.Visibility = VisibilityHelper.Visible(IsChecked);
-            Column.Width = Width;
-            if (Index >= 0)
-                Column.DisplayIndex = Index;
-        }
-    }
-
     #endregion
 
     #region Read-only properties
 
-    public string Name { get; }
+    private object header = null;
+    public object Header
+    {
+        get
+        {
+            if (header is null)
+            {
+                header = string.IsNullOrEmpty(Icon)
+                    ? Name
+                    : new FontIcon()
+                    {
+                        Glyph = Icon,
+                        ToolTip = Name,
+                    };
+            }
+
+            return header;
+        }
+    }
+
+    private Style headerStyle = null;
+    public Style HeaderStyle
+    {
+        get
+        {
+            if (headerStyle is null)
+            {
+                void FileOpColumnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
+                    => ColumnWidth = e.NewSize.Width;
+
+                headerStyle = new()
+                {
+                    TargetType = typeof(DataGridColumnHeader),
+                    BasedOn = App.Current.FindResource("FileOpColumnHeaderStyle") as Style
+                };
+
+                headerStyle.Setters.Add(new EventSetter(FrameworkElement.SizeChangedEvent, new SizeChangedEventHandler(FileOpColumnHeader_SizeChanged)));
+            }
+            
+            return headerStyle;
+        }
+    }
+
+    private DataGridColumn column = null;
+    public DataGridColumn Column
+    {
+        get
+        {
+            if (column is null)
+            {
+                column = new DataGridTemplateColumn()
+                {
+                    Header = Header,
+                    CellTemplate = CellTemplate,
+                    HeaderStyle = HeaderStyle,
+                    CanUserResize = !string.IsNullOrEmpty(Icon),
+                    SortMemberPath = SortPath,
+                    Visibility = VisibilityHelper.Visible(IsChecked),
+                    Width = ColumnWidth,
+                    DisplayIndex = Index,
+                };
+            }
+
+            return column;
+        }
+    }
+
+    public DataTemplate CellTemplate { get; }
 
     public string Icon { get; }
 
     public ColumnType Type { get; }
 
+    public string SortPath { get; }
+
+    public string Name => TypeString(Type);
+
     public bool IsEnabled => IsChecked is false || FileOpColumns.CheckedColumnsCount > 1;
 
     #endregion
 
-    public FileOpColumnConfig(ColumnType type, string name, double defaultWidth = 0, string icon = null, bool visibleByDefault = true)
+    public FileOpColumnConfig(ColumnType type, DataTemplate cellTemplate, int defaultIndex, double defaultWidth = 0, string icon = null, bool visibleByDefault = true, string sortPath = "")
     {
         Type = type;
-        Name = name;
         Icon = icon;
-
+        CellTemplate = cellTemplate;
+        SortPath = sortPath;
+        
         bool isChecked = visibleByDefault;
-        int index = -1;
+        int index = defaultIndex;
         double width = defaultWidth;
 
         if (Retrieve() is string storage && storage.Count(c => c == ',') == 2)
@@ -151,12 +238,24 @@ public class FileOpColumnConfig : ViewModelBase
 
         IsChecked = isChecked;
         Index = index;
-        Width = width;
+        ColumnWidth = width;
 
         FileOpColumns.CheckedColumnsCount.PropertyChanged += (object sender, PropertyChangedEventArgs<int> e) => OnPropertyChanged(nameof(IsEnabled));
     }
 
+    public static string TypeString(ColumnType columnType) => columnType switch
+    {
+        ColumnType.OpType => "Operation Type",
+        ColumnType.FileName => "File Name",
+        ColumnType.Progress => "Progress",
+        ColumnType.Source => "Source",
+        ColumnType.Dest => "Destination",
+        ColumnType.TimeStamp => "Added",
+        ColumnType.Device => "Device",
+        _ => throw new NotSupportedException(),
+    };
+
     private string Retrieve() => Storage.RetrieveValue(Type.ToString())?.ToString();
 
-    private void Store() => Storage.StoreValue(Type.ToString(), $"{IsChecked},{Index},{Width}");
+    private void Store() => Storage.StoreValue(Type.ToString(), $"{IsChecked},{Index},{ColumnWidth}");
 }

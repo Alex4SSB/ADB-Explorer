@@ -16,28 +16,10 @@
         ItemContainerStyle="{StaticResource AdbMenuItemStyle}"
         ItemTemplate="{StaticResource FileOpColConfigTemplate}"
         ItemsSource="{Binding Source={x:Static Member=models:FileOpColumns.List}}" />
-    <DataTemplate x:Key="FileOpColumnHeaderPresenter">
-        <Border>
-            <ContentPresenter x:Name="ContentPresenter" Content="{Binding}" />
-        </Border>
-        <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsPastViewVisible}" Value="True">
-                <Setter TargetName="ContentPresenter" Property="Margin" Value="0,2,0,0" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
-    </DataTemplate>
     <Style
         x:Key="FileOpColumnHeaderStyle"
         BasedOn="{StaticResource DataGridColumnHeaderStyle}"
         TargetType="DataGridColumnHeader">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsPastViewVisible}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource HistoryDeviceBottomBorderBrush}" />
-                <Setter Property="TextElement.FontFamily" Value="Miriam Fixed" />
-                <Setter Property="TextElement.FontSize" Value="14" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="ContentTemplate" Value="{StaticResource FileOpColumnHeaderPresenter}" />
         <Setter Property="ContextMenu" Value="{StaticResource FileOpHeaderContextMenu}" />
         <Style.Resources>
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">

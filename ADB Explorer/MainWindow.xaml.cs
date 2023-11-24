@@ -762,49 +762,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         FileOpColumns.Init();
 
-        FileOpColumns.List.ForEach(col => col.Column = GetColumnFromType(col.Type));
-        foreach (var item in FileOpColumns.List)
-        {
-            var column = GetColumnFromType(item.Type);
-            item.Column = column;
-
-            if (item.Icon is null)
-                column.Header = item.Name;
-            else
-            {
-                column.Header = new FontIcon()
-                {
-                    Glyph = item.Icon,
-                    ToolTip = item.Name,
-                };
-            }
-        }
-
-        DataGridColumn GetColumnFromType(FileOpColumnConfig.ColumnType columnType) => columnType switch
-        {
-            FileOpColumnConfig.ColumnType.OpType => OpTypeColumn,
-            FileOpColumnConfig.ColumnType.FileName => FileNameColumn,
-            FileOpColumnConfig.ColumnType.Progress => ProgressColumn,
-            FileOpColumnConfig.ColumnType.Source => SourceColumn,
-            FileOpColumnConfig.ColumnType.Dest => DestColumn,
-            FileOpColumnConfig.ColumnType.TimeStamp => TimeColumn,
-            FileOpColumnConfig.ColumnType.Device => DeviceColumn,
-            _ => throw new NotSupportedException(),
-        };
+        FileOpColumns.List.ForEach(c => CurrentOperationDetailedDataGrid.Columns.Add(c.Column));
     });
-
-    private FileOpColumnConfig.ColumnType GetColumnType(DataGridColumn column)
-    {
-        if (column == OpTypeColumn) return FileOpColumnConfig.ColumnType.OpType;
-        if (column == FileNameColumn) return FileOpColumnConfig.ColumnType.FileName;
-        if (column == ProgressColumn) return FileOpColumnConfig.ColumnType.Progress;
-        if (column == SourceColumn) return FileOpColumnConfig.ColumnType.Source;
-        if (column == DestColumn) return FileOpColumnConfig.ColumnType.Dest;
-        if (column == TimeColumn) return FileOpColumnConfig.ColumnType.TimeStamp;
-        if (column == DeviceColumn) return FileOpColumnConfig.ColumnType.Device;
-
-        throw new NotSupportedException();
-    }
 
     private void RefreshLocation()
     {
@@ -1480,28 +1439,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
-    {
-        if (e.Column is not DataGridColumn column)
-            return;
-
-        var col = FileOpColumns.List.Find(col => col.Type == GetColumnType(column));
-        if (col?.Column is null)
-            return;
-
-        col.Index = column.DisplayIndex;
-    }
-
-    private void DataGridColumnHeader_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        if (((DataGridColumnHeader)sender).Column is not DataGridColumn column)
-            return;
-
-        var col = FileOpColumns.List.Find(col => col.Type == GetColumnType(column));
-        if (col?.Column is null)
-            return;
-
-        col.Width = column.ActualWidth;
-    }
+        => FileOpColumns.UpdateColumnIndexes();
 
     private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
     {

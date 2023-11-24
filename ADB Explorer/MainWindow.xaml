@@ -35,12 +35,6 @@
         <ContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
         <ContextMenu x:Key="PathButtonsMenu" Style="{StaticResource PathBoxContextMenuStyle}" />
         <Style
-            x:Key="FileOpHeaderResizeStyle"
-            BasedOn="{StaticResource FileOpColumnHeaderStyle}"
-            TargetType="DataGridColumnHeader">
-            <EventSetter Event="SizeChanged" Handler="DataGridColumnHeader_SizeChanged" />
-        </Style>
-        <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
             TargetType="{x:Type DataGridCell}">
@@ -447,43 +441,12 @@
                                 x:Name="CurrentOperationDetailedDataGrid"
                                 CellStyle="{StaticResource DataGridCellStyle}"
                                 ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
-                                ColumnHeaderStyle="{StaticResource FileOpHeaderResizeStyle}"
+                                ColumnHeaderStyle="{StaticResource FileOpColumnHeaderStyle}"
                                 ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}"
                                 KeyUp="CurrentOperationDetailedDataGrid_KeyUp"
                                 PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
                                 SelectionChanged="CurrentOperationDetailedDataGrid_SelectionChanged"
-                                Style="{StaticResource DetailedFileOpGridStyle}">
-                                <DataGrid.Columns>
-                                    <DataGridTemplateColumn
-                                        x:Name="OpTypeColumn"
-                                        CanUserResize="False"
-                                        CellTemplate="{StaticResource OperationIconTemplate}">
-                                        <DataGridTemplateColumn.HeaderStyle>
-                                            <Style BasedOn="{StaticResource FileOpHeaderResizeStyle}" TargetType="DataGridColumnHeader">
-                                                <Setter Property="ContentTemplate" Value="{x:Null}" />
-                                            </Style>
-                                        </DataGridTemplateColumn.HeaderStyle>
-                                    </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn x:Name="FileNameColumn" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
-                                    <DataGridTemplateColumn x:Name="ProgressColumn" CellTemplate="{StaticResource FileOpProgressTemplate}" />
-                                    <DataGridTemplateColumn
-                                        x:Name="SourceColumn"
-                                        CellTemplate="{StaticResource FileOpSourcePathTemplate}"
-                                        SortMemberPath="SourcePathString" />
-                                    <DataGridTemplateColumn
-                                        x:Name="DestColumn"
-                                        CellTemplate="{StaticResource FileOpTargetPathTemplate}"
-                                        SortMemberPath="TargetPathString" />
-                                    <DataGridTemplateColumn
-                                        x:Name="TimeColumn"
-                                        CellTemplate="{StaticResource FileOpTimeStampTemplate}"
-                                        SortMemberPath="StatusInfo.Time" />
-                                    <DataGridTemplateColumn
-                                        x:Name="DeviceColumn"
-                                        CellTemplate="{StaticResource FileOpDeviceColumnStyle}"
-                                        SortMemberPath="Device.Device.Name" />
-                                </DataGrid.Columns>
-                            </DataGrid>
+                                Style="{StaticResource DetailedFileOpGridStyle}" />
                             <Border
                                 Grid.Column="1"
                                 BorderBrush="Gray"
