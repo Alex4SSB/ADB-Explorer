@@ -16,6 +16,7 @@ internal class MenuTemplateSelector : DataTemplateSelector
     public DataTemplate CompoundIconSubMenuTemplate { get; set; }
     public DataTemplate DualActionButtonTemplate { get; set; }
     public DataTemplate CompoundDualActionTemplate { get; set; }
+    public DataTemplate GeneralSubMenuTemplate { get; set; }
 
     public override DataTemplate SelectTemplate(object item, DependencyObject container) => item switch
     {
@@ -25,6 +26,7 @@ internal class MenuTemplateSelector : DataTemplateSelector
         CompoundIconSubMenu => CompoundIconSubMenuTemplate,
         MenuSeparator => SeparatorTemplate,
         AnimatedNotifyMenu => AnimatedNotifyTemplate,
+        GeneralSubMenu or CheckBox => GeneralSubMenuTemplate,
         SubMenu or string => SubMenuTemplate,
         AltTextMenu => DynamicAltTextTemplate,
         IconMenu => IconMenuTemplate,
@@ -48,6 +50,7 @@ internal class MenuStyleSelector : StyleSelector
     public Style CompoundIconMenuStyle { get; set; }
     public Style DualActionButtonStyle { get; set; }
     public Style CompoundDualActionStyle { get; set; }
+    public Style GeneralSubMenuStyle { get; set; }
 
     public override Style SelectStyle(object item, DependencyObject container) => item switch
     {
@@ -57,6 +60,7 @@ internal class MenuStyleSelector : StyleSelector
         CompoundIconSubMenu => CompoundIconSubMenuStyle,
         MenuSeparator => SeparatorStyle,
         AnimatedNotifyMenu => AnimatedNotifyStyle,
+        GeneralSubMenu or CheckBox => GeneralSubMenuStyle,
         SubMenu or string => SubMenuStyle,
         AltTextMenu => DynamicAltTextStyle,
         IconMenu => IconMenuStyle,

@@ -126,6 +126,7 @@ public static class Security
             ? new FailedOpProgressViewModel(message)
             : new CompletedShellProgressViewModel(message);
 
+        op.IsValidated = fails < 1;
         op.SetValidation(false);
     }
 }

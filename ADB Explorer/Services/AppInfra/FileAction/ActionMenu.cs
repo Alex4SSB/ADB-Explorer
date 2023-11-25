@@ -249,6 +249,17 @@ internal class SubMenu : ActionMenu
     }
 }
 
+internal class GeneralSubMenu : SubMenu
+{
+    public object Content { get; }
+
+    public GeneralSubMenu(object content)
+        : base(new(FileAction.FileActionType.None, () => true, () => { }), null)
+    {
+        Content = content;
+    }
+}
+
 internal class CompoundIconSubMenu : SubMenu
 {
     public UserControl CompoundIcon { get; }
@@ -291,6 +302,8 @@ internal class DualActionButton : IconMenu
         }
     }
 
+    public bool IsCheckable { get; } = true;
+
     private readonly ObservableProperty<bool> observableIsChecked;
 
     public Brush CheckBackground { get; }
@@ -300,19 +313,23 @@ internal class DualActionButton : IconMenu
     /// </summary>
     public DualActionButton(FileAction action,
                             ObservableProperty<string> icon,
-                            ObservableProperty<bool> isChecked,
+                            ObservableProperty<bool> isChecked = null,
                             int iconSize = 20,
                             StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
                             Brush checkBackground = null,
-                            ObservableProperty<bool> isVisible = null)
-        : base(action, icon, animation, iconSize, isVisible: isVisible)
+                            IEnumerable<SubMenu> children = null,
+                            ObservableProperty<bool> isVisible = null,
+                            bool isCheckable = true)
+        : base(action, icon, animation, iconSize, children: children, isVisible: isVisible)
     {
-        observableIsChecked = isChecked;
-        IsChecked = isChecked;
         CheckBackground = checkBackground;
+        observableIsChecked = isChecked;
+        IsCheckable = isCheckable;
+
+        IsChecked = isChecked;
+        observableIsChecked.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsChecked = e.NewValue;
 
         icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
-        observableIsChecked.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsChecked = e.NewValue;
     }
 
     /// <summary>

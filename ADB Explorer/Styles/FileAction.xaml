@@ -126,6 +126,7 @@
         CompoundIconSubMenuTemplate="{x:Null}"
         DualActionButtonTemplate="{StaticResource DualActionButtonTemplate}"
         DynamicAltTextTemplate="{StaticResource DynamicAltTextTemplate}"
+        GeneralSubMenuTemplate="{x:Null}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
         SubMenuSeparatorTemplate="{x:Null}"
@@ -261,9 +262,16 @@
         x:Key="DualActionButtonStyle"
         BasedOn="{StaticResource IconMenuStyle}"
         TargetType="MenuItem">
-        <Setter Property="IsCheckable" Value="True" />
+        <Setter Property="IsCheckable" Value="{Binding IsCheckable}" />
         <Setter Property="IsChecked" Value="{Binding IsChecked}" />
         <Setter Property="helpers:MenuHelper.CheckBackground" Value="{Binding CheckBackground}" />
+    </Style>
+    <Style
+        x:Key="GeneralSubMenuStyle"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
+        TargetType="MenuItem">
+        <Setter Property="FlowDirection" Value="LeftToRight" />
+        <Setter Property="Header" Value="{Binding Content}" />
     </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"
@@ -274,6 +282,7 @@
         CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
         DualActionButtonStyle="{StaticResource DualActionButtonStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
+        GeneralSubMenuStyle="{StaticResource GeneralSubMenuStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"
         SeparatorStyle="{StaticResource MenuSeparatorStyle}"
         SubMenuSeparatorStyle="{StaticResource SubMenuSeparatorStyle}"

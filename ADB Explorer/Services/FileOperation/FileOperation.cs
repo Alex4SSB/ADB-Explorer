@@ -80,6 +80,13 @@ public abstract class FileOperation : ViewModelBase
         set => Set(ref isPastOp, value);
     }
 
+    private bool isValidated = false;
+    public bool IsValidated
+    {
+        get => isValidated;
+        set => Set(ref isValidated, value);
+    }
+
     #endregion
 
     #region Base Properties
@@ -99,6 +106,25 @@ public abstract class FileOperation : ViewModelBase
     #endregion
 
     #region Read-only Properties
+
+    public FileOpFilter.FilterType Filter
+    {
+        get
+        {
+            if (IsValidated) return FileOpFilter.FilterType.Validated;
+            if (IsPastOp) return FileOpFilter.FilterType.Previous;
+
+            return Status switch
+            {
+                OperationStatus.InProgress => FileOpFilter.FilterType.Running,
+                OperationStatus.Waiting => FileOpFilter.FilterType.Pending,
+                OperationStatus.Completed => FileOpFilter.FilterType.Completed,
+                OperationStatus.Failed => FileOpFilter.FilterType.Failed,
+                OperationStatus.Canceled => FileOpFilter.FilterType.Canceled,
+                _ => throw new NotSupportedException(),
+            };
+        }
+    }
 
     public string TypeOnDevice => $"{OperationName}@{Device.ID}";
 

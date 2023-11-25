@@ -10,6 +10,7 @@ using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Resources.Strings;
+using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer;
 
@@ -92,6 +93,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.PropertyChanged += FileActions_PropertyChanged;
         DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
         DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
+        FileOpFilters.CheckedFilterCount.PropertyChanged += CheckedFilterCount_PropertyChanged;
         
         var versionTask = AdbHelper.CheckAdbVersion();
         versionTask.ContinueWith((t) =>
@@ -123,6 +125,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Task.WaitAll(launchTask, versionTask);
             RuntimeSettings.IsWindowLoaded = true;
         });
+    }
+
+    private void CheckedFilterCount_PropertyChanged(object sender, PropertyChangedEventArgs<int> e)
+    {
+        UpdateFileOpFilterCheck();
+
+        SortFileOps(true);
+    }
+
+    private static void UpdateFileOpFilterCheck()
+    {
+        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpFilter).Button.IsChecked
+            = FileOpFilters.CheckedFilterCount < FileOpFilters.List.Count;
     }
 
     private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -363,19 +378,31 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             UpdateFileOp();
         
         if (e.PropertyName is nameof(FileOperationQueue.CurrentChanged))
-            RefreshFileOps();
+            SortFileOps();
 
         UpdateSelectedFileOp();
     }
 
-    private void RefreshFileOps()
+    private void SortFileOps(bool onlyFilter = false)
     {
         var collectionView = CollectionViewSource.GetDefaultView(CurrentOperationDetailedDataGrid.ItemsSource);
         if (collectionView is null)
             return;
 
+        Predicate<object> predicate = op =>
+        {
+            var fileOp = (FileOperation)op;
+
+            return FileOpFilters.List.Find(f => f.Type == fileOp.Filter).IsChecked is true;
+        };
+
+        collectionView.Filter = new(predicate);
+
+        if (onlyFilter)
+            return;
+
         collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new(nameof(FileOperation.Status), ListSortDirection.Ascending));
+        collectionView.SortDescriptions.Add(new(nameof(FileOperation.Filter), ListSortDirection.Ascending));
     }
 
     private void UpdateFileOp()
@@ -702,6 +729,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DeviceHelper.UpdateWsaPkgStatus();
 
         SettingsHelper.CheckForUpdates();
+
+        UpdateFileOpFilterCheck();
     }
 
     private void FilterDevices() => DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(DevicesList.ItemsSource));

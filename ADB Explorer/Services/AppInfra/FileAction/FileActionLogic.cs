@@ -813,7 +813,12 @@ internal static class FileActionLogic
     {
         var changed = false;
 
-        Data.FileActions.IsFileOpStopEnabled = Data.FileOpQ.HasIncompleteOperations && (Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible);
+        var opStopEnabled = Data.FileOpQ.HasIncompleteOperations && (Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible);
+        if (Data.FileActions.IsFileOpStopEnabled != opStopEnabled)
+        {
+            Data.FileActions.IsFileOpStopEnabled = opStopEnabled;
+            changed = true;
+        }
 
         var opStopButton = AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button;
         var opStopChecked = !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;

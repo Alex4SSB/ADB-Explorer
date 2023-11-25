@@ -469,18 +469,28 @@
             Background="{TemplateBinding Background}"
             SnapsToDevicePixels="True">
             <Border
+                x:Name="BaseLayer"
+                BorderThickness="1"
+                Style="{StaticResource MenuBorderStyle}" />
+            <Border
                 x:Name="Background"
                 Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                Style="{StaticResource MenuBorderStyle}" />
-            <ContentPresenter
-                x:Name="ContentPresenter"
-                Margin="{TemplateBinding Padding}"
-                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                ContentSource="Header"
-                RecognizesAccessKey="True"
-                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                Style="{StaticResource MenuBorderStyle}">
+                <Border
+                    x:Name="Border"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Style="{StaticResource MenuBorderStyle}">
+                    <ContentPresenter
+                        x:Name="ContentPresenter"
+                        Margin="{TemplateBinding Padding}"
+                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                        ContentSource="Header"
+                        RecognizesAccessKey="True"
+                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                        TextElement.Foreground="{TemplateBinding Foreground}" />
+                </Border>
+            </Border>
             <ui:MenuPopup
                 x:Name="PART_Popup"
                 AllowsTransparency="true"
@@ -524,22 +534,189 @@
             <Trigger SourceName="PART_Popup" Property="IsSuspendingAnimation" Value="true">
                 <Setter TargetName="PART_Popup" Property="PopupAnimation" Value="None" />
             </Trigger>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
-                <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPointerOver}" />
-                <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
+
+            <!--  BACKGROUND, FOREGROUND: Checked, external check BG  -->
+            <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="Background" Property="Background" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=(helpers:MenuHelper.CheckBackground)}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{ui:ThemeResource SystemControlBackgroundAltHighBrush}" />
             </Trigger>
-            <!--  Selected  -->
-            <Trigger Property="IsSubmenuOpen" Value="True">
+
+            <!--  BACKGROUND: Dark Theme, Checked  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="helpers:MenuHelper.CheckBackground" Value="{x:Null}" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+            </MultiTrigger>
+
+            <!--  BACKGROUND: Light Theme, Checked  -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.CheckBackground)}" Value="{x:Null}" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorBrush}" />
+            </MultiDataTrigger>
+
+            <!--  BACKGROUND: Win10, Checked  -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:StyleHelper.UseFluentStyles)}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.CheckBackground)}" Value="{x:Null}" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
+
+            <!--  BACKGROUND, FOREGROUND, BORDER: Unchecked  -->
+            <Trigger Property="IsChecked" Value="False">
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuFlyoutItemRevealBackground}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="Transparent" />
+                <Setter TargetName="Border" Property="BorderThickness" Value="0" />
+                <Setter TargetName="BaseLayer" Property="Background" Value="Transparent" />
+            </Trigger>
+
+            <!--  BASE, BORDER: Button Menu  -->
+            <Trigger Property="helpers:MenuHelper.IsButtonMenu" Value="True">
+                <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                <Setter TargetName="BaseLayer" Property="Background" Value="{DynamicResource DevicesListBackground}" />
+            </Trigger>
+
+            <!--  BACKGROUND, BORDER: Button Menu, Unchecked  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+                    <Condition Property="IsChecked" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundNormal}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource DarkFluentButtonBorderBrush}" />
+            </MultiTrigger>
+
+            <!--  BACKGROUND, BORDER: Button Menu, Checked  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+                    <Condition Property="IsChecked" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource DarkFluentAccentButtonBorderBrush}" />
+            </MultiTrigger>
+
+            <!--  BORDER: Light Theme, Button Menu, Unchecked  -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="False" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.IsButtonMenu)}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LightFluentButtonBorderBrush}" />
+            </MultiDataTrigger>
+
+            <!--  BORDER: Light Theme, Button Menu, Checked  -->
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsChecked}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:MenuHelper.IsButtonMenu)}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource LightFluentAccentButtonBorderBrush}" />
+            </MultiDataTrigger>
+
+            <!--  BACKGORUND: Unchecked, Mouse Over  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPointerOver}" />
+            </MultiTrigger>
+
+            <!--  BACKGORUND: Unchecked, Mouse Over, Button Menu  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundMouseOver}" />
+            </MultiTrigger>
+
+            <!--  BACKGORUND (OPACITY): Checked, Mouse Over  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Opacity" Value="{StaticResource AccentButtonBackgroundMouseOverOpacity}" />
+            </MultiTrigger>
+
+            <!--  Unchecked, Pressed  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPressed}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </MultiTrigger>
+
+            <!--  Unchecked, Pressed, Menu Button  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundPressed}" />
+            </MultiTrigger>
+
+            <!--  BACKGORUND (OPACITY), FOREGROUND: Checked, Pressed  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Opacity" Value="{StaticResource AccentButtonBackgroundPressedOpacity}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground">
+                    <Setter.Value>
+                        <SolidColorBrush Opacity="{StaticResource AccentButtonForegroundPressedOrDisabledOpacity}" Color="{ui:ThemeResource SystemAltHighColor}" />
+                    </Setter.Value>
+                </Setter>
+            </MultiTrigger>
+
+            <!--  SubMenu Open, Checked  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsSubmenuOpen" Value="True" />
+                </MultiTrigger.Conditions>
                 <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundSelected}" />
                 <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushSelected}" />
                 <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource MenuBarItemBackgroundSelected}" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="Background" Property="Background" Value="{DynamicResource MenuBarItemBackgroundPressed}" />
-                <Setter TargetName="Background" Property="BorderBrush" Value="{DynamicResource MenuBarItemBorderBrushPressed}" />
-                <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource MenuBarItemBackgroundPressed}" />
-            </Trigger>
+            </MultiTrigger>
+
+            <!--  BACKGROUND: Disabled, Checked  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="True" />
+                    <Condition Property="IsEnabled" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
+            </MultiTrigger>
+
+            <!--  BACKGROUND, BORDER, FOREGROUND: Disabled, Unchecked, Button Menu  -->
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsEnabled" Value="False" />
+                </MultiTrigger.Conditions>
+                <Setter TargetName="Background" Property="Background" Value="{DynamicResource AdbButtonBackgroundDisabled}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource AdbButtonBorderDisabled}" />
+                <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+            </MultiTrigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
 

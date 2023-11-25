@@ -48,6 +48,13 @@ internal static class AppActions
 
     public static List<ToggleMenu> ToggleActions { get; } = new()
     {
+        new(FileActionType.FileOpFilter,
+            () => true,
+            "Filter File Operations",
+            "\uF16C",
+            () => { },
+            toggleOnClick: false,
+            children: FileOpFilters.List.Select(f => new GeneralSubMenu(f.CheckBox))),
         new(FileActionType.FileOpStop,
             () => Data.FileActions.IsFileOpStopEnabled,
             "Resume",
@@ -468,6 +475,7 @@ internal class FileAction : ViewModelBase
         ExpandSettings,
         LogToggle,
         FileOpValidate,
+        FileOpFilter,
     }
 
     public FileActionType Name { get; }

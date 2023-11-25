@@ -27,4 +27,11 @@
             </Style>
         </Style.Resources>
     </Style>
+    <Style
+        x:Key="FileOpFilterCheckBox"
+        BasedOn="{StaticResource CheckBoxStyle}"
+        TargetType="CheckBox">
+        <Setter Property="IsChecked" Value="{Binding IsChecked, Mode=TwoWay}" />
+        <Setter Property="IsEnabled" Value="{Binding IsEnabled, Mode=OneWay}" />
+    </Style>
 </ResourceDictionary>
