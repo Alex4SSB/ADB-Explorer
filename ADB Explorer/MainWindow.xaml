@@ -869,54 +869,27 @@
                                         MouseMove="SortedSettings_MouseMove"
                                         Style="{StaticResource SortedSettingsListView}" />
                                     <Separator />
-                                    <Expander x:Name="SettingsAboutExpander" Header="About">
-                                        <Expander.Style>
-                                            <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Expander.Style>
+                                    <Expander x:Name="SettingsAboutExpander" Style="{StaticResource SettingsAboutExpanderStyle}">
                                         <StackPanel>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock FontSize="18" Text="ADB Explorer" />
-                                                <TextBlock
-                                                    Margin="10,0,0,1"
-                                                    VerticalAlignment="Bottom"
-                                                    Text="v" />
-                                                <TextBlock
-                                                    Margin="2,0,0,1"
-                                                    VerticalAlignment="Bottom"
-                                                    Text="{x:Static app_prop:Resources.AppVersion}" />
+                                            <TextBlock
+                                                HorizontalAlignment="Center"
+                                                FontSize="18"
+                                                Text="ADB Explorer" />
+                                            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                                                <TextBlock VerticalAlignment="Bottom" Text="v" />
+                                                <TextBlock VerticalAlignment="Bottom" Text="{x:Static app_prop:Resources.AppVersion}" />
                                             </StackPanel>
-                                            <ui:SimpleStackPanel Orientation="Horizontal" Spacing="20">
-                                                <ui:HyperlinkButton
-                                                    Content="GitHub repository"
-                                                    NavigateUri="https://github.com/Alex4SSB/ADB-Explorer"
-                                                    ToolTip="https://github.com/Alex4SSB/ADB-Explorer" />
-                                                <ui:HyperlinkButton
-                                                    Content="Privacy Policy"
-                                                    NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
-                                                    ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
-                                            </ui:SimpleStackPanel>
-                                            <CheckBox
-                                                Content="Check For Updates"
-                                                IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}"
-                                                ToolTip="Checks for updates each time the app is launched">
-                                                <CheckBox.Style>
-                                                    <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                                                        <Setter Property="HorizontalAlignment" Value="Stretch" />
-                                                        <Style.Triggers>
-                                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsAppDeployed}" Value="True">
-                                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                            </DataTrigger>
-                                                        </Style.Triggers>
-                                                    </Style>
-                                                </CheckBox.Style>
-                                            </CheckBox>
-                                            <Grid>
+                                            <ui:HyperlinkButton
+                                                Margin="0,4,0,-6"
+                                                Content="GitHub repository"
+                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer"
+                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer" />
+                                            <ui:HyperlinkButton
+                                                Content="Privacy Policy"
+                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
+                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
+                                            <CheckBox Margin="0,6,0,0" Style="{StaticResource UpdatesCheckBoxStyle}" />
+                                            <Grid Margin="1,0,0,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
                                                     <ColumnDefinition />
@@ -929,14 +902,16 @@
                                                     TextWrapping="Wrap" />
                                             </Grid>
                                             <TextBlock
-                                                Margin="0,16,0,0"
+                                                Margin="0,24,0,0"
+                                                HorizontalAlignment="Center"
                                                 FontWeight="Bold"
-                                                Text="Attributions &amp; Third Party Licenses:" />
+                                                Text="Attributions &amp; Third Party Licenses" />
                                             <ui:HyperlinkButton
                                                 Content="ModernWPF"
                                                 NavigateUri="https://github.com/Kinnara/ModernWpf"
                                                 ToolTip="https://github.com/Kinnara/ModernWpf" />
                                             <ui:HyperlinkButton
+                                                Margin="0,-6"
                                                 Content="Icons8"
                                                 NavigateUri="https://icons8.com"
                                                 ToolTip="https://icons8.com" />

@@ -937,4 +937,29 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style
+        x:Key="UpdatesCheckBoxStyle"
+        BasedOn="{StaticResource CheckBoxStyle}"
+        TargetType="CheckBox">
+        <Setter Property="ToolTip" Value="Checks for updates on each launch" />
+        <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" />
+        <Setter Property="Content" Value="Check For Updates" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsAppDeployed}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="SettingsAboutExpanderStyle"
+        BasedOn="{StaticResource FluentExpanderStyle}"
+        TargetType="Expander">
+        <Setter Property="Header" Value="About" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
