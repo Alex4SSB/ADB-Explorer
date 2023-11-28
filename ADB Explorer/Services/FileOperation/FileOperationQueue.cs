@@ -80,6 +80,23 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
+    public void AddOperations(IEnumerable<FileOperation> operations)
+    {
+        try
+        {
+            mutex.WaitOne();
+
+            Operations.AddRange(operations);
+            OnPropertyChanged(nameof(HasIncompleteOperations));
+
+            Start();
+        }
+        finally
+        {
+            mutex.ReleaseMutex();
+        }
+    }
+
     public void RemoveOperation(FileOperation fileOp)
     {
         try

@@ -1,21 +1,15 @@
 ﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
 public class FileDeleteOperation : AbstractShellFileOperation
 {
-    private readonly ObservableList<FileClass> fileList;
-
-    public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass path, ObservableList<FileClass> fileList)
+    public FileDeleteOperation(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, FileClass path)
         : base(path, adbDevice, dispatcher)
     {
         OperationName = OperationType.Delete;
-
-        this.fileList = fileList;
     }
 
     public override void Start()
@@ -36,18 +30,6 @@ public class FileDeleteOperation : AbstractShellFileOperation
             {
                 Status = OperationStatus.Completed;
                 StatusInfo = new CompletedShellProgressViewModel();
-
-                Dispatcher.Invoke(() =>
-                {
-                    FileActionLogic.RemoveFile(base.FilePath);
-
-                    fileList.Remove(base.FilePath);
-                });
-
-                if (base.FilePath.TrashIndex is TrashIndexer indexer)
-                {
-                    ShellFileOperation.SilentDelete(Device, indexer.IndexerPath);
-                }
             }
             else
             {

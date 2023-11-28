@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.Services;
 
@@ -41,11 +42,43 @@ public static class ShellFileOperation
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, args);
     }
 
-    public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, ObservableList<FileClass> fileList, Dispatcher dispatcher)
+    public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
         foreach (var item in items)
         {
-            Data.FileOpQ.AddOperation(new FileDeleteOperation(dispatcher, device, item, fileList));
+            var fileOp = new FileDeleteOperation(dispatcher, device, item);
+            fileOp.PropertyChanged += DeleteFileOp_PropertyChanged;
+
+            Data.FileOpQ.AddOperation(fileOp);
+        }
+    }
+
+    private static void DeleteFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var op = sender as FileDeleteOperation;
+
+        // when operation completes, remove this event handler anyway
+        if (e.PropertyName is nameof(FileOperation.Status)
+            && op.Status is FileOperation.OperationStatus.Completed)
+        {
+            // delete file trash indexer if present, even if not current device
+            if (op.FilePath.TrashIndex is TrashIndexer indexer)
+                SilentDelete(op.Device, indexer.IndexerPath);
+
+            if (op.Device.ID == Data.CurrentADBDevice.ID)
+            {
+                // remove file from cut items and clear its trash indexer if current device
+                FileActionLogic.RemoveFile(op.FilePath);
+
+                // update UI if current path
+                if (op.TargetPath.ParentPath == Data.CurrentPath)
+                {
+                    Data.DirList.FileList.Remove(op.FilePath);
+                    FileActionLogic.UpdateFileActions();
+                }
+            }
+
+            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
         }
     }
 
@@ -73,20 +106,15 @@ public static class ShellFileOperation
 
     public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, bool isCopy = false)
     {
+        List<FileOperation> fileops = new();
+
         if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
         {
-            var mdTask = Task.Run(() => MakeDir(device, AdbExplorerConst.RECYCLE_PATH));
-            mdTask.ContinueWith((t) =>
+            foreach (var item in items)
             {
-                dispatcher.Invoke(() =>
-                {
-                    foreach (var item in items)
-                    {
-                        SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
-                        Data.FileOpQ.AddOperation(new FileMoveOperation(item, target, fileList, device, dispatcher));
-                    }
-                });
-            });
+                SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
+                fileops.Add(new FileMoveOperation(item, target, device, dispatcher));
+            }
         }
         else if (targetPath is null && currentPath == AdbExplorerConst.RECYCLE_PATH) // Restore
         {
@@ -96,22 +124,85 @@ public static class ShellFileOperation
                     continue;
 
                 SyncFile target = new(FileHelper.ConcatPaths(item.TrashIndex.ParentPath, item.FullName));
-                Data.FileOpQ.AddOperation(new FileMoveOperation(item, target, fileList, device, dispatcher));
+                fileops.Add(new FileMoveOperation(item, target, device, dispatcher));
             }
         }
-        else
+        else // copy & cut
         {
             foreach (var item in items)
             {
                 var targetName = item.FullName;
                 if (currentPath == targetPath)
-                {
                     targetName = $"{item.NoExtName}{FileClass.ExistingIndexes(fileList, item.NoExtName, isCopy)}{item.Extension}";
-                }
 
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
-                Data.FileOpQ.AddOperation(new FileMoveOperation(item, target, fileList, device, dispatcher, isCopy));
+                fileops.Add(new FileMoveOperation(item, target, device, dispatcher, isCopy));
             }
+        }
+
+        fileops.ForEach(op => op.PropertyChanged += MoveFileOp_PropertyChanged);
+        Data.FileOpQ.AddOperations(fileops);
+    }
+
+    private static void MoveFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var op = sender as FileMoveOperation;
+
+        // when operation completes, remove this event handler anyway
+        if (e.PropertyName is nameof(FileOperation.Status)
+            && op.Status is FileOperation.OperationStatus.Completed)
+        {
+            // write or delete indexer, even if not current device
+            if (op.OperationName is FileOperation.OperationType.Recycle)
+            {
+                var date = op.DateModified.HasValue ? op.DateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
+                WriteLine(op.Device, op.IndexerPath, ADBService.EscapeAdbShellString($"{op.RecycleName}|{op.FilePath.FullPath}|{date}"));
+            }
+            else if (op.OperationName is FileOperation.OperationType.Restore)
+            {
+                SilentDelete(op.Device, op.IndexerPath);
+            }
+
+            if (op.Device.ID == Data.CurrentADBDevice.ID)
+            {
+                // remove file from cut items and clear its trash indexer if restore / recycle on current device
+                if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
+                {
+                    FileActionLogic.RemoveFile(op.FilePath);
+                }
+
+                // update UI when copy / cut target is current path
+                if (op.TargetPath.ParentPath == Data.CurrentPath)
+                {
+                    if (op.OperationName is FileOperation.OperationType.Copy)
+                    {
+                        FileClass newFile = new(op.FilePath);
+                        newFile.UpdatePath(op.TargetPath.FullPath);
+                        newFile.ModifiedTime = op.DateModified;
+                        Data.DirList.FileList.Add(newFile);
+
+                        Data.FileActions.ItemToSelect = newFile;
+                    }
+                    else
+                    {
+                        op.FilePath.UpdatePath(op.TargetPath.FullPath);
+                        Data.DirList.FileList.Add(op.FilePath);
+
+                        Data.FileActions.ItemToSelect = op.FilePath;
+                    }
+
+                    FileActionLogic.UpdateFileActions();
+                }
+
+                // update UI when cut / restore / recycle source is current path
+                else if (op.FilePath.ParentPath == Data.CurrentPath && op.OperationName is not FileOperation.OperationType.Copy)
+                {
+                    Data.DirList.FileList.Remove(op.FilePath);
+                    FileActionLogic.UpdateFileActions();
+                }
+            }
+
+            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
         }
     }
 

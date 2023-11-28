@@ -445,6 +445,8 @@ internal static class FileActionLogic
 
         if (!Data.FileActions.IsRecycleBin && Data.Settings.EnableRecycle && !result.Item2)
         {
+            await Task.Run(() => ShellFileOperation.MakeDir(Data.CurrentADBDevice, AdbExplorerConst.RECYCLE_PATH));
+
             ShellFileOperation.MoveItems(Data.CurrentADBDevice,
                                          itemsToDelete,
                                          AdbExplorerConst.RECYCLE_PATH,
@@ -455,7 +457,7 @@ internal static class FileActionLogic
         }
         else
         {
-            ShellFileOperation.DeleteItems(Data.CurrentADBDevice, itemsToDelete, Data.DirList.FileList, App.Current.Dispatcher);
+            ShellFileOperation.DeleteItems(Data.CurrentADBDevice, itemsToDelete, App.Current.Dispatcher);
 
             if (Data.FileActions.IsRecycleBin)
             {
@@ -479,8 +481,6 @@ internal static class FileActionLogic
 
         if (Data.CutItems.Count == 0)
             Data.FileActions.PasteState = FileClass.CutType.None;
-
-        UpdateFileActions();
 
         file.TrashIndex = null;
     }
@@ -741,14 +741,18 @@ internal static class FileActionLogic
         var op = sender as FileSyncOperation;
 
         // If operation completed now and current path is where the new file was pushed to and it is not shown yet
-        if (e.PropertyName is nameof(FileSyncOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed
-            && op.Device.ID == Data.CurrentADBDevice.ID
-            && op.TargetPath.ParentPath == Data.CurrentPath
-            && !Data.DirList.FileList.Any(f => f.FullName == op.FilePath.FullName))
+        if (e.PropertyName is nameof(FileOperation.Status)
+            && op.Status is FileOperation.OperationStatus.Completed)
         {
-            Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject));
+            if (op.Device.ID == Data.CurrentADBDevice.ID
+                && op.TargetPath.ParentPath == Data.CurrentPath
+                && !Data.DirList.FileList.Any(f => f.FullName == op.FilePath.FullName))
+            {
+                Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject));
+            }
+
             op.FilePath.ShellObject = null;
+            op.PropertyChanged -= PushOpeartion_PropertyChanged;
         }
     }
 
