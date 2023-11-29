@@ -36,13 +36,6 @@ public class FileRenameOperation : AbstractShellFileOperation
             {
                 Status = OperationStatus.Completed;
                 StatusInfo = new CompletedShellProgressViewModel();
-
-                Dispatcher.Invoke(() =>
-                {
-                    FilePath.UpdatePath(TargetPath.FullPath);
-
-                    Data.FileActions.ItemToSelect = FilePath;
-                });
             }
             else
             {

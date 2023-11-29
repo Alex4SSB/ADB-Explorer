@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
@@ -7,24 +6,9 @@ namespace ADB_Explorer.Services;
 
 public class PackageInstallOperation : AbstractShellFileOperation
 {
-    private readonly ObservableList<Package> packageList;
-    private bool pushPackage;
-    private bool isPackagePath;
+    public bool PushPackage;
 
-    private string packageName;
-    public string PackageName
-    {
-        get => packageName;
-        set
-        {
-            if (Set(ref packageName, value))
-            {
-                OnPropertyChanged(nameof(IsUninstall));
-                OnPropertyChanged(nameof(Tooltip));
-                OnPropertyChanged(nameof(OpIcon));
-            }
-        }
-    }
+    public string PackageName { get; }
 
     public bool IsUninstall => !string.IsNullOrEmpty(PackageName);
 
@@ -36,15 +20,19 @@ public class PackageInstallOperation : AbstractShellFileOperation
                                    ADBService.AdbDevice adbDevice,
                                    FileClass path = null,
                                    string packageName = null,
-                                   ObservableList<Package> packageList = null,
-                                   bool pushPackage = false,
-                                   bool isPackagePath = false) : base(path, adbDevice, dispatcher)
+                                   bool pushPackage = false) : base(path, adbDevice, dispatcher)
     {
         OperationName = OperationType.Install;
         PackageName = packageName;
-        this.packageList = packageList;
-        this.pushPackage = pushPackage;
-        this.isPackagePath = isPackagePath;
+        PushPackage = pushPackage;
+
+        if (IsUninstall)
+        {
+            AltSource = NavHistory.SpecialLocation.PackageDrive;
+            AltTarget = NavHistory.SpecialLocation.devNull;
+        }
+        else
+            AltTarget = NavHistory.SpecialLocation.PackageDrive;
     }
 
     public override void Start()
@@ -70,7 +58,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
         // install (pm / adb)
         else
         {
-            if (!pushPackage)
+            if (!PushPackage)
             {
                 args = new string[4];
                 args[0] = "install";
@@ -83,32 +71,22 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
         args[index] = ADBService.EscapeAdbShellString(args[index]);
 
-        string stdout = "", stderr = "";
-        var operationTask = Task.Run(() =>
-        {
-            return pushPackage
-                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, "install", out stdout, out stderr, args)
-                : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, "pm", out stdout, out stderr, args);
-        }, CancelTokenSource.Token);
+        var operationTask = PushPackage
+                ? ADBService.ExecuteDeviceAdbCommand(Device.ID, CancelTokenSource.Token, "install", args)
+                : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, CancelTokenSource.Token, "pm", args);
 
         operationTask.ContinueWith((t) =>
         {
-            Status = t.Result == 0 ? OperationStatus.Completed : OperationStatus.Failed;
-            
-            if (Status is OperationStatus.Completed)
+            if (t.Result == "")
             {
+                Status = OperationStatus.Completed;
                 StatusInfo = new CompletedShellProgressViewModel();
-                Dispatcher.Invoke(() =>
-                {
-                    if (packageList is not null)
-                        packageList.RemoveAll(pkg => pkg.Name == packageName);
-                    else if (pushPackage && isPackagePath)
-                        Data.FileActions.RefreshPackages = true;
-                });
             }
             else
-                StatusInfo = new FailedOpProgressViewModel(string.IsNullOrEmpty(stderr) ? stdout : stderr);
-
+            {
+                Status = OperationStatus.Failed;
+                StatusInfo = new FailedOpProgressViewModel(t.Result);
+            }
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
         operationTask.ContinueWith((t) =>

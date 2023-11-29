@@ -14,8 +14,11 @@ public abstract class AbstractShellFileOperation : FileOperation
     public AbstractShellFileOperation(FileClass filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
         : base(filePath, adbDevice, dispatcher)
     {
-        FilePath = filePath;
-        TargetPath = new(filePath);
+        if (filePath is not null)
+        {
+            FilePath = filePath;
+            TargetPath = new(filePath);
+        }
     }
 
     public override void ClearChildren()
@@ -82,12 +85,35 @@ public static class ShellFileOperation
         }
     }
 
-    public static FileRenameOperation Rename(FileClass item, string targetPath, ADBService.AdbDevice device)
+    public static void Rename(FileClass item, string targetPath, ADBService.AdbDevice device)
     {
         var fileOp = new FileRenameOperation(item, targetPath, device, App.Current.Dispatcher);
-        Data.FileOpQ.AddOperation(fileOp);
+        fileOp.PropertyChanged += RenameFileOp_PropertyChanged;
 
-        return fileOp;
+        Data.FileOpQ.AddOperation(fileOp);
+    }
+
+    private static void RenameFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var op = sender as FileRenameOperation;
+
+        // when operation completes, remove this event handler anyway
+        if (e.PropertyName is nameof(FileOperation.Status)
+            && op.Status is FileOperation.OperationStatus.Completed)
+        {
+            if (op.Device.ID == Data.CurrentADBDevice.ID
+                && op.FilePath.ParentPath == Data.CurrentPath)
+            {
+                // update UI when on current device and current path
+                op.FilePath.UpdatePath(op.TargetPath.FullPath);
+
+                // only select the item if there aren't any other operations
+                if (Data.FileOpQ.TotalCount == 1)
+                    Data.FileActions.ItemToSelect = op.FilePath;
+            }
+
+            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
+        }
     }
 
     public static bool SilentMove(ADBService.AdbDevice device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
@@ -181,14 +207,18 @@ public static class ShellFileOperation
                         newFile.ModifiedTime = op.DateModified;
                         Data.DirList.FileList.Add(newFile);
 
-                        Data.FileActions.ItemToSelect = newFile;
+                        // only select the item if there aren't any other operations
+                        if (Data.FileOpQ.TotalCount == 1)
+                            Data.FileActions.ItemToSelect = newFile;
                     }
                     else
                     {
                         op.FilePath.UpdatePath(op.TargetPath.FullPath);
                         Data.DirList.FileList.Add(op.FilePath);
 
-                        Data.FileActions.ItemToSelect = op.FilePath;
+                        // only select the item if there aren't any other operations
+                        if (Data.FileOpQ.TotalCount == 1)
+                            Data.FileActions.ItemToSelect = op.FilePath;
                     }
 
                     FileActionLogic.UpdateFileActions();
@@ -356,23 +386,54 @@ public static class ShellFileOperation
     {
         foreach (var item in items)
         {
-            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, item)));
+            var op = new PackageInstallOperation(dispatcher, device, item);
+            op.PropertyChanged += InstallOp_PropertyChanged;
+
+            Data.FileOpQ.AddOperation(op);
         }
     }
 
-    public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellObject> items, Dispatcher dispatcher, bool isPackagePath = false)
+    public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellObject> items, Dispatcher dispatcher)
     {
-        foreach (var item in items.Select(file => new FilePath(file) as FileClass))
+        foreach (var item in items.Select(file => new FilePath(file)))
         {
-            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, item, pushPackage: true, isPackagePath: isPackagePath)));
+            var op = new PackageInstallOperation(dispatcher, device, new(item), pushPackage: true);
+            op.PropertyChanged += InstallOp_PropertyChanged;
+            
+            Data.FileOpQ.AddOperation(op);
         }
     }
 
-    public static void UninstallPackages(ADBService.AdbDevice device, IEnumerable<string> packages, Dispatcher dispatcher, ObservableList<Package> packageList)
+    public static void UninstallPackages(ADBService.AdbDevice device, IEnumerable<string> packages, Dispatcher dispatcher)
     {
         foreach (var item in packages)
         {
-            dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new PackageInstallOperation(dispatcher, device, packageName: item, packageList: packageList)));
+            var op = new PackageInstallOperation(dispatcher, device, packageName: item);
+            op.PropertyChanged += InstallOp_PropertyChanged;
+
+            Data.FileOpQ.AddOperation(op);
+        }
+    }
+
+    private static void InstallOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var op = sender as PackageInstallOperation;
+
+        // when operation completes, remove this event handler anyway
+        if (e.PropertyName is nameof(FileOperation.Status)
+            && op.Status is FileOperation.OperationStatus.Completed)
+        {
+            if (op.Device.ID == Data.CurrentADBDevice.ID
+                && Data.FileActions.IsAppDrive)
+            {
+                // update UI when on current device and current path
+                if (op.IsUninstall)
+                    Data.Packages.RemoveAll(pkg => pkg.Name == op.PackageName);
+                else if (op.PushPackage)
+                    Data.FileActions.RefreshPackages = true;
+            }
+
+            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
         }
     }
 
@@ -416,6 +477,8 @@ public static class ShellFileOperation
 
     public static void ChangeDateFromName(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
+        List<FileOperation> operations = new();
+
         foreach (var item in items)
         {
             var match = AdbRegEx.RE_FILE_NAME_DATE.Match(item.FullName);
@@ -442,8 +505,30 @@ public static class ShellFileOperation
 
             if (item.ModifiedTime is DateTime modified && modified > nameDate)
             {
-                dispatcher.Invoke(() => Data.FileOpQ.AddOperation(new FileChangeModifiedOperation(item, nameDate, device, dispatcher)));
+                operations.Add(new FileChangeModifiedOperation(item, nameDate, device, dispatcher));
             }
+        }
+
+        operations.ForEach(op => op.PropertyChanged += ChangeModifiedOp_PropertyChanged);
+        Data.FileOpQ.AddOperations(operations);
+    }
+
+    private static void ChangeModifiedOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var op = sender as FileChangeModifiedOperation;
+
+        // when operation completes, remove this event handler anyway
+        if (e.PropertyName is nameof(FileOperation.Status)
+            && op.Status is FileOperation.OperationStatus.Completed)
+        {
+            if (op.Device.ID == Data.CurrentADBDevice.ID
+                && op.FilePath.ParentPath == Data.CurrentPath)
+            {
+                // update UI when on current device and current path
+                op.FilePath.ModifiedTime = op.NewDate;
+            }
+
+            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
         }
     }
 }

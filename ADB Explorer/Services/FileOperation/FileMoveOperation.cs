@@ -17,9 +17,15 @@ public class FileMoveOperation : AbstractShellFileOperation
         if (isCopy)
             OperationName = OperationType.Copy;
         else if (targetPath.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH))
+        {
             OperationName = OperationType.Recycle;
+            AltTarget = NavHistory.SpecialLocation.RecycleBin;
+        }
         else if (filePath.TrashIndex is not null)
+        {
             OperationName = OperationType.Restore;
+            AltSource = NavHistory.SpecialLocation.RecycleBin;
+        }
         else
             OperationName = OperationType.Move;
 

@@ -10,6 +10,7 @@ public class FileDeleteOperation : AbstractShellFileOperation
         : base(path, adbDevice, dispatcher)
     {
         OperationName = OperationType.Delete;
+        AltTarget = NavHistory.SpecialLocation.devNull;
     }
 
     public override void Start()

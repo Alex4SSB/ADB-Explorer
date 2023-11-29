@@ -1030,8 +1030,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             FileActionLogic.UpdateFileActions();
         }
-        else if (location is string path)
+        else
         {
+            string path;
+            if (location is NavHistory.SpecialLocation special)
+                path = NavHistory.StringFromLocation(special);
+            else if (location is string str)
+                path = str;
+            else
+                return;
+
             if (!FileActions.IsExplorerVisible)
                 InitNavigation(path, bfNavigated);
             else

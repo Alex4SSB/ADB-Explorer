@@ -76,23 +76,7 @@ public static class FileHelper
             return;
         }
 
-        var op = ShellFileOperation.Rename(file, newPath, Data.CurrentADBDevice);
-
-        var statusTask = Task.Run(() =>
-        {
-            while (op.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress)
-            { }
-
-            return op.Status;
-        });
-
-        statusTask.ContinueWith((t) =>
-        {
-            if (t.Result is FileOperation.OperationStatus.Completed && Data.Settings.ShowExtensions)
-            {
-                App.Current.Dispatcher.Invoke(() => file.UpdatePath(newPath));
-            }
-        });
+        ShellFileOperation.Rename(file, newPath, Data.CurrentADBDevice);
     }
 
     public static string DisplayName(TextBox textBox) => DisplayName(textBox.DataContext as FilePath);

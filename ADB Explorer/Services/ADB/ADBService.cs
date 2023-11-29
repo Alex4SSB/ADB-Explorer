@@ -104,6 +104,19 @@ public partial class ADBService
         return ExecuteAdbCommand("-s", out stdout, out stderr, new[] { deviceSerial, cmd }.Concat(args).ToArray());
     }
 
+    public static async Task<string> ExecuteDeviceAdbCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
+    {
+        string stdout = "", stderr = "";
+        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, new[] { deviceId, cmd }.Concat(args).ToArray()), cancellationToken);
+
+        if (res == 0)
+            return "";
+        else if (cancellationToken.IsCancellationRequested)
+            return "Canceled";
+        else
+            return string.IsNullOrEmpty(stderr) ? stdout : stderr;
+    }
+
     public static IEnumerable<string> ExecuteCommandAsync(
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {

@@ -14,7 +14,29 @@ namespace ADB_Explorer.Models
             Up,
             RecycleBin,
             PackageDrive,
+            devNull,
         }
+
+        public static string DisplayName(this SpecialLocation location) => location switch
+        {
+            SpecialLocation.RecycleBin => AdbExplorerConst.DRIVE_DISPLAY_NAMES[AbstractDrive.DriveType.Trash],
+            SpecialLocation.PackageDrive => AdbExplorerConst.DRIVE_DISPLAY_NAMES[AbstractDrive.DriveType.Package],
+            SpecialLocation.Back or SpecialLocation.Forward or SpecialLocation.Up => location.ToString(),
+            SpecialLocation.DriveView => "Device Drives",
+            SpecialLocation.devNull => "Permanent Deletion",
+            _ => "",
+        };
+
+        public static bool IsNavigable(this SpecialLocation location) => location switch
+        {
+            SpecialLocation.DriveView => true,
+            SpecialLocation.Back => true,
+            SpecialLocation.Forward => true,
+            SpecialLocation.Up => true,
+            SpecialLocation.RecycleBin => true,
+            SpecialLocation.PackageDrive => true,
+            _ => false,
+        };
 
         public static string StringFromLocation(SpecialLocation location) => $"[{Enum.GetName(typeof(SpecialLocation), location)}]";
 

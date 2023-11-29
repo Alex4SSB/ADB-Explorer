@@ -31,14 +31,14 @@ internal static class FileActionLogic
             return files.Select(item => ShellFileOperation.GetPackageName(Data.CurrentADBDevice, item.FullPath));
         });
 
-        ShellFileOperation.UninstallPackages(Data.CurrentADBDevice, packageTask, App.Current.Dispatcher, Data.Packages);
+        ShellFileOperation.UninstallPackages(Data.CurrentADBDevice, packageTask, App.Current.Dispatcher);
     }
 
     public static void InstallPackages()
     {
         var packages = Data.SelectedFiles;
 
-        Task.Run(() => ShellFileOperation.InstallPackages(Data.CurrentADBDevice, packages, App.Current.Dispatcher));
+        ShellFileOperation.InstallPackages(Data.CurrentADBDevice, packages, App.Current.Dispatcher);
     }
 
     public static void CopyToTemp()
@@ -67,13 +67,12 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        Task.Run(() => ShellFileOperation.PushPackages(Data.CurrentADBDevice, dialog.FilesAsShellObject, App.Current.Dispatcher, Data.FileActions.IsAppDrive));
+        ShellFileOperation.PushPackages(Data.CurrentADBDevice, dialog.FilesAsShellObject, App.Current.Dispatcher);
     }
 
     public static void UpdateModifiedDates()
     {
-        var items = Data.SelectedFiles;
-        Task.Run(() => ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, items, App.Current.Dispatcher));
+        ShellFileOperation.ChangeDateFromName(Data.CurrentADBDevice, Data.SelectedFiles, App.Current.Dispatcher);
     }
 
     public static void OpenEditor()

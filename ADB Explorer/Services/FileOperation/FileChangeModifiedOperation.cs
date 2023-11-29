@@ -5,13 +5,13 @@ namespace ADB_Explorer.Services;
 
 public class FileChangeModifiedOperation : AbstractShellFileOperation
 {
-    private readonly DateTime newDate;
+    public readonly DateTime NewDate;
 
     public FileChangeModifiedOperation(FileClass filePath, DateTime newDate, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
         : base(filePath, adbDevice, dispatcher)
     {
         OperationName = OperationType.Update;
-        this.newDate = newDate;
+        NewDate = newDate;
     }
 
     public override void Start()
@@ -29,7 +29,7 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
                                                                     "touch",
                                                                     "-m",
                                                                     "-t",
-                                                                    newDate.ToString("yyyyMMddHHmm.ss"),
+                                                                    NewDate.ToString("yyyyMMddHHmm.ss"),
                                                                     ADBService.EscapeAdbShellString(FilePath.FullPath));
 
         operationTask.ContinueWith((t) =>
@@ -38,8 +38,6 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
             {
                 Status = OperationStatus.Completed;
                 StatusInfo = new CompletedShellProgressViewModel();
-
-                Dispatcher.Invoke(() => FilePath.ModifiedTime = newDate);
             }
             else
             {

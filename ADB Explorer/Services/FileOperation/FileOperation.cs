@@ -101,6 +101,10 @@ public abstract class FileOperation : ViewModelBase
 
     public virtual SyncFile TargetPath { get; protected set; }
 
+    public NavHistory.SpecialLocation AltSource { get; protected set; } = NavHistory.SpecialLocation.None;
+
+    public NavHistory.SpecialLocation AltTarget { get; protected set; } = NavHistory.SpecialLocation.None;
+
     public double LastProgress = 0.0;
 
     #endregion
@@ -134,15 +138,16 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
+            if (AltSource is not NavHistory.SpecialLocation.None)
+                return AltSource.DisplayName();
+
             if (FilePath is null)
                 return "";
 
-            if (FilePath.ParentPath == AdbExplorerConst.RECYCLE_PATH)
-                return "Recycle Bin";
-            else if (OperationName is OperationType.Rename)
+            if (OperationName is OperationType.Rename)
                 return FileHelper.ConcatPaths(FilePath.ParentPath, FilePath.DisplayName);
-            else
-                return FilePath.ParentPath;
+            
+            return FilePath.ParentPath;
         }
     }
 
@@ -150,15 +155,13 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
+            if (AltTarget is not NavHistory.SpecialLocation.None)
+                return AltTarget.DisplayName();
+
             if (TargetPath is null)
                 return "";
 
-            return OperationName switch
-            {
-                OperationType.Delete => "Permanent Deletion",
-                OperationType.Recycle => "Recycle Bin",
-                _ => TargetPath.ParentPath,
-            };
+            return TargetPath.ParentPath;
         }
     }
 
@@ -209,25 +212,45 @@ public abstract class FileOperation : ViewModelBase
         Status = OperationStatus.Waiting;
 
         SourceAction = new(
-            () => FilePath.PathType is AbstractFile.FilePathType.Windows || Device.Status is AbstractDevice.DeviceStatus.Ok,
-            () => OpenLocation(FilePath));
+            () => FilePath?.PathType is AbstractFile.FilePathType.Windows
+                || (Device.Status is AbstractDevice.DeviceStatus.Ok && (FilePath is not null || AltSource.IsNavigable())),
+            () => OpenLocation(false));
 
         TargetAction = new(
-            () => TargetPath.PathType is AbstractFile.FilePathType.Windows || (Device.Status is AbstractDevice.DeviceStatus.Ok && OperationName is not OperationType.Delete),
-            () => OpenLocation(TargetPath));
+            () => TargetPath?.PathType is AbstractFile.FilePathType.Windows
+                || (Device.Status is AbstractDevice.DeviceStatus.Ok && (FilePath is not null || AltTarget.IsNavigable())),
+            () => OpenLocation(true));
     }
 
-    private void OpenLocation(FilePath file)
+    private void OpenLocation(bool target)
     {
-        if (file.PathType is AbstractFile.FilePathType.Windows)
-            Process.Start("explorer.exe", file.ParentPath);
+        object location;
+        if (target)
+            location = AltTarget.IsNavigable() ? TargetPath : AltTarget;
         else
+            location = AltSource.IsNavigable() ? FilePath : AltSource;
+
+        if (location is FilePath file)
+        {
+            if (file.PathType is AbstractFile.FilePathType.Windows)
+                Process.Start("explorer.exe", file.ParentPath);
+            else
+            {
+                if (!Device.Device.IsOpen)
+                    Data.RuntimeSettings.DeviceToOpen = Device.Device;
+
+                Data.RuntimeSettings.LocationToNavigate = file.ParentPath;
+            }
+        }
+        else if (location is NavHistory.SpecialLocation)
         {
             if (!Device.Device.IsOpen)
                 Data.RuntimeSettings.DeviceToOpen = Device.Device;
 
-            Data.RuntimeSettings.LocationToNavigate = file.ParentPath;
+            Data.RuntimeSettings.LocationToNavigate = location;
         }
+        else
+            throw new NotSupportedException();
     }
 
     public void SetValidation(bool value)
