@@ -36,9 +36,9 @@ public class FileOpFilter : ViewModelBase
         Pending,
         Completed,
         Validated,
-        Previous,
         Failed,
         Canceled,
+        Previous,
     }
 
     private bool? isChecked = null;
@@ -68,7 +68,7 @@ public class FileOpFilter : ViewModelBase
                 {
                     Style = (Style)App.Current.FindResource("FileOpFilterCheckBox"),
                     DataContext = this,
-                    Content = Type,
+                    Content = AdbExplorerConst.FILE_OP_NAMES[Type],
                     Margin = new(0, -6, 0, -6),
                 };
             }

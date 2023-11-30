@@ -806,10 +806,14 @@ internal static class FileActionLogic
 
     public static void ToggleFileOpQ()
     {
-        if (Data.FileOpQ.IsActive)
-            Data.FileOpQ.Stop();
-        else
+        Data.FileOpQ.IsAutoPlayOn ^= true;
+
+        if (Data.FileOpQ.IsAutoPlayOn)
             Data.FileOpQ.Start();
+        else
+            Data.FileOpQ.Stop();
+
+        Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
     public static void UpdateFileOpControls()
@@ -820,14 +824,6 @@ internal static class FileActionLogic
         if (Data.FileActions.IsFileOpStopEnabled != opStopEnabled)
         {
             Data.FileActions.IsFileOpStopEnabled = opStopEnabled;
-            changed = true;
-        }
-
-        var opStopButton = AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button;
-        var opStopChecked = !Data.FileOpQ.IsActive && Data.FileOpQ.HasIncompleteOperations;
-        if (opStopButton.IsChecked != opStopChecked)
-        {
-            opStopButton.IsChecked = opStopChecked;
             changed = true;
         }
 

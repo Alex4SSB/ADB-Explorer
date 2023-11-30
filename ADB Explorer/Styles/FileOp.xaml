@@ -201,7 +201,7 @@
             Text="{Binding StatusInfo.Time}" />
     </DataTemplate>
     <DataTemplate x:Key="WaitingOpProgressTemplate">
-        <TextBlock Margin="4,0" Text="Pending..." />
+        <TextBlock Margin="4,0" Text="{Binding Name}" />
     </DataTemplate>
     <DataTemplate x:Key="InProgSyncProgressTemplate">
         <Grid Margin="4,0">

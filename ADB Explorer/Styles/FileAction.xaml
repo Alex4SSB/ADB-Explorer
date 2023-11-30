@@ -156,6 +156,7 @@
         TargetType="MenuItem">
         <Setter Property="MinWidth" Value="40" />
         <Setter Property="ToolTip" Value="{Binding Tooltip}" />
+        <Setter Property="ToolTip.FlowDirection" Value="LeftToRight" />
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="{Binding Animation}" />
         <Setter Property="helpers:StyleHelper.AnimateOnClick" Value="{Binding AnimateOnClick}" />
         <Setter Property="helpers:StyleHelper.ActivateAnimation" Value="{Binding ActivateAnimation}" />
@@ -365,6 +366,7 @@
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="ItemsPanel" Value="{StaticResource VerticalItemsPanel}" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="10,0" />
+        <Setter Property="helpers:MenuHelper.ItemMargin" Value="0.5" />
     </Style>
     <Style
         x:Key="LogControlsPanelStyle"

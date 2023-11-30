@@ -19,6 +19,13 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
+    private bool isAutoPlayOn = true;
+    public bool IsAutoPlayOn
+    {
+        get => isAutoPlayOn;
+        set => Set(ref isAutoPlayOn, value);
+    }
+
     private double progress = 0.0;
     public double Progress
     {
@@ -158,7 +165,7 @@ public class FileOperationQueue : ViewModelBase
 
     public void Start()
     {
-        if (TotalCount < 1)
+        if (TotalCount < 1 || !IsAutoPlayOn)
             return;
 
         if (!IsActive)
@@ -246,7 +253,9 @@ public class FileOperationQueue : ViewModelBase
             and not FileOperation.OperationStatus.InProgress)
         {
             MoveToCompleted(op);
-            MoveToNextOperation();
+
+            if (IsAutoPlayOn)
+                MoveToNextOperation();
         }
 
         if (e.PropertyName is nameof(FileOperation.StatusInfo)

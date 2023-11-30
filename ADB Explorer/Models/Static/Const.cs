@@ -116,4 +116,15 @@ public static class AdbExplorerConst
     public static readonly ulong DISK_READ_THRESHOLD = 500000;
     public static readonly ulong DISK_WRITE_THRESHOLD = 500000;
     public static readonly ulong MAX_DISK_DISPLAY_RATE = 1000000000;
+
+    public static readonly Dictionary<FileOpFilter.FilterType, string> FILE_OP_NAMES = new()
+    {
+        { FileOpFilter.FilterType.Running, "Running" },
+        { FileOpFilter.FilterType.Pending, "Queued" },
+        { FileOpFilter.FilterType.Completed, "Completed" },
+        { FileOpFilter.FilterType.Validated, "Validated" },
+        { FileOpFilter.FilterType.Failed, "Failed" },
+        { FileOpFilter.FilterType.Canceled, "Canceled" },
+        { FileOpFilter.FilterType.Previous, "Previous" },
+    };
 }
