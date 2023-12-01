@@ -226,10 +226,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             if (FileActions.IsDriveViewVisible && NavHistory.LocationFromString(RuntimeSettings.LocationToNavigate) is NavHistory.SpecialLocation.DriveView)
                                 FileActionLogic.RefreshDrives(true);
                             else
-                            {
-                                NavHistory.Navigate(RuntimeSettings.LocationToNavigate);
                                 NavigateToLocation(RuntimeSettings.LocationToNavigate);
-                            }
                             break;
                         default:
                             break;
