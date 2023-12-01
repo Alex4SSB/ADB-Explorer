@@ -54,8 +54,10 @@ public class FileSyncOperation : FileOperation
             arg = "-a";
         }
 
+        var targetPath = TargetPath.IsDirectory ? TargetPath.ParentPath : TargetPath.FullPath;
+
         operationTask = Task.Run(() =>
-            Device.DoFileSync(cmd, arg, TargetPath.FullPath, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token),
+            Device.DoFileSync(cmd, arg, targetPath, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token),
             cancelTokenSource.Token);
 
         operationTask.ContinueWith((t) => progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged);

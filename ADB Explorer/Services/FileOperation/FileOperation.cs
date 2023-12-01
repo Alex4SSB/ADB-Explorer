@@ -226,9 +226,9 @@ public abstract class FileOperation : ViewModelBase
     {
         object location;
         if (target)
-            location = AltTarget.IsNavigable() ? TargetPath : AltTarget;
+            location = AltTarget.IsNavigable() ? AltTarget : TargetPath;
         else
-            location = AltSource.IsNavigable() ? FilePath : AltSource;
+            location = AltSource.IsNavigable() ? AltSource : FilePath;
 
         if (location is FilePath file)
         {
