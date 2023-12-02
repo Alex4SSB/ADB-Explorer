@@ -1,8 +1,8 @@
 ﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.Data;
+using static ADB_Explorer.Services.SettingsAction;
 
 namespace ADB_Explorer.Services;
 
@@ -17,6 +17,24 @@ public static class UISettings
         .Where(set => set.Visibility is Visibility.Visible)
         .OrderBy(sett => sett.Description);
 
+    private static readonly Dictionary<ActionType, string> Icons = new()
+    {
+        { ActionType.ChangeDefaultPath, "\uE70F" },
+        { ActionType.ClearDefaultPath, "\uE711" },
+        { ActionType.ResetApp, "\uE72C" },
+        { ActionType.AnimationInfo, "\uE82F" },
+    };
+
+    private static readonly List<SettingsAction> SettingsActions = new()
+    {
+        new(ActionType.ChangeDefaultPath, () => true, SettingsHelper.ChangeDefaultPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
+        new(ActionType.ClearDefaultPath, () => !string.IsNullOrEmpty(Settings.DefaultFolder), () => Settings.DefaultFolder = "", Icons[ActionType.ClearDefaultPath], "Clear"),
+        new(ActionType.ChangeAdbPath, () => true,SettingsHelper.ChangeAdbPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
+        new(ActionType.ClearAdbPath, () => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", Icons[ActionType.ClearDefaultPath], "Clear"),
+        new(ActionType.ResetApp, () => true, SettingsHelper.ResetAppAction, Icons[ActionType.ResetApp], Strings.S_RESTART_APP),
+        new(ActionType.AnimationInfo, () => true, SettingsHelper.DisableAnimationTipAction, Icons[ActionType.AnimationInfo], "More Info"),
+    };
+
     public static void Init()
     {
         Type appSettings = Settings.GetType();
@@ -25,78 +43,87 @@ public static class UISettings
         {
             new SettingsGroup("ADB", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableMdns)), "Enable mDNS (experimental)", "ADB"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDevices)), "Poll For Devices", "ADB"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), "Poll For Battery Status", "ADB"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), "Enable Command Log", "ADB"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableMdns)), "Enable mDNS (experimental)"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDevices)), "Poll For Devices"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), "Poll For Battery Status"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), "Enable Command Log"),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Device", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoRoot)), "Automatically Enable Root", "Device"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.SaveDevices)), "Save Manually Connected Devices", "Device"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoOpen)), "Automatically Open For Browsing", "Device"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoRoot)), "Automatically Enable Root"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.SaveDevices)), "Save Manually Connected Devices"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoOpen)), "Automatically Open For Browsing"),
+            }),
+            new SettingsSeparator(),
+            new SettingsGroup("File Operations", new()
+            {
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.StopPollingOnSync)), "Stop Polling On Push/Pull"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.AllowMultiOp)), "Allow Simultaneous Operations"),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Drives & Features", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDrives)), "Poll For Drives", "Drives & Features"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableRecycle)), "Enable Recycle Bin", "Drives & Features"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableApk)), "Enable APK Handling", "Drives & Features"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDrives)), "Poll For Drives"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableRecycle)), "Enable Recycle Bin"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableApk)), "Enable APK Handling"),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Explorer", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), "Show File Name Extensions", "File Behavior"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowHiddenItems)), "Show Hidden Items", "File Behavior"),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowSystemPackages)), "Show System Apps", "File Behavior", visibleProp: appSettings.GetProperty(nameof(Settings.EnableApk))),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), "Show File Name Extensions"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowHiddenItems)), "Show Hidden Items"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowSystemPackages)), "Show System Apps", visibleProp: appSettings.GetProperty(nameof(Settings.EnableApk))),
             }),
             new SettingsSeparator(),
             new SettingsGroup("File Double Click", new()
             {
-                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() { { AppSettings.DoubleClickAction.none, "None" }, { AppSettings.DoubleClickAction.pull, "Pull To Default Folder" }, { AppSettings.DoubleClickAction.edit, "Open In Editor" } }),
+                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() {
+                    { AppSettings.DoubleClickAction.none, "None" },
+                    { AppSettings.DoubleClickAction.pull, "Pull To Default Folder" },
+                    { AppSettings.DoubleClickAction.edit, "Open In Editor" } }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Working Directories", new()
             {
                 new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)),
                                   "Default Folder",
-                                  "Working Directories",
-                                  commands: new SettingsAction[] {
-                                      new(() => true, SettingsHelper.ChangeDefaultPathAction, "\uE70F", "Change"),
-                                      new(() => !string.IsNullOrEmpty(Settings.DefaultFolder), () => Settings.DefaultFolder = "", "\uE711", "Clear"),
+                                  commands: new[] {
+                                      SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
+                                      SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
                                   }),
                 new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)),
                                   "Override ADB Path",
-                                  "Working Directories",
-                                  commands: new SettingsAction[] {
-                                      new(() => true,SettingsHelper.ChangeAdbPathAction, "\uE70F", "Change"),
-                                      new(() => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", "\uE711", "Clear"),
-                                      new(() => true, SettingsHelper.ResetAppAction, "\uE72C", Strings.S_RESTART_APP),
+                                  commands: new[] {
+                                      SettingsActions.Find(a => a.Name is ActionType.ChangeAdbPath),
+                                      SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
+                                      SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Theme", new()
             {
-                new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() { { AppSettings.AppTheme.light, "Light" }, { AppSettings.AppTheme.dark, "Dark" }, { AppSettings.AppTheme.windowsDefault, "Windows Default" } }),
+                new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() {
+                    { AppSettings.AppTheme.light, "Light" },
+                    { AppSettings.AppTheme.dark, "Dark" },
+                    { AppSettings.AppTheme.windowsDefault, "Windows Default" } }),
             }),
             new SettingsSeparator(),
             new SettingsGroup("Graphics", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", "Graphics", visibleProp: RuntimeSettings.GetType().GetProperty(nameof(RuntimeSettings.HideForceFluent))),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration", "Graphics"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", visibleProp: RuntimeSettings.GetType().GetProperty(nameof(RuntimeSettings.HideForceFluent))),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
                                 "Disable Animations",
-                                "Graphics",
-                                commands: new SettingsAction[] {
-                                    new(() => true, SettingsHelper.ResetAppAction, "\uE72C", Strings.S_RESTART_APP),
-                                    new(() => true, SettingsHelper.DisableAnimationTipAction, "\uE82F", "More Info"),
+                                commands: new[] {
+                                    SettingsActions.Find(a => a.Name is ActionType.ResetApp),
+                                    SettingsActions.Find(a => a.Name is ActionType.AnimationInfo),
                                 }),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableSplash)), "Display Splash Screen", "Graphics"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableSplash)), "Display Splash Screen"),
             }),
             new Ungrouped(new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), "Check For Updates", "About"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), "Check For Updates"),
             }),
         };
     }
@@ -122,6 +149,8 @@ public class SettingsGroup : AbstractGroup
     {
         Name = name;
         Children = children;
+
+        Children.ForEach(c => c.GroupName = Name);
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }
@@ -150,17 +179,16 @@ public abstract class AbstractSetting : ViewModelBase
     protected readonly PropertyInfo visibleProp;
 
     public string Description { get; private set; }
-    public string GroupName { get; private set; }
+    public string GroupName { get; set; }
     public BaseAction[] Commands { get; private set; }
 
     public Visibility Visibility => visibleProp is null || (bool)visibleProp.GetValue(visibleProp.DeclaringType.Name is nameof(AppSettings) ? Settings : RuntimeSettings) ? Visibility.Visible : Visibility.Collapsed;
 
-    protected AbstractSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
+    protected AbstractSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
     {
         this.visibleProp = visibleProp;
         this.valueProp = valueProp;
         Description = description;
-        GroupName = groupName;
         Commands = commands;
         
         Settings.PropertyChanged += Settings_PropertyChanged;
@@ -185,8 +213,8 @@ public class BoolSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public BoolSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, groupName, visibleProp, commands)
+    public BoolSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
     { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -210,8 +238,8 @@ public class StringSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public StringSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, groupName, visibleProp, commands)
+    public StringSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
     { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -238,8 +266,8 @@ public class EnumSetting : AbstractSetting
 
     public List<EnumRadioButton> Buttons { get; } = new();
 
-    public EnumSetting(PropertyInfo valueProp, string description, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, groupName, visibleProp, commands)
+    public EnumSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
     {
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }
@@ -255,8 +283,8 @@ public class EnumSetting : AbstractSetting
 
 public class ThemeSetting : EnumSetting
 {
-    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.AppTheme, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, groupName, visibleProp, commands)
+    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.AppTheme, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
     }
@@ -264,8 +292,8 @@ public class ThemeSetting : EnumSetting
 
 public class DoubleClickSetting : EnumSetting
 {
-    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.DoubleClickAction, string> enumNames, string groupName = null, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, groupName, visibleProp, commands)
+    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.DoubleClickAction, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
     }
@@ -302,13 +330,26 @@ public class EnumRadioButton
 
 public class SettingsAction : BaseAction
 {
+    public enum ActionType
+    {
+        ChangeDefaultPath,
+        ChangeAdbPath,
+        ClearDefaultPath,
+        ClearAdbPath,
+        ResetApp,
+        AnimationInfo,
+    }
+
+    public ActionType Name { get; }
+
     public string Icon { get; }
 
     public string Tooltip { get; }
 
-    public SettingsAction(Func<bool> canExecute, Action action, string icon, string tooltip)
+    public SettingsAction(ActionType name, Func<bool> canExecute, Action action, string icon, string tooltip)
         : base(canExecute, action)
     {
+        Name = name;
         Icon = icon;
         Tooltip = tooltip;
     }

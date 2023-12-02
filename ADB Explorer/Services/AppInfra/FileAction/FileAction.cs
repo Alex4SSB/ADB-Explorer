@@ -44,6 +44,7 @@ internal static class AppActions
         { FileActionType.Install, "\uE896" },
         { FileActionType.CopyToTemp, "\uF413" },
         { FileActionType.FileOpRemove, "\uE711" },
+        { FileActionType.PauseLogs, "\uE769" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } = new()
@@ -61,11 +62,11 @@ internal static class AppActions
             "\uE768",
             FileActionLogic.ToggleFileOpQ,
             "Disable Auto Play\nCancel All Running",
-            "\uE71A"),
+            Icons[FileActionType.PauseLogs]),
         new(FileActionType.PauseLogs,
             () => true,
             "Log Updates Are Paused",
-            "\uE769",
+            Icons[FileActionType.PauseLogs],
             () => Data.RuntimeSettings.IsLogPaused ^= true,
             "Pause Log Updates"),
         new(FileActionType.SortSettings,

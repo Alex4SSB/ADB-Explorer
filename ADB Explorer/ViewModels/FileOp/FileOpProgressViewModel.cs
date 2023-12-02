@@ -4,10 +4,6 @@ namespace ADB_Explorer.ViewModels;
 
 public abstract class FileOpProgressViewModel : ViewModelBase
 {
-    public DateTime TimeStamp { get; }
-
-    public string Time => TimeStamp.ToLongTimeString();
-
     public Services.FileOperation.OperationStatus Status { get; }
 
     private FileOpFilter.FilterType FilterType => Status switch
@@ -31,7 +27,6 @@ public abstract class FileOpProgressViewModel : ViewModelBase
 
     public FileOpProgressViewModel(Services.FileOperation.OperationStatus status)
     {
-        TimeStamp = DateTime.Now;
         Status = status;
     }
 }

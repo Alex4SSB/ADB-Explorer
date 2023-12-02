@@ -155,7 +155,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
 
-        DiskUsageHelper.GetAdbDiskUsage();
+        Task.Run(DiskUsageHelper.GetAdbDiskUsage);
 
         if (Settings.PollDevices
             && MdnsService?.State is MDNS.MdnsState.Running
@@ -322,6 +322,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.RefreshSettingsControls):
                     SettingsControlsMenu.Items.Refresh();
                     break;
+
+                case nameof(AppRuntimeSettings.SortFileOps):
+                    SortFileOps();
+                    break;
             }
         });
     }
@@ -404,7 +408,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void UpdateFileOp()
     {
-        FileActionLogic.UpdateFileOpControls();
+        Task.Run(FileActionLogic.UpdateFileOpControls);
 
         if (FileOpQ.AnyFailedOperations)
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
@@ -840,8 +844,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ListDevices(IEnumerable<LogicalDevice> devices)
     {
-        RuntimeSettings.LastServerResponse = DateTime.Now;
-
         if (devices is null)
             return;
 
@@ -871,10 +873,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Task.Run(() =>
         {
-            if (!connectTimerMutex.WaitOne(0))
-            {
+            if (RuntimeSettings.IsPollingStopped || !connectTimerMutex.WaitOne(0))
                 return;
-            }
 
             if (Settings.PollDevices)
             {

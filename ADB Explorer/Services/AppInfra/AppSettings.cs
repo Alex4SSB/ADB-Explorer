@@ -192,15 +192,37 @@ public class AppSettings : ViewModelBase
 
     #endregion
 
+    #region File Ops
+
     private bool showExtendedView;
-    /// <summary>
-    /// File Operations Detailed View
-    /// </summary>
     public bool ShowExtendedView
     {
         get => true; // Get(ref showExtendedView, true);
         //set => Set(ref showExtendedView, value);
     }
+
+    private bool stopPollingWhileSync;
+    public bool StopPollingOnSync
+    {
+        get => Get(ref stopPollingWhileSync, false);
+        set
+        {
+            if (Set(ref stopPollingWhileSync, value))
+            {
+                Data.RuntimeSettings.IsPollingStopped = value
+                    && Data.FileOpQ.Operations.Any(op => op is FileSyncOperation && op.Status is FileOperation.OperationStatus.InProgress);
+            }
+        }
+    }
+
+    private bool allowMultiOp;
+    public bool AllowMultiOp
+    {
+        get => Get(ref allowMultiOp, true);
+        set => Set(ref allowMultiOp, value);
+    }
+
+    #endregion
 
     #region about
 

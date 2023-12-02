@@ -224,7 +224,11 @@ public class FileOperationQueue : ViewModelBase
                 var groups = pending.GroupBy(op => op.TypeOnDevice);
                 foreach (var item in groups)
                 {
-                    if (Operations.Any(op => op.Status is FileOperation.OperationStatus.InProgress && op.TypeOnDevice == item.Key))
+                    Func<FileOperation, bool> predicate = op =>
+                        op.Status is FileOperation.OperationStatus.InProgress
+                        && (!Data.Settings.AllowMultiOp || op.TypeOnDevice == item.Key);
+
+                    if (Operations.Any(predicate))
                         continue;
 
                     item.First().PropertyChanged += CurrentOperation_PropertyChanged;
@@ -248,14 +252,20 @@ public class FileOperationQueue : ViewModelBase
     {
         var op = (FileOperation)sender;
         
-        if (e.PropertyName is nameof(FileOperation.Status) && op.Status
-            is not FileOperation.OperationStatus.Waiting
-            and not FileOperation.OperationStatus.InProgress)
+        if (e.PropertyName is nameof(FileOperation.Status))
         {
-            MoveToCompleted(op);
+            Data.RuntimeSettings.IsPollingStopped = Data.Settings.StopPollingOnSync
+                && Operations.Any(op => op is FileSyncOperation && op.Status is FileOperation.OperationStatus.InProgress);
 
-            if (IsAutoPlayOn)
-                MoveToNextOperation();
+            if (op.Status
+                is not FileOperation.OperationStatus.Waiting
+                and not FileOperation.OperationStatus.InProgress)
+            {
+                MoveToCompleted(op);
+
+                if (IsAutoPlayOn)
+                    MoveToNextOperation();
+            }
         }
 
         if (e.PropertyName is nameof(FileOperation.StatusInfo)

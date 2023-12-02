@@ -107,9 +107,13 @@ public abstract class FileOperation : ViewModelBase
 
     public double LastProgress = 0.0;
 
+    public DateTime TimeStamp { get; }
+
     #endregion
 
     #region Read-only Properties
+
+    public string Time => TimeStamp.ToLongTimeString();
 
     public FileOpFilter.FilterType Filter
     {
@@ -199,6 +203,12 @@ public abstract class FileOperation : ViewModelBase
         }
     }
 
+    public bool IsSourceNavigable => FilePath?.PathType is AbstractFile.FilePathType.Windows
+                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltSource.IsNoneOrNavigable());
+
+    public bool IsTargetNavigable => TargetPath?.PathType is AbstractFile.FilePathType.Windows
+                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltTarget.IsNoneOrNavigable());
+
     #endregion
 
     public BaseAction SourceAction { get; private set; }
@@ -206,20 +216,30 @@ public abstract class FileOperation : ViewModelBase
 
     public FileOperation(FilePath filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
     {
+        TimeStamp = DateTime.Now;
+
         Dispatcher = dispatcher;
         Device = adbDevice;
         FilePath = filePath;
         Status = OperationStatus.Waiting;
 
         SourceAction = new(
-            () => FilePath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is AbstractDevice.DeviceStatus.Ok && (FilePath is not null || AltSource.IsNavigable())),
+            () => IsSourceNavigable,
             () => OpenLocation(false));
 
         TargetAction = new(
-            () => TargetPath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is AbstractDevice.DeviceStatus.Ok && (FilePath is not null || AltTarget.IsNavigable())),
+            () => IsTargetNavigable,
             () => OpenLocation(true));
+
+        Device.Device.PropertyChanged += Device_PropertyChanged;
+    }
+
+    private void Device_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Device.Status))
+        {
+            Data.RuntimeSettings.SortFileOps = true;
+        }
     }
 
     private void OpenLocation(bool target)

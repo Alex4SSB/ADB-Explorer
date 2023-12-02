@@ -96,8 +96,13 @@ public partial class ADBService
         return cmdProcess.ExitCode;
     }
 
-    public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args) =>
-        ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, Encoding.UTF8, args);
+    public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args)
+    {
+        var result = ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, Encoding.UTF8, args);
+        RuntimeSettings.LastServerResponse = DateTime.Now;
+
+        return result;
+    }
 
     public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, params string[] args)
     {
@@ -135,6 +140,8 @@ public partial class ADBService
             {
                 stdoutLineTask = cmdProcess.StandardOutput.ReadLineAsync();
                 stdoutLineTask.Wait(cancellationToken);
+
+                RuntimeSettings.LastServerResponse = DateTime.Now;
             }
             catch (OperationCanceledException)
             {

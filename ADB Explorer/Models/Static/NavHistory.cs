@@ -38,6 +38,14 @@ namespace ADB_Explorer.Models
             _ => false,
         };
 
+        public static bool IsNoneOrNavigable(this SpecialLocation location)
+        {
+            if (location is SpecialLocation.None)
+                return true;
+
+            return location.IsNavigable();
+        }
+
         public static string StringFromLocation(SpecialLocation location) => $"[{Enum.GetName(typeof(SpecialLocation), location)}]";
 
         public static SpecialLocation LocationFromString(object location)

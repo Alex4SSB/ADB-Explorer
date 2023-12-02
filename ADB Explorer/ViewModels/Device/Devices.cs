@@ -260,7 +260,8 @@ public class Devices : AbstractDevice
     public static async Task<bool> UpdateLogicalIp(ObservableList<DeviceViewModel> devices)
     {
         var result = false;
-        foreach (var item in devices.OfType<LogicalDeviceViewModel>().Where(d => d.Type is DeviceType.Service or DeviceType.Local && !d.IsIpAddressValid))
+        var items = devices.OfType<LogicalDeviceViewModel>().Where(d => d.Type is DeviceType.Service or DeviceType.Local && !d.IsIpAddressValid).ToList();
+        foreach (var item in items)
         {
             if (item.Type is DeviceType.Service)
             {

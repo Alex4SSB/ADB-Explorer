@@ -198,7 +198,7 @@
         <TextBlock
             Margin="4,0"
             Style="{StaticResource BoldInProgressTextBlockStyle}"
-            Text="{Binding StatusInfo.Time}" />
+            Text="{Binding Time}" />
     </DataTemplate>
     <DataTemplate x:Key="WaitingOpProgressTemplate">
         <TextBlock Margin="4,0" Text="{Binding Name}" />

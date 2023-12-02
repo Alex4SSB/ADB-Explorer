@@ -89,11 +89,14 @@ internal static class DiskUsageHelper
         prevWrite = newWrite;
         prevOther = newOther;
 
-        Data.RuntimeSettings.AdbReadRate = Usage.ReadString;
-        Data.RuntimeSettings.AdbWriteRate = Usage.WriteString;
-        Data.RuntimeSettings.AdbOtherRate = Usage.OtherString;
+        App.Current.Dispatcher.Invoke(() =>
+        {
+            Data.RuntimeSettings.AdbReadRate = Usage.ReadString;
+            Data.RuntimeSettings.AdbWriteRate = Usage.WriteString;
+            Data.RuntimeSettings.AdbOtherRate = Usage.OtherString;
 
-        Data.RuntimeSettings.IsAdbReadActive = Usage.IsReadActive;
-        Data.RuntimeSettings.IsAdbWriteActive = Usage.IsWriteActive;
+            Data.RuntimeSettings.IsAdbReadActive = Usage.IsReadActive;
+            Data.RuntimeSettings.IsAdbWriteActive = Usage.IsWriteActive;
+        });
     }
 }

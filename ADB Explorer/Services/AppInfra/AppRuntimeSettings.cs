@@ -150,10 +150,16 @@ public class AppRuntimeSettings : ViewModelBase
         set
         {
             lastServerResponse = value;
-            OnPropertyChanged(nameof(lastServerResponse));
 
-            OnPropertyChanged(nameof(TimeFromLastResponse));
-            OnPropertyChanged(nameof(ServerUnresponsive));
+            if (App.Current?.Dispatcher?.HasShutdownStarted is false)
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(TimeFromLastResponse));
+                    OnPropertyChanged(nameof(ServerUnresponsive));
+                });
+            }
         }
     }
 
@@ -336,6 +342,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isAdbWriteActive, value);
     }
 
+    private bool isPollingStopped = false;
+    public bool IsPollingStopped
+    {
+        get => isPollingStopped;
+        set => Set(ref isPollingStopped, value);
+    }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public bool IsWin11 =>
@@ -369,6 +382,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool RefreshFileOpControls { get => false; set => OnPropertyChanged(); }
     public bool ClearLogs { get => false; set => OnPropertyChanged(); }
     public bool RefreshSettingsControls { get => false; set => OnPropertyChanged(); }
+    public bool SortFileOps { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

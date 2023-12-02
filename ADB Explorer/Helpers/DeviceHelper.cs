@@ -323,10 +323,8 @@ public static class DeviceHelper
         Data.DevicesObject.LastUpdate = DateTime.Now;
     }
 
-    public static void ListServices(IEnumerable<ServiceDevice> services)
+    public static async void ListServices(IEnumerable<ServiceDevice> services)
     {
-        Data.RuntimeSettings.LastServerResponse = DateTime.Now;
-
         if (services is null)
             return;
 
@@ -342,7 +340,7 @@ public static class DeviceHelper
 
             if (qrServices.Any())
             {
-                PairService(qrServices.First()).ContinueWith((t) => Data.RuntimeSettings.LastServerResponse = DateTime.Now);
+                await PairService(qrServices.First());
             }
         }
     }
@@ -381,7 +379,8 @@ public static class DeviceHelper
 
     public static void UpdateDevicesRootAccess()
     {
-        foreach (var device in Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is RootStatus.Unchecked))
+        var devices = Data.DevicesObject.LogicalDeviceViewModels.Where(d => d.Root is RootStatus.Unchecked).ToList();
+        foreach (var device in devices)
         {
             bool root = ADBService.WhoAmI(device.ID);
             bool rootDisabled = Data.DevicesObject.RootDevices.Contains(device.ID);
