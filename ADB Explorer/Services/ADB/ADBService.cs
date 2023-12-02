@@ -82,37 +82,38 @@ public partial class ADBService
         return cmdProcess;
     }
     public static int ExecuteCommand(
-        string file, string cmd, out string stdout, out string stderr, Encoding encoding, params string[] args)
+        string file, string cmd, out string stdout, out string stderr, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
 
-        using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
-        using var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
-        Task.WaitAll(stdoutTask, stderrTask);
-        cmdProcess.WaitForExit();
+        using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync(cancellationToken);
+        using var stderrTask = cmdProcess.StandardError.ReadToEndAsync(cancellationToken);
+        using var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
+
+        Task.WaitAll(stdoutTask, stderrTask, processTask);
 
         stdout = stdoutTask.Result;
         stderr = stderrTask.Result;
         return cmdProcess.ExitCode;
     }
 
-    public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, params string[] args)
+    public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        var result = ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, Encoding.UTF8, args);
+        var result = ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
         RuntimeSettings.LastServerResponse = DateTime.Now;
 
         return result;
     }
 
-    public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, params string[] args)
+    public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteAdbCommand("-s", out stdout, out stderr, new[] { deviceSerial, cmd }.Concat(args).ToArray());
+        return ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, new[] { deviceSerial, cmd }.Concat(args).ToArray());
     }
 
     public static async Task<string> ExecuteDeviceAdbCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
     {
         string stdout = "", stderr = "";
-        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, new[] { deviceId, cmd }.Concat(args).ToArray()), cancellationToken);
+        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, new[] { deviceId, cmd }.Concat(args).ToArray()), cancellationToken);
 
         if (res == 0)
             return "";
@@ -145,7 +146,7 @@ public partial class ADBService
             }
             catch (OperationCanceledException)
             {
-                cmdProcess.Kill();
+                ProcessHandling.KillProcess(cmdProcess);
                 throw;
             }
         }
@@ -160,7 +161,7 @@ public partial class ADBService
         }
         catch (OperationCanceledException)
         {
-            cmdProcess.Kill();
+            ProcessHandling.KillProcess(cmdProcess);
             throw;
         }
 
@@ -169,7 +170,7 @@ public partial class ADBService
         if (cmdProcess.ExitCode != 0)
         {
             if (cmd == "-s"
-                && ExecuteDeviceAdbCommand(args[0], "get-state", out _, out string error) != 0
+                && ExecuteDeviceAdbCommand(args[0], "get-state", out _, out string error, cancellationToken) != 0
                 && error.StartsWith("error: device"))
             {
                 // device is disconnected
@@ -189,15 +190,15 @@ public partial class ADBService
         return ExecuteAdbCommandAsync("-s", cancellationToken, new[] { deviceSerial, cmd }.Concat(args).ToArray());
     }
 
-    public static int ExecuteDeviceAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, params string[] args)
+    public static int ExecuteDeviceAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, new[] { cmd }.Concat(args).ToArray());
+        return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, new[] { cmd }.Concat(args).ToArray());
     }
 
     public static async Task<string> ExecuteDeviceAdbShellCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
     {
         string stdout = "", stderr = "";
-        var res = await Task.Run(() => ExecuteDeviceAdbShellCommand(deviceId, cmd, out stdout, out stderr, args), cancellationToken);
+        var res = await Task.Run(() => ExecuteDeviceAdbShellCommand(deviceId, cmd, out stdout, out stderr, cancellationToken, args), cancellationToken);
 
         if (res == 0)
             return "";
@@ -223,7 +224,7 @@ public partial class ADBService
 
     public static IEnumerable<LogicalDevice> GetDevices()
     {
-        ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, "-l");
+        ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, new(), "-l");
 
         return RE_DEVICE_NAME.Matches(stdout).Select(
             m => LogicalDevice.New(
@@ -240,7 +241,7 @@ public partial class ADBService
 
     public static void PairNetworkDevice(string fullAddress, string pairingCode) => NetworkDeviceOperation("pair", fullAddress, pairingCode);
 
-    public static void KillEmulator(string emulatorName) => ExecuteDeviceAdbCommand(emulatorName, "emu", out _, out _, "kill");
+    public static void KillEmulator(string emulatorName) => ExecuteDeviceAdbCommand(emulatorName, "emu", out _, out _, new(), "kill");
 
     /// <summary>
     /// 
@@ -252,7 +253,7 @@ public partial class ADBService
     /// <exception cref="ConnectionTimeoutException"></exception>
     private static void NetworkDeviceOperation(string cmd, string fullAddress, string pairingCode = null)
     {
-        ExecuteAdbCommand(cmd, out string stdout, out _, fullAddress, pairingCode);
+        ExecuteAdbCommand(cmd, out string stdout, out _, new(), fullAddress, pairingCode);
         if (stdout.ToLower() is string lower
             && (lower.Contains("cannot connect") || lower.Contains("error") || lower.Contains("failed")))
         {
@@ -265,7 +266,7 @@ public partial class ADBService
     public static GroupCollection GetMmcNode(string deviceID)
     {
         // Check to see if the MMC block device (first partition) exists (MMC0 / MMC1)
-        ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
+        ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, new(), @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
         // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
 
         // Get major and minor nodes in hex and return
@@ -280,7 +281,7 @@ public partial class ADBService
 
         // Get a list of all volumes (and their nodes)
         // The public flag reduces execution time significantly
-        int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out string stdout, out _, "list-volumes", "public");
+        int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out string stdout, out _, new(), "list-volumes", "public");
         if (exitCode != 0)
             return "";
 
@@ -300,26 +301,26 @@ public partial class ADBService
 
     public static void KillAdbServer(bool restart = false)
     {
-        ExecuteAdbCommand("kill-server", out _, out _);
+        ExecuteAdbCommand("kill-server", out _, out _, new());
 
         if (restart)
-            ExecuteAdbCommand("start-server", out _, out _);
+            ExecuteAdbCommand("start-server", out _, out _, new());
     }
 
     public static bool KillAdbProcess()
     {
-        return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, "/im", "\"adb.exe\"") == 0;
+        return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, new(), "/im", "\"adb.exe\"") == 0;
     }
 
     public static bool Root(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, Settings.RootArgs);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, new(), Settings.RootArgs);
         return !stdout.Contains("cannot run as root");
     }
 
     public static bool Unroot(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, Settings.UnrootArgs);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, new(), Settings.UnrootArgs);
         var result = stdout.Contains("restarting adbd as non root");
         DevicesObject.UpdateDeviceRoot(device.ID, result);
 
@@ -328,7 +329,7 @@ public partial class ADBService
 
     public static bool WhoAmI(string deviceId)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out string stderr) != 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out string stderr, new()) != 0)
             return false;
 
         return stdout.Trim() == "root";
@@ -338,7 +339,7 @@ public partial class ADBService
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, true);
 
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, args);
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), args);
 
         return ulong.TryParse(stdout, out var count) ? count : 0;
     }
@@ -347,14 +348,14 @@ public partial class ADBService
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, false);
 
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, args);
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), args);
 
         return stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
     }
 
     public static string[] FindFiles(string deviceID, IEnumerable<string> paths)
     {
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
 
         return stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
     }
@@ -417,7 +418,7 @@ public partial class ADBService
         string stdout = "";
         try
         {
-            exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8);
+            exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8, new());
         }
         catch (Exception) { }
 

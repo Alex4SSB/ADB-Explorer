@@ -48,7 +48,7 @@ public static class Security
     {
         // find ./ -mindepth 1 -type f -exec md5sum {} \;
         string[] args = { ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;" };
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "find", out string stdout, out string stderr, args);
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "find", out string stdout, out string stderr, new(), args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH.Matches(stdout);
         return list.Where(m => m.Success).ToDictionary(

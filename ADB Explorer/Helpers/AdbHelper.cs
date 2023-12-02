@@ -138,7 +138,7 @@ internal static class AdbHelper
         => 0 == ADBService.ExecuteAdbCommand("pull",
                                              out _,
                                              out _,
-                                             new[]
+                                             new(), new[]
                                              {
                                                  "-a",
                                                  ADBService.EscapeAdbString(file.FullPath),
@@ -149,7 +149,7 @@ internal static class AdbHelper
         => 0 == ADBService.ExecuteAdbCommand("push",
             out _,
             out _,
-            new[]
+            new(), new[]
             {
                 ADBService.EscapeAdbString(windowsPath),
                 ADBService.EscapeAdbString(androidPath)

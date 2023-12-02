@@ -158,7 +158,7 @@ public partial class ADBService
             if (path.StartsWith("//"))
                 path = path[1..];
 
-            int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, EscapeAdbShellString(path), "&&", "pwd");
+            int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, new(), EscapeAdbShellString(path), "&&", "pwd");
             if (exitCode != 0)
             {
                 throw new Exception(stderr);
@@ -208,7 +208,7 @@ public partial class ADBService
 
         private IEnumerable<LogicalDrive> ReadDrives(Regex re, params string[] args)
         {
-            int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr, args);
+            int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr, new(), args);
             if (exitCode != 0)
                 return null;
 
@@ -222,7 +222,7 @@ public partial class ADBService
             {
                 if (props is null)
                 {
-                    int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr);
+                    int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr, new());
                     if (exitCode == 0)
                     {
                         props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(
@@ -244,15 +244,15 @@ public partial class ADBService
 
         public Task<string> GetAndroidVersion() => Task.Run(() =>
         {
-            if (Props.ContainsKey(ANDROID_VERSION))
-                return Props[ANDROID_VERSION];
+            if (Props.TryGetValue(ANDROID_VERSION, out string value))
+                return value;
             else
                 return "";
         });
 
         public static Dictionary<string, string> GetBatteryInfo(LogicalDevice device)
         {
-            if (ExecuteDeviceAdbShellCommand(device.ID, BATTERY, out string stdout, out string stderr) == 0)
+            if (ExecuteDeviceAdbShellCommand(device.ID, BATTERY, out string stdout, out string stderr, new()) == 0)
             {
                 return stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
                     line => line.Split(':')[0].Trim(),
@@ -263,13 +263,13 @@ public partial class ADBService
 
         public static void Reboot(string deviceId, string arg)
         {
-            if (ExecuteDeviceAdbCommand(deviceId, "reboot", out string stdout, out string stderr, arg) != 0)
+            if (ExecuteDeviceAdbCommand(deviceId, "reboot", out string stdout, out string stderr, new(), arg) != 0)
                 throw new Exception(string.IsNullOrEmpty(stderr) ? stdout : stderr);
         }
 
         public static bool GetDeviceIp(DeviceViewModel device)
         {
-            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
+            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new(), new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
                 return false;
 
             var match = AdbRegEx.RE_DEVICE_WLAN_INET.Match(stdout);

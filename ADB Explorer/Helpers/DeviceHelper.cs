@@ -668,7 +668,7 @@ public static class DeviceHelper
                                                 out string stdout,
                                                 out _,
                                                 Encoding.UTF8,
-                                                new[] { "\"netstat", "-nao", "|", "findstr", $"{wsaPid.Value}\"" });
+                                                new(), new[] { "\"netstat", "-nao", "|", "findstr", $"{wsaPid.Value}\"" });
 
         if (retCode != 0)
             return;

@@ -42,7 +42,7 @@ public static class ShellFileOperation
     public static void SilentDelete(ADBService.AdbDevice device, params string[] items)
     {
         var args = new[] { "-rf" }.Concat(items.Select(item => ADBService.EscapeAdbShellString(item))).ToArray();
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, args);
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, new(), args);
     }
 
     public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
@@ -120,7 +120,7 @@ public static class ShellFileOperation
 
     public static bool SilentMove(ADBService.AdbDevice device, string fullPath, string targetPath, bool throwOnError = true)
     {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mv", out string stdout, out string stderr, new[] { ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath) });
+        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mv", out string stdout, out string stderr, new(), new[] { ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath) });
 
         if (exitCode != 0 && throwOnError)
         {
@@ -242,7 +242,7 @@ public static class ShellFileOperation
                                                                "mkdir",
                                                                out string stdout,
                                                                out string stderr,
-                                                               new[] { "-p", ADBService.EscapeAdbShellString(fullPath) });
+                                                               new(), new[] { "-p", ADBService.EscapeAdbShellString(fullPath) });
 
         if (exitCode != 0)
         {
@@ -256,7 +256,7 @@ public static class ShellFileOperation
                                                                "touch",
                                                                out string stdout,
                                                                out string stderr,
-                                                               ADBService.EscapeAdbShellString(fullPath));
+                                                               new(), ADBService.EscapeAdbShellString(fullPath));
 
         if (exitCode != 0)
         {
@@ -270,7 +270,7 @@ public static class ShellFileOperation
                                                                "echo",
                                                                out string stdout,
                                                                out string stderr,
-                                                               new[] { newLine, ">>", ADBService.EscapeAdbShellString(fullPath) });
+                                                               new(), new[] { newLine, ">>", ADBService.EscapeAdbShellString(fullPath) });
 
         if (exitCode != 0)
         {
@@ -284,7 +284,7 @@ public static class ShellFileOperation
                                                                 "cat",
                                                                 out string stdout,
                                                                 out string stderr,
-                                                                paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
+                                                                new(), paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
 
         if (exitCode != 0)
             throw new Exception(stderr);
@@ -372,6 +372,7 @@ public static class ShellFileOperation
                                                 "pm",
                                                 out string stdout,
                                                 out _,
+                                                new(),
                                                 "install",
                                                 "-R",
                                                 "--pkg",
@@ -439,7 +440,7 @@ public static class ShellFileOperation
 
     public static ulong? GetPackagesCount(ADBService.AdbDevice device)
     {
-        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, new[] { "list", "packages", "|", "wc", "-l" });
+        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, new(), new[] { "list", "packages", "|", "wc", "-l" });
         if (result != 0 || !ulong.TryParse(stdout, out ulong value))
             return null;
 
@@ -459,7 +460,7 @@ public static class ShellFileOperation
         if (includeSystem)
         {
             // get system packages
-            var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, args);
+            var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, new(), args);
 
             if (systemExitCode == 0)
                 packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
@@ -467,7 +468,7 @@ public static class ShellFileOperation
 
         args[2] = "-3";
         // get user packages
-        var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, args);
+        var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, new(), args);
 
         if (userExitCode == 0)
             packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
