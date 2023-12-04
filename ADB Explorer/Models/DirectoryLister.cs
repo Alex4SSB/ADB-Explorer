@@ -37,6 +37,7 @@ public class DirectoryLister : ViewModelBase
     private int MinUpdateThreshold { get; set; }
     private Task ReadTask { get; set; }
     private CancellationTokenSource CurrentCancellationToken { get; set; }
+    private CancellationTokenSource LinkListCancellation { get; set; }
     private Func<FileClass, FileClass> FileManipulator { get; }
 
     private ConcurrentQueue<FileStat> currentFileQueue;
@@ -56,6 +57,7 @@ public class DirectoryLister : ViewModelBase
 
     public void Stop()
     {
+        LinkListCancellation?.Cancel();
         StopDirectoryList();
     }
 
@@ -74,8 +76,8 @@ public class DirectoryLister : ViewModelBase
         CurrentCancellationToken = new CancellationTokenSource();
         currentFileQueue = new ConcurrentQueue<FileStat>();
         ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
-        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(StopDirectoryList), CurrentCancellationToken.Token);
-        
+        ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
+
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
 
         ScheduleUpdate();
@@ -111,15 +113,14 @@ public class DirectoryLister : ViewModelBase
         {
             for (int i = 0; finish || (i < DIR_LIST_UPDATE_THRESHOLD_MAX); i++)
             {
-                FileStat fileStat;
-                if (!currentFileQueue.TryDequeue(out fileStat))
+                if (!currentFileQueue.TryDequeue(out FileStat fileStat))
                 {
                     break;
                 }
 
                 FileClass item = FileClass.GenerateAndroidFile(fileStat);
 
-                if (FileManipulator != null)
+                if (FileManipulator is not null)
                 {
                     item = FileManipulator(item);
                 }
@@ -156,9 +157,34 @@ public class DirectoryLister : ViewModelBase
         }
 
         UpdateDirectoryList(true);
-        InProgress = false;
-        IsProgressVisible = false;
-        ReadTask = null;
-        CurrentCancellationToken = null;
+        LinkListCancellation = new();
+
+        var linkTask = Task.Run(ListLinks, LinkListCancellation.Token);
+
+        linkTask.ContinueWith((t) => Dispatcher.Invoke(() =>
+        {
+            InProgress = false;
+            IsProgressVisible = false;
+            ReadTask = null;
+            CurrentCancellationToken = null;
+        }));
+    }
+
+    private void ListLinks()
+    {
+        var items = FileList.Where(f => f.IsLink).ToList();
+        foreach (var item in items)
+        {
+            if (item.Type is not AbstractFile.FileType.Unknown)
+                continue;
+
+            var targetType = Device.GetFile(item.FullPath, LinkListCancellation.Token);
+
+            Dispatcher.Invoke(() =>
+            {
+                item.Type = targetType;
+                item.UpdateType();
+            });
+        }
     }
 }

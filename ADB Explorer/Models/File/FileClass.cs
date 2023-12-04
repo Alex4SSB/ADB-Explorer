@@ -240,7 +240,7 @@ public class FileClass : FileStat
 
         Icon icon;
         var iconId = new Tuple<string, bool>(extension, isLink);
-        if (!FileIcons.ContainsKey(iconId))
+        if (!FileIcons.TryGetValue(iconId, out Icon value))
         {
             if (isApk)
             {
@@ -252,9 +252,7 @@ public class FileClass : FileStat
             FileIcons.Add(iconId, icon);
         }
         else
-        {
-            icon = FileIcons[iconId];
-        }
+            icon = value;
 
         return icon;
     }

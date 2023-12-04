@@ -59,7 +59,7 @@ public class FileOperationQueue : ViewModelBase
 
     public string StringProgress => $"{Operations.Count(op => op.Status is FileOperation.OperationStatus.Completed)} / {TotalCount}";
 
-    public bool AnyFailedOperations => Operations.Any(op => op.Status is FileOperation.OperationStatus.Failed);
+    public bool AnyFailedOperations => Operations.Any(op => !op.IsPastOp && op.Status is FileOperation.OperationStatus.Failed);
 
     #endregion
 

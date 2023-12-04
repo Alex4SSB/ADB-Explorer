@@ -44,14 +44,60 @@ public partial class ADBService
 
         private enum UnixFileMode : UInt32
         {
-            S_IFMT = 0b1111 << 12, // bit mask for the file type bit fields
+            S_IFMT = 0b1111 << 12,   // bit mask for the file type bit fields
             S_IFSOCK = 0b1100 << 12, // socket
-            S_IFLNK = 0b1010 << 12, // symbolic link
-            S_IFREG = 0b1000 << 12, // regular file
-            S_IFBLK = 0b0110 << 12, // block device
-            S_IFDIR = 0b0100 << 12, // directory
-            S_IFCHR = 0b0010 << 12, // character device
-            S_IFIFO = 0b0001 << 12  // FIFO
+            S_IFLNK = 0b1010 << 12,  // symbolic link
+            S_IFREG = 0b1000 << 12,  // regular file
+            S_IFBLK = 0b0110 << 12,  // block device
+            S_IFDIR = 0b0100 << 12,  // directory
+            S_IFCHR = 0b0010 << 12,  // character device
+            S_IFIFO = 0b0001 << 12   // FIFO
+        }
+
+        private static FileStat CreateFile(string path, string stdoutLine)
+        {
+            var match = AdbRegEx.RE_LS_FILE_ENTRY.Match(stdoutLine);
+            if (!match.Success)
+            {
+                throw new Exception($"Invalid output for adb ls command: {stdoutLine}");
+            }
+
+            var name = match.Groups["Name"].Value;
+            var size = UInt64.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
+            var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
+            var mode = UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
+
+            if (SPECIAL_DIRS.Contains(name))
+                return null;
+
+            return new(
+                fileName: name,
+                path: FileHelper.ConcatPaths(path, name),
+                type: ParseFileMode(mode),
+                size: (mode != 0) ? size : new UInt64?(),
+                modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : new DateTime?(),
+                isLink: (mode & (UInt32)UnixFileMode.S_IFMT) == (UInt32)UnixFileMode.S_IFLNK);
+        }
+
+        private static FileType ParseFileMode(uint mode) => 
+            (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
+        {
+            UnixFileMode.S_IFSOCK => FileType.Socket,
+            UnixFileMode.S_IFLNK => FileType.Unknown,
+            UnixFileMode.S_IFREG => FileType.File,
+            UnixFileMode.S_IFBLK => FileType.BlockDevice,
+            UnixFileMode.S_IFDIR => FileType.Folder,
+            UnixFileMode.S_IFCHR => FileType.CharDevice,
+            UnixFileMode.S_IFIFO => FileType.FIFO,
+            _ => FileType.Unknown,
+        };
+
+        public FileType GetFile(string path, CancellationToken cancellationToken)
+        {
+            if (ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out _, cancellationToken, "-L", "-c", "%f", EscapeAdbString(path)) == 0)
+                return ParseFileMode(UInt32.Parse(stdout, NumberStyles.HexNumber));
+
+            return FileType.Unknown;
         }
 
         public void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
@@ -60,42 +106,12 @@ public partial class ADBService
             var stdout = ExecuteDeviceAdbCommandAsync(ID, "ls", cancellationToken, EscapeAdbString(path));
             foreach (string stdoutLine in stdout)
             {
-                var match = AdbRegEx.RE_LS_FILE_ENTRY.Match(stdoutLine);
-                if (!match.Success)
-                {
-                    throw new Exception($"Invalid output for adb ls command: {stdoutLine}");
-                }
+                var item = CreateFile(path, stdoutLine);
 
-                var name = match.Groups["Name"].Value;
-                var size = UInt64.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
-                var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
-                var mode = UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
-
-                if (SPECIAL_DIRS.Contains(name))
-                {
+                if (item is null)
                     continue;
-                }
 
-                output.Enqueue(new FileStat
-                (
-                    fileName: name,
-                    path: FileHelper.ConcatPaths(path, name),
-                    type: (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
-                    {
-                        UnixFileMode.S_IFSOCK => FileType.Socket,
-                        UnixFileMode.S_IFLNK => FileType.Unknown,
-                        UnixFileMode.S_IFREG => FileType.File,
-                        UnixFileMode.S_IFBLK => FileType.BlockDevice,
-                        UnixFileMode.S_IFDIR => FileType.Folder,
-                        UnixFileMode.S_IFCHR => FileType.CharDevice,
-                        UnixFileMode.S_IFIFO => FileType.FIFO,
-                        (UnixFileMode)0 => FileType.Unknown,
-                        _ => throw new Exception($"Unexpected file type for \"{name}\" with mode: {mode}")
-                    },
-                    size: (mode != 0) ? size : new UInt64?(),
-                    modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : new DateTime?(),
-                    isLink: (mode & (UInt32)UnixFileMode.S_IFMT) == (UInt32)UnixFileMode.S_IFLNK
-                ));
+                output.Enqueue(item);
             }
         }
 

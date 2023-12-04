@@ -265,7 +265,7 @@ public partial class ADBService
 
     public static GroupCollection GetMmcNode(string deviceID)
     {
-        // Check to see if the MMC block device (first partition) exists (MMC0 / MMC1)
+        // Check whether the MMC block device (first partition) exists (MMC0 / MMC1)
         ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, new(), @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
         // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
 
