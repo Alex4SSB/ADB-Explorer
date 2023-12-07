@@ -65,6 +65,7 @@ public class DirectoryLister : ViewModelBase
     {
         Dispatcher.BeginInvoke(() =>
         {
+            LinkListCancellation?.Cancel();
             StopDirectoryList();
             FileList.RemoveAll();
 
@@ -73,7 +74,8 @@ public class DirectoryLister : ViewModelBase
             CurrentPath = path;
         }).Wait();
 
-        CurrentCancellationToken = new CancellationTokenSource();
+        CurrentCancellationToken = new();
+        LinkListCancellation = new();
         currentFileQueue = new ConcurrentQueue<FileStat>();
         ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
@@ -157,21 +159,19 @@ public class DirectoryLister : ViewModelBase
         }
 
         UpdateDirectoryList(true);
-        LinkListCancellation = new();
 
-        var linkTask = Task.Run(ListLinks, LinkListCancellation.Token);
+        InProgress = false;
+        IsProgressVisible = false;
+        ReadTask = null;
+        CurrentCancellationToken = null;
 
-        linkTask.ContinueWith((t) => Dispatcher.Invoke(() =>
-        {
-            InProgress = false;
-            IsProgressVisible = false;
-            ReadTask = null;
-            CurrentCancellationToken = null;
-        }));
+        Task.Run(ListLinks, LinkListCancellation.Token);
     }
 
-    private void ListLinks()
+    private async void ListLinks()
     {
+        await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, LinkListCancellation.Token);
+
         var items = FileList.Where(f => f.IsLink).ToList();
         foreach (var item in items)
         {

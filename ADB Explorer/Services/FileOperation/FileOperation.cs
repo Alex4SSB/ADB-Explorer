@@ -29,6 +29,7 @@ public abstract class FileOperation : ViewModelBase
         Install,
         Update,
         Rename,
+        //Archive,
     }
 
     #region Notifiable Properties

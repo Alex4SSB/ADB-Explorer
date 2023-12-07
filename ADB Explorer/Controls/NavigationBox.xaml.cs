@@ -153,7 +153,6 @@ public partial class NavigationBox : UserControl
             AddSpecialButton(ref path,
                              ref expectedLength,
                              ref tempButtons,
-                             ref pathItems,
                              DisplayNames.FirstOrDefault(kv => path.StartsWith(kv.Key)),
                              false);
         }
@@ -161,7 +160,8 @@ public partial class NavigationBox : UserControl
         var pairs = DisplayNames.Where(kv => path.StartsWith(kv.Key));
         var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.FirstOrDefault();
         
-        AddSpecialButton(ref path, ref expectedLength, ref tempButtons, ref pathItems, specialPair);
+        AddSpecialButton(ref path, ref expectedLength, ref tempButtons, specialPair);
+        pathItems.Add(specialPair.Key);
 
         var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
         foreach (var dir in dirs)
@@ -195,7 +195,6 @@ public partial class NavigationBox : UserControl
         void AddSpecialButton(ref string path,
                               ref double expectedLength,
                               ref List<MenuItem> tempButtons,
-                              ref List<string> pathItems,
                               KeyValuePair<string, string> specialPair,
                               bool trimStart = true)
         {
@@ -204,7 +203,6 @@ public partial class NavigationBox : UserControl
 
             MenuItem button = CreatePathButton(specialPair);
             tempButtons.Add(button);
-            pathItems.Add(specialPair.Key);
 
             path = path[specialPair.Key.Length..];
             if (trimStart)

@@ -60,6 +60,6 @@ namespace ADB_Explorer.Models
             new(@"^ *TCP +(?<IP>[\d.]+):(?<Port>[\d]+)", RegexOptions.Multiline);
 
         public static readonly Regex RE_ANDROID_FIND_HASH =
-            new(@"^(?<Hash>\w+) +(?<Path>.+)$", RegexOptions.Multiline);
+            new(@"^(?<Hash>\w+)[ -]+(?<Path>.+)$", RegexOptions.Multiline);
     }
 }

@@ -56,6 +56,18 @@ public static class Security
             m => m.Groups["Hash"].Value.ToUpper());
     }
 
+    public static Dictionary<string, string> CalculateAndroidArchiveHash(FilePath path, Device device)
+    {
+        // tar -xf *.tar.gz --to-command='echo $(md5sum) $TAR_FILENAME'
+        string[] args = { "xf", ADBService.EscapeAdbShellString(path.FullPath), "--to-command='echo $(md5sum) $TAR_FILENAME'" };
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "tar", out string stdout, out string stderr, new(), args);
+
+        var list = AdbRegEx.RE_ANDROID_FIND_HASH.Matches(stdout);
+        return list.Where(m => m.Success).ToDictionary(
+            m => m.Groups["Path"].Value.TrimEnd('\r', '\n'),
+            m => m.Groups["Hash"].Value.ToUpper());
+    }
+
     public static void ValidateOps()
     {
         foreach (var item in Data.FileActions.SelectedFileOps.Value)
