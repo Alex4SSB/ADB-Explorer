@@ -393,11 +393,11 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isExplorerEditing, value);
     }
 
-    private bool isFileOpStopEnabled = false;
-    public bool IsFileOpStopEnabled
+    private bool isFollowLinkEnabled = false;
+    public bool IsFollowLinkEnabled
     {
-        get => isFileOpStopEnabled;
-        set => Set(ref isFileOpStopEnabled, value);
+        get => isFollowLinkEnabled;
+        set => Set(ref isFollowLinkEnabled, value);
     }
 
     #region Observable properties

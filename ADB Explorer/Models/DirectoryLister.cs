@@ -178,11 +178,25 @@ public class DirectoryLister : ViewModelBase
             if (item.Type is not AbstractFile.FileType.Unknown)
                 continue;
 
-            var targetType = Device.GetFile(item.FullPath, LinkListCancellation.Token);
+            AbstractFile.FileType? targetType = null;
+            try
+            {
+                targetType = Device.GetFile(item.FullPath, LinkListCancellation.Token);
+            }
+            catch (Exception e)
+            {
+                if ((e is not AggregateException) || ((e as AggregateException).InnerException is not TaskCanceledException))
+                {
+                    throw;
+                }
+            }
+
+            if (targetType is null)
+                continue;
 
             Dispatcher.Invoke(() =>
             {
-                item.Type = targetType;
+                item.Type = targetType.Value;
                 item.UpdateType();
             });
         }

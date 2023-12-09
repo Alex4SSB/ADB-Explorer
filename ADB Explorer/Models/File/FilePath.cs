@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.ViewModels;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
@@ -51,7 +52,7 @@ public class FilePath : AbstractFile
         protected set => Set(ref fullPath, value);
     }
 
-    public string ParentPath => FullPath[..LastSeparatorIndex(FullPath)];
+    public string ParentPath => FileHelper.GetParentPath(FullPath);
 
     private string fullName;
     public string FullName

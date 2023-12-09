@@ -31,9 +31,8 @@ internal class FileOpTest
 
     public static void TestCurrentOperation()
     {
-        if (Data.FileOpQ.Operations.Count > 0)
+        if (Data.FileOpQ.Operations.OfType<InProgressTestOperation>().FirstOrDefault() is InProgressTestOperation op)
         {
-            var op = Data.FileOpQ.Operations.First() as InProgressTestOperation;
             if (i == updates.Length)
             {
                 Data.FileOpQ.RemoveOperation(op);

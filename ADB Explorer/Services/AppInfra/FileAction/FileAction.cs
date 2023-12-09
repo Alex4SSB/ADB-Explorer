@@ -45,6 +45,7 @@ internal static class AppActions
         { FileActionType.CopyToTemp, "\uF413" },
         { FileActionType.FileOpRemove, "\uE711" },
         { FileActionType.PauseLogs, "\uE769" },
+        { FileActionType.FollowLink, "\uE838" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } = new()
@@ -387,6 +388,12 @@ internal static class AppActions
             () => Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
             Security.ValidateOps,
             Data.FileActions.ValidateAction),
+        new(FileActionType.FollowLink,
+            () => Data.FileActions.IsFollowLinkEnabled,
+            FileActionLogic.FollowLink,
+            "Open Item Location",
+            new(Key.Enter, ModifierKeys.Shift),
+            true)
     };
 
     public static List<KeyBinding> Bindings =>
@@ -477,6 +484,7 @@ internal class FileAction : ViewModelBase
         LogToggle,
         FileOpValidate,
         FileOpFilter,
+        FollowLink,
     }
 
     public FileActionType Name { get; }
@@ -517,6 +525,7 @@ internal class FileAction : ViewModelBase
             result += key;
 
             result = result.Replace("Delete", "Del");
+            result = result.Replace("Return", "Enter");
 
             return result;
         }

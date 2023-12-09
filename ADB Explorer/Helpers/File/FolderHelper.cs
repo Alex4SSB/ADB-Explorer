@@ -11,18 +11,25 @@ internal class FolderHelper
     {
         Data.CurrentDisplayNames.TryAdd(NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView), Data.DevicesObject.Current.Name);
 
-        foreach (var drive in Data.DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type is not AbstractDrive.DriveType.Root))
+        foreach (var drive in Data.DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type 
+            is not AbstractDrive.DriveType.Root 
+            and not AbstractDrive.DriveType.Internal))
         {
             Data.CurrentDisplayNames.TryAdd(drive.Path, drive.Type is AbstractDrive.DriveType.External
                 ? drive.ID : drive.DisplayName);
         }
+
         foreach (var item in AdbExplorerConst.SPECIAL_FOLDERS_DISPLAY_NAMES)
         {
             Data.CurrentDisplayNames.TryAdd(item.Key, item.Value);
         }
+
         foreach (var item in AdbExplorerConst.DRIVE_TYPES)
         {
-            var names = AdbExplorerConst.DRIVE_DISPLAY_NAMES.Where(n => n.Key == item.Value);
+            var names = AdbExplorerConst.DRIVE_DISPLAY_NAMES.Where(n => n.Key == item.Value && item.Value
+                is not AbstractDrive.DriveType.Root
+                and not AbstractDrive.DriveType.Internal);
+
             if (names.Any())
                 Data.CurrentDisplayNames.TryAdd(item.Key, names.First().Value);
         }

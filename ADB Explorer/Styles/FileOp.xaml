@@ -30,13 +30,7 @@
     <Style
         x:Key="BoldInProgressTextBlockStyle"
         BasedOn="{StaticResource DisabledTooltipTextBlockStyle}"
-        TargetType="TextBlock">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Status}" Value="InProgress">
-                <Setter Property="FontWeight" Value="Bold" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
+        TargetType="TextBlock" />
     <Style
         x:Key="BoldInProgressHyperTextStyle"
         BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
@@ -117,7 +111,6 @@
             <TextBlock Grid.Row="1" Grid.Column="1">
                 <TextBlock.Style>
                     <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock">
-                        <Setter Property="FontWeight" Value="Bold" />
                         <Setter Property="Text" Value="{Binding StatusInfo.CurrentFileNameWithoutExtension}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
@@ -205,11 +198,6 @@
     </DataTemplate>
     <DataTemplate x:Key="InProgSyncProgressTemplate">
         <Grid Margin="4,0">
-            <Grid.Resources>
-                <Style TargetType="TextBlock">
-                    <Setter Property="FontWeight" Value="Bold" />
-                </Style>
-            </Grid.Resources>
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />

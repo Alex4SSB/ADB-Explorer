@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
 using static ADB_Explorer.Models.Data;
@@ -427,5 +428,17 @@ public partial class ADBService
 
         string version = RE_ADB_VERSION.Match(stdout).Groups["version"]?.Value;
         return string.IsNullOrEmpty(version) ? null : new Version(version);
+    }
+
+    public static string ReadLink(string deviceID, string symLinkPath)
+    {
+        var result = ExecuteDeviceAdbShellCommand(deviceID, "readlink", out string stdout, out string stderr, new(), "-f", EscapeAdbShellString(symLinkPath));
+        if (result != 0 || string.IsNullOrEmpty(stdout))
+        {
+            DialogService.ShowMessage(string.IsNullOrEmpty(stderr) ? stdout : stderr, Strings.S_FOLLOW_LINK_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+            return null;
+        }
+
+        return stdout.Trim('\r', '\n');
     }
 }

@@ -110,6 +110,7 @@ internal static class MainToolBar
             children: new SubMenu[]
             {
                 new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
                 new SubMenuSeparator(() => Data.FileActions.PackageActionsEnabled),
@@ -155,6 +156,7 @@ internal static class ExplorerContextMenu
             || Data.FileActions.CopyEnabled
             || Data.FileActions.PasteEnabled
             || Data.FileActions.RenameEnabled
+            || Data.FileActions.IsFollowLinkEnabled
             || Data.FileActions.IsCopyItemPathEnabled
             || Data.FileActions.UpdateModifiedEnabled
             || Data.FileActions.EditFileEnabled
@@ -164,6 +166,7 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), AppActions.Icons[FileAction.FileActionType.Copy]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), AppActions.Icons[FileAction.FileActionType.Paste]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icons[FileAction.FileActionType.Rename]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
         new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.More),
@@ -180,6 +183,7 @@ internal static class ExplorerContextMenu
             || Data.FileActions.CopyEnabled
             || Data.FileActions.PasteEnabled
             || Data.FileActions.RenameEnabled
+            || Data.FileActions.IsFollowLinkEnabled
             || Data.FileActions.IsCopyItemPathEnabled
             || Data.FileActions.UpdateModifiedEnabled
             || Data.FileActions.EditFileEnabled
@@ -201,6 +205,7 @@ internal static class ExplorerContextMenu
             || Data.FileActions.CopyEnabled
             || Data.FileActions.PasteEnabled
             || Data.FileActions.RenameEnabled
+            || Data.FileActions.IsFollowLinkEnabled
             || Data.FileActions.IsCopyItemPathEnabled
             || Data.FileActions.UpdateModifiedEnabled
             || Data.FileActions.EditFileEnabled

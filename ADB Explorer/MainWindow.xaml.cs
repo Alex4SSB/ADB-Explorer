@@ -645,7 +645,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     }
                     break;
                 case FileType.Folder:
-                    NavigateToPath(file.FullPath);
+                    NavigateToPath(file.FullPath, isLink: file.IsLink);
                     break;
                 default:
                     break;
@@ -922,12 +922,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(DeviceHelper.ListServices), WiFiPairingService.GetServices()).Wait();
     }
 
-    public bool NavigateToPath(string path, bool bfNavigated = false)
+    public bool NavigateToPath(string path, bool bfNavigated = false, bool isLink = false)
     {
         if (path is null)
             return false;
 
-        var realPath = FolderHelper.FolderExists(path);
+        string realPath;
+        if (isLink && ADBService.ReadLink(CurrentADBDevice.ID, path) is string linkTarget && !string.IsNullOrEmpty(linkTarget))
+            realPath = linkTarget;
+        else
+            realPath = FolderHelper.FolderExists(path);
+
         FileActions.ExplorerFilter = "";
 
         return realPath is not null && _navigateToPath(realPath, bfNavigated);
@@ -951,7 +956,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CurrentPath = realPath;
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin) : realPath;
-        ParentPath = CurrentPath[..FilePath.LastSeparatorIndex(CurrentPath)];
+        ParentPath = FileHelper.GetParentPath(CurrentPath);
 
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
         FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);

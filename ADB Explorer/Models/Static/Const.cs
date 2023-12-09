@@ -8,7 +8,8 @@ public static class AdbExplorerConst
 
     public static readonly string DEFAULT_PATH = "/sdcard";
     public static readonly string TEMP_PATH = "/data/local/tmp";
-    public static readonly string RECYCLE_PATH = "/sdcard/.Trash-AdbExplorer";
+    public static readonly string RECYCLE_FOLDER = ".Trash-AdbExplorer";
+    public static readonly string RECYCLE_PATH = $"/sdcard/{RECYCLE_FOLDER}";
     public static readonly string RECYCLE_INDEX_SUFFIX = ".index";
 
     public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
@@ -19,6 +20,9 @@ public static class AdbExplorerConst
         { "/mnt/sdcard", "Internal Storage" },
         { "/", "Root" }
     };
+
+    public static List<string> POSSIBLE_RECYCLE_PATHS =>
+        SPECIAL_FOLDERS_DISPLAY_NAMES.Where(kv => kv.Value == "Internal Storage").Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}").ToList();
 
     public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
     {

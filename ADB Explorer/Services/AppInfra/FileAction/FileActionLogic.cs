@@ -613,6 +613,7 @@ internal static class FileActionLogic
         Data.FileActions.PackageActionsEnabled =
         Data.FileActions.IsCopyItemPathEnabled =
         Data.FileActions.UpdateModifiedEnabled =
+        Data.FileActions.IsFollowLinkEnabled =
         Data.RuntimeSettings.IsExplorerLoaded =
         Data.FileActions.ParentEnabled = false;
 
@@ -699,6 +700,8 @@ internal static class FileActionLogic
             && Data.SelectedFiles.First().Type is FileType.File
             && !Data.SelectedFiles.First().IsApk
             && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
+
+        Data.FileActions.IsFollowLinkEnabled = Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsLink;
 
         Data.RuntimeSettings.FilterActions = true;
     }
@@ -820,13 +823,6 @@ internal static class FileActionLogic
     {
         var changed = false;
 
-        var opStopEnabled = Data.FileOpQ.HasIncompleteOperations && (Data.FileActions.IsExplorerVisible || Data.FileActions.IsDriveViewVisible);
-        if (Data.FileActions.IsFileOpStopEnabled != opStopEnabled)
-        {
-            Data.FileActions.IsFileOpStopEnabled = opStopEnabled;
-            changed = true;
-        }
-
         var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
         if (Data.FileActions.RemoveFileOpAction.Value != removeAction)
         {
@@ -873,5 +869,22 @@ internal static class FileActionLogic
         Data.RuntimeSettings.GroupsExpanded ^= true;
 
         Data.RuntimeSettings.RefreshSettingsControls = true;
+    }
+
+    public static void FollowLink()
+    {
+        var target = ADBService.ReadLink(Data.CurrentADBDevice.ID, Data.SelectedFiles.First().FullPath);
+
+        if (string.IsNullOrEmpty(target))
+            return;
+
+        if (FileHelper.GetParentPath(target) == Data.CurrentPath)
+        {
+            var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
+            if (file is not null)
+                Data.FileActions.ItemToSelect = file;
+        }
+        else
+            Data.RuntimeSettings.LocationToNavigate = target + "/..";
     }
 }

@@ -379,7 +379,7 @@ public partial class NavigationBox : UserControl
         }
         else if (e.Key == Key.Enter)
         {
-            Data.RuntimeSettings.PathBoxNavigation = DisplayPath.StartsWith(AdbExplorerConst.RECYCLE_PATH)
+            Data.RuntimeSettings.PathBoxNavigation = AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(path => DisplayPath.StartsWith(path))
                 ? AdbExplorerConst.RECYCLE_PATH
                 : DisplayPath;
 

@@ -55,7 +55,7 @@ public static class FileHelper
 
     public static bool IsHiddenRecycleItem(FileClass file)
     {
-        if (file.FullPath == AdbExplorerConst.RECYCLE_PATH || file.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
+        if (AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Contains(file.FullPath) || file.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
             return true;
         
         if (!string.IsNullOrEmpty(Data.FileActions.ExplorerFilter) && !file.ToString().Contains(Data.FileActions.ExplorerFilter, StringComparison.OrdinalIgnoreCase))
@@ -118,4 +118,7 @@ public static class FileHelper
 
         return result.TrimStart('/', '\\');
     }
+
+    public static string GetParentPath(string fullPath) =>
+        fullPath[..FilePath.LastSeparatorIndex(fullPath)];
 }
