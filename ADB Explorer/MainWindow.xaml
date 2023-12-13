@@ -263,9 +263,13 @@
                                         <Setter Property="Text" Value="{Binding SizeString}" />
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Type}" Value="File">
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding Type}" Value="File" />
+                                                    <Condition Binding="{Binding IsLink}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
                                                 <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
+                                            </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>

@@ -693,12 +693,15 @@ internal static class FileActionLogic
             && Data.SelectedFiles.All(file => file.IsInstallApk)
             && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
 
-        Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin && Data.SelectedFiles.Any() && Data.SelectedFiles.All(file => file.Type is FileType.File && !file.IsApk);
+        Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin
+            && Data.SelectedFiles.Any()
+            && Data.SelectedFiles.All(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
         Data.FileActions.EditFileEnabled = !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.Count() == 1
             && Data.SelectedFiles.First().Type is FileType.File
             && !Data.SelectedFiles.First().IsApk
+            && !Data.SelectedFiles.First().IsLink
             && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
 
         Data.FileActions.IsFollowLinkEnabled = Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsLink;

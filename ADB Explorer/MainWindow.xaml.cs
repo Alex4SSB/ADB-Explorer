@@ -293,6 +293,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.FilterActions):
                     FilterFileActions();
                     FilterExplorerContextMenu();
+                    ExplorerContextMenu.UpdateSeparators();
                     break;
 
                 case nameof(AppRuntimeSettings.ClearNavBox):

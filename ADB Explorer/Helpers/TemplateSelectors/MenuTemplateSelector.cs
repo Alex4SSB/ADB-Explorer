@@ -51,11 +51,13 @@ internal class MenuStyleSelector : StyleSelector
     public Style DualActionButtonStyle { get; set; }
     public Style CompoundDualActionStyle { get; set; }
     public Style GeneralSubMenuStyle { get; set; }
+    public Style DummySubMenuStyle { get; set; }
 
     public override Style SelectStyle(object item, DependencyObject container) => item switch
     {
         CompoundDualAction => CompoundDualActionStyle,
         DualActionButton => DualActionButtonStyle,
+        DummySubMenu => DummySubMenuStyle,
         SubMenuSeparator => SubMenuSeparatorStyle,
         CompoundIconSubMenu => CompoundIconSubMenuStyle,
         MenuSeparator => SeparatorStyle,

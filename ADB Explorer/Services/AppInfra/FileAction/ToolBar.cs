@@ -111,6 +111,7 @@ internal static class MainToolBar
             {
                 new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
+                new SubMenuSeparator(() => true),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
                 new SubMenuSeparator(() => Data.FileActions.PackageActionsEnabled),
@@ -129,6 +130,26 @@ internal static class MainToolBar
 
 internal static class ExplorerContextMenu
 {
+    public static void UpdateSeparators()
+    {
+        var list = List.ToArray();
+        var separators = list.OfType<SubMenuSeparator>().Select(separator => (separator, List.IndexOf(separator))).ToList();
+
+        for (int i = 0; i < separators.Count; i++)
+        {
+            var sep = separators[i];
+
+            Index startIndexBefore = i < 1 ? 0 : separators[i - 1].Item2 + 1;
+            Index endIndexBefore = separators[i].Item2;
+            Index startIndexAfter = separators[i].Item2 + 1;
+
+            sep.separator.IsEnabled = list[startIndexBefore..endIndexBefore].Any(a => a.Action.Command.IsEnabled)
+                && list[startIndexAfter..].Any(a => a is not SubMenuSeparator and not DummySubMenu && a.Action.Command.IsEnabled);
+        }
+
+        List.OfType<DummySubMenu>().First().IsEnabled = List.Where(a => a is not SubMenuSeparator and not DummySubMenu).All(a => !a.Action.Command.IsEnabled);
+    }
+
     public static ObservableList<SubMenu> List { get; } = new() {
         new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
@@ -141,7 +162,7 @@ internal static class ExplorerContextMenu
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
             }),
-        new SubMenuSeparator(() => Data.FileActions.PullEnabled || Data.FileActions.ContextPushEnabled),
+        new SubMenuSeparator(() => true),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextNew),
             AppActions.Icons[FileAction.FileActionType.New],
@@ -150,21 +171,11 @@ internal static class ExplorerContextMenu
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFolder), "\uE8F4"),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.NewFile), AppActions.Icons[FileAction.FileActionType.NewFile]),
             }),
-        new SubMenuSeparator(
-            () => Data.FileActions.ContextNewEnabled
-            && (Data.FileActions.CutEnabled
-            || Data.FileActions.CopyEnabled
-            || Data.FileActions.PasteEnabled
-            || Data.FileActions.RenameEnabled
-            || Data.FileActions.IsFollowLinkEnabled
-            || Data.FileActions.IsCopyItemPathEnabled
-            || Data.FileActions.UpdateModifiedEnabled
-            || Data.FileActions.EditFileEnabled
-            || Data.FileActions.UninstallPackageEnabled
-            || Data.FileActions.RestoreEnabled)),
+        new SubMenuSeparator(() => true),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Cut), AppActions.Icons[FileAction.FileActionType.Cut]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Copy), AppActions.Icons[FileAction.FileActionType.Copy]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Paste), AppActions.Icons[FileAction.FileActionType.Paste]),
+        new SubMenuSeparator(() => true),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icons[FileAction.FileActionType.Rename]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
         new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
@@ -178,18 +189,7 @@ internal static class ExplorerContextMenu
             }),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall), AppActions.Icons[FileAction.FileActionType.Uninstall]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore), AppActions.Icons[FileAction.FileActionType.Restore]),
-        new SubMenuSeparator(
-            () => (Data.FileActions.CutEnabled
-            || Data.FileActions.CopyEnabled
-            || Data.FileActions.PasteEnabled
-            || Data.FileActions.RenameEnabled
-            || Data.FileActions.IsFollowLinkEnabled
-            || Data.FileActions.IsCopyItemPathEnabled
-            || Data.FileActions.UpdateModifiedEnabled
-            || Data.FileActions.EditFileEnabled
-            || Data.FileActions.UninstallPackageEnabled
-            || Data.FileActions.RestoreEnabled)
-            && Data.FileActions.PackageActionsEnabled),
+        new SubMenuSeparator(() => true),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
             AppActions.Icons[FileAction.FileActionType.Package],
@@ -200,23 +200,10 @@ internal static class ExplorerContextMenu
                 new SubMenuSeparator(() => true),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), AppActions.Icons[FileAction.FileActionType.CopyToTemp]),
             }),
-        new SubMenuSeparator(
-            () => (Data.FileActions.CutEnabled
-            || Data.FileActions.CopyEnabled
-            || Data.FileActions.PasteEnabled
-            || Data.FileActions.RenameEnabled
-            || Data.FileActions.IsFollowLinkEnabled
-            || Data.FileActions.IsCopyItemPathEnabled
-            || Data.FileActions.UpdateModifiedEnabled
-            || Data.FileActions.EditFileEnabled
-            || Data.FileActions.UninstallPackageEnabled
-            || Data.FileActions.RestoreEnabled
-            || Data.FileActions.PackageActionsEnabled)
-            && (Data.FileActions.DeleteEnabled
-            || Data.FileActions.ContextPushPackagesEnabled)),
+        new SubMenuSeparator(() => true),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete), AppActions.Icons[FileAction.FileActionType.Delete]),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), AppActions.Icons[FileAction.FileActionType.Package]),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EmptyTrash), "\uF141"),
+        new DummySubMenu(),
     };
 }
 

@@ -227,9 +227,6 @@
             <DataTrigger Binding="{Binding IconIsText}" Value="True">
                 <Setter Property="Icon" Value="{StaticResource IconTextBlock}" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Action.Name}" Value="EmptyTrash">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Action.Name}" Value="ContextPushPackages" />
@@ -251,6 +248,16 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Collapsed" />
             </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DummySubMenuStyle"
+        BasedOn="{StaticResource SubMenuItemStyle}"
+        TargetType="MenuItem">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -282,6 +289,7 @@
         CompoundIconMenuStyle="{StaticResource IconMenuStyle}"
         CompoundIconSubMenuStyle="{StaticResource CompoundIconSubMenuStyle}"
         DualActionButtonStyle="{StaticResource DualActionButtonStyle}"
+        DummySubMenuStyle="{StaticResource DummySubMenuStyle}"
         DynamicAltTextStyle="{StaticResource DynamicAltTextStyle}"
         GeneralSubMenuStyle="{StaticResource GeneralSubMenuStyle}"
         IconMenuStyle="{StaticResource IconMenuStyle}"

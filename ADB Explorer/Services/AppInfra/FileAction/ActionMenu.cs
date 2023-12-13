@@ -274,9 +274,39 @@ internal class CompoundIconSubMenu : SubMenu
     }
 }
 
+internal class DummySubMenu : SubMenu
+{
+    private static readonly Action dummyAction = () =>
+        DialogService.ShowMessage("An SSL error has occurred and a secure connection to\nthe server cannot be made.",
+                                  "SHAKESPEARE QUOTE OF THE DAY",
+                                  DialogService.DialogIcon.Informational);
+    
+    private bool? isEnabled = null;
+    public bool? IsEnabled
+    {
+        get => isEnabled;
+        set => Set(ref isEnabled, value);
+    }
+
+    public DummySubMenu()
+        : base(new(FileAction.FileActionType.None, () => true, dummyAction, "Menu Is Empty"), "\uF141")
+    { }
+}
+
 internal class SubMenuSeparator : SubMenu
 {
-    public bool HideSeparator => !Action.Command.IsEnabled;
+    public bool HideSeparator => IsEnabled is null ? !Action.Command.IsEnabled : !IsEnabled.Value;
+
+    private bool? isEnabled = null;
+    public bool? IsEnabled
+    {
+        get => isEnabled;
+        set
+        {
+            if (Set(ref isEnabled, value))
+                OnPropertyChanged(nameof(HideSeparator));
+        }
+    }
 
     public SubMenuSeparator(Func<bool> canExecute)
         : base(new(FileAction.FileActionType.None, canExecute, () => { }), "")
