@@ -240,6 +240,7 @@ public class FileOperationQueue : ViewModelBase
             else if (!Operations.Any(op => op.Status is FileOperation.OperationStatus.InProgress))
             {
                 IsActive = false;
+                CurrentChanged = true;
             }
         }
         finally

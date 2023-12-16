@@ -131,7 +131,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         UpdateFileOpFilterCheck();
 
-        SortFileOps(true);
+        SortFileOps();
     }
 
     private static void UpdateFileOpFilterCheck()
@@ -327,6 +327,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.SortFileOps):
                     SortFileOps();
                     break;
+
+                case nameof(AppRuntimeSettings.RefreshExplorerSorting):
+                    FilterExplorerItems(true);
+                    break;
             }
         });
     }
@@ -385,7 +389,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         UpdateSelectedFileOp();
     }
 
-    private void SortFileOps(bool onlyFilter = false)
+    private void SortFileOps()
     {
         var collectionView = CollectionViewSource.GetDefaultView(CurrentOperationDetailedDataGrid.ItemsSource);
         if (collectionView is null)
@@ -400,11 +404,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         collectionView.Filter = new(predicate);
 
-        if (onlyFilter)
-            return;
-
-        collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new(nameof(FileOperation.Filter), ListSortDirection.Ascending));
+        if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(FileOperation.Filter)))
+            collectionView.SortDescriptions.Add(new(nameof(FileOperation.Filter), ListSortDirection.Ascending));
     }
 
     private void UpdateFileOp()
@@ -989,7 +990,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         TypeColumn.Visibility =
         SizeColumn.Visibility = Visible(!FileActions.IsAppDrive);
 
-        FileActions.CopyPathAction.Value = FileActions.IsAppDrive ? S_COPY_APK_NAME : S_COPY_PATH;
+        FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? S_COPY_APK_NAME : S_COPY_PATH;
 
         if (FileActions.IsRecycleBin)
         {
@@ -997,8 +998,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             TrashHelper.ParseIndexers().ContinueWith((t) => DirList.Navigate(realPath));
 
             DateColumn.Header = S_DATE_DEL_COL;
-            FileActions.DeleteAction.Value = S_EMPTY_TRASH;
-            FileActions.RestoreAction.Value = S_RESTORE_ALL;
+            FileActions.DeleteDescription.Value = S_EMPTY_TRASH;
+            FileActions.RestoreDescription.Value = S_RESTORE_ALL;
         }
         else
         {
@@ -1012,7 +1013,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             DirList.Navigate(realPath);
 
             DateColumn.Header = S_DATE_MOD_COL;
-            FileActions.DeleteAction.Value = S_DELETE_ACTION;
+            FileActions.DeleteDescription.Value = S_DELETE_ACTION;
         }
 
         RuntimeSettings.ExplorerSource = DirList.FileList;
@@ -1312,8 +1313,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         };
 
         collectionView.Filter = new(predicate);
-        collectionView.SortDescriptions.Clear();
-        collectionView.SortDescriptions.Add(new SortDescription(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
+
+        if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(DriveViewModel.Type)))
+            collectionView.SortDescriptions.Add(new(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
     }
 
     private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -1348,7 +1350,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DriveHelper.ClearSelectedDrives();
     }
 
-    private void FilterExplorerItems()
+    private void FilterExplorerItems(bool refreshOnly = false)
     {
         //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
 
@@ -1359,27 +1361,38 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (collectionView is null)
             return;
 
+        if (refreshOnly)
+            collectionView.Refresh();
+
         if (FileActions.IsAppDrive)
         {
             collectionView.Filter = Settings.ShowSystemPackages
                 ? new(FileHelper.PkgFilter())
                 : new(pkg => ((Package)pkg).Type is Package.PackageType.User);
 
-            ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
-            collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new(nameof(Package.Type), ListSortDirection.Descending));
+            if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(Package.Type)))
+            {
+                ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
+
+                collectionView.SortDescriptions.Add(new(nameof(Package.Type), ListSortDirection.Descending));
+            }
         }
         else
         {
             collectionView.Filter = !Settings.ShowHiddenItems
-            ? (new(FileHelper.HideFiles()))
-            : (new(file => !FileHelper.IsHiddenRecycleItem((FileClass)file)));
+                ? new(FileHelper.HideFiles())
+                : new(file => !FileHelper.IsHiddenRecycleItem((FileClass)file));
 
-            ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
-            collectionView.SortDescriptions.Clear();
-            collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
-            collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
-            collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
+            if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(FileClass.IsTemp)
+                                                          || d.PropertyName == nameof(FileClass.IsDirectory)
+                                                          || d.PropertyName == nameof(FileClass.SortName)))
+            {
+                ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
+
+                collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
+                collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
+                collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
+            }
         }
     }
 

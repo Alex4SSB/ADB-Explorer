@@ -9,7 +9,7 @@ public class DriveViewModel : AbstractDrive
     #region Full properties
 
     private Drive drive;
-    protected Drive Drive
+    public Drive Drive
     {
         get => drive;
         set => Set(ref drive, value);

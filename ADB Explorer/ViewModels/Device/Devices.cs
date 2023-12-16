@@ -190,6 +190,9 @@ public class Devices : AbstractDevice
                     isCurrentTypeUpdated = true;
 
                 device.UpdateDevice(item);
+
+                if (device.Drives.Count != item.Drives.Count)
+                    device.UpdateDrives(item, App.Current.Dispatcher, true);
             }
             else
             {

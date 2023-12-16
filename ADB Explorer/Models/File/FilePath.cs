@@ -28,10 +28,11 @@ public abstract class AbstractFile : ViewModelBase
         CharDevice = 4,
         FIFO = 5,
         Unknown = 6,
+        BrokenLink = 7,
     }
 
     private static readonly string[] names =
-        { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown" };
+        { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown", "Broken Link" };
 
     public static string GetFileTypeName(FileType type) => names[(int)type];
 

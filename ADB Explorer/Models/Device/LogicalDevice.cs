@@ -187,6 +187,11 @@ public class LogicalDevice : Device
                 Drives.Add(new LogicalDriveViewModel(logical));
                 added = true;
             }
+            else if (other is VirtualDrive virt && !Drives.Any(d => d.Type == virt.Type))
+            {
+                Drives.Add(new VirtualDriveViewModel(virt));
+                added = true;
+            }
             else
                 throw new NotSupportedException();
         }

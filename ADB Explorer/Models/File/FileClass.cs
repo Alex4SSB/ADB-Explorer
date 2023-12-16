@@ -12,6 +12,7 @@ public class FileClass : FileStat
         None,
         Cut,
         Copy,
+        Link,
     }
 
     public static string CutTypeString(CutType cutType) => cutType switch
@@ -19,6 +20,7 @@ public class FileClass : FileStat
         CutType.None => "",
         CutType.Cut => "Cut",
         CutType.Copy => "Copied",
+        CutType.Link => "",
         _ => throw new NotImplementedException(),
     };
 
@@ -72,19 +74,7 @@ public class FileClass : FileStat
         }
     }
 
-    private bool? isApk = null;
-    public bool IsApk
-    {
-        get
-        {
-            if (isApk is null)
-            {
-                isApk = Array.IndexOf(AdbExplorerConst.APK_NAMES, Extension.ToUpper()) > -1;
-            }
-
-            return (bool)isApk;
-        }
-    }
+    public bool IsApk => AdbExplorerConst.APK_NAMES.Contains(Extension.ToUpper());
 
     public bool IsInstallApk => Array.IndexOf(AdbExplorerConst.INSTALL_APK, Extension.ToUpper()) > -1;
 
@@ -196,6 +186,8 @@ public class FileClass : FileStat
     private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, false));
     private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, true));
     private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
+    private static readonly BitmapSource brokenLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 271, iconSize));
+    private static readonly Icon shortcutOverlayIcon = ShellInfoManager.ExtractIconByIndex("Shell32.dll", 29, iconSize);
 
     private static BitmapSource IconToBitmapSource(Icon icon)
     {
@@ -206,9 +198,10 @@ public class FileClass : FileStat
     {
         return Type switch
         {
-            FileType.File => IconToBitmapSource(ExtIcon(Extension, iconSize, IsLink, IsApk)),
+            FileType.File => IsApk && !IsLink ? null : IconToBitmapSource(ExtIcon(Extension, iconSize, IsLink, IsApk)),
             FileType.Folder => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
             FileType.Unknown => unknownFileIconBitmapSource,
+            FileType.BrokenLink => brokenLinkIconBitmapSource,
             _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
         };
     }
@@ -217,23 +210,29 @@ public class FileClass : FileStat
     {
         TypeName = GetTypeName();
         Icon = GetIcon();
+        IsRegularFile = Type is FileType.File;
     }
 
     private string GetTypeName()
     {
-        return Type switch
+        var type = Type switch
         {
-            FileType.File => IsLink ? "Link" : GetTypeName(FullName),
-            FileType.Folder => IsLink ? "Link" : "Folder",
+            FileType.File => GetTypeName(FullName),
+            FileType.Folder => "Folder",
             FileType.Unknown => "",
             _ => GetFileTypeName(Type),
         };
+
+        if (IsLink && Type is not FileType.BrokenLink)
+            type = string.IsNullOrEmpty(type) ? "Link" : $"{type} (Link)";
+
+        return type;
     }
 
     private static Icon ExtIcon(string extension, ShellInfoManager.IconSize iconSize, bool isLink, bool isApk = false)
     {
         // No extension -> "*" which means unknown file 
-        if (extension == string.Empty)
+        if (string.IsNullOrEmpty(extension))
         {
             extension = "*";
         }
@@ -244,7 +243,7 @@ public class FileClass : FileStat
         {
             if (isApk)
             {
-                icon = Properties.Resources.APK_icon;
+                icon = isLink ? shortcutOverlayIcon : null;
             }
             else
                 icon = ShellInfoManager.GetExtensionIcon(extension, iconSize, isLink);
@@ -259,28 +258,28 @@ public class FileClass : FileStat
 
     public static ulong TotalSize(IEnumerable<FileClass> files)
     {
-        if (files.Any(i => i.Type != FileType.File))
+        if (files.Any(f => f.Type is not FileType.File || f.IsLink))
             return 0;
         
         return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
     }
 
-    public static string ExistingIndexes(ObservableList<FileClass> fileList, string namePrefix, bool isCopy = false)
+    public static string ExistingIndexes(ObservableList<FileClass> fileList, string namePrefix, CutType cutType = CutType.None)
     {
         var existingItems = fileList.Where(item => item.NoExtName.StartsWith(namePrefix));
         var suffixes = existingItems.Select(item => item.NoExtName[namePrefix.Length..].Trim());
 
-        if (isCopy)
+        if (cutType is CutType.Copy or CutType.Link)
         {
             suffixes = suffixes.Select(item => item.Replace("- Copy", "").Trim());
         }
 
-        return ExistingIndexes(suffixes, isCopy);
+        return ExistingIndexes(suffixes, cutType);
     }
 
-    public static string ExistingIndexes(IEnumerable<string> suffixes, bool isCopy = false)
+    public static string ExistingIndexes(IEnumerable<string> suffixes, CutType cutType = CutType.None)
     {
-        var copySuffix = isCopy ? " - Copy" : "";
+        var copySuffix = cutType is CutType.Copy or CutType.Link ? " - Copy" : "";
 
         var indexes = (from i in suffixes
                        where int.TryParse(i, out _)

@@ -94,10 +94,10 @@ public partial class ADBService
 
         public FileType GetFile(string path, CancellationToken cancellationToken)
         {
-            if (ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out _, cancellationToken, "-L", "-c", "%f", EscapeAdbString(path)) == 0)
+            if (ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out string stderr, cancellationToken, "-L", "-c", "%f", EscapeAdbShellString(path)) == 0)
                 return ParseFileMode(UInt32.Parse(stdout, NumberStyles.HexNumber));
 
-            return FileType.Unknown;
+            return stderr.Contains("No such file or directory") ? FileType.BrokenLink : FileType.Unknown;
         }
 
         public void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)

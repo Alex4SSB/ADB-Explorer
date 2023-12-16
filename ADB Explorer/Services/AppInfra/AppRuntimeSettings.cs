@@ -383,6 +383,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool ClearLogs { get => false; set => OnPropertyChanged(); }
     public bool RefreshSettingsControls { get => false; set => OnPropertyChanged(); }
     public bool SortFileOps { get => false; set => OnPropertyChanged(); }
+    public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

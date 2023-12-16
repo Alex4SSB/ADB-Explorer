@@ -10,11 +10,12 @@ public class FileMoveOperation : AbstractShellFileOperation
     public string RecycleName;
     public string IndexerPath;
     public DateTime? DateModified;
+    public readonly bool isLink;
 
-    public FileMoveOperation(FileClass filePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher, bool isCopy = false)
+    public FileMoveOperation(FileClass filePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher, FileClass.CutType cutType = FileClass.CutType.None)
         : base(filePath, adbDevice, dispatcher)
     {
-        if (isCopy)
+        if (cutType is FileClass.CutType.Copy or FileClass.CutType.Link)
             OperationName = OperationType.Copy;
         else if (targetPath.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH))
         {
@@ -30,6 +31,7 @@ public class FileMoveOperation : AbstractShellFileOperation
             OperationName = OperationType.Move;
 
         TargetPath = targetPath;
+        isLink = cutType is FileClass.CutType.Link;
     }
 
     public override void Start()
@@ -51,7 +53,17 @@ public class FileMoveOperation : AbstractShellFileOperation
         }
 
         var cmd = OperationName is OperationType.Copy ? "cp" : "mv";
-        var flag = OperationName is OperationType.Copy && FilePath.IsDirectory ? "-r" : "";
+        var flag = "";
+
+        if (OperationName is OperationType.Copy && FilePath.IsDirectory)
+            flag += "r";
+
+        if (isLink)
+            flag += "s";
+
+        if (flag.Length > 0)
+            flag = "-" + flag;
+
         if (OperationName is OperationType.Copy)
             DateModified = DateTime.Now;
 
@@ -74,7 +86,7 @@ public class FileMoveOperation : AbstractShellFileOperation
                 var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, FilePath.FullPath));
                 AddUpdates(updates);
 
-                var message = updates.Last().Message;
+                var message = updates.Any() ? updates.Last().Message : t.Result;
                 if (message.Contains(':'))
                     message = message.Split(':').Last().TrimStart();
 

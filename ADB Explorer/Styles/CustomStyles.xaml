@@ -451,6 +451,21 @@
                 Width="16"
                 Margin="0,1,0,0"
                 RenderOptions.BitmapScalingMode="HighQuality"
+                Source="/Resources/APK_format_icon_2014-2019_.ico">
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsApk}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+            </Image>
+            <Image
+                Width="16"
+                Margin="0,1,0,0"
+                RenderOptions.BitmapScalingMode="HighQuality"
                 Source="{Binding Icon}">
                 <Image.Style>
                     <Style TargetType="Image">

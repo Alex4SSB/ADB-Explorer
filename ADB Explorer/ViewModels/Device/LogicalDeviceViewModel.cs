@@ -192,6 +192,9 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public Task<bool> UpdateDrives(IEnumerable<Drive> drives, Dispatcher dispatcher, bool asyncClassify = false) => Device.UpdateDrives(drives, dispatcher, asyncClassify);
 
+    public Task<bool> UpdateDrives(LogicalDeviceViewModel other, Dispatcher dispatcher, bool asyncClassify = false)
+        => UpdateDrives(other.Device.Drives.Select(d => d.Drive), dispatcher, asyncClassify);
+
     #endregion
 }
 

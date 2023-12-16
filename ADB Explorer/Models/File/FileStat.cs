@@ -20,7 +20,11 @@ public class FileStat : FilePath
     public FileType Type
     {
         get => type;
-        set => Set(ref type, value);
+        set
+        {
+            if (Set(ref type, value))
+                IsDirectory = value is FileType.Folder;
+        }
     }
 
     private ulong? size;

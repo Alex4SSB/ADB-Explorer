@@ -69,6 +69,9 @@ public static class Strings
     public const string S_WSA_PKG_TIP = "Launch WSA in background";
     public const string S_WSA_LAUNCH = "Select Launch if ADB is already authorized in WSA.\nTo approve ADB, open WSA advanced settings.";
     public const string S_FOLLOW_LINK_ERROR_TITLE = "Unable To Follow Link";
+    public const string S_PULL_ACTION = "Pull";
+    public const string S_PULL_ACTION_LINK = "Pull (Link Target)";
+    public const string S_RESTORE_ACTION = "Restore";
 
 
     public static string S_MISSING_REDIRECTION(string exception) =>

@@ -400,17 +400,14 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isFollowLinkEnabled, value);
     }
 
+    private bool isPasteLinkEnabled = false;
+    public bool IsPasteLinkEnabled
+    {
+        get => isPasteLinkEnabled;
+        set => Set(ref isPasteLinkEnabled, value);
+    }
+
     #region Observable properties
-
-    public ObservableProperty<string> CopyPathAction = new();
-
-    public ObservableProperty<string> DeleteAction = new();
-
-    public ObservableProperty<string> RestoreAction = new();
-
-    public ObservableProperty<string> PasteAction = new();
-
-    public ObservableProperty<string> CutItemsCount = new();
 
     public ObservableProperty<bool> IsCutState = new();
 
@@ -426,11 +423,25 @@ internal class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsLogToggleVisible = new() { Value = Data.Settings.EnableLog };
 
+
     public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = Enumerable.Empty<FileOperation>() };
 
-    public ObservableProperty<string> ValidateAction = new();
 
-    public ObservableProperty<string> RemoveFileOpAction = new();
+    public ObservableProperty<string> CopyPathDescription = new();
+
+    public ObservableProperty<string> DeleteDescription = new();
+
+    public ObservableProperty<string> RestoreDescription = new();
+
+    public ObservableProperty<string> PasteDescription = new();
+
+    public ObservableProperty<string> CutItemsCount = new();
+
+    public ObservableProperty<string> ValidateDescription = new();
+
+    public ObservableProperty<string> RemoveFileOpDescription = new();
+
+    public ObservableProperty<string> PullDescription = new();
 
     #endregion
 
@@ -440,7 +451,7 @@ internal class FileActionsEnable : ViewModelBase
     public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
     public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
     public bool PushPackageVisible => PushPackageEnabled && Data.Settings.EnableApk;
-    public bool MoreEnabled => PackageActionsEnabled || IsCopyItemPathEnabled || UpdateModifiedEnabled;
+    public bool MoreEnabled => EditFileEnabled || UpdateModifiedEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
     public bool IsPasteStateVisible => IsExplorerVisible && !IsRecycleBin && !IsAppDrive;

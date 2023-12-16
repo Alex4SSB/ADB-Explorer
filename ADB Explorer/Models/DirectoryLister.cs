@@ -150,13 +150,8 @@ public class DirectoryLister : ViewModelBase
         {
             ReadTask.Wait();
         }
-        catch (Exception e)
-        {
-            if ((e is not AggregateException) || ((e as AggregateException).InnerException is not TaskCanceledException))
-            {
-                throw;
-            }
-        }
+        catch (AggregateException e) when (e.InnerException is TaskCanceledException)
+        { }
 
         UpdateDirectoryList(true);
 
@@ -183,13 +178,8 @@ public class DirectoryLister : ViewModelBase
             {
                 targetType = Device.GetFile(item.FullPath, LinkListCancellation.Token);
             }
-            catch (Exception e)
-            {
-                if ((e is not AggregateException) || ((e as AggregateException).InnerException is not TaskCanceledException))
-                {
-                    throw;
-                }
-            }
+            catch (AggregateException e) when (e.InnerException is TaskCanceledException)
+            { }
 
             if (targetType is null)
                 continue;
@@ -200,5 +190,7 @@ public class DirectoryLister : ViewModelBase
                 item.UpdateType();
             });
         }
+
+        Data.RuntimeSettings.RefreshExplorerSorting = true;
     }
 }

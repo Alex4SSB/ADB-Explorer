@@ -64,6 +64,10 @@
   <ItemGroup>
   	 <Resource Include="app_icon_black_2023_256px.png" />
   </ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
+	</ItemGroup>
 	
   <ItemGroup>
     <None Update="app_icon_2023_combined.ico">

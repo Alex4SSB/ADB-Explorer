@@ -204,6 +204,20 @@ internal class IconMenu : ActionMenu
             selectionBar.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsSelectionBarVisible = e.NewValue;
         }
     }
+
+    public IconMenu(IEnumerable<SubMenu> children,
+                    string description,
+                    string icon,
+                    StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                    int iconSize = 16,
+                    ObservableProperty<bool> selectionBar = null,
+                    FileAction altAction = null,
+                    ObservableProperty<bool> isVisible = null)
+        : this(new(FileAction.FileActionType.More,
+                   () => children.Any(c => c is not SubMenuSeparator && c.Action.Command.IsEnabled),
+                   () => { },
+                   description), icon, animation, iconSize, selectionBar, children, altAction, isVisible)
+    { }
 }
 
 internal class AnimatedNotifyMenu : DynamicAltTextMenu

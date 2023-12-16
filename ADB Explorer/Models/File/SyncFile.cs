@@ -32,6 +32,9 @@ public class SyncFile : FilePath
 
     public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation fileOp = null)
     {
+        if (!newUpdates.Any())
+            return;
+
         if (!IsDirectory || newUpdates.All(u => u.AndroidPath.Equals(FullPath)))
         {
             ProgressUpdates.AddRange(newUpdates);

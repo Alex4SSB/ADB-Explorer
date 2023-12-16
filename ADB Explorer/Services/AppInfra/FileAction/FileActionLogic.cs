@@ -43,7 +43,7 @@ internal static class FileActionLogic
 
     public static void CopyToTemp()
     {
-        _ = ShellFileOperation.MoveItems(true,
+        _ = ShellFileOperation.MoveItems(FileClass.CutType.Copy,
                                          AdbExplorerConst.TEMP_PATH,
                                          Data.SelectedFiles,
                                          FileHelper.DisplayName(Data.SelectedFiles.First()),
@@ -288,7 +288,7 @@ internal static class FileActionLogic
             Data.FileActions.IsCutState.Value = false;
         }
 
-        Data.FileActions.PasteAction.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} {PluralityConverter.Convert(Data.CutItems, "Item")}";
+        Data.FileActions.PasteDescription.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} {PluralityConverter.Convert(Data.CutItems, "Item")}";
 
         if (Data.CutItems.Count < 1 || Data.FileActions.IsRecycleBin || !Data.FileActions.IsExplorerVisible)
             return false;
@@ -318,7 +318,7 @@ internal static class FileActionLogic
         return true;
     }
 
-    public static async void PasteFiles()
+    public static async void PasteFiles(bool isLink = false)
     {
         var firstSelectedFile = Data.SelectedFiles.Any() ? Data.SelectedFiles.First() : null;
         var targetName = "";
@@ -335,8 +335,11 @@ internal static class FileActionLogic
             targetName = FileHelper.DisplayName(Data.SelectedFiles.First());
         }
 
-        var pasteItems = Data.CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
-        await Task.Run(() => ShellFileOperation.MoveItems(Data.FileActions.PasteState is FileClass.CutType.Copy,
+        var pasteItems = isLink
+            ? Data.CutItems
+            : Data.CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
+
+        await Task.Run(() => ShellFileOperation.MoveItems(isLink ? FileClass.CutType.Link : Data.FileActions.PasteState,
                                                           targetPath,
                                                           pasteItems,
                                                           targetName,
@@ -451,8 +454,7 @@ internal static class FileActionLogic
                                          AdbExplorerConst.RECYCLE_PATH,
                                          Data.CurrentPath,
                                          Data.DirList.FileList,
-                                         App.Current.Dispatcher,
-                                         Data.DevicesObject.Current);
+                                         App.Current.Dispatcher);
         }
         else
         {
@@ -650,8 +652,8 @@ internal static class FileActionLogic
             return;
         }
 
-        Data.FileActions.IsRegularItem = !(Data.SelectedFiles.Any() && Data.DevicesObject.Current?.Root is not AbstractDevice.RootStatus.Enabled
-            && Data.SelectedFiles.All(item => item is FileClass file && file.Type is not (FileType.File or FileType.Folder)));
+        Data.FileActions.IsRegularItem = Data.RuntimeSettings.IsRootActive
+            || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
         if (Data.FileActions.IsRecycleBin)
         {
@@ -659,28 +661,49 @@ internal static class FileActionLogic
         }
         else
         {
-            Data.FileActions.DeleteEnabled = Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem;
+            Data.FileActions.DeleteEnabled = Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem
+                && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
+
             Data.FileActions.RestoreEnabled = false;
         }
 
-        Data.FileActions.DeleteAction.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_EMPTY_TRASH : "Delete";
-        Data.FileActions.RestoreAction.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : "Restore";
+        Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
+                                               && Data.SelectedFiles.Count() == 1
+                                               && Data.SelectedFiles.First().IsLink
+                                               && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
 
-        Data.FileActions.PullEnabled = Data.FileActions.PushPullEnabled && !Data.FileActions.IsRecycleBin && Data.SelectedFiles.Any() && Data.FileActions.IsRegularItem;
+        Data.FileActions.PullDescription.Value = Data.FileActions.IsFollowLinkEnabled ? Strings.S_PULL_ACTION_LINK : Strings.S_PULL_ACTION;
+        Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_EMPTY_TRASH : Strings.S_DELETE_ACTION;
+        Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : Strings.S_RESTORE_ACTION;
+
+        Data.FileActions.PullEnabled = Data.FileActions.PushPullEnabled
+                                       && !Data.FileActions.IsRecycleBin
+                                       && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
+                                       && Data.FileActions.IsRegularItem;
+
         Data.FileActions.ContextPushEnabled = Data.FileActions.PushPullEnabled && !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
-        Data.FileActions.RenameEnabled = !Data.FileActions.IsRecycleBin && Data.SelectedFiles.Count() == 1 && Data.FileActions.IsRegularItem;
+        Data.FileActions.RenameEnabled = !Data.FileActions.IsRecycleBin
+                                         && Data.SelectedFiles.Count() == 1
+                                         && Data.FileActions.IsRegularItem
+                                         && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
         var allSelectedAreCut = Data.SelectedFiles.Any() && Data.CutItems.All(item => Data.SelectedFiles.Contains(item)) && Data.CutItems.Count == Data.SelectedFiles.Count();
-        Data.FileActions.CutEnabled = Data.SelectedFiles.Any() && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Cut) && Data.FileActions.IsRegularItem;
-        Data.FileActions.CopyEnabled = Data.SelectedFiles.Any() && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Copy) && Data.FileActions.IsRegularItem && !Data.FileActions.IsRecycleBin;
+        Data.FileActions.CutEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
+                                      && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Cut)
+                                      && Data.FileActions.IsRegularItem
+                                      && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
+
+        Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
+                                       && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Copy)
+                                       && Data.FileActions.IsRegularItem
+                                       && !Data.FileActions.IsRecycleBin;
 
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
         Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
-                                                 && Data.SelectedFiles.Any()
-                                                 && Data.SelectedFiles.All(file => file.IsInstallApk)
+                                                 && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
                                                  && !Data.FileActions.IsRecycleBin
                                                  && !(Data.DevicesObject?.Current?.Type is AbstractDevice.DeviceType.Recovery
                                                  && Data.FileActions.IsTemp);
@@ -689,13 +712,11 @@ internal static class FileActionLogic
 
         Data.FileActions.ContextNewEnabled = !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin;
         Data.FileActions.SubmenuUninstallEnabled = Data.FileActions.IsTemp
-            && Data.SelectedFiles.Any()
-            && Data.SelectedFiles.All(file => file.IsInstallApk)
+            && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
             && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
 
         Data.FileActions.UpdateModifiedEnabled = !Data.FileActions.IsRecycleBin
-            && Data.SelectedFiles.Any()
-            && Data.SelectedFiles.All(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
+            && Data.SelectedFiles.AnyAll(file => file.Type is FileType.File && !file.IsApk && !file.IsLink);
 
         Data.FileActions.EditFileEnabled = !Data.FileActions.IsRecycleBin
             && Data.SelectedFiles.Count() == 1
@@ -704,7 +725,12 @@ internal static class FileActionLogic
             && !Data.SelectedFiles.First().IsLink
             && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
 
-        Data.FileActions.IsFollowLinkEnabled = Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsLink;
+        Data.FileActions.IsPasteLinkEnabled = !Data.FileActions.IsRecycleBin
+            && Data.RuntimeSettings.IsRootActive
+            && Data.CutItems.Count == 1
+            && Data.FileActions.PasteState is FileClass.CutType.Copy
+            && (!Data.SelectedFiles.Any() ||
+            (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.RuntimeSettings.FilterActions = true;
     }
@@ -827,16 +853,16 @@ internal static class FileActionLogic
         var changed = false;
 
         var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
-        if (Data.FileActions.RemoveFileOpAction.Value != removeAction)
+        if (Data.FileActions.RemoveFileOpDescription.Value != removeAction)
         {
-            Data.FileActions.RemoveFileOpAction.Value = removeAction;
+            Data.FileActions.RemoveFileOpDescription.Value = removeAction;
             changed = true;
         }
 
         var validateAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
-        if (Data.FileActions.ValidateAction.Value != validateAction)
+        if (Data.FileActions.ValidateDescription.Value != validateAction)
         {
-            Data.FileActions.ValidateAction.Value = validateAction;
+            Data.FileActions.ValidateDescription.Value = validateAction;
             changed = true;
         }
 

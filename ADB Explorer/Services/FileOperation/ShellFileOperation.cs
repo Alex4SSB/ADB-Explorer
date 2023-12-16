@@ -130,7 +130,7 @@ public static class ShellFileOperation
         return exitCode == 0;
     }
 
-    public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, bool isCopy = false)
+    public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, FileClass.CutType cutType = FileClass.CutType.None)
     {
         List<FileOperation> fileops = new();
 
@@ -159,10 +159,10 @@ public static class ShellFileOperation
             {
                 var targetName = item.FullName;
                 if (currentPath == targetPath)
-                    targetName = $"{item.NoExtName}{FileClass.ExistingIndexes(fileList, item.NoExtName, isCopy)}{item.Extension}";
+                    targetName = $"{item.NoExtName}{FileClass.ExistingIndexes(fileList, item.NoExtName, cutType)}{item.Extension}";
 
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
-                fileops.Add(new FileMoveOperation(item, target, device, dispatcher, isCopy));
+                fileops.Add(new FileMoveOperation(item, target, device, dispatcher, cutType));
             }
         }
 
@@ -202,9 +202,13 @@ public static class ShellFileOperation
                 {
                     if (op.OperationName is FileOperation.OperationType.Copy)
                     {
-                        FileClass newFile = new(op.FilePath);
+                        FileClass newFile = new(op.FilePath)
+                        {
+                            IsLink = op.isLink
+                        };
                         newFile.UpdatePath(op.TargetPath.FullPath);
                         newFile.ModifiedTime = op.DateModified;
+                        
                         Data.DirList.FileList.Add(newFile);
 
                         // only select the item if there aren't any other operations
@@ -292,7 +296,7 @@ public static class ShellFileOperation
         return stdout;
     }
 
-    public static async Task MoveItems(bool isCopy,
+    public static async Task MoveItems(FileClass.CutType cutType,
                                        string targetPath,
                                        IEnumerable<FileClass> pasteItems,
                                        string targetName,
@@ -362,7 +366,7 @@ public static class ShellFileOperation
                       currentPath: currentPath,
                       fileList: fileList,
                       dispatcher: dispatcher,
-                      isCopy: isCopy);
+                      cutType: cutType);
         });
     }
 

@@ -694,7 +694,7 @@ public static class DeviceHelper
         Process.GetProcessesByName(AdbExplorerConst.WSA_PROCESS_NAME).FirstOrDefault()?.Id;
 
     private static bool IsWsaInstalled() =>
-        new PackageManager().FindPackagesForUser("")?.Any(pkg => pkg.DisplayName == AdbExplorerConst.WSA_PACKAGE_NAME)
+        new PackageManager().FindPackagesForUser("")?.Any(pkg => pkg.DisplayName.Contains(AdbExplorerConst.WSA_PACKAGE_NAME))
         is true;
 
     public static void UpdateWsaPkgStatus()
