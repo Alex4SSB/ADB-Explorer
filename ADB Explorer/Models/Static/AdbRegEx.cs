@@ -61,5 +61,8 @@ namespace ADB_Explorer.Models
 
         public static readonly Regex RE_ANDROID_FIND_HASH =
             new(@"^(?<Hash>\w+)[ -]+(?<Path>.+)$", RegexOptions.Multiline);
+
+        public static readonly Regex RE_LIST_LINKS =
+            new(@"(?:(?<Path>^[^;\r\n]+) ; (?<Mode>.*))|(?<Error>^stat:.*'(?<ErrorPath>.+)'.*No such.*)", RegexOptions.Multiline);
     }
 }

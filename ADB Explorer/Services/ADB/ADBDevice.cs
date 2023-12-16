@@ -92,12 +92,27 @@ public partial class ADBService
             _ => FileType.Unknown,
         };
 
-        public FileType GetFile(string path, CancellationToken cancellationToken)
+        public IEnumerable<(string, FileType)> GetFile(CancellationToken cancellationToken, IEnumerable<string> filePaths)
         {
-            if (ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out string stderr, cancellationToken, "-L", "-c", "%f", EscapeAdbShellString(path)) == 0)
-                return ParseFileMode(UInt32.Parse(stdout, NumberStyles.HexNumber));
+            var args = new[] { "-L", "-c", "'%n ; %f'" }
+                .Concat(filePaths.Select(f => EscapeAdbShellString(f)))
+                .Append("2>&1").ToArray();
 
-            return stderr.Contains("No such file or directory") ? FileType.BrokenLink : FileType.Unknown;
+            ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out string stderr, cancellationToken, args);
+
+            var matches = AdbRegEx.RE_LIST_LINKS.Matches(stdout);
+
+            foreach (Match match in matches)
+            {
+                if (!match.Success)
+                    continue;
+
+                if (string.IsNullOrEmpty(match.Groups["Error"].Value))
+                    yield return (match.Groups["Path"].Value, ParseFileMode(UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber)));
+
+                else
+                    yield return (match.Groups["ErrorPath"].Value, match.Groups["Error"].Value.Contains("No such file or directory") ? FileType.BrokenLink : FileType.Unknown);
+            }
         }
 
         public void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)

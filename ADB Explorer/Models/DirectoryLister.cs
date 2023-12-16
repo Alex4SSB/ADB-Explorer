@@ -1,6 +1,8 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using System.Collections;
+using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
@@ -167,27 +169,29 @@ public class DirectoryLister : ViewModelBase
     {
         await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, LinkListCancellation.Token);
 
-        var items = FileList.Where(f => f.IsLink).ToList();
-        foreach (var item in items)
+        var items = FileList.Where(f => f.IsLink && f.Type is FileType.Unknown).ToList();
+
+        IEnumerable<(string, FileType)> result = null;
+        try
         {
-            if (item.Type is not AbstractFile.FileType.Unknown)
-                continue;
+            result = Device.GetFile(LinkListCancellation.Token, items.Select(f => f.FullPath));
+        }
+        catch (AggregateException e) when (e.InnerException is TaskCanceledException)
+        { }
 
-            AbstractFile.FileType? targetType = null;
-            try
-            {
-                targetType = Device.GetFile(item.FullPath, LinkListCancellation.Token);
-            }
-            catch (AggregateException e) when (e.InnerException is TaskCanceledException)
-            { }
+        if (result is null)
+            return;
 
-            if (targetType is null)
+        foreach (var item in result)
+        {
+            var file = items.Where(f => f.FullPath == item.Item1);
+            if (!file.Any())
                 continue;
 
             Dispatcher.Invoke(() =>
             {
-                item.Type = targetType.Value;
-                item.UpdateType();
+                file.First().Type = item.Item2;
+                file.First().UpdateType();
             });
         }
 
