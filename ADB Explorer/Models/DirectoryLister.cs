@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
-using System.Collections;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
@@ -79,6 +78,7 @@ public class DirectoryLister : ViewModelBase
         CurrentCancellationToken = new();
         LinkListCancellation = new();
         currentFileQueue = new ConcurrentQueue<FileStat>();
+
         ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
 
@@ -89,7 +89,19 @@ public class DirectoryLister : ViewModelBase
 
     private void ScheduleUpdate()
     {
-        bool manyPendingFilesExist = currentFileQueue.Count >= DIR_LIST_UPDATE_THRESHOLD_MAX;
+        UpdateDelays(currentFileQueue.Count);
+
+        UpdateTask = Task.Delay(UpdateInterval);
+        UpdateTask.ContinueWith(
+            (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)),
+            CurrentCancellationToken.Token,
+            TaskContinuationOptions.OnlyOnRanToCompletion,
+            TaskScheduler.Default);
+    }
+
+    private void UpdateDelays(int queueCount)
+    {
+        bool manyPendingFilesExist = queueCount >= DIR_LIST_UPDATE_THRESHOLD_MAX;
         bool isListingStarting = FileList.Count < DIR_LIST_START_COUNT;
 
         if (isListingStarting || manyPendingFilesExist)
@@ -102,13 +114,6 @@ public class DirectoryLister : ViewModelBase
             UpdateInterval = DIR_LIST_UPDATE_INTERVAL;
             MinUpdateThreshold = DIR_LIST_UPDATE_THRESHOLD_MIN;
         }
-
-        UpdateTask = Task.Delay(UpdateInterval);
-        UpdateTask.ContinueWith(
-            (t) => Dispatcher.BeginInvoke(() => UpdateDirectoryList(!InProgress)), 
-            CurrentCancellationToken.Token, 
-            TaskContinuationOptions.OnlyOnRanToCompletion, 
-            TaskScheduler.Default);
     }
 
     private void UpdateDirectoryList(bool finish)
@@ -167,14 +172,16 @@ public class DirectoryLister : ViewModelBase
 
     private async void ListLinks()
     {
-        await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, LinkListCancellation.Token);
+        await AsyncHelper.WaitUntil(() => FileList.Count > 0, DIR_LIST_UPDATE_INTERVAL, TimeSpan.FromMilliseconds(20), LinkListCancellation.Token);
 
         var items = FileList.Where(f => f.IsLink && f.Type is FileType.Unknown).ToList();
+        if (items.Count < 1)
+            return;
 
         IEnumerable<(string, FileType)> result = null;
         try
         {
-            result = Device.GetFile(LinkListCancellation.Token, items.Select(f => f.FullPath));
+            result = Device.GetLinkType(items.Select(f => f.FullPath), LinkListCancellation.Token);
         }
         catch (AggregateException e) when (e.InnerException is TaskCanceledException)
         { }

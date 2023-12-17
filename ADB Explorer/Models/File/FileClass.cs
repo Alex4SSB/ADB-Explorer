@@ -194,17 +194,14 @@ public class FileClass : FileStat
         return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
     }
 
-    private object GetIcon()
+    private object GetIcon() => Type switch
     {
-        return Type switch
-        {
-            FileType.File => IsApk && !IsLink ? null : IconToBitmapSource(ExtIcon(Extension, iconSize, IsLink, IsApk)),
-            FileType.Folder => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
-            FileType.Unknown => unknownFileIconBitmapSource,
-            FileType.BrokenLink => brokenLinkIconBitmapSource,
-            _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
-        };
-    }
+        FileType.File => IsApk && !IsLink ? null : IconToBitmapSource(ExtIcon(Extension, iconSize, IsLink, IsApk)),
+        FileType.Folder => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
+        FileType.Unknown => unknownFileIconBitmapSource,
+        FileType.BrokenLink => brokenLinkIconBitmapSource,
+        _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
+    };
 
     public void UpdateType()
     {

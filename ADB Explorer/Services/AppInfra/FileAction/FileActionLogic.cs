@@ -900,20 +900,22 @@ internal static class FileActionLogic
         Data.RuntimeSettings.RefreshSettingsControls = true;
     }
 
-    public static void FollowLink()
+    public static async void FollowLink()
     {
         var target = ADBService.ReadLink(Data.CurrentADBDevice.ID, Data.SelectedFiles.First().FullPath);
 
         if (string.IsNullOrEmpty(target))
             return;
 
-        if (FileHelper.GetParentPath(target) == Data.CurrentPath)
+        if (FileHelper.GetParentPath(target) != Data.CurrentPath)
         {
-            var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
-            if (file is not null)
-                Data.FileActions.ItemToSelect = file;
-        }
-        else
             Data.RuntimeSettings.LocationToNavigate = target + "/..";
+        }
+
+        await AsyncHelper.WaitUntil(() => !Data.DirList.InProgress, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(20), new());
+
+        var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
+        if (file is not null)
+            Data.FileActions.ItemToSelect = file;
     }
 }

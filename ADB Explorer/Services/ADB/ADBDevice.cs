@@ -92,7 +92,7 @@ public partial class ADBService
             _ => FileType.Unknown,
         };
 
-        public IEnumerable<(string, FileType)> GetFile(CancellationToken cancellationToken, IEnumerable<string> filePaths)
+        public IEnumerable<(string, FileType)> GetLinkType(IEnumerable<string> filePaths, CancellationToken cancellationToken)
         {
             var args = new[] { "-L", "-c", "'%n ; %f'" }
                 .Concat(filePaths.Select(f => EscapeAdbShellString(f)))

@@ -120,10 +120,4 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
         suppressOnCollectionChanged = false;
         OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
     }
-
-    public void Set(IEnumerable<T> other)
-    {
-        RemoveAll();
-        AddRange(other);
-    }
 }
