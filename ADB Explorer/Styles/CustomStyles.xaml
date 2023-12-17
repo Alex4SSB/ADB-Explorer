@@ -339,7 +339,7 @@
         x:Key="SelectedItemsStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=SelectedItems.Count}" />
+        <Setter Property="Text" Value="{Binding ElementName=MainWin, Path=SelectedFilesCount}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=SelectedItems.Count}" />

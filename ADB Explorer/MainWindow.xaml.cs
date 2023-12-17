@@ -21,6 +21,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 {
     private readonly DispatcherTimer ServerWatchdogTimer = new();
     private readonly DispatcherTimer ConnectTimer = new();
+    private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
+
     private readonly Mutex connectTimerMutex = new();
     private readonly ThemeService themeService = new();
     private int clickCount = 0;
@@ -36,6 +38,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public string SelectedFilesTotalSize => (SelectedFiles is not null && FileClass.TotalSize(SelectedFiles) is ulong size and > 0) ? size.ToSize() : "";
+    public string SelectedFilesCount => $"{ExplorerGrid.SelectedItems.Count}";
 
     private string prevPath = "";
 
@@ -94,7 +97,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
         DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
         FileOpFilters.CheckedFilterCount.PropertyChanged += CheckedFilterCount_PropertyChanged;
-        
+
+        SelectionTimer.Tick += SelectionTimer_Tick;
+
         var versionTask = AdbHelper.CheckAdbVersion();
         versionTask.ContinueWith((t) =>
         {
@@ -676,16 +681,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
         }
 
+        SelectionTimer.Stop();
+        SelectionTimer.Start();
+    }
+
+    private void SelectionTimer_Tick(object sender, EventArgs e)
+    {
         SelectedFiles = FileActions.IsAppDrive ? Enumerable.Empty<FileClass>() : ExplorerGrid.SelectedItems.OfType<FileClass>();
         SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : Enumerable.Empty<Package>();
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
+        OnPropertyChanged(nameof(SelectedFilesCount));
 
-        if (SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
-        {
-            Task.Run(() => Task.Delay(SELECTION_CHANGED_DELAY)).ContinueWith((t) => Dispatcher.Invoke(() => FileActionLogic.UpdateFileActions()));
-        }
-        else
-            FileActionLogic.UpdateFileActions();
+        FileActionLogic.UpdateFileActions();
+
+        SelectionTimer.Stop();
     }
 
     /// <summary>
