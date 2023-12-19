@@ -32,6 +32,13 @@ public class DirectoryLister : ViewModelBase
         private set => Set(ref isProgressVisible, value);
     }
 
+    private bool isLinlListingFinished = false;
+    public bool IsLinkListingFinished
+    {
+        get => isLinlListingFinished;
+        set => Set(ref isLinlListingFinished, value);
+    }
+
     private Dispatcher Dispatcher { get; }
     private Task UpdateTask { get; set; }
     private TimeSpan UpdateInterval { get; set; }
@@ -66,6 +73,8 @@ public class DirectoryLister : ViewModelBase
     {
         Dispatcher.BeginInvoke(() =>
         {
+            IsLinkListingFinished = false;
+
             LinkListCancellation?.Cancel();
             StopDirectoryList();
             FileList.RemoveAll();
@@ -176,7 +185,10 @@ public class DirectoryLister : ViewModelBase
 
         var items = FileList.Where(f => f.IsLink && f.Type is FileType.Unknown).ToList();
         if (items.Count < 1)
+        {
+            IsLinkListingFinished = true;
             return;
+        }
 
         IEnumerable<(string, FileType)> result = null;
         try
@@ -187,7 +199,10 @@ public class DirectoryLister : ViewModelBase
         { }
 
         if (result is null)
+        {
+            IsLinkListingFinished = true;
             return;
+        }
 
         foreach (var item in result)
         {
@@ -201,6 +216,8 @@ public class DirectoryLister : ViewModelBase
                 file.First().UpdateType();
             });
         }
+
+        IsLinkListingFinished = true;
 
         Data.RuntimeSettings.RefreshExplorerSorting = true;
     }

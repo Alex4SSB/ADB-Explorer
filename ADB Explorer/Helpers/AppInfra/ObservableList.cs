@@ -12,9 +12,15 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
         }
     }
 
-    public void AddRange(IEnumerable<T> items)
+    /// <summary>
+    /// Adds a collection of items to the end of the list. <br />
+    /// *** USE OptimizeForOne ONLY WHEN THE COLLECTION HAS BEEN ALREADY ENUMERATED ***
+    /// </summary>
+    /// <param name="items"></param>
+    /// <param name="OptimizeForOne">Use regular Add if there's 1 or less items to add.</param>
+    public void AddRange(IEnumerable<T> items, bool OptimizeForOne = true)
     {
-        if (items.Count() < 2)
+        if (OptimizeForOne && items.Count() < 2)
         {
             if (items.Any())
                 Add(items.First());

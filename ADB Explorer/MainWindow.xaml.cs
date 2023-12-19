@@ -208,7 +208,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             if (!InitNavigation(RuntimeSettings.PathBoxNavigation))
                             {
                                 DriveViewNav();
-                                NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
                                 return;
                             }
                         }
@@ -515,7 +514,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e) => Dispatcher.Invoke(() =>
     {
         if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
         {
@@ -537,17 +536,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 TrashHelper.EnableRecycleButtons();
             }
-
-            if (string.IsNullOrEmpty(prevPath))
+        }
+        else if (e.PropertyName == nameof(DirectoryLister.IsLinkListingFinished)
+            && DirList.IsLinkListingFinished)
+        {
+            if (ExplorerGrid.Items.Count < 1)
                 return;
 
-            var prevItem = DirList.FileList.Where(item => item.FullPath == prevPath);
-            if (prevItem.Any())
+            if (!string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null)
             {
-                ExplorerGrid.SelectedIndex = ExplorerGrid.Items.IndexOf(prevItem.First());
+                Task.Delay(DIR_LIST_AUTO_SCROLL_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => FileActions.ItemToSelect = prevItem));
+            }
+            else
+            {
+                Task.Delay(DIR_LIST_AUTO_SCROLL_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0])));
             }
         }
-    }
+    });
 
     private void ThemeService_PropertyChanged(object sender, PropertyChangedEventArgs e) =>
         Dispatcher.Invoke(SetTheme);
@@ -822,6 +827,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         NavigationBox.Path = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
+        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
         
         DriveList.ItemsSource = DevicesObject.Current.Drives;
 
