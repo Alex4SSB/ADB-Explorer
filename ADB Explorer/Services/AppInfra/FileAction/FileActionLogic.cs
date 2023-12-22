@@ -759,7 +759,7 @@ internal static class FileActionLogic
         foreach (var item in dialog.FilesAsShellObject)
         {
             var source = new SyncFile(item) { ShellObject = item };
-            var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), item is ShellFolder ? FileType.Folder : FileType.File);
+            var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), isFolderPicker ? FileType.Folder : FileType.File);
 
             var pushOpeartion = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
             pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;

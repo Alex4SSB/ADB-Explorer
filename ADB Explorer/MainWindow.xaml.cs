@@ -28,8 +28,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private int clickCount = 0;
     private int firstSelectedRow = -1;
 
-    private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight");
-    private double ScrollContentPresenterMargin => ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top;
+    private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
+    private double ScrollContentPresenterMargin => RuntimeSettings.UseFluentStyles ? ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top : 0;
     private double DataGridContentWidth
         => StyleHelper.GetChildItemsPresenter(ExplorerGrid) is ItemsPresenter presenter ? presenter.ActualWidth : 0;
 
@@ -556,8 +556,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ThemeService_PropertyChanged(object sender, PropertyChangedEventArgs e) =>
         Dispatcher.Invoke(SetTheme);
-
-    
 
     private void Window_Closing(object sender, CancelEventArgs e)
     {
@@ -1194,7 +1192,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
+        if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2 or MouseButton.Right)
             return;
 
         var row = sender as DataGridRow;
@@ -1229,14 +1227,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         MouseDownPoint = point;
         var actualRowWidth = 0.0;
         int selectionIndex;
+        var rowHeight = ExplorerGrid.MinRowHeight + (RuntimeSettings.UseFluentStyles ? 2 : 0); // fluent row margin = 0, 1
 
         foreach (var item in ExplorerGrid.Columns.Where(col => col.Visibility == Visibility.Visible))
         {
             actualRowWidth += item.ActualWidth;
         }
 
-        if (point.Y > (ExplorerGrid.Items.Count * ExplorerGrid.MinRowHeight + ColumnHeaderHeight)
-            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % ExplorerGrid.MinRowHeight)
+        if (point.Y > (ExplorerGrid.Items.Count * rowHeight + ColumnHeaderHeight)
+            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % rowHeight)
             || point.Y < ColumnHeaderHeight + ScrollContentPresenterMargin
             || point.X > actualRowWidth
             || point.X > DataGridContentWidth)
@@ -1770,11 +1769,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
     {
         var point = e.GetPosition(ExplorerCanvas);
-        if (e.LeftButton == MouseButtonState.Released || !RuntimeSettings.IsExplorerLoaded)
+        if (e.LeftButton == MouseButtonState.Released
+            || !RuntimeSettings.IsExplorerLoaded
+            || MouseDownPoint == new Point(-1, -1))
         {
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
         }
+
+        if (!SelectionRect.IsVisible
+            && ((StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedHorizontalScrollBarVisibility is Visibility.Visible
+            && point.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight)
+            || (StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedVerticalScrollBarVisibility is Visibility.Visible
+            && point.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth)))
+        {
+            MouseDownPoint = point;
+        }
+
+        if (MouseDownPoint.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth
+            || MouseDownPoint.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight)
+            return;
 
         SelectionRect.Visibility = Visibility.Visible;
         if (point.Y > MouseDownPoint.Y)
@@ -1848,5 +1862,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void KillAdbButton_Click(object sender, RoutedEventArgs e)
     {
         ADBService.KillAdbProcess();
+    }
+
+    private void Grid_MouseEnter(object sender, MouseEventArgs e)
+    {
+        MouseDownPoint = new(-1, -1);
     }
 }

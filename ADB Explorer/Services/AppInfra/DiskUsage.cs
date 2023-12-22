@@ -71,8 +71,12 @@ internal static class DiskUsageHelper
     public static ulong prevOther = 0;
     public static DiskUsage Usage = new(0);
 
+    public static Mutex DiskUsageMutex = new();
+
     public static void GetAdbDiskUsage()
     {
+        DiskUsageMutex.WaitOne(0);
+
         var newUsages = GetAdbPid().ToList().Select(GetDiskUsage).Where(usage => usage is not null);
 
         var newRead = (ulong)newUsages.Sum(u => (decimal)u.ReadRate);
@@ -98,5 +102,7 @@ internal static class DiskUsageHelper
             Data.RuntimeSettings.IsAdbReadActive = Usage.IsReadActive;
             Data.RuntimeSettings.IsAdbWriteActive = Usage.IsWriteActive;
         });
+
+        DiskUsageMutex.ReleaseMutex();
     }
 }

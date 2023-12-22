@@ -76,7 +76,7 @@
                     MouseDown="Window_MouseDown" />
                 <Menu Grid.Column="2" Style="{StaticResource SettingsMenuStyle}" />
             </Grid>
-            <Grid Grid.Row="1">
+            <Grid Grid.Row="1" MouseEnter="Grid_MouseEnter">
                 <StackPanel Margin="0,4,0,2">
                     <Separator />
                     <Grid Margin="6,2">
