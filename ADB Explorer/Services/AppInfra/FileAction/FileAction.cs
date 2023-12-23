@@ -52,7 +52,7 @@ internal static class AppActions
     public static List<ToggleMenu> ToggleActions { get; } = new()
     {
         new(FileActionType.FileOpFilter,
-            () => true,
+            () => !Data.FileOpQ.IsActive,
             "Filter File Operations",
             "\uF16C",
             () => { },
@@ -368,7 +368,7 @@ internal static class AppActions
             true),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,
         new(FileActionType.FileOpRemove,
-            () => Data.FileActions.SelectedFileOps.Value.Any(),
+            () => !Data.FileOpQ.IsActive && Data.FileActions.SelectedFileOps.Value.Any(),
             () => Data.FileOpQ.Operations.RemoveAll(Data.FileActions.SelectedFileOps.Value),
             Data.FileActions.RemoveFileOpDescription),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.LogToggle).FileAction,
@@ -388,7 +388,7 @@ internal static class AppActions
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.ExpandSettings).FileAction,
         new(FileActionType.FileOpValidate,
-            () => Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
+            () => !Data.FileOpQ.IsActive && Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
             Security.ValidateOps,
             Data.FileActions.ValidateDescription),
         new(FileActionType.FollowLink,

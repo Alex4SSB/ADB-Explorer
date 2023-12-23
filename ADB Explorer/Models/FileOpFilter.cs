@@ -79,13 +79,25 @@ public class FileOpFilter : ViewModelBase
 
     public FilterType Type { get; }
 
-    public bool IsEnabled => IsChecked is false || FileOpFilters.CheckedFilterCount > 1;
+    public bool IsEnabled
+    {
+        get
+        {
+            if (IsChecked is null)
+                return false;
+
+            return IsChecked is false || FileOpFilters.CheckedFilterCount > 1;
+        }
+    }
 
     public FileOpFilter(FilterType type)
     {
         Type = type;
 
-        IsChecked = Retrieve() is bool val ? val : true;
+        if (type is FilterType.Running)
+            IsChecked = null;
+        else
+            IsChecked = Retrieve() is bool val ? val : true;
 
         FileOpFilters.CheckedFilterCount.PropertyChanged += (object sender, PropertyChangedEventArgs<int> e) => OnPropertyChanged(nameof(IsEnabled));
     }

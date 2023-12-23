@@ -8,16 +8,6 @@
     <converters:TreeViewIndentConverter x:Key="TreeViewIndentConverter" />
     <converters:FileOpTreeStatusConverter x:Key="FileOpTreeStatusConverter" />
     <Style
-        x:Key="CompletedOperationsProgressStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource DoubleEquals}, ConverterParameter=100, Path=Value}" Value="False">
-                <Setter Property="ShowError" Value="True" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="FileOpProgressStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ui:ProgressBar">
@@ -263,21 +253,36 @@
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <ui:ProgressBar Style="{StaticResource CompletedOperationsProgressStyle}" Value="{Binding FileCountCompletedRate, Mode=OneWay}" />
+                <ui:FontIcon>
+                    <ui:FontIcon.Style>
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                            <Setter Property="Glyph" Value="&#xF13E;" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FilesSkipped}" Value="0">
+                                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                                    <Setter Property="Glyph" Value="&#xF13E;" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:FontIcon.Style>
+                </ui:FontIcon>
                 <TextBlock
                     Grid.Column="1"
                     Margin="4,0"
                     Text="{Binding FileCountCompletedString}"
                     TextTrimming="CharacterEllipsis" />
             </Grid>
+            <Separator Grid.Row="1" />
             <TextBlock
-                Grid.Row="1"
+                Grid.Row="2"
                 Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext, Converter={StaticResource CompletedStatsConverter}}"
                 TextTrimming="CharacterEllipsis" />
         </Grid>

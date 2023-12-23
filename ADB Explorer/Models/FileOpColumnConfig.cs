@@ -14,15 +14,18 @@ public static class FileOpColumns
                 (DataTemplate)App.Current.FindResource("OperationIconTemplate"),
                 0,
                 30,
-                icon: "\uE8AF"),
+                icon: "\uE8AF",
+                sortPath: nameof(FileOperation.OperationName)),
             new(FileOpColumnConfig.ColumnType.FileName,
                 (DataTemplate)App.Current.FindResource("FileOpFileNameTemplate"),
                 1,
-                250),
+                250,
+                sortPath: $"{nameof(FileOperation.AndroidPath)}.{nameof(FileOperation.AndroidPath.FullName)}"),
             new(FileOpColumnConfig.ColumnType.Progress,
                 (DataTemplate)App.Current.FindResource("FileOpProgressTemplate"),
                 2,
-                180),
+                180,
+                sortPath: nameof(FileOperation.Filter)),
             new(FileOpColumnConfig.ColumnType.Source,
                 (DataTemplate)App.Current.FindResource("FileOpSourcePathTemplate"),
                 3,
@@ -232,7 +235,7 @@ public class FileOpColumnConfig : ViewModelBase
             if (!int.TryParse(split[1], out index))
                 index = -1;
 
-            if (!double.TryParse(split[2], out width))
+            if (!string.IsNullOrEmpty(icon) || !double.TryParse(split[2], out width))
                 width = defaultWidth;
         }
 

@@ -267,10 +267,17 @@ internal class GeneralSubMenu : SubMenu
 {
     public object Content { get; }
 
+    public bool IsEnabled { get; private set; } = true;
+
     public GeneralSubMenu(object content)
         : base(new(FileAction.FileActionType.None, () => true, () => { }), null)
     {
         Content = content;
+        
+        if (content is CheckBox cb)
+        {
+            cb.IsEnabledChanged += (object sender, DependencyPropertyChangedEventArgs e) => IsEnabled = cb.IsEnabled;
+        }
     }
 }
 

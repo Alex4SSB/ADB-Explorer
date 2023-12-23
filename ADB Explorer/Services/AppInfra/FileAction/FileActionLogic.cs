@@ -848,8 +848,12 @@ internal static class FileActionLogic
         Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
+    private static Mutex FileOpControlsMutex = new();
+
     public static void UpdateFileOpControls()
     {
+        FileOpControlsMutex.WaitOne(0);
+
         var changed = false;
 
         var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
@@ -868,6 +872,8 @@ internal static class FileActionLogic
 
         if (changed)
             Data.RuntimeSettings.RefreshFileOpControls = true;
+
+        FileOpControlsMutex.ReleaseMutex();
     }
 
     public static async void ResetAppSettings()

@@ -280,6 +280,7 @@
         TargetType="MenuItem">
         <Setter Property="FlowDirection" Value="LeftToRight" />
         <Setter Property="Header" Value="{Binding Content}" />
+        <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
     </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"

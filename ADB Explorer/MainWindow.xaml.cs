@@ -5,6 +5,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using System.IO;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -142,7 +143,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private static void UpdateFileOpFilterCheck()
     {
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpFilter).Button.IsChecked
-            = FileOpFilters.CheckedFilterCount < FileOpFilters.List.Count;
+            = FileOpFilters.CheckedFilterCount + 1 < FileOpFilters.List.Count;
     }
 
     private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -385,12 +386,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void FileOperationQueue_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (FileOperationQueue.NotifyProperties.Contains(e.PropertyName))
+        {
             UpdateFileOp();
-        
-        if (e.PropertyName is nameof(FileOperationQueue.CurrentChanged))
-            SortFileOps();
 
-        UpdateSelectedFileOp();
+            if (e.PropertyName == nameof(FileOperationQueue.IsActive))
+            {
+                CurrentOperationDetailedDataGrid.UnselectAll();
+
+                RuntimeSettings.RefreshFileOpControls = true;
+            }
+        }
+
+        if (e.PropertyName is nameof(FileOperationQueue.CurrentChanged))
+        {
+            SortFileOps();
+            Task.Run(FileActionLogic.UpdateFileOpControls);
+        }
+
+        if (!FileOpQ.IsActive)
+            UpdateSelectedFileOp();
     }
 
     private void SortFileOps()
@@ -399,9 +413,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (collectionView is null)
             return;
 
+        if (collectionView.Filter is not null)
+        {
+            collectionView.Refresh();
+            return;
+        }
+
         Predicate<object> predicate = op =>
         {
             var fileOp = (FileOperation)op;
+
+            if (FileOpQ.IsActive)
+                return fileOp.Filter is FileOpFilter.FilterType.Running;
 
             return FileOpFilters.List.Find(f => f.Type == fileOp.Filter).IsChecked is true;
         };
@@ -412,9 +435,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             collectionView.SortDescriptions.Add(new(nameof(FileOperation.Filter), ListSortDirection.Ascending));
     }
 
-    private void UpdateFileOp()
+    private void UpdateFileOp(bool onlyProgress = true)
     {
-        Task.Run(FileActionLogic.UpdateFileOpControls);
+        if (!onlyProgress)
+            Task.Run(FileActionLogic.UpdateFileOpControls);
 
         if (FileOpQ.AnyFailedOperations)
             TaskbarItemInfo.ProgressState = TaskbarItemProgressState.Error;
