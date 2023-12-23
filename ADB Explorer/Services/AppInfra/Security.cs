@@ -12,7 +12,14 @@ public static class Security
 
     public static string CalculateWindowsFileHash(Stream file)
     {
+#if NET6_0
+        Span<byte> content = new();
+        file.Read(content);
+        var hash = MD5.HashData(content);
+#elif NET7_0
         var hash = MD5.HashData(file);
+#endif
+
         return Convert.ToHexString(hash);
     }
 
@@ -24,8 +31,13 @@ public static class Security
 
     public static Dictionary<string, string> CalculateWindowsFolderHash(string path, string parent = "")
     {
+#if NET6_0
+        if (!Directory.Exists(path) && !File.Exists(path))
+            return new();
+#elif NET7_0
         if (!Path.Exists(path))
             return new();
+#endif
 
         if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
         {

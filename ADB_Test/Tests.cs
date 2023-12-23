@@ -127,10 +127,10 @@ namespace ADB_Test
             Assert.AreEqual(" 2", FileClass.ExistingIndexes(names));
             Assert.AreEqual(" 1", FileClass.ExistingIndexes(names1));
 
-            Assert.AreEqual("", FileClass.ExistingIndexes(names[..0], true));
-            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(new[] { "" }, true));
-            Assert.AreEqual(" - Copy 2", FileClass.ExistingIndexes(names, true));
-            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(names1, true));
+            Assert.AreEqual("", FileClass.ExistingIndexes(names[..0], FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(new[] { "" }, FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 2", FileClass.ExistingIndexes(names, FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(names1, FileClass.CutType.Copy));
         }
 
         [TestMethod]

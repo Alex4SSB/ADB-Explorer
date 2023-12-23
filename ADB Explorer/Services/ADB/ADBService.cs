@@ -87,8 +87,13 @@ public partial class ADBService
     {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
 
+#if NET6_0
+        using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
+        using var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
+#elif NET7_0
         using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync(cancellationToken);
         using var stderrTask = cmdProcess.StandardError.ReadToEndAsync(cancellationToken);
+#endif
         using var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
 
         Task.WaitAll(stdoutTask, stderrTask, processTask);
