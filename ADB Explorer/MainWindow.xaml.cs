@@ -5,7 +5,6 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
-using System.IO;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -61,7 +60,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         set
         {
-
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
             if (cell is not null)
             {
@@ -76,6 +74,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitializeComponent();
 
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
+        PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
 
         DevicesObject = new();
         DevicesList.ItemsSource = DevicesObject.UIList;
@@ -131,6 +130,40 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Task.WaitAll(launchTask, versionTask);
             RuntimeSettings.IsWindowLoaded = true;
         });
+    }
+
+    private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        if (RuntimeSettings.IsDevicesPaneOpen
+            || RuntimeSettings.IsSettingsPaneOpen
+            || SearchBox.IsFocused
+            || NavigationBox.Mode is NavigationBox.ViewMode.Path
+            || FileActions.IsExplorerEditing)
+            return;
+
+        var selected = ExplorerGrid.SelectedItems.Count;
+        var selectedIndex = ExplorerGrid.SelectedIndex;
+        object altItem = null;
+
+        for (int i = 0; i < ExplorerGrid.Items.Count; i++)
+        {
+            var item = ExplorerGrid.Items[i];
+            var name = item.ToString();
+
+            if (name.StartsWith(e.Text, StringComparison.OrdinalIgnoreCase))
+            {
+                if (selected != 1 || selectedIndex < i)
+                {
+                    FileActions.ItemToSelect = item;
+                    break;
+                }
+                else if(altItem is null)
+                    altItem = item;
+            }
+        }
+
+        if (selectedIndex == ExplorerGrid.SelectedIndex && altItem is not null)
+            FileActions.ItemToSelect = altItem;
     }
 
     private void CheckedFilterCount_PropertyChanged(object sender, PropertyChangedEventArgs<int> e)
@@ -1209,6 +1242,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
                     DoubleClick(ExplorerGrid.SelectedItem);
+                break;
+            case Key.Apps:
+                ExplorerGrid.ContextMenu.IsOpen = true;
                 break;
             default:
                 return false;
