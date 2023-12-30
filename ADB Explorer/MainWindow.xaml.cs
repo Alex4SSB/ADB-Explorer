@@ -521,10 +521,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 FileActionLogic.UpdateFileActions();
 
                 if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
-                {
                     FileActionLogic.RefreshDrives(true);
-                    FilterDrives();
-                }
+
+                FilterDrives();
 
                 break;
             case nameof(AppSettings.SaveDevices):
@@ -573,7 +572,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             else
             {
-                Task.Delay(DIR_LIST_AUTO_SCROLL_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0])));
+                Task.Delay(DIR_LIST_AUTO_SCROLL_DELAY).ContinueWith((t) => Dispatcher.Invoke(() =>
+                {
+                    if (ExplorerGrid.Items.Count > 0)
+                        ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                }));
             }
         }
     });

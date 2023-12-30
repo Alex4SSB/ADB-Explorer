@@ -193,7 +193,7 @@
                                     </Style>
                                 </DataGridTextColumn.EditingElementStyle>
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource ExplorerGridCellStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
@@ -207,7 +207,7 @@
                                 x:Name="OriginalPath"
                                 Width="180"
                                 Binding="{Binding TrashIndex.ParentPath}"
-                                ElementStyle="{StaticResource ExplorerGridCellStyle}"
+                                ElementStyle="{StaticResource DirectoryGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Original Location"
                                 IsReadOnly="True" />
@@ -219,7 +219,7 @@
                                 IsReadOnly="True"
                                 SortMemberPath="ModifiedTime">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource ExplorerGridCellStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
                                         <Style.Triggers>
@@ -241,7 +241,7 @@
                                 IsReadOnly="True"
                                 SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource ExplorerGridCellStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Text" Value="{Binding TypeName}" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
@@ -259,7 +259,7 @@
                                 IsReadOnly="True"
                                 SortMemberPath="Size">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource ExplorerGridCellStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Text" Value="{Binding SizeString}" />
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
@@ -282,7 +282,7 @@
                                 Header="Date Modified"
                                 IsReadOnly="True">
                                 <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource ExplorerGridCellStyle}" TargetType="TextBlock">
+                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
                                         <Style.Triggers>

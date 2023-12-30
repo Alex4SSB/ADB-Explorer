@@ -115,6 +115,11 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style
+        x:Key="DirectoryGridCellStyle"
+        BasedOn="{StaticResource ExplorerGridCellStyle}"
+        TargetType="TextBlock">
         <Style.Triggers>
             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
