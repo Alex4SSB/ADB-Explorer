@@ -286,11 +286,13 @@ internal static class FileActionLogic
             Data.FileActions.CutItemsCount.Value = "";
             Data.FileActions.IsCopyState.Value = false;
             Data.FileActions.IsCutState.Value = false;
+
+            return false;
         }
 
         Data.FileActions.PasteDescription.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} {PluralityConverter.Convert(Data.CutItems, "Item")}";
 
-        if (Data.CutItems.Count < 1 || Data.FileActions.IsRecycleBin || !Data.FileActions.IsExplorerVisible)
+        if (Data.CutItems.Count < 1)
             return false;
 
         if (Data.CutItems.Count == 1 && Data.CutItems[0].Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self)

@@ -4,7 +4,12 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-internal abstract class ActionBase : ViewModelBase
+internal interface IMenuItem : INotifyPropertyChanged
+{
+
+}
+
+internal abstract class ActionBase : ViewModelBase, IMenuItem
 {
     public enum AnimationSource
     {
@@ -116,7 +121,7 @@ internal abstract class ActionMenu : ActionBase
     { }
 }
 
-internal class MenuSeparator : ActionMenu
+internal class MenuSeparator : ViewModelBase, IMenuItem
 { }
 
 internal class AltTextMenu : ActionMenu

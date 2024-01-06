@@ -141,10 +141,10 @@ namespace ADB_Test
             var badIcon2 = "FOO";
 
             // Verify this does not throw an exception by simply executing it
-            StyleHelper.VerifyIcon(ref goodIcon);
+            StyleHelper.VerifyIcon(goodIcon);
 
-            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(ref badIcon1));
-            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(ref badIcon2));
+            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(badIcon1));
+            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(badIcon2));
         }
 
         [TestMethod]

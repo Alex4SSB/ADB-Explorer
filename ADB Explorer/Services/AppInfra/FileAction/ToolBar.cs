@@ -31,7 +31,7 @@ internal static class NavigationToolBar
 
 internal static class MainToolBar
 {
-    public static ObservableList<ActionMenu> List { get; } = new() {
+    public static ObservableList<IMenuItem> List { get; } = new() {
         new AnimatedNotifyMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenDevices),
             Data.DevicesObject.ObservableCount,
@@ -135,6 +135,8 @@ internal static class ExplorerContextMenu
         var list = List.ToArray();
         var separators = list.OfType<SubMenuSeparator>().Select(separator => (separator, List.IndexOf(separator))).ToList();
 
+        App.Current.Dispatcher.Invoke(() =>
+        {
         for (int i = 0; i < separators.Count; i++)
         {
             var sep = separators[i];
@@ -148,6 +150,7 @@ internal static class ExplorerContextMenu
         }
 
         List.OfType<DummySubMenu>().First().IsEnabled = List.Where(a => a is not SubMenuSeparator and not DummySubMenu).All(a => !a.Action.Command.IsEnabled);
+        });
     }
 
     public static ObservableList<SubMenu> List { get; } = new() {

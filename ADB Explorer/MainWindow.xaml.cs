@@ -332,9 +332,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.FilterActions):
+                    Task.Run(() => 
+                    {
+                        if (FileActions.IsAppDrive || FileActions.IsRecycleBin)
                     FilterFileActions();
+                    });
+                    Task.Run(() =>
+                    {
                     FilterExplorerContextMenu();
                     ExplorerContextMenu.UpdateSeparators();
+                    });
                     break;
 
                 case nameof(AppRuntimeSettings.ClearNavBox):
@@ -766,9 +773,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// Refresh file actions menu to update their ToolTips
     /// </summary>
-    private void FilterFileActions() => MainToolBar.Items?.Refresh();
+    private void FilterFileActions() => Dispatcher.Invoke(() => MainToolBar.Items?.Refresh());
 
-    private void FilterExplorerContextMenu()
+    private void FilterExplorerContextMenu() => Dispatcher.Invoke(() =>
     {
         var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ContextMenu.ItemsSource);
         if (collectionView is null)
@@ -785,7 +792,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         };
 
         collectionView.Filter = new(predicate);
-    }
+    });
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
     {
