@@ -115,7 +115,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
         });
 
-        AppActions.Bindings.ForEach(binding => InputBindings.Add(binding));
+        AppActions.Bindings.ForEach(binding =>
+        {
+            InputBindings.Add(binding);
+            ExplorerGrid.InputBindings.Add(binding);
+        });
 
         UpperProgressBar.DataContext = FileOpQ;
         CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
@@ -920,6 +924,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         UpdateFileOp();
 
         Task.Delay(EXPLORER_NAV_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
+
+        Task.Delay(INIT_NAV_HIDE_FILTER_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsSearchBoxFocused = false));
 
         if (Width > MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
             RuntimeSettings.IsSearchBoxFocused = true;
