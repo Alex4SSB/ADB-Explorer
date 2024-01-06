@@ -57,8 +57,8 @@ internal abstract class ActionBase : ViewModelBase
                          FileAction altAction = null,
                          ObservableProperty<bool> isVisible = null)
     {
-        if (this is not SubMenu)
-            StyleHelper.VerifyIcon(ref icon);
+        if (!string.IsNullOrEmpty(icon))
+            StyleHelper.VerifyIcon(icon);
 
         Action = action;
         Icon = icon;
@@ -251,16 +251,12 @@ internal class CompoundIconMenu : ActionMenu
 
 internal class SubMenu : ActionMenu
 {
-    public bool IconIsText { get; }
-
     protected SubMenu()
     { }
 
     public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null)
         : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction)
-    {
-        IconIsText = !StyleHelper.IsFontIcon(icon);
-    }
+    { }
 }
 
 internal class GeneralSubMenu : SubMenu
@@ -316,10 +312,12 @@ internal class DummySubMenu : SubMenu
 
 internal class SubMenuSeparator : SubMenu
 {
-    public bool HideSeparator => IsEnabled is null ? !Action.Command.IsEnabled : !IsEnabled.Value;
+    private readonly bool externalVisibility;
 
-    private bool? isEnabled = null;
-    public bool? IsEnabled
+    public bool HideSeparator => externalVisibility ? !IsEnabled : !Action.Command.IsEnabled;
+
+    private bool isEnabled = true;
+    public bool IsEnabled
     {
         get => isEnabled;
         set
@@ -329,9 +327,11 @@ internal class SubMenuSeparator : SubMenu
         }
     }
 
-    public SubMenuSeparator(Func<bool> canExecute)
+    public SubMenuSeparator(Func<bool> canExecute = null)
         : base(new(FileAction.FileActionType.None, canExecute, () => { }), "")
-    { }
+    {
+        externalVisibility = canExecute is null;
+    }
 }
 
 internal class DualActionButton : IconMenu

@@ -175,10 +175,10 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static void VerifyIcon(ref string icon)
+    public static void VerifyIcon(string icon, [CallerMemberName] string propertyName = null)
     {
         if (!IsFontIcon(icon))
-            throw new ArgumentException("An icon must be one char in range E000-F8FF", nameof(icon));
+            throw new ArgumentException("An icon must be one char in range E000-F8FF", propertyName);
     }
 
     public static bool IsFontIcon(string icon) =>

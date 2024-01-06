@@ -47,7 +47,7 @@ public class BaseAction : ViewModelBase
 
     public BaseAction(Func<bool> canExecute, Action action)
     {
-        this.canExecute = canExecute;
+        this.canExecute = canExecute ??= () => true;
         this.action = action;
     }
 

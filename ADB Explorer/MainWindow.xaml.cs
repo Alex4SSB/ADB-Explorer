@@ -23,6 +23,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DispatcherTimer ConnectTimer = new();
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
 
+    private readonly Mutex DiskUsageMutex = new();
     private readonly Mutex connectTimerMutex = new();
     private readonly ThemeService themeService = new();
     private int clickCount = 0;
@@ -194,7 +195,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
 
-        Task.Run(DiskUsageHelper.GetAdbDiskUsage);
+        DiskUsageMutex.WaitOne(0);
+        Task.Run(DiskUsageHelper.GetAdbDiskUsage).ContinueWith(
+            (t) => Dispatcher.Invoke(DiskUsageMutex.ReleaseMutex));
 
         if (Settings.PollDevices
             && MdnsService?.State is MDNS.MdnsState.Running

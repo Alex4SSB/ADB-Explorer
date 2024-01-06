@@ -62,11 +62,6 @@
         x:Key="MenuIcon"
         x:Shared="False"
         Style="{StaticResource MenuIconStyle}" />
-    <TextBlock
-        x:Key="IconTextBlock"
-        x:Shared="False"
-        Style="{StaticResource DisabledTextBlockStyle}"
-        Text="{Binding Icon}" />
     <DataTemplate x:Key="IconMenuTemplate">
         <Grid>
             <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
@@ -144,16 +139,11 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="BaseMenuItemStyle"
+        x:Key="IconMenuStyle"
         BasedOn="{StaticResource ActionMenuItemStyle}"
         TargetType="MenuItem">
         <Setter Property="Padding" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource MenuItemConverter}, ConverterParameter=Padding}" />
         <Setter Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource MenuItemConverter}, ConverterParameter=Margin}" />
-    </Style>
-    <Style
-        x:Key="IconMenuStyle"
-        BasedOn="{StaticResource BaseMenuItemStyle}"
-        TargetType="MenuItem">
         <Setter Property="MinWidth" Value="40" />
         <Setter Property="ToolTip" Value="{Binding Tooltip}" />
         <Setter Property="ToolTip.FlowDirection" Value="LeftToRight" />
@@ -199,7 +189,7 @@
     </Style>
     <Style
         x:Key="SubMenuSeparatorStyle"
-        BasedOn="{StaticResource ActionMenuItemStyle}"
+        BasedOn="{StaticResource AdbMenuItemStyle}"
         TargetType="MenuItem">
         <Setter Property="Template">
             <Setter.Value>
@@ -224,9 +214,6 @@
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding IconIsText}" Value="True">
-                <Setter Property="Icon" Value="{StaticResource IconTextBlock}" />
-            </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding Action.Name}" Value="ContextPushPackages" />
