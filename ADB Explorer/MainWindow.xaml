@@ -420,49 +420,47 @@
                 helpers:ExpanderHelper.ExpanderArrow="None"
                 helpers:ExpanderHelper.IsHeaderVisible="False"
                 ExpandDirection="Up"
-                IsExpanded="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}">
-                <Expander.Content>
-                    <Grid x:Name="FileOpDetailedGrid" IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <GridSplitter
-                            x:Name="FileOpDetailedSplitter"
-                            Height="3"
-                            Margin="0,-2,0,0"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Top"
-                            Background="Gray"
-                            DragDelta="GridSplitter_DragDelta"
-                            FocusVisualStyle="{x:Null}" />
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <DataGrid
-                                x:Name="CurrentOperationDetailedDataGrid"
-                                CellStyle="{StaticResource DataGridCellStyle}"
-                                ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
-                                ColumnHeaderStyle="{StaticResource FileOpColumnHeaderStyle}"
-                                ItemsSource="{Binding ElementName=CurrentOperationDataGrid, Path=ItemsSource}"
-                                KeyUp="CurrentOperationDetailedDataGrid_KeyUp"
-                                PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
-                                SelectionChanged="CurrentOperationDetailedDataGrid_SelectionChanged"
-                                Style="{StaticResource DetailedFileOpGridStyle}" />
-                            <Border
-                                Grid.Column="1"
-                                BorderBrush="Gray"
-                                BorderThickness="1,0,0,0" />
-                            <Menu
-                                x:Name="FileOpControlsMenu"
-                                Grid.Column="1"
-                                Margin="1,0,0,0"
-                                Style="{StaticResource DetailedFileOpControlsStyle}" />
-                        </Grid>
+                Style="{StaticResource ExtendedViewFileOpExpanderStyle}">
+                <Grid x:Name="FileOpDetailedGrid" IsVisibleChanged="FileOpDetailedGrid_IsVisibleChanged">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <GridSplitter
+                        x:Name="FileOpDetailedSplitter"
+                        Height="3"
+                        Margin="0,-2,0,0"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Top"
+                        Background="Gray"
+                        DragDelta="GridSplitter_DragDelta"
+                        FocusVisualStyle="{x:Null}" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <DataGrid
+                            x:Name="CurrentOperationDetailedDataGrid"
+                            CellStyle="{StaticResource DataGridCellStyle}"
+                            ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
+                            ColumnHeaderStyle="{StaticResource FileOpColumnHeaderStyle}"
+                            ItemsSource="{Binding}"
+                            KeyUp="CurrentOperationDetailedDataGrid_KeyUp"
+                            PreviewMouseWheel="ScrollViewer_PreviewMouseWheel"
+                            SelectionChanged="CurrentOperationDetailedDataGrid_SelectionChanged"
+                            Style="{StaticResource DetailedFileOpGridStyle}" />
+                        <Border
+                            Grid.Column="1"
+                            BorderBrush="Gray"
+                            BorderThickness="1,0,0,0" />
+                        <Menu
+                            x:Name="FileOpControlsMenu"
+                            Grid.Column="1"
+                            Margin="1,0,0,0"
+                            Style="{StaticResource DetailedFileOpControlsStyle}" />
                     </Grid>
-                </Expander.Content>
+                </Grid>
             </Expander>
             <Grid Grid.Row="3" Margin="6,0">
                 <Grid.Resources>
@@ -526,84 +524,6 @@
                 </StackPanel>
             </Grid>
         </Grid>
-        <ui:SplitView
-            x:Name="FileOperationsSplitView"
-            d:IsHidden="True"
-            FocusVisualStyle="{x:Null}"
-            OpenPaneLength="300"
-            PanePlacement="Right">
-            <ui:SplitView.Style>
-                <Style TargetType="ui:SplitView">
-                    <Setter Property="IsPaneOpen" Value="False" />
-                    <Style.Triggers>
-                        <MultiDataTrigger>
-                            <MultiDataTrigger.Conditions>
-                                <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" Value="False" />
-                            </MultiDataTrigger.Conditions>
-                            <Setter Property="IsPaneOpen" Value="True" />
-                        </MultiDataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </ui:SplitView.Style>
-            <ui:SplitView.Pane>
-                <Border
-                    BorderBrush="Gray"
-                    BorderThickness="1,1,0,0"
-                    Style="{StaticResource SplitViewBorderStyle}">
-                    <Grid>
-                        <Grid Margin="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="52" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                FontSize="24"
-                                Text="File Operations" />
-                            <!--<Menu HorizontalAlignment="Right">
-                                compact file operations hide button was here
-                            </Menu>-->
-                            <Border
-                                Grid.Row="1"
-                                Margin="0,0,0,6"
-                                BorderBrush="Gray">
-                                <Menu x:Name="CompactFileOpControlsMenu" Style="{StaticResource FileOpControlsPanelStyle}" />
-                            </Border>
-                            <Grid Grid.Row="2">
-                                <Grid.Style>
-                                    <Style TargetType="Grid">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ElementName=CurrentOperationDataGrid, Path=Items.Count}" Value="0">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Grid.Style>
-                                <DataGrid
-                                    x:Name="CurrentOperationDataGrid"
-                                    Width="Auto"
-                                    MaxWidth="282"
-                                    AutoGenerateColumns="False"
-                                    CanUserDeleteRows="False"
-                                    CellStyle="{StaticResource DataGridCellStyle}"
-                                    FocusVisualStyle="{x:Null}"
-                                    HeadersVisibility="None"
-                                    ItemsSource="{Binding}">
-                                    <DataGrid.Columns>
-                                        <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
-                                        <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
-                                        <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                </Border>
-            </ui:SplitView.Pane>
-        </ui:SplitView>
         <ui:SplitView
             x:Name="DevicesSplitView"
             d:IsHidden="False"

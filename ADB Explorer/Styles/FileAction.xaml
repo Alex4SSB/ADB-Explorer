@@ -178,6 +178,16 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsFileOpRingVisible}" Value="True">
                 <Setter Property="helpers:StyleHelper.ContentAnimation" Value="None" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsContentDropDown}" Value="True">
+                <Setter Property="helpers:MenuHelper.DropDownPlacement" Value="Left" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsContentDropDown}" Value="True" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="ItemsSource" Value="{x:Null}" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -268,6 +278,12 @@
         <Setter Property="FlowDirection" Value="LeftToRight" />
         <Setter Property="Header" Value="{Binding Content}" />
         <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsDropDown}" Value="True">
+                <Setter Property="StaysOpenOnClick" Value="True" />
+                <Setter Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <helpers:MenuStyleSelector
         x:Key="MenuStyleSelector"

@@ -179,9 +179,12 @@ internal class DynamicAltTextMenu : AltTextMenu
 
 internal class AltObjectMenu : ActionMenu
 {
-    public AltObjectMenu(FileAction fileAction, string icon, FileAction altAction = null)
-        : base(fileAction, icon, altAction: altAction)
-    { }
+    public bool IsContentDropDown { get; }
+    public AltObjectMenu(FileAction fileAction, string icon, FileAction altAction = null, IEnumerable<SubMenu> children = null, bool isContentDropDown = false)
+        : base(fileAction, icon, altAction: altAction, children: children)
+    {
+        IsContentDropDown = isContentDropDown;
+    }
 }
 
 internal class IconMenu : ActionMenu
@@ -270,10 +273,13 @@ internal class GeneralSubMenu : SubMenu
 
     public bool IsEnabled { get; private set; } = true;
 
-    public GeneralSubMenu(object content)
+    public bool IsDropDown { get; }
+
+    public GeneralSubMenu(object content, bool isDropDown = false)
         : base(new(FileAction.FileActionType.None, () => true, () => { }), null)
     {
         Content = content;
+        IsDropDown = isDropDown;
         
         if (content is CheckBox cb)
         {

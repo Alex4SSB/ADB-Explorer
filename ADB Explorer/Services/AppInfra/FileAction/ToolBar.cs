@@ -137,19 +137,19 @@ internal static class ExplorerContextMenu
 
         App.Current.Dispatcher.Invoke(() =>
         {
-        for (int i = 0; i < separators.Count; i++)
-        {
-            var sep = separators[i];
+            for (int i = 0; i < separators.Count; i++)
+            {
+                var sep = separators[i];
 
-            Index startIndexBefore = i < 1 ? 0 : separators[i - 1].Item2 + 1;
-            Index endIndexBefore = separators[i].Item2;
-            Index startIndexAfter = separators[i].Item2 + 1;
+                Index startIndexBefore = i < 1 ? 0 : separators[i - 1].Item2 + 1;
+                Index endIndexBefore = separators[i].Item2;
+                Index startIndexAfter = separators[i].Item2 + 1;
 
-            sep.separator.IsEnabled = list[startIndexBefore..endIndexBefore].Any(a => a.Action.Command.IsEnabled)
-                && list[startIndexAfter..].Any(a => a is not SubMenuSeparator and not DummySubMenu && a.Action.Command.IsEnabled);
-        }
+                sep.separator.IsEnabled = list[startIndexBefore..endIndexBefore].Any(a => a.Action.Command.IsEnabled)
+                    && list[startIndexAfter..].Any(a => a is not SubMenuSeparator and not DummySubMenu && a.Action.Command.IsEnabled);
+            }
 
-        List.OfType<DummySubMenu>().First().IsEnabled = List.Where(a => a is not SubMenuSeparator and not DummySubMenu).All(a => !a.Action.Command.IsEnabled);
+            List.OfType<DummySubMenu>().First().IsEnabled = List.Where(a => a is not SubMenuSeparator and not DummySubMenu).All(a => !a.Action.Command.IsEnabled);
         });
     }
 
@@ -226,7 +226,13 @@ internal static class SettingsMenu
 {
     public static ObservableList<ActionMenu> List { get; } = new()
     {
-        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps), AppActions.Icons[FileAction.FileActionType.OpenFileOps]),
+        new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps),
+            AppActions.Icons[FileAction.FileActionType.OpenFileOps],
+            isContentDropDown: true,
+            children: new SubMenu[]
+            {
+                new GeneralSubMenu(App.Current.Resources["CompactFileOpDropDown"], true)
+            }),
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
             "\uE713",
             iconSize: 18),

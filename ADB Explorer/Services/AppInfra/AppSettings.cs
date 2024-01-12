@@ -197,8 +197,8 @@ public class AppSettings : ViewModelBase
     private bool showExtendedView;
     public bool ShowExtendedView
     {
-        get => true; // Get(ref showExtendedView, true);
-        //set => Set(ref showExtendedView, value);
+        get => Get(ref showExtendedView, true);
+        set => Set(ref showExtendedView, value);
     }
 
     private bool stopPollingWhileSync;

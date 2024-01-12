@@ -73,7 +73,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public MainWindow()
     {
         InitializeComponent();
-
+        
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
         PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
 
@@ -122,7 +122,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
 
         UpperProgressBar.DataContext = FileOpQ;
-        CurrentOperationDataGrid.ItemsSource = FileOpQ.Operations;
+        CurrentOperationDetailedDataGrid.ItemsSource = FileOpQ.Operations;
+        ((DataGrid)FindResource("CurrentOperationDataGrid")).ItemsSource = FileOpQ.Operations;
         UpdateFileOp();
 
 #if DEBUG
@@ -311,7 +312,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.IsSearchBoxFocused):
                     if (!RuntimeSettings.IsSearchBoxFocused)
-                        FileOperationsSplitView.Focus();
+                        SettingsSplitView.Focus();
                     break;
 
                 case nameof(AppRuntimeSettings.AutoHideSearchBox):
@@ -319,7 +320,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                         RuntimeSettings.IsSearchBoxFocused = false;
 
                     if (NavigationBox.Mode is not NavigationBox.ViewMode.Path)
-                        FileOperationsSplitView.Focus();
+                        SettingsSplitView.Focus();
                     break;
 
                 case nameof(AppRuntimeSettings.ExplorerSource):
@@ -339,12 +340,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     Task.Run(() => 
                     {
                         if (FileActions.IsAppDrive || FileActions.IsRecycleBin)
-                    FilterFileActions();
+                            FilterFileActions();
                     });
                     Task.Run(() =>
                     {
-                    FilterExplorerContextMenu();
-                    ExplorerContextMenu.UpdateSeparators();
+                        FilterExplorerContextMenu();
+                        ExplorerContextMenu.UpdateSeparators();
                     });
                     break;
 
@@ -698,7 +699,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (NavigationBox.Mode is NavigationBox.ViewMode.None)
                 return;
 
-            NavigationBox.UnfocusTarget = FileOperationsSplitView;
+            NavigationBox.UnfocusTarget = SettingsSplitView;
             NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         }
     }

@@ -26,7 +26,7 @@ internal class MenuTemplateSelector : DataTemplateSelector
         CompoundIconSubMenu => CompoundIconSubMenuTemplate,
         MenuSeparator => SeparatorTemplate,
         AnimatedNotifyMenu => AnimatedNotifyTemplate,
-        GeneralSubMenu or CheckBox => GeneralSubMenuTemplate,
+        GeneralSubMenu or UIElement => GeneralSubMenuTemplate,
         SubMenu or string => SubMenuTemplate,
         AltTextMenu => DynamicAltTextTemplate,
         IconMenu => IconMenuTemplate,

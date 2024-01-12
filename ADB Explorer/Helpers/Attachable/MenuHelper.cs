@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Helpers;
+﻿using Windows.UI.Popups;
+
+namespace ADB_Explorer.Helpers;
 
 public static class MenuHelper
 {
@@ -64,6 +66,19 @@ public static class MenuHelper
         DependencyProperty.RegisterAttached(
             "IsButtonMenu",
             typeof(bool?),
+            typeof(MenuHelper),
+            null);
+
+    public static PlacementMode GetDropDownPlacement(UIElement control) =>
+        (PlacementMode)control.GetValue(DropDownPlacementProperty);
+
+    public static void SetDropDownPlacement(UIElement control, PlacementMode value) =>
+        control.SetValue(DropDownPlacementProperty, value);
+
+    public static readonly DependencyProperty DropDownPlacementProperty =
+        DependencyProperty.RegisterAttached(
+            "DropDownPlacement",
+            typeof(PlacementMode),
             typeof(MenuHelper),
             null);
 }

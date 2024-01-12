@@ -496,7 +496,7 @@
                 AllowsTransparency="true"
                 Focusable="false"
                 IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
-                Placement="Bottom"
+                Placement="{Binding RelativeSource={RelativeSource AncestorType=MenuItem, Mode=FindAncestor}, Path=(helpers:MenuHelper.DropDownPlacement)}"
                 PopupAnimation="{DynamicResource {x:Static SystemParameters.MenuPopupAnimationKey}}">
                 <ui:ThemeShadowChrome CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" IsShadowEnabled="{DynamicResource {x:Static SystemParameters.DropShadowKey}}">
                     <Border
@@ -995,6 +995,7 @@
         <Setter Property="Padding" Value="12,0" />
         <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Setter Property="helpers:MenuHelper.DropDownPlacement" Value="Bottom" />
         <Style.Triggers>
             <Trigger Property="Role" Value="TopLevelHeader">
                 <Setter Property="Background" Value="{DynamicResource MenuBarItemBackground}" />

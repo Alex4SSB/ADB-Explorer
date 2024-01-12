@@ -531,4 +531,40 @@
         </DataTemplate.Triggers>
         <TextBlock Margin="4,0" Style="{StaticResource FileOpDeviceTextblockStyle}" />
     </DataTemplate>
+    <DataGrid
+        x:Key="CurrentOperationDataGrid"
+        x:Name="CurrentOperationDataGrid"
+        Grid.Row="1"
+        Grid.ColumnSpan="3"
+        Width="Auto"
+        AutoGenerateColumns="False"
+        CanUserDeleteRows="False"
+        CellStyle="{StaticResource BaseCellStyle}"
+        FocusVisualStyle="{x:Null}"
+        HeadersVisibility="None"
+        ItemsSource="{Binding}">
+        <DataGrid.Columns>
+            <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
+            <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
+            <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
+        </DataGrid.Columns>
+    </DataGrid>
+    <Grid x:Key="CompactFileOpDropDown" Margin="4,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Border
+            Grid.Row="0"
+            Grid.ColumnSpan="3"
+            Margin="0,0,0,6">
+            <Menu x:Name="CompactFileOpControlsMenu" Style="{StaticResource FileOpControlsPanelStyle}" />
+        </Border>
+        <StaticResource ResourceKey="CurrentOperationDataGrid" />
+    </Grid>
 </ResourceDictionary>

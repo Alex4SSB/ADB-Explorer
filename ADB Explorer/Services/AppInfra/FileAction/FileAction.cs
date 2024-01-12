@@ -47,6 +47,7 @@ internal static class AppActions
         { FileActionType.PauseLogs, "\uE769" },
         { FileActionType.FollowLink, "\uE838" },
         { FileActionType.PasteLink, "\uE1A5" },
+        { FileActionType.HideSettings, "\uE761" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } = new()
@@ -534,7 +535,7 @@ internal class FileAction : ViewModelBase
         }
     }
 
-    public FileAction(FileActionType name, BaseAction command, string description, KeyGesture gesture, bool useForGesture = false)
+    public FileAction(FileActionType name, BaseAction command, string description, KeyGesture gesture = null, bool useForGesture = false)
     {
         Name = name;
         Command = command;

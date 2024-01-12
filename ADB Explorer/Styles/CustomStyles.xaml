@@ -985,4 +985,18 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style
+        x:Key="ExtendedViewFileOpExpanderStyle"
+        BasedOn="{StaticResource FluentExpanderStyle}"
+        TargetType="Expander">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtendedView}" Value="True" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="IsExpanded" Value="True" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>
