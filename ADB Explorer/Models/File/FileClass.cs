@@ -78,24 +78,23 @@ public class FileClass : FileStat
 
     public bool IsInstallApk => Array.IndexOf(AdbExplorerConst.INSTALL_APK, Extension.ToUpper()) > -1;
 
-    public bool IsHidden => FullName.StartsWith('.');
-
     /// <summary>
     /// Returns the extension (including the period ".") of a regular file.<br />
     /// Returns an empty string if file has no extension, or is not a regular file.
     /// </summary>
-    public string Extension
+    public override string Extension => Type is FileType.File ? base.Extension : "";
+
+    public string ShortExtension
     {
         get
         {
-            if (Type is not FileType.File || (IsHidden && FullName.Count(c => c == '.') == 1))
-                return "";
-
-            return Path.GetExtension(FullName);
+            return (Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(Extension[1])) > -1)
+                ? Extension[1..]
+                : "";
         }
     }
 
-    public string ShortExtension { get { return (Extension.Length > 1 && Array.IndexOf(AdbExplorerConst.UNICODE_ICONS, char.GetUnicodeCategory(Extension[1])) > -1) ? Extension[1..] : ""; } }
+    
 
     public bool ExtensionIsGlyph { get; set; }
     public bool ExtensionIsFontIcon { get; set; }

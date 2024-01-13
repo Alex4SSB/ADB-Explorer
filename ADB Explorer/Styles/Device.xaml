@@ -315,10 +315,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Menu
-        x:Key="DeviceActionsMenu"
-        helpers:MenuHelper.ItemPadding="2"
-        x:Shared="False">
+    <Menu x:Key="DeviceActionsMenu" x:Shared="False">
         <Menu.Resources>
             <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                 <Setter Property="FontSize" Value="18" />

@@ -117,7 +117,9 @@ public static class Security
         foreach (var item in source)
         {
             var key = item.Key;
-            var other = target.Where(f => f.Key == item.Key);
+            var other = target.Where(f => f.Key == item.Key ||
+                                    (op.OperationName is FileOperation.OperationType.Copy
+                                    && target.Count() == 1));
 
             key = op.AndroidPath.IsDirectory 
                 ? FileHelper.ConcatPaths(op.AndroidPath, key)

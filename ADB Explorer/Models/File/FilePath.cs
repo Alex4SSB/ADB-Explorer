@@ -68,13 +68,36 @@ public class FilePath : AbstractFile
             if (IsDirectory || !IsRegularFile || HiddenOrWithoutExt(FullName))
                 return FullName;
             else
-                return FullName[..FullName.LastIndexOf('.')];
+                return FullName[..^Extension.Length];
         }
     }
 
     public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
 
     public ShellObject ShellObject { get; set; } = null;
+
+    public bool IsHidden => FullName.StartsWith('.');
+
+    /// <summary>
+    /// Returns the extension (including the period ".").<br />
+    /// Returns an empty string if file has no extension.
+    /// </summary>
+    public virtual string Extension
+    {
+        get
+        {
+            var lastDot = FullName.LastIndexOf('.');
+            if (lastDot < 1)
+                return "";
+
+            var secondLast = FullName[..lastDot].LastIndexOf(".");
+
+            if (secondLast > 0 && FullName[(secondLast + 1)..lastDot] == "tar")
+                return FullName[secondLast..];
+
+            return FullName[lastDot..];
+        }
+    }
 
     public FilePath(ShellObject windowsPath)
     {
