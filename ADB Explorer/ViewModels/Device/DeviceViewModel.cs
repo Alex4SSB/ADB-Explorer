@@ -18,11 +18,7 @@ public abstract class DeviceViewModel : AbstractDevice
     public bool DeviceSelected
     {
         get => deviceSelected;
-        set
-        {
-            if (Set(ref deviceSelected, value) && this is LogicalDeviceViewModel && Status is DeviceStatus.Ok)
-                Data.RuntimeSettings.SelectedDevicesCount += value ? 1 : -1;
-        }
+        set => Set(ref deviceSelected, value);
     }
 
     public string IpAddress

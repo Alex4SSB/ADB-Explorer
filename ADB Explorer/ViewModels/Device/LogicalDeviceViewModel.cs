@@ -116,7 +116,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction BrowseCommand { get; }
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
-    public List<RebootCommand> RebootCommands { get; } = new();
+    public List<object> RebootCommands { get; } = new();
 
     #endregion
 
@@ -135,7 +135,10 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
         foreach (RebootCommand.RebootType item in Enum.GetValues(typeof(RebootCommand.RebootType)))
         {
-            RebootCommands.Add(new(this, item));
+            RebootCommands.Add(new RebootCommand(this, item));
+
+            if (item is RebootCommand.RebootType.Title)
+                RebootCommands.Add(new Separator() { Margin = new(-11, 0, -11, 0)});
         }
 
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;

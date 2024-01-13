@@ -372,7 +372,6 @@ public static class DeviceHelper
         // To make sure value changes to true
         Data.RuntimeSettings.CollapseDevices = false;
         Data.RuntimeSettings.CollapseDevices = true;
-        Data.RuntimeSettings.SelectedDevicesCount = 0;
 
         Data.RuntimeSettings.IsPathBoxFocused = false;
     }
