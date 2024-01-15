@@ -35,8 +35,6 @@ public static class Strings
     public const string S_COPY_PATH = "Copy Item Path";
     public const string S_RESTORE_ALL = "Restore All Items";
     public const string S_EMPTY_TRASH = "Empty Recycle Bin";
-    public const string S_DATE_DEL_COL = "Date Deleted";
-    public const string S_DATE_MOD_COL = "Date Modified";
     public const string S_DELETE_ACTION = "Delete";
     public const string S_DEST_ERR = "Destination Path Error";
     public const string S_FAILED_CONN = "failed to connect to ";

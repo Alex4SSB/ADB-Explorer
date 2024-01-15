@@ -279,23 +279,8 @@
                                 Width="Auto"
                                 Binding="{Binding TrashIndex.ModifiedTimeString}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Date Modified"
-                                IsReadOnly="True">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Setter Property="Text" Value="{Binding ModifiedTimeString}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Type}" Value="File">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                            <DataTrigger Binding="{Binding Type}" Value="Folder">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
+                                Header="Date Deleted"
+                                IsReadOnly="True" />
                             <DataGridTextColumn
                                 x:Name="PackageName"
                                 Width="400"

@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.ViewModels;
+﻿using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
 
@@ -63,8 +64,16 @@ public class TrashIndexer : ViewModelBase
         DateModified = dateModified;
     }
 
+    public TrashIndexer(FileMoveOperation op)
+    {
+        RecycleName = op.RecycleName;
+        OriginalPath = op.FilePath.FullPath;
+        DateModified = op.DateModified;
+    }
+
     public override string ToString()
     {
-        return $"{RecycleName}|{OriginalPath}|{DateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT)}";
+        var date = DateModified is null ? "?" : DateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT);
+        return $"{RecycleName}|{OriginalPath}|{date}";
     }
 }

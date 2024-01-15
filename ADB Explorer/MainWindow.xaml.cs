@@ -1087,7 +1087,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActions.ListingInProgress = true;
             TrashHelper.ParseIndexers().ContinueWith((t) => DirList.Navigate(realPath));
 
-            DateColumn.Header = S_DATE_DEL_COL;
             FileActions.DeleteDescription.Value = S_EMPTY_TRASH;
             FileActions.RestoreDescription.Value = S_RESTORE_ALL;
         }
@@ -1102,7 +1101,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             DirList.Navigate(realPath);
 
-            DateColumn.Header = S_DATE_MOD_COL;
             FileActions.DeleteDescription.Value = S_DELETE_ACTION;
         }
 

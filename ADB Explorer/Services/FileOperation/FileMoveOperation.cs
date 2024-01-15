@@ -48,7 +48,6 @@ public class FileMoveOperation : AbstractShellFileOperation
         {
             RecycleName = $"{{{DateTimeOffset.Now.ToUnixTimeMilliseconds()}}}";
             TargetPath.UpdatePath(FileHelper.ConcatPaths(TargetPath.ParentPath, RecycleName));
-            DateModified = FilePath.ModifiedTime;
             IndexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{RecycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
         }
 
@@ -64,7 +63,7 @@ public class FileMoveOperation : AbstractShellFileOperation
         if (flag.Length > 0)
             flag = "-" + flag;
 
-        if (OperationName is OperationType.Copy)
+        if (OperationName is OperationType.Copy or OperationType.Recycle)
             DateModified = DateTime.Now;
 
         var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, CancelTokenSource.Token, cmd, flag,

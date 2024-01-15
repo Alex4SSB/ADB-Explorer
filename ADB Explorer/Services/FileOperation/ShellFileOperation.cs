@@ -181,8 +181,8 @@ public static class ShellFileOperation
             // write or delete indexer, even if not current device
             if (op.OperationName is FileOperation.OperationType.Recycle)
             {
-                var date = op.DateModified.HasValue ? op.DateModified.Value.ToString(AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT) : "?";
-                WriteLine(op.Device, op.IndexerPath, ADBService.EscapeAdbShellString($"{op.RecycleName}|{op.FilePath.FullPath}|{date}"));
+                TrashIndexer indexer = new(op);
+                WriteLine(op.Device, op.IndexerPath, ADBService.EscapeAdbShellString(indexer.ToString()));
             }
             else if (op.OperationName is FileOperation.OperationType.Restore)
             {
