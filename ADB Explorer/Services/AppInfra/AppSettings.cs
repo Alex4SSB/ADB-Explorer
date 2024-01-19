@@ -194,11 +194,11 @@ public class AppSettings : ViewModelBase
 
     #region File Ops
 
-    private bool showExtendedView;
-    public bool ShowExtendedView
+    private bool enableCompactView;
+    public bool EnableCompactView
     {
-        get => Get(ref showExtendedView, true);
-        set => Set(ref showExtendedView, value);
+        get => Get(ref enableCompactView, false);
+        set => Set(ref enableCompactView, value);
     }
 
     private bool stopPollingWhileSync;

@@ -58,7 +58,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("File Operations", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtendedView)), "Use Extended View"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableCompactView)), "Enable Compact View"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.StopPollingOnSync)), "Stop Polling On Push/Pull"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.AllowMultiOp)), "Allow Simultaneous Operations"),
             }),

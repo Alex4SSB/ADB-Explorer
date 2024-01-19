@@ -397,7 +397,7 @@ internal static class AppActions
             FileActionLogic.FollowLink,
             "Open Item Location",
             new(Key.Enter, ModifierKeys.Shift),
-            true)
+            true),
     };
 
     public static List<KeyBinding> Bindings =>

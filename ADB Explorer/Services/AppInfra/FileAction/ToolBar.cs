@@ -6,7 +6,7 @@ namespace ADB_Explorer.Services;
 
 internal static class NavigationToolBar
 {
-    public static ObservableList<IconMenu> List { get; } = new() {
+    public static ObservableList<IMenuItem> List { get; } = new() {
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Home),
             "\uE80F",
@@ -222,9 +222,9 @@ internal static class PathContextMenu
     };
 }
 
-internal static class SettingsMenu
+internal static class FileOpMenu
 {
-    public static ObservableList<ActionMenu> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         new AltObjectMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenFileOps),
             AppActions.Icons[FileAction.FileActionType.OpenFileOps],
@@ -233,6 +233,13 @@ internal static class SettingsMenu
             {
                 new GeneralSubMenu(App.Current.Resources["CompactFileOpDropDown"], true)
             }),
+    };
+}
+
+internal static class SettingsMenu
+{
+    public static ObservableList<IMenuItem> List { get; } = new()
+    {
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
             "\uE713",
             iconSize: 18),
@@ -241,7 +248,7 @@ internal static class SettingsMenu
 
 internal static class SettingsPaneMenu
 {
-    public static ObservableList<ActionMenu> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.HideSettings),
             "\uE761",
@@ -251,7 +258,7 @@ internal static class SettingsPaneMenu
 
 internal static class EditorControls
 {
-    public static ObservableList<ActionBase> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         new DualActionButton(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CloseEditor),
             AppActions.Icons[FileAction.FileActionType.FileOpRemove],
@@ -265,7 +272,7 @@ internal static class EditorControls
 
 internal static class FileOpControls
 {
-    public static ObservableList<ActionBase> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpFilter).Button,
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.FileOpStop).Button,
@@ -285,7 +292,7 @@ internal static class FileOpControls
 
 internal static class LogControls
 {
-    public static ObservableList<ActionBase> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.PauseLogs).Button,
         new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ClearLogs),
@@ -296,7 +303,7 @@ internal static class LogControls
 
 internal static class ResetSettings
 {
-    public static ObservableList<ActionBase> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         new CompoundDualAction(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ResetSettings),
             new ResetSettingsIcon()),
@@ -305,7 +312,7 @@ internal static class ResetSettings
 
 internal static class SettingsControls
 {
-    public static ObservableList<ActionBase> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.SortSettings).Button,
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.ExpandSettings).Button,
@@ -314,8 +321,15 @@ internal static class SettingsControls
 
 internal static class LogToggle
 {
-    public static ObservableList<ActionBase> List { get; } = new()
+    public static ObservableList<IMenuItem> List { get; } = new()
     {
         AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.LogToggle).Button,
     };
+}
+
+internal static class PeekDetailed
+{
+    public static BaseAction Action { get; } = new(
+            () => true,
+            () => Data.RuntimeSettings.IsDetailedPeekMode = true);
 }

@@ -55,7 +55,10 @@ public class AppRuntimeSettings : ViewModelBase
         set
         {
             if (Set(ref isOperationsViewOpen, value))
+            {
                 DeviceHelper.CollapseDevices();
+                IsDetailedPeekMode = false;
+            }
         }
     }
 
@@ -340,6 +343,13 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => isPollingStopped;
         set => Set(ref isPollingStopped, value);
+    }
+
+    private bool isDetailedPeekMode = false;
+    public bool IsDetailedPeekMode
+    {
+        get => isDetailedPeekMode;
+        set => Set(ref isDetailedPeekMode, value);
     }
 
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";

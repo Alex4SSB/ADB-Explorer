@@ -645,7 +645,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Storage.StoreValue(AppSettings.SystemVals.windowMaximized, WindowState == WindowState.Maximized);
 
-        var detailedVisible = RuntimeSettings.IsOperationsViewOpen && Settings.ShowExtendedView;
+        var detailedVisible = RuntimeSettings.IsOperationsViewOpen && Settings.EnableCompactView;
         Storage.StoreValue(AppSettings.SystemVals.detailedVisible, detailedVisible);
         if (detailedVisible)
             Storage.StoreValue(AppSettings.SystemVals.detailedHeight, FileOpDetailedGrid.Height);

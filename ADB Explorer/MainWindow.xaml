@@ -63,7 +63,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid>
+            <Grid Margin="0,0,7,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
@@ -74,7 +74,13 @@
                     Grid.Column="1"
                     Background="Transparent"
                     MouseDown="Window_MouseDown" />
-                <Menu Grid.Column="2" Style="{StaticResource SettingsMenuStyle}" />
+                <StackPanel
+                    Grid.Column="2"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+                    <Menu Style="{StaticResource FileOpMenuStyle}" />
+                    <Menu Style="{StaticResource SettingsMenuStyle}" />
+                </StackPanel>
             </Grid>
             <Grid Grid.Row="1" MouseEnter="Grid_MouseEnter">
                 <StackPanel Margin="0,4,0,2">

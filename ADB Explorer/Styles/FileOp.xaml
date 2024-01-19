@@ -4,6 +4,7 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:TreeViewIndentConverter x:Key="TreeViewIndentConverter" />
     <converters:FileOpTreeStatusConverter x:Key="FileOpTreeStatusConverter" />
@@ -535,7 +536,6 @@
         x:Key="CurrentOperationDataGrid"
         x:Name="CurrentOperationDataGrid"
         Grid.Row="1"
-        Grid.ColumnSpan="3"
         Width="Auto"
         AutoGenerateColumns="False"
         CanUserDeleteRows="False"
@@ -551,20 +551,14 @@
     </DataGrid>
     <Grid x:Key="CompactFileOpDropDown" Margin="4,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <Border
-            Grid.Row="0"
-            Grid.ColumnSpan="3"
-            Margin="0,0,0,6">
-            <Menu x:Name="CompactFileOpControlsMenu" Style="{StaticResource FileOpControlsPanelStyle}" />
-        </Border>
+        <Button
+            Margin="0,0,0,6"
+            HorizontalAlignment="Center"
+            Command="{Binding Source={x:Static Member=services:PeekDetailed.Action}, Path=Command}"
+            Content="Show Detailed View" />
         <StaticResource ResourceKey="CurrentOperationDataGrid" />
     </Grid>
 </ResourceDictionary>
