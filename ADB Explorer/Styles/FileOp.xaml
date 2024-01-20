@@ -139,6 +139,30 @@
         FolderInProgOpFileNameTemplate="{StaticResource FolderInProgOpFileNameTemplate}"
         RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
         UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
+    <DataTemplate x:Key="CompactFolderInProgOpFileNameInnerTemplate">
+        <Grid Margin="4,0,0,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon Style="{StaticResource FileOpFileNameFolderIconStyle}" />
+            <TextBlock Grid.Column="1" Style="{StaticResource FileOpFileNamesTextBlockStyle}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="CompactFolderInProgOpFileNameTemplate">
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource FolderCompletedOpFileNameTemplate}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Status}" Value="InProgress">
+                            <Setter Property="ContentTemplate" Value="{StaticResource CompactFolderInProgOpFileNameInnerTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </DataTemplate>
     <DataTemplate x:Key="FileOpFileNameTemplate">
         <DataTemplate.Triggers>
             <Trigger Property="Visibility" Value="Visible">
@@ -149,6 +173,23 @@
             </DataTrigger>
         </DataTemplate.Triggers>
         <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource FileOpFileNameTemplateSelector}" />
+    </DataTemplate>
+    <helpers:FileOpFileNameTemplateSelector
+        x:Key="CompactFileOpFileNameTemplateSelector"
+        FolderCompletedOpFileNameTemplate="{StaticResource FolderCompletedOpFileNameTemplate}"
+        FolderInProgOpFileNameTemplate="{StaticResource CompactFolderInProgOpFileNameTemplate}"
+        RegularOpFileNameTemplate="{StaticResource RegularOpFileNameTemplate}"
+        UninstallOpFileNameTemplate="{StaticResource UninstallOpFileNameTemplate}" />
+    <DataTemplate x:Key="CompactFileOpFileNameTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+        <ContentControl Content="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext}" ContentTemplateSelector="{StaticResource CompactFileOpFileNameTemplateSelector}" />
     </DataTemplate>
     <DataTemplate x:Key="FileOpSourcePathTemplate">
         <ui:HyperlinkButton
@@ -240,12 +281,47 @@
             </StackPanel>
         </Grid>
     </DataTemplate>
+    <DataTemplate x:Key="CompactInProgSyncProgressTemplate">
+        <Grid Margin="4,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
+                <TextBlock Text="%" />
+            </StackPanel>
+        </Grid>
+    </DataTemplate>
     <DataTemplate x:Key="InProgShellProgressTemplate">
         <ui:ProgressBar
             Margin="4,0"
             IsIndeterminate="True"
             Style="{StaticResource FluentProgressBarStyle}" />
     </DataTemplate>
+    <Style
+        x:Key="SyncProgressIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+        <Setter Property="Glyph" Value="&#xF13E;" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding FilesSkipped}" Value="0">
+                <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                <Setter Property="Glyph" Value="&#xF13E;" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <DataTemplate x:Key="CompletedSyncProgressInnerTemplate">
         <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
             <Grid.Resources>
@@ -261,20 +337,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <ui:FontIcon>
-                    <ui:FontIcon.Style>
-                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                            <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
-                            <Setter Property="Glyph" Value="&#xF13E;" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding FilesSkipped}" Value="0">
-                                    <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
-                                    <Setter Property="Glyph" Value="&#xF13E;" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ui:FontIcon.Style>
-                </ui:FontIcon>
+                <ui:FontIcon Style="{StaticResource SyncProgressIconStyle}" />
                 <TextBlock
                     Grid.Column="1"
                     Margin="4,0"
@@ -285,6 +348,21 @@
             <TextBlock
                 Grid.Row="2"
                 Text="{Binding RelativeSource={RelativeSource Mode=Self}, Path=DataContext, Converter={StaticResource CompletedStatsConverter}}"
+                TextTrimming="CharacterEllipsis" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="CompactCompletedSyncProgressInnerTemplate">
+        <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ui:FontIcon Style="{StaticResource SyncProgressIconStyle}" />
+            <TextBlock
+                Grid.Column="1"
+                Margin="4,0"
+                Style="{StaticResource DisabledTooltipTextBlockStyle}"
+                Text="{Binding FileCountCompletedString}"
                 TextTrimming="CharacterEllipsis" />
         </Grid>
     </DataTemplate>
@@ -326,6 +404,20 @@
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Setter Property="ContentTemplate" Value="{StaticResource CompletedSyncProgressInnerTemplate}" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsValidationInProgress}" Value="True">
+                            <Setter Property="ContentTemplate" Value="{StaticResource ValidatingProgressInnerTemplate}" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+    </DataTemplate>
+    <DataTemplate x:Key="CompactCompletedSyncProgressTemplate">
+        <ContentControl>
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="ContentTemplate" Value="{StaticResource CompactCompletedSyncProgressInnerTemplate}" />
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding IsValidationInProgress}" Value="True">
                             <Setter Property="ContentTemplate" Value="{StaticResource ValidatingProgressInnerTemplate}" />
@@ -414,6 +506,26 @@
                 ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
         </Grid>
     </DataTemplate>
+    <helpers:FileOpProgressTemplateSelector
+        x:Key="CompactFileOpProgressTemplateSelector"
+        CanceledOpProgressTemplate="{StaticResource CanceledOpProgressTemplate}"
+        CompletedShellProgressTemplate="{StaticResource CompletedShellProgressTemplate}"
+        CompletedSyncProgressTemplate="{StaticResource CompactCompletedSyncProgressTemplate}"
+        FailedOpProgressTemplate="{StaticResource FailedOpProgressTemplate}"
+        InProgShellProgressTemplate="{StaticResource InProgShellProgressTemplate}"
+        InProgSyncProgressTemplate="{StaticResource CompactInProgSyncProgressTemplate}"
+        WaitingOpProgressTemplate="{StaticResource WaitingOpProgressTemplate}" />
+    <DataTemplate x:Key="CompactFileOpProgressTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+        <ContentControl Content="{Binding StatusInfo}" ContentTemplateSelector="{StaticResource CompactFileOpProgressTemplateSelector}" />
+    </DataTemplate>
     <DataTemplate x:Key="OperationIconTemplate">
         <DataTemplate.Triggers>
             <Trigger Property="Visibility" Value="Visible">
@@ -425,6 +537,21 @@
         </DataTemplate.Triggers>
         <ContentPresenter
             Margin="0,0,6,0"
+            HorizontalAlignment="Right"
+            Content="{Binding OpIcon}"
+            ToolTip="{Binding Tooltip}" />
+    </DataTemplate>
+    <DataTemplate x:Key="CompactOperationIconTemplate">
+        <DataTemplate.Triggers>
+            <Trigger Property="Visibility" Value="Visible">
+                <Setter Property="IsEnabled" Value="False" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Device.Device.Status}" Value="Ok">
+                <Setter Property="IsEnabled" Value="True" />
+            </DataTrigger>
+        </DataTemplate.Triggers>
+        <ContentPresenter
+            Margin="2,0"
             HorizontalAlignment="Right"
             Content="{Binding OpIcon}"
             ToolTip="{Binding Tooltip}" />
@@ -544,12 +671,12 @@
         HeadersVisibility="None"
         ItemsSource="{Binding}">
         <DataGrid.Columns>
-            <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource FileOpProgressTemplate}" />
-            <DataGridTemplateColumn CellTemplate="{StaticResource OperationIconTemplate}" />
-            <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource FileOpFileNameTemplate}" />
+            <DataGridTemplateColumn MinWidth="100" CellTemplate="{StaticResource CompactFileOpProgressTemplate}" />
+            <DataGridTemplateColumn CellTemplate="{StaticResource CompactOperationIconTemplate}" />
+            <DataGridTemplateColumn MaxWidth="130" CellTemplate="{StaticResource CompactFileOpFileNameTemplate}" />
         </DataGrid.Columns>
     </DataGrid>
-    <Grid x:Key="CompactFileOpDropDown" Margin="4,0">
+    <Grid x:Key="CompactFileOpDropDown">
         <Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
