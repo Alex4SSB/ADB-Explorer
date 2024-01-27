@@ -1,12 +1,19 @@
-#include <windows.h>
-#include <tchar.h>
 #include <vector>
 #include <string>
 #include <numeric>
 #include <iostream>
 #include <algorithm>
-#include <io.h>
+
+#define _WINDOWS_
+#define _INC_WINDOWS
+#define _AMD64_
+#define UNICODE
+
+#include <windef.h>
+#include <winbase.h>
+#include <wincon.h>
 #include <fcntl.h>
+#include <corecrt_io.h>
 
 #define CAPTURE_INTERVAL_MS 100
 
@@ -174,8 +181,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	std::wstring prev_line_str;
 	while (WaitForSingleObject(child_handle, 0) == WAIT_TIMEOUT) {
 		// Read current line, where the cursor is
-		if (auto line_str = ReadConsoleLine(console_handle, 0);
-			(line_str != prev_line_str) && IsLinePrintable(line_str)) {
+		auto line_str = ReadConsoleLine(console_handle, 0);
+		if ((line_str != prev_line_str) && IsLinePrintable(line_str)) {
 			std::wcout << line_str << std::endl;
 			prev_line_str = line_str;
 			Sleep(CAPTURE_INTERVAL_MS);
@@ -183,8 +190,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	}
 
 	// Read previous line to get the final message
-	if (auto line_str = ReadConsoleLine(console_handle, -1);
-		(line_str != prev_line_str) && IsLinePrintable(line_str)) {
+	auto line_str = ReadConsoleLine(console_handle, -1);
+	if ((line_str != prev_line_str) && IsLinePrintable(line_str)) {
 		std::wcout << line_str << std::endl;
 	}
 
