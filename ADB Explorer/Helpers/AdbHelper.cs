@@ -56,7 +56,7 @@ internal static class AdbHelper
         {
             try
             {
-                string newPath = $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
+                string newPath = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
                 if (File.Exists(newPath))
                 {
                     Data.ProgressRedirectionPath = newPath;

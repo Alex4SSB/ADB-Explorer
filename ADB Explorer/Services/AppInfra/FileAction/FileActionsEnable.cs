@@ -366,11 +366,13 @@ internal class FileActionsEnable : ViewModelBase
     }
 
     private FileClass editorFilePath;
-    public FileClass EditorFilePath
+    public FileClass EditorAndroidPath
     {
         get => editorFilePath;
         set => Set(ref editorFilePath, value);
     }
+
+    public string EditorWindowsPath { get; set; }
 
     private string explorerFilter = "";
     public string ExplorerFilter

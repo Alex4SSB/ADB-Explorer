@@ -38,3 +38,4 @@ global using System.Windows.Media;
 global using System.Windows.Media.Imaging;
 global using System.Windows.Shell;
 global using System.Windows.Threading;
+global using Windows.Storage;

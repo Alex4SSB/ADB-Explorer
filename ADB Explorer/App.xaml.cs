@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer;
@@ -8,24 +9,52 @@ namespace ADB_Explorer;
 /// </summary>
 public partial class App : Application
 {
-    private static string TempFilesPath => $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}";
+    private static string SettingsFilePath;
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
-        // Restore application-scope property from isolated storage
-        IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
+        Data.AppDataPath = FileHelper.ConcatPaths(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AdbExplorerConst.APP_DATA_FOLDER, '\\');
+        SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+
         try
         {
-            using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE, FileMode.Open, storage);
-            Data.IsolatedStorageLocation = Path.GetDirectoryName(stream.GetType().GetField("_fullPath", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(stream).ToString());
-
-            if (Keyboard.IsKeyDown(Key.LeftCtrl))
+            // if settings file exists in local app data - try to read it from there, otherwise try to read it from the isolated storage (old method)
+            if (File.Exists(SettingsFilePath))
             {
-                Process.Start("explorer.exe", Data.IsolatedStorageLocation);
+                using StreamReader appDataReader = new(SettingsFilePath);
+                ReadSettingsFile(appDataReader);
             }
+            else
+            {
+                if (!Directory.Exists(Data.AppDataPath))
+                    Directory.CreateDirectory(Data.AppDataPath);
 
-            using StreamReader reader = new(stream);
-            // Restore each application-scope property individually
+                using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE,
+                                                             FileMode.Open,
+                                                             IsolatedStorageFile.GetUserStoreForDomain());
+                using StreamReader reader = new(stream);
+                ReadSettingsFile(reader);
+            }
+        }
+        catch
+        {
+            // in any case of failing to read the settings, try to write them instead
+            // will happen on first ever launch, or after resetting app settings
+
+            WriteSettings();
+        }
+
+        //Select the text in a TextBox when it receives focus.
+        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.PreviewMouseLeftButtonDownEvent,
+            new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
+        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotKeyboardFocusEvent,
+            new RoutedEventHandler(SelectAllText));
+        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.MouseDoubleClickEvent,
+            new RoutedEventHandler(SelectAllText));
+
+
+        void ReadSettingsFile(StreamReader reader)
+        {
             while (!reader.EndOfStream)
             {
                 string[] keyValue = reader.ReadLine().TrimEnd(';').Split(':', 2);
@@ -42,34 +71,13 @@ public partial class App : Application
                     Properties[keyValue[0]] = keyValue[1];
                 }
             }
-
-            Task.Run(() =>
-            {
-                if (!Directory.Exists(TempFilesPath))
-                    Directory.CreateDirectory(TempFilesPath);
-                else
-                    CleanTempFiles();
-            });
         }
-        catch // FileNotFoundException ex
-        {
-            WriteSettings();
-        }
-
-        //Select the text in a TextBox when it receives focus.
-        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.PreviewMouseLeftButtonDownEvent,
-            new MouseButtonEventHandler(SelectivelyIgnoreMouseButton));
-        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotKeyboardFocusEvent,
-            new RoutedEventHandler(SelectAllText));
-        EventManager.RegisterClassHandler(typeof(TextBox), TextBox.MouseDoubleClickEvent,
-            new RoutedEventHandler(SelectAllText));
     }
 
     private void Application_Exit(object sender, ExitEventArgs e)
     {
         Data.FileOpQ.Stop();
         WriteSettings();
-        Task.Run(CleanTempFiles);
 
         if (Data.Settings.UnrootOnDisconnect is true)
             ADBService.Unroot(Data.CurrentADBDevice);
@@ -77,34 +85,27 @@ public partial class App : Application
 
     private void WriteSettings()
     {
-        // Persist application-scope property to isolated storage
-        IsolatedStorageFile storage = IsolatedStorageFile.GetUserStoreForDomain();
-
         if (Data.RuntimeSettings.ResetAppSettings)
         {
-            storage.DeleteFile(AdbExplorerConst.APP_SETTINGS_FILE);
+            try
+            {
+                File.Delete(SettingsFilePath);
+            }
+            catch
+            { }
+            
             return;
         }
 
-        using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE, FileMode.Create, storage);
-        using StreamWriter writer = new(stream);
-
-        // Persist each application-scope property individually
-        foreach (string key in from string key in Properties.Keys
-                               orderby key
-                               select key)
-        {
-            writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })};");
-        }
-    }
-
-    private void CleanTempFiles()
-    {
         try
         {
-            foreach (var file in Directory.GetFiles(TempFilesPath))
+            using StreamWriter writer = new(SettingsFilePath);
+
+            foreach (string key in from string key in Properties.Keys
+                                   orderby key
+                                   select key)
             {
-                File.Delete(file);
+                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })};");
             }
         }
         catch (Exception)

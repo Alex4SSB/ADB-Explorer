@@ -565,7 +565,7 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Padding" Value="5,5,6,6" />
         <Setter Property="Margin" Value="2,0,6,0" />
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorFilePath.FullPath, Mode=OneWay}" />
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=EditorAndroidPath.FullPath, Mode=OneWay}" />
     </Style>
     <Style x:Key="EditorGridStyle" TargetType="Grid">
         <Setter Property="Margin" Value="0,0,0,10" />

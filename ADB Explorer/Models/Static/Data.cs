@@ -36,7 +36,7 @@ internal static class Data
 
     public static DirectoryLister DirList { get; set; }
 
-    public static string IsolatedStorageLocation { get; set; } = "";
+    public static string AppDataPath { get; set; } = "";
 
     public static string ProgressRedirectionPath { get; set; } = AdbExplorerConst.PROGRESS_REDIRECTION_PATH;
 

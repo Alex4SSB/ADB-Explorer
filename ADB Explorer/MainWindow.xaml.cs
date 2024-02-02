@@ -73,7 +73,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public MainWindow()
     {
         InitializeComponent();
-        
+
         KeyDown += new KeyEventHandler(OnButtonKeyDown);
         PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
 

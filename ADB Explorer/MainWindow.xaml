@@ -804,20 +804,8 @@
                                                 NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
                                                 ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
                                             <CheckBox Margin="0,6,0,0" Style="{StaticResource UpdatesCheckBoxStyle}" />
-                                            <Grid Margin="1,0,0,0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <ui:FontIcon Glyph="&#xE946;" />
-                                                <TextBlock
-                                                    Grid.Column="1"
-                                                    Margin="6,0,0,0"
-                                                    Text="Launch app while holding L-Ctrl to open app settings location."
-                                                    TextWrapping="Wrap" />
-                                            </Grid>
                                             <TextBlock
-                                                Margin="0,24,0,0"
+                                                Margin="0,20,0,0"
                                                 HorizontalAlignment="Center"
                                                 FontWeight="Bold"
                                                 Text="Attributions &amp; Third Party Licenses" />

@@ -77,22 +77,22 @@ internal static class FileActionLogic
 
     public static void OpenEditor()
     {
-        if (!Data.FileActions.EditFileEnabled || Data.FileActions.IsEditorOpen && Data.FileActions.EditorFilePath.Equals(Data.SelectedFiles.First()))
+        if (!Data.FileActions.EditFileEnabled || Data.FileActions.IsEditorOpen && Data.FileActions.EditorAndroidPath.Equals(Data.SelectedFiles.First()))
         {
             Data.FileActions.IsEditorOpen = false;
             return;
         }
         Data.FileActions.IsEditorOpen = true;
 
-        Data.FileActions.EditorFilePath = Data.SelectedFiles.First();
-
+        Data.FileActions.EditorAndroidPath = Data.SelectedFiles.First();
+        
         var readTask = Task.Run(() =>
         {
             try
             {
-                string windowsPath = $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}\\{Data.FileActions.EditorFilePath.FullName}";
-                if (AdbHelper.SilentPull(Data.CurrentADBDevice, Data.FileActions.EditorFilePath, windowsPath))
-                    return File.ReadAllText(windowsPath);
+                Data.FileActions.EditorWindowsPath = Path.GetTempFileName();
+                if (AdbHelper.SilentPull(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath, Data.FileActions.EditorWindowsPath))
+                    return File.ReadAllText(Data.FileActions.EditorWindowsPath);
                 else
                     throw new Exception(Strings.S_READ_FILE_ERROR);
             }
@@ -120,10 +120,9 @@ internal static class FileActionLogic
         {
             try
             {
-                string windowsPath = $"{Data.IsolatedStorageLocation}\\{AdbExplorerConst.TEMP_FILES_FOLDER}\\{Data.FileActions.EditorFilePath.FullName}";
-                File.WriteAllText(windowsPath, Data.FileActions.EditorText);
+                File.WriteAllText(Data.FileActions.EditorWindowsPath, Data.FileActions.EditorText);
 
-                if (AdbHelper.SilentPush(Data.CurrentADBDevice, windowsPath, Data.FileActions.EditorFilePath.FullPath))
+                if (AdbHelper.SilentPush(Data.CurrentADBDevice, Data.FileActions.EditorWindowsPath, Data.FileActions.EditorAndroidPath.FullPath))
                     return true;
                 else
                     throw new Exception(Strings.S_WRITE_FILE_ERROR);
@@ -144,7 +143,7 @@ internal static class FileActionLogic
 
             Data.FileActions.OriginalEditorText = Data.FileActions.EditorText;
 
-            if (Data.FileActions.EditorFilePath.ParentPath == Data.CurrentPath)
+            if (Data.FileActions.EditorAndroidPath.ParentPath == Data.CurrentPath)
                 Data.RuntimeSettings.Refresh = true;
         }));
     }
@@ -854,28 +853,31 @@ internal static class FileActionLogic
 
     public static void UpdateFileOpControls()
     {
-        FileOpControlsMutex.WaitOne(0);
-
-        var changed = false;
-
-        var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
-        if (Data.FileActions.RemoveFileOpDescription.Value != removeAction)
+        App.Current.Dispatcher.Invoke(() =>
         {
-            Data.FileActions.RemoveFileOpDescription.Value = removeAction;
-            changed = true;
-        }
+            FileOpControlsMutex.WaitOne(0);
 
-        var validateAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
-        if (Data.FileActions.ValidateDescription.Value != validateAction)
-        {
-            Data.FileActions.ValidateDescription.Value = validateAction;
-            changed = true;
-        }
+            var changed = false;
 
-        if (changed)
-            Data.RuntimeSettings.RefreshFileOpControls = true;
+            var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
+            if (Data.FileActions.RemoveFileOpDescription.Value != removeAction)
+            {
+                Data.FileActions.RemoveFileOpDescription.Value = removeAction;
+                changed = true;
+            }
 
-        FileOpControlsMutex.ReleaseMutex();
+            var validateAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
+            if (Data.FileActions.ValidateDescription.Value != validateAction)
+            {
+                Data.FileActions.ValidateDescription.Value = validateAction;
+                changed = true;
+            }
+
+            if (changed)
+                Data.RuntimeSettings.RefreshFileOpControls = true;
+
+            FileOpControlsMutex.ReleaseMutex();
+        });
     }
 
     public static async void ResetAppSettings()

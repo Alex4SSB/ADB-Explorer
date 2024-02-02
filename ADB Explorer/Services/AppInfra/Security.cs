@@ -39,7 +39,7 @@ public static class Security
             return new();
 #endif
 
-        if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
+        if (!File.GetAttributes(path).HasFlag(System.IO.FileAttributes.Directory))
         {
             return new() { { Path.GetFileName(path), CalculateWindowsFileHash(path) } };
         }

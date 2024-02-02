@@ -4,7 +4,7 @@ public static class AdbExplorerConst
 {
     public static readonly string ADB_PROCESS = "adb";
     public static readonly string PROGRESS_REDIRECTION_PATH = "AdbProgressRedirection.exe";
-    public static readonly string TEMP_FILES_FOLDER = "TEMP";
+    public static readonly string APP_DATA_FOLDER = "AdbExplorer";
 
     public static readonly string DEFAULT_PATH = "/sdcard";
     public static readonly string TEMP_PATH = "/data/local/tmp";
