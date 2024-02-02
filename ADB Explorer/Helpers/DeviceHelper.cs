@@ -672,7 +672,7 @@ public static class DeviceHelper
         if (retCode != 0)
             return;
 
-        var match = AdbRegEx.RE_NETSTAT_TCP_SOCK.Match(stdout);
+        var match = AdbRegEx.RE_NETSTAT_TCP_SOCK().Match(stdout);
         if (match.Groups?.Count < 2)
             return;
 

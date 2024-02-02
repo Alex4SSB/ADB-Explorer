@@ -352,6 +352,8 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isDetailedPeekMode, value);
     }
 
+    public string DefaultBrowserPath { get; set; }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public bool IsWin11 =>

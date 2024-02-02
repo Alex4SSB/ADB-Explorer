@@ -221,6 +221,9 @@
             <DataTrigger Binding="{Binding HideSeparator}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
@@ -230,29 +233,6 @@
         <Setter Property="Header" Value="{Binding Action.Description}" />
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Action.Name}" Value="ContextPushPackages" />
-                    <Condition Binding="{Binding Action.Command.IsEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Action.Name}" Value="PushPackages" />
-                    <Condition Binding="{Binding Action.Command.IsEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Action.Name}" Value="Package" />
-                    <Condition Binding="{Binding Action.Command.IsEnabled}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Collapsed" />
-            </MultiDataTrigger>
-        </Style.Triggers>
     </Style>
     <Style
         x:Key="DummySubMenuStyle"

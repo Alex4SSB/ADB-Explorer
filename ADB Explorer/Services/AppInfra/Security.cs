@@ -62,7 +62,7 @@ public static class Security
         string[] args = { ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;" };
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "find", out string stdout, out string stderr, new(), args);
 
-        var list = AdbRegEx.RE_ANDROID_FIND_HASH.Matches(stdout);
+        var list = AdbRegEx.RE_ANDROID_FIND_HASH().Matches(stdout);
         return list.Where(m => m.Success).ToDictionary(
             m => FileHelper.ExtractRelativePath(m.Groups["Path"].Value.TrimEnd('\r', '\n'), path.FullPath), 
             m => m.Groups["Hash"].Value.ToUpper());
@@ -74,7 +74,7 @@ public static class Security
         string[] args = { "xf", ADBService.EscapeAdbShellString(path.FullPath), "--to-command='echo $(md5sum) $TAR_FILENAME'" };
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "tar", out string stdout, out string stderr, new(), args);
 
-        var list = AdbRegEx.RE_ANDROID_FIND_HASH.Matches(stdout);
+        var list = AdbRegEx.RE_ANDROID_FIND_HASH().Matches(stdout);
         return list.Where(m => m.Success).ToDictionary(
             m => m.Groups["Path"].Value.TrimEnd('\r', '\n'),
             m => m.Groups["Hash"].Value.ToUpper());

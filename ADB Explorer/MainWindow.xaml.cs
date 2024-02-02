@@ -339,7 +339,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.FilterActions):
                     Task.Run(() => 
                     {
-                        if (FileActions.IsAppDrive || FileActions.IsRecycleBin)
+                        if (FileActions.IsAppDrive || FileActions.IsRecycleBin || DevicesObject.Current is null)
                             FilterFileActions();
                     });
                     Task.Run(() =>
@@ -580,6 +580,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 FilterDevices();
                 break;
+
             default:
                 break;
         }
@@ -859,6 +860,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Settings.RootArgs ??= new[] { "root" };
         Settings.UnrootArgs ??= new[] { "unroot" };
         Settings.UnrootOnDisconnect ??= false;
+
+        RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
     }
 
     private void SetRenderMode() => Dispatcher.Invoke(() =>
@@ -926,7 +929,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Task.Delay(EXPLORER_NAV_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
 
-        Task.Delay(INIT_NAV_HIDE_FILTER_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsSearchBoxFocused = false));
+        Task.Delay(INIT_NAV_HIDE_FILTER_DELAY).ContinueWith((t) => Dispatcher.Invoke(() =>
+        {
+            if (!SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
+                RuntimeSettings.IsSearchBoxFocused = false;
+        }));
 
         if (Width > MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
             RuntimeSettings.IsSearchBoxFocused = true;

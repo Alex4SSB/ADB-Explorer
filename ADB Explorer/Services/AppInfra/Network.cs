@@ -53,4 +53,18 @@ public static class Network
         
         return ipv4.First().Address.ToString();
     }
+
+    public static string GetDefaultBrowser()
+    {
+        try
+        {
+            var browserName = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice");
+            var browserCommand = Registry.ClassesRoot.OpenSubKey($@"{browserName.GetValue("Progid")}\shell\open\command").GetValue(null);
+            return AdbRegEx.RE_EXE_FROM_REG().Match($"{browserCommand}").Value;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }

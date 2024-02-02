@@ -35,7 +35,7 @@ public class FileDeleteOperation : AbstractShellFileOperation
             else
             {
                 Status = OperationStatus.Failed;
-                var res = AdbRegEx.RE_SHELL_ERROR.Matches(t.Result);
+                var res = AdbRegEx.RE_SHELL_ERROR().Matches(t.Result);
                 var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, base.FilePath.FullPath));
                 base.AddUpdates(updates);
 

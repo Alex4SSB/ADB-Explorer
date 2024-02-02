@@ -39,7 +39,7 @@ public class WiFiPairingService
         ADBService.ExecuteAdbCommand("mdns", out string services, out _, new(), "services");
 
         List<ServiceDevice> mdnsServices = new();
-        var matches = AdbRegEx.RE_MDNS_SERVICE.Matches(services);
+        var matches = AdbRegEx.RE_MDNS_SERVICE().Matches(services);
         foreach (Match item in matches)
         {
             var id = item.Groups["ID"].Value;

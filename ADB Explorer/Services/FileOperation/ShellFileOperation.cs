@@ -383,7 +383,7 @@ public static class ShellFileOperation
                                                 "''",
                                                 ADBService.EscapeAdbShellString(fullPath));
 
-        var match = AdbRegEx.RE_PACKAGE_NAME.Match(stdout);
+        var match = AdbRegEx.RE_PACKAGE_NAME().Match(stdout);
         return match.Success ? match.Groups["package"].Value : fullPath[..fullPath.LastIndexOf('.')][(fullPath.LastIndexOf('/') + 1)..];
     }
 
@@ -486,7 +486,7 @@ public static class ShellFileOperation
 
         foreach (var item in items)
         {
-            var match = AdbRegEx.RE_FILE_NAME_DATE.Match(item.FullName);
+            var match = AdbRegEx.RE_FILE_NAME_DATE().Match(item.FullName);
             if (!match.Success)
                 continue;
 

@@ -620,8 +620,6 @@ internal static class FileActionLogic
         Data.RuntimeSettings.IsExplorerLoaded =
         Data.FileActions.ParentEnabled = false;
 
-        Data.FileActions.PushPackageEnabled = Data.Settings.EnableApk && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
-
         Data.FileActions.ExplorerFilter = "";
 
         if (clearDevice)
@@ -629,9 +627,9 @@ internal static class FileActionLogic
             Data.CurrentDisplayNames.Clear();
             Data.CurrentPath = null;
             Data.RuntimeSettings.CurrentDevice = null;
-            Data.FileActions.PushPackageEnabled = false;
-
             Data.RuntimeSettings.ClearNavBox = true;
+
+            UpdateFileActions();
         }
 
         Data.RuntimeSettings.FilterActions = true;
@@ -639,11 +637,16 @@ internal static class FileActionLogic
 
     public static void UpdateFileActions()
     {
+        Data.FileActions.IsApkActionsVisible.Value = Data.Settings.EnableApk && Data.DevicesObject?.Current;
+        Data.FileActions.PushPackageEnabled = Data.FileActions.IsApkActionsVisible && Data.DevicesObject.Current.Type is not AbstractDevice.DeviceType.Recovery;
+
         Data.FileActions.UninstallPackageEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Any();
         Data.FileActions.ContextPushPackagesEnabled = Data.FileActions.IsAppDrive && !Data.SelectedPackages.Any();
 
         Data.FileActions.IsRefreshEnabled = Data.FileActions.IsDriveViewVisible || Data.FileActions.IsExplorerVisible;
         Data.FileActions.IsCopyCurrentPathEnabled = Data.FileActions.IsExplorerVisible && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
+
+        Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1 && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
 
         if (Data.FileActions.IsAppDrive)
         {
@@ -927,5 +930,12 @@ internal static class FileActionLogic
         var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
         if (file is not null)
             Data.FileActions.ItemToSelect = file;
+    }
+
+    public static void ApkWebSearch()
+    {
+        var apk = Data.SelectedPackages.First();
+        
+        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"? {apk.Name}\"");
     }
 }

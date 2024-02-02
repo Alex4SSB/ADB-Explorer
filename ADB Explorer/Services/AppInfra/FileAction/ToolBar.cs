@@ -40,15 +40,17 @@ internal static class MainToolBar
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
             new PullIcon()),
-         new CompoundIconMenu(
+        new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
             new PushIcon(),
             new SubMenu[]
             {
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
-                new SubMenuSeparator(() => Data.FileActions.PushPackageEnabled),
-                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushPackages), AppActions.Icons[FileAction.FileActionType.Package]),
+                new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushPackages),
+                    AppActions.Icons[FileAction.FileActionType.Package],
+                    isVisible: Data.FileActions.IsApkActionsVisible),
             }),
         new MenuSeparator(),
         new AltTextMenu(
@@ -109,14 +111,19 @@ internal static class MainToolBar
             children: new SubMenu[]
             {
                 new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb),
+                    AppActions.Icons[FileAction.FileActionType.SearchApkOnWeb],
+                    isVisible: Data.FileActions.IsApkActionsVisible),
+                new SubMenuSeparator(),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PasteLink), AppActions.Icons[FileAction.FileActionType.PasteLink]),
                 new SubMenuSeparator(),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.UpdateModified), AppActions.Icons[FileAction.FileActionType.UpdateModified]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Edit), AppActions.Icons[FileAction.FileActionType.Edit]),
-                new SubMenuSeparator(() => Data.FileActions.PackageActionsEnabled),
+                new SubMenuSeparator(Data.FileActions.IsApkActionsVisible),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Package),
                     AppActions.Icons[FileAction.FileActionType.Package],
+                    isVisible: Data.FileActions.IsApkActionsVisible,
                     children: new SubMenu[]
                     {
                         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.Install), AppActions.Icons[FileAction.FileActionType.Install]),
@@ -204,6 +211,7 @@ internal static class ExplorerContextMenu
                 new SubMenuSeparator(),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyToTemp), AppActions.Icons[FileAction.FileActionType.CopyToTemp]),
             }),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb), AppActions.Icons[FileAction.FileActionType.SearchApkOnWeb]),
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete), AppActions.Icons[FileAction.FileActionType.Delete]),
         new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPushPackages), AppActions.Icons[FileAction.FileActionType.Package]),

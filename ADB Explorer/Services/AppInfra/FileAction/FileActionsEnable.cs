@@ -32,7 +32,7 @@ internal class FileActionsEnable : ViewModelBase
         }
     }
 
-    private bool pushPackageEnabled;
+    private bool pushPackageEnabled = false;
     public bool PushPackageEnabled
     {
         get => pushPackageEnabled;
@@ -40,7 +40,6 @@ internal class FileActionsEnable : ViewModelBase
             if (Set(ref pushPackageEnabled, value))
             {
                 OnPropertyChanged(nameof(PushEnabled));
-                OnPropertyChanged(nameof(PushPackageVisible));
             }
         }
     }
@@ -409,6 +408,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isPasteLinkEnabled, value);
     }
 
+    private bool isApkWebSearchEnabled = false;
+    public bool IsApkWebSearchEnabled
+    {
+        get => isApkWebSearchEnabled;
+        set => Set(ref isApkWebSearchEnabled, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<bool> IsCutState = new();
@@ -424,6 +430,8 @@ internal class FileActionsEnable : ViewModelBase
     public ObservableProperty<bool> IsExpandSettingsVisible = new() { Value = true };
 
     public ObservableProperty<bool> IsLogToggleVisible = new() { Value = Data.Settings.EnableLog };
+
+    public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };
 
 
     public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = Enumerable.Empty<FileOperation>() };
@@ -452,7 +460,6 @@ internal class FileActionsEnable : ViewModelBase
     public bool InstallUninstallEnabled => PackageActionsEnabled && InstallPackageEnabled;
     public bool CopyToTempEnabled => PackageActionsEnabled && !InstallPackageEnabled;
     public bool PushEnabled => PushFilesFoldersEnabled || PushPackageEnabled;
-    public bool PushPackageVisible => PushPackageEnabled && Data.Settings.EnableApk;
     public bool MoreEnabled => EditFileEnabled || UpdateModifiedEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;

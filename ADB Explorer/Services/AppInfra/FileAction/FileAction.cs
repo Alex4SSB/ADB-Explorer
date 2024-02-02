@@ -48,6 +48,7 @@ internal static class AppActions
         { FileActionType.FollowLink, "\uE838" },
         { FileActionType.PasteLink, "\uE1A5" },
         { FileActionType.HideSettings, "\uE761" },
+        { FileActionType.SearchApkOnWeb, "\uF6FA" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } = new()
@@ -398,6 +399,12 @@ internal static class AppActions
             "Open Item Location",
             new(Key.Enter, ModifierKeys.Shift),
             true),
+        new(FileActionType.SearchApkOnWeb,
+            () => Data.FileActions.IsApkWebSearchEnabled,
+            FileActionLogic.ApkWebSearch,
+            "Search In Browser",
+            new(Key.O, ModifierKeys.Control),
+            true)
     };
 
     public static List<KeyBinding> Bindings =>
@@ -489,6 +496,7 @@ internal class FileAction : ViewModelBase
         FileOpFilter,
         FollowLink,
         PasteLink,
+        SearchApkOnWeb,
     }
 
     public FileActionType Name { get; }

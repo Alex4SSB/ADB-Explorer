@@ -11,7 +11,7 @@ internal class FileOpTest
     {
         new AdbSyncProgressInfo("/Folder/subfolderA/file1", 10, new Random().Next(1, 99), null),
         new AdbSyncProgressInfo("/Folder/subfolderA/file2", 15, new Random().Next(1, 99), null),
-        SyncErrorInfo.New(AdbRegEx.RE_FILE_SYNC_ERROR.Match("adb: error: stat failed when trying to push to /Folder/subfolderA/file3: Permission denied")),
+        SyncErrorInfo.New(AdbRegEx.RE_FILE_SYNC_ERROR().Match("adb: error: stat failed when trying to push to /Folder/subfolderA/file3: Permission denied")),
         new AdbSyncProgressInfo("/Folder/subfolderA/file4", 25, new Random().Next(1, 99), null),
         new AdbSyncProgressInfo("/Folder/subfolderA/file5", 30, new Random().Next(1, 99), null),
         new AdbSyncProgressInfo("/Folder/subfolderA/file6", 35, new Random().Next(1, 99), null),

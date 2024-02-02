@@ -262,8 +262,8 @@ internal class SubMenu : ActionMenu
     protected SubMenu()
     { }
 
-    public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null)
-        : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction)
+    public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null, ObservableProperty<bool> isVisible = null)
+        : base(fileAction, icon, children, iconSize: iconSize, altAction: altAction, isVisible: isVisible)
     { }
 }
 
@@ -343,6 +343,10 @@ internal class SubMenuSeparator : SubMenu
     {
         externalVisibility = canExecute is null;
     }
+
+    public SubMenuSeparator(ObservableProperty<bool> isVisible)
+        : base(new(FileAction.FileActionType.None, () => isVisible.Value, () => { }), "", isVisible: isVisible)
+    { }
 }
 
 internal class DualActionButton : IconMenu

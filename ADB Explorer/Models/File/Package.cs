@@ -40,7 +40,7 @@ public class Package : ViewModelBase
 
     public static Package New(string package, PackageType type)
     {
-        var match = AdbRegEx.RE_PACKAGE_LISTING.Match(package);
+        var match = AdbRegEx.RE_PACKAGE_LISTING().Match(package);
         if (!match.Success)
             return null;
 

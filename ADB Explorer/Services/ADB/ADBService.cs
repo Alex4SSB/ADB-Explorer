@@ -232,7 +232,7 @@ public partial class ADBService
     {
         ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, new(), "-l");
 
-        return RE_DEVICE_NAME.Matches(stdout).Select(
+        return RE_DEVICE_NAME().Matches(stdout).Select(
             m => LogicalDevice.New(
                 name: DeviceHelper.ParseDeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
                 id: m.Groups["id"].Value,
@@ -276,7 +276,7 @@ public partial class ADBService
         // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
 
         // Get major and minor nodes in hex and return
-        return RE_MMC_BLOCK_DEVICE_NODE.Match(stdout).Groups;
+        return RE_MMC_BLOCK_DEVICE_NODE().Match(stdout).Groups;
     }
 
     public static string GetMmcId(string deviceID)
@@ -431,7 +431,7 @@ public partial class ADBService
         if (exitCode != 0)
             return null;
 
-        string version = RE_ADB_VERSION.Match(stdout).Groups["version"]?.Value;
+        string version = RE_ADB_VERSION().Match(stdout).Groups["version"]?.Value;
         return string.IsNullOrEmpty(version) ? null : new Version(version);
     }
 

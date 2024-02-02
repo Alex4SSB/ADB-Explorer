@@ -56,7 +56,7 @@ public partial class ADBService
 
         private static FileStat CreateFile(string path, string stdoutLine)
         {
-            var match = AdbRegEx.RE_LS_FILE_ENTRY.Match(stdoutLine);
+            var match = AdbRegEx.RE_LS_FILE_ENTRY().Match(stdoutLine);
             if (!match.Success)
             {
                 throw new Exception($"Invalid output for adb ls command: {stdoutLine}");
@@ -100,7 +100,7 @@ public partial class ADBService
 
             ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out string stderr, cancellationToken, args);
 
-            var matches = AdbRegEx.RE_LIST_LINKS.Matches(stdout);
+            var matches = AdbRegEx.RE_LIST_LINKS().Matches(stdout);
 
             foreach (Match match in matches)
             {
@@ -158,12 +158,12 @@ public partial class ADBService
                 if (string.IsNullOrWhiteSpace(lastStdoutLine))
                     continue;
 
-                var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS.Match(stdoutLine);
+                var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS().Match(stdoutLine);
                 if (progressMatch.Success)
                     updates.Add(new AdbSyncProgressInfo(progressMatch));
                 else
                 {
-                    var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR.Match(stdoutLine);
+                    var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR().Match(stdoutLine);
                     if (errorMatch.Success && SyncErrorInfo.New(errorMatch) is SyncErrorInfo error)
                     {
                         updates.Add(error);
@@ -174,7 +174,7 @@ public partial class ADBService
             if (string.IsNullOrWhiteSpace(lastStdoutLine))
                 return null;
 
-            var match = AdbRegEx.RE_FILE_SYNC_STATS.Match(lastStdoutLine);
+            var match = AdbRegEx.RE_FILE_SYNC_STATS().Match(lastStdoutLine);
             if (!match.Success)
                 return null;
 
@@ -201,19 +201,19 @@ public partial class ADBService
         {
             List<LogicalDrive> drives = new();
 
-            var root = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE, "/");
+            var root = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE(), "/");
             if (root is null)
                 return null;
             else if (root.Any())
                 drives.Add(root.First());
 
-            var intStorage = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE, "/sdcard");
+            var intStorage = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE(), "/sdcard");
             if (intStorage is null)
                 return drives;
             else if (intStorage.Any())
                 drives.Add(intStorage.First());
 
-            var extStorage = ReadDrives(AdbRegEx.RE_EMULATED_ONLY, EMULATED_DRIVES_GREP);
+            var extStorage = ReadDrives(AdbRegEx.RE_EMULATED_ONLY(), EMULATED_DRIVES_GREP);
             if (extStorage is null)
                 return drives;
             else
@@ -303,7 +303,7 @@ public partial class ADBService
             if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new(), new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
                 return false;
 
-            var match = AdbRegEx.RE_DEVICE_WLAN_INET.Match(stdout);
+            var match = AdbRegEx.RE_DEVICE_WLAN_INET().Match(stdout);
             if (!match.Success)
                 return false;
 
