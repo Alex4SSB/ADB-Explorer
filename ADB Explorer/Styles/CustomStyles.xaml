@@ -410,17 +410,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
-        <Setter Property="HorizontalAlignment" Value="Right" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="ItemsPanel">
-            <Setter.Value>
-                <ItemsPanelTemplate>
-                    <WrapPanel FlowDirection="RightToLeft" />
-                </ItemsPanelTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
     <Style x:Key="StretchListViewItem" TargetType="ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
@@ -750,15 +739,6 @@
         BasedOn="{StaticResource DefaultListViewStyle}"
         TargetType="ListView">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-    </Style>
-    <Style x:Key="SplashScreenStyle" TargetType="Border">
-        <Setter Property="Background" Value="#FF80C9E4" />
-        <Setter Property="Margin" Value="0,-50,0,0" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSplashScreenVisible}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
     <Style TargetType="controls:NavigationBox">
         <Setter Property="MenuPadding" Value="4" />

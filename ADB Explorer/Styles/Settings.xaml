@@ -16,6 +16,28 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel FlowDirection="RightToLeft" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileOpQ}, Path=IsActive}" Value="True">
+                <Setter Property="IsEnabled" Value="False" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ExpanderHeaderItemsControlStyle"
+        BasedOn="{StaticResource RightHorizontalItemsControlStyle}"
+        TargetType="ItemsControl">
+        <Setter Property="Opacity" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}" />
+    </Style>
     <DataTemplate x:Key="SettingsActionTemplate" DataType="services:SettingsAction">
         <Button
             Command="{Binding Command}"
@@ -66,6 +88,9 @@
                             <Trigger Property="IsEnabled" Value="True">
                                 <Setter Property="IsChecked" Value="{Binding Value, Mode=TwoWay}" />
                             </Trigger>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileOpQ}, Path=IsActive}" Value="True">
+                                <Setter Property="IsEnabled" Value="False" />
+                            </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </CheckBox.Style>
@@ -137,7 +162,17 @@
         <RadioButton
             Content="{Binding Name}"
             GroupName="{Binding Group}"
-            IsChecked="{Binding IsChecked, Mode=TwoWay}" />
+            IsChecked="{Binding IsChecked, Mode=TwoWay}">
+            <RadioButton.Style>
+                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileOpQ}, Path=IsActive}" Value="True">
+                            <Setter Property="IsEnabled" Value="False" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </RadioButton.Style>
+        </RadioButton>
     </DataTemplate>
     <DataTemplate x:Key="GropuedEnumSettingTemplate" DataType="services:EnumSetting">
         <ListView
@@ -146,10 +181,21 @@
             ItemsSource="{Binding Buttons}" />
     </DataTemplate>
     <DataTemplate x:Key="SortedEnumSettingTemplate" DataType="services:EnumSetting">
-        <Expander
-            Margin="0,4,0,0"
-            Header="{Binding Description}"
-            IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+        <Expander Margin="0,4,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <Expander.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding Description}" />
+                    <ItemsControl
+                        Grid.Column="1"
+                        ItemTemplate="{StaticResource SettingsActionTemplate}"
+                        ItemsSource="{Binding Commands}"
+                        Style="{StaticResource ExpanderHeaderItemsControlStyle}" />
+                </Grid>
+            </Expander.Header>
             <ListView
                 ItemContainerStyle="{StaticResource StretchListViewItem}"
                 ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
@@ -194,26 +240,37 @@
     <DataTemplate x:Key="SettingsExpanderTemplate" DataType="services:SettingsGroup">
         <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
             <Expander.Header>
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Name}" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Name}" Value="ADB">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" Value="{x:Null}">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Style>
-                        <TextBlock Text=" - v" />
-                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" />
+                        <TextBlock Text="{Binding Name}" />
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel.Style>
+                                <Style TargetType="StackPanel">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Name}" Value="ADB">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </StackPanel.Style>
+                            <TextBlock Text=" - v" />
+                            <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" />
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                    <ItemsControl
+                        Grid.Column="1"
+                        ItemTemplate="{StaticResource SettingsActionTemplate}"
+                        ItemsSource="{Binding Commands}"
+                        Style="{StaticResource ExpanderHeaderItemsControlStyle}" />
+                </Grid>
             </Expander.Header>
             <ListView
                 ItemContainerStyle="{StaticResource StretchListViewItem}"

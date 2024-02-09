@@ -25,9 +25,6 @@ public static class Strings
     public const string S_OVERRIDE_ADB_BROWSE = "Select ADB Executable";
     public const string S_RESET_SETTINGS = "All app settings will be reset upon closing the app.\nThis cannot be undone. Are you sure?";
     public const string S_RESET_SETTINGS_TITLE = "Reset App Settings";
-    public const string S_MISSING_REDIRECTION_TITLE = "Missing Progress Redirection";
-    public const string S_FIRST_RUN_SETUP = "The app needs to restart to complete first run setup.\nUntil then, push and pull operations are not available.";
-    public const string S_FIRST_RUN_TITLE = "First Run Setup";
     public const string S_NO_DEVICES_TITLE = " - NO CONNECTED DEVICES";
     public const string S_NEW_VERSION_TITLE = "New App Version";
     public const string S_NAV_ERR_TITLE = "Navigation Error";
@@ -70,10 +67,27 @@ public static class Strings
     public const string S_PULL_ACTION = "Pull";
     public const string S_PULL_ACTION_LINK = "Pull (Link Target)";
     public const string S_RESTORE_ACTION = "Restore";
+    public const string S_DEPLOY_REDIRECTION = "A helper program for reading push/pull progress from ADB.\nMight falsely trigger some anti-virus programs.";
+    public const string S_CONSOLE_PROGRESS = "Push/Pull operations show ADB in a console window.\nDisk usage is used for progress and summary in UI.";
+    public const string S_DISK_USAGE_PROGRESS = "Push/pull progress is displayed in total bytes transferred.\nPercentage is available only when total size is known.";
+    public const string S_DEPLOY_REDIRECTION_TITLE = "Deploy AdbProgressRedirection.exe";
+    public const string S_CONSOLE_PROGRESS_TITLE = "Display In Console Window";
+    public const string S_DISK_USAGE_PROGRESS_TITLE = "Disk Usage Only";
+    public const string S_PROGRESS_METHOD_TITLE = "Progress Method";
+    public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.";
+    public const string S_VERIFY_REDIRECTION_ERROR = "Unable to verify executable.\nDisk usage progress method will be used instead.";
+    public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
 
 
-    public static string S_MISSING_REDIRECTION(string exception) =>
-        $"{exception}\n\nAdbProgressRedirection.exe was NOT found in the app directory.\nPush and pull operations are not available.\nRestarting the app may help. If the issue persists, please download and install the app from GitHub (link in Settings > About) to fix this issue.";
+    public static string S_PROGRESS_METHOD_INFO() =>
+        $"• {S_DEPLOY_REDIRECTION_TITLE}\n" +
+        $"    {S_DEPLOY_REDIRECTION.Replace("\n", "\n    ")}\n" +
+        $"\n" +
+        $"• {S_CONSOLE_PROGRESS_TITLE}\n" +
+        $"    {S_CONSOLE_PROGRESS.Replace("\n", "\n    ")}\n" +
+        $"\n" +
+        $"• {S_DISK_USAGE_PROGRESS_TITLE}\n" +
+        $"    {S_DISK_USAGE_PROGRESS.Replace("\n", "\n    ")}";
 
     public static string S_NEW_VERSION(Version newVersion) =>
         $"A new {Properties.Resources.AppDisplayName}, version {newVersion}, is available";

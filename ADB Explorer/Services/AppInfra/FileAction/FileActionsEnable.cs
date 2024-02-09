@@ -14,13 +14,6 @@ internal class FileActionsEnable : ViewModelBase
 
     #region booleans
 
-    private bool pushPullEnabled = true;
-    public bool PushPullEnabled
-    {
-        get => pushPullEnabled;
-        set => Set(ref pushPullEnabled, value);
-    }
-
     private bool pushFilesFoldersEnabled = false;
     public bool PushFilesFoldersEnabled
     {

@@ -53,24 +53,25 @@ public partial class ADBService
         public string StandardError { get; set; }
     };
 
-    private static void InitProcess(Process cmdProcess)
-    {
-        cmdProcess.StartInfo.UseShellExecute = false;
-        cmdProcess.StartInfo.RedirectStandardOutput = true;
-        cmdProcess.StartInfo.RedirectStandardError = true;
-        cmdProcess.StartInfo.CreateNoWindow = true;
-    }
-
-    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, params string[] args)
+    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, params string[] args)
     {
         var cmdProcess = new Process();
         var arguments = $"{cmd} {string.Join(' ', args.Where(arg => !string.IsNullOrEmpty(arg)))}";
 
-        InitProcess(cmdProcess);
+        cmdProcess.StartInfo.UseShellExecute = false;
+
+        cmdProcess.StartInfo.RedirectStandardOutput =
+        cmdProcess.StartInfo.RedirectStandardError =
+        cmdProcess.StartInfo.CreateNoWindow = redirect;
+
         cmdProcess.StartInfo.FileName = file;
         cmdProcess.StartInfo.Arguments = arguments;
-        cmdProcess.StartInfo.StandardOutputEncoding = encoding;
-        cmdProcess.StartInfo.StandardErrorEncoding = encoding;
+
+        if (redirect)
+        {
+            cmdProcess.StartInfo.StandardOutputEncoding =
+            cmdProcess.StartInfo.StandardErrorEncoding = encoding;
+        }
         
         if (IsMdnsEnabled)
             cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
@@ -85,7 +86,7 @@ public partial class ADBService
     public static int ExecuteCommand(
         string file, string cmd, out string stdout, out string stderr, Encoding encoding, CancellationToken cancellationToken, params string[] args)
     {
-        using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
+        using var cmdProcess = StartCommandProcess(file, cmd, encoding, args: args);
 
 #if NET6_0
         using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
@@ -129,10 +130,19 @@ public partial class ADBService
             return string.IsNullOrEmpty(stderr) ? stdout : stderr;
     }
 
-    public static IEnumerable<string> ExecuteCommandAsync(
-        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, params string[] args)
+    public static IEnumerable<string> RedirectCommandAsync(
+        string file, CancellationToken cancellationToken, params string[] args)
     {
-        using var cmdProcess = StartCommandProcess(file, cmd, encoding, args);
+        if (Settings.AdbProgressMethod is AppSettings.ProgressMethod.Redirection)
+            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, args: args);
+        else
+            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Console, args);
+    }
+
+    public static IEnumerable<string> ExecuteCommandAsync(
+        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, params string[] args)
+    {
+        using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, args);
         
         Task<string?> stdoutLineTask = null;
         string stdoutLine = null;
@@ -145,8 +155,21 @@ public partial class ADBService
 
             try
             {
-                stdoutLineTask = cmdProcess.StandardOutput.ReadLineAsync();
-                stdoutLineTask.Wait(cancellationToken);
+                if (redirect)
+                {
+                    stdoutLineTask = cmdProcess.StandardOutput.ReadLineAsync();
+                    stdoutLineTask.Wait(cancellationToken);
+                }
+                else
+                {
+                    stdoutLineTask = Task.Run(async () =>
+                    {
+                        await cmdProcess.WaitForExitAsync(cancellationToken);
+
+                        return (string)null;
+                    });
+                }
+
 
                 RuntimeSettings.LastServerResponse = DateTime.Now;
             }
@@ -157,6 +180,12 @@ public partial class ADBService
             }
         }
         while ((stdoutLine = stdoutLineTask.Result) != null);
+
+        if (!redirect)
+        {
+            yield return null;
+            yield break;
+        }
 
         string stderr = null;
         try
@@ -189,7 +218,7 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
-        ExecuteCommandAsync(ADB_PATH, cmd, Encoding.UTF8, cancellationToken, args);
+        ExecuteCommandAsync(ADB_PATH, cmd, Encoding.UTF8, cancellationToken, args: args);
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {

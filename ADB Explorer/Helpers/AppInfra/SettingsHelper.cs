@@ -80,6 +80,9 @@ internal static class SettingsHelper
 
     public static async void SplashScreenTask()
     {
+        if (Data.Settings.ShowWelcomeScreen)
+            return;
+
         await Task.Delay(Data.Settings.EnableSplash ? AdbExplorerConst.SPLASH_DISPLAY_TIME : TimeSpan.Zero);
 
         App.Current.Dispatcher.Invoke(() => Data.RuntimeSettings.IsSplashScreenVisible = false);
@@ -143,4 +146,7 @@ internal static class SettingsHelper
             DialogService.ShowDialog(stack, Strings.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
         });
     }
+
+    public static void ProgressMethodTipAction() =>
+        DialogService.ShowMessage(Strings.S_PROGRESS_METHOD_INFO(), Strings.S_PROGRESS_METHOD_TITLE, DialogService.DialogIcon.Tip);
 }

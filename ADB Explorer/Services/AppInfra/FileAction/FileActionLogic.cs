@@ -680,12 +680,11 @@ internal static class FileActionLogic
         Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_EMPTY_TRASH : Strings.S_DELETE_ACTION;
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : Strings.S_RESTORE_ACTION;
 
-        Data.FileActions.PullEnabled = Data.FileActions.PushPullEnabled
-                                       && !Data.FileActions.IsRecycleBin
+        Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                        && Data.FileActions.IsRegularItem;
 
-        Data.FileActions.ContextPushEnabled = Data.FileActions.PushPullEnabled && !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
+        Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = !Data.FileActions.IsRecycleBin
                                          && Data.SelectedFiles.Count() == 1

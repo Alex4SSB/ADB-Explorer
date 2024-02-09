@@ -568,8 +568,6 @@ public static class DeviceHelper
 
         Data.FileOpQ.MoveOperationsToPast();
         FileActionLogic.UpdateFileActions();
-
-        AdbHelper.VerifyProgressRedirection();
     }
 
     public static void TestDevices()

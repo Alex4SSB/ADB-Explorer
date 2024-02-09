@@ -39,6 +39,7 @@
             <!--  Other app resources here  -->
 
             <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+            <FontFamily x:Key="Nunito">pack://application:,,,/Resources/Fonts/#Nunito</FontFamily>
 
         </ResourceDictionary>
     </Application.Resources>

@@ -581,6 +581,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 FilterDevices();
                 break;
 
+            case nameof(AppSettings.AdbProgressMethod):
+                AdbHelper.VerifyProgressRedirection();
+                break;
+
             default:
                 break;
         }
@@ -818,7 +822,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitFileOpColumns();
 
         DeviceHelper.UpdateWsaPkgStatus();
-
+        AdbHelper.VerifyProgressRedirection();
         SettingsHelper.CheckForUpdates();
 
         UpdateFileOpFilterCheck();
@@ -1065,13 +1069,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
         FileActions.InstallPackageEnabled = FileActions.IsTemp && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
+
         FileActions.ContextPushPackagesEnabled =
         FileActions.IsUninstallVisible.Value = FileActions.IsAppDrive;
 
         FileActions.PushFilesFoldersEnabled =
         FileActions.ContextNewEnabled =
         FileActions.ContextPushEnabled =
-        FileActions.NewEnabled = FileActions.PushPullEnabled && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
+        FileActions.NewEnabled = !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
         OriginalPath.Visibility =
         OriginalDate.Visibility = Visible(FileActions.IsRecycleBin);

@@ -50,16 +50,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\AdbProgressRedirection\AdbProgressRedirection.vcxproj">
-      <Project>{b402782f-de0a-41fa-b364-60612a786fb2}</Project>
-      <Name>mycppproject</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ProjectReference>
-  </ItemGroup>
 
   <ItemGroup>
   	 <Resource Include="app_icon_black_2023_256px.png" />
@@ -67,6 +57,7 @@
 
 	<ItemGroup>
 		<Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
+		<Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
 	</ItemGroup>
 	
   <ItemGroup>

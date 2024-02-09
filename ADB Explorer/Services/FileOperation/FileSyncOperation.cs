@@ -66,7 +66,9 @@ public class FileSyncOperation : FileOperation
         {
             Status = OperationStatus.Completed;
             if (t.Result is null)
-                StatusInfo = null;
+                StatusInfo = Data.Settings.AdbProgressMethod is AppSettings.ProgressMethod.Console
+                ? StatusInfo = new CompletedShellProgressViewModel()
+                : null;
             else if (t.Result.FilesTransferred + t.Result.FilesSkipped < 1)
                 StatusInfo = new CompletedShellProgressViewModel();
             else

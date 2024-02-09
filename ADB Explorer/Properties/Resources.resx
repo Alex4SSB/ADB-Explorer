@@ -130,4 +130,7 @@
   <data name="AppVersion" xml:space="preserve">
     <value>0.8.23120</value>
   </data>
+  <data name="ProgressRedirectionHash" xml:space="preserve">
+    <value>1511635BCA3E1782790C95B55868CEC9</value>
+  </data>
 </root>

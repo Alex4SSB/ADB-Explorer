@@ -26,6 +26,13 @@ public class AppSettings : ViewModelBase
         none,
     }
 
+    public enum ProgressMethod
+    {
+        Redirection,
+        Console,
+        DiskUsage,
+    }
+
     #region paths
 
     private string defaultFolder;
@@ -302,8 +309,6 @@ public class AppSettings : ViewModelBase
 
     #endregion
 
-    #region theme
-
     private AppTheme appTheme;
     public AppTheme Theme
     {
@@ -311,13 +316,18 @@ public class AppSettings : ViewModelBase
         set => Set(ref appTheme, value);
     }
 
-    #endregion theme
-
-    private bool isFirstRun;
-    public bool IsFirstRun
+    private ProgressMethod progressMethod;
+    public ProgressMethod AdbProgressMethod
     {
-        get => Get(ref isFirstRun, true);
-        set => Set(ref isFirstRun, value);
+        get => Get(ref progressMethod, ProgressMethod.DiskUsage);
+        set => Set(ref progressMethod, value);
+    }
+
+    private bool showWelcomeScreen;
+    public bool ShowWelcomeScreen
+    {
+        get => Get(ref showWelcomeScreen, true);
+        set => Set(ref showWelcomeScreen, value);
     }
 
     private bool showLaunchWsaMessage;

@@ -1,0 +1,139 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.SplashScreen"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app_prop="clr-namespace:ADB_Explorer.Properties"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:resources="clr-namespace:ADB_Explorer.Resources"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="splashScreen"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    ui:ThemeManager.RequestedTheme="Light"
+    mc:Ignorable="d">
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Setter Property="Margin" Value="0,-50,0,0" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsSplashScreenVisible}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+    <UserControl.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
+        </Style>
+        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
+        </Style>
+        <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <EventSetter Event="Click" Handler="RadioButton_Checked" />
+        </Style>
+    </UserControl.Resources>
+    <Border Background="#FF80C9E4" DataContext="{Binding ElementName=splashScreen}">
+        <Grid>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition>
+                        <RowDefinition.Style>
+                            <Style TargetType="RowDefinition">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=FirstLaunchGrid, Path=Visibility}" Value="Collapsed">
+                                        <Setter Property="Height" Value="0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </RowDefinition.Style>
+                    </RowDefinition>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="1" Grid.Column="1">
+                    <Border Width="150" Height="150">
+                        <Border.Background>
+                            <ImageBrush ImageSource="/app_icon_black_2023_256px.png" />
+                        </Border.Background>
+                    </Border>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        FontFamily="{StaticResource Nunito}"
+                        FontSize="40"
+                        Text="ADB Explorer" />
+                </StackPanel>
+                <Grid
+                    x:Name="FirstLaunchGrid"
+                    Grid.Row="3"
+                    Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Margin="0,0,0,10"
+                        HorizontalAlignment="Center"
+                        FontSize="20"
+                        Text="Select Progress Method:" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Button
+                            x:Name="ConfirmButton"
+                            Margin="0,0,10,0"
+                            Click="ConfirmButton_Click"
+                            Content="Confirm"
+                            IsEnabled="False"
+                            Style="{StaticResource AccentButtonStyle}"
+                            ToolTip="You can always change this in the settings" />
+                        <ui:SimpleStackPanel Grid.Column="1" Spacing="2">
+                            <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION_TITLE}}" />
+                            <RadioButton x:Name="CmdRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_CONSOLE_PROGRESS_TITLE}}" />
+                            <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS_TITLE}}" />
+                        </ui:SimpleStackPanel>
+                    </Grid>
+                    <StackPanel
+                        x:Name="ExplanationPanel"
+                        Grid.Row="2"
+                        Margin="0,10,0,0"
+                        d:Visibility="Visible"
+                        Orientation="Horizontal"
+                        Visibility="Hidden">
+                        <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
+                        <Grid>
+                            <TextBlock x:Name="DeployTextBlock" Text="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION}}" />
+                            <TextBlock
+                                x:Name="CmdTextBlock"
+                                d:Visibility="Hidden"
+                                Text="{Binding Source={x:Static Member=resources:Strings.S_CONSOLE_PROGRESS}}" />
+                            <TextBlock
+                                x:Name="DiskUsageTextBlock"
+                                d:Visibility="Hidden"
+                                Text="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS}}" />
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+            <TextBlock
+                Margin="6,4"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                FontFamily="{StaticResource ConsoleFont}"
+                FontSize="14"
+                Text="{x:Static app_prop:Resources.AppVersion}" />
+        </Grid>
+    </Border>
+</UserControl>

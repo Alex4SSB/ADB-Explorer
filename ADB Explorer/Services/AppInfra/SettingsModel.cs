@@ -29,10 +29,11 @@ public static class UISettings
     {
         new(ActionType.ChangeDefaultPath, () => true, SettingsHelper.ChangeDefaultPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
         new(ActionType.ClearDefaultPath, () => !string.IsNullOrEmpty(Settings.DefaultFolder), () => Settings.DefaultFolder = "", Icons[ActionType.ClearDefaultPath], "Clear"),
-        new(ActionType.ChangeAdbPath, () => true,SettingsHelper.ChangeAdbPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
+        new(ActionType.ChangeAdbPath, () => true, SettingsHelper.ChangeAdbPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
         new(ActionType.ClearAdbPath, () => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", Icons[ActionType.ClearDefaultPath], "Clear"),
         new(ActionType.ResetApp, () => true, SettingsHelper.ResetAppAction, Icons[ActionType.ResetApp], Strings.S_RESTART_APP),
         new(ActionType.AnimationInfo, () => true, SettingsHelper.DisableAnimationTipAction, Icons[ActionType.AnimationInfo], "More Info"),
+        new(ActionType.ProgressMethodInfo, () => true, SettingsHelper.ProgressMethodTipAction, Icons[ActionType.AnimationInfo], "More Info"),
     };
 
     public static void Init()
@@ -48,6 +49,19 @@ public static class UISettings
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), "Poll For Battery Status"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), "Enable Command Log"),
             }),
+            new SettingsSeparator(),
+            new SettingsGroup(Strings.S_PROGRESS_METHOD_TITLE, new()
+            {
+                new ProgressMethodSetting(appSettings.GetProperty(nameof(Settings.AdbProgressMethod)),
+                Strings.S_PROGRESS_METHOD_TITLE,
+                new ()
+                {
+                    { AppSettings.ProgressMethod.Redirection, Strings.S_DEPLOY_REDIRECTION_TITLE },
+                    { AppSettings.ProgressMethod.Console, Strings.S_CONSOLE_PROGRESS_TITLE },
+                    { AppSettings.ProgressMethod.DiskUsage, Strings.S_DISK_USAGE_PROGRESS_TITLE },
+                },
+                commands: SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo))
+            }, SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo)),
             new SettingsSeparator(),
             new SettingsGroup("Device", new()
             {
@@ -130,7 +144,12 @@ public static class UISettings
     }
 }
 
-public abstract class AbstractGroup : ViewModelBase
+public abstract class SettingsBase : ViewModelBase
+{
+    public BaseAction[] Commands { get; protected set; }
+}
+
+public abstract class AbstractGroup : SettingsBase
 {
     public List<AbstractSetting> Children { get; set; }
 }
@@ -146,10 +165,11 @@ public class SettingsGroup : AbstractGroup
 
     public string Name { get; set; }
 
-    public SettingsGroup(string name, List<AbstractSetting> children)
+    public SettingsGroup(string name, List<AbstractSetting> children, params SettingsAction[] commands)
     {
         Name = name;
         Children = children;
+        Commands = commands;
 
         Children.ForEach(c => c.GroupName = Name);
 
@@ -174,14 +194,13 @@ public class Ungrouped : AbstractGroup
     }
 }
 
-public abstract class AbstractSetting : ViewModelBase
+public abstract class AbstractSetting : SettingsBase
 {
     protected readonly PropertyInfo valueProp;
     protected readonly PropertyInfo visibleProp;
 
     public string Description { get; private set; }
     public string GroupName { get; set; }
-    public BaseAction[] Commands { get; private set; }
 
     public Visibility Visibility => visibleProp is null || (bool)visibleProp.GetValue(visibleProp.DeclaringType.Name is nameof(AppSettings) ? Settings : RuntimeSettings) ? Visibility.Visible : Visibility.Collapsed;
 
@@ -300,6 +319,15 @@ public class DoubleClickSetting : EnumSetting
     }
 }
 
+public class ProgressMethodSetting : EnumSetting
+{
+    public ProgressMethodSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.ProgressMethod, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
+    {
+        Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
+    }
+}
+
 public class EnumRadioButton
 {
     private readonly PropertyInfo sourceProp;
@@ -339,6 +367,7 @@ public class SettingsAction : BaseAction
         ClearAdbPath,
         ResetApp,
         AnimationInfo,
+        ProgressMethodInfo,
     }
 
     public ActionType Name { get; }

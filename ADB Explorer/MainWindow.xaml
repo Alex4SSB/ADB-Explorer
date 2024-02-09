@@ -788,6 +788,7 @@
                                         <StackPanel>
                                             <TextBlock
                                                 HorizontalAlignment="Center"
+                                                FontFamily="{StaticResource Nunito}"
                                                 FontSize="18"
                                                 Text="ADB Explorer" />
                                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
@@ -831,29 +832,6 @@
                 </Border>
             </ui:SplitView.Pane>
         </ui:SplitView>
-        <Border d:Visibility="Collapsed" Style="{StaticResource SplashScreenStyle}">
-            <Grid>
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Image Width="150">
-                        <Image.Source>
-                            <BitmapImage DecodePixelWidth="256" UriSource="app_icon_black_2023_256px.png" />
-                        </Image.Source>
-                    </Image>
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        FontSize="40"
-                        Foreground="Black"
-                        Text="ADB Explorer" />
-                </StackPanel>
-                <TextBlock
-                    Margin="6,4"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    FontFamily="{StaticResource ConsoleFont}"
-                    FontSize="14"
-                    Foreground="Black"
-                    Text="{x:Static app_prop:Resources.AppVersion}" />
-            </Grid>
-        </Border>
+        <controls:SplashScreen d:Visibility="Collapsed" />
     </Grid>
 </Window>

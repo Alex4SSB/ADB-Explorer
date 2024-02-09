@@ -97,5 +97,14 @@ namespace ADB_Explorer.Properties {
                 return ResourceManager.GetString("AppVersion", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1511635BCA3E1782790C95B55868CEC9.
+        /// </summary>
+        public static string ProgressRedirectionHash {
+            get {
+                return ResourceManager.GetString("ProgressRedirectionHash", resourceCulture);
+            }
+        }
     }
 }

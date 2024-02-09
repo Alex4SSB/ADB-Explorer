@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
@@ -52,45 +51,32 @@ internal static class AdbHelper
 
     public static void VerifyProgressRedirection() => Task.Run(() =>
     {
-        if (!File.Exists($"{Environment.CurrentDirectory}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}"))
+        if (Data.Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Redirection)
+            return;
+
+        string path = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
+        if (!File.Exists(path))
         {
             try
             {
-                string newPath = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
-                if (File.Exists(newPath))
-                {
-                    Data.ProgressRedirectionPath = newPath;
-                }
-                else
-                {
-                    File.WriteAllBytes(newPath, Properties.Resources.AdbProgressRedirection);
-                    Data.ProgressRedirectionPath = newPath;
-                }
-                
-                return;
+                File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection);
             }
             catch (Exception e)
             {
-                App.Current.Dispatcher.Invoke(async () =>
-                {
-                    if (Data.Settings.IsFirstRun)
-                    {
-                        Data.Settings.IsFirstRun = false;
-                        var dialogTask = await DialogService.ShowConfirmation(Strings.S_FIRST_RUN_SETUP,
-                                                                        Strings.S_FIRST_RUN_TITLE,
-                                                                        "Restart Now",
-                                                                        cancelText: "Restart Later",
-                                                                        icon: DialogService.DialogIcon.Exclamation);
+                Data.Settings.AdbProgressMethod = AppSettings.ProgressMethod.DiskUsage;
 
-                        if (dialogTask.Item1 is ContentDialogResult.Primary)
-                            SettingsHelper.ResetAppAction();
-                    }
-                    else
-                        DialogService.ShowMessage(Strings.S_MISSING_REDIRECTION(e.Message), Strings.S_MISSING_REDIRECTION_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(Strings.S_DEPLOY_REDIRECTION_ERROR, Strings.S_DEPLOY_REDIRECTION_TITLE, DialogService.DialogIcon.Exclamation);
 
-                    Data.FileActions.PushPullEnabled = false;
-                });
+                return;
             }
+        }
+        
+        if (Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash)
+            Data.ProgressRedirectionPath = path;
+        else
+        {
+            Data.Settings.AdbProgressMethod = AppSettings.ProgressMethod.DiskUsage;
+            DialogService.ShowMessage(Strings.S_VERIFY_REDIRECTION_ERROR, Strings.S_DEPLOY_REDIRECTION_TITLE, DialogService.DialogIcon.Exclamation);
         }
     });
 

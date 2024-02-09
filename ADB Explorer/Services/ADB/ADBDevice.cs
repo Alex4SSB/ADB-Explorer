@@ -138,10 +138,8 @@ public partial class ADBService
             ref ObservableList<FileOpProgressInfo> updates,
             CancellationToken cancellationToken)
         {
-            var stdout = ExecuteCommandAsync(
-                Data.ProgressRedirectionPath,
+            var stdout = RedirectCommandAsync(
                 ADB_PATH,
-                Encoding.Unicode,
                 cancellationToken,
                 "-s",
                 ID,
