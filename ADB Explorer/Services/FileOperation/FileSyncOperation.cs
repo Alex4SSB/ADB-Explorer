@@ -17,6 +17,12 @@ public class FileSyncOperation : FileOperation
         ? FilePath
         : TargetPath;
 
+    public DiskUsage AdbProcess { get; } = new(new());
+
+    public string BytesTransferred { get; private set; }
+
+    public int DiskUsageProgress { get; private set; }
+
     public FileSyncOperation(
         OperationType operationName,
         SyncFile sourcePath,
@@ -27,6 +33,22 @@ public class FileSyncOperation : FileOperation
         OperationName = operationName;
         FilePath = sourcePath;
         TargetPath = targetPath;
+
+        AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
+    }
+
+    private void AdbProcess_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var totalBytes = OperationName is OperationType.Push ? AdbProcess.ReadRate : AdbProcess.WriteRate;
+
+        BytesTransferred = totalBytes?.ToSize();
+        OnPropertyChanged(nameof(BytesTransferred));
+
+        if (FilePath.Size is ulong and > 0 && totalBytes is not null)
+        {
+            DiskUsageProgress = (int)(100 * (double)totalBytes / FilePath.Size);
+            OnPropertyChanged(nameof(DiskUsageProgress));
+        }
     }
 
     public override void Start()
@@ -57,7 +79,7 @@ public class FileSyncOperation : FileOperation
         var targetPath = TargetPath.IsDirectory ? TargetPath.ParentPath : TargetPath.FullPath;
 
         operationTask = Task.Run(() =>
-            Device.DoFileSync(cmd, arg, targetPath, FilePath.FullPath, ref progressUpdates, cancelTokenSource.Token),
+            Device.DoFileSync(cmd, arg, targetPath, FilePath.FullPath, AdbProcess.Process, ref progressUpdates, cancelTokenSource.Token),
             cancelTokenSource.Token);
 
         operationTask.ContinueWith((t) => progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged);

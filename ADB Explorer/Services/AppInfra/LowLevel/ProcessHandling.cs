@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.Services;
 
-internal class ProcessHandling
+public class ProcessHandling
 {
     public static void KillProcess(Process process, bool recursive = true) =>
         KillProcess(process.Id, recursive);

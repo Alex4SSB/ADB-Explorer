@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace ADB_Explorer.Helpers;
+namespace ADB_Explorer.Services;
 
 public static class ShellInfoManager
 {

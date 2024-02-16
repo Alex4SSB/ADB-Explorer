@@ -9,6 +9,8 @@ public class SyncFile : FilePath
 
     public ObservableList<SyncFile> Children { get; } = new();
 
+    public ulong? Size { get; }
+
     public SyncFile(string androidPath, FileType fileType = FileType.File)
         : base(androidPath, fileType: fileType)
     {
@@ -18,13 +20,13 @@ public class SyncFile : FilePath
     public SyncFile(ShellObject windowsPath)
         : base(windowsPath)
     {
-
+        Size = windowsPath.Properties.System.Size.Value;
     }
 
-    public SyncFile(FilePath fileClass)
-        : base(fileClass.FullPath, fileType: fileClass.IsDirectory ? FileType.Folder : FileType.File)
+    public SyncFile(FileClass fileClass)
+        : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
-
+        Size = fileClass.Size;
     }
 
     public void AddUpdates(params FileOpProgressInfo[] newUpdates)

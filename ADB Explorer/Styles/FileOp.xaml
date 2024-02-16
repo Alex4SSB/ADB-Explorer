@@ -493,6 +493,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <ui:FontIcon
                 Margin="4,0"
@@ -504,6 +505,13 @@
                 Grid.Column="1"
                 Content="{Binding StatusInfo}"
                 ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="{Binding BytesTransferred}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding DiskUsageProgress}" />
+                    <TextBlock Text="%" />
+                </StackPanel>
+            </StackPanel>
         </Grid>
     </DataTemplate>
     <helpers:FileOpProgressTemplateSelector

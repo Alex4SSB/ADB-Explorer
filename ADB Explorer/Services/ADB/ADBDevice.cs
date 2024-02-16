@@ -135,18 +135,21 @@ public partial class ADBService
             string arg,
             string target,
             string source,
-            ref ObservableList<FileOpProgressInfo> updates,
-            CancellationToken cancellationToken)
+            Process cmdProcess,
+            ref ObservableList<FileOpProgressInfo> updates, CancellationToken cancellationToken)
         {
             var stdout = RedirectCommandAsync(
                 ADB_PATH,
                 cancellationToken,
-                "-s",
-                ID,
-                cmd,
-                arg,
-                EscapeAdbString(source),
-                EscapeAdbString(target));
+                cmdProcess,
+                new string[] {
+                    "-s",
+                    ID,
+                    cmd,
+                    arg,
+                    EscapeAdbString(source),
+                    EscapeAdbString(target)
+                });
             
             // Each line should be a progress update (but sometimes the output can be weird)
             string lastStdoutLine = null;

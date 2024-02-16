@@ -53,13 +53,13 @@ public partial class ADBService
         public string StandardError { get; set; }
     };
 
-    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, params string[] args)
+    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, Process cmdProcess = null, params string[] args)
     {
-        var cmdProcess = new Process();
+        cmdProcess ??= new();
         var arguments = $"{cmd} {string.Join(' ', args.Where(arg => !string.IsNullOrEmpty(arg)))}";
 
         cmdProcess.StartInfo.UseShellExecute = false;
-
+        
         cmdProcess.StartInfo.RedirectStandardOutput =
         cmdProcess.StartInfo.RedirectStandardError =
         cmdProcess.StartInfo.CreateNoWindow = redirect;
@@ -131,19 +131,19 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> RedirectCommandAsync(
-        string file, CancellationToken cancellationToken, params string[] args)
+        string file, CancellationToken cancellationToken, Process process = null, params string[] args)
     {
         if (Settings.AdbProgressMethod is AppSettings.ProgressMethod.Redirection)
-            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, args: args);
+            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, args);
         else
-            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Console, args);
+            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Console, process, args);
     }
 
     public static IEnumerable<string> ExecuteCommandAsync(
-        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, params string[] args)
+        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, params string[] args)
     {
-        using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, args);
-        
+        using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, args);
+
         Task<string?> stdoutLineTask = null;
         string stdoutLine = null;
         do

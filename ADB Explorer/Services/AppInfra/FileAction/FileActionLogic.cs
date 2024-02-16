@@ -763,7 +763,7 @@ internal static class FileActionLogic
         {
             var source = new SyncFile(item) { ShellObject = item };
             var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), isFolderPicker ? FileType.Folder : FileType.File);
-
+            
             var pushOpeartion = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
             pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOpeartion);
@@ -835,7 +835,7 @@ internal static class FileActionLogic
             SyncFile target = new(path);
             target.UpdatePath(FileHelper.ConcatPaths(target, item.FullName));
 
-            Data.FileOpQ.AddOperation(FileSyncOperation.PullFile((SyncFile)item, target, Data.CurrentADBDevice, App.Current.Dispatcher));
+            Data.FileOpQ.AddOperation(FileSyncOperation.PullFile(new(item), target, Data.CurrentADBDevice, App.Current.Dispatcher));
         }
     }
 
