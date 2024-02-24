@@ -51,12 +51,17 @@ internal static class AdbHelper
 
     public static void VerifyProgressRedirection() => Task.Run(() =>
     {
-        if (Data.Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Redirection)
+        if (Data.Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Redirection
+            || Data.RuntimeSettings.AdbVersion is null)
             return;
 
+        if (string.IsNullOrEmpty(Data.RuntimeSettings.AdbPath))
+            Data.RuntimeSettings.AdbPath = Data.Settings.ManualAdbPath;
+
         string path = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
-        if (!File.Exists(path))
+        if (Security.CalculateWindowsFileHash(path) != Properties.Resources.ProgressRedirectionHash)
         {
+            // hash will be null if file does not exist, or is inaccessible
             try
             {
                 File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection);
@@ -65,19 +70,17 @@ internal static class AdbHelper
             {
                 Data.Settings.AdbProgressMethod = AppSettings.ProgressMethod.DiskUsage;
 
-                DialogService.ShowMessage(Strings.S_DEPLOY_REDIRECTION_ERROR, Strings.S_DEPLOY_REDIRECTION_TITLE, DialogService.DialogIcon.Exclamation);
+                App.Current.Dispatcher.Invoke(() =>
+                    DialogService.ShowMessage(Strings.S_DEPLOY_REDIRECTION_ERROR + e.Message,
+                                              Strings.S_DEPLOY_REDIRECTION_TITLE,
+                                              DialogService.DialogIcon.Exclamation,
+                                              copyToClipboard: true));
 
                 return;
             }
         }
-        
-        if (Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash)
-            Data.ProgressRedirectionPath = path;
-        else
-        {
-            Data.Settings.AdbProgressMethod = AppSettings.ProgressMethod.DiskUsage;
-            DialogService.ShowMessage(Strings.S_VERIFY_REDIRECTION_ERROR, Strings.S_DEPLOY_REDIRECTION_TITLE, DialogService.DialogIcon.Exclamation);
-        }
+
+        Data.ProgressRedirectionPath = path;
     });
 
     public static void MdnsCheck()

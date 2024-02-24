@@ -2,6 +2,8 @@
 
 namespace ADB_Explorer.Services;
 
+using HANDLE = IntPtr;
+
 public static class ShellInfoManager
 {
     private const uint SHGFI_LARGEICON = 0x0;
@@ -15,7 +17,7 @@ public static class ShellInfoManager
     [StructLayout(LayoutKind.Sequential)]
     private struct SHFILEINFO
     {
-        public IntPtr hIcon;
+        public HANDLE hIcon;
         public int iIcon;
         public uint dwAttributes;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
@@ -25,11 +27,11 @@ public static class ShellInfoManager
     };
 
     [DllImport("Shell32.dll")]
-    private static extern IntPtr SHGetFileInfo(
+    private static extern HANDLE SHGetFileInfo(
         string pszPath, uint dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
 
     [DllImport("User32.dll")]
-    private static extern int DestroyIcon(IntPtr hIcon);
+    private static extern int DestroyIcon(HANDLE hIcon);
 
     public enum IconSize : uint
     {
@@ -38,8 +40,8 @@ public static class ShellInfoManager
     }
     private static Icon GetIcon(string filePath, uint flags)
     {
-        SHFILEINFO shinfo = new SHFILEINFO();
-        IntPtr hImgSmall = SHGetFileInfo(
+        SHFILEINFO shinfo = new();
+        HANDLE hImgSmall = SHGetFileInfo(
             filePath,
             FILE_ATTRIBUTE_NORMAL,
             ref shinfo,
@@ -63,7 +65,7 @@ public static class ShellInfoManager
 
     public static Icon ExtractIconByIndex(string filePath, int index, IconSize iconSize)
     {
-        IntPtr hIcon;
+        HANDLE hIcon;
         if (iconSize == IconSize.Large)
         {
             ExtractIconEx(filePath, index, out hIcon, IntPtr.Zero, 1);
@@ -79,24 +81,26 @@ public static class ShellInfoManager
     }
 
     [DllImport("shell32", CharSet = CharSet.Unicode)]
-    private static extern int ExtractIconEx(string lpszFile, int nIconIndex, out IntPtr phiconLarge, IntPtr phiconSmall, int nIcons);
+    private static extern int ExtractIconEx(string lpszFile, int nIconIndex, out HANDLE phiconLarge, HANDLE phiconSmall, int nIcons);
 
     [DllImport("shell32", CharSet = CharSet.Unicode)]
-    private static extern int ExtractIconEx(string lpszFile, int nIconIndex, IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons);
+    private static extern int ExtractIconEx(string lpszFile, int nIconIndex, HANDLE phiconLarge, out HANDLE phiconSmall, int nIcons);
 
     public static string GetShellFileType(string fileName)
     {
-        var shinfo = new SHFILEINFO();
+        SHFILEINFO shInfo = new();
         const uint flags = SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES;
 
-        if (SHGetFileInfo(fileName,
-                          FILE_ATTRIBUTE_NORMAL,
-                          ref shinfo,
-                          (uint)Marshal.SizeOf(shinfo),
-                          flags) == IntPtr.Zero)
+        var fileInfo = SHGetFileInfo(fileName,
+                              FILE_ATTRIBUTE_NORMAL,
+                              ref shInfo,
+                              (uint)Marshal.SizeOf(shInfo),
+                              flags);
+
+        if (fileInfo == HANDLE.Zero)
             return "File";
 
-        return shinfo.szTypeName;
+        return shInfo.szTypeName;
     }
 
     [DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]

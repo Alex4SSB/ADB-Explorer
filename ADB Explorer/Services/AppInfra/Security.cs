@@ -8,7 +8,17 @@ namespace ADB_Explorer.Services;
 public static class Security
 {
     public static string CalculateWindowsFileHash(string path)
-        => CalculateWindowsFileHash(new StreamReader(path).BaseStream);
+    {
+        try
+        {
+            using StreamReader reader = new(path);
+            return CalculateWindowsFileHash(reader.BaseStream);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
 
     public static string CalculateWindowsFileHash(Stream file)
     {

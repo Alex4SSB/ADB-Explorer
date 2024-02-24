@@ -32,7 +32,7 @@
         [GeneratedRegex(@"(?<ID>[^\s]+)\t*_adb-tls-(?<PortType>pairing|connect)\._tcp\.*\t*(?<IpAddress>[^:]+):(?<Port>\d+)")]
         public static partial Regex RE_MDNS_SERVICE();
 
-        [GeneratedRegex(@"^Version[\t ]*(?<version>[\d.]+)", RegexOptions.Multiline)]
+        [GeneratedRegex(@"^Version[\t ]*(?<version>[\d.]+)[\s\S]*^Installed as (?<Path>.+)$", RegexOptions.Multiline)]
         public static partial Regex RE_ADB_VERSION();
 
         [GeneratedRegex(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])")]

@@ -74,8 +74,7 @@ public static class Strings
     public const string S_CONSOLE_PROGRESS_TITLE = "Display In Console Window";
     public const string S_DISK_USAGE_PROGRESS_TITLE = "Disk Usage Only";
     public const string S_PROGRESS_METHOD_TITLE = "Progress Method";
-    public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.";
-    public const string S_VERIFY_REDIRECTION_ERROR = "Unable to verify executable.\nDisk usage progress method will be used instead.";
+    public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.\n\n";
     public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
 
 

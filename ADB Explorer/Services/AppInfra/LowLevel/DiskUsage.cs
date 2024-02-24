@@ -4,6 +4,8 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
+using HANDLE = IntPtr;
+
 public class DiskUsage : ViewModelBase
 {
     public Process Process { get; }
@@ -97,7 +99,7 @@ internal static class DiskUsageHelper
     }
 
     [DllImport("kernel32.dll")]
-    private static extern bool GetProcessIoCounters(IntPtr ProcessHandle, out IO_COUNTERS IoCounters);
+    private static extern bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
 
     public static DiskUsage GetDiskUsage(int pid)
     {

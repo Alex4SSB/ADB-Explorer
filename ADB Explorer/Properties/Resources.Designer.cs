@@ -99,7 +99,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1511635BCA3E1782790C95B55868CEC9.
+        ///   Looks up a localized string similar to 43D3C986291747066A046B97197C057B.
         /// </summary>
         public static string ProgressRedirectionHash {
             get {

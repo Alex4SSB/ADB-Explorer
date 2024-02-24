@@ -354,6 +354,8 @@ public class AppRuntimeSettings : ViewModelBase
 
     public string DefaultBrowserPath { get; set; }
 
+    public string AdbPath { get; set; }
+
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
     public bool IsWin11 =>

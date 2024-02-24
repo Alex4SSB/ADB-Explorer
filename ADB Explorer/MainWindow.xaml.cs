@@ -133,7 +133,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Task.Run(() =>
         {
             SettingsHelper.SplashScreenTask();
-            Task.WaitAll(launchTask, versionTask);
+
+            versionTask.Wait();
+            AdbHelper.VerifyProgressRedirection();
+
+            launchTask.Wait();
             RuntimeSettings.IsWindowLoaded = true;
         });
     }
@@ -822,7 +826,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitFileOpColumns();
 
         DeviceHelper.UpdateWsaPkgStatus();
-        AdbHelper.VerifyProgressRedirection();
+        
         SettingsHelper.CheckForUpdates();
 
         UpdateFileOpFilterCheck();

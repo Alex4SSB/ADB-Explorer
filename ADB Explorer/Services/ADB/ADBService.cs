@@ -56,7 +56,7 @@ public partial class ADBService
     public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, Process cmdProcess = null, params string[] args)
     {
         cmdProcess ??= new();
-        var arguments = $"{cmd} {string.Join(' ', args.Where(arg => !string.IsNullOrEmpty(arg)))}";
+        var arguments = string.Join(' ', args.Prepend(cmd).Where(arg => !string.IsNullOrEmpty(arg)));
 
         cmdProcess.StartInfo.UseShellExecute = false;
         
@@ -69,8 +69,10 @@ public partial class ADBService
 
         if (redirect)
         {
-            cmdProcess.StartInfo.StandardOutputEncoding =
-            cmdProcess.StartInfo.StandardErrorEncoding = encoding;
+            cmdProcess.StartInfo.StandardOutputEncoding = encoding;
+
+            if (file == ProgressRedirectionPath)
+                cmdProcess.StartInfo.WorkingDirectory = FileHelper.GetParentPath(RuntimeSettings.AdbPath);
         }
         
         if (IsMdnsEnabled)
@@ -134,7 +136,7 @@ public partial class ADBService
         string file, CancellationToken cancellationToken, Process process = null, params string[] args)
     {
         if (Settings.AdbProgressMethod is AppSettings.ProgressMethod.Redirection)
-            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, args);
+            return ExecuteCommandAsync(ProgressRedirectionPath, "./adb.exe", Encoding.Unicode, cancellationToken, true, process, args);
         else
             return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Console, process, args);
     }
@@ -204,7 +206,8 @@ public partial class ADBService
 
         if (cmdProcess.ExitCode != 0)
         {
-            if (cmd == "-s"
+            if (args.Length > 0
+                && args[0] == "-s"
                 && ExecuteDeviceAdbCommand(args[0], "get-state", out _, out string error, cancellationToken) != 0
                 && error.StartsWith("error: device"))
             {
@@ -460,7 +463,10 @@ public partial class ADBService
         if (exitCode != 0)
             return null;
 
-        string version = RE_ADB_VERSION().Match(stdout).Groups["version"]?.Value;
+        var match = RE_ADB_VERSION().Match(stdout);
+        RuntimeSettings.AdbPath = match.Groups["Path"]?.Value;
+
+        string version = match.Groups["version"]?.Value;
         return string.IsNullOrEmpty(version) ? null : new Version(version);
     }
 
