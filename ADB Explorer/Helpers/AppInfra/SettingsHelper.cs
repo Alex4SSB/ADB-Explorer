@@ -53,12 +53,12 @@ internal static class SettingsHelper
         if (dialog.ShowDialog() == true)
         {
             string message = "";
-            var version = ADBService.VerifyAdbVersion(dialog.FileName);
-            if (version is null)
+            ADBService.VerifyAdbVersion(dialog.FileName);
+            if (Data.RuntimeSettings.AdbVersion is null)
             {
                 message = Strings.S_MISSING_ADB_OVERRIDE;
             }
-            else if (version < AdbExplorerConst.MIN_ADB_VERSION)
+            else if (Data.RuntimeSettings.AdbVersion < AdbExplorerConst.MIN_ADB_VERSION)
             {
                 message = Strings.S_ADB_VERSION_LOW_OVERRIDE;
             }

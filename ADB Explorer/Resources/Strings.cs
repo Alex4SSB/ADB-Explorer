@@ -76,6 +76,7 @@ public static class Strings
     public const string S_PROGRESS_METHOD_TITLE = "Progress Method";
     public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.\n\n";
     public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
+    public const string S_REDIRECTION = "Progress Redirection ";
 
 
     public static string S_PROGRESS_METHOD_INFO() =>

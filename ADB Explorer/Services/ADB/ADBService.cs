@@ -9,19 +9,6 @@ namespace ADB_Explorer.Services;
 
 public partial class ADBService
 {
-    private static string adbPath = "";
-    private static string ADB_PATH
-    {
-        get
-        {
-            if (adbPath == "")
-            {
-                adbPath = Settings.ManualAdbPath is string path && !string.IsNullOrEmpty(path) ? $"\"{path}\"" : ADB_PROCESS;
-            }
-            return adbPath;
-        }
-    }
-
     private const string GET_DEVICES = "devices";
     private const string ENABLE_MDNS = "ADB_MDNS_OPENSCREEN";
 
@@ -70,9 +57,6 @@ public partial class ADBService
         if (redirect)
         {
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
-
-            if (file == ProgressRedirectionPath)
-                cmdProcess.StartInfo.WorkingDirectory = FileHelper.GetParentPath(RuntimeSettings.AdbPath);
         }
         
         if (IsMdnsEnabled)
@@ -108,7 +92,7 @@ public partial class ADBService
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        var result = ExecuteCommand(ADB_PATH, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
+        var result = ExecuteCommand(RuntimeSettings.AdbPath, cmd, out stdout, out stderr, Encoding.UTF8, cancellationToken, args);
         RuntimeSettings.LastServerResponse = DateTime.Now;
 
         return result;
@@ -136,7 +120,12 @@ public partial class ADBService
         string file, CancellationToken cancellationToken, Process process = null, params string[] args)
     {
         if (Settings.AdbProgressMethod is AppSettings.ProgressMethod.Redirection)
-            return ExecuteCommandAsync(ProgressRedirectionPath, "./adb.exe", Encoding.Unicode, cancellationToken, true, process, args);
+        {
+            if (file[0] != '"')
+                file = $"\"{file}\"";
+
+            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, args);
+        }
         else
             return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Console, process, args);
     }
@@ -208,7 +197,7 @@ public partial class ADBService
         {
             if (args.Length > 0
                 && args[0] == "-s"
-                && ExecuteDeviceAdbCommand(args[0], "get-state", out _, out string error, cancellationToken) != 0
+                && ExecuteDeviceAdbCommand(args[1], "get-state", out _, out string error, cancellationToken) != 0
                 && error.StartsWith("error: device"))
             {
                 // device is disconnected
@@ -216,12 +205,22 @@ public partial class ADBService
                 // command results are no longer relevant and will be cleared by DeviceListSetup()
             }
             else
-                throw new ProcessFailedException(cmdProcess.ExitCode, stderr);
+            {
+                if (stderr[1] == '\0')
+                {
+                    stderr = Encoding.Unicode.GetString(Encoding.UTF8.GetBytes(stderr));
+
+                    if (stderr.StartsWith("Error"))
+                        stderr = Strings.S_REDIRECTION + stderr ;
+                }
+
+                throw new ProcessFailedException(cmdProcess.ExitCode, stderr.Trim());
+            }
         }
     }
 
     public static IEnumerable<string> ExecuteAdbCommandAsync(string cmd, CancellationToken cancellationToken, params string[] args) =>
-        ExecuteCommandAsync(ADB_PATH, cmd, Encoding.UTF8, cancellationToken, args: args);
+        ExecuteCommandAsync(RuntimeSettings.AdbPath, cmd, Encoding.UTF8, cancellationToken, args: args);
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {
@@ -447,10 +446,12 @@ public partial class ADBService
         return CountFiles(deviceID, TEMP_PATH, includeNames: INSTALL_APK.Select(name => "*" + name));
     }
 
-    public static Version VerifyAdbVersion(string adbPath)
+    public static void VerifyAdbVersion(string adbPath)
     {
+        RuntimeSettings.AdbVersion = null;
+
         if (string.IsNullOrEmpty(adbPath))
-            return null;
+            return;
 
         int exitCode = 1;
         string stdout = "";
@@ -461,13 +462,14 @@ public partial class ADBService
         catch (Exception) { }
 
         if (exitCode != 0)
-            return null;
+            return;
 
         var match = RE_ADB_VERSION().Match(stdout);
-        RuntimeSettings.AdbPath = match.Groups["Path"]?.Value;
+        RuntimeSettings.AdbPath = match.Groups["Path"]?.Value.Trim();
 
         string version = match.Groups["version"]?.Value;
-        return string.IsNullOrEmpty(version) ? null : new Version(version);
+        if (!string.IsNullOrEmpty(version))
+            RuntimeSettings.AdbVersion = new(version);
     }
 
     public static string ReadLink(string deviceID, string symLinkPath)

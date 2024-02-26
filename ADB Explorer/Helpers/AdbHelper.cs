@@ -12,7 +12,7 @@ internal static class AdbHelper
             ? AdbExplorerConst.ADB_PROCESS
             : $"\"{Data.Settings.ManualAdbPath}\"";
 
-        Data.RuntimeSettings.AdbVersion = ADBService.VerifyAdbVersion(adbPath);
+        ADBService.VerifyAdbVersion(adbPath);
         if (Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION)
             return true;
 
@@ -52,11 +52,9 @@ internal static class AdbHelper
     public static void VerifyProgressRedirection() => Task.Run(() =>
     {
         if (Data.Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Redirection
-            || Data.RuntimeSettings.AdbVersion is null)
+            || Data.RuntimeSettings.AdbVersion is null
+            || string.IsNullOrEmpty(Data.RuntimeSettings.AdbPath))
             return;
-
-        if (string.IsNullOrEmpty(Data.RuntimeSettings.AdbPath))
-            Data.RuntimeSettings.AdbPath = Data.Settings.ManualAdbPath;
 
         string path = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
         if (Security.CalculateWindowsFileHash(path) != Properties.Resources.ProgressRedirectionHash)

@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using static ADB_Explorer.Converters.FileOpStatusConverter;
 
@@ -34,7 +35,11 @@ public static class FileOpStatusConverter
     public static string StatusString(Type type, int completed = 0, int failed = -1, string message = "", bool total = false)
     {
         if (!string.IsNullOrEmpty(message))
-            return $"Error: {message}";
+        {
+            return message.StartsWith(Strings.S_REDIRECTION)
+                ? message
+                : $"Error: {message}";
+        }
 
         var completedString = (type == typeof(HashFailInfo) || type == typeof(HashSuccessInfo))
             ? "Validated" : "Completed";
