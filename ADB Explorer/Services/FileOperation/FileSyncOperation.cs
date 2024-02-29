@@ -17,11 +17,11 @@ public class FileSyncOperation : FileOperation
         ? FilePath
         : TargetPath;
 
-    public DiskUsage AdbProcess { get; } = new(new());
+    public DiskUsage AdbProcess { get; private set; } = new(new());
 
     public string BytesTransferred { get; private set; }
 
-    public int DiskUsageProgress { get; private set; }
+    public int? DiskUsageProgress { get; private set; }
 
     public FileSyncOperation(
         OperationType operationName,
@@ -34,17 +34,35 @@ public class FileSyncOperation : FileOperation
         FilePath = sourcePath;
         TargetPath = targetPath;
 
-        AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
+        var procTask = AsyncHelper.WaitUntil(() => !string.IsNullOrEmpty(AdbProcess.Process.StartInfo.Arguments),
+                                             TimeSpan.FromSeconds(10),
+                                             TimeSpan.FromMilliseconds(100),
+                                             new());
+
+        procTask.ContinueWith((t) =>
+        {
+            if (AdbProcess.Process.StartInfo.FileName == Data.ProgressRedirectionPath)
+            {
+                var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
+                var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
+
+                if (adbProc is null)
+                    return;
+
+                AdbProcess = new(adbProc);
+                AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
+            }
+        });
     }
 
     private void AdbProcess_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         var totalBytes = OperationName is OperationType.Push ? AdbProcess.ReadRate : AdbProcess.WriteRate;
-
+        
         BytesTransferred = totalBytes?.ToSize();
         OnPropertyChanged(nameof(BytesTransferred));
 
-        if (FilePath.Size is ulong and > 0 && totalBytes is not null)
+        if (!FilePath.IsDirectory && totalBytes is not null) // FilePath.Size is ulong and > 0
         {
             DiskUsageProgress = (int)(100 * (double)totalBytes / FilePath.Size);
             OnPropertyChanged(nameof(DiskUsageProgress));

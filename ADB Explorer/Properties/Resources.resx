@@ -118,8 +118,11 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="AdbProgressRedirection" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\AdbProgressRedirection;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="AdbProgressRedirection_ARM" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AdbProgressRedirection_ARM;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="AdbProgressRedirection_x86" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AdbProgressRedirection_x86;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="APK_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\APK_format_icon_2014-2019_.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -130,7 +133,10 @@
   <data name="AppVersion" xml:space="preserve">
     <value>0.8.23120</value>
   </data>
-  <data name="ProgressRedirectionHash" xml:space="preserve">
+  <data name="ProgressRedirectionHash_ARM" xml:space="preserve">
+    <value>1BB31666C3F85E667A42270B0C600C84</value>
+  </data>
+  <data name="ProgressRedirectionHash_x64" xml:space="preserve">
     <value>2BF11C22BA3658C8C0E5B92F31F2D6CF</value>
   </data>
 </root>

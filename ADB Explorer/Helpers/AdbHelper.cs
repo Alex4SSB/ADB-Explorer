@@ -56,13 +56,30 @@ internal static class AdbHelper
             || string.IsNullOrEmpty(Data.RuntimeSettings.AdbPath))
             return;
 
+        bool isArm = RuntimeInformation.ProcessArchitecture switch
+        {
+            Architecture.Arm64 or Architecture.Arm => true,
+            Architecture.X64 or Architecture.X86 => false,
+            _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
+        };
+        
         string path = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
-        if (Security.CalculateWindowsFileHash(path) != Properties.Resources.ProgressRedirectionHash)
+        bool hashValid;
+
+        if (isArm)
+            hashValid = Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash_ARM;
+        else
+            hashValid = Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash_x64;
+
+        if (!hashValid)
         {
             // hash will be null if file does not exist, or is inaccessible
             try
             {
-                File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection);
+                if (isArm)
+                    File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection_ARM);
+                else
+                    File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection_x86);
             }
             catch (Exception e)
             {

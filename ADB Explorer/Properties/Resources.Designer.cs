@@ -63,9 +63,19 @@ namespace ADB_Explorer.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        public static byte[] AdbProgressRedirection {
+        public static byte[] AdbProgressRedirection_ARM {
             get {
-                object obj = ResourceManager.GetObject("AdbProgressRedirection", resourceCulture);
+                object obj = ResourceManager.GetObject("AdbProgressRedirection_ARM", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] AdbProgressRedirection_x86 {
+            get {
+                object obj = ResourceManager.GetObject("AdbProgressRedirection_x86", resourceCulture);
                 return ((byte[])(obj));
             }
         }
@@ -99,11 +109,20 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 1BB31666C3F85E667A42270B0C600C84.
+        /// </summary>
+        public static string ProgressRedirectionHash_ARM {
+            get {
+                return ResourceManager.GetString("ProgressRedirectionHash_ARM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 2BF11C22BA3658C8C0E5B92F31F2D6CF.
         /// </summary>
-        public static string ProgressRedirectionHash {
+        public static string ProgressRedirectionHash_x64 {
             get {
-                return ResourceManager.GetString("ProgressRedirectionHash", resourceCulture);
+                return ResourceManager.GetString("ProgressRedirectionHash_x64", resourceCulture);
             }
         }
     }

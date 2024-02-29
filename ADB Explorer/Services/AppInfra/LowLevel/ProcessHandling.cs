@@ -2,29 +2,36 @@
 
 public class ProcessHandling
 {
-    public static void KillProcess(Process process, bool recursive = true) =>
-        KillProcess(process.Id, recursive);
-
-    public static void KillProcess(int parentProcessId, bool recursive = true)
+    public static void KillProcess(Process process, bool recursive = true)
     {
-        if (recursive)
+        var procs = GetChildProcesses(process, recursive);
+
+        foreach (var item in procs)
         {
-            ManagementObjectSearcher searcher = new(
+            item.Kill();
+        }
+    }
+
+    public static IEnumerable<Process> GetChildProcesses(Process process, bool recursive = true)
+    {
+        ManagementObjectSearcher searcher = new(
             "SELECT * " +
             "FROM Win32_Process " +
-            "WHERE ParentProcessId=" + parentProcessId);
+            "WHERE ParentProcessId=" + process.Id);
 
-            foreach (var item in searcher.Get())
-            {
-                int childProcessId = (int)(uint)item["ProcessId"];
-                KillProcess(childProcessId);
-            }
-        }
-
-        try
+        foreach (var item in searcher.Get())
         {
-            Process.GetProcessById(parentProcessId).Kill();
+            var proc = Process.GetProcessById((int)(uint)item["ProcessId"]);
+
+            if (recursive)
+            {
+                foreach (var subItem in GetChildProcesses(proc))
+                {
+                    yield return subItem;
+                }
+            }
+            else
+                yield return proc;
         }
-        catch { }
     }
 }
