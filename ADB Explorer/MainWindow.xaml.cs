@@ -22,6 +22,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DispatcherTimer ServerWatchdogTimer = new();
     private readonly DispatcherTimer ConnectTimer = new();
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
+    private readonly DispatcherTimer DiskUsageTimer = new() { Interval = DISK_USAGE_INTERVAL_ACTIVE };
 
     private readonly Mutex DiskUsageMutex = new();
     private readonly Mutex connectTimerMutex = new();
@@ -88,6 +89,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         ServerWatchdogTimer.Interval = RESPONSE_TIMER_INTERVAL;
         ServerWatchdogTimer.Tick += ServerWatchdogTimer_Tick;
+        DiskUsageTimer.Tick += DiskUsageTimer_Tick;
 
         Settings.PropertyChanged += Settings_PropertyChanged;
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
@@ -109,6 +111,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 Dispatcher.Invoke(() =>
                 {
                     ConnectTimer.Start();
+                    ServerWatchdogTimer.Start();
+                    DiskUsageTimer.Start();
+
                     RuntimeSettings.IsDevicesViewEnabled = true;
                     RuntimeSettings.IsDevicesPaneOpen = true;
                 });
@@ -140,6 +145,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             launchTask.Wait();
             RuntimeSettings.IsWindowLoaded = true;
         });
+    }
+
+    private void DiskUsageTimer_Tick(object sender, EventArgs e)
+    {
+        DiskUsageMutex.WaitOne(0);
+        Task.Run(DiskUsageHelper.GetAdbDiskUsage).ContinueWith(
+            (t) => Dispatcher.Invoke(DiskUsageMutex.ReleaseMutex));
+
+        DiskUsageTimer.Interval = FileOpQ.IsActive
+            ? DISK_USAGE_INTERVAL_ACTIVE
+            : DISK_USAGE_INTERVAL_IDLE;
     }
 
     private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -203,10 +219,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ServerWatchdogTimer_Tick(object sender, EventArgs e)
     {
         RuntimeSettings.LastServerResponse = RuntimeSettings.LastServerResponse;
-
-        DiskUsageMutex.WaitOne(0);
-        Task.Run(DiskUsageHelper.GetAdbDiskUsage).ContinueWith(
-            (t) => Dispatcher.Invoke(DiskUsageMutex.ReleaseMutex));
 
         if (Settings.PollDevices
             && MdnsService?.State is MDNS.MdnsState.Running
@@ -647,6 +659,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         ConnectTimer.Stop();
         ServerWatchdogTimer.Stop();
+        DiskUsageTimer.Stop();
         StoreClosingValues();
     }
 
@@ -972,9 +985,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ConnectTimer_Tick(object sender, EventArgs e)
     {
-        if (!ServerWatchdogTimer.IsEnabled)
-            ServerWatchdogTimer.Start();
-
         if (ConnectTimer.Interval == CONNECT_TIMER_INIT)
             ConnectTimer.Interval = CONNECT_TIMER_INTERVAL;
 

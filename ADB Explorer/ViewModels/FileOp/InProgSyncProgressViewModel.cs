@@ -19,6 +19,10 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
 
     public int? TotalPercentage => adbInfo?.TotalPercentage;
 
+    public ulong? TotalBytesTransferred => adbInfo?.TotalBytesTransferred;
+
+    public string TotalBytes => TotalBytesTransferred?.ToSize();
+
     public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
 
     public UInt64? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
@@ -28,16 +32,4 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
     public string CurrentFileName => Path.GetFileName(CurrentFilePath);
 
     public string CurrentFileNameWithoutExtension => Path.GetFileNameWithoutExtension(CurrentFilePath);
-
-    public string TotalProgress => TotalPercentage.HasValue ? $"{TotalPercentage.Value}%" : "?";
-
-    public string CurrentFileProgress
-    {
-        get
-        {
-            return CurrentFilePercentage.HasValue ? $"{CurrentFilePercentage.Value}%" :
-                   CurrentFileBytesTransferred.HasValue ? UnitConverter.ToSize(CurrentFileBytesTransferred.Value)
-                                                        : string.Empty;
-        }
-    }
 }

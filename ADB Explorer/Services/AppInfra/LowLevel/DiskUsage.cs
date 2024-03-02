@@ -8,6 +8,8 @@ using HANDLE = IntPtr;
 
 public class DiskUsage : ViewModelBase
 {
+    public DateTime TimeStamp { get; set; }
+
     public Process Process { get; }
 
     public int? PID => Process?.Id;
@@ -61,16 +63,18 @@ public class DiskUsage : ViewModelBase
 
     public string OtherString => (OtherRate is null || OtherRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : OtherRate.Value).ToSize(true) + "/s";
 
-    public DiskUsage(Process process, ulong? readRate = null, ulong? writeRate = null, ulong? otherRate = null)
+    public DiskUsage(Process process, ulong? readRate = null, ulong? writeRate = null, ulong? otherRate = null, DateTime? time = null)
     {
         Process = process;
         ReadRate = readRate;
         WriteRate = writeRate;
         OtherRate = otherRate;
+
+        TimeStamp = time ?? DateTime.Now;
     }
 
-    public DiskUsage(ulong? readRate, ulong? writeRate, ulong? otherRate)
-        : this(null, readRate, writeRate, otherRate)
+    public DiskUsage(ulong? readRate, ulong? writeRate, ulong? otherRate, DateTime? time = null)
+        : this(null, readRate, writeRate, otherRate, time)
     {
 
     }
@@ -83,6 +87,30 @@ public class DiskUsage : ViewModelBase
         ReadRate = other.ReadRate;
         WriteRate = other.WriteRate;
         OtherRate = other.OtherRate;
+
+        TimeStamp = DateTime.Now;
+    }
+
+    public static DiskUsage Consolidate(IEnumerable<DiskUsage> list)
+    {
+        var time = list.Max(u => u.TimeStamp);
+
+        var read = (ulong)list.Sum(u => (decimal)u.ReadRate);
+        var write = (ulong)list.Sum(u => (decimal)u.WriteRate);
+        var other = (ulong)list.Sum(u => (decimal)u.OtherRate);
+
+        return new(read, write, other, time);
+    }
+
+    public DiskUsage Subtract(DiskUsage other)
+    {
+        var timeDelta = (TimeStamp - other.TimeStamp).TotalSeconds;
+
+        var totalRead = (ulong)((ReadRate - other.ReadRate) / timeDelta);
+        var totalWrite = (ulong)((WriteRate - other.WriteRate) / timeDelta);
+        var totalOther = (ulong)((OtherRate - other.OtherRate) / timeDelta);
+
+        return new(totalRead, totalWrite, totalOther);
     }
 }
 
@@ -101,15 +129,7 @@ internal static class DiskUsageHelper
     [DllImport("kernel32.dll")]
     private static extern bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
 
-    public static DiskUsage GetDiskUsage(int pid)
-    {
-        Process[] processes = Process.GetProcesses();
-
-        var process = processes.FirstOrDefault(p => p.Id == pid);
-        return process is null ? null : GetDiskUsage(process);
-    }
-
-    public static DiskUsage GetDiskUsage(Process process)
+    private static DiskUsage GetDiskUsage(Process process)
     {
         try
         {
@@ -123,14 +143,12 @@ internal static class DiskUsageHelper
         }
     }
 
-    public static Process[] GetAdbProcs() =>
+    private static Process[] GetAdbProcs() =>
         Process.GetProcessesByName(AdbExplorerConst.ADB_PROCESS);
 
+    private static DiskUsage prevUsage;
 
-    public static ulong prevRead = 0;
-    public static ulong prevWrite = 0;
-    public static ulong prevOther = 0;
-    public static DiskUsage Usage;
+    private static DateTime LastUpdate = DateTime.MinValue;
 
     public static void GetAdbDiskUsage()
     {
@@ -149,28 +167,25 @@ internal static class DiskUsageHelper
             usage.Update(newUsages.FirstOrDefault(proc => proc.PID == usage.PID));
         }
 
-        var newRead = (ulong)newUsages.Sum(u => (decimal)u.ReadRate);
-        var newWrite = (ulong)newUsages.Sum(u => (decimal)u.WriteRate);
-        var newOther = (ulong)newUsages.Sum(u => (decimal)u.OtherRate);
+        var newUsage = DiskUsage.Consolidate(newUsages);
 
-        var totalRead = newRead - prevRead;
-        var totalWrite = newWrite - prevWrite;
-        var totalOther = newOther - prevOther;
-
-        Usage = new(totalRead, totalWrite, totalOther);
-
-        prevRead = newRead;
-        prevWrite = newWrite;
-        prevOther = newOther;
-
-        App.Current.Dispatcher.Invoke(() =>
+        if (prevUsage is not null && DateTime.Now - LastUpdate >= AdbExplorerConst.DISK_USAGE_INTERVAL_IDLE)
         {
-            Data.RuntimeSettings.AdbReadRate = Usage.ReadString;
-            Data.RuntimeSettings.AdbWriteRate = Usage.WriteString;
-            Data.RuntimeSettings.AdbOtherRate = Usage.OtherString;
+            var totalUsage = newUsage.Subtract(prevUsage);
 
-            Data.RuntimeSettings.IsAdbReadActive = Usage.IsReadActive;
-            Data.RuntimeSettings.IsAdbWriteActive = Usage.IsWriteActive;
-        });
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                Data.RuntimeSettings.AdbReadRate = totalUsage.ReadString;
+                Data.RuntimeSettings.AdbWriteRate = totalUsage.WriteString;
+                Data.RuntimeSettings.AdbOtherRate = totalUsage.OtherString;
+
+                Data.RuntimeSettings.IsAdbReadActive = totalUsage.IsReadActive;
+                Data.RuntimeSettings.IsAdbWriteActive = totalUsage.IsWriteActive;
+            });
+
+            LastUpdate = DateTime.Now;
+        }
+
+        prevUsage = newUsage;
     }
 }

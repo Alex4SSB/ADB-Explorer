@@ -19,10 +19,6 @@ public class FileSyncOperation : FileOperation
 
     public DiskUsage AdbProcess { get; private set; } = new(new());
 
-    public string BytesTransferred { get; private set; }
-
-    public int? DiskUsageProgress { get; private set; }
-
     public FileSyncOperation(
         OperationType operationName,
         SyncFile sourcePath,
@@ -46,27 +42,32 @@ public class FileSyncOperation : FileOperation
                 var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
                 var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
 
-                if (adbProc is null)
-                    return;
-
-                AdbProcess = new(adbProc);
-                AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
+                if (adbProc is not null)
+                    AdbProcess = new(adbProc);
             }
+
+            AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
         });
     }
 
     private void AdbProcess_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         var totalBytes = OperationName is OperationType.Push ? AdbProcess.ReadRate : AdbProcess.WriteRate;
-        
-        BytesTransferred = totalBytes?.ToSize();
-        OnPropertyChanged(nameof(BytesTransferred));
+        int? DiskUsageProgress = null;
 
-        if (!FilePath.IsDirectory && totalBytes is not null) // FilePath.Size is ulong and > 0
+        // for now we only have size of files, and folders are still 4096B
+        if (!FilePath.IsDirectory && totalBytes is not null)
         {
             DiskUsageProgress = (int)(100 * (double)totalBytes / FilePath.Size);
             OnPropertyChanged(nameof(DiskUsageProgress));
         }
+
+        if (StatusInfo is InProgSyncProgressViewModel prog
+            && prog.TotalPercentage is not null
+            && !string.IsNullOrEmpty(prog.CurrentFilePath))
+            return;
+
+        StatusInfo = new InProgSyncProgressViewModel(new(null, DiskUsageProgress, null, totalBytes));
     }
 
     public override void Start()
@@ -100,7 +101,11 @@ public class FileSyncOperation : FileOperation
             Device.DoFileSync(cmd, arg, targetPath, FilePath.FullPath, AdbProcess.Process, ref progressUpdates, cancelTokenSource.Token),
             cancelTokenSource.Token);
 
-        operationTask.ContinueWith((t) => progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged);
+        operationTask.ContinueWith((t) =>
+        {
+            progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged;
+            AdbProcess.PropertyChanged -= AdbProcess_PropertyChanged;
+        });
 
         operationTask.ContinueWith((t) => 
         {

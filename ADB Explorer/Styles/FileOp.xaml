@@ -263,6 +263,19 @@
                 <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
                 <TextBlock Text="%" />
             </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding TotalPercentage, Mode=OneWay}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Margin="4,0,0,0" Text="{Binding TotalBytes, Mode=OneWay}" />
+            </StackPanel>
             <StackPanel
                 Grid.Row="1"
                 Grid.Column="1"
@@ -493,7 +506,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <ui:FontIcon
                 Margin="4,0"
@@ -505,13 +517,6 @@
                 Grid.Column="1"
                 Content="{Binding StatusInfo}"
                 ContentTemplateSelector="{StaticResource FileOpProgressTemplateSelector}" />
-            <StackPanel Grid.Column="2">
-                <TextBlock Text="{Binding BytesTransferred}" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding DiskUsageProgress}" />
-                    <TextBlock Text="%" />
-                </StackPanel>
-            </StackPanel>
         </Grid>
     </DataTemplate>
     <helpers:FileOpProgressTemplateSelector

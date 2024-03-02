@@ -106,6 +106,7 @@ public class AdbSyncProgressInfo : FileOpProgressInfo
     public int? TotalPercentage { get; }
     public int? CurrentFilePercentage { get; }
     public UInt64? CurrentFileBytesTransferred { get; }
+    public ulong? TotalBytesTransferred { get; }
 
     public AdbSyncProgressInfo(Match match)
     {
@@ -130,8 +131,14 @@ public class AdbSyncProgressInfo : FileOpProgressInfo
     {
         AndroidPath = currentFile;
         TotalPercentage = totalPercentage;
-        CurrentFilePercentage = currentFilePercentage;
-        CurrentFileBytesTransferred = currentFileBytesTransferred;
+
+        if (currentFilePercentage is null)
+            TotalBytesTransferred = currentFileBytesTransferred;
+        else
+        {
+            CurrentFilePercentage = currentFilePercentage;
+            CurrentFileBytesTransferred = currentFileBytesTransferred;
+        }
     }
 }
 
