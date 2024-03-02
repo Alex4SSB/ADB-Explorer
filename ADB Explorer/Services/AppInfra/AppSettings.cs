@@ -26,13 +26,6 @@ public class AppSettings : ViewModelBase
         none,
     }
 
-    public enum ProgressMethod
-    {
-        Redirection,
-        Console,
-        DiskUsage,
-    }
-
     #region paths
 
     private string defaultFolder;
@@ -316,10 +309,10 @@ public class AppSettings : ViewModelBase
         set => Set(ref appTheme, value);
     }
 
-    private ProgressMethod progressMethod;
-    public ProgressMethod AdbProgressMethod
+    private bool progressMethod;
+    public bool UseProgressRedirection
     {
-        get => Get(ref progressMethod, ProgressMethod.DiskUsage);
+        get => Get(ref progressMethod, false);
         set => Set(ref progressMethod, value);
     }
 

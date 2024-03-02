@@ -21,23 +21,21 @@ public partial class SplashScreen : UserControl
         ExplanationPanel.Visibility = Visibility.Visible;
 
         DeployTextBlock.Visibility = DeployRadioButton.IsChecked is true ? Visibility.Visible : Visibility.Hidden;
-        CmdTextBlock.Visibility = CmdRadioButton.IsChecked is true ? Visibility.Visible : Visibility.Hidden;
         DiskUsageTextBlock.Visibility = DiskUsageRadioButton.IsChecked is true ? Visibility.Visible : Visibility.Hidden;
     }
 
     private void ConfirmButton_Click(object sender, RoutedEventArgs e)
     {
         if (DeployRadioButton.IsChecked is true)
-            Data.Settings.AdbProgressMethod = Services.AppSettings.ProgressMethod.Redirection;
-        else if (CmdRadioButton.IsChecked is true)
-            Data.Settings.AdbProgressMethod = Services.AppSettings.ProgressMethod.Console;
+            Data.Settings.UseProgressRedirection = true;
         else if (DiskUsageRadioButton.IsChecked is true)
-            Data.Settings.AdbProgressMethod = Services.AppSettings.ProgressMethod.DiskUsage;
+            Data.Settings.UseProgressRedirection = false;
         else
             throw new NotSupportedException("Unsupported progress method");
 
         Data.Settings.ShowWelcomeScreen =
         Data.RuntimeSettings.IsSplashScreenVisible = false;
+        Data.RuntimeSettings.IsDevicesPaneOpen = true;
 
         AdbHelper.VerifyProgressRedirection();
     }

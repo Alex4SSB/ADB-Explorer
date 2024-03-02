@@ -119,7 +119,7 @@ public partial class ADBService
     public static IEnumerable<string> RedirectCommandAsync(
         string file, CancellationToken cancellationToken, Process process = null, params string[] args)
     {
-        if (Settings.AdbProgressMethod is AppSettings.ProgressMethod.Redirection)
+        if (Settings.UseProgressRedirection)
         {
             if (file[0] != '"')
                 file = $"\"{file}\"";
@@ -127,7 +127,7 @@ public partial class ADBService
             return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, args);
         }
         else
-            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Console, process, args);
+            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, true, process, args);
     }
 
     public static IEnumerable<string> ExecuteCommandAsync(

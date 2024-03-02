@@ -263,13 +263,6 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isLogPaused, value);
     }
 
-    private string appTitle = $"{Properties.Resources.AppDisplayName}{Strings.S_NO_DEVICES_TITLE}";
-    public string AppTitle
-    {
-        get => appTitle;
-        set => Set(ref appTitle, value);
-    }
-
     private bool isRootActive = false;
     public bool IsRootActive
     {
@@ -351,6 +344,13 @@ public class AppRuntimeSettings : ViewModelBase
         get => isDetailedPeekMode;
         set => Set(ref isDetailedPeekMode, value);
     }
+
+    public bool IsArm => RuntimeInformation.ProcessArchitecture switch
+    {
+        Architecture.Arm64 or Architecture.Arm => true,
+        Architecture.X64 or Architecture.X86 => false,
+        _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
+    };
 
     public string DefaultBrowserPath { get; set; }
 

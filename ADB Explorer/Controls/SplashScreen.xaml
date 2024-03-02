@@ -70,7 +70,7 @@
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource Nunito}"
                         FontSize="40"
-                        Text="ADB Explorer" />
+                        Text="{x:Static app_prop:Resources.AppDisplayName}" />
                 </StackPanel>
                 <Grid
                     x:Name="FirstLaunchGrid"
@@ -101,7 +101,6 @@
                             ToolTip="You can always change this in the settings" />
                         <ui:SimpleStackPanel Grid.Column="1" Spacing="2">
                             <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION_TITLE}}" />
-                            <RadioButton x:Name="CmdRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_CONSOLE_PROGRESS_TITLE}}" />
                             <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS_TITLE}}" />
                         </ui:SimpleStackPanel>
                     </Grid>
@@ -115,10 +114,6 @@
                         <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
                         <Grid>
                             <TextBlock x:Name="DeployTextBlock" Text="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION}}" />
-                            <TextBlock
-                                x:Name="CmdTextBlock"
-                                d:Visibility="Hidden"
-                                Text="{Binding Source={x:Static Member=resources:Strings.S_CONSOLE_PROGRESS}}" />
                             <TextBlock
                                 x:Name="DiskUsageTextBlock"
                                 d:Visibility="Hidden"

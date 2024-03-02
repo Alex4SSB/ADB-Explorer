@@ -48,20 +48,10 @@ public static class UISettings
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDevices)), "Poll For Devices"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), "Poll For Battery Status"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), "Enable Command Log"),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.UseProgressRedirection)),
+                                Strings.S_DEPLOY_REDIRECTION_TITLE,
+                                commands: SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo)),
             }),
-            new SettingsSeparator(),
-            new SettingsGroup(Strings.S_PROGRESS_METHOD_TITLE, new()
-            {
-                new ProgressMethodSetting(appSettings.GetProperty(nameof(Settings.AdbProgressMethod)),
-                Strings.S_PROGRESS_METHOD_TITLE,
-                new ()
-                {
-                    { AppSettings.ProgressMethod.Redirection, Strings.S_DEPLOY_REDIRECTION_TITLE },
-                    { AppSettings.ProgressMethod.Console, Strings.S_CONSOLE_PROGRESS_TITLE },
-                    { AppSettings.ProgressMethod.DiskUsage, Strings.S_DISK_USAGE_PROGRESS_TITLE },
-                },
-                commands: SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo))
-            }, SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo)),
             new SettingsSeparator(),
             new SettingsGroup("Device", new()
             {
@@ -126,7 +116,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup("Graphics", new()
             {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", visibleProp: RuntimeSettings.GetType().GetProperty(nameof(RuntimeSettings.HideForceFluent))),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", visibleProp: RuntimeSettings.GetType().GetProperty(nameof(AppRuntimeSettings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
                                 "Disable Animations",
@@ -313,15 +303,6 @@ public class ThemeSetting : EnumSetting
 public class DoubleClickSetting : EnumSetting
 {
     public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.DoubleClickAction, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, commands)
-    {
-        Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
-    }
-}
-
-public class ProgressMethodSetting : EnumSetting
-{
-    public ProgressMethodSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.ProgressMethod, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
         : base(valueProp, description, visibleProp, commands)
     {
         Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));

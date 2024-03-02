@@ -51,22 +51,15 @@ internal static class AdbHelper
 
     public static void VerifyProgressRedirection() => Task.Run(() =>
     {
-        if (Data.Settings.AdbProgressMethod is not AppSettings.ProgressMethod.Redirection
+        if (!Data.Settings.UseProgressRedirection
             || Data.RuntimeSettings.AdbVersion is null
             || string.IsNullOrEmpty(Data.RuntimeSettings.AdbPath))
             return;
-
-        bool isArm = RuntimeInformation.ProcessArchitecture switch
-        {
-            Architecture.Arm64 or Architecture.Arm => true,
-            Architecture.X64 or Architecture.X86 => false,
-            _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
-        };
         
         string path = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
         bool hashValid;
 
-        if (isArm)
+        if (Data.RuntimeSettings.IsArm)
             hashValid = Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash_ARM;
         else
             hashValid = Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash_x64;
@@ -76,14 +69,14 @@ internal static class AdbHelper
             // hash will be null if file does not exist, or is inaccessible
             try
             {
-                if (isArm)
+                if (Data.RuntimeSettings.IsArm)
                     File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection_ARM);
                 else
                     File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection_x86);
             }
             catch (Exception e)
             {
-                Data.Settings.AdbProgressMethod = AppSettings.ProgressMethod.DiskUsage;
+                Data.Settings.UseProgressRedirection = false;
 
                 App.Current.Dispatcher.Invoke(() =>
                     DialogService.ShowMessage(Strings.S_DEPLOY_REDIRECTION_ERROR + e.Message,

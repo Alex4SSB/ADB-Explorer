@@ -67,11 +67,8 @@ public static class Strings
     public const string S_PULL_ACTION = "Pull";
     public const string S_PULL_ACTION_LINK = "Pull (Link Target)";
     public const string S_RESTORE_ACTION = "Restore";
-    public const string S_DEPLOY_REDIRECTION = "A helper program for reading push/pull progress from ADB.\nMight falsely trigger some anti-virus programs.";
-    public const string S_CONSOLE_PROGRESS = "Push/Pull operations show ADB in a console window.\nDisk usage is used for progress and summary in UI.";
     public const string S_DISK_USAGE_PROGRESS = "Push/pull progress is displayed in total bytes transferred.\nPercentage is available only when total size is known.";
     public const string S_DEPLOY_REDIRECTION_TITLE = "Deploy AdbProgressRedirection.exe";
-    public const string S_CONSOLE_PROGRESS_TITLE = "Display In Console Window";
     public const string S_DISK_USAGE_PROGRESS_TITLE = "Disk Usage Only";
     public const string S_PROGRESS_METHOD_TITLE = "Progress Method";
     public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.\n\n";
@@ -79,12 +76,13 @@ public static class Strings
     public const string S_REDIRECTION = "Progress Redirection ";
 
 
+    public static string S_DEPLOY_REDIRECTION => $"A helper program for reading push/pull progress from ADB.\n{(Data.RuntimeSettings.IsArm
+        ? "Might falsely trigger some anti-virus programs."
+        : $"Copied to %LocalAppData%\\{AdbExplorerConst.APP_DATA_FOLDER}\\")}";
+
     public static string S_PROGRESS_METHOD_INFO() =>
         $"• {S_DEPLOY_REDIRECTION_TITLE}\n" +
         $"    {S_DEPLOY_REDIRECTION.Replace("\n", "\n    ")}\n" +
-        $"\n" +
-        $"• {S_CONSOLE_PROGRESS_TITLE}\n" +
-        $"    {S_CONSOLE_PROGRESS.Replace("\n", "\n    ")}\n" +
         $"\n" +
         $"• {S_DISK_USAGE_PROGRESS_TITLE}\n" +
         $"    {S_DISK_USAGE_PROGRESS.Replace("\n", "\n    ")}";

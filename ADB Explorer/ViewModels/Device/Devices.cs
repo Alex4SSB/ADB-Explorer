@@ -68,7 +68,6 @@ public class Devices : AbstractDevice
     private void UIList_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         OnPropertyChanged(nameof(Count));
-        Data.RuntimeSettings.AppTitle = UpdateAppTitle();
     }
 
     #region History device handling
@@ -302,21 +301,9 @@ public class Devices : AbstractDevice
         if (!Data.RuntimeSettings.DeviceToOpen.Equals(device))
             Data.RuntimeSettings.DeviceToOpen = device;
 
-        Data.RuntimeSettings.AppTitle = UpdateAppTitle();
         Data.RuntimeSettings.IsRootActive = device?.Root is RootStatus.Enabled;
 
         return device is not null;
-    }
-
-    public string UpdateAppTitle()
-    {
-        if (Count < 1)
-            return $"{Properties.Resources.AppDisplayName}{Strings.S_NO_DEVICES_TITLE}";
-
-        if (Current)
-            return $"{Properties.Resources.AppDisplayName} - {Current.Name}";
-        else
-            return Properties.Resources.AppDisplayName;
     }
 
     #endregion

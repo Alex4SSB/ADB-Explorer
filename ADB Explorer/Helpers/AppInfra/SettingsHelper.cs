@@ -85,7 +85,11 @@ internal static class SettingsHelper
 
         await Task.Delay(Data.Settings.EnableSplash ? AdbExplorerConst.SPLASH_DISPLAY_TIME : TimeSpan.Zero);
 
-        App.Current.Dispatcher.Invoke(() => Data.RuntimeSettings.IsSplashScreenVisible = false);
+        App.Current.Dispatcher.Invoke(() =>
+        {
+            Data.RuntimeSettings.IsSplashScreenVisible = false;
+            Data.RuntimeSettings.IsDevicesPaneOpen = true;
+        });
     }
 
     public static async void CheckForUpdates()

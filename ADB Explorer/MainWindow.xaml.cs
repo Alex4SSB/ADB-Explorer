@@ -115,7 +115,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     DiskUsageTimer.Start();
 
                     RuntimeSettings.IsDevicesViewEnabled = true;
-                    RuntimeSettings.IsDevicesPaneOpen = true;
+                    RuntimeSettings.IsDevicesPaneOpen = !RuntimeSettings.IsSplashScreenVisible;
                 });
             }
         });
@@ -597,7 +597,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 FilterDevices();
                 break;
 
-            case nameof(AppSettings.AdbProgressMethod):
+            case nameof(AppSettings.UseProgressRedirection):
                 AdbHelper.VerifyProgressRedirection();
                 break;
 
