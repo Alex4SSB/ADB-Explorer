@@ -13,40 +13,8 @@ internal static class AdbHelper
             : $"\"{Data.Settings.ManualAdbPath}\"";
 
         ADBService.VerifyAdbVersion(adbPath);
-        if (Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION)
-            return true;
 
-        App.Current.Dispatcher.Invoke(() =>
-        {
-            SimpleStackPanel stack = new()
-            {
-                Spacing = 8,
-                Children =
-            {
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Data.RuntimeSettings.AdbVersion is null ? Strings.S_MISSING_ADB : Strings.S_ADB_VERSION_LOW,
-                },
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.S_OVERRIDE_ADB,
-                },
-                new HyperlinkButton()
-                {
-                    Content = Strings.S_ADB_LEARN_MORE,
-                    ToolTip = Links.L_ADB_PAGE,
-                    NavigateUri = Links.L_ADB_PAGE,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                },
-            },
-            };
-
-            DialogService.ShowDialog(stack, Strings.S_MISSING_ADB_TITLE, DialogService.DialogIcon.Critical);
-        });
-
-        return false;
+        return Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
     });
 
     public static void VerifyProgressRedirection() => Task.Run(() =>

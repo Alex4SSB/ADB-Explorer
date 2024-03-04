@@ -71,8 +71,20 @@
         <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
     </Style>
     <Style
-        x:Key="TrimmedTextTooltipStyle"
+        x:Key="FluentTooltipStyle"
         BasedOn="{StaticResource DefaultToolTipStyle}"
+        TargetType="ToolTip">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
+                <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style BasedOn="{StaticResource FluentTooltipStyle}" TargetType="ToolTip" />
+    <Style
+        x:Key="TrimmedTextTooltipStyle"
+        BasedOn="{StaticResource FluentTooltipStyle}"
         TargetType="ToolTip">
         <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTooltip}}" />
     </Style>
@@ -392,14 +404,6 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersion}" Value="{x:Null}">
                 <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip">
-        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
-                <Setter Property="ui:ControlHelper.CornerRadius" Value="0" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

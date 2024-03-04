@@ -192,13 +192,6 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    private bool isDevicesViewEnabled = false;
-    public bool IsDevicesViewEnabled
-    {
-        get => isDevicesViewEnabled;
-        set => Set(ref isDevicesViewEnabled, value);
-    }
-
     private Version adbVersion;
     public Version AdbVersion
     {
@@ -391,6 +384,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool RefreshSettingsControls { get => false; set => OnPropertyChanged(); }
     public bool SortFileOps { get => false; set => OnPropertyChanged(); }
     public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
+    public bool FinalizeSplash { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }

@@ -6,12 +6,6 @@ namespace ADB_Explorer.Resources;
 public static class Strings
 {
     public const string S_SAVED_DEVICES = "SavedDevices";
-
-    public const string S_MISSING_ADB = "Failed to execute ADB from the environment PATH to get its version. Make sure there's a PATH entry pointing to the Android Platform Tools directory.";
-    public const string S_ADB_VERSION_LOW = "ADB version is too low. Please install a newer version.";
-    public const string S_OVERRIDE_ADB = "Alternatively, you can define / override ADB path in the app settings.";
-    public const string S_ADB_LEARN_MORE = "Learn More About ADB";
-    public const string S_MISSING_ADB_TITLE = "ADB missing or Incompatible";
     public const string S_CC_NAME = "Creative Commons";
     public const string S_APACHE_NAME = "Apache";
     public const string S_ANDROID_ROBOT_LIC = "The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.";
@@ -75,6 +69,10 @@ public static class Strings
     public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
     public const string S_REDIRECTION = "Progress Redirection ";
 
+
+    public static string S_ADB_LEARN_MORE => Data.RuntimeSettings.IsAppDeployed
+        ? "Learn More About ADB"
+        : "Download ADB";
 
     public static string S_DEPLOY_REDIRECTION => $"A helper program for reading push/pull progress from ADB.\n{(Data.RuntimeSettings.IsArm
         ? "Might falsely trigger some anti-virus programs."
