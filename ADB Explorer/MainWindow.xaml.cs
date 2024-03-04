@@ -19,8 +19,8 @@ namespace ADB_Explorer;
 /// </summary>
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
-    private readonly DispatcherTimer ServerWatchdogTimer = new();
-    private readonly DispatcherTimer ConnectTimer = new();
+    private readonly DispatcherTimer ServerWatchdogTimer = new() { Interval = RESPONSE_TIMER_INTERVAL };
+    private readonly DispatcherTimer ConnectTimer = new() { Interval = CONNECT_TIMER_INIT };
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
     private readonly DispatcherTimer DiskUsageTimer = new() { Interval = DISK_USAGE_INTERVAL_ACTIVE };
 
@@ -84,12 +84,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileOpQ = new();
         Task launchTask = Task.Run(LaunchSequence);
 
-        ConnectTimer.Interval = CONNECT_TIMER_INIT;
         ConnectTimer.Tick += ConnectTimer_Tick;
-
-        ServerWatchdogTimer.Interval = RESPONSE_TIMER_INTERVAL;
         ServerWatchdogTimer.Tick += ServerWatchdogTimer_Tick;
         DiskUsageTimer.Tick += DiskUsageTimer_Tick;
+        SelectionTimer.Tick += SelectionTimer_Tick;
 
         Settings.PropertyChanged += Settings_PropertyChanged;
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
@@ -100,25 +98,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
         DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
         FileOpFilters.CheckedFilterCount.PropertyChanged += CheckedFilterCount_PropertyChanged;
-
-        SelectionTimer.Tick += SelectionTimer_Tick;
-
-        var versionTask = AdbHelper.CheckAdbVersion();
-        versionTask.ContinueWith((t) =>
-        {
-            if (!t.IsCanceled && t.Result)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    ConnectTimer.Start();
-                    ServerWatchdogTimer.Start();
-                    DiskUsageTimer.Start();
-
-                    RuntimeSettings.IsDevicesViewEnabled = true;
-                    RuntimeSettings.IsDevicesPaneOpen = !RuntimeSettings.IsSplashScreenVisible;
-                });
-            }
-        });
 
         AppActions.Bindings.ForEach(binding =>
         {
@@ -137,14 +116,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Task.Run(() =>
         {
+            SetTheme(AppSettings.AppTheme.light);
             SettingsHelper.SplashScreenTask();
-
-            versionTask.Wait();
-            AdbHelper.VerifyProgressRedirection();
 
             launchTask.Wait();
             RuntimeSettings.IsWindowLoaded = true;
         });
+    }
+
+    private void FinalizeSplash()
+    {
+        SetTheme();
+
+        RuntimeSettings.IsSplashScreenVisible = false;
+        RuntimeSettings.IsDevicesPaneOpen = true;
+
+        AdbHelper.VerifyProgressRedirection();
+
+        ConnectTimer.Start();
+        ServerWatchdogTimer.Start();
+        DiskUsageTimer.Start();
     }
 
     private void DiskUsageTimer_Tick(object sender, EventArgs e)
@@ -399,6 +390,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.RefreshExplorerSorting):
                     FilterExplorerItems(true);
+                    break;
+
+                case nameof(AppRuntimeSettings.FinalizeSplash):
+                    FinalizeSplash();
                     break;
             }
         });
@@ -857,7 +852,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         Dispatcher.Invoke(SettingsHelper.SetSymbolFont);
 
-        SetTheme(Settings.Theme);
         SetRenderMode();
 
         AdbHelper.EnableMdns();

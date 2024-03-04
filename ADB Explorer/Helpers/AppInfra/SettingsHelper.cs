@@ -80,16 +80,16 @@ internal static class SettingsHelper
 
     public static async void SplashScreenTask()
     {
-        if (Data.Settings.ShowWelcomeScreen)
+        var startTime = DateTime.Now;
+        var versionValid = await AdbHelper.CheckAdbVersion();
+        var versionTime = DateTime.Now - startTime;
+
+        if (Data.Settings.ShowWelcomeScreen || !versionValid)
             return;
 
-        await Task.Delay(Data.Settings.EnableSplash ? AdbExplorerConst.SPLASH_DISPLAY_TIME : TimeSpan.Zero);
+        await Task.Delay(Data.Settings.EnableSplash ? AdbExplorerConst.SPLASH_DISPLAY_TIME - versionTime : TimeSpan.Zero);
 
-        App.Current.Dispatcher.Invoke(() =>
-        {
-            Data.RuntimeSettings.IsSplashScreenVisible = false;
-            Data.RuntimeSettings.IsDevicesPaneOpen = true;
-        });
+        Data.RuntimeSettings.FinalizeSplash = true;
     }
 
     public static async void CheckForUpdates()

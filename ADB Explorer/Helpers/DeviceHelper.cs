@@ -525,9 +525,6 @@ public static class DeviceHelper
         if (!Data.Settings.AutoOpen || !Data.DevicesObject.SetOpenDevice(selectedAddress))
             return;
 
-        if (!Data.RuntimeSettings.IsDevicesViewEnabled)
-            Data.RuntimeSettings.IsDevicesPaneOpen = false;
-
         Data.DevicesObject.SetOpenDevice(Data.DevicesObject.Current);
         Data.CurrentADBDevice = new(Data.DevicesObject.Current);
         Data.RuntimeSettings.InitLister = true;

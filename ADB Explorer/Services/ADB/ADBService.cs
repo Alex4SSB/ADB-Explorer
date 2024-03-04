@@ -448,7 +448,7 @@ public partial class ADBService
 
     public static void VerifyAdbVersion(string adbPath)
     {
-        RuntimeSettings.AdbVersion = null;
+        RuntimeSettings.AdbVersion = new(0, 0, 0);
 
         if (string.IsNullOrEmpty(adbPath))
             return;
