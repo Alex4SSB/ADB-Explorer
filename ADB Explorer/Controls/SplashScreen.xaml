@@ -74,7 +74,8 @@
                     Grid.Row="3"
                     Grid.Column="1"
                     d:Visibility="Visible"
-                    Spacing="14">
+                    Spacing="14"
+                    Visibility="Collapsed">
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                         <TextBlock FontSize="20" Text="Locate ADB (v" />
                         <TextBlock FontSize="20" Text="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_ADB_VERSION}}" />
@@ -124,7 +125,8 @@
                     Grid.Row="3"
                     Grid.Column="1"
                     d:Visibility="Hidden"
-                    Spacing="10">
+                    Spacing="10"
+                    Visibility="Collapsed">
                     <TextBlock
                         HorizontalAlignment="Center"
                         FontSize="20"
