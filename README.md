@@ -25,9 +25,8 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 <br></br>
 <h2 align="left"/>App Files</h2>
 
-`...\AppData\Local\IsolatedStorage\...`
+`%LocalAppData%\AdbExplorer`
 
-Launch app while pressing L-Ctrl to open app files location which may contain:
 * App.txt - persistent settings file.
 * AdbProgressRedirection.exe - a pipe for getting progress updates while executing ADB push & pull commands.
 * TEMP - a folder to which edited files are transferred temporarily.
