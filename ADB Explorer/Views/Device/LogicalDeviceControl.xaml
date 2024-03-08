@@ -97,34 +97,12 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StaticResource ResourceKey="DeviceActionsMenu" />
-            <ui:SimpleStackPanel
+            <Button
                 Grid.Column="1"
                 HorizontalAlignment="Right"
-                Orientation="Horizontal"
-                Spacing="8">
-                <Button
-                    Padding="5"
-                    Command="{Binding RemoveCommand.Command}"
-                    ToolTip="{Binding RemoveCommand.Description}">
-                    <Button.Style>
-                        <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                    <ui:FontIcon
-                        FontSize="12"
-                        Glyph="&#xE711;"
-                        Style="{DynamicResource DisabledButtonGlyphStyle}" />
-                </Button>
-                <Button
-                    Command="{Binding BrowseCommand.Command}"
-                    Content="Browse"
-                    Style="{StaticResource DeviceTextButtonStyle}" />
-            </ui:SimpleStackPanel>
+                Command="{Binding BrowseCommand.Command}"
+                Content="Browse"
+                Style="{StaticResource DeviceTextButtonStyle}" />
         </Grid>
     </Expander>
 </UserControl>

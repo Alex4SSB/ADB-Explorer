@@ -417,14 +417,28 @@
             ItemsSource="{Binding RebootCommands}"
             Style="{StaticResource DeviceActionsMenuItemStyle}"
             ToolTip="Reboot Into">
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE777;" />
-            </MenuItem.Header>
             <MenuItem.ItemContainerStyle>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                     <Setter Property="Command" Value="{Binding Command}" />
                 </Style>
             </MenuItem.ItemContainerStyle>
+            <MenuItem.Header>
+                <ui:FontIcon Glyph="&#xE777;" />
+            </MenuItem.Header>
+        </MenuItem>
+        <MenuItem Command="{Binding RemoveCommand.Command}" ToolTip="{Binding RemoveCommand.Description}">
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
+            <MenuItem.Header>
+                <ui:FontIcon Glyph="&#xE711;" />
+            </MenuItem.Header>
         </MenuItem>
     </Menu>
     <Style
