@@ -28,7 +28,7 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 `%LocalAppData%\AdbExplorer`
 
 
-### For Store version: To be able to see these files, create `%LocalAppData%\AdbExplorer\App.txt` before installing, otherwise the files are stored in an unknown location.
+### ℹ️ For Store version: <br />To be able to see these files, create `%LocalAppData%\AdbExplorer\App.txt` <br /> *before installing*, otherwise the files are stored in an unknown location.
 
 
 * App.txt - persistent settings file.
