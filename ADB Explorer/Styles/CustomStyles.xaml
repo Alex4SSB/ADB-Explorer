@@ -11,6 +11,18 @@
     <converters:DoubleEquals x:Key="DoubleEquals" />
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
     <converters:FileOpProgressConverter x:Key="FileOpProgressConverter" />
+    <Style
+        x:Key="StretchCheckBoxStyle"
+        BasedOn="{StaticResource CheckBoxStyle}"
+        TargetType="CheckBox">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
+    <Style
+        x:Key="StretchRadioButton"
+        BasedOn="{StaticResource RadioButtonStyle}"
+        TargetType="RadioButton">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
     <Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
@@ -246,16 +258,6 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="Height" Value="0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="ForceFluentVisibility"
-        BasedOn="{StaticResource CheckBoxStyle}"
-        TargetType="CheckBox">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsWin11}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -947,7 +949,7 @@
     </Style>
     <Style
         x:Key="UpdatesCheckBoxStyle"
-        BasedOn="{StaticResource CheckBoxStyle}"
+        BasedOn="{StaticResource StretchCheckBoxStyle}"
         TargetType="CheckBox">
         <Setter Property="ToolTip" Value="Checks for updates on each launch" />
         <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" />

@@ -444,10 +444,11 @@ public partial class ADBService
 
     public static void VerifyAdbVersion(string adbPath)
     {
-        RuntimeSettings.AdbVersion = new(0, 0, 0);
-
         if (string.IsNullOrEmpty(adbPath))
+        {
+            RuntimeSettings.AdbVersion = new(0, 0, 0);
             return;
+        }
 
         int exitCode = 1;
         string stdout = "";
@@ -458,7 +459,10 @@ public partial class ADBService
         catch (Exception) { }
 
         if (exitCode != 0)
+        {
+            RuntimeSettings.AdbVersion = new(0, 0, 0);
             return;
+        }
 
         var match = RE_ADB_VERSION().Match(stdout);
         RuntimeSettings.AdbPath = match.Groups["Path"]?.Value.Trim();

@@ -23,8 +23,7 @@
         </Style>
     </UserControl.Style>
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
             <EventSetter Event="Click" Handler="RadioButton_Checked" />
         </Style>
     </UserControl.Resources>

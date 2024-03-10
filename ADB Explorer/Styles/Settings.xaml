@@ -81,8 +81,7 @@
                     </StackPanel>
                 </Grid>
                 <CheckBox.Style>
-                    <Style BasedOn="{StaticResource CheckBoxStyle}" TargetType="CheckBox">
-                        <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Style BasedOn="{StaticResource StretchCheckBoxStyle}" TargetType="CheckBox">
                         <Setter Property="IsChecked" Value="False" />
                         <Style.Triggers>
                             <Trigger Property="IsEnabled" Value="True">
@@ -164,7 +163,7 @@
             GroupName="{Binding Group}"
             IsChecked="{Binding IsChecked, Mode=TwoWay}">
             <RadioButton.Style>
-                <Style BasedOn="{StaticResource RadioButtonStyle}" TargetType="RadioButton">
+                <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileOpQ}, Path=IsActive}" Value="True">
                             <Setter Property="IsEnabled" Value="False" />
