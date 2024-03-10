@@ -25,7 +25,11 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 <br></br>
 <h2 align="left"/>App Files</h2>
 
-`%LocalAppData%\AdbExplorer` (Might not be available on Store version)
+`%LocalAppData%\AdbExplorer`
+
+
+### For Store version: To be able to see these files, create `%LocalAppData%\AdbExplorer\App.txt` before installing, otherwise the files are stored in an unknown location.
+
 
 * App.txt - persistent settings file.
 * AdbProgressRedirection.exe - a pipe for getting progress updates while executing ADB push & pull commands.
