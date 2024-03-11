@@ -21,7 +21,16 @@ public class ProcessHandling
 
         foreach (var item in searcher.Get())
         {
-            var proc = Process.GetProcessById((int)(uint)item["ProcessId"]);
+            Process proc;
+
+            try
+            {
+                proc = Process.GetProcessById((int)(uint)item["ProcessId"]);
+            }
+            catch (Exception)
+            {
+                continue;
+            }
 
             if (recursive)
             {

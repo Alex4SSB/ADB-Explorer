@@ -49,6 +49,7 @@
             <EventSetter Event="MouseDown" Handler="DataGridRow_MouseDown" />
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
+            <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
         </Style>
     </Window.Resources>
     <Window.TaskbarItemInfo>
@@ -142,6 +143,7 @@
                         ContextMenu="{StaticResource RowContextMenu}"
                         ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
+                        Drop="ExplorerGrid_Drop"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
                         IsReadOnly="False"

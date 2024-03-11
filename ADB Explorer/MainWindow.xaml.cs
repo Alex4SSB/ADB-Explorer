@@ -1966,4 +1966,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         MouseDownPoint = new(-1, -1);
     }
+
+    private void ExplorerGrid_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
+            return;
+
+        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName),
+                                         new(CurrentPath, FileType.Folder));
+    }
+
+    private void DataGridRow_Drop(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
+            return;
+
+        if (((DataGridRow)sender).DataContext is not FileClass file
+            || !file.IsDirectory)
+            return;
+
+        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), new(file));
+    }
 }

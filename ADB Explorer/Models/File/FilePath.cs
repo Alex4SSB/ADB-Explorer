@@ -105,8 +105,9 @@ public class FilePath : AbstractFile
 
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.Name;
-        IsDirectory = windowsPath is ShellFolder;
         IsRegularFile = !IsDirectory;
+
+        IsDirectory = File.GetAttributes(FullPath) is System.IO.FileAttributes.Directory;
     }
 
     public FilePath(string androidPath,
