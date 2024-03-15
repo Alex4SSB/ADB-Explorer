@@ -2,6 +2,8 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using static ADB_Explorer.Models.AbstractFile;
+using static ADB_Explorer.Models.FileClass;
 
 namespace ADB_Explorer.Helpers;
 
@@ -85,14 +87,18 @@ public static class FileHelper
 
     public static FileClass GetFromCell(DataGridCellInfo cell) => CellConverter.GetDataGridCell(cell).DataContext as FileClass;
 
+    public static void ClearCutFiles(Func<FileClass, bool> predicate)
+        => ClearCutFiles(Data.CutItems.Where(predicate));
+
     public static void ClearCutFiles(IEnumerable<FileClass> items = null)
     {
-        var list = items is null ? Data.CutItems : items;
-        foreach (var item in list)
+        items ??= Data.CutItems;
+        
+        foreach (var item in items)
         {
             item.CutState = FileClass.CutType.None;
         }
-        Data.CutItems.RemoveAll(list.ToList());
+        Data.CutItems.RemoveAll(items.ToList());
 
         Data.FileActions.PasteState = FileClass.CutType.None;
     }
@@ -121,4 +127,63 @@ public static class FileHelper
 
     public static string GetParentPath(string fullPath) =>
         fullPath[..FilePath.LastSeparatorIndex(fullPath)];
+
+    public static string GetFullName(string fullPath) =>
+        fullPath[FilePath.LastSeparatorIndex(fullPath)..];
+
+    public static ulong? GetSize(this ShellObject shellObject)
+        => shellObject.Properties.System.Size.Value;
+
+    public static DateTime? GetDateModified(this ShellObject shellObject)
+        => shellObject.Properties.System.DateModified.Value;
+
+    public static ulong TotalSize(IEnumerable<FileClass> files)
+    {
+        if (files.Any(f => f.Type is not FileType.File || f.IsLink))
+            return 0;
+
+        return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
+    }
+
+    public static string ExistingIndexes(ObservableList<FileClass> fileList, string namePrefix, CutType cutType = CutType.None)
+    {
+        var existingItems = fileList.Where(item => item.NoExtName.StartsWith(namePrefix));
+        var suffixes = existingItems.Select(item => item.NoExtName[namePrefix.Length..].Trim());
+
+        if (cutType is CutType.Copy or CutType.Link)
+        {
+            suffixes = suffixes.Select(item => item.Replace("- Copy", "").Trim());
+        }
+
+        return ExistingIndexes(suffixes, cutType);
+    }
+
+    public static string ExistingIndexes(IEnumerable<string> suffixes, CutType cutType = CutType.None)
+    {
+        var copySuffix = cutType is CutType.Copy or CutType.Link ? " - Copy" : "";
+
+        var indexes = (from i in suffixes
+                       where int.TryParse(i, out _)
+                       select int.Parse(i)).ToList();
+        if (suffixes.Any(s => s == ""))
+            indexes.Add(0);
+
+        indexes.Sort();
+        if (indexes.Count == 0 || indexes[0] != 0)
+            return "";
+
+        var result = "";
+        for (int i = 0; i < indexes.Count; i++)
+        {
+            if (indexes[i] > i)
+            {
+                result = $"{copySuffix} {i}";
+                break;
+            }
+        }
+        if (result == "")
+            result = $"{copySuffix} {indexes.Count}";
+
+        return result;
+    }
 }

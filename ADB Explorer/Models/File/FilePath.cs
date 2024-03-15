@@ -39,7 +39,7 @@ public abstract class AbstractFile : ViewModelBase
     public static readonly char[] Separators = new [] { '\\', '/' };
 }
 
-public class FilePath : AbstractFile
+public class FilePath : AbstractFile, IBaseFile
 {
     public FilePathType PathType { get; protected set; }
 
@@ -105,9 +105,9 @@ public class FilePath : AbstractFile
 
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.Name;
-        IsRegularFile = !IsDirectory;
-
+        
         IsDirectory = File.GetAttributes(FullPath) is System.IO.FileAttributes.Directory;
+        IsRegularFile = !IsDirectory;
     }
 
     public FilePath(string androidPath,

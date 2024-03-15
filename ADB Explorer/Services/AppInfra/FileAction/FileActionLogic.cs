@@ -319,16 +319,51 @@ internal static class FileActionLogic
         return true;
     }
 
+    public static void UpdateClipboardDropItems()
+    {
+        FileHelper.ClearCutFiles(i => i.PathType is FilePathType.Windows);
+
+        if (!Clipboard.ContainsFileDropList())
+        {
+            if (!Data.CutItems.Any())
+                Data.FileActions.PasteState = FileClass.CutType.None;
+
+            return;
+        }
+
+        int newItems = 0;
+        foreach (var item in Clipboard.GetFileDropList())
+        {
+            if (item is null)
+                continue;
+
+            var windowsPath = ShellObject.FromParsingName(item);
+            Data.CutItems.Add(new(windowsPath)
+            {
+                ShellObject = windowsPath,
+                CutState = FileClass.CutType.Copy
+            });
+            newItems++;
+        }
+
+        if (newItems == 0)
+            return;
+
+        FileHelper.ClearCutFiles(i => i.PathType is FilePathType.Android);
+
+        Data.FileActions.PasteState = FileClass.CutType.Copy;
+        UpdateFileActions();
+    }
+
     public static async void PasteFiles(bool isLink = false)
     {
         var firstSelectedFile = Data.SelectedFiles.Any() ? Data.SelectedFiles.First() : null;
-        var targetName = "";
-        var targetPath = "";
+        string targetName, targetPath = "";
 
         if (Data.SelectedFiles.Count() != 1 || (firstSelectedFile is not null && !firstSelectedFile.IsDirectory))
         {
             targetPath = Data.CurrentPath;
-            targetName = Data.CurrentPath[Data.CurrentPath.LastIndexOf('/')..];
+            targetName = FileHelper.GetFullName(Data.CurrentPath);
         }
         else
         {
@@ -336,22 +371,29 @@ internal static class FileActionLogic
             targetName = FileHelper.DisplayName(Data.SelectedFiles.First());
         }
 
-        var pasteItems = isLink
-            ? Data.CutItems
-            : Data.CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
+        if (Data.CutItems.First().PathType is FilePathType.Windows)
+        {
+            PushShellObjects(Data.CutItems.Where(f => !f.IsLink).Select(f => f.ShellObject), targetPath);
+        }
+        else
+        {
+            var pasteItems = isLink
+                ? Data.CutItems
+                : Data.CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
 
-        await Task.Run(() => ShellFileOperation.MoveItems(isLink ? FileClass.CutType.Link : Data.FileActions.PasteState,
-                                                          targetPath,
-                                                          pasteItems,
-                                                          targetName,
-                                                          Data.DirList.FileList,
-                                                          App.Current.Dispatcher,
-                                                          Data.CurrentADBDevice,
-                                                          Data.CurrentPath));
+            await ShellFileOperation.MoveItems(isLink ? FileClass.CutType.Link : Data.FileActions.PasteState,
+                                               targetPath,
+                                               pasteItems,
+                                               targetName,
+                                               Data.DirList.FileList,
+                                               App.Current.Dispatcher,
+                                               Data.CurrentADBDevice,
+                                               Data.CurrentPath);
 
-        if (Data.FileActions.PasteState is FileClass.CutType.Cut)
-            FileHelper.ClearCutFiles(pasteItems);
-
+            if (Data.FileActions.PasteState is FileClass.CutType.Cut)
+                FileHelper.ClearCutFiles(pasteItems);
+        }
+        
         Data.FileActions.PasteEnabled = IsPasteEnabled();
     }
 
@@ -542,7 +584,7 @@ internal static class FileActionLogic
     public static void UpdateInstallersCount()
     {
         var countTask = Task.Run(() => ADBService.CountPackages(Data.DevicesObject.Current.ID));
-        countTask.ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
+        countTask.ContinueWith((t) => App.Current?.Dispatcher.Invoke(() =>
         {
             if (!t.IsCanceled && Data.DevicesObject.Current is not null)
             {
@@ -731,6 +773,7 @@ internal static class FileActionLogic
         Data.FileActions.IsPasteLinkEnabled = !Data.FileActions.IsRecycleBin
             && Data.RuntimeSettings.IsRootActive
             && Data.CutItems.Count == 1
+            && Data.CutItems[0].PathType is FilePathType.Android
             && Data.FileActions.PasteState is FileClass.CutType.Copy
             && (!Data.SelectedFiles.Any() ||
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
@@ -759,10 +802,10 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        PushShellObjects(dialog.FilesAsShellObject, targetPath);
+        PushShellObjects(dialog.FilesAsShellObject, targetPath.FullPath);
     }
 
-    public static void PushShellObjects(IEnumerable<ShellObject> items, SyncFile targetPath)
+    public static void PushShellObjects(IEnumerable<ShellObject> items, string targetPath)
     {
         foreach (var item in items)
         {

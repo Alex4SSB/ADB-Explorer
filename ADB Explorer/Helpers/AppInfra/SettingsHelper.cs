@@ -82,12 +82,12 @@ internal static class SettingsHelper
     {
         var startTime = DateTime.Now;
         var versionValid = await AdbHelper.CheckAdbVersion();
-        var versionTime = DateTime.Now - startTime;
-
+        var delay = AdbExplorerConst.SPLASH_DISPLAY_TIME - (DateTime.Now - startTime);
+        
         if (Data.Settings.ShowWelcomeScreen || !versionValid)
             return;
 
-        await Task.Delay(Data.Settings.EnableSplash ? AdbExplorerConst.SPLASH_DISPLAY_TIME - versionTime : TimeSpan.Zero);
+        await Task.Delay(Data.Settings.EnableSplash && delay > TimeSpan.Zero ? delay : TimeSpan.Zero);
 
         Data.RuntimeSettings.FinalizeSplash = true;
     }

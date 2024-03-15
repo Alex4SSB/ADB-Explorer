@@ -159,7 +159,7 @@ public static class ShellFileOperation
             {
                 var targetName = item.FullName;
                 if (currentPath == targetPath)
-                    targetName = $"{item.NoExtName}{FileClass.ExistingIndexes(fileList, item.NoExtName, cutType)}{item.Extension}";
+                    targetName = $"{item.NoExtName}{FileHelper.ExistingIndexes(fileList, item.NoExtName, cutType)}{item.Extension}";
 
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
                 fileops.Add(new FileMoveOperation(item, target, device, dispatcher, cutType));

@@ -39,7 +39,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
     protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    public string SelectedFilesTotalSize => (SelectedFiles is not null && FileClass.TotalSize(SelectedFiles) is ulong size and > 0) ? size.ToSize() : "";
+    public string SelectedFilesTotalSize => (SelectedFiles is not null && FileHelper.TotalSize(SelectedFiles) is ulong size and > 0) ? size.ToSize() : "";
     public string SelectedFilesCount => $"{ExplorerGrid.SelectedItems.Count}";
 
     private string prevPath = "";
@@ -1767,7 +1767,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void NewItem(bool isFolder)
     {
         var namePrefix = S_NEW_ITEM(isFolder);
-        var index = FileClass.ExistingIndexes(DirList.FileList, namePrefix);
+        var index = FileHelper.ExistingIndexes(DirList.FileList, namePrefix);
 
         var fileName = $"{namePrefix}{index}";
         FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), isFolder ? FileType.Folder : FileType.File, isTemp: true);
@@ -1972,8 +1972,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
             return;
 
-        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName),
-                                         new(CurrentPath, FileType.Folder));
+        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), CurrentPath);
     }
 
     private void DataGridRow_Drop(object sender, DragEventArgs e)
@@ -1981,10 +1980,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
             return;
 
-        if (((DataGridRow)sender).DataContext is not FileClass file
-            || !file.IsDirectory)
+        if (((DataGridRow)sender).DataContext is not FileClass target
+            || !target.IsDirectory)
             return;
 
-        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), new(file));
+        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target.FullPath);
+    }
+
+    private void MainWin_Activated(object sender, EventArgs e)
+    {
+        FileActionLogic.UpdateClipboardDropItems();
     }
 }

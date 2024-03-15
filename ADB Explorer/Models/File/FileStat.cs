@@ -1,50 +1,33 @@
 ﻿namespace ADB_Explorer.Models;
 
-public class FileStat : FilePath
+public class FileStat : AbstractFile, IBaseFile, IFileStat
 {
     public FileStat(string fileName,
                     string path,
                     FileType type,
-                    bool isLink = false,
-                    ulong? size = null,
-                    DateTime? modifiedTime = null)
-        : base(path, fileName, type)
+                    bool isLink,
+                    ulong? size,
+                    DateTime? modifiedTime)
     {
-        this.type = type;
-        this.size = size;
-        this.modifiedTime = modifiedTime;
-        this.isLink = isLink;
+        FullName = fileName;
+        FullPath = path;
+
+        Type = type;
+        Size = size;
+        ModifiedTime = modifiedTime;
+
+        IsLink = isLink;
     }
 
-    private FileType type;
-    public FileType Type
-    {
-        get => type;
-        set
-        {
-            if (Set(ref type, value))
-                IsDirectory = value is FileType.Folder;
-        }
-    }
+    public string FullName { get; set; }
 
-    private ulong? size;
-    public ulong? Size
-    {
-        get => size;
-        set => Set(ref size, value);
-    }
+    public string FullPath { get; set; }
 
-    private DateTime? modifiedTime;
-    public virtual DateTime? ModifiedTime
-    {
-        get => modifiedTime;
-        set => Set(ref modifiedTime, value);
-    }
+    public FileType Type { get; set; }
 
-    private bool isLink;
-    public bool IsLink
-    {
-        get => isLink;
-        set => Set(ref isLink, value);
-    }
+    public ulong? Size { get; set; }
+
+    public DateTime? ModifiedTime { get; set; }
+
+    public bool IsLink { get; set; }
 }

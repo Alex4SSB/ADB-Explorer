@@ -1,12 +1,10 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
-using System.Drawing;
-using static ADB_Explorer.Models.Data;
 
 namespace ADB_Explorer.Models;
 
-public class FileClass : FileStat
+public class FileClass : FilePath, IFileStat
 {
     public enum CutType
     {
@@ -16,64 +14,88 @@ public class FileClass : FileStat
         Link,
     }
 
-    public static string CutTypeString(CutType cutType) => cutType switch
+    #region Notify Properties
+
+    private ulong? size;
+    public ulong? Size
     {
-        CutType.None => "",
-        CutType.Cut => "Cut",
-        CutType.Copy => "Copied",
-        CutType.Link => "",
-        _ => throw new NotImplementedException(),
-    };
-
-    private const ShellInfoManager.IconSize iconSize = ShellInfoManager.IconSize.Small;
-
-    public FileClass(string fileName, string path, FileType type, bool isLink = false, UInt64? size = null, DateTime? modifiedTime = null, bool isTemp = false)
-        : base(fileName, path, type, isLink, size)
-    {
-        icon = GetIcon();
-        typeName = GetTypeName();
-        IsTemp = isTemp;
-        ModifiedTime = modifiedTime;
-
-        SortName = new(fileName);
+        get => size;
+        set => Set(ref size, value);
     }
 
-    public FileClass(FileClass other)
-        : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
-    { }
-
-    public FileClass(FilePath other)
-        : this(other.FullName, other.FullPath, other.IsDirectory ? FileType.Folder : FileType.File)
-    { }
-
-    public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
-    (
-        fileName: fileStat.FullName,
-        path: fileStat.FullPath,
-        type: fileStat.Type,
-        size: fileStat.Size,
-        modifiedTime: fileStat.ModifiedTime,
-        isLink: fileStat.IsLink
-    );
-
-    public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellObject windowsShellObject) =>
-        new(androidTargetPath)
+    private bool isLink;
+    public bool IsLink
     {
-        Size = windowsShellObject.Properties.System.Size.Value,
-        ModifiedTime = windowsShellObject.Properties.System.DateModified.Value
-    };
+        get => isLink;
+        set => Set(ref isLink, value);
+    }
 
-    public override string ToString()
+    private FileType type;
+    public FileType Type
     {
-        if (TrashIndex is null)
+        get => type;
+        set
         {
-            return $"{DisplayName}\n{ModifiedTimeString}\n{TypeName}\n{SizeString}";
-        }
-        else
-        {
-            return $"{DisplayName}\n{TrashIndex.OriginalPath}\n{TrashIndex.ModifiedTimeString}\n{TypeName}\n{SizeString}\n{ModifiedTimeString}";
+            if (Set(ref type, value))
+                IsDirectory = value is FileType.Folder;
         }
     }
+
+    private string typeName;
+    public string TypeName
+    {
+        get => typeName;
+        private set => Set(ref typeName, value);
+    }
+
+    private DateTime? modifiedTime;
+    public DateTime? ModifiedTime
+    {
+        get => modifiedTime;
+        set
+        {
+            if (Set(ref modifiedTime, value))
+                OnPropertyChanged(nameof(ModifiedTimeString));
+        }
+    }
+
+    private object icon;
+    public object Icon
+    {
+        get => icon;
+        private set => Set(ref icon, value);
+    }
+
+    private CutType cutState = CutType.None;
+    public CutType CutState
+    {
+        get => cutState;
+        set => Set(ref cutState, value);
+    }
+
+    private TrashIndexer trashIndex;
+    public TrashIndexer TrashIndex
+    {
+        get => trashIndex;
+        set
+        {
+            Set(ref trashIndex, value);
+            if (value is not null)
+                FullName = value.OriginalPath.Split('/')[^1];
+        }
+    }
+
+    #endregion
+
+    public bool ExtensionIsGlyph { get; set; }
+
+    public bool ExtensionIsFontIcon { get; set; }
+
+    public bool IsTemp { get; set; }
+
+    public FileNameSort SortName { get; private set; }
+
+    #region Read Only Properties
 
     public bool IsApk => AdbExplorerConst.APK_NAMES.Contains(Extension.ToUpper());
 
@@ -95,10 +117,111 @@ public class FileClass : FileStat
         }
     }
 
-    
+    public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
 
-    public bool ExtensionIsGlyph { get; set; }
-    public bool ExtensionIsFontIcon { get; set; }
+    public string SizeString => Size?.ToSize();
+
+    #endregion
+
+    public FileClass(
+        string fileName,
+        string path,
+        FileType type,
+        bool isLink = false,
+        UInt64? size = null,
+        DateTime? modifiedTime = null,
+        bool isTemp = false)
+        : base(path, fileName, type)
+    {
+        Type = type;
+        Size = size;
+        ModifiedTime = modifiedTime;
+        IsLink = isLink;
+
+        icon = IconHelper.GetIcon(this);
+        typeName = GetTypeName();
+        IsTemp = isTemp;
+        
+        SortName = new(fileName);
+    }
+
+    public FileClass(FileClass other)
+        : this(other.FullName, other.FullPath, other.Type, other.IsLink, other.Size, other.ModifiedTime, other.IsTemp)
+    { }
+
+    public FileClass(FilePath other)
+        : this(other.FullName, other.FullPath, other.IsDirectory ? FileType.Folder : FileType.File)
+    { }
+
+    public FileClass(ShellObject windowsPath)
+        : base(windowsPath)
+    {
+        Type = IsDirectory ? FileType.Folder : FileType.File;
+        Size = windowsPath.GetSize();
+        ModifiedTime = windowsPath.GetDateModified();
+        IsLink = windowsPath.IsLink;
+
+        icon = IconHelper.GetIcon(this);
+        typeName = GetTypeName();
+
+        SortName = new(FullName);
+    }
+
+    public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
+    (
+        fileName: fileStat.FullName,
+        path: fileStat.FullPath,
+        type: fileStat.Type,
+        size: fileStat.Size,
+        modifiedTime: fileStat.ModifiedTime,
+        isLink: fileStat.IsLink
+    );
+
+    public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellObject windowsPath) =>
+        new(androidTargetPath)
+    {
+        Size = windowsPath.GetSize(),
+        ModifiedTime = windowsPath.GetDateModified(),
+    };
+
+    public override void UpdatePath(string androidPath)
+    {
+        base.UpdatePath(androidPath);
+
+        SortName = new(FullName);
+    }
+
+    public static string CutTypeString(CutType cutType) => cutType switch
+    {
+        CutType.None => "",
+        CutType.Cut => "Cut",
+        CutType.Copy => "Copied",
+        CutType.Link => "",
+        _ => throw new NotImplementedException(),
+    };
+
+    public void UpdateType()
+    {
+        TypeName = GetTypeName();
+        Icon = IconHelper.GetIcon(this);
+        IsRegularFile = Type is FileType.File;
+    }
+
+    private string GetTypeName()
+    {
+        var type = Type switch
+        {
+            FileType.File => GetTypeName(FullName),
+            FileType.Folder => "Folder",
+            FileType.Unknown => "",
+            _ => GetFileTypeName(Type),
+        };
+
+        if (IsLink && Type is not FileType.BrokenLink)
+            type = string.IsNullOrEmpty(type) ? "Link" : $"{type} (Link)";
+
+        return type;
+    }
 
     public string GetTypeName(string fileName)
     {
@@ -126,181 +249,16 @@ public class FileClass : FileStat
             return name;
     }
 
-    private string typeName;
-    public string TypeName
+    public override string ToString()
     {
-        get => typeName;
-        private set => Set(ref typeName, value);
-    }
-
-    private DateTime? modifiedTime;
-    public override DateTime? ModifiedTime
-    {
-        get => modifiedTime;
-        set
+        if (TrashIndex is null)
         {
-            if (Set(ref modifiedTime, value))
-                OnPropertyChanged(nameof(ModifiedTimeString));
-        }
-    }
-    public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
-    public string SizeString => Size?.ToSize();
-
-    private object icon;
-    public object Icon
-    {
-        get => icon;
-        private set => Set(ref icon, value);
-    }
-
-    private CutType cutState = CutType.None;
-    public CutType CutState
-    {
-        get => cutState;
-        set => Set(ref cutState, value);
-    }
-
-    public bool IsTemp { get; set; }
-
-    private TrashIndexer trashIndex;
-    public TrashIndexer TrashIndex
-    {
-        get => trashIndex;
-        set
-        {
-            Set(ref trashIndex, value);
-            if (value is not null)
-                FullName = value.OriginalPath.Split('/')[^1];
-        }
-    }
-
-    public FileNameSort SortName { get; private set; }
-
-    public override void UpdatePath(string androidPath)
-    {
-        base.UpdatePath(androidPath);
-
-        SortName = new(FullName);
-    }
-
-    private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, false));
-    private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.GetFileIcon(Path.GetTempPath(), iconSize, true));
-    private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 175, iconSize));
-    private static readonly BitmapSource brokenLinkIconBitmapSource = IconToBitmapSource(ShellInfoManager.ExtractIconByIndex("Shell32.dll", 271, iconSize));
-    private static readonly Icon shortcutOverlayIcon = ShellInfoManager.ExtractIconByIndex("Shell32.dll", 29, iconSize);
-
-    private static BitmapSource IconToBitmapSource(Icon icon)
-    {
-        return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-    }
-
-    private object GetIcon() => Type switch
-    {
-        FileType.File => IsApk && !IsLink ? null : IconToBitmapSource(ExtIcon(Extension, iconSize, IsLink, IsApk)),
-        FileType.Folder => IsLink ? folderLinkIconBitmapSource : folderIconBitmapSource,
-        FileType.Unknown => unknownFileIconBitmapSource,
-        FileType.BrokenLink => brokenLinkIconBitmapSource,
-        _ => IconToBitmapSource(ExtIcon(string.Empty, iconSize, IsLink))
-    };
-
-    public void UpdateType()
-    {
-        TypeName = GetTypeName();
-        Icon = GetIcon();
-        IsRegularFile = Type is FileType.File;
-    }
-
-    private string GetTypeName()
-    {
-        var type = Type switch
-        {
-            FileType.File => GetTypeName(FullName),
-            FileType.Folder => "Folder",
-            FileType.Unknown => "",
-            _ => GetFileTypeName(Type),
-        };
-
-        if (IsLink && Type is not FileType.BrokenLink)
-            type = string.IsNullOrEmpty(type) ? "Link" : $"{type} (Link)";
-
-        return type;
-    }
-
-    private static Icon ExtIcon(string extension, ShellInfoManager.IconSize iconSize, bool isLink, bool isApk = false)
-    {
-        // No extension -> "*" which means unknown file 
-        if (string.IsNullOrEmpty(extension))
-        {
-            extension = "*";
-        }
-
-        Icon icon;
-        var iconId = new Tuple<string, bool>(extension, isLink);
-        if (!FileIcons.TryGetValue(iconId, out Icon value))
-        {
-            if (isApk)
-            {
-                icon = isLink ? shortcutOverlayIcon : null;
-            }
-            else
-                icon = ShellInfoManager.GetExtensionIcon(extension, iconSize, isLink);
-
-            FileIcons.Add(iconId, icon);
+            return $"{DisplayName}\n{ModifiedTimeString}\n{TypeName}\n{SizeString}";
         }
         else
-            icon = value;
-
-        return icon;
-    }
-
-    public static ulong TotalSize(IEnumerable<FileClass> files)
-    {
-        if (files.Any(f => f.Type is not FileType.File || f.IsLink))
-            return 0;
-        
-        return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
-    }
-
-    public static string ExistingIndexes(ObservableList<FileClass> fileList, string namePrefix, CutType cutType = CutType.None)
-    {
-        var existingItems = fileList.Where(item => item.NoExtName.StartsWith(namePrefix));
-        var suffixes = existingItems.Select(item => item.NoExtName[namePrefix.Length..].Trim());
-
-        if (cutType is CutType.Copy or CutType.Link)
         {
-            suffixes = suffixes.Select(item => item.Replace("- Copy", "").Trim());
+            return $"{DisplayName}\n{TrashIndex.OriginalPath}\n{TrashIndex.ModifiedTimeString}\n{TypeName}\n{SizeString}\n{ModifiedTimeString}";
         }
-
-        return ExistingIndexes(suffixes, cutType);
-    }
-
-    public static string ExistingIndexes(IEnumerable<string> suffixes, CutType cutType = CutType.None)
-    {
-        var copySuffix = cutType is CutType.Copy or CutType.Link ? " - Copy" : "";
-
-        var indexes = (from i in suffixes
-                       where int.TryParse(i, out _)
-                       select int.Parse(i)).ToList();
-        if (suffixes.Any(s => s == ""))
-            indexes.Add(0);
-
-        indexes.Sort();
-        if (indexes.Count == 0 || indexes[0] != 0)
-            return "";
-
-        var result = "";
-        for (int i = 0; i < indexes.Count; i++)
-        {
-            if (indexes[i] > i)
-            {
-                result = $"{copySuffix} {i}";
-                break;
-            }
-        }
-        if (result == "")
-            result = $"{copySuffix} {indexes.Count}";
-
-        return result;
     }
 
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)

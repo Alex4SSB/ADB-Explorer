@@ -23,6 +23,7 @@
     Cursor="{Binding ElementName=UnfinishedBlock, Path=Cursor}"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
+    Activated="MainWin_Activated"
     SizeChanged="Window_SizeChanged"
     SourceInitialized="Window_SourceInitialized"
     StateChanged="MainWin_StateChanged"
