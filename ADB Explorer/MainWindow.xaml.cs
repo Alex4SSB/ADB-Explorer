@@ -25,32 +25,31 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DispatcherTimer DiskUsageTimer = new() { Interval = DISK_USAGE_INTERVAL_ACTIVE };
 
     private readonly Mutex DiskUsageMutex = new();
-    private readonly Mutex connectTimerMutex = new();
-    private readonly ThemeService themeService = new();
-    private int clickCount = 0;
-    private int firstSelectedRow = -1;
-
+    private readonly Mutex ConnectTimerMutex = new();
+    private readonly ThemeService ThemeService = new();
+    
+    private static Point NullPoint => new(-1, -1);
+    
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
     private double ScrollContentPresenterMargin => RuntimeSettings.UseFluentStyles ? ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top : 0;
     private double DataGridContentWidth
         => StyleHelper.GetChildItemsPresenter(ExplorerGrid) is ItemsPresenter presenter ? presenter.ActualWidth : 0;
-
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public string SelectedFilesTotalSize => (SelectedFiles is not null && FileHelper.TotalSize(SelectedFiles) is ulong size and > 0) ? size.ToSize() : "";
     public string SelectedFilesCount => $"{ExplorerGrid.SelectedItems.Count}";
 
     private string prevPath = "";
 
+    private int ClickCount = 0;
+    private bool IsDragInProgress = false;
+    private bool WasSelected = false;
     private Point MouseDownPoint;
 
     private bool IsInEditMode
     {
         get
         {
-            if (FileActions.IsAppDrive)
+            if (FileActions.IsAppDrive || !ExplorerGrid.SelectedCells.Any())
                 return false;
 
             var cell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
@@ -70,6 +69,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
         }
     }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     public MainWindow()
     {
@@ -91,7 +93,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Settings.PropertyChanged += Settings_PropertyChanged;
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-        themeService.PropertyChanged += ThemeService_PropertyChanged;
+        ThemeService.PropertyChanged += ThemeService_PropertyChanged;
         CommandLog.CollectionChanged += CommandLog_CollectionChanged;
         FileOpQ.PropertyChanged += FileOperationQueue_PropertyChanged;
         FileActions.PropertyChanged += FileActions_PropertyChanged;
@@ -671,7 +673,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void SetTheme()
     {
         SetTheme(Settings.Theme is AppSettings.AppTheme.windowsDefault
-            ? themeService.WindowsTheme
+            ? ThemeService.WindowsTheme
             : ThemeManager.Current.ApplicationTheme.Value);
     }
 
@@ -891,7 +893,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         AppSettings.AppTheme.light => ApplicationTheme.Light,
         AppSettings.AppTheme.dark => ApplicationTheme.Dark,
-        AppSettings.AppTheme.windowsDefault => themeService.WindowsTheme,
+        AppSettings.AppTheme.windowsDefault => ThemeService.WindowsTheme,
         _ => throw new NotSupportedException(),
     };
 
@@ -984,7 +986,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Task.Run(() =>
         {
-            if (RuntimeSettings.IsPollingStopped || !connectTimerMutex.WaitOne(0))
+            if (RuntimeSettings.IsPollingStopped || !ConnectTimerMutex.WaitOne(0))
                 return;
 
             if (Settings.PollDevices)
@@ -1014,7 +1016,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 DeviceHelper.UpdateWsaPkgStatus();
             }
 
-            connectTimerMutex.ReleaseMutex();
+            ConnectTimerMutex.ReleaseMutex();
         });
     }
 
@@ -1212,7 +1214,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return;
 
         bool handle = false;
-
+        
         if (FileActions.IsExplorerVisible)
         {
             handle |= ExplorerGridKeyNavigation(e.Key);
@@ -1229,7 +1231,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (DriveList.Items.Count == 0)
             return false;
-
+        
         if (DriveList.SelectedItems.Count == 0)
         {
             if (key is Key.Left or Key.Up)
@@ -1266,7 +1268,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         switch (key)
         {
             case Key.Down or Key.Up or Key.Home or Key.End:
-                if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                     ExplorerGrid.MultiSelect(key);
                 else
                     ExplorerGrid.SingleSelect(key);
@@ -1290,23 +1292,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2 or MouseButton.Right)
+        if (e.ChangedButton is not MouseButton.Left)
             return;
+
+        if (e.OriginalSource is Border)
+        {
+            ClickCount = -1;
+            return;
+        }
 
         var row = sender as DataGridRow;
 
-        if (!row.IsSelected)
-        {
-            ExplorerGrid.UnselectAll();
-        }
+        IsDragInProgress = e.OriginalSource is TextBlock or Image || row.IsSelected;
 
-        if (e.OriginalSource is not Border)
-        {
-            row.IsSelected = true;
-
-            SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, row.GetIndex());
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, row.GetIndex());
-        }
+        SelectionHelper.SetIndexSingle(ExplorerGrid, row.GetIndex());
     }
 
     private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
@@ -1321,8 +1320,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        IsDragInProgress = e.OriginalSource is TextBlock or Image;
+
         var point = e.GetPosition(ExplorerGrid);
         MouseDownPoint = point;
+
         var actualRowWidth = 0.0;
         int selectionIndex;
         var rowHeight = ExplorerGrid.MinRowHeight + (RuntimeSettings.UseFluentStyles ? 2 : 0); // fluent row margin = 0, 1
@@ -1649,114 +1651,49 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void NameColumnCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+    private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         if (e.ChangedButton != MouseButton.Left)
             return;
+
+        if (e.OriginalSource is Border)
+        {
+            ClickCount = -1;
+            return;
+        }
 
         var cell = sender as DataGridCell;
         if (cell.IsEditing)
             return;
 
+        var row = DataGridRow.GetRowContainingElement(cell);
+        var current = row.GetIndex();
+
+        IsDragInProgress = e.OriginalSource is TextBlock or Image || row.IsSelected;
+        WasSelected = row.IsSelected;
+
         MouseDownPoint = e.GetPosition(ExplorerGrid);
         e.Handled = true;
-        clickCount = e.ClickCount;
+        ClickCount = e.ClickCount;
 
-        if (clickCount > 1)
+        if (ClickCount > 1)
         {
             DoubleClick(cell.DataContext);
+            return;
         }
-        else
+
+        RuntimeSettings.IsPathBoxFocused = false;
+
+        if (!row.IsSelected && IsDragInProgress)
         {
-            RuntimeSettings.IsPathBoxFocused = false;   
-            var row = DataGridRow.GetRowContainingElement(cell);
-            var current = row.GetIndex();
-
-            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
-            {
-                ExplorerGrid.SelectedItems.Clear();
-
-                int firstUnselected = firstSelectedRow, lastUnselected = current + 1;
-                if (current < firstSelectedRow)
-                {
-                    firstUnselected = current;
-                    lastUnselected = firstSelectedRow + 1;
-                }
-
-                for (int i = firstUnselected; i < lastUnselected; i++)
-                {
-                    ExplorerGrid.SelectedItems.Add(ExplorerGrid.Items[i]);
-                }
-
-                return;
-            }
-
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-            {
-                row.IsSelected = !row.IsSelected;
-                return;
-            }
-
-            firstSelectedRow = row.GetIndex();
-
-            if (!row.IsSelected)
-            {
-                ExplorerGrid.SelectedItems.Clear();
-                row.IsSelected = true;
-            }
-            else
-            {
-                if (SelectedFiles is null || SelectedFiles.Count() > 1)
-                {
-                    ExplorerGrid.SelectedItems.Clear();
-                    row.IsSelected = true;
-
-                    return;
-                }
-
-                if (cell.IsReadOnly || (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
-                    && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
-                    return;
-
-                Task.Delay(DOUBLE_CLICK_TIMEOUT).ContinueWith(t =>
-                {
-                    if (clickCount != 1)
-                        return;
-
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (e.LeftButton == MouseButtonState.Released && SelectedFiles.Count() == 1)
-                        {
-                            cell.IsEditing = true;
-                            FileActions.IsExplorerEditing = true;
-                        }
-                    });
-                });
-            }
+            ExplorerGrid.UnselectAll();
+            row.IsSelected = true;
         }
-    }
 
-    private void NameColumnCell_MouseEnter(object sender, MouseEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-            DataGridRow.GetRowContainingElement(sender as DataGridCell).IsSelected = true;
-    }
-
-    private void NameColumnCell_MouseLeave(object sender, MouseEventArgs e)
-    {
-        if (e.LeftButton == MouseButtonState.Pressed)
-        {
-            var cell = sender as DataGridCell;
-            var row = DataGridRow.GetRowContainingElement(cell);
-            var index = row.GetIndex();
-            var pos = e.GetPosition(cell).Y;
-
-            if (index == firstSelectedRow)
-                return;
-
-            if ((index > firstSelectedRow && pos < 0) || (index < firstSelectedRow && pos > 0))
-                row.IsSelected = false;
-        }
+        SelectionHelper.SetNextSelectedIndex(ExplorerGrid, current);
+        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
+        if (ExplorerGrid.SelectedItems.Count < 1)
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
     }
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
@@ -1779,16 +1716,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         IsInEditMode = true;
         if (!IsInEditMode) // in case cell was not acquired
             FileActionLogic.CreateNewItem(newItem);
-    }
-
-    private void ExplorerGrid_PreviewKeyDown(object sender, KeyEventArgs e)
-    {
-        if (e.Key is Key.Delete)
-        {
-            e.Handled = true;
-            if (FileActions.DeleteEnabled)
-                FileActionLogic.DeleteFiles();
-        }
     }
 
     private void ClearLogs()
@@ -1867,9 +1794,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
     {
         var point = e.GetPosition(ExplorerCanvas);
+        bool withinEditingCell = false;
+
+        if (IsInEditMode)
+        {
+            DataGridCell editingCell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
+            withinEditingCell = VisualTreeHelper.GetDescendantBounds(editingCell).Contains(e.GetPosition(editingCell));
+        }
+
         if (e.LeftButton == MouseButtonState.Released
             || !RuntimeSettings.IsExplorerLoaded
-            || MouseDownPoint == new Point(-1, -1))
+            || MouseDownPoint == NullPoint
+            || IsDragInProgress
+            || withinEditingCell)
         {
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
@@ -1909,10 +1846,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
         SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
 
-        SelectRows();
+        SelectRows(point);
     }
 
-    private void SelectRows()
+    private void SelectRows(Point mousePosition)
     {
         Rect selection = new(Canvas.GetLeft(SelectionRect),
                              Canvas.GetTop(SelectionRect),
@@ -1926,17 +1863,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             Rect rowRect = new(row.TranslatePoint(new(), ExplorerGrid), row.DesiredSize);
             row.IsSelected = rowRect.IntersectsWith(selection);
-        }
-    }
 
-    private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-    {
-        MouseDownPoint = e.GetPosition(ExplorerGrid);
+            rowRect.Inflate(double.PositiveInfinity, 0);
+            if (rowRect.Contains(mousePosition))
+                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, row.GetIndex());
+        }
+
+        if (ExplorerGrid.SelectedItems.Count == 1)
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
     }
 
     private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         SelectionRect.Visibility = Visibility.Collapsed;
+
+        if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+        {
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, SelectionHelper.GetNextSelectedIndex(ExplorerGrid));
+        }
     }
 
     private void CurrentOperationDetailedDataGrid_KeyUp(object sender, KeyEventArgs e)
@@ -1964,7 +1908,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Grid_MouseEnter(object sender, MouseEventArgs e)
     {
-        MouseDownPoint = new(-1, -1);
+        MouseDownPoint = NullPoint;
     }
 
     private void ExplorerGrid_Drop(object sender, DragEventArgs e)
@@ -1990,5 +1934,104 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void MainWin_Activated(object sender, EventArgs e)
     {
         FileActionLogic.UpdateClipboardDropItems();
+    }
+
+    private void DataGridCell_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton is not MouseButton.Left || ClickCount < 0)
+            return;
+
+        e.Handled = CellMouseUp(sender, e);
+
+        IsDragInProgress = false;
+    }
+
+    private bool CellMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        DataGridCell cell;
+        DataGridRow row;
+
+        if (sender is DataGridCell c)
+        {
+            cell = c;
+            row = DataGridRow.GetRowContainingElement(cell);
+
+            if (cell.IsEditing)
+                return false;
+        }
+        else if (sender is DataGridRow r)
+        {
+            row = r;
+            cell = null;
+        }
+        else
+            return false;
+
+        var current = row.GetIndex();
+        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
+
+        if (!IsDragInProgress && MultiRowSelect(row))
+            return true;
+
+        SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
+
+        if (!row.IsSelected || ExplorerGrid.SelectedItems?.Count != 1)
+        {
+            ExplorerGrid.UnselectAll();
+            row.IsSelected = true;
+            return true;
+        }
+
+        if (cell?.Column == NameColumn)
+            MouseUpOnName(cell);
+
+        return true;
+    }
+
+    private void MouseUpOnName(DataGridCell cell)
+    {
+        if (cell.IsReadOnly
+            || (DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
+                && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
+            return;
+
+        if (ClickCount == 1 && ExplorerGrid.SelectedItems.Count == 1 && WasSelected)
+        {
+            cell.IsEditing = true;
+            FileActions.IsExplorerEditing = true;
+        }
+    }
+
+    private bool MultiRowSelect(DataGridRow row)
+    {
+        var current = row.GetIndex();
+
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+        {
+            ExplorerGrid.UnselectAll();
+
+            var firstSelected = SelectionHelper.GetFirstSelectedIndex(ExplorerGrid);
+            int firstUnselected = firstSelected, lastUnselected = current + 1;
+            if (current < firstSelected)
+            {
+                firstUnselected = current;
+                lastUnselected = firstSelected + 1;
+            }
+
+            for (int i = firstUnselected; i < lastUnselected; i++)
+            {
+                ExplorerGrid.SelectedItems.Add(ExplorerGrid.Items[i]);
+            }
+
+            return true;
+        }
+
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            row.IsSelected = !row.IsSelected;
+            return true;
+        }
+
+        return false;
     }
 }

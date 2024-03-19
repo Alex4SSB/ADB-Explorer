@@ -18,12 +18,12 @@
     MinHeight="400"
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
+    Activated="MainWin_Activated"
     Background="{DynamicResource AdbWindowBackground}"
     Closing="Window_Closing"
     Cursor="{Binding ElementName=UnfinishedBlock, Path=Cursor}"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
-    Activated="MainWin_Activated"
     SizeChanged="Window_SizeChanged"
     SourceInitialized="Window_SourceInitialized"
     StateChanged="MainWin_StateChanged"
@@ -41,6 +41,7 @@
             TargetType="{x:Type DataGridCell}">
             <EventSetter Event="RequestBringIntoView" Handler="DataGridCell_RequestBringIntoView" />
             <EventSetter Event="PreviewMouseDown" Handler="DataGridCell_PreviewMouseDown" />
+            <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
         </Style>
         <Style
             x:Key="RowStyle"
@@ -51,6 +52,7 @@
             <EventSetter Event="MouseDoubleClick" Handler="DataGridRow_MouseDoubleClick" />
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
+            <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
         </Style>
     </Window.Resources>
     <Window.TaskbarItemInfo>
@@ -153,7 +155,6 @@
                         MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
                         MouseMove="ExplorerGrid_MouseMove"
-                        PreviewKeyDown="ExplorerGrid_PreviewKeyDown"
                         RowStyle="{StaticResource RowStyle}"
                         SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
                         SelectionChanged="ExplorerGrid_SelectionChanged"
@@ -180,13 +181,6 @@
                                 Header="Name"
                                 IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
                                 SortMemberPath="FullName">
-                                <DataGridTextColumn.CellStyle>
-                                    <Style BasedOn="{StaticResource DataGridCellStyle}" TargetType="DataGridCell">
-                                        <EventSetter Event="MouseEnter" Handler="NameColumnCell_MouseEnter" />
-                                        <EventSetter Event="MouseLeave" Handler="NameColumnCell_MouseLeave" />
-                                        <EventSetter Event="PreviewMouseDown" Handler="NameColumnCell_PreviewMouseDown" />
-                                    </Style>
-                                </DataGridTextColumn.CellStyle>
                                 <DataGridTextColumn.EditingElementStyle>
                                     <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
                                         <EventSetter Event="Loaded" Handler="NameColumnEdit_Loaded" />

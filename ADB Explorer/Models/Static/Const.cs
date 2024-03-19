@@ -93,7 +93,6 @@ public static class AdbExplorerConst
     public static readonly Version WIN11_VERSION = new(10, 0, 22000);
     public static readonly Version WIN11_22H2 = new(10, 0, 22621);
 
-    public static readonly TimeSpan DOUBLE_CLICK_TIMEOUT = TimeSpan.FromMilliseconds(300);
     public static readonly TimeSpan SELECTION_CHANGED_DELAY = TimeSpan.FromMilliseconds(150);
 
     public static readonly string ADB_EXPLORER_DATE_FORMAT = "yyyy.MM.dd-HH:mm:ss";

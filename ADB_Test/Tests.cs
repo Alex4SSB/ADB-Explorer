@@ -122,15 +122,15 @@ namespace ADB_Test
             string[] names = { "", "1" };
             string[] names1 = { "", "2" };
 
-            Assert.AreEqual("", FileClass.ExistingIndexes(names[..0])); // empty array
-            Assert.AreEqual(" 1", FileClass.ExistingIndexes(new [] { "" }));
-            Assert.AreEqual(" 2", FileClass.ExistingIndexes(names));
-            Assert.AreEqual(" 1", FileClass.ExistingIndexes(names1));
+            Assert.AreEqual("", FileHelper.ExistingIndexes(names[..0])); // empty array
+            Assert.AreEqual(" 1", FileHelper.ExistingIndexes(new [] { "" }));
+            Assert.AreEqual(" 2", FileHelper.ExistingIndexes(names));
+            Assert.AreEqual(" 1", FileHelper.ExistingIndexes(names1));
 
-            Assert.AreEqual("", FileClass.ExistingIndexes(names[..0], FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(new[] { "" }, FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 2", FileClass.ExistingIndexes(names, FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 1", FileClass.ExistingIndexes(names1, FileClass.CutType.Copy));
+            Assert.AreEqual("", FileHelper.ExistingIndexes(names[..0], FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes(new[] { "" }, FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 2", FileHelper.ExistingIndexes(names, FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes(names1, FileClass.CutType.Copy));
         }
 
         [TestMethod]

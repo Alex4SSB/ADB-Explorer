@@ -140,6 +140,7 @@
         <Setter Property="FontSize" Value="13" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="Opacity" Value="1" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
     <Style
         x:Key="DirectoryGridCellStyle"

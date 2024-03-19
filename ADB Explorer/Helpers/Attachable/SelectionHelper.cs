@@ -61,6 +61,31 @@ public static class SelectionHelper
             typeof(SelectionHelper),
             null);
 
+    public static int GetNextSelectedIndex(UIElement control) =>
+        (int)control.GetValue(NextSelectedIndexProperty);
+
+    public static void SetNextSelectedIndex(UIElement control, int value) =>
+        control.SetValue(NextSelectedIndexProperty, value);
+
+    public static readonly DependencyProperty NextSelectedIndexProperty =
+        DependencyProperty.RegisterAttached(
+            "NextSelectedIndex",
+            typeof(int),
+            typeof(SelectionHelper),
+            null);
+
+    /// <summary>
+    /// Sets index to First, Current, and Next
+    /// </summary>
+    /// <param name="control"></param>
+    /// <param name="value"></param>
+    public static void SetIndexSingle(UIElement control, int value)
+    {
+        SetFirstSelectedIndex(control, value);
+        SetCurrentSelectedIndex(control, value);
+        SetNextSelectedIndex(control, value);
+    }
+
     public static bool GetSelectionInProgress(UIElement control) =>
         (bool)control.GetValue(SelectionInProgressProperty);
 
@@ -142,6 +167,7 @@ public static class SelectionHelper
         }
 
         SetCurrentSelectedIndex(dataGrid, dataGrid.SelectedIndex);
+        SetFirstSelectedIndex(dataGrid, dataGrid.SelectedIndex);
         if (dataGrid.SelectedIndex > -1)
             dataGrid.ScrollIntoView(dataGrid.SelectedItem);
     }
