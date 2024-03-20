@@ -425,13 +425,9 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False" />
-                </MultiDataTrigger.Conditions>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
                 <Setter Property="AllowDrop" Value="True" />
-            </MultiDataTrigger>
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
@@ -504,6 +500,9 @@
             </Trigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
                 <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <Setter Property="AllowDrop" Value="True" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>

@@ -69,7 +69,9 @@ public class PackageInstallOperation : AbstractShellFileOperation
             args[index] = FilePath.FullPath;
         }
 
-        args[index] = ADBService.EscapeAdbShellString(args[index]);
+        args[index] = PushPackage 
+            ? ADBService.EscapeAdbString(args[index])
+            : ADBService.EscapeAdbShellString(args[index]);
 
         var operationTask = PushPackage
                 ? ADBService.ExecuteDeviceAdbCommand(Device.ID, CancelTokenSource.Token, "install", args)

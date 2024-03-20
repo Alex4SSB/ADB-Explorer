@@ -1916,6 +1916,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
             return;
 
+        if (FileActions.IsAppDrive)
+        {
+            DropPackages(items);
+            return;
+        }
+
         FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), CurrentPath);
     }
 
@@ -1924,11 +1930,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
             return;
 
+        if (FileActions.IsAppDrive)
+        {
+            DropPackages(items);
+            return;
+        }
+
         if (((DataGridRow)sender).DataContext is not FileClass target
             || !target.IsDirectory)
             return;
 
         FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target.FullPath);
+    }
+
+    private void DropPackages(string[] items)
+    {
+        if (items.AnyAll(i => i.Contains('.') && APK_NAMES.Any(n => n[1..] == i.Split('.').Last().ToUpper())))
+            ShellFileOperation.PushPackages(CurrentADBDevice, items.Select(ShellObject.FromParsingName), Dispatcher);
     }
 
     private void MainWin_Activated(object sender, EventArgs e)

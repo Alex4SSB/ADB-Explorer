@@ -93,6 +93,9 @@ public class DiskUsage : ViewModelBase
 
     public static DiskUsage Consolidate(IEnumerable<DiskUsage> list)
     {
+        if (!list.Any())
+            return null;
+
         var time = list.Max(u => u.TimeStamp);
 
         var read = (ulong)list.Sum(u => (decimal)u.ReadRate);
@@ -154,6 +157,9 @@ internal static class DiskUsageHelper
     {
         var newUsages = GetAdbProcs().Select(GetDiskUsage).Where(usage => usage is not null);
 
+        if (!newUsages.Any())
+            return;
+
         var syncUsages = Data.FileOpQ.Operations
             .OfType<FileSyncOperation>()
             .Where(op => op.Status is FileOperation.OperationStatus.InProgress)
@@ -168,6 +174,9 @@ internal static class DiskUsageHelper
         }
 
         var newUsage = DiskUsage.Consolidate(newUsages);
+
+        if (newUsage is null)
+            return;
 
         if (prevUsage is not null && DateTime.Now - LastUpdate >= AdbExplorerConst.DISK_USAGE_INTERVAL_IDLE)
         {

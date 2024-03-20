@@ -19,6 +19,7 @@
     ui:ThemeManager.IsThemeAware="True"
     ui:WindowHelper.UseModernWindowStyle="True"
     Activated="MainWin_Activated"
+    AllowDrop="True"
     Background="{DynamicResource AdbWindowBackground}"
     Closing="Window_Closing"
     Cursor="{Binding ElementName=UnfinishedBlock, Path=Cursor}"
