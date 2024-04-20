@@ -23,7 +23,7 @@ public class FileDeleteOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
 
-        var task = ADBService.ExecuteDeviceAdbShellCommand(Device.ID, CancelTokenSource.Token, "rm", "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath)); 
+        var task = ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource.Token, "rm", "-rf", ADBService.EscapeAdbShellString(FilePath.FullPath)); 
 
         task.ContinueWith((t) =>
         {

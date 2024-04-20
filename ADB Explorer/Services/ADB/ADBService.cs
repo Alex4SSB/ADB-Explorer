@@ -40,7 +40,7 @@ public partial class ADBService
         public string StandardError { get; set; }
     };
 
-    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, Process cmdProcess = null, params string[] args)
+    public static Process StartCommandProcess(string file, string cmd, Encoding encoding, bool redirect = true, Process cmdProcess = null, string workingDir = null, params string[] args)
     {
         cmdProcess ??= new();
         var arguments = string.Join(' ', args.Prepend(cmd).Where(arg => !string.IsNullOrEmpty(arg)));
@@ -51,6 +51,7 @@ public partial class ADBService
         cmdProcess.StartInfo.RedirectStandardError =
         cmdProcess.StartInfo.CreateNoWindow = redirect;
 
+        cmdProcess.StartInfo.WorkingDirectory = workingDir;
         cmdProcess.StartInfo.FileName = file;
         cmdProcess.StartInfo.Arguments = arguments;
 
@@ -76,7 +77,7 @@ public partial class ADBService
 
         using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync(cancellationToken);
         using var stderrTask = cmdProcess.StandardError.ReadToEndAsync(cancellationToken);
-
+        
         using var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
 
         Task.WaitAll(stdoutTask, stderrTask, processTask);
@@ -113,23 +114,23 @@ public partial class ADBService
     }
 
     public static IEnumerable<string> RedirectCommandAsync(
-        string file, CancellationToken cancellationToken, Process process = null, params string[] args)
+        string file, CancellationToken cancellationToken, Process process = null, string workingDir = null, params string[] args)
     {
         if (Settings.UseProgressRedirection)
         {
             if (file[0] != '"')
                 file = $"\"{file}\"";
 
-            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, args);
+            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, workingDir, args: args);
         }
         else
-            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, true, process, args);
+            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, true, process, workingDir, args: args);
     }
 
     public static IEnumerable<string> ExecuteCommandAsync(
-        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, params string[] args)
+        string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {
-        using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, args);
+        using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, workingDir, args: args);
 
         Task<string?> stdoutLineTask = null;
         string stdoutLine = null;
@@ -202,7 +203,7 @@ public partial class ADBService
             }
             else
             {
-                if (stderr[1] == '\0')
+                if (!string.IsNullOrEmpty(stderr) && stderr[1] == '\0')
                 {
                     stderr = Encoding.Unicode.GetString(Encoding.UTF8.GetBytes(stderr));
 
@@ -228,7 +229,10 @@ public partial class ADBService
         return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, new[] { cmd }.Concat(args).ToArray());
     }
 
-    public static async Task<string> ExecuteDeviceAdbShellCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
+    /// <summary>
+    /// Executes a device ADB shell command that is expected to return a value only upon failure.
+    /// </summary>
+    public static async Task<string> ExecuteVoidShellCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
     {
         string stdout = "", stderr = "";
         var res = await Task.Run(() => ExecuteDeviceAdbShellCommand(deviceId, cmd, out stdout, out stderr, cancellationToken, args), cancellationToken);

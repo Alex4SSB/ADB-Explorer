@@ -96,19 +96,19 @@ public static class FileHelper
         
         foreach (var item in items)
         {
-            item.CutState = FileClass.CutType.None;
+            item.CutState = CutType.None;
         }
         Data.CutItems.RemoveAll(items.ToList());
 
-        Data.FileActions.PasteState = FileClass.CutType.None;
+        Data.FileActions.PasteState = CutType.None;
     }
 
     public static string ConcatPaths(FilePath path1, string path2) => 
-        ConcatPaths(path1.FullPath, path2, path1.PathType is AbstractFile.FilePathType.Android ? '/' : '\\');
+        ConcatPaths(path1.FullPath, path2, path1.PathType is FilePathType.Android ? '/' : '\\');
 
     public static string ConcatPaths(string path1, string path2, char separator = '/')
     {
-        return $"{path1.TrimEnd(AbstractFile.Separators)}{separator}{path2.TrimStart(AbstractFile.Separators)}";
+        return $"{path1.TrimEnd(Separators)}{separator}{path2.TrimStart(Separators)}";
     }
 
     public static string ExtractRelativePath(string fullPath, string parent)

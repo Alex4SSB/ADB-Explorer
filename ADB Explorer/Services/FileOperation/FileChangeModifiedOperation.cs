@@ -24,7 +24,7 @@ public class FileChangeModifiedOperation : AbstractShellFileOperation
         Status = OperationStatus.InProgress;
         StatusInfo = new InProgShellProgressViewModel();
 
-        var operationTask = ADBService.ExecuteDeviceAdbShellCommand(Device.ID,
+        var operationTask = ADBService.ExecuteVoidShellCommand(Device.ID,
                                                                     CancelTokenSource.Token,
                                                                     "touch",
                                                                     "-m",

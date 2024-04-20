@@ -75,7 +75,7 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
         var operationTask = PushPackage
                 ? ADBService.ExecuteDeviceAdbCommand(Device.ID, CancelTokenSource.Token, "install", args)
-                : ADBService.ExecuteDeviceAdbShellCommand(Device.ID, CancelTokenSource.Token, "pm", args);
+                : ADBService.ExecuteVoidShellCommand(Device.ID, CancelTokenSource.Token, "pm", args);
 
         operationTask.ContinueWith((t) =>
         {

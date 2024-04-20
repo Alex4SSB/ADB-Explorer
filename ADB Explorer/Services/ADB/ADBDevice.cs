@@ -138,17 +138,27 @@ public partial class ADBService
             Process cmdProcess,
             ref ObservableList<FileOpProgressInfo> updates, CancellationToken cancellationToken)
         {
+            string workingDir = "", _target = "";
+            if (target[1] == ':' && target.Split('\\').Count(s => s.Length > 0) < 3)
+            {
+                workingDir = target[..(target.IndexOf('\\') + 1)];
+                target = "./";
+            }
+            else
+                _target = EscapeAdbString(target);
+
             var stdout = RedirectCommandAsync(
                 Data.RuntimeSettings.AdbPath,
                 cancellationToken,
                 cmdProcess,
-                new string[] {
+                workingDir,
+                args: new string[] {
                     "-s",
                     ID,
                     cmd,
                     arg,
                     EscapeAdbString(source),
-                    EscapeAdbString(target)
+                    _target
                 });
             
             // Each line should be a progress update (but sometimes the output can be weird)
