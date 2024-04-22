@@ -32,18 +32,18 @@ public class DirectoryLister : ViewModelBase
         private set => Set(ref isProgressVisible, value);
     }
 
-    private bool isLinlListingFinished = false;
+    private bool isLinkListingFinished = false;
     public bool IsLinkListingFinished
     {
-        get => isLinlListingFinished;
-        set => Set(ref isLinlListingFinished, value);
+        get => isLinkListingFinished;
+        private set => Set(ref isLinkListingFinished, value);
     }
 
     private Dispatcher Dispatcher { get; }
     private Task UpdateTask { get; set; }
     private TimeSpan UpdateInterval { get; set; }
     private int MinUpdateThreshold { get; set; }
-    private Task ReadTask { get; set; }
+    private Task ReadTask { get; set; } = null;
     private CancellationTokenSource CurrentCancellationToken { get; set; }
     private CancellationTokenSource LinkListCancellation { get; set; }
     private Func<FileClass, FileClass> FileManipulator { get; }
@@ -67,6 +67,7 @@ public class DirectoryLister : ViewModelBase
     {
         LinkListCancellation?.Cancel();
         StopDirectoryList();
+        IsLinkListingFinished = true;
     }
 
     private void StartDirectoryList(string path)
@@ -157,7 +158,7 @@ public class DirectoryLister : ViewModelBase
     {
         if (ReadTask == null)
         {
-            return;
+           return;
         }
 
         CurrentCancellationToken.Cancel();
@@ -175,6 +176,12 @@ public class DirectoryLister : ViewModelBase
         IsProgressVisible = false;
         ReadTask = null;
         CurrentCancellationToken = null;
+
+        if (currentFileQueue.IsEmpty && !FileList.Any())
+        {
+            isLinkListingFinished = true;
+            return;
+        }
 
         Task.Run(ListLinks, LinkListCancellation.Token);
     }

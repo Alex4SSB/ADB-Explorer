@@ -87,9 +87,9 @@ namespace ADB_Explorer.Models
                 return false;
             }
 
-            var fileAction = direction is not SpecialLocation.Forward
-                ? FileAction.FileActionType.Back
-                : FileAction.FileActionType.Forward;
+            var fileAction = direction is SpecialLocation.Forward
+                ? FileAction.FileActionType.Forward
+                : FileAction.FileActionType.Back;
             var command = AppActions.List.First(action => action.Name == fileAction).Command.Command as CommandHandler;
 
             Data.RuntimeSettings.LocationToNavigate = direction;

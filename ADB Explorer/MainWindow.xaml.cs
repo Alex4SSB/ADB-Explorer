@@ -40,6 +40,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private string prevPath = "";
 
+    /// <summary>
+    /// Back / Forward Navigation
+    /// </summary>
+    private bool bfNavigation = false;
+
     private int ClickCount = 0;
     private bool IsDragInProgress = false;
     private bool WasSelected = false;
@@ -249,7 +254,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 case nameof(AppRuntimeSettings.PathBoxNavigation):
                     if (RuntimeSettings.PathBoxNavigation == "-")
-                        NavigateToLocation(NavHistory.GoBack(), true);
+                    {
+                        bfNavigation = true;
+                        NavigateToLocation(NavHistory.GoBack());
+                    }
                     else
                     {
                         if (FileActions.IsExplorerVisible)
@@ -269,15 +277,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     switch (RuntimeSettings.LocationToNavigate)
                     {
                         case NavHistory.SpecialLocation.Back:
-                            NavigateToLocation(NavHistory.GoBack(), true);
+                            bfNavigation = true;
+                            NavigateToLocation(NavHistory.GoBack());
                             break;
                         case NavHistory.SpecialLocation.Forward:
-                            NavigateToLocation(NavHistory.GoForward(), true);
+                            bfNavigation = true;
+                            NavigateToLocation(NavHistory.GoForward());
                             break;
                         case NavHistory.SpecialLocation.Up:
+                            bfNavigation = false;
                             NavigateToPath(ParentPath);
                             break;
                         case not null:
+                            bfNavigation = false;
                             if (FileActions.IsDriveViewVisible && NavHistory.LocationFromString(RuntimeSettings.LocationToNavigate) is NavHistory.SpecialLocation.DriveView)
                                 FileActionLogic.RefreshDrives(true);
                             else
@@ -626,23 +638,19 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 TrashHelper.EnableRecycleButtons();
             }
         }
-        else if (e.PropertyName == nameof(DirectoryLister.IsLinkListingFinished)
-            && DirList.IsLinkListingFinished)
+        else if (e.PropertyName == nameof(DirectoryLister.IsLinkListingFinished))
         {
-            if (ExplorerGrid.Items.Count < 1)
+            if (ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished)
                 return;
 
-            if (!string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null)
+            if (bfNavigation && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null)
             {
-                Task.Delay(DIR_LIST_AUTO_SCROLL_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => FileActions.ItemToSelect = prevItem));
+                FileActions.ItemToSelect = prevItem;
             }
             else
             {
-                Task.Delay(DIR_LIST_AUTO_SCROLL_DELAY).ContinueWith((t) => Dispatcher.Invoke(() =>
-                {
                     if (ExplorerGrid.Items.Count > 0)
                         ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
-                }));
             }
         }
     });
@@ -749,7 +757,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     }
                     break;
                 case FileType.Folder:
-                    NavigateToPath(file.FullPath, isLink: file.IsLink);
+                    bfNavigation = false;
+                    NavigateToPath(file.FullPath, file.IsLink);
                     break;
                 default:
                     break;
@@ -928,7 +937,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
     }
 
-    private bool InitNavigation(string path = "", bool bfNavigated = false)
+    private bool InitNavigation(string path = "")
     {
         if (path is null)
             return true;
@@ -955,7 +964,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (Width > MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
             RuntimeSettings.IsSearchBoxFocused = true;
 
-        return _navigateToPath(realPath, bfNavigated);
+        return _navigateToPath(realPath);
     }
 
     private void ListDevices(IEnumerable<LogicalDevice> devices)
@@ -1035,10 +1044,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(DeviceHelper.ListServices), WiFiPairingService.GetServices()).Wait();
     }
 
-    public bool NavigateToPath(string path, bool bfNavigated = false, bool isLink = false)
+    public bool NavigateToPath(string path, bool isLink = false)
     {
         if (path is null)
             return false;
+
+        if (!bfNavigation)
+            prevPath = path;
 
         string realPath;
         if (isLink && ADBService.ReadLink(CurrentADBDevice.ID, path) is string linkTarget && !string.IsNullOrEmpty(linkTarget))
@@ -1048,22 +1060,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileActions.ExplorerFilter = "";
 
-        return realPath is not null && _navigateToPath(realPath, bfNavigated);
+        return realPath is not null && _navigateToPath(realPath);
     }
 
-    private bool _navigateToPath(string realPath, bool bfNavigated = false)
+    private bool _navigateToPath(string realPath)
     {
-        if (bfNavigated)
-            prevPath = CurrentPath;
-        else
-        {
             NavHistory.Navigate(realPath);
 
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);
             SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, -1);
-
-            prevPath = "";
-        }
 
         ExplorerGrid.Focus();
         CurrentPath = realPath;
@@ -1131,7 +1136,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return true;
     }
 
-    private void NavigateToLocation(object location, bool bfNavigated = false)
+    private void NavigateToLocation(object location)
     {
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
 
@@ -1155,9 +1160,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
 
             if (!FileActions.IsExplorerVisible)
-                InitNavigation(path, bfNavigated);
+                InitNavigation(path);
             else
-                NavigateToPath(path, bfNavigated);
+                NavigateToPath(path);
         }
     }
 
@@ -1268,6 +1273,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         switch (key)
         {
             case Key.Down or Key.Up or Key.Home or Key.End:
+                if (bfNavigation)
+                {
+                    SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                    bfNavigation = false;
+                }
+
                 if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                     ExplorerGrid.MultiSelect(key);
                 else
