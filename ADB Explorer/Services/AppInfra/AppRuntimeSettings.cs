@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 using System.Collections;
 
@@ -348,6 +347,8 @@ public class AppRuntimeSettings : ViewModelBase
     public string DefaultBrowserPath { get; set; }
 
     public string AdbPath { get; set; }
+
+    public string TempDragPath => FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.TEMP_DRAG_FOLDER, '\\');
 
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 

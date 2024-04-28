@@ -649,9 +649,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             }
             else
             {
-                    if (ExplorerGrid.Items.Count > 0)
-                        ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                if (ExplorerGrid.Items.Count > 0)
+                    ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
             }
+
+            PrepareFileDescriptors();
         }
     });
 
@@ -747,7 +749,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     switch (Settings.DoubleClick)
                     {
                         case AppSettings.DoubleClickAction.pull when Settings.IsPullOnDoubleClickEnabled:
-                            FileActionLogic.PullFiles(true);
+                            FileActionLogic.PullFiles(Settings.DefaultFolder);
                             break;
                         case AppSettings.DoubleClickAction.edit when FileActions.EditFileEnabled:
                             FileActionLogic.OpenEditor();
@@ -1065,10 +1067,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool _navigateToPath(string realPath)
     {
-            NavHistory.Navigate(realPath);
+        NavHistory.Navigate(realPath);
 
-            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);
-            SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, -1);
+        SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);
+        SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, -1);
 
         ExplorerGrid.Focus();
         CurrentPath = realPath;
@@ -1518,7 +1520,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
                 collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
             }
+
+            PrepareFileDescriptors();
         }
+    }
+
+    private void PrepareFileDescriptors()
+    {
+        if (FileActions.IsAppDrive || FileActions.IsRecycleBin)
+            return;
+
+        Cursor = Cursors.AppStarting;
+        var items = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Cast<FileClass>().Where(f => f.Descriptors is null).ToList();
+
+        // PrepareDescriptors accesses the Children, which in turn executes the find command and builds the tree
+        Task.Run(() => items.ForEach(f => f.PrepareDescriptors()))
+            .ContinueWith((t) => Dispatcher.Invoke(() => Cursor = Cursors.Arrow));
     }
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
@@ -1705,6 +1722,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
         if (ExplorerGrid.SelectedItems.Count < 1)
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
+         
+        if (IsDragInProgress)
+        {
+            if (ExplorerGrid.SelectedItems.Count < 1 || ExplorerGrid.SelectedItems[0] is not FileClass)
+                return;
+
+            var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
+            var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems);
+
+            if (vfdo is null)
+                return;
+
+            VirtualFileDataObject.SendObjectToSystem(vfdo, VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy);
+        }
     }
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)

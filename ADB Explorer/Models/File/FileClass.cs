@@ -95,6 +95,34 @@ public class FileClass : FilePath, IFileStat
 
     public FileNameSort SortName { get; private set; }
 
+    private string[] children = null;
+    public string[] Children
+    {
+        get
+        {
+            if (children is null || !IsDirectory)
+            {
+                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID,
+                                                        "cd",
+                                                        out string stdout,
+                                                        out _,
+                                                        new(),
+                                                        ParentPath,
+                                                        "&&",
+                                                        "find",
+                                                        ADBService.EscapeAdbShellString(FullName),
+                                                        "-type",
+                                                        "f");
+
+                children = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            return children;
+        }
+    }
+
+    public IEnumerable<VirtualFileDataObject.FileDescriptor> Descriptors { get; private set; } = null;
+
     #region Read Only Properties
 
     public bool IsApk => AdbExplorerConst.APK_NAMES.Contains(Extension.ToUpper());
@@ -249,15 +277,67 @@ public class FileClass : FilePath, IFileStat
             return name;
     }
 
+    public void PrepareDescriptors()
+    {
+        SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'));
+        var fileOp = FileSyncOperation.PullFile(new(this), target, Data.CurrentADBDevice, App.Current.Dispatcher);
+        
+        // When a folder isn't empty, there's no need creating a file descriptor for it, since all folders are automatcally created
+        var items = IsDirectory && Children.Any() ? Children : new[] { FullName };
+
+        // Set directory flag only for an empty folder
+        bool isDir = IsDirectory && !Children.Any();
+
+        // We only know the size of a single file beforehand
+        long? size = IsDirectory ? null : (long)Size;
+
+        Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor()
+        {
+            Name = item,
+            IsDirectory = isDir,
+            Length = size,
+            StreamContents = (stream) =>
+            {
+                // Start the operation if it hasn't been started yet
+                if (fileOp.Status is FileOperation.OperationStatus.Waiting)
+                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(fileOp));
+
+                // Wait for the operation to complete
+                while (fileOp.Status is not FileOperation.OperationStatus.Completed)
+                {
+                    Thread.Sleep(100);
+                }
+
+                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item, '\\');
+
+                // Try 10 times to read from the file and write to the stream,
+                // in case the file is still in use by ADB or hasn't appeared yet
+                for (int i = 0; i < 10; i++)
+                {
+                    try
+                    {
+                        stream.Write(File.ReadAllBytes(file));
+                        break;
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(100);
+                        continue;
+                    }
+                }
+            }
+        });
+    }
+
     public override string ToString()
     {
         if (TrashIndex is null)
         {
-            return $"{DisplayName}\n{ModifiedTimeString}\n{TypeName}\n{SizeString}";
+            return $"{DisplayName} \n{ModifiedTimeString} \n{TypeName} \n{SizeString}";
         }
         else
         {
-            return $"{DisplayName}\n{TrashIndex.OriginalPath}\n{TrashIndex.ModifiedTimeString}\n{TypeName}\n{SizeString}\n{ModifiedTimeString}";
+            return $"{DisplayName} \n{TrashIndex.OriginalPath} \n{TrashIndex.ModifiedTimeString} \n{TypeName} \n{SizeString} \n{ModifiedTimeString}";
         }
     }
 

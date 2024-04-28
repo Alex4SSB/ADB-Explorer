@@ -417,6 +417,15 @@ internal static class FileActionLogic
 
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
+
+        if (isCopy)
+        {
+            var vfdo = VirtualFileDataObject.PrepareTransfer(Data.CutItems);
+            if (vfdo is null)
+                return;
+
+            VirtualFileDataObject.SendObjectToSystem(vfdo, VirtualFileDataObject.SendMethod.Clipboard);
+        }
     }
 
     public static void Rename(TextBox textBox)
@@ -838,16 +847,16 @@ internal static class FileActionLogic
         }
     }
 
-    public static void PullFiles(bool quick = false)
+    public static void PullFiles(string targetPath = "")
     {
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
         int itemsCount = Data.SelectedFiles.Count();
         ShellObject path;
 
-        if (quick)
+        if (!string.IsNullOrEmpty(targetPath))
         {
-            path = ShellObject.FromParsingName(Data.Settings.DefaultFolder);
+            path = ShellObject.FromParsingName(targetPath);
         }
         else
         {

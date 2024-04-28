@@ -2,9 +2,10 @@
 // https://dlaa.me/blog/post/9913083
 // Used and modified under the MIT license
 
+using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
 
-namespace VirtualFileDataObject;
+namespace ADB_Explorer.Services;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
@@ -55,7 +56,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <summary>
     /// Stores the user-specified start action.
     /// </summary>
-    private readonly Action<VirtualFileDataObject> _startAction;
+    public readonly Action<VirtualFileDataObject> _startAction;
 
     /// <summary>
     /// Stores the user-specified end action.
@@ -65,21 +66,19 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <summary>
     /// Initializes a new instance of the VirtualFileDataObject class.
     /// </summary>
-    public VirtualFileDataObject()
-    {
-        IsAsynchronous = true;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the VirtualFileDataObject class.
-    /// </summary>
     /// <param name="startAction">Optional action to run at the start of the data transfer.</param>
     /// <param name="endAction">Optional action to run at the end of the data transfer.</param>
     public VirtualFileDataObject(Action<VirtualFileDataObject> startAction, Action<VirtualFileDataObject> endAction)
-        : this()
     {
+        IsAsynchronous = true;
+
         _startAction = startAction;
         _endAction = endAction;
+    }
+
+    public VirtualFileDataObject() : this((vfdo) => { }, (vfdo) => { })
+    {
+        // Usually this would have Dispatcher.BeginInvoke() in each of the actions
     }
 
     #region IDataObject Members
@@ -171,13 +170,11 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         {
             // Find the best match
             var formatCopy = format; // Cannot use ref or out parameter inside an anonymous method, lambda expression, or query expression
-            var dataObject = _dataObjects
-                .Where(d =>
-                    (d.FORMATETC.cfFormat == formatCopy.cfFormat) &&
-                    (d.FORMATETC.dwAspect == formatCopy.dwAspect) &&
-                    (0 != (d.FORMATETC.tymed & formatCopy.tymed) &&
-                    (d.FORMATETC.lindex == formatCopy.lindex)))
-                .FirstOrDefault();
+            var dataObject = _dataObjects.FirstOrDefault(d =>
+                    (d.FORMATETC.cfFormat == formatCopy.cfFormat)
+                    && (d.FORMATETC.dwAspect == formatCopy.dwAspect)
+                    && 0 != (d.FORMATETC.tymed & formatCopy.tymed)
+                    && (d.FORMATETC.lindex == formatCopy.lindex));
             if (dataObject != null)
             {
                 if (!IsAsynchronous && (FILEDESCRIPTORW == dataObject.FORMATETC.cfFormat) && !_inOperation)
@@ -300,6 +297,27 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
     #endregion
 
+    public void UpdateData(short dataFormat, IEnumerable<byte> data)
+    {
+        var query = _dataObjects.Where(dataObject => dataObject.FORMATETC.cfFormat == dataFormat);
+        if (!query.Any())
+        {
+            SetData(dataFormat, data);
+            return;
+        }
+
+        var dataObject = query.First();
+        Marshal.FreeHGlobal(dataObject.GetData().Item1);
+
+        dataObject.GetData = () =>
+        {
+            var dataArray = data.ToArray();
+            var ptr = Marshal.AllocHGlobal(dataArray.Length);
+            Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
+            return (ptr, NativeMethods.S_OK);
+        };
+    }
+
     /// <summary>
     /// Provides data for the specified data format (HGLOBAL).
     /// </summary>
@@ -380,8 +398,10 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     {
         // Prepare buffer
         List<byte> bytes = new();
+
         // Add FILEGROUPDESCRIPTOR header
-        bytes.AddRange(StructureBytes(new NativeMethods.FILEGROUPDESCRIPTOR { cItems = (uint)(fileDescriptors.Count()) }));
+        bytes.AddRange(StructureBytes(new NativeMethods.FILEGROUPDESCRIPTOR { cItems = (uint)fileDescriptors.Count() }));
+
         // Add n FILEDESCRIPTORs
         foreach (var fileDescriptor in fileDescriptors)
         {
@@ -390,10 +410,18 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             {
                 cFileName = fileDescriptor.Name,
             };
+
+            // Set optional directory flag
+            if (fileDescriptor.IsDirectory)
+            {
+                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FLAGS.FD_ATTRIBUTES;
+                FILEDESCRIPTOR.dwFileAttributes |= NativeMethods.FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY;
+            }
+
             // Set optional timestamp
             if (fileDescriptor.ChangeTimeUtc.HasValue)
             {
-                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_CREATETIME | NativeMethods.FD_WRITESTIME;
+                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FLAGS.FD_CREATETIME | NativeMethods.FD_FLAGS.FD_WRITESTIME;
                 var changeTime = fileDescriptor.ChangeTimeUtc.Value.ToLocalTime().ToFileTime();
                 var changeTimeFileTime = new FILETIME
                 {
@@ -403,19 +431,25 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                 FILEDESCRIPTOR.ftLastWriteTime = changeTimeFileTime;
                 FILEDESCRIPTOR.ftCreationTime = changeTimeFileTime;
             }
+
             // Set optional length
             if (fileDescriptor.Length.HasValue)
             {
-                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FILESIZE;
+                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FLAGS.FD_FILESIZE;
                 FILEDESCRIPTOR.nFileSizeLow = (uint)(fileDescriptor.Length & 0xffffffff);
                 FILEDESCRIPTOR.nFileSizeHigh = (uint)(fileDescriptor.Length >> 32);
             }
+
             // Add structure to buffer
             bytes.AddRange(StructureBytes(FILEDESCRIPTOR));
         }
 
-        // Set CFSTR_FILEDESCRIPTORW
-        SetData(FILEDESCRIPTORW, bytes);
+        // Update file descriptors to preserve the pointer if already set
+        UpdateData(FILEDESCRIPTORW, bytes);
+
+        // Remove all previous streams
+        _dataObjects.RemoveAll(d => d.FORMATETC.cfFormat == FILECONTENTS);
+
         // Set n CFSTR_FILECONTENTS
         var index = 0;
         foreach (var fileDescriptor in fileDescriptors)
@@ -597,6 +631,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         /// Gets or sets an Action that returns the contents of the file.
         /// </summary>
         public Action<Stream> StreamContents { get; set; }
+
+        public bool IsDirectory { get; set; }
     }
 
     /// <summary>
@@ -634,88 +670,100 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             _iStream = iStream;
         }
 
-        /// <summary>
-        /// Gets a value indicating whether the current stream supports reading.
-        /// </summary>
         public override bool CanRead => false;
 
-        /// <summary>
-        /// Gets a value indicating whether the current stream supports seeking.
-        /// </summary>
         public override bool CanSeek => false;
 
-        /// <summary>
-        /// Gets a value indicating whether the current stream supports writing.
-        /// </summary>
         public override bool CanWrite => true;
 
-        /// <summary>
-        /// Clears all buffers for this stream and causes any buffered data to be written to the underlying device.
-        /// </summary>
         public override void Flush()
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Gets the length in bytes of the stream.
-        /// </summary>
         public override long Length
         {
             get { throw new NotImplementedException(); }
         }
 
-        /// <summary>
-        /// Gets or sets the position within the current stream.
-        /// </summary>
         public override long Position
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
 
-        /// <summary>
-        /// Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
-        /// </summary>
-        /// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between offset and (offset + count - 1) replaced by the bytes read from the current source.</param>
-        /// <param name="offset">The zero-based byte offset in buffer at which to begin storing the data read from the current stream.</param>
-        /// <param name="count">The maximum number of bytes to be read from the current stream.</param>
-        /// <returns>The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.</returns>
         public override int Read(byte[] buffer, int offset, int count)
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Sets the position within the current stream.
-        /// </summary>
-        /// <param name="offset">A byte offset relative to the origin parameter.</param>
-        /// <param name="origin">A value of type SeekOrigin indicating the reference point used to obtain the new position.</param>
-        /// <returns>The new position within the current stream.</returns>
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Sets the length of the current stream.
-        /// </summary>
-        /// <param name="value">The desired length of the current stream in bytes.</param>
         public override void SetLength(long value)
         {
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
-        /// </summary>
-        /// <param name="buffer">An array of bytes. This method copies count bytes from buffer to the current stream.</param>
-        /// <param name="offset">The zero-based byte offset in buffer at which to begin copying bytes to the current stream.</param>
-        /// <param name="count">The number of bytes to be written to the current stream.</param>
         public override void Write(byte[] buffer, int offset, int count)
         {
             _iStream.Write(buffer[offset..], count, IntPtr.Zero);
         }
+    }
+
+    public enum SendMethod
+    {
+        DragDrop,
+        Clipboard,
+    }
+
+    public static void SendObjectToSystem(VirtualFileDataObject vfdo, SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
+    {
+
+#if DEBUG
+        Trace.WriteLine("Sending VFDO to the system is not allowed in DEBUG (DragDrop / Clipboard)");
+        return;
+
+#elif RELEASE
+
+        try
+        {
+            if (method == SendMethod.DragDrop)
+                DoDragDrop(dragSource, vfdo, allowedEffects);
+            else if (method == SendMethod.Clipboard)
+                Clipboard.SetDataObject(vfdo);
+            else
+                throw new NotSupportedException();
+        }
+        catch (COMException)
+        {
+            // Failure; no way to recover
+        }
+
+#endif
+    }
+
+    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files)
+    {
+        if (files.Any(f => f.Descriptors is null))
+            return null;
+
+        try
+        {
+            Directory.Delete(Data.RuntimeSettings.TempDragPath, true);
+        }
+        catch
+        { }
+
+        Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
+
+        VirtualFileDataObject vfdo = new() { PreferredDropEffect = DragDropEffects.Copy };
+
+        vfdo.SetData(files.SelectMany(f => f.Descriptors));
+
+        return vfdo;
     }
 
     /// <summary>
@@ -796,9 +844,6 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         public const int DV_E_FORMATETC = -2147221404;
         public const int DV_E_TYMED = -2147221399;
         public const int E_FAIL = -2147467259;
-        public const uint FD_CREATETIME = 0x00000008;
-        public const uint FD_WRITESTIME = 0x00000020;
-        public const uint FD_FILESIZE = 0x00000040;
         public const int OLE_E_ADVISENOTSUPPORTED = -2147221501;
         public const int S_OK = 0;
         public const int S_FALSE = 1;
@@ -811,6 +856,87 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         public const string CFSTR_PERFORMEDDROPEFFECT = "Performed DropEffect";
         public const string CFSTR_PREFERREDDROPEFFECT = "Preferred DropEffect";
 
+        // https://github.com/dahall/Vanara/blob/master/PInvoke/Shell32/Clipboard.cs
+        /// <summary>An array of flags that indicate which of the <see cref="FILEDESCRIPTOR"/> structure members contain valid data.</summary>
+        [Flags]
+        public enum FD_FLAGS : uint
+        {
+            /// <summary>The <c>clsid</c> member is valid.</summary>
+            FD_CLSID = 0x00000001,
+
+            /// <summary>The <c>sizel</c> and <c>pointl</c> members are valid.</summary>
+            FD_SIZEPOINT = 0x00000002,
+
+            /// <summary>The <c>dwFileAttributes</c> member is valid.</summary>
+            FD_ATTRIBUTES = 0x00000004,
+
+            /// <summary>The <c>ftCreationTime</c> member is valid.</summary>
+            FD_CREATETIME = 0x00000008,
+
+            /// <summary>The <c>ftLastAccessTime</c> member is valid.</summary>
+            FD_ACCESSTIME = 0x00000010,
+
+            /// <summary>The <c>ftLastWriteTime</c> member is valid.</summary>
+            FD_WRITESTIME = 0x00000020,
+
+            /// <summary>The <c>nFileSizeHigh</c> and <c>nFileSizeLow</c> members are valid.</summary>
+            FD_FILESIZE = 0x00000040,
+
+            /// <summary>A progress indicator is shown with drag-and-drop operations.</summary>
+            FD_PROGRESSUI = 0x00004000,
+
+            /// <summary>Treat the operation as a shortcut.</summary>
+            FD_LINKUI = 0x00008000,
+
+            /// <summary><c>Windows Vista and later</c>. The descriptor is Unicode.</summary>
+            FD_UNICODE = 0x80000000,
+        }
+
+        // https://github.com/dahall/Vanara/blob/master/PInvoke/Shared/WinNT/FileFlagsAndAttributes.cs
+        /// <summary>
+        /// File attributes are metadata values stored by the file system on disk and are used by the system and are available to developers via
+        /// various file I/O APIs.
+        /// </summary>
+        [Flags]
+        public enum FileFlagsAndAttributes : uint
+        {
+            /// <summary>
+            /// A file that is read-only. Applications can read the file, but cannot write to it or delete it. This attribute is not honored on
+            /// directories.
+            /// </summary>
+            FILE_ATTRIBUTE_READONLY = 0x00000001,
+
+            /// <summary>The file or directory is hidden. It is not included in an ordinary directory listing.</summary>
+            FILE_ATTRIBUTE_HIDDEN = 0x00000002,
+
+            /// <summary>A file or directory that the operating system uses a part of, or uses exclusively.</summary>
+            FILE_ATTRIBUTE_SYSTEM = 0x00000004,
+
+            /// <summary>The handle that identifies a directory.</summary>
+            FILE_ATTRIBUTE_DIRECTORY = 0x00000010,
+
+            /// <summary>
+            /// A file or directory that is an archive file or directory. Applications typically use this attribute to mark files for backup or
+            /// removal.
+            /// </summary>
+            FILE_ATTRIBUTE_ARCHIVE = 0x00000020,
+
+            /// <summary>This value is reserved for system use.</summary>
+            FILE_ATTRIBUTE_DEVICE = 0x00000040,
+
+            /// <summary>A file that does not have other attributes set. This attribute is valid only when used alone.</summary>
+            FILE_ATTRIBUTE_NORMAL = 0x00000080,
+
+            /// <summary>
+            /// A file that is being used for temporary storage. File systems avoid writing data back to mass storage if sufficient cache memory is
+            /// available, because typically, an application deletes a temporary file after the handle is closed. In that scenario, the system can
+            /// entirely avoid writing the data. Otherwise, the data is written after the handle is closed.
+            /// </summary>
+            FILE_ATTRIBUTE_TEMPORARY = 0x00000100,
+
+            // The following flags are omitted
+        }
+
         [StructLayout(LayoutKind.Sequential)]
         public struct FILEGROUPDESCRIPTOR
         {
@@ -821,13 +947,13 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public struct FILEDESCRIPTOR
         {
-            public UInt32 dwFlags;
+            public FD_FLAGS dwFlags;
             public Guid clsid;
             public Int32 sizelcx;
             public Int32 sizelcy;
             public Int32 pointlx;
             public Int32 pointly;
-            public UInt32 dwFileAttributes;
+            public FileFlagsAndAttributes dwFileAttributes;
             public FILETIME ftCreationTime;
             public FILETIME ftLastAccessTime;
             public FILETIME ftLastWriteTime;
@@ -872,7 +998,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         /// Returns true if the HRESULT is a success code.
         /// </summary>
         /// <param name="hr">HRESULT to check.</param>
-        /// <returns>True iff a success code.</returns>
+        /// <returns>True if a success code.</returns>
         public static bool SUCCEEDED(int hr)
         {
             return 0 <= hr;
