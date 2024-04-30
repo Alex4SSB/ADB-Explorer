@@ -110,6 +110,10 @@ public static class SelectionHelper
             currentIndex--;
         else if (key == Key.Down)
             currentIndex++;
+        else if (key == Key.Home)
+            currentIndex = 0;
+        else if (key == Key.End)
+            currentIndex = dataGrid.Items.Count - 1;
 
         dataGrid.UnselectAll();
 

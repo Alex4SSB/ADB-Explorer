@@ -283,13 +283,13 @@ public class FileClass : FilePath, IFileStat
         var fileOp = FileSyncOperation.PullFile(new(this), target, Data.CurrentADBDevice, App.Current.Dispatcher);
         
         // When a folder isn't empty, there's no need creating a file descriptor for it, since all folders are automatcally created
-        var items = IsDirectory && Children.Any() ? Children : new[] { FullName };
+        var items = IsDirectory && Children.Length > 0 ? Children : new[] { FullName };
 
         // Set directory flag only for an empty folder
-        bool isDir = IsDirectory && !Children.Any();
+        bool isDir = IsDirectory && Children.Length < 1;
 
         // We only know the size of a single file beforehand
-        long? size = IsDirectory ? null : (long)Size;
+        long? size = IsDirectory ? null : (long?)Size;
 
         Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor()
         {

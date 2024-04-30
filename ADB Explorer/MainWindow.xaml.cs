@@ -30,6 +30,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     
     private static Point NullPoint => new(-1, -1);
     
+    private double? RowHeight { get; set; }
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
     private double ScrollContentPresenterMargin => RuntimeSettings.UseFluentStyles ? ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top : 0;
     private double DataGridContentWidth
@@ -48,6 +49,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private int ClickCount = 0;
     private bool IsDragInProgress = false;
     private bool WasSelected = false;
+    private bool WasEditing = false;
     private Point MouseDownPoint;
 
     private bool IsInEditMode
@@ -555,6 +557,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             case nameof(AppSettings.ForceFluentStyles):
                 SettingsHelper.SetSymbolFont();
                 NavigationBox.Refresh();
+                RowHeight = null;
                 break;
             case nameof(AppSettings.Theme):
                 SetTheme(Settings.Theme);
@@ -1333,6 +1336,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        if (RowHeight is null && ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(0) is DataGridRow row)
+            RowHeight = row.ActualHeight;
+
         IsDragInProgress = e.OriginalSource is TextBlock or Image;
 
         var point = e.GetPosition(ExplorerGrid);
@@ -1340,15 +1346,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         var actualRowWidth = 0.0;
         int selectionIndex;
-        var rowHeight = ExplorerGrid.MinRowHeight + (RuntimeSettings.UseFluentStyles ? 2 : 0); // fluent row margin = 0, 1
 
         foreach (var item in ExplorerGrid.Columns.Where(col => col.Visibility == Visibility.Visible))
         {
             actualRowWidth += item.ActualWidth;
         }
 
-        if (point.Y > (ExplorerGrid.Items.Count * rowHeight + ColumnHeaderHeight)
-            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % rowHeight)
+        if (point.Y > (ExplorerGrid.Items.Count * RowHeight + ColumnHeaderHeight)
+            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % RowHeight)
             || point.Y < ColumnHeaderHeight + ScrollContentPresenterMargin
             || point.X > actualRowWidth
             || point.X > DataGridContentWidth)
@@ -1691,7 +1696,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         var cell = sender as DataGridCell;
-        if (cell.IsEditing)
+        WasEditing = cell.IsEditing;
+
+        if (WasEditing)
             return;
 
         var row = DataGridRow.GetRowContainingElement(cell);
@@ -1854,17 +1861,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return;
         }
 
+        var horizontal = StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
+        var vertical = StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
+
         if (!SelectionRect.IsVisible
-            && ((StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedHorizontalScrollBarVisibility is Visibility.Visible
-            && point.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight)
-            || (StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedVerticalScrollBarVisibility is Visibility.Visible
-            && point.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth)))
+            && ((point.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
+            || (point.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)))
         {
             MouseDownPoint = point;
         }
 
-        if (MouseDownPoint.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth
-            || MouseDownPoint.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight)
+        if (MouseDownPoint.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal
+            || MouseDownPoint.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)
             return;
 
         SelectionRect.Visibility = Visibility.Visible;
@@ -2055,7 +2063,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
             return;
 
-        if (ClickCount == 1 && ExplorerGrid.SelectedItems.Count == 1 && WasSelected)
+        if (ClickCount == 1 && ExplorerGrid.SelectedItems.Count == 1 && WasSelected && !WasEditing)
         {
             cell.IsEditing = true;
             FileActions.IsExplorerEditing = true;

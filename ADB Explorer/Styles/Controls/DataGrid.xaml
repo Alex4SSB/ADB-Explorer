@@ -421,6 +421,7 @@
         x:Key="ExplorerGridStyle"
         BasedOn="{StaticResource BaseDataGridStyle}"
         TargetType="DataGrid">
+        <Setter Property="MinRowHeight" Value="32" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -436,8 +437,8 @@
     <Style x:Key="FluentDataGridRowBorderStyle" TargetType="Border">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="CornerRadius" Value="2" />
-                <Setter Property="Margin" Value="0,1" />
+                <Setter Property="CornerRadius" Value="3" />
+                <Setter Property="Margin" Value="0,2" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

@@ -153,7 +153,6 @@
                         IsReadOnly="False"
                         ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
                         KeyboardNavigation.TabNavigation="Once"
-                        MinRowHeight="21"
                         MouseDown="ExplorerGrid_MouseDown"
                         MouseMove="ExplorerGrid_MouseMove"
                         RowStyle="{StaticResource RowStyle}"
@@ -189,6 +188,7 @@
                                         <EventSetter Event="KeyDown" Handler="NameColumnEdit_KeyDown" />
                                         <EventSetter Event="TextChanged" Handler="NameColumnEdit_TextChanged" />
                                         <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
+                                        <Setter Property="HorizontalAlignment" Value="Left" />
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
                                                 <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
@@ -431,7 +431,7 @@
                         </Grid.ColumnDefinitions>
                         <DataGrid
                             x:Name="CurrentOperationDetailedDataGrid"
-                            CellStyle="{StaticResource DataGridCellStyle}"
+                            CellStyle="{StaticResource BaseCellStyle}"
                             ColumnDisplayIndexChanged="CurrentOperationDetailedDataGrid_ColumnDisplayIndexChanged"
                             ColumnHeaderStyle="{StaticResource FileOpColumnHeaderStyle}"
                             ItemsSource="{Binding}"
