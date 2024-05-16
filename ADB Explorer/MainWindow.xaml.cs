@@ -23,6 +23,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DispatcherTimer ConnectTimer = new() { Interval = CONNECT_TIMER_INIT };
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
     private readonly DispatcherTimer DiskUsageTimer = new() { Interval = DISK_USAGE_INTERVAL_ACTIVE };
+    private readonly DispatcherTimer DragExitTimer = new() { Interval = DRAG_EXIT_INTERVAL };
 
     private readonly Mutex DiskUsageMutex = new();
     private readonly Mutex ConnectTimerMutex = new();
@@ -51,6 +52,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool WasSelected = false;
     private bool WasEditing = false;
     private Point MouseDownPoint;
+    private Point LastDragPoint;
 
     private bool IsInEditMode
     {
@@ -97,6 +99,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ServerWatchdogTimer.Tick += ServerWatchdogTimer_Tick;
         DiskUsageTimer.Tick += DiskUsageTimer_Tick;
         SelectionTimer.Tick += SelectionTimer_Tick;
+        DragExitTimer.Tick += DragExitTimer_Tick;
 
         Settings.PropertyChanged += Settings_PropertyChanged;
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
@@ -133,6 +136,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
     }
 
+    private void DragExitTimer_Tick(object sender, EventArgs e)
+    {
+        if (CursorBorder.Visible())
+            CursorBorder.Visible(MonitorInfo.IsMouseWithinElement(ExplorerCanvas));
+    }
+
     private void FinalizeSplash()
     {
         SetTheme();
@@ -145,6 +154,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ConnectTimer.Start();
         ServerWatchdogTimer.Start();
         DiskUsageTimer.Start();
+        DragExitTimer.Start();
     }
 
     private void DiskUsageTimer_Tick(object sender, EventArgs e)
@@ -1977,9 +1987,23 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
-        if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
-            return;
+        Dictionary<string, object> data = new();
 
+        foreach (var item in e.Data.GetFormats())
+        {
+            try
+            {
+                data.Add(item, e.Data.GetData(item));
+            }
+            catch (Exception)
+            {
+                data.Add(item, null);
+                continue;
+            }
+        }
+
+        if (data.TryGetValue(DataFormats.FileDrop, out var val) && val is string[] items)
+        {
         if (FileActions.IsAppDrive)
         {
             DropPackages(items);
@@ -2101,5 +2125,45 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
 
         return false;
+    }
+
+    private void MainWin_DragOver(object sender, DragEventArgs e)
+    {
+        var prevPoint = LastDragPoint;
+        LastDragPoint = e.GetPosition(ExplorerCanvas);
+
+        // Set relative position using offset received from the shell
+        Canvas.SetTop(CursorBorder, LastDragPoint.Y - RuntimeSettings.DragOffset.Y);
+        Canvas.SetLeft(CursorBorder, LastDragPoint.X - RuntimeSettings.DragOffset.X);
+
+        // Compare with mouse position at 5 times the current vector to reduce exit misdetection
+        var nextPoint = LastDragPoint + 5 * (LastDragPoint - prevPoint);
+        Size size = new(ExplorerGrid.ActualWidth, ExplorerGrid.ActualHeight);
+
+        CursorBorder.Visible(new Rect(size).Contains(nextPoint));
+    }
+
+    private void ExplorerGrid_DragEnter(object sender, DragEventArgs e)
+    {
+        if (e.Data.GetDataPresent("DragImageBits") && e.Data.GetData("DragImageBits") is var dragImage && dragImage is MemoryStream stream)
+        {
+            var dragBitmap = VirtualFileDataObject.GetBitmapFromShell(stream);
+
+            RuntimeSettings.DragBitmap = dragBitmap.Bitmap;
+            RuntimeSettings.DragOffset = dragBitmap.Offset;
+
+            if (RuntimeSettings.DragBitmap is not null && e.KeyStates.HasFlag(DragDropKeyStates.LeftMouseButton))
+            {
+                CursorBorder.Height = RuntimeSettings.DragBitmap.PixelHeight;
+                CursorBorder.Width = RuntimeSettings.DragBitmap.PixelWidth;
+                CursorBorder.Visible(true);
+                DragBackground.Background = new SolidColorBrush(dragBitmap.Background);
+
+                return;
+            }
+        }
+
+        RuntimeSettings.DragBitmap = null;
+        CursorBorder.Visible(false);
     }
 }

@@ -38,4 +38,32 @@ internal static class MonitorInfo
 
         return current == primaryMonitor;
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT
+    {
+        public Int32 X;
+        public Int32 Y;
+
+        public POINT(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public static implicit operator Point(POINT self)
+            => new(self.X, self.Y);
+    }
+
+    [DllImport("user32.dll")]
+    private static extern bool GetCursorPos(out POINT lpPoint);
+
+    public static bool IsMouseWithinElement(FrameworkElement element)
+    {
+        GetCursorPos(out var point);
+
+        var relativePoint = element.PointFromScreen(point);
+
+        return new Rect(new(element.ActualWidth, element.ActualHeight)).Contains(relativePoint);
+    }
 }

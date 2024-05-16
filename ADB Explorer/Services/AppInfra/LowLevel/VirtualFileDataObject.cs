@@ -2,6 +2,7 @@
 // https://dlaa.me/blog/post/9913083
 // Used and modified under the MIT license
 
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -18,29 +19,14 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     public bool IsAsynchronous { get; set; }
 
-    /// <summary>
-    /// Identifier for CFSTR_FILECONTENTS.
-    /// </summary>
     private static readonly short FILECONTENTS = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILECONTENTS).Id);
 
-    /// <summary>
-    /// Identifier for CFSTR_FILEDESCRIPTORW.
-    /// </summary>
     private static readonly short FILEDESCRIPTORW = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILEDESCRIPTORW).Id);
 
-    /// <summary>
-    /// Identifier for CFSTR_PASTESUCCEEDED.
-    /// </summary>
     private static readonly short PASTESUCCEEDED = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PASTESUCCEEDED).Id);
 
-    /// <summary>
-    /// Identifier for CFSTR_PERFORMEDDROPEFFECT.
-    /// </summary>
     private static readonly short PERFORMEDDROPEFFECT = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PERFORMEDDROPEFFECT).Id);
 
-    /// <summary>
-    /// Identifier for CFSTR_PREFERREDDROPEFFECT.
-    /// </summary>
     private static readonly short PREFERREDDROPEFFECT = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PREFERREDDROPEFFECT).Id);
 
     /// <summary>
@@ -346,6 +332,20 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             });
     }
 
+    public void UpdateData(short dataFormat, IEnumerable<Action<Stream>> dataStreams)
+    {
+        // Remove all previous streams
+        _dataObjects.RemoveAll(d => d.FORMATETC.cfFormat == dataFormat);
+
+        // Set n CFSTR_FILECONTENTS
+        var index = 0;
+        foreach (var stream in dataStreams)
+        {
+            SetData(dataFormat, index, stream);
+            index++;
+        }
+    }
+
     /// <summary>
     /// Provides data for the specified data format and index (ISTREAM).
     /// </summary>
@@ -397,66 +397,17 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     public void SetData(IEnumerable<FileDescriptor> fileDescriptors)
     {
         // Prepare buffer
-        List<byte> bytes = new();
 
         // Add FILEGROUPDESCRIPTOR header
-        bytes.AddRange(StructureBytes(new NativeMethods.FILEGROUPDESCRIPTOR { cItems = (uint)fileDescriptors.Count() }));
 
         // Add n FILEDESCRIPTORs
-        foreach (var fileDescriptor in fileDescriptors)
-        {
-            // Set required fields
-            var FILEDESCRIPTOR = new NativeMethods.FILEDESCRIPTOR
-            {
-                cFileName = fileDescriptor.Name,
-            };
-
-            // Set optional directory flag
-            if (fileDescriptor.IsDirectory)
-            {
-                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FLAGS.FD_ATTRIBUTES;
-                FILEDESCRIPTOR.dwFileAttributes |= NativeMethods.FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY;
-            }
-
-            // Set optional timestamp
-            if (fileDescriptor.ChangeTimeUtc.HasValue)
-            {
-                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FLAGS.FD_CREATETIME | NativeMethods.FD_FLAGS.FD_WRITESTIME;
-                var changeTime = fileDescriptor.ChangeTimeUtc.Value.ToLocalTime().ToFileTime();
-                var changeTimeFileTime = new FILETIME
-                {
-                    dwLowDateTime = (int)(changeTime & 0xffffffff),
-                    dwHighDateTime = (int)(changeTime >> 32),
-                };
-                FILEDESCRIPTOR.ftLastWriteTime = changeTimeFileTime;
-                FILEDESCRIPTOR.ftCreationTime = changeTimeFileTime;
-            }
-
-            // Set optional length
-            if (fileDescriptor.Length.HasValue)
-            {
-                FILEDESCRIPTOR.dwFlags |= NativeMethods.FD_FLAGS.FD_FILESIZE;
-                FILEDESCRIPTOR.nFileSizeLow = (uint)(fileDescriptor.Length & 0xffffffff);
-                FILEDESCRIPTOR.nFileSizeHigh = (uint)(fileDescriptor.Length >> 32);
-            }
-
-            // Add structure to buffer
-            bytes.AddRange(StructureBytes(FILEDESCRIPTOR));
-        }
-
         // Update file descriptors to preserve the pointer if already set
-        UpdateData(FILEDESCRIPTORW, bytes);
+        
+        FileGroup group = new(fileDescriptors);
 
-        // Remove all previous streams
-        _dataObjects.RemoveAll(d => d.FORMATETC.cfFormat == FILECONTENTS);
+        UpdateData(FILEDESCRIPTORW, group.GroupDescriptorBytes);
 
-        // Set n CFSTR_FILECONTENTS
-        var index = 0;
-        foreach (var fileDescriptor in fileDescriptors)
-        {
-            SetData(FILECONTENTS, index, fileDescriptor.StreamContents);
-            index++;
-        }
+        UpdateData(FILECONTENTS, group.DataStreams);
     }
 
     /// <summary>
@@ -588,7 +539,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     /// <param name="source">Structure to return.</param>
     /// <returns>In-memory representation of structure.</returns>
-    private static IEnumerable<byte> StructureBytes(object source)
+    private static IEnumerable<byte> BytesFromStructure<T>(T source)
     {
         // Set up for call to StructureToPtr
         var size = Marshal.SizeOf(source.GetType());
@@ -605,6 +556,35 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             Marshal.FreeHGlobal(ptr);
         }
         return bytes;
+    }
+
+    private static T StructureFromBytes<T>(IEnumerable<byte> bytes)
+    {
+        var handle = GCHandle.Alloc(bytes.ToArray(), GCHandleType.Pinned);
+
+        var data = Marshal.PtrToStructure<T>(handle.AddrOfPinnedObject());
+
+        handle.Free();
+
+        return data;
+    }
+
+    public class FileGroup
+    {
+        private readonly IEnumerable<FileDescriptor> FileDescriptors;
+
+        private NativeMethods.FILEGROUPDESCRIPTOR GroupDescriptor;
+
+        public IEnumerable<byte> GroupDescriptorBytes => GroupDescriptor.Bytes;
+
+        public IEnumerable<Action<Stream>> DataStreams => FileDescriptors.Select(f => f.StreamContents);
+
+        public FileGroup(IEnumerable<FileDescriptor> fileDescriptors)
+        {
+            FileDescriptors = fileDescriptors;
+
+            GroupDescriptor = new(FileDescriptors);
+        }
     }
 
     /// <summary>
@@ -633,6 +613,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         public Action<Stream> StreamContents { get; set; }
 
         public bool IsDirectory { get; set; }
+
+        public string SourcePath { get; set; }
     }
 
     /// <summary>
@@ -832,11 +814,82 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
     }
 
+    public class DragBitmap
+    {
+        public BitmapSource Bitmap { get; internal set; }
+
+        public Point Offset { get; internal set; }
+
+        public Color Background { get; internal set; }
+    }
+
+    public static DragBitmap GetBitmapFromShell(MemoryStream stream)
+    {
+        var shImage = NativeMethods.SHDRAGIMAGE.FromStream(stream, out var bitmap);
+
+        // Remove opacity effects
+        for (int i = 0; i < bitmap.Length; i += 4)
+        {
+            var bgra = bitmap[i..(i + 4)];
+
+            // Opacity = 0%   ->  leave as is
+            if (bgra[3] == 0)
+                continue;
+
+            // Color = Black   ->   Bump up opacity to 100%
+            if (bgra[0..3].Max() == 0)
+            {
+                // if the opacity isn't 255 - 64, then it wasn't originally black - leave as is
+                if (bgra[3] == 191)
+                    bitmap[i + 3] = 255;
+
+                continue;
+            }
+
+            var hsv = ColorHelper.BgrToHsv(bgra[0..3]);
+
+            // Increase value by ~34%
+            hsv[2] = Math.Clamp(hsv[2] / 0.745, 0, 1);
+            var bgr = ColorHelper.HsvToBgr(hsv);
+
+            // Increase Opacity by 25%
+            bitmap[i + 3] = (byte)Math.Clamp(bgra[3] + 64, 0, 255);
+
+            Array.Copy(bgr, 0, bitmap, i, 3);
+        }
+
+        var bitmapSource = BitmapSource.Create(shImage.sizeDragImage.Width,
+                                               shImage.sizeDragImage.Height,
+                                               shImage.sizeDragImage.Width,
+                                               shImage.sizeDragImage.Height,
+                                               PixelFormats.Bgra32,
+                                               null,
+                                               bitmap,
+                                               shImage.sizeDragImage.Width * 4);
+
+        return New(bitmapSource, shImage);
+
+
+        static DragBitmap New(BitmapSource bitmapSource, NativeMethods.SHDRAGIMAGE shImage)
+        {
+            DragBitmap bitmap = new()
+            {
+                Bitmap = bitmapSource,
+                Offset = shImage.ptOffset,
+                Background = (shImage.sizeDragImage.Width == 96 && shImage.sizeDragImage.Height == 96) ? Colors.White : Colors.Transparent,
+            };
+
+            return bitmap;
+        }
+    }
+
     /// <summary>
     /// Provides access to Win32-level constants, structures, and functions.
     /// </summary>
     private static class NativeMethods
     {
+        public const int MAX_PATH = 260;
+
         public const int DRAGDROP_S_DROP = 0x00040100;
         public const int DRAGDROP_S_CANCEL = 0x00040101;
         public const int DRAGDROP_S_USEDEFAULTCURSORS = 0x00040102;
@@ -937,15 +990,153 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             // The following flags are omitted
         }
 
+
+        //
+        //  https://learn.microsoft.com/en-us/windows/win32/shell/clipboard
+        //
+
         [StructLayout(LayoutKind.Sequential)]
-        public struct FILEGROUPDESCRIPTOR
+        public struct SIZE
+        {
+            public Int32 Width;
+            public Int32 Height;
+
+            public static implicit operator Size(SIZE self)
+                => new(self.Width, self.Height);
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SHDRAGIMAGE : IByteStruct
+        {
+            public SIZE sizeDragImage;
+            public Point ptOffset;
+            public HANDLE hbmpDragImage;
+            public uint crColorKey;
+
+            public readonly IEnumerable<byte> Bytes => BytesFromStructure(this);
+
+            public static SHDRAGIMAGE FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<SHDRAGIMAGE>(bytes);
+
+            public static SHDRAGIMAGE FromStream(MemoryStream stream, out byte[] bitmap)
+            {
+                SHDRAGIMAGE image = new();
+                using BinaryReader reader = new(stream);
+                List<byte[]> bytes = new();
+
+                try
+                {
+                    image.sizeDragImage.Width = reader.ReadInt32();
+                    image.sizeDragImage.Height = reader.ReadInt32();
+                    image.ptOffset.X = reader.ReadInt32();
+                    image.ptOffset.Y = reader.ReadInt32();
+                    image.hbmpDragImage = new(reader.ReadInt32());
+                    image.crColorKey = reader.ReadUInt32();
+
+                    // Row length in bytes
+                    var stride = image.sizeDragImage.Width * 4;
+
+                    while (reader.ReadBytes(stride) is byte[] arr && arr.Length == stride)
+                    {
+                        // Read a whole row
+                        bytes.Add(arr);
+                    }
+                }
+                catch
+                { }
+
+                List<byte> tmp = new();
+
+                // Reverse row order to flip image vertically
+                bytes.Reverse();
+                bytes.ForEach(tmp.AddRange);
+
+                // Not actually part of the struct so returned as an out param
+                bitmap = tmp.ToArray();
+
+                return image;
+            }
+        }
+
+        public interface IByteStruct
+        {
+            public IEnumerable<byte> Bytes { get; }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct FILEGROUPDESCRIPTOR : IByteStruct
         {
             public UInt32 cItems;
-            // Followed by 0 or more FILEDESCRIPTORs
+            public FILEDESCRIPTOR[] descriptors;
+
+            public readonly IEnumerable<byte> Bytes
+            {
+                get
+                {
+                    List<byte> bytes = new();
+                    bytes.AddRange(BytesFromStructure(cItems));
+
+                    foreach (var item in descriptors)
+                    {
+                        bytes.AddRange(item.Bytes);
+                    }
+
+                    return bytes;
+                }
+            }
+
+            public FILEGROUPDESCRIPTOR(IEnumerable<FileDescriptor> fileDescriptors)
+            {
+                descriptors = fileDescriptors.Select(f => new FILEDESCRIPTOR(f)).ToArray();
+
+                cItems = (uint)descriptors.Length;
+            }
+
+            public static FILEGROUPDESCRIPTOR FromBytes(IEnumerable<byte> bytes)
+                => new()
+            {
+                cItems = StructureFromBytes<UInt32>(bytes.Take(sizeof(UInt32))),
+                descriptors = bytes.Skip(sizeof(UInt32))
+                                       .Chunk(Marshal.SizeOf(typeof(FILEDESCRIPTOR)))
+                                       .Select(FILEDESCRIPTOR.FromBytes)
+                                       .ToArray()
+            };
+
+            public static FILEGROUPDESCRIPTOR FromStream(MemoryStream stream)
+            {
+                FILEGROUPDESCRIPTOR fgd = new();
+                var fdSize = Marshal.SizeOf(typeof(FILEDESCRIPTOR));
+                using BinaryReader reader = new(stream);
+
+                try
+                {
+                    fgd.cItems = reader.ReadUInt32();
+                }
+                catch (Exception)
+                {
+                    return fgd;
+                }
+
+                Array.Resize(ref fgd.descriptors, (int)fgd.cItems);
+                
+                for (int i = 0; i < fgd.cItems; i++)
+                {
+                    try
+                    {
+                        var fdBytes = reader.ReadBytes(fdSize);
+                        fgd.descriptors[i] = FILEDESCRIPTOR.FromBytes(fdBytes);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                }
+
+                return fgd;
+            }
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public struct FILEDESCRIPTOR
+        public struct FILEDESCRIPTOR : IByteStruct
         {
             public FD_FLAGS dwFlags;
             public Guid clsid;
@@ -959,8 +1150,50 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             public FILETIME ftLastWriteTime;
             public UInt32 nFileSizeHigh;
             public UInt32 nFileSizeLow;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
             public string cFileName;
+
+            public readonly IEnumerable<byte> Bytes => BytesFromStructure(this);
+
+            public FILEDESCRIPTOR(FileDescriptor file)
+            {
+                cFileName = file.Name;
+
+                // Set optional directory flag
+                if (file.IsDirectory)
+                {
+                    dwFlags |= FD_FLAGS.FD_ATTRIBUTES;
+
+                    dwFileAttributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY;
+                }
+
+                // Set optional timestamp
+                if (file.ChangeTimeUtc.HasValue)
+                {
+                    dwFlags |= FD_FLAGS.FD_CREATETIME | FD_FLAGS.FD_WRITESTIME;
+
+                    var changeTime = file.ChangeTimeUtc.Value.ToLocalTime().ToFileTime();
+                    var changeTimeFileTime = new FILETIME
+                    {
+                        dwLowDateTime = (int)(changeTime & 0xffffffff),
+                        dwHighDateTime = (int)(changeTime >> 32),
+                    };
+
+                    ftLastWriteTime = changeTimeFileTime;
+                    ftCreationTime = changeTimeFileTime;
+                }
+
+                // Set optional length
+                if (file.Length.HasValue)
+                {
+                    dwFlags |= FD_FLAGS.FD_FILESIZE;
+
+                    nFileSizeLow = (uint)(file.Length & 0xffffffff);
+                    nFileSizeHigh = (uint)(file.Length >> 32);
+                }
+            }
+
+            public static FILEDESCRIPTOR FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<FILEDESCRIPTOR>(bytes);
         }
 
         [ComImport]

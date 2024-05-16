@@ -935,4 +935,14 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="DragBackgroundStyle" TargetType="Border">
+        <Style.Triggers>
+            <Trigger Property="Background" Value="White">
+                <Setter Property="BorderThickness" Value="1" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="Black" />
+    </Style>
 </ResourceDictionary>

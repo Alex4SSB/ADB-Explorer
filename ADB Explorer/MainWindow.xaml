@@ -23,6 +23,7 @@
     Background="{DynamicResource AdbWindowBackground}"
     Closing="Window_Closing"
     Cursor="{Binding ElementName=UnfinishedBlock, Path=Cursor}"
+    DragDrop.DragOver="MainWin_DragOver"
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
     SizeChanged="Window_SizeChanged"
@@ -147,6 +148,7 @@
                         ContextMenu="{StaticResource RowContextMenu}"
                         ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
+                        DragEnter="ExplorerGrid_DragEnter"
                         Drop="ExplorerGrid_Drop"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
@@ -319,15 +321,28 @@
                                 IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Canvas
-                        x:Name="ExplorerCanvas"
-                        Grid.Row="2"
-                        PreviewMouseUp="ExplorerCanvas_PreviewMouseUp">
+                    <Canvas x:Name="ExplorerCanvas" PreviewMouseUp="ExplorerCanvas_PreviewMouseUp">
                         <Border
                             x:Name="SelectionRect"
                             MouseMove="ExplorerGrid_MouseMove"
                             Style="{StaticResource SelectionBorderStyle}"
                             Visibility="Collapsed" />
+                        <Border
+                            x:Name="CursorBorder"
+                            ClipToBounds="False"
+                            IsHitTestVisible="False">
+                            <Grid>
+                                <Border
+                                    x:Name="DragBackground"
+                                    Margin="-3"
+                                    Style="{StaticResource DragBackgroundStyle}" />
+                                <Image
+                                    x:Name="DragImage"
+                                    IsHitTestVisible="False"
+                                    Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
+                                    Stretch="Fill" />
+                            </Grid>
+                        </Border>
                     </Canvas>
                     <Grid>
                         <Grid.Style>

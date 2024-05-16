@@ -337,6 +337,20 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isDetailedPeekMode, value);
     }
 
+    private BitmapSource dragBitmap = null;
+    public BitmapSource DragBitmap
+    {
+        get => dragBitmap;
+        set => Set(ref dragBitmap, value);
+    }
+
+    private Point dragOffset = new(0, 0);
+    public Point DragOffset
+    {
+        get => dragOffset;
+        set => Set(ref dragOffset, value);
+    }
+
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch
     {
         Architecture.Arm64 or Architecture.Arm => true,

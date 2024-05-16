@@ -294,6 +294,7 @@ public class FileClass : FilePath, IFileStat
         Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor()
         {
             Name = item,
+            SourcePath = FullPath,
             IsDirectory = isDir,
             Length = size,
             StreamContents = (stream) =>
