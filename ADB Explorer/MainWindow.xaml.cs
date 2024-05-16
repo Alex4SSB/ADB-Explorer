@@ -28,9 +28,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly Mutex DiskUsageMutex = new();
     private readonly Mutex ConnectTimerMutex = new();
     private readonly ThemeService ThemeService = new();
-    
+
     private static Point NullPoint => new(-1, -1);
-    
+
     private double? RowHeight { get; set; }
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
     private double ScrollContentPresenterMargin => RuntimeSettings.UseFluentStyles ? ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top : 0;
@@ -193,7 +193,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     FileActions.ItemToSelect = item;
                     break;
                 }
-                else if(altItem is null)
+                else if (altItem is null)
                     altItem = item;
             }
         }
@@ -370,7 +370,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.FilterActions):
-                    Task.Run(() => 
+                    Task.Run(() =>
                     {
                         if (FileActions.IsAppDrive || FileActions.IsRecycleBin || DevicesObject.Current is null)
                             FilterFileActions();
@@ -542,7 +542,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (e.NewItems is null || Dispatcher.HasShutdownStarted)
             return;
-        
+
         if (e.OldItems is null || e.OldItems.Count < 1)
             Dispatcher.Invoke(LogControlsPanel.Items.Refresh);
 
@@ -589,7 +589,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 break;
             case nameof(AppSettings.EnableLog):
                 FileActions.IsLogToggleVisible.Value = Settings.EnableLog;
-                
+
                 if (!Settings.EnableLog)
                 {
                     AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.LogToggle).Toggle(false);
@@ -860,7 +860,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         InitFileOpColumns();
 
         DeviceHelper.UpdateWsaPkgStatus();
-        
+
         SettingsHelper.CheckForUpdates();
 
         UpdateFileOpFilterCheck();
@@ -945,7 +945,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
         NavigationBox.Path = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
         NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
-        
+
         DriveList.ItemsSource = DevicesObject.Current.Drives;
 
         if (DriveList.SelectedIndex > -1)
@@ -1234,7 +1234,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return;
 
         bool handle = false;
-        
+
         if (FileActions.IsExplorerVisible)
         {
             handle |= ExplorerGridKeyNavigation(e.Key);
@@ -1251,7 +1251,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (DriveList.Items.Count == 0)
             return false;
-        
+
         if (DriveList.SelectedItems.Count == 0)
         {
             if (key is Key.Left or Key.Up)
@@ -1739,7 +1739,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
         if (ExplorerGrid.SelectedItems.Count < 1)
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
-         
+
         if (IsDragInProgress)
         {
             if (ExplorerGrid.SelectedItems.Count < 1 || ExplorerGrid.SelectedItems[0] is not FileClass)
@@ -1771,7 +1771,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         ExplorerGrid.ScrollIntoView(newItem);
         ExplorerGrid.SelectedItem = newItem;
-        
+
         IsInEditMode = true;
         if (!IsInEditMode) // in case cell was not acquired
             FileActionLogic.CreateNewItem(newItem);
@@ -2004,17 +2004,18 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (data.TryGetValue(DataFormats.FileDrop, out var val) && val is string[] items)
         {
-        if (FileActions.IsAppDrive)
-        {
-            DropPackages(items);
-            return;
+            if (FileActions.IsAppDrive)
+            {
+                DropPackages(items);
+                return;
+            }
+
+            if (((DataGridRow)sender).DataContext is not FileClass target
+                || !target.IsDirectory)
+                return;
+
+            FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target.FullPath);
         }
-
-        if (((DataGridRow)sender).DataContext is not FileClass target
-            || !target.IsDirectory)
-            return;
-
-        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target.FullPath);
     }
 
     private void DropPackages(string[] items)
