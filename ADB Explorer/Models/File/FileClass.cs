@@ -262,7 +262,7 @@ public class FileClass : FilePath, IFileStat
         if (Extension.ToLower() == ".exe")
             return "Windows Executable";
 
-        var name = ShellInfoManager.GetShellFileType(fileName);
+        var name = NativeMethods.GetShellFileType(fileName);
 
         if (name.EndsWith("? File"))
         {
@@ -375,6 +375,6 @@ public class FileNameSort : IComparable
         if (obj is not FileNameSort other)
             return 0;
 
-        return ShellInfoManager.StringCompareLogical(Name, other.Name);
+        return NativeMethods.StringCompareLogical(Name, other.Name);
     }
 }

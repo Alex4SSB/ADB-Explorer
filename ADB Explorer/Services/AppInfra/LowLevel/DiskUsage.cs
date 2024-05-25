@@ -119,24 +119,12 @@ public class DiskUsage : ViewModelBase
 
 internal static class DiskUsageHelper
 {
-    private struct IO_COUNTERS
-    {
-        public ulong ReadOperationCount;
-        public ulong WriteOperationCount;
-        public ulong OtherOperationCount;
-        public ulong ReadTransferCount;
-        public ulong WriteTransferCount;
-        public ulong OtherTransferCount;
-    }
-
-    [DllImport("kernel32.dll")]
-    private static extern bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
-
+    
     private static DiskUsage GetDiskUsage(Process process)
     {
         try
         {
-            GetProcessIoCounters(process.Handle, out IO_COUNTERS counters);
+            var counters = NativeMethods.GetProcessIoCounters(process.Handle);
 
             return new(process, counters.ReadTransferCount, counters.WriteTransferCount, counters.OtherTransferCount);
         }

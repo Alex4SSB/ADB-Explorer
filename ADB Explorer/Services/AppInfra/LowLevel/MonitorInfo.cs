@@ -4,18 +4,8 @@ using HANDLE = IntPtr;
 
 internal static class MonitorInfo
 {
-    private enum MonitorType
-    {
-        Primary = 0x00000001,
-        Nearest = 0x00000002,
-    }
-
     private static HANDLE? handler = null;
-    private static HANDLE primaryMonitor => MonitorFromWindow(IntPtr.Zero, (Int32)MonitorType.Primary);
-
-
-    [DllImport("user32.dll")]
-    private static extern HANDLE MonitorFromWindow(HANDLE handle, Int32 flags);
+    private static HANDLE primaryMonitor => NativeMethods.PrimaryMonitor();
 
     public static void Init(Window window)
     {
@@ -34,33 +24,14 @@ internal static class MonitorInfo
         if (handler is null)
             return null;
 
-        var current = MonitorFromWindow(handler.Value, (Int32)MonitorType.Nearest);
+        var current = NativeMethods.NearestMonitor(handler.Value);
 
         return current == primaryMonitor;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct POINT
-    {
-        public Int32 X;
-        public Int32 Y;
-
-        public POINT(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
-
-        public static implicit operator Point(POINT self)
-            => new(self.X, self.Y);
-    }
-
-    [DllImport("user32.dll")]
-    private static extern bool GetCursorPos(out POINT lpPoint);
-
     public static bool IsMouseWithinElement(FrameworkElement element)
     {
-        GetCursorPos(out var point);
+        var point = NativeMethods.GetCursorPos();
 
         var relativePoint = element.PointFromScreen(point);
 

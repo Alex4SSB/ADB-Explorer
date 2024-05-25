@@ -337,13 +337,18 @@ internal static class FileActionLogic
             if (item is null)
                 continue;
 
-            var windowsPath = ShellObject.FromParsingName(item);
-            Data.CutItems.Add(new(windowsPath)
+            try
             {
-                ShellObject = windowsPath,
-                CutState = FileClass.CutType.Copy
-            });
-            newItems++;
+                var windowsPath = ShellObject.FromParsingName(item);
+                Data.CutItems.Add(new(windowsPath)
+                {
+                    ShellObject = windowsPath,
+                    CutState = FileClass.CutType.Copy
+                });
+                newItems++;
+            }
+            catch
+            { }
         }
 
         if (newItems == 0)
