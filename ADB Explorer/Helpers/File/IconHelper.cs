@@ -7,7 +7,7 @@ namespace ADB_Explorer.Helpers;
 
 internal class IconHelper
 {
-    private const NativeMethods.IconSize iconSize = NativeMethods.IconSize.Small;
+    private const FileToIconConverter.IconSize iconSize = FileToIconConverter.IconSize.Small;
     private static readonly BitmapSource folderIconBitmapSource = IconToBitmapSource(NativeMethods.GetFileIcon(Path.GetTempPath(), iconSize, false));
     private static readonly BitmapSource folderLinkIconBitmapSource = IconToBitmapSource(NativeMethods.GetFileIcon(Path.GetTempPath(), iconSize, true));
     private static readonly BitmapSource unknownFileIconBitmapSource = IconToBitmapSource(NativeMethods.ExtractIconByIndex("Shell32.dll", 175, iconSize));
@@ -19,7 +19,7 @@ internal class IconHelper
         return Imaging.CreateBitmapSourceFromHIcon(icon.Handle, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
     }
 
-    private static Icon ExtIcon(string extension, NativeMethods.IconSize iconSize, bool isLink, bool isApk = false)
+    private static Icon ExtIcon(string extension, FileToIconConverter.IconSize iconSize, bool isLink, bool isApk = false)
     {
         // No extension -> "*" which means unknown file 
         if (string.IsNullOrEmpty(extension))
