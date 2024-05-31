@@ -808,34 +808,42 @@
                                                 <TextBlock VerticalAlignment="Bottom" Text="v" />
                                                 <TextBlock VerticalAlignment="Bottom" Text="{x:Static app_prop:Resources.AppVersion}" />
                                             </StackPanel>
+                                            <ui:SimpleStackPanel Margin="0,6" Spacing="-3">
                                             <ui:HyperlinkButton
                                                 Margin="0,4,0,-6"
                                                 Content="GitHub repository"
-                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer"
-                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer" />
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}" />
                                             <ui:HyperlinkButton
                                                 Content="Privacy Policy"
-                                                NavigateUri="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md"
-                                                ToolTip="https://github.com/Alex4SSB/ADB-Explorer/blob/master/Privacy.md" />
-                                            <CheckBox Margin="0,6,0,0" Style="{StaticResource UpdatesCheckBoxStyle}" />
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}" />
+                                            </ui:SimpleStackPanel>
+                                            <CheckBox Style="{StaticResource UpdatesCheckBoxStyle}" />
                                             <TextBlock
                                                 Margin="0,20,0,0"
                                                 HorizontalAlignment="Center"
                                                 FontWeight="Bold"
                                                 Text="Attributions &amp; Third Party Licenses" />
+                                            <ui:SimpleStackPanel Spacing="-3">
                                             <ui:HyperlinkButton
                                                 Content="ModernWPF"
-                                                NavigateUri="https://github.com/Kinnara/ModernWpf"
-                                                ToolTip="https://github.com/Kinnara/ModernWpf" />
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.MODERN_WPF}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.MODERN_WPF}}" />
                                             <ui:HyperlinkButton
                                                 Margin="0,-6"
                                                 Content="Icons8"
-                                                NavigateUri="https://icons8.com"
-                                                ToolTip="https://icons8.com" />
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.ICONS8}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.ICONS8}}" />
+                                                <ui:HyperlinkButton
+                                                    Content="LGPL v3"
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.LGPL3}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.LGPL3}}" />
                                             <ui:HyperlinkButton
                                                 Click="AndroidRobotLicense_Click"
                                                 Content="The Android Robot Icon(s)"
                                                 ToolTip="See terms" />
+                                            </ui:SimpleStackPanel>
                                         </StackPanel>
                                     </Expander>
                                 </ui:SimpleStackPanel>

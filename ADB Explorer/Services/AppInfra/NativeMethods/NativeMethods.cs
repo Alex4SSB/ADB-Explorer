@@ -202,7 +202,7 @@ public static partial class NativeMethods
         public string szTypeName;
     };
 
-    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
+    [DllImport("Shell32.dll")]
     private static extern HANDLE SHGetFileInfo(
         string pszPath, FileFlagsAndAttributes dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, FileInfoFlags uFlags);
 
@@ -260,16 +260,6 @@ public static partial class NativeMethods
         _ = DestroyIcon(hIcon);
 
         return icon;
-    }
-
-    public static Icon GetExtensionIcon(string extension, FileToIconConverter.IconSize iconSize, bool isLink)
-    {
-        return GetIcon(extension, FileInfoFlags.SHGFI_USEFILEATTRIBUTES | (FileInfoFlags)iconSize | (isLink ? FileInfoFlags.SHGFI_LINKOVERLAY : 0));
-    }
-
-    public static Icon GetFileIcon(string filePath, FileToIconConverter.IconSize iconSize, bool isLink)
-    {
-        return GetIcon(filePath, (FileInfoFlags)iconSize | (isLink ? FileInfoFlags.SHGFI_LINKOVERLAY : 0));
     }
 
     [DllImport("Gdi32.dll")]

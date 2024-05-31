@@ -54,6 +54,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private Point MouseDownPoint;
     private Point LastDragPoint;
 
+    private FileToIconConverter FileToIcon;
+
     private bool IsInEditMode
     {
         get
@@ -864,6 +866,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SettingsHelper.CheckForUpdates();
 
         UpdateFileOpFilterCheck();
+
+        FileToIcon = new();
     }
 
     private void FilterDevices() => DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(DevicesList.ItemsSource));

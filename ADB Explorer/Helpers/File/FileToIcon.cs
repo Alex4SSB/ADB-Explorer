@@ -2,6 +2,7 @@
 // https://www.codeproject.com/Articles/32059/WPF-Filename-To-Icon-Converter
 // Used and modified under the LGPLv3 license
 
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using System.Drawing;
 using static Services.NativeMethods;
@@ -10,11 +11,6 @@ namespace ADB_Explorer.Helpers;
 
 public class FileToIconConverter
 {
-    private static readonly string[] imageFilter = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-    private static readonly string exeFilter = ".exe,.lnk";
-
-    private readonly int defaultsize;
-
     public enum IconSize : uint
     {
         Large,
@@ -24,25 +20,25 @@ public class FileToIconConverter
         Thumbnail,
     }
 
-    private class ThumbnailInfo
+    private const int FOLDER_ICON_INDEX = 3;
+    private const int LINK_OVERLAY_INDEX = 29;
+    private const int UNKNOWN_ICON_INDEX = 175;
+    private const int BROKEN_LINK_ICON_INDEX = 271;
+
+    private static readonly Dictionary<string, BitmapSource> iconDic = new();
+    private static readonly SysImageList _imgList = new SysImageList(SysImageListSize.SHIL_JUMBO);
+
+    public FileToIconConverter()
     {
-        public IconSize iconsize;
-        public WriteableBitmap bitmap;
-        public string fullPath;
-        public ThumbnailInfo(WriteableBitmap b, string path, IconSize size)
-        {
-            bitmap = b;
-            fullPath = path;
-            iconsize = size;
-        }
+
     }
 
     // <summary>
     /// Return large file icon of the specified file.
     /// </summary>
-    internal static Icon GetFileIcon(string fileName, IconSize size)
+    private static Icon GetFileIcon(string fileName, IconSize size)
     {
-        NativeMethods.FileInfoFlags flags = NativeMethods.FileInfoFlags.SHGFI_SYSICONINDEX;
+        var flags = NativeMethods.FileInfoFlags.SHGFI_SYSICONINDEX;
         
         if (!fileName.Contains(':'))
             flags = flags | NativeMethods.FileInfoFlags.SHGFI_USEFILEATTRIBUTES;
@@ -52,50 +48,8 @@ public class FileToIconConverter
         
         return NativeMethods.GetIcon(fileName, flags);
     }
-
-    #region Static Tools
-
-    private static void CopyBitmap(BitmapSource source, WriteableBitmap target, bool useDispatcher)
-    {
-        int width = source.PixelWidth;
-        int height = source.PixelHeight;
-        int stride = width * ((source.Format.BitsPerPixel + 7) / 8);
-
-        byte[] bits = new byte[height * stride];
-        source.CopyPixels(bits, stride, 0);
-        source = null;
-
-        Action method = () =>
-        {
-            var delta = target.Height - height;
-            var newWidth = width > target.Width ? (int)target.Width : width;
-            var newHeight = height > target.Height ? (int)target.Height : height;
-            Int32Rect outRect = new Int32Rect(0, (int)(delta >= 0 ? delta : 0) / 2, newWidth, newWidth);
-            try
-            {
-                target.WritePixels(outRect, bits, stride, 0);
-            }
-            catch
-            { }
-        };
-
-        if (useDispatcher)
-        {
-            target.Dispatcher.BeginInvoke(DispatcherPriority.Background, method);
-        }
-        else
-        {
-            method();
-        }
-    }
-
-    private static System.Drawing.Size GetDefaultSize(IconSize size) => size switch
-    {
-        IconSize.Thumbnail or IconSize.Jumbo => new(256, 256),
-        IconSize.ExtraLarge => new(48, 48),
-        IconSize.Large => new(32, 32),
-        _ => new(16, 16),
-    };
+    private static Icon GetIconFromIndex(int index, IconSize size)
+        => NativeMethods.ExtractIconByIndex("Shell32.dll", index, size);
 
     private static Bitmap ResizeImage(Bitmap imgToResize, System.Drawing.Size size, int spacing, bool addBorder = true)
     {
@@ -163,59 +117,32 @@ public class FileToIconConverter
         }
     }
 
-    private static bool IsImage(string fileName)
+    private static string ReturnKey(string fileName, IconSize size, AbstractFile.SpecialFileType specialType)
     {
-        string ext = Path.GetExtension(fileName).ToLower();
-        if (ext == "")
-            return false;
-        return imageFilter.Contains(ext) && File.Exists(fileName);
-    }
+        string key;
 
-    private static bool IsExecutable(string fileName)
-    {
-        string ext = Path.GetExtension(fileName).ToLower();
-        if (ext == "")
-            return false;
-        return exeFilter.Contains(ext) && File.Exists(fileName);
-    }
-
-    private static bool IsFolder(string path)
-    {
-        return path.EndsWith("\\") || Directory.Exists(path);
-    }
-
-    private static string ReturnKey(string fileName, IconSize size)
-    {
-        var key = Path.GetExtension(fileName).ToLower();
-
-        if (IsExecutable(fileName)
-            || IsImage(fileName) && size == IconSize.Thumbnail
-            || IsFolder(fileName))
-            key = fileName.ToLower();
+        if (specialType is AbstractFile.SpecialFileType.None)
+            key = Path.GetExtension(fileName).ToLower();
+        else
+            key = $"#{Enum.GetName(specialType).ToUpper()}#";
 
         return size switch
         {
-            IconSize.Thumbnail => key + (IsImage(fileName) ? "+T" : "+J"),
-            IconSize.Jumbo => key + "+J",
+            IconSize.Jumbo or IconSize.Thumbnail => key + "+J",
             IconSize.ExtraLarge => key + "+XL",
             IconSize.Large => key + "+L",
             IconSize.Small => key + "+S",
             _ => key,
         };
     }
-    #endregion
 
-    #region Static Cache
-    private static readonly Dictionary<string, ImageSource> iconDic = new Dictionary<string, ImageSource>();
-    private static readonly SysImageList _imgList = new SysImageList(SysImageListSize.SHIL_JUMBO);
-
-    private static Bitmap LoadJumbo(string lookup, int desiredSize)
+    private static Bitmap LoadJumbo(int index, int desiredSize)
     {
         // Used to contain code to support OSs before Windows Vista
         // ADB Explorer requires at least Windows 10 build 18362
 
         _imgList.ImageListSize = SysImageListSize.SHIL_JUMBO;
-        Icon icon = _imgList.Icon(_imgList.IconIndex(lookup, IsFolder(lookup)));
+        Icon icon = _imgList.Icon(index);
         Bitmap bitmap = icon.ToBitmap();
         icon.Dispose();
 
@@ -228,10 +155,16 @@ public class FileToIconConverter
         else
         {
             _imgList.ImageListSize = usable;
-            bitmap = ResizeImage(_imgList.Icon(_imgList.IconIndex(lookup)).ToBitmap(), new System.Drawing.Size(desiredSize, desiredSize), 0);
+            bitmap = ResizeImage(_imgList.Icon(index).ToBitmap(), new System.Drawing.Size(desiredSize, desiredSize), 0);
         }
 
         return bitmap;
+    }
+
+    private static Bitmap LoadJumbo(string lookup, int desiredSize)
+    {
+        _imgList.ImageListSize = SysImageListSize.SHIL_JUMBO;
+        return LoadJumbo(_imgList.IconIndex(lookup), desiredSize);
     }
 
     private static SysImageListSize FindUsableSize(Bitmap bitmap)
@@ -260,142 +193,119 @@ public class FileToIconConverter
         };
     }
 
-    #endregion
-
-    #region Instance Cache
-    private static readonly Dictionary<string, ImageSource> thumbDic = new Dictionary<string, ImageSource>();
-
-    public static void ClearInstanceCache()
+    private static BitmapSource AddToDic(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
     {
-        thumbDic.Clear();
+        var key = ReturnKey(fileName, size, specialType);
+
+        if (!iconDic.ContainsKey(key))
+            lock (iconDic)
+                iconDic.Add(key, GetImage(fileName, size, desiredSize, specialType));
+
+        return iconDic[key];
     }
 
-    private void PollIconCallback(object state)
+    private static BitmapSource AddToDic(Icon icon, IconSize size, AbstractFile.SpecialFileType specialType)
     {
-        ThumbnailInfo input = state as ThumbnailInfo;
-        string fileName = input.fullPath;
-        WriteableBitmap writeBitmap = input.bitmap;
-        IconSize size = input.iconsize;
+        var key = ReturnKey("", size, specialType);
 
-        Bitmap origBitmap = GetFileIcon(fileName, size).ToBitmap();
-        Bitmap inputBitmap;
+        if (!iconDic.ContainsKey(key))
+            lock (iconDic)
+                iconDic.Add(key, LoadBitmap(icon.ToBitmap()));
 
-        if (size == IconSize.Jumbo || size == IconSize.Thumbnail)
-            inputBitmap = ResizeImage(origBitmap, GetDefaultSize(size), 5);
-        else inputBitmap = ResizeImage(origBitmap, GetDefaultSize(size), 0);
-
-        BitmapSource inputBitmapSource = LoadBitmap(inputBitmap);
-        origBitmap.Dispose();
-        inputBitmap.Dispose();
-
-        CopyBitmap(inputBitmapSource, writeBitmap, true);
+        return iconDic[key];
     }
 
-    private void PollThumbnailCallback(object state)
-    {
-        //Non UIThread
-        ThumbnailInfo input = state as ThumbnailInfo;
-        string fileName = input.fullPath;
-        WriteableBitmap writeBitmap = input.bitmap;
-        IconSize size = input.iconsize;
+    private static BitmapSource GetImage(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
+        => LoadBitmap(GetBitmap(fileName, size, desiredSize, specialType));
 
-        try
-        {
-            Bitmap origBitmap = new Bitmap(fileName);
-            Bitmap inputBitmap = ResizeImage(origBitmap, GetDefaultSize(size), 5);
-            BitmapSource inputBitmapSource = LoadBitmap(inputBitmap);
-            origBitmap.Dispose();
-            inputBitmap.Dispose();
-
-            CopyBitmap(inputBitmapSource, writeBitmap, true);
-        }
-        catch { }
-    }
-
-    private ImageSource AddToDic(string fileName, IconSize size, int desiredSize)
-    {
-        string key = ReturnKey(fileName, size);
-
-        if (size == IconSize.Thumbnail || IsExecutable(fileName))
-        {
-            if (!thumbDic.ContainsKey(key))
-                lock (thumbDic)
-                    thumbDic.Add(key, GetImage(fileName, size, desiredSize));
-
-            return thumbDic[key];
-        }
-        else
-        {
-            if (!iconDic.ContainsKey(key))
-                lock (iconDic)
-                    iconDic.Add(key, GetImage(fileName, size, desiredSize));
-            return iconDic[key];
-        }
-    }
-
-    public ImageSource GetImage(string fileName, int iconSize)
-    {
-        IconSize size;
-
-        if (iconSize <= 16) size = IconSize.Small;
-        else if (iconSize <= 32) size = IconSize.Large;
-        else if (iconSize <= 48) size = IconSize.ExtraLarge;
-        else if (iconSize <= 72) size = IconSize.Jumbo;
-        else size = IconSize.Thumbnail;
-
-        return AddToDic(fileName, size, iconSize);
-    }
-
-    #endregion
-
-    #region Instance Tools
-
-    private BitmapSource GetImage(string fileName, IconSize size, int desiredSize)
+    private static Bitmap GetBitmap(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
     {
         Icon icon;
-        string key = ReturnKey(fileName, size);
-        string lookup = "aaa" + Path.GetExtension(fileName).ToLower();
-        if (!key.StartsWith("."))
+        string lookup;
+
+        if (!ReturnKey(fileName, size, specialType).StartsWith("."))
             lookup = fileName;
-
-        if (IsExecutable(fileName))
-        {
-            WriteableBitmap bitmap = new WriteableBitmap(AddToDic("aaa.exe", size, desiredSize) as BitmapSource);
-            ThreadPool.QueueUserWorkItem(new WaitCallback(PollIconCallback), new ThumbnailInfo(bitmap, fileName, size));
-            return bitmap;
-        }
-
         else
-            switch (size)
-            {
-                case IconSize.Thumbnail:
-                    if (IsImage(fileName))
-                    {
-                        //Load as jumbo icon first.                         
-                        WriteableBitmap bitmap = new WriteableBitmap(AddToDic(fileName, IconSize.Jumbo, desiredSize) as BitmapSource);
-                        ThreadPool.QueueUserWorkItem(new WaitCallback(PollThumbnailCallback), new ThumbnailInfo(bitmap, fileName, size));
-                        return bitmap;
-                    }
-                    else
-                    {
-                        return GetImage(lookup, IconSize.Jumbo, desiredSize);
-                    }
-                case IconSize.Jumbo:
-                    return LoadBitmap(LoadJumbo(lookup, desiredSize));
-                case IconSize.ExtraLarge:
-                    _imgList.ImageListSize = SysImageListSize.SHIL_EXTRALARGE;
-                    icon = _imgList.Icon(_imgList.IconIndex(lookup, IsFolder(fileName)));
-                    return LoadBitmap(icon.ToBitmap());
-                default:
-                    icon = GetFileIcon(lookup, size);
-                    return LoadBitmap(icon.ToBitmap());
-            }
+            lookup = $"aaa{Path.GetExtension(fileName).ToLower()}";
+
+        var specialIndex = SpecialTypeIndex(specialType);
+
+        switch (size)
+        {
+            case IconSize.Jumbo or IconSize.Thumbnail:
+                return specialIndex < 0
+                    ? LoadJumbo(lookup, desiredSize)
+                    : LoadJumbo(specialIndex, desiredSize);
+
+            case IconSize.ExtraLarge:
+                _imgList.ImageListSize = SysImageListSize.SHIL_EXTRALARGE;
+                icon = _imgList.Icon(specialIndex < 0 ? _imgList.IconIndex(lookup) : specialIndex);
+
+                return icon.ToBitmap();
+
+            default:
+                icon = specialIndex < 0 ? GetFileIcon(lookup, size) : GetIconFromIndex(specialIndex, size);
+
+                return icon.ToBitmap();
+        }
     }
 
-    #endregion
+    private static int SpecialTypeIndex(AbstractFile.SpecialFileType specialType)
+        => specialType switch
+        {
+            AbstractFile.SpecialFileType.Folder => FOLDER_ICON_INDEX,
+            AbstractFile.SpecialFileType.BrokenLink => BROKEN_LINK_ICON_INDEX,
+            AbstractFile.SpecialFileType.Unknown => UNKNOWN_ICON_INDEX,
+            AbstractFile.SpecialFileType.LinkOverlay => LINK_OVERLAY_INDEX,
+            _ => -1,
+        };
 
-    public FileToIconConverter()
+    private static System.Drawing.Size IconToSize(IconSize size) => size switch
     {
-        defaultsize = 48;
+        IconSize.Small => new(16, 16),
+        IconSize.Large => new(32, 32),
+        IconSize.ExtraLarge => new(48, 48),
+        IconSize.Jumbo or IconSize.Thumbnail => new(256, 256),
+        _ => throw new NotSupportedException(),
+    };
+
+    public static BitmapSource GetImage(string fileName, int iconSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
+    {
+        IconSize size = iconSize switch
+        {
+            <= 16 => IconSize.Small,
+            <= 32 => IconSize.Large,
+            <= 48 => IconSize.ExtraLarge,
+            _ => IconSize.Jumbo,
+        };
+
+        return AddToDic(fileName, size, iconSize, specialType);
+    }
+
+    public static IEnumerable<BitmapSource> GetImage(FilePath file, bool smallIcon = true)
+    {
+        var size = smallIcon ? IconSize.Small : IconSize.Jumbo;
+        var specialType = file.SpecialType;
+
+        if (specialType is 0)
+            yield break;
+        
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
+        {
+            Icon apkIcon = new(Properties.Resources.APK_icon, IconToSize(size));
+
+            yield return AddToDic(apkIcon, size, AbstractFile.SpecialFileType.Apk);
+        }
+        else
+        {
+            // Get icon without link overlay
+            yield return AddToDic(file.FullName, size, smallIcon ? 16 : 96, specialType & ~AbstractFile.SpecialFileType.LinkOverlay);
+        }
+
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.LinkOverlay))
+        {
+            // Get link overlay if required
+            yield return AddToDic(file.FullName, size, smallIcon ? 16 : 96, AbstractFile.SpecialFileType.LinkOverlay);
+        }
     }
 }

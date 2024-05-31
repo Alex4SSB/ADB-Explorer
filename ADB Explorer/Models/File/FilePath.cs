@@ -31,6 +31,17 @@ public abstract class AbstractFile : ViewModelBase
         BrokenLink = 7,
     }
 
+    [Flags]
+    public enum SpecialFileType
+    {
+        None = 1,
+        Folder = 2,
+        Apk = 4,
+        BrokenLink = 8,
+        Unknown = 16,
+        LinkOverlay = 32,
+    }
+
     private static readonly string[] names =
         { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown", "Broken Link" };
 
@@ -43,8 +54,11 @@ public class FilePath : AbstractFile, IBaseFile
 {
     public FilePathType PathType { get; protected set; }
 
-    protected bool IsRegularFile { get; set; }
-    public bool IsDirectory { get; protected set; }
+    public SpecialFileType SpecialType { get; protected set; }
+
+    public bool IsRegularFile => SpecialType.HasFlag(SpecialFileType.None);
+
+    public bool IsDirectory => SpecialType.HasFlag(SpecialFileType.Folder);
 
     private string fullPath;
     public string FullPath
@@ -65,7 +79,7 @@ public class FilePath : AbstractFile, IBaseFile
     {
         get
         {
-            if (IsDirectory || !IsRegularFile || HiddenOrWithoutExt(FullName))
+            if (!IsRegularFile || HiddenOrWithoutExt(FullName))
                 return FullName;
             else
                 return FullName[..^Extension.Length];
@@ -106,8 +120,9 @@ public class FilePath : AbstractFile, IBaseFile
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.Name;
         
-        IsDirectory = File.GetAttributes(FullPath) is System.IO.FileAttributes.Directory;
-        IsRegularFile = !IsDirectory;
+        SpecialType = File.GetAttributes(FullPath).HasFlag(System.IO.FileAttributes.Directory)
+            ? SpecialFileType.Folder
+            : SpecialFileType.None;
     }
 
     public FilePath(string androidPath,
@@ -118,8 +133,10 @@ public class FilePath : AbstractFile, IBaseFile
 
         FullPath = androidPath;
         FullName = string.IsNullOrEmpty(fullName) ? GetFullName(androidPath) : fullName;
-        IsDirectory = fileType == FileType.Folder;
-        IsRegularFile = fileType == FileType.File;
+
+        SpecialType = fileType is FileType.Folder
+            ? SpecialFileType.Folder
+            : SpecialFileType.None;
     }
 
     public virtual void UpdatePath(string newPath)

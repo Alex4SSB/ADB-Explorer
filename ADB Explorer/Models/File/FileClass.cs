@@ -27,7 +27,11 @@ public class FileClass : FilePath, IFileStat
     public bool IsLink
     {
         get => isLink;
-        set => Set(ref isLink, value);
+        set
+        {
+            if (Set(ref isLink, value))
+                UpdateSpecialType();
+        }
     }
 
     private FileType type;
@@ -37,7 +41,7 @@ public class FileClass : FilePath, IFileStat
         set
         {
             if (Set(ref type, value))
-                IsDirectory = value is FileType.Folder;
+                UpdateSpecialType();
         }
     }
 
@@ -59,11 +63,18 @@ public class FileClass : FilePath, IFileStat
         }
     }
 
-    private object icon;
-    public object Icon
+    private BitmapSource icon = null;
+    public BitmapSource Icon
     {
         get => icon;
         private set => Set(ref icon, value);
+    }
+
+    private BitmapSource iconOverlay = null;
+    public BitmapSource IconOverlay
+    {
+        get => iconOverlay;
+        private set => Set(ref iconOverlay, value);
     }
 
     private CutType cutState = CutType.None;
@@ -166,8 +177,8 @@ public class FileClass : FilePath, IFileStat
         ModifiedTime = modifiedTime;
         IsLink = isLink;
 
-        icon = IconHelper.GetIcon(this);
-        typeName = GetTypeName();
+        GetIcon();
+        TypeName = GetTypeName();
         IsTemp = isTemp;
         
         SortName = new(fileName);
@@ -189,8 +200,8 @@ public class FileClass : FilePath, IFileStat
         ModifiedTime = windowsPath.GetDateModified();
         IsLink = windowsPath.IsLink;
 
-        icon = IconHelper.GetIcon(this);
-        typeName = GetTypeName();
+        GetIcon();
+        TypeName = GetTypeName();
 
         SortName = new(FullName);
     }
@@ -231,8 +242,25 @@ public class FileClass : FilePath, IFileStat
     public void UpdateType()
     {
         TypeName = GetTypeName();
-        Icon = IconHelper.GetIcon(this);
-        IsRegularFile = Type is FileType.File;
+        GetIcon();
+    }
+
+    public void UpdateSpecialType()
+    {
+        if (Type is FileType.Folder)
+            SpecialType = SpecialFileType.Folder;
+        else if (Type is FileType.Unknown)
+            SpecialType = SpecialFileType.Unknown;
+        else if (Type is FileType.BrokenLink)
+            SpecialType = SpecialFileType.BrokenLink;
+        else
+            SpecialType = SpecialFileType.None; // Regular file or some /dev
+
+        if (IsApk)
+            SpecialType |= SpecialFileType.Apk;
+
+        if (IsLink && Type is not FileType.BrokenLink)
+            SpecialType |= SpecialFileType.LinkOverlay;
     }
 
     private string GetTypeName()
@@ -328,6 +356,21 @@ public class FileClass : FilePath, IFileStat
                 }
             }
         });
+    }
+
+    public void GetIcon()
+    {
+        var icons = FileToIconConverter.GetImage(this, true).ToArray();
+        
+        if (icons.Length > 0 && icons[0] is BitmapSource icon)
+            Icon = icon;
+        else
+            Icon = null;
+
+        if (icons.Length > 1 && icons[1] is BitmapSource icon2)
+            IconOverlay = icon2;
+        else
+            IconOverlay = null;
     }
 
     public override string ToString()
