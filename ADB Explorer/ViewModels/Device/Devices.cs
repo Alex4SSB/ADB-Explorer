@@ -298,7 +298,7 @@ public class Devices : AbstractDevice
         if (Data.RuntimeSettings.DeviceToOpen is null && device is null)
             return false;
 
-        if (!Data.RuntimeSettings.DeviceToOpen.Equals(device))
+        if (Data.RuntimeSettings.DeviceToOpen?.Equals(device) is not true)
             Data.RuntimeSettings.DeviceToOpen = device;
 
         Data.RuntimeSettings.IsRootActive = device?.Root is RootStatus.Enabled;

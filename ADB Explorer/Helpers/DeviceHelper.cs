@@ -522,10 +522,18 @@ public static class DeviceHelper
 
         DisconnectDevice();
 
-        if (!Data.Settings.AutoOpen || !Data.DevicesObject.SetOpenDevice(selectedAddress))
-            return;
+        if (string.IsNullOrEmpty(selectedAddress))
+        {
+            if (!Data.Settings.AutoOpen)
+                return;
+        }
+        else
+        {
+            if (!Data.DevicesObject.SetOpenDevice(selectedAddress))
+                return;
+        }
 
-        Data.DevicesObject.SetOpenDevice(Data.DevicesObject.Current);
+        Data.DevicesObject.SetOpenDevice(Data.DevicesObject.Current ?? devices.First());
         Data.CurrentADBDevice = new(Data.DevicesObject.Current);
         Data.RuntimeSettings.InitLister = true;
         if (init)
