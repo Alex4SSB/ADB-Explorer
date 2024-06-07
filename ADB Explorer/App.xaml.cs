@@ -13,9 +13,22 @@ public partial class App : Application
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
-        Data.AppDataPath = FileHelper.ConcatPaths(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AdbExplorerConst.APP_DATA_FOLDER, '\\');
-        SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+        if (e.Args.Length > 0)
+        {
+            if (!Directory.Exists(e.Args[0]))
+            {
+                DialogService.ShowMessage("Provided path does not exist.", "Custom App Data Path", DialogService.DialogIcon.Critical);
+                Current.Shutdown();
+                return;
+            }
 
+            Data.AppDataPath = e.Args[0];
+        }
+        else
+            Data.AppDataPath = FileHelper.ConcatPaths(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AdbExplorerConst.APP_DATA_FOLDER, '\\');
+
+        SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+        
         try
         {
             // if settings file exists in local app data - try to read it from there, otherwise try to read it from the isolated storage (old method)
