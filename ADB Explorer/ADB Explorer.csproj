@@ -28,6 +28,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="PortableLauncher.bat" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="app_icon_2023_combined.ico" />
   </ItemGroup>
 
@@ -57,6 +61,9 @@
 
   <ItemGroup>
   	 <Resource Include="app_icon_black_2023_256px.png" />
+  	 <Resource Include="PortableLauncher.bat">
+  	   <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  	 </Resource>
   </ItemGroup>
 
 	<ItemGroup>
