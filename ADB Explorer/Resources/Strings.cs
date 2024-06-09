@@ -88,8 +88,8 @@ public static class Strings
     public static string S_NEW_VERSION(Version newVersion) =>
         $"A new {Properties.Resources.AppDisplayName}, version {newVersion}, is available";
 
-    public static string S_ITEMS_DESTINATION(bool multipleItems, object singleItem) =>
-        "Select destination for " + (multipleItems ? "multiple items" : singleItem);
+    public static string S_ITEMS_DESTINATION(bool multipleItems, FileClass singleItem) =>
+        "Select destination for " + (multipleItems ? "multiple items" : singleItem.DisplayName);
 
     public static string S_PUSH_BROWSE_TITLE(bool isFolderPicker, string targetName)
     {
