@@ -5,26 +5,42 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
-    FontFamily="Dosis"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    FontFamily="Bahnschrift SemiBold"
     FontSize="10"
     mc:Ignorable="d">
-    <Border
-        d:BorderBrush="Black"
-        d:CornerRadius="3"
-        BorderBrush="{DynamicResource SystemControlPageTextBaseHighBrush}"
-        BorderThickness="1">
-        <Border.Style>
-            <Style TargetType="Border">
-                <Style.Triggers>
-                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                        <Setter Property="CornerRadius" Value="4" />
-                    </DataTrigger>
-                </Style.Triggers>
-            </Style>
-        </Border.Style>
-        <StackPanel Margin="2,1,2,0" Orientation="Horizontal">
-            <TextBlock Text="\\" />
-            <TextBlock Margin="1,0,0,0" Text=".." />
-        </StackPanel>
-    </Border>
+    <Grid>
+        <ui:FontIcon Glyph="&#xE62F;">
+            <ui:FontIcon.Style>
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:FontIcon.Style>
+        </ui:FontIcon>
+        <Border
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            d:BorderBrush="Black"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseHighBrush}"
+            BorderThickness="1">
+            <Border.Style>
+                <Style TargetType="Border">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Border.Style>
+            <StackPanel Margin="2,1,2,0" Orientation="Horizontal">
+                <TextBlock Text="\\" />
+                <TextBlock Margin="1,0,0,0" Text=".." />
+            </StackPanel>
+        </Border>
+    </Grid>
+
 </UserControl>

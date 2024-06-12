@@ -208,7 +208,7 @@ public partial class ADBService
                     stderr = Encoding.Unicode.GetString(Encoding.UTF8.GetBytes(stderr));
 
                     if (stderr.StartsWith("Error"))
-                        stderr = Strings.S_REDIRECTION + stderr ;
+                        stderr = Strings.S_REDIRECTION + stderr;
                 }
 
                 throw new ProcessFailedException(cmdProcess.ExitCode, stderr.Trim());

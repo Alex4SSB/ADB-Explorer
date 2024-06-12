@@ -199,8 +199,9 @@ public abstract class FileOperation : ViewModelBase
             if (Status is not OperationStatus.Completed)
                 return false;
 
-            return !StatusInfo.IsValidationInProgress 
-                && Device.Device.Status is AbstractDevice.DeviceStatus.Ok;
+            return StatusInfo is null 
+                || (!StatusInfo.IsValidationInProgress 
+                && Device.Device.Status is AbstractDevice.DeviceStatus.Ok);
         }
     }
 
@@ -276,6 +277,9 @@ public abstract class FileOperation : ViewModelBase
 
     public void SetValidation(bool value)
     {
+        if (StatusInfo is null)
+            StatusInfo = new CompletedShellProgressViewModel();
+
         StatusInfo.IsValidationInProgress = value;
         OnPropertyChanged(nameof(ValidationAllowed));
 

@@ -114,7 +114,7 @@ public static class FileHelper
     public static string ExtractRelativePath(string fullPath, string parent)
     {
         if (fullPath == parent)
-            return FilePath.GetFullName(fullPath);
+            return GetFullName(fullPath);
 
         var index = fullPath.IndexOf(parent);
         
@@ -126,10 +126,34 @@ public static class FileHelper
     }
 
     public static string GetParentPath(string fullPath) =>
-        fullPath[..FilePath.LastSeparatorIndex(fullPath)];
+        fullPath[..LastSeparatorIndex(fullPath)];
 
-    public static string GetFullName(string fullPath) =>
-        fullPath[FilePath.LastSeparatorIndex(fullPath)..];
+    public static string GetFullName(string fullPath)
+    {
+        if (fullPath.Length < 2)
+            return fullPath;
+
+        fullPath = fullPath.TrimEnd(Separators);
+        var index = LastSeparatorIndex(fullPath);
+
+        if (index.IsFromEnd)
+            return fullPath;
+
+        return fullPath[(index.Value + 1)..];
+    }
+
+    public static Index LastSeparatorIndex(string path)
+        => IndexAdjust(path.LastIndexOfAny(Separators));
+
+    public static Index NextSeparatorIndex(string parentPath, string childPath)
+        => IndexAdjust(childPath.IndexOfAny(Separators, parentPath.Length + 1));
+
+    public static Index IndexAdjust(int originalIndex) => originalIndex switch
+    {
+        0 => 1,
+        < 0 => ^0,
+        _ => originalIndex,
+    };
 
     public static ulong? GetSize(this ShellObject shellObject)
         => shellObject.Properties.System.Size.Value;

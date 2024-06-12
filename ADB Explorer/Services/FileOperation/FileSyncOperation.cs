@@ -39,6 +39,16 @@ public class FileSyncOperation : FileOperation
         {
             if (AdbProcess.Process.StartInfo.FileName == Data.ProgressRedirectionPath)
             {
+                try
+                {
+                    var id = AdbProcess.Process.Id;
+                }
+                catch
+                {
+                    // if we can't get the pid without throwing an exception, the process is useless
+                    return;
+                }
+
                 var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
                 var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
 
@@ -111,7 +121,7 @@ public class FileSyncOperation : FileOperation
         {
             Status = OperationStatus.Completed;
             if (t.Result is null)
-                StatusInfo = null;
+                StatusInfo = new CompletedShellProgressViewModel("Finished with no confirmation");
             else if (t.Result.FilesTransferred + t.Result.FilesSkipped < 1)
                 StatusInfo = new CompletedShellProgressViewModel();
             else

@@ -132,7 +132,7 @@ public class FilePath : AbstractFile, IBaseFile
         PathType = FilePathType.Android;
 
         FullPath = androidPath;
-        FullName = string.IsNullOrEmpty(fullName) ? GetFullName(androidPath) : fullName;
+        FullName = string.IsNullOrEmpty(fullName) ? FileHelper.GetFullName(androidPath) : fullName;
 
         SpecialType = fileType is FileType.Folder
             ? SpecialFileType.Folder
@@ -142,23 +142,9 @@ public class FilePath : AbstractFile, IBaseFile
     public virtual void UpdatePath(string newPath)
     {
         FullPath = newPath;
-        FullName = GetFullName(newPath);
+        FullName = FileHelper.GetFullName(newPath);
 
         OnPropertyChanged(nameof(NoExtName));
-    }
-
-    public static string GetFullName(string fullPath)
-    {
-        if (fullPath.Length < 2)
-            return fullPath;
-
-        fullPath = fullPath.TrimEnd(Separators);
-        var index = LastSeparatorIndex(fullPath);
-
-        if (index.IsFromEnd)
-            return fullPath;
-
-        return fullPath[(index.Value + 1)..];
     }
 
     private static bool HiddenOrWithoutExt(string fullName) => fullName.Count(c => c == '.') switch
@@ -187,16 +173,6 @@ public class FilePath : AbstractFile, IBaseFile
 
         return RelationType.Unrelated;
     }
-
-    public static Index LastSeparatorIndex(string path)
-        => IndexAdjust(path.LastIndexOfAny(Separators));
-
-    protected static Index IndexAdjust(int originalIndex) => originalIndex switch
-    {
-        0 => 1,
-        < 0 => ^0,
-        _ => originalIndex,
-    };
 
     public override string ToString()
     {

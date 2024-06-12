@@ -82,12 +82,9 @@ public class SyncFile : FilePath
         if (fullPath is null || !fullPath.Contains(FullPath) || fullPath.Length - FullPath.Length < 2)
             return null;
 
-        var index = NextSeparatorIndex(FullPath, fullPath);
+        var index = FileHelper.NextSeparatorIndex(FullPath, fullPath);
         return fullPath[..index];
     }
-
-    protected static Index NextSeparatorIndex(string parentPath, string childPath, char separator = '/')
-        => IndexAdjust(childPath.IndexOf(separator, parentPath.Length + 1));
 }
 
 public class SyncFileComparer : IEqualityComparer<SyncFile>

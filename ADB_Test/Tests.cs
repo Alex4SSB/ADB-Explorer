@@ -255,15 +255,15 @@ namespace ADB_Test
         [TestMethod]
         public void GetFullNameTest()
         {
-            Assert.AreEqual("adb.exe", FilePath.GetFullName(@"E:\Android_SDK\platform-tools_r33.0.3\adb.exe"));
+            Assert.AreEqual("adb.exe", FileHelper.GetFullName(@"E:\Android_SDK\platform-tools_r33.0.3\adb.exe"));
 
-            Assert.AreEqual("root-checker-6-5-0.apk", FilePath.GetFullName(@"/sdcard/ASUS/root-checker-6-5-0.apk"));
+            Assert.AreEqual("root-checker-6-5-0.apk", FileHelper.GetFullName(@"/sdcard/ASUS/root-checker-6-5-0.apk"));
 
-            Assert.AreEqual("root-checker-6-5-0.apk", FilePath.GetFullName(@"root-checker-6-5-0.apk"));
+            Assert.AreEqual("root-checker-6-5-0.apk", FileHelper.GetFullName(@"root-checker-6-5-0.apk"));
 
-            Assert.AreEqual("ASUS", FilePath.GetFullName(@"/sdcard/ASUS/"));
+            Assert.AreEqual("ASUS", FileHelper.GetFullName(@"/sdcard/ASUS/"));
 
-            Assert.AreEqual("/", FilePath.GetFullName("/"));
+            Assert.AreEqual("/", FileHelper.GetFullName("/"));
         }
     }
 }
