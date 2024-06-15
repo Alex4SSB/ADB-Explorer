@@ -90,17 +90,17 @@ public static class FileHelper
     public static void ClearCutFiles(Func<FileClass, bool> predicate)
         => ClearCutFiles(Data.CutItems.Where(predicate));
 
-    public static void ClearCutFiles(IEnumerable<FileClass> items = null)
+    public static void ClearCutFiles(IEnumerable<FileClass> items)
     {
-        items ??= Data.CutItems;
-        
         foreach (var item in items)
         {
             item.CutState = CutType.None;
         }
+
         Data.CutItems.RemoveAll(items.ToList());
 
-        Data.FileActions.PasteState = CutType.None;
+        if (!Data.CutItems.Any())
+            Data.FileActions.PasteState = CutType.None;
     }
 
     public static string ConcatPaths(FilePath path1, string path2) => 

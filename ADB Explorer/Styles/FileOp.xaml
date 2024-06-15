@@ -46,6 +46,16 @@
             <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True">
                 <Setter Property="Text" Value="{Binding FilePath.FullName}" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding OperationName}" Value="Rename">
+                <Setter Property="Text" Value="{Binding TargetPath.NoExtName}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding OperationName}" Value="Rename" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Text" Value="{Binding TargetPath.FullName}" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <Style

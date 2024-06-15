@@ -68,7 +68,13 @@ public static class Strings
     public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.\n\n";
     public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
     public const string S_REDIRECTION = "Progress Redirection ";
+    public const string S_LS_ERROR_TITLE = "List Directory Error";
 
+
+    public const string S_FUSE_DRIVE_TOOLTIP = "FUSE drive." +
+        "\n• Symbolic links are not supported" +
+        "\n• File names cannot contain \" * / : < > ? \\ |" +
+        "\n• Installation of APKs is not supported";
 
     public static string S_ADB_LEARN_MORE => Data.RuntimeSettings.IsAppDeployed
         ? "Learn More About ADB"
@@ -158,5 +164,10 @@ public static class Strings
         };
 
         return $"{remType} {name}";
+    }
+
+    public static string S_LS_ERROR(Exception e)
+    {
+        return $"{(string.IsNullOrEmpty(e.Message) ? "" : e.Message + "\n\n")}An error occured while trying to list the contents of this folder.\n Visible content may be incomplete.";
     }
 }

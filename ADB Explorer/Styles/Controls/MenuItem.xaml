@@ -381,6 +381,7 @@
             <!--  BACKGORUND: Unchecked, Mouse Over  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
@@ -390,6 +391,7 @@
             <!--  BACKGORUND: Unchecked, Mouse Over, Button Menu  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsMouseOver" Value="True" />
@@ -400,6 +402,7 @@
             <!--  BACKGORUND (OPACITY): Checked, Mouse Over  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
@@ -409,6 +412,7 @@
             <!--  Unchecked, Pressed  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsPressed" Value="True" />
                 </MultiTrigger.Conditions>
@@ -419,6 +423,7 @@
             <!--  Unchecked, Pressed, Menu Button  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsPressed" Value="True" />
@@ -429,6 +434,7 @@
             <!--  BACKGORUND (OPACITY), FOREGROUND: Checked, Pressed  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsPressed" Value="True" />
                 </MultiTrigger.Conditions>
@@ -627,6 +633,7 @@
             <!--  BACKGORUND: Unchecked, Mouse Over  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
@@ -636,6 +643,7 @@
             <!--  BACKGORUND: Unchecked, Mouse Over, Button Menu  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsMouseOver" Value="True" />
@@ -646,6 +654,7 @@
             <!--  BACKGORUND (OPACITY): Checked, Mouse Over  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsMouseOver" Value="True" />
                 </MultiTrigger.Conditions>
@@ -655,6 +664,7 @@
             <!--  Unchecked, Pressed  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsPressed" Value="True" />
                 </MultiTrigger.Conditions>
@@ -665,6 +675,7 @@
             <!--  Unchecked, Pressed, Menu Button  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
                     <Condition Property="IsChecked" Value="False" />
                     <Condition Property="IsPressed" Value="True" />
@@ -675,6 +686,7 @@
             <!--  BACKGORUND (OPACITY), FOREGROUND: Checked, Pressed  -->
             <MultiTrigger>
                 <MultiTrigger.Conditions>
+                    <Condition Property="helpers:MenuHelper.IsMouseSelectionVisible" Value="True" />
                     <Condition Property="IsChecked" Value="True" />
                     <Condition Property="IsPressed" Value="True" />
                 </MultiTrigger.Conditions>

@@ -536,8 +536,6 @@ public static class DeviceHelper
         Data.DevicesObject.SetOpenDevice(Data.DevicesObject.Current ?? devices.First());
         Data.CurrentADBDevice = new(Data.DevicesObject.Current);
         Data.RuntimeSettings.InitLister = true;
-        if (init)
-            InitDevice();
 
         static void DisconnectDevice()
         {
@@ -565,7 +563,7 @@ public static class DeviceHelper
         Data.RuntimeSettings.DriveViewNav = true;
         NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
-        FileHelper.ClearCutFiles();
+        FileHelper.ClearCutFiles(Data.CutItems);
         Data.RuntimeSettings.FilterDrives = true;
 
         Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;

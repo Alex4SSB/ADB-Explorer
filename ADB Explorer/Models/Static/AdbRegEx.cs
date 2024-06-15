@@ -20,10 +20,10 @@
         [GeneratedRegex("^(?<SourcePath>.+?): (?<TotalTransferred>\\d+) files? (?>pulled|pushed), (?<TotalSkipped>\\d+) skipped\\.(?> (?<AverageRate>\\d+(?>\\.\\d+)?) MB\\/s \\((?<TotalBytes>\\d+) bytes in (?<TotalTime>\\d+(?>\\.\\d+)?)s\\))? *$", RegexOptions.Multiline)]
         public static partial Regex RE_FILE_SYNC_STATS();
 
-        [GeneratedRegex(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]")]
+        [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]")]
         public static partial Regex RE_EMULATED_STORAGE_SINGLE();
 
-        [GeneratedRegex(@"(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage|mnt\/media_rw)\/[\w-]+?)[\r\n]", RegexOptions.Multiline)]
+        [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>\/(?:storage|mnt\/media_rw)\/[\w-]+?)[\r\n]", RegexOptions.Multiline)]
         public static partial Regex RE_EMULATED_ONLY();
 
         [GeneratedRegex(@"(?<major>[a-f\d]+),(?<minor>[a-f\d]+)")]

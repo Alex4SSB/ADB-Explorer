@@ -39,7 +39,7 @@ public class FileDeleteOperation : AbstractShellFileOperation
                 var updates = res.Where(m => m.Success).Select(m => new ShellErrorInfo(m, base.FilePath.FullPath));
                 base.AddUpdates(updates);
 
-                var message = updates.Last().Message;
+                var message = updates.Any() ? updates.Last().Message : "";
                 if (message.Contains(':'))
                     message = message.Split(':').Last().TrimStart();
 

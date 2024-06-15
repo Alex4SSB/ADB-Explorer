@@ -298,6 +298,23 @@ internal static class FileActionLogic
             return false;
 
         var selected = isKeyboard & Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
+
+        string targetPath;
+        if (selected == 1)
+        {
+            var targetFile = Data.SelectedFiles.First();
+            targetPath = targetFile.IsLink ? targetFile.LinkTarget : targetFile.FullPath;
+        }
+        else
+        {
+            targetPath = Data.CurrentPath;
+        }
+
+        if (DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true)
+        {
+            return !Data.CutItems.Any(file => file.FullName.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c)));
+        }
+
         switch (selected)
         {
             case 0:
@@ -404,7 +421,7 @@ internal static class FileActionLogic
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
     {
-        FileHelper.ClearCutFiles();
+        FileHelper.ClearCutFiles(Data.CutItems);
         Data.FileActions.PasteState = isCopy ? FileClass.CutType.Copy : FileClass.CutType.Cut;
 
         var itemsToCut = Data.DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
@@ -761,6 +778,10 @@ internal static class FileActionLogic
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
+        // APK enabled in settings
+        // All selected files are installable
+        // Not in trash
+        // If recovery, only enabled outside temp drive (to enable copy to temp, but install is disabled, even in temp drive)
         Data.FileActions.PackageActionsEnabled = Data.Settings.EnableApk
                                                  && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
                                                  && !Data.FileActions.IsRecycleBin
@@ -770,7 +791,8 @@ internal static class FileActionLogic
         Data.FileActions.IsCopyItemPathEnabled = Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
 
         Data.FileActions.ContextNewEnabled = !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin;
-        Data.FileActions.SubmenuUninstallEnabled = Data.FileActions.IsTemp
+
+        Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
             && Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
 
@@ -784,13 +806,16 @@ internal static class FileActionLogic
             && !Data.SelectedFiles.First().IsLink
             && Data.SelectedFiles.First().Size < Data.Settings.EditorMaxFileSize;
 
-        Data.FileActions.IsPasteLinkEnabled = !Data.FileActions.IsRecycleBin
+        Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.RuntimeSettings.IsRootActive
             && Data.CutItems.Count == 1
             && Data.CutItems[0].PathType is FilePathType.Android
             && Data.FileActions.PasteState is FileClass.CutType.Copy
             && (!Data.SelectedFiles.Any() ||
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
+
+        Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery
+            && Data.CurrentDrive?.IsFUSE is not true;
 
         Data.RuntimeSettings.FilterActions = true;
     }

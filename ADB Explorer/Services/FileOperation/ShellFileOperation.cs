@@ -104,12 +104,14 @@ public static class ShellFileOperation
             if (op.Device.ID == Data.CurrentADBDevice.ID
                 && op.FilePath.ParentPath == Data.CurrentPath)
             {
+                var file = Data.DirList.FileList.Find(f => f.FullPath == op.FilePath.FullPath);
+
                 // update UI when on current device and current path
-                op.FilePath.UpdatePath(op.TargetPath.FullPath);
+                file.UpdatePath(op.TargetPath.FullPath);
 
                 // only select the item if there aren't any other operations
                 if (Data.FileOpQ.TotalCount == 1)
-                    Data.FileActions.ItemToSelect = op.FilePath;
+                    Data.FileActions.ItemToSelect = file;
             }
 
             op.PropertyChanged -= DeleteFileOp_PropertyChanged;

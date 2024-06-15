@@ -34,6 +34,13 @@ public class FileClass : FilePath, IFileStat
         }
     }
 
+    private string linkTarget = "";
+    public string LinkTarget
+    {
+        get => linkTarget;
+        set => Set(ref linkTarget, value);
+    }
+
     private FileType type;
     public FileType Type
     {

@@ -12,7 +12,7 @@ internal static class Data
     public static string CurrentPath { get; set; }
     public static string ParentPath { get; set; }
 
-    public static Dictionary<Tuple<string, bool>, Icon> FileIcons { get; set; } = new();
+    public static DriveViewModel CurrentDrive { get; set; } = null;
 
     public static FileOperationQueue FileOpQ { get; set; }
 

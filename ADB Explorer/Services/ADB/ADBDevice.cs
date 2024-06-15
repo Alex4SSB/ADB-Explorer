@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -94,9 +95,9 @@ public partial class ADBService
 
         public IEnumerable<(string, FileType)> GetLinkType(IEnumerable<string> filePaths, CancellationToken cancellationToken)
         {
-            var args = new[] { "-L", "-c", "'%n ; %f'" }
+            var args = new[] { "`readlink", "-f" }
                 .Concat(filePaths.Select(f => EscapeAdbShellString(f)))
-                .Append("2>&1").ToArray();
+                .Concat(new[] { "`", "-c", "'%n ; %f'", "2>&1" }).ToArray();
 
             ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out string stderr, cancellationToken, args);
 
@@ -115,18 +116,28 @@ public partial class ADBService
             }
         }
 
-        public void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, CancellationToken cancellationToken)
+        public void ListDirectory(string path, ref ConcurrentQueue<FileStat> output, Dispatcher dispatcher, CancellationToken cancellationToken)
         {
-            // Execute adb ls to get file list
-            var stdout = ExecuteDeviceAdbCommandAsync(ID, "ls", cancellationToken, EscapeAdbString(path));
-            foreach (string stdoutLine in stdout)
+            IEnumerable<string> stdout;
+
+            try
             {
-                var item = CreateFile(path, stdoutLine);
+                stdout = ExecuteDeviceAdbCommandAsync(ID, "ls", cancellationToken, EscapeAdbString(path));
 
-                if (item is null)
-                    continue;
+                foreach (string stdoutLine in stdout)
+                {
+                    var item = CreateFile(path, stdoutLine);
 
-                output.Enqueue(item);
+                    if (item is null)
+                        continue;
+
+                    output.Enqueue(item);
+                }
+            }
+            catch (Exception e)
+            {
+                dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_LS_ERROR(e), Strings.S_LS_ERROR_TITLE, DialogService.DialogIcon.Critical, true, copyToClipboard: true));
+                return;
             }
         }
 

@@ -59,6 +59,13 @@
                                     <DataTrigger Binding="{Binding ItemsCount}" Value="-1">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ItemsCount}" Value="0" />
+                                            <Condition Binding="{Binding Type}" Value="Temp" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
@@ -118,6 +125,13 @@
                                     <DataTrigger Binding="{Binding Type}" Value="Package">
                                         <Setter Property="Text" Value="??" />
                                     </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding ItemsCount}" Value="0" />
+                                            <Condition Binding="{Binding Type}" Value="Temp" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </MultiDataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </TextBlock.Style>

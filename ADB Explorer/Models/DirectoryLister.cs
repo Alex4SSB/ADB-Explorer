@@ -89,7 +89,7 @@ public class DirectoryLister : ViewModelBase
         LinkListCancellation = new();
         currentFileQueue = new ConcurrentQueue<FileStat>();
 
-        ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
+        ReadTask = Task.Run(() => Device.ListDirectory(CurrentPath, ref currentFileQueue, Dispatcher, CurrentCancellationToken.Token), CurrentCancellationToken.Token);
         ReadTask.ContinueWith((t) => Dispatcher.BeginInvoke(() => StopDirectoryList()), CurrentCancellationToken.Token);
 
         Task.Delay(DIR_LIST_VISIBLE_PROGRESS_DELAY).ContinueWith((t) => Dispatcher.BeginInvoke(() => IsProgressVisible = InProgress), CurrentCancellationToken.Token);
@@ -197,10 +197,10 @@ public class DirectoryLister : ViewModelBase
             return;
         }
 
-        IEnumerable<(string, FileType)> result = null;
+        List<(string, FileType)> result = null;
         try
         {
-            result = Device.GetLinkType(items.Select(f => f.FullPath), LinkListCancellation.Token);
+            result = Device.GetLinkType(items.Select(f => f.FullPath), LinkListCancellation.Token).ToList();
         }
         catch (AggregateException e) when (e.InnerException is TaskCanceledException)
         { }
@@ -211,16 +211,16 @@ public class DirectoryLister : ViewModelBase
             return;
         }
 
-        foreach (var item in result)
+        for (var i = 0; i < items.Count; i++)
         {
-            var file = items.Where(f => f.FullPath == item.Item1);
-            if (!file.Any())
-                continue;
+            var file = items[i];
+            var target = result[i];
 
             Dispatcher.Invoke(() =>
             {
-                file.First().Type = item.Item2;
-                file.First().UpdateType();
+                file.LinkTarget = target.Item1;
+                file.Type = target.Item2;
+                file.UpdateType();
             });
         }
 

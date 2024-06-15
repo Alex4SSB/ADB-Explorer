@@ -170,7 +170,7 @@ public class LogicalDevice : Device
                 switch (self)
                 {
                     case LogicalDriveViewModel logical:
-                        logical.SetParams((LogicalDrive)other);
+                        logical.UpdateDrive((LogicalDrive)other);
                         if (other.Type is not AbstractDrive.DriveType.Unknown)
                             logical.SetType(other.Type);
                         break;

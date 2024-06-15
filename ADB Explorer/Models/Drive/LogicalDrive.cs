@@ -32,10 +32,30 @@ public class LogicalDrive : Drive
         set => Set(ref usageP, value);
     }
 
+    private string fileSystem = "";
+    public string FileSystem
+    {
+        get => fileSystem;
+        set
+        {
+            if (Set(ref fileSystem, value))
+                OnPropertyChanged(nameof(IsFUSE));
+        }
+    }
+
+    public override bool IsFUSE => FileSystem.Contains("fuse");
+
     public string ID => Path.Count(c => c == '/') > 1 ? Path[(Path.LastIndexOf('/') + 1)..] : Path;
 
 
-    public LogicalDrive(string size = "", string used = "", string available = "", sbyte usageP = -1, string path = "", bool isMMC = false, bool isEmulator = false)
+    public LogicalDrive(string size = "",
+                        string used = "",
+                        string available = "",
+                        sbyte usageP = -1,
+                        string path = "",
+                        bool isMMC = false,
+                        bool isEmulator = false,
+                        string fileSystem = "")
         : base(path)
     {
         if (usageP is < -1 or > 100)
@@ -54,6 +74,8 @@ public class LogicalDrive : Drive
         {
             Type = DriveType.Emulated;
         }
+
+        FileSystem = fileSystem;
     }
 
     public LogicalDrive(GroupCollection match, bool isMMC = false, bool isEmulator = false, string forcePath = "")
@@ -64,41 +86,7 @@ public class LogicalDrive : Drive
               sbyte.Parse(match["usage_P"].Value),
               string.IsNullOrEmpty(forcePath) ? match["path"].Value : forcePath,
               isMMC,
-              isEmulator)
+              isEmulator,
+              match["FileSystem"].Value)
     { }
-
-
-    public List<string> SetDriveParams(string size = "", string used = "", string available = "", sbyte usageP = -1)
-    {
-        List<string> updatedParams = new();
-
-        if (usageP is < -1 or > 100)
-            throw new ArgumentOutOfRangeException(nameof(usageP));
-
-        if (size != "" && Size != size)
-        {
-            Size = size;
-            updatedParams.Add(nameof(Size));
-        }
-
-        if (used != "" && Used != used)
-        {
-            Used = used;
-            updatedParams.Add(nameof(Used));
-        }
-
-        if (available != "" && Available != available)
-        {
-            Available = available;
-            updatedParams.Add(nameof(Available));
-        }
-
-        if (usageP > -1 && UsageP != usageP)
-        {
-            UsageP = usageP;
-            updatedParams.Add(nameof(UsageP));
-        }
-
-        return updatedParams;
-    }
 }

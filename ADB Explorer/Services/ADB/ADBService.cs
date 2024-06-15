@@ -59,7 +59,7 @@ public partial class ADBService
         {
             cmdProcess.StartInfo.StandardOutputEncoding = encoding;
         }
-        
+
         if (IsMdnsEnabled)
             cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
 
@@ -250,6 +250,7 @@ public partial class ADBService
         var result = string.Concat(str.Select(c =>
             c switch
             {
+                '"' => "\\\\\\\"",
                 var ch when ESCAPE_ADB_SHELL_CHARS.Contains(ch) => @"\" + ch,
                 _ => new string(c, 1)
             }));

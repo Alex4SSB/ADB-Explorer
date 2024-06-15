@@ -25,12 +25,37 @@ class LogicalDriveViewModel : DriveViewModel
         Drive = drive;
     }
 
-    public void SetParams(LogicalDriveViewModel other) => SetParams(other.Drive);
-
-    public void SetParams(LogicalDrive other)
+    public void UpdateDrive(LogicalDrive other)
     {
-        var updatedParams = Drive.SetDriveParams(other.Size, other.Used, other.Available, other.UsageP);
-        updatedParams.ForEach(OnPropertyChanged);
+        if (Drive.Size != other.Size)
+        {
+            Drive.Size = other.Size;
+            OnPropertyChanged(nameof(Size));
+        }
+
+        if (Drive.Used != other.Used)
+        {
+            Drive.Used = other.Used;
+            OnPropertyChanged(nameof(Used));
+        }
+
+        if (Drive.Available != other.Available)
+        {
+            Drive.Available = other.Available;
+            OnPropertyChanged(nameof(Available));
+        }
+
+        if (Drive.UsageP != other.UsageP)
+        {
+            Drive.UsageP = other.UsageP;
+            OnPropertyChanged(nameof(UsageP));
+        }
+
+        if (Drive.FileSystem != other.FileSystem)
+        {
+            Drive.FileSystem = other.FileSystem;
+            OnPropertyChanged(nameof(IsFUSE));
+        }
     }
 
     public void SetExtension(bool isMMC = true) => SetType(isMMC ? DriveType.Expansion : DriveType.External);

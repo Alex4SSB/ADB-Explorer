@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 
 namespace ADB_Explorer.Controls;
 
@@ -38,6 +39,8 @@ public partial class NavigationBox : UserControl
             SetValue(PathProperty, value);
         }
     }
+
+    private bool isFuse = false;
 
     public static readonly DependencyProperty PathProperty =
         DependencyProperty.Register("Path", typeof(string),
@@ -156,6 +159,8 @@ public partial class NavigationBox : UserControl
                              DisplayNames.FirstOrDefault(kv => path.StartsWith(kv.Key)),
                              false);
         }
+        
+        isFuse = DriveHelper.GetCurrentDrive(path)?.IsFUSE is true;
 
         var pairs = DisplayNames.Where(kv => path.StartsWith(kv.Key));
         var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.FirstOrDefault();
@@ -214,6 +219,11 @@ public partial class NavigationBox : UserControl
 
     private void ConsolidateButtons(double expectedLength)
     {
+        if (isFuse)
+        {
+            expectedLength += ControlSize.GetWidth(CreateFuseIcon());
+        }
+
         if (expectedLength > PathBox.ActualWidth)
             expectedLength += ControlSize.GetWidth(CreateExcessButton());
 
@@ -223,7 +233,7 @@ public partial class NavigationBox : UserControl
 
         if (excessLength > 0)
         {
-            int i = 0;
+            int i = 1;
             while (excessLength >= 0 && Breadcrumbs.Count - excessButtons.Count > 0)
             {
                 var path = TextHelper.GetAltObject(Breadcrumbs[i]).ToString();
@@ -251,10 +261,22 @@ public partial class NavigationBox : UserControl
 
         foreach (var item in Breadcrumbs.Except(excessButtons))
         {
+            if (BreadcrumbMenu.Items.Count == 1 && ((MenuItem)BreadcrumbMenu.Items[0]).HasItems)
+            {
+                AddPathButton(item, 0);
+                AddPathArrow(1);
+                continue;
+            }
+
             if (BreadcrumbMenu.Items.Count > 0)
                 AddPathArrow();
 
             AddPathButton(item);
+        }
+
+        if (isFuse)
+        {
+            AddFuseIcon();
         }
 
         if (excessLength > 0)
@@ -269,7 +291,7 @@ public partial class NavigationBox : UserControl
             Breadcrumbs[^1].Width = double.NaN;
     }
 
-    private MenuItem CreateExcessButton()
+    private static MenuItem CreateExcessButton()
     {
         var menuItem = new MenuItem()
         {
@@ -315,7 +337,7 @@ public partial class NavigationBox : UserControl
         return button;
     }
 
-    private void AddPathButton(MenuItem button)
+    private void AddPathButton(MenuItem button, int index = -1)
     {
         if (TextHelper.GetAltObject(button) is string str && str == AdbExplorerConst.RECYCLE_PATH)
             button.ContextMenu = null;
@@ -326,10 +348,13 @@ public partial class NavigationBox : UserControl
 
         ControlHelper.SetCornerRadius(button, new(Data.RuntimeSettings.UseFluentStyles ? 3 : 0));
 
-        BreadcrumbMenu.Items.Add(button);
+        if (index < 0)
+            BreadcrumbMenu.Items.Add(button);
+        else
+            BreadcrumbMenu.Items.Insert(index, button);
     }
 
-    private MenuItem CreatePathArrow() => new()
+    private static MenuItem CreatePathArrow() => new()
     {
         VerticalAlignment = VerticalAlignment.Center,
         Height = 24,
@@ -343,14 +368,41 @@ public partial class NavigationBox : UserControl
         },
     };
 
-    private void AddPathArrow(bool append = true)
+    private void AddPathArrow(int index = -1)
     {
         var arrow = CreatePathArrow();
 
-        if (append)
+        if (index < 0)
             BreadcrumbMenu.Items.Add(arrow);
         else
-            BreadcrumbMenu.Items.Insert(0, arrow);
+            BreadcrumbMenu.Items.Insert(index, arrow);
+    }
+
+    private static MenuItem CreateFuseIcon()
+    {
+        MenuItem menuItem = new()
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            Height = 24,
+            Margin = new(0, 0, 4, 0),
+            Padding = new(3, 0, 3, 0),
+            IsChecked = true,
+            Header = new FontIcon()
+            {
+                Glyph = "\uF0EF",
+                FontSize = 20,
+            },
+            ToolTip = Strings.S_FUSE_DRIVE_TOOLTIP,
+        };
+
+        MenuHelper.SetIsMouseSelectionVisible(menuItem, false);
+
+        return menuItem;
+    }
+
+    private void AddFuseIcon()
+    {
+        BreadcrumbMenu.Items.Insert(0, CreateFuseIcon());
     }
 
     private void PathButton_Click(object sender, RoutedEventArgs e)

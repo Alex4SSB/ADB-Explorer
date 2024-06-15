@@ -951,6 +951,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
         DriveList.ItemsSource = DevicesObject.Current.Drives;
+        CurrentDrive = null;
 
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
@@ -1094,6 +1095,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         NavigationBox.Path = realPath == RECYCLE_PATH ? NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin) : realPath;
         ParentPath = FileHelper.GetParentPath(CurrentPath);
+        CurrentDrive = DriveHelper.GetCurrentDrive(CurrentPath);
 
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
         FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);
@@ -1761,7 +1763,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
-        (sender as TextBox).FilterString(INVALID_ANDROID_CHARS);
+        (sender as TextBox).FilterString(CurrentDrive.IsFUSE
+            ? INVALID_NTFS_CHARS
+            : new[] { '/', '\\' });
     }
 
     private void NewItem(bool isFolder)

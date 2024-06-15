@@ -27,14 +27,18 @@ public static class AdbExplorerConst
 
     public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
     {
-        { "/storage/emulated", AbstractDrive.DriveType.Internal },
         { "/sdcard", AbstractDrive.DriveType.Internal },
-        { "/", AbstractDrive.DriveType.Root },
+        { "/storage/emulated/0", AbstractDrive.DriveType.Internal },
+        { "/storage/self/primary", AbstractDrive.DriveType.Internal },
+        { "/mnt/sdcard", AbstractDrive.DriveType.Internal },
+        { "/storage/emulated", AbstractDrive.DriveType.Internal },
         { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
         { NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
         { TEMP_PATH, AbstractDrive.DriveType.Temp },
         { NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
+        { "/", AbstractDrive.DriveType.Root },
     };
+
     public static readonly Dictionary<AbstractDrive.DriveType, string> DRIVE_DISPLAY_NAMES = new()
     {
         { AbstractDrive.DriveType.Root, "Root" },
@@ -84,11 +88,11 @@ public static class AdbExplorerConst
 
     public static readonly UnicodeCategory[] UNICODE_ICONS = { UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned };
 
-    public static readonly char[] ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
+    public static readonly char[] WIFI_PAIRING_ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-+*/<>{}".ToCharArray();
     public static readonly string PAIRING_SERVICE_PREFIX = "adbexplorer-";
 
     public static readonly char[] ESCAPE_ADB_SHELL_CHARS = { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`' };
-    public static readonly char[] INVALID_ANDROID_CHARS = { '"', '*', '/', ':', '<', '>', '?', '\\', '|' };
+    public static readonly char[] INVALID_NTFS_CHARS = { '"', '*', '/', ':', '<', '>', '?', '\\', '|' };
 
     public static readonly Version MIN_ADB_VERSION = new(31, 0, 2);
     public static readonly Version WIN11_VERSION = new(10, 0, 22000);

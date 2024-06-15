@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -94,7 +95,14 @@ public class SyncErrorInfo : FileOpErrorInfo
             return null;
 
         result.Message = match.Groups["Message"].Value;
-        if (result.Message.Contains(':'))
+        
+        var path = string.IsNullOrEmpty(result.WindowsPath) ? result.AndroidPath : result.WindowsPath;
+
+        if (path.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c)))
+        {
+            result.Message = $"File name illegal on target file system: {FileHelper.GetFullName(path)}";
+        }
+        else if (result.Message.Contains(':'))
             result.Message = result.Message.Split(':').Last().Trim();
 
         return result;
