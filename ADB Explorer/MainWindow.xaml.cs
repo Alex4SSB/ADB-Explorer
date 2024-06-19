@@ -458,9 +458,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 FilterExplorerItems();
                 break;
 
-            case nameof(FileActionsEnable.ItemToSelect) when FileActions.ItemToSelect is not null:
+            case nameof(FileActionsEnable.ItemToSelect):
+                if (FileActions.ItemToSelect is null)
+                    ExplorerGrid.UnselectAll();
+                else
+                {
                 ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
                 ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
+                }
                 break;
 
             case nameof(FileActionsEnable.PasteEnabled):
@@ -816,6 +821,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         OnPropertyChanged(nameof(SelectedFilesCount));
 
         FileActionLogic.UpdateFileActions();
+        MainToolBar.Items?.Refresh();
 
         SelectionTimer.Stop();
     }

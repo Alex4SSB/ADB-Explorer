@@ -233,6 +233,7 @@ public class FileClass : FilePath, IFileStat
     public override void UpdatePath(string androidPath)
     {
         base.UpdatePath(androidPath);
+        UpdateType();
 
         SortName = new(FullName);
     }

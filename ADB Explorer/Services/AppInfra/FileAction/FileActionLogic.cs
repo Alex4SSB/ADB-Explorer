@@ -454,6 +454,17 @@ internal static class FileActionLogic
     {
         FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
         var name = FileHelper.DisplayName(textBox);
+
+        if (textBox.Text is "." or "..")
+        {
+            if (file.IsTemp)
+                Data.DirList.FileList.Remove(file);
+
+            DialogService.ShowMessage(Strings.S_ILLEGAL_UNIX_NAME, Strings.S_ILLEGAL_UNIX_NAME_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+
+            return;
+        }
+
         if (file.IsTemp)
         {
             if (string.IsNullOrEmpty(textBox.Text))
@@ -461,6 +472,7 @@ internal static class FileActionLogic
                 Data.DirList.FileList.Remove(file);
                 return;
             }
+            
             try
             {
                 CreateNewItem(file, textBox.Text);
@@ -755,7 +767,11 @@ internal static class FileActionLogic
 
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                       && Data.FileActions.IsRegularItem;
+                                       && Data.FileActions.IsRegularItem
+                                       && Data.SelectedFiles.AnyAll(f => !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(f.FullName)
+                                                                         && !f.FullName.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
+                                                                         && f.FullName[^1] is not ' ' and not '.'
+                                                                         && f.FullName[0] is not ' ');
 
         Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
