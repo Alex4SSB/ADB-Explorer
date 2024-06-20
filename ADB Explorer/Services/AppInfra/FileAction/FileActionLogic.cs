@@ -918,6 +918,14 @@ internal static class FileActionLogic
                 return;
 
             path = dialog.FileAsShellObject;
+
+            var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
+            
+            if (match.Success && Data.SelectedFiles.Any(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName)))
+            {
+                DialogService.ShowMessage(Strings.S_WIN_ROOT_ILLEGAL, Strings.S_WIN_ROOT_ILLEGAL_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+                return;
+            }
         }
 
         if (!Directory.Exists(path.ParsingName))

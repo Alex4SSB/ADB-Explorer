@@ -58,5 +58,8 @@
 
         [GeneratedRegex(@"""*([^""]+\.exe)""*")]
         public static partial Regex RE_EXE_FROM_REG();
+
+        [GeneratedRegex(@"^\w:\\$")]
+        public static partial Regex RE_WINDOWS_DRIVE_ROOT();
     }
 }

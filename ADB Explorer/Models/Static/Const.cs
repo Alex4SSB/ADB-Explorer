@@ -94,6 +94,7 @@ public static class AdbExplorerConst
     public static readonly char[] ESCAPE_ADB_SHELL_CHARS = { '(', ')', '<', '>', '|', ';', '&', '*', '\\', '~', '"', '\'', ' ', '$', '`' };
     public static readonly char[] INVALID_NTFS_CHARS = { '"', '*', '/', ':', '<', '>', '?', '\\', '|' };
     public static readonly string[] INVALID_WINDOWS_FILENAMES = { "CON", "PRN", "AUX", "NUL", "COM0", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "COM¹", "COM²", "COM³", "LPT0", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9", "LPT¹", "LPT²", "LPT³" };
+    public static readonly string[] INVALID_WINDOWS_ROOT_PATHS = { "$AttrDef", "$BadClus", "$Bitmap", "$Boot", "$LogFile", "$MFT", "$MFTMirr", "$Secure", "$UpCase", "$Volume", "$Extend", @"$Extend\$ObjId", @"$Extend\$Quota", @"$Extend\$Reparse" };
 
     public static readonly Version MIN_ADB_VERSION = new(31, 0, 2);
     public static readonly Version WIN11_VERSION = new(10, 0, 22000);
