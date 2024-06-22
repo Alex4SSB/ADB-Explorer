@@ -56,6 +56,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private FileToIconConverter FileToIcon;
 
+    private DateTime appDataClick;
+
     private bool IsInEditMode
     {
         get
@@ -761,31 +763,27 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DoubleClick(object source)
     {
-        if (source is FileClass file && !FileActions.IsRecycleBin)
+        if (source is not FileClass file || FileActions.IsRecycleBin)
+            return;
+
+        if (file.Type is FileType.Folder)
         {
-            switch (file.Type)
-            {
-                case FileType.File:
-                    switch (Settings.DoubleClick)
-                    {
-                        case AppSettings.DoubleClickAction.pull when Settings.IsPullOnDoubleClickEnabled:
-                            FileActionLogic.PullFiles(Settings.DefaultFolder);
-                            break;
-                        case AppSettings.DoubleClickAction.edit when FileActions.EditFileEnabled:
-                            FileActionLogic.OpenEditor();
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case FileType.Folder:
                     bfNavigation = false;
                     NavigateToPath(file.FullPath, file.IsLink);
-                    break;
-                default:
-                    break;
+
+            return;
             }
+        else if (file.Type is not FileType.File)
+            return;
+
+        if (Settings.DoubleClick is AppSettings.DoubleClickAction.pull
+            && Settings.IsPullOnDoubleClickEnabled
+            && FileActions.PullEnabled)
+        {
+            FileActionLogic.PullFiles(Settings.DefaultFolder);
         }
+        else if (Settings.DoubleClick is AppSettings.DoubleClickAction.edit)
+            FileActionLogic.OpenEditor();
     }
 
     private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -800,8 +798,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             if (ExplorerGrid.SelectedItems.Count == 1)
             {
-                SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
                 SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+                    || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+                {
+                    SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+            }
             }
             else if (ExplorerGrid.SelectedItems.Count > 1 && e.AddedItems.Count == 1)
             {
@@ -819,6 +821,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : Enumerable.Empty<Package>();
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
         OnPropertyChanged(nameof(SelectedFilesCount));
+        FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
 
         FileActionLogic.UpdateFileActions();
         MainToolBar.Items?.Refresh();
@@ -1220,7 +1223,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else if (key is Key.Up or Key.Down)
         {
-            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
                 ExplorerGrid.MultiSelect(key);
             else
                 ExplorerGrid.SingleSelect(key);
@@ -1366,7 +1369,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         MouseDownPoint = point;
 
         var actualRowWidth = 0.0;
-        int selectionIndex;
+        int selectionIndex = ExplorerGrid.SelectedIndex;
 
         foreach (var item in ExplorerGrid.Columns.Where(col => col.Visibility == Visibility.Visible))
         {
@@ -1382,15 +1385,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (ExplorerGrid.SelectedItems.Count > 0 && IsInEditMode)
                 IsInEditMode = false;
 
+            if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+            {
             ExplorerGrid.UnselectAll();
-
             selectionIndex = -1;
         }
-        else
-            selectionIndex = ExplorerGrid.SelectedIndex;
+        }
 
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, selectionIndex);
+
+        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+        {
         SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, selectionIndex);
+    }
     }
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1667,11 +1675,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var textBox = sender as TextBox;
         TextHelper.SetAltObject(textBox, FileHelper.GetFromCell(ExplorerGrid.SelectedCells[1]));
         textBox.Focus();
+        
+        var editPoint = textBox.TranslatePoint(new(), ExplorerCanvas);
+        Canvas.SetTop(RenameTooltip, editPoint.Y - RenameTooltip.ActualHeight - 4);
+        Canvas.SetLeft(RenameTooltip, editPoint.X + 4);
+        RenameTooltip.Visibility = Visibility.Visible;
     }
 
     private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
     {
         FileActionLogic.Rename(sender as TextBox);
+        RenameTooltip.Visibility = Visibility.Hidden;
     }
 
     private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
@@ -1691,7 +1705,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 textBox.Text = FileHelper.DisplayName(sender as TextBox);
             }
 
-            AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
+            AppActions.List.First(action => action.Name is FileActionType.Rename).Command.Execute();
         }
         else if (e.Key is not Key.Enter)
             return;
@@ -1768,9 +1782,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
-        (sender as TextBox).FilterString(CurrentDrive.IsFUSE
+        var textBox = sender as TextBox;
+        textBox.FilterString(CurrentDrive.IsFUSE
             ? INVALID_NTFS_CHARS
             : new[] { '/', '\\' });
+
+        FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text);
+
+        FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, true);
+        
+        FileActions.IsRenameDriveRootLegal = FileActions.IsRenameWindowsLegal
+                                             && !INVALID_WINDOWS_ROOT_PATHS.Contains(textBox.Text);
     }
 
     private void NewItem(bool isFolder)
@@ -1942,15 +1964,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, row.GetIndex());
         }
 
-        if (ExplorerGrid.SelectedItems.Count == 1)
+        if (ExplorerGrid.SelectedItems.Count == 1
+            && (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift))
+        {
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+    }
     }
 
     private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         SelectionRect.Visibility = Visibility.Collapsed;
 
-        if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, SelectionHelper.GetNextSelectedIndex(ExplorerGrid));
         }
@@ -2076,10 +2103,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var current = row.GetIndex();
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
 
-        if (!IsDragInProgress && MultiRowSelect(row))
+        if (MultiRowSelect(row)) // && !IsDragInProgress
             return true;
 
+        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+        {
         SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
+        }
 
         if (!row.IsSelected || ExplorerGrid.SelectedItems?.Count != 1)
         {
@@ -2179,5 +2210,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         RuntimeSettings.DragBitmap = null;
         CursorBorder.Visible(false);
+    }
+
+    private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DateTime.Now - appDataClick < TimeSpan.FromMilliseconds(300))
+            return;
+
+        appDataClick = DateTime.Now;
+        Process.Start("explorer.exe", AppDataPath);
     }
 }

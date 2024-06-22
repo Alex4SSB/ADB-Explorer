@@ -153,7 +153,7 @@ public class AppRuntimeSettings : ViewModelBase
         {
             lastServerResponse = value;
 
-            if (App.Current?.Dispatcher?.HasShutdownStarted is false)
+            try
             {
                 App.Current.Dispatcher.Invoke(() =>
                 {
@@ -161,6 +161,11 @@ public class AppRuntimeSettings : ViewModelBase
                     OnPropertyChanged(nameof(TimeFromLastResponse));
                     OnPropertyChanged(nameof(ServerUnresponsive));
                 });
+            }
+            catch
+            {
+                if (App.Current?.Dispatcher is not null)
+                    throw;
             }
         }
     }

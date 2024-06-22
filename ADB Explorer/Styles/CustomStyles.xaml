@@ -936,4 +936,17 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Black" />
     </Style>
+    <Style
+        x:Key="FileNameEditingElementStyle"
+        BasedOn="{StaticResource TextBoxFluentStyle}"
+        TargetType="TextBox">
+        <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
+                <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

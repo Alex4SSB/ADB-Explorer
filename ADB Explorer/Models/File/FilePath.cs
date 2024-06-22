@@ -120,7 +120,7 @@ public class FilePath : AbstractFile, IBaseFile
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.Name;
         
-        SpecialType = File.GetAttributes(FullPath).HasFlag(System.IO.FileAttributes.Directory)
+        SpecialType = File.GetAttributes(FullPath).HasFlag(FileAttributes.Directory)
             ? SpecialFileType.Folder
             : SpecialFileType.None;
     }

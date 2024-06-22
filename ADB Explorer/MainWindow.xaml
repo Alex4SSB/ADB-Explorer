@@ -184,18 +184,11 @@
                                 IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
                                 SortMemberPath="FullName">
                                 <DataGridTextColumn.EditingElementStyle>
-                                    <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox">
+                                    <Style BasedOn="{StaticResource FileNameEditingElementStyle}" TargetType="TextBox">
                                         <EventSetter Event="Loaded" Handler="NameColumnEdit_Loaded" />
                                         <EventSetter Event="LostFocus" Handler="NameColumnEdit_LostFocus" />
                                         <EventSetter Event="KeyDown" Handler="NameColumnEdit_KeyDown" />
                                         <EventSetter Event="TextChanged" Handler="NameColumnEdit_TextChanged" />
-                                        <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
-                                        <Setter Property="HorizontalAlignment" Value="Left" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
-                                                <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
                                     </Style>
                                 </DataGridTextColumn.EditingElementStyle>
                                 <DataGridTextColumn.ElementStyle>
@@ -343,7 +336,13 @@
                                     Stretch="Fill" />
                             </Grid>
                         </Border>
+                        <controls:RenameTooltip x:Name="RenameTooltip" Visibility="Hidden" />
                     </Canvas>
+                    <controls:PasteAndPullTooltip
+                        x:Name="PasteTooltip"
+                        Margin="0,34,20,0"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top" />
                     <Grid>
                         <Grid.Style>
                             <Style TargetType="Grid">
@@ -810,7 +809,10 @@
                                             </StackPanel>
                                             <ui:SimpleStackPanel Margin="0,6" Spacing="-3">
                                             <ui:HyperlinkButton
-                                                Margin="0,4,0,-6"
+                                                    Click="HyperlinkButton_Click"
+                                                    Content="App Data Folder"
+                                                    ToolTip="{Binding Source={x:Static Member=models:Data.AppDataPath}}" />
+                                                <ui:HyperlinkButton
                                                 Content="GitHub repository"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}" />
@@ -831,7 +833,6 @@
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.MODERN_WPF}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.MODERN_WPF}}" />
                                             <ui:HyperlinkButton
-                                                Margin="0,-6"
                                                 Content="Icons8"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ICONS8}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ICONS8}}" />

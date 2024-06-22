@@ -408,6 +408,55 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isApkWebSearchEnabled, value);
     }
 
+    private bool isRenameFuseLegal = false;
+    public bool IsRenameFuseLegal
+    {
+        get => isRenameFuseLegal;
+        set => Set(ref isRenameFuseLegal, value);
+    }
+
+    private bool isRenameWindowsLegal = false;
+    public bool IsRenameWindowsLegal
+    {
+        get => isRenameWindowsLegal;
+        set => Set(ref isRenameWindowsLegal, value);
+    }
+
+    private bool isRenameDriveRootLegal = false;
+    public bool IsRenameDriveRootLegal
+    {
+        get => isRenameDriveRootLegal;
+        set => Set(ref isRenameDriveRootLegal, value);
+    }
+
+    private int selectedFilesCount = 0;
+    public int SelectedItemsCount
+    {
+        get => selectedFilesCount;
+        set => Set(ref selectedFilesCount, value);
+    }
+
+    private bool isPastingIllegalOnFuse = false;
+    public bool IsPastingIllegalOnFuse
+    {
+        get => isPastingIllegalOnFuse;
+        set => Set(ref isPastingIllegalOnFuse, value);
+    }
+
+    private bool isSelectionIllegalOnWindows = false;
+    public bool IsSelectionIllegalOnWindows
+    {
+        get => isSelectionIllegalOnWindows;
+        set => Set(ref isSelectionIllegalOnWindows, value);
+    }
+
+    private bool isPastingInDescendant = false;
+    public bool IsPastingInDescendant
+    {
+        get => isPastingInDescendant;
+        set => Set(ref isPastingInDescendant, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<bool> IsCutState = new();

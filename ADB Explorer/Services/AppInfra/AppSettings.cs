@@ -316,6 +316,13 @@ public class AppSettings : ViewModelBase
         set => Set(ref progressMethod, value);
     }
 
+    private bool hidePasteNamingInfo;
+    public bool HidePasteNamingInfo
+    {
+        get => Get(ref hidePasteNamingInfo, false);
+        set => Set(ref hidePasteNamingInfo, value);
+    }
+
     private bool showWelcomeScreen;
     public bool ShowWelcomeScreen
     {

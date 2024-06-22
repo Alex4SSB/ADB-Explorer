@@ -210,4 +210,25 @@ public static class FileHelper
 
         return result;
     }
+
+    static readonly Func<string, bool> FileNamePredicateWindows = (name) => 
+        !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
+        && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
+        && name[^1] is not ' ' and not '.'
+        && name[0] is not ' ';
+
+    static readonly Func<string, bool> FileNamePredicateFuse = (file) =>
+        !file.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c));
+
+    public static bool FileNameLegal(string fileName, bool isWindows = false)
+        => FileNameLegal(new[] { fileName }, isWindows);
+
+    public static bool FileNameLegal(FilePath file, bool isWindows = false)
+        => FileNameLegal(new[] { file }, isWindows);
+
+    public static bool FileNameLegal(IEnumerable<FilePath> files, bool isWindows = false)
+        => FileNameLegal(files.Select(f => f.FullName), isWindows);
+
+    public static bool FileNameLegal(IEnumerable<string> names, bool isWindows = false)
+        => names.AnyAll(isWindows ? FileNamePredicateWindows : FileNamePredicateFuse);
 }

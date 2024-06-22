@@ -10,6 +10,7 @@ namespace ADB_Explorer;
 public partial class App : Application
 {
     private static string SettingsFilePath;
+    private static readonly JsonSerializerSettings JsonSettings = new() { TypeNameHandling = TypeNameHandling.Objects };
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
@@ -73,7 +74,7 @@ public partial class App : Application
                 string[] keyValue = reader.ReadLine().TrimEnd(';').Split(':', 2);
                 try
                 {
-                    var jObj = JsonConvert.DeserializeObject(keyValue[1], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects });
+                    var jObj = JsonConvert.DeserializeObject(keyValue[1], JsonSettings);
                     if (jObj is JArray jArr)
                         Properties[keyValue[0]] = jArr.Values<string>().ToArray();
                     else
@@ -118,7 +119,7 @@ public partial class App : Application
                                    orderby key
                                    select key)
             {
-                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Objects })};");
+                writer.WriteLine($"{key}:{JsonConvert.SerializeObject(Properties[key], JsonSettings)};");
             }
         }
         catch (Exception)

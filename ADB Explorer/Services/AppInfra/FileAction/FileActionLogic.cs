@@ -294,7 +294,10 @@ internal static class FileActionLogic
         if (Data.CutItems.Count < 1)
             return false;
 
-        if (Data.CutItems.Count == 1 && Data.CutItems[0].Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self)
+        Data.FileActions.IsPastingInDescendant = Data.CutItems.Count == 1
+            && Data.CutItems[0].Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+
+        if (Data.FileActions.IsPastingInDescendant)
             return false;
 
         var selected = isKeyboard & Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
@@ -310,30 +313,36 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        if (DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true)
-        {
-            return !Data.CutItems.Any(file => file.FullName.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c)));
-        }
+        Data.FileActions.IsPastingIllegalOnFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true
+            && !FileHelper.FileNameLegal(Data.CutItems);
+
+        if (Data.FileActions.IsPastingIllegalOnFuse)
+            return false;
 
         switch (selected)
         {
             case 0:
-                return !(Data.CutItems[0].ParentPath == Data.CurrentPath && Data.FileActions.PasteState is FileClass.CutType.Cut);
+                Data.FileActions.IsPastingInDescendant = Data.CutItems[0].ParentPath == Data.CurrentPath
+                    && Data.FileActions.PasteState is FileClass.CutType.Cut;
+
+                break;
             case 1:
                 if (isKeyboard && Data.FileActions.PasteState is FileClass.CutType.Copy && Data.CutItems[0].RelationFrom(Data.SelectedFiles.First()) is RelationType.Self)
                     return true;
 
                 var item = Data.SelectedFiles.First();
-                if (!item.IsDirectory
-                    || (Data.CutItems.Count == 1 && Data.CutItems[0].FullPath == item.FullPath)
-                    || (Data.CutItems[0].ParentPath == item.FullPath))
+                if (!item.IsDirectory)
                     return false;
+
+                Data.FileActions.IsPastingInDescendant = (Data.CutItems.Count == 1 && Data.CutItems[0].FullPath == item.FullPath)
+                    || (Data.CutItems[0].ParentPath == item.FullPath);
+
                 break;
             default:
                 return false;
         }
 
-        return true;
+        return !Data.FileActions.IsPastingInDescendant;
     }
 
     public static void UpdateClipboardDropItems()
@@ -744,6 +753,11 @@ internal static class FileActionLogic
         Data.FileActions.IsRegularItem = Data.RuntimeSettings.IsRootActive
             || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
+        Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
+                                               && Data.SelectedFiles.Count() == 1
+                                               && Data.SelectedFiles.First().IsLink
+                                               && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
+
         if (Data.FileActions.IsRecycleBin)
         {
             TrashHelper.EnableRecycleButtons(Data.SelectedFiles.Any() ? Data.SelectedFiles : Data.DirList.FileList);
@@ -756,22 +770,16 @@ internal static class FileActionLogic
             Data.FileActions.RestoreEnabled = false;
         }
 
-        Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
-                                               && Data.SelectedFiles.Count() == 1
-                                               && Data.SelectedFiles.First().IsLink
-                                               && Data.SelectedFiles.First().Type is not FileType.BrokenLink;
-
         Data.FileActions.PullDescription.Value = Data.FileActions.IsFollowLinkEnabled ? Strings.S_PULL_ACTION_LINK : Strings.S_PULL_ACTION;
         Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_EMPTY_TRASH : Strings.S_DELETE_ACTION;
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : Strings.S_RESTORE_ACTION;
 
+        Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, true);
+
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                        && Data.FileActions.IsRegularItem
-                                       && Data.SelectedFiles.AnyAll(f => !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(f.FullName)
-                                                                         && !f.FullName.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
-                                                                         && f.FullName[^1] is not ' ' and not '.'
-                                                                         && f.FullName[0] is not ' ');
+                                       && !Data.FileActions.IsSelectionIllegalOnWindows;
 
         Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
