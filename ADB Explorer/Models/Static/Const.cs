@@ -142,4 +142,6 @@ public static class AdbExplorerConst
         { FileOpFilter.FilterType.Canceled, "Canceled" },
         { FileOpFilter.FilterType.Previous, "Previous" },
     };
+
+    public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 }

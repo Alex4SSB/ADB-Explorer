@@ -9,8 +9,6 @@ using static ADB_Explorer.Services.NativeMethods;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
-using HANDLE = IntPtr;
-
 public static partial class NativeMethods
 {
     #region Public Enumerations

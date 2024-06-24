@@ -26,6 +26,15 @@ public class AppSettings : ViewModelBase
         none,
     }
 
+    public enum DragMethod
+    {
+        None,
+        ReceiveOnly,
+        ZipFolders,
+        BuildTreeOnSelect,
+        BuildTreeOnNavigate,
+    }
+
     #region paths
 
     private string defaultFolder;
@@ -321,6 +330,13 @@ public class AppSettings : ViewModelBase
     {
         get => Get(ref hidePasteNamingInfo, false);
         set => Set(ref hidePasteNamingInfo, value);
+    }
+
+    private DragMethod dragDropMethod;
+    public DragMethod DragDropMethod
+    {
+        get => Get(ref dragDropMethod, DragMethod.None);
+        set => Set(ref dragDropMethod, value);
     }
 
     private bool showWelcomeScreen;

@@ -1,10 +1,9 @@
 ﻿namespace ADB_Explorer.Services;
 
+using System.Drawing.Imaging;
 using System.Runtime.InteropServices.ComTypes;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
-
-using HANDLE = IntPtr;
 
 public static partial class NativeMethods
 {
@@ -195,8 +194,6 @@ public static partial class NativeMethods
         public static FILEDESCRIPTOR FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<FILEDESCRIPTOR>(bytes);
     }
 
-
-
     //
     //  https://learn.microsoft.com/en-us/windows/win32/shell/clipboard
     //
@@ -208,12 +205,37 @@ public static partial class NativeMethods
         public POINT ptOffset;
         public HANDLE hbmpDragImage;
         public uint crColorKey;
+        public byte[] bitmapArray;
 
-        public readonly IEnumerable<byte> Bytes => BytesFromStructure(this);
+        public readonly IEnumerable<byte> Bytes => BytesFromStructure(this).Concat(bitmapArray);
 
-        public static SHDRAGIMAGE FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<SHDRAGIMAGE>(bytes);
+        //public static SHDRAGIMAGE FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<SHDRAGIMAGE>(bytes);
 
-        public static SHDRAGIMAGE FromStream(MemoryStream stream, out byte[] bitmap)
+        public SHDRAGIMAGE(System.Drawing.Bitmap bitmap)
+        {
+            sizeDragImage.Width = bitmap.Width;
+            sizeDragImage.Height = bitmap.Height;
+
+            System.Drawing.Rectangle rect = new(0, 0, bitmap.Width, bitmap.Height);
+            var argbBtimap = bitmap.Clone(rect, PixelFormat.Format32bppPArgb);
+            argbBtimap.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
+
+            //hbmpDragImage = argbBtimap.GetHbitmap();
+
+            var bitmapData = argbBtimap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
+
+            int bytes = bitmapData.Stride * argbBtimap.Height;
+            bitmapArray = new byte[bytes];
+
+            var ptr = bitmapData.Scan0;
+            Marshal.Copy(ptr, bitmapArray, 0, bytes);
+
+            hbmpDragImage = ptr;
+
+            //bitmap.UnlockBits(bitmapData);
+        }
+
+        public static SHDRAGIMAGE FromStream(MemoryStream stream)
         {
             SHDRAGIMAGE image = new();
             using BinaryReader reader = new(stream);
@@ -246,8 +268,7 @@ public static partial class NativeMethods
             bytes.Reverse();
             bytes.ForEach(tmp.AddRange);
 
-            // Not actually part of the struct so returned as an out param
-            bitmap = tmp.ToArray();
+            image.bitmapArray = tmp.ToArray();
 
             return image;
         }

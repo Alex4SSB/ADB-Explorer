@@ -1,7 +1,5 @@
 ﻿namespace ADB_Explorer.Services;
 
-using HANDLE = IntPtr;
-
 internal static class MonitorInfo
 {
     private static HANDLE? handler = null;

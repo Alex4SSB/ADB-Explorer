@@ -6,8 +6,6 @@ using System.Runtime.InteropServices.ComTypes;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
-using HANDLE = IntPtr;
-
 public static partial class NativeMethods
 {
     #region Constants
@@ -30,6 +28,7 @@ public static partial class NativeMethods
     public const int VARIANT_FALSE = 0;
     public const int VARIANT_TRUE = -1;
 
+    public const string CFSTR_DRAGIMAGE = "DragImageBits";
     public const string CFSTR_FILECONTENTS = "FileContents";
     public const string CFSTR_FILEDESCRIPTORW = "FileGroupDescriptorW";
     public const string CFSTR_PASTESUCCEEDED = "Paste Succeeded";
@@ -171,6 +170,9 @@ public static partial class NativeMethods
 
         public static implicit operator Point(POINT self)
             => new(self.X, self.Y);
+
+        public static implicit operator POINT(System.Windows.Point self)
+            => new((int)self.X, (int)self.Y);
 
         public static implicit operator System.Windows.Point(POINT self)
             => new(self.X, self.Y);

@@ -347,6 +347,9 @@ internal static class FileActionLogic
 
     public static void UpdateClipboardDropItems()
     {
+        if (Data.Settings.DragDropMethod < AppSettings.DragMethod.ReceiveOnly)
+            return;
+
         FileHelper.ClearCutFiles(i => i.PathType is FilePathType.Windows);
 
         if (!Clipboard.ContainsFileDropList())
@@ -449,7 +452,7 @@ internal static class FileActionLogic
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
-        if (isCopy)
+        if (isCopy && Data.Settings.DragDropMethod > AppSettings.DragMethod.ReceiveOnly)
         {
             var vfdo = VirtualFileDataObject.PrepareTransfer(Data.CutItems);
             if (vfdo is null)

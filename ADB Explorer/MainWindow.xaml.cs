@@ -465,8 +465,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     ExplorerGrid.UnselectAll();
                 else
                 {
-                ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
-                ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
+                    ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
+                    ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
                 }
                 break;
 
@@ -768,11 +768,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (file.Type is FileType.Folder)
         {
-                    bfNavigation = false;
-                    NavigateToPath(file.FullPath, file.IsLink);
+            bfNavigation = false;
+            NavigateToPath(file.FullPath, file.IsLink);
 
             return;
-            }
+        }
         else if (file.Type is not FileType.File)
             return;
 
@@ -803,7 +803,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
                 {
                     SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
-            }
+                }
             }
             else if (ExplorerGrid.SelectedItems.Count > 1 && e.AddedItems.Count == 1)
             {
@@ -1387,9 +1387,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             if (Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
             {
-            ExplorerGrid.UnselectAll();
-            selectionIndex = -1;
-        }
+                ExplorerGrid.UnselectAll();
+                selectionIndex = -1;
+            }
         }
 
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, selectionIndex);
@@ -1397,8 +1397,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-        SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, selectionIndex);
-    }
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, selectionIndex);
+        }
     }
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1561,7 +1561,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void PrepareFileDescriptors()
     {
-        if (FileActions.IsAppDrive || FileActions.IsRecycleBin)
+        if (FileActions.IsAppDrive || FileActions.IsRecycleBin || Settings.DragDropMethod < AppSettings.DragMethod.ZipFolders)
             return;
 
         Cursor = Cursors.AppStarting;
@@ -1765,7 +1765,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (ExplorerGrid.SelectedItems.Count < 1)
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
 
-        if (IsDragInProgress)
+        if (IsDragInProgress && Settings.DragDropMethod > AppSettings.DragMethod.ReceiveOnly)
         {
             if (ExplorerGrid.SelectedItems.Count < 1 || ExplorerGrid.SelectedItems[0] is not FileClass)
                 return;
@@ -1775,6 +1775,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             if (vfdo is null)
                 return;
+
+            vfdo.SendDragBitmapToShell(new VirtualFileDataObject.DragBitmap()
+            {
+                Bitmap = FileToIconConverter.GetBitmap(selectedItems.First()),
+                Offset = DRAG_OFFSET_DEFAULT,
+                Background = Colors.White,
+            });
 
             VirtualFileDataObject.SendObjectToSystem(vfdo, VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy);
         }
@@ -1969,7 +1976,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift))
         {
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
-    }
+        }
     }
 
     private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -2109,7 +2116,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
-        SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
         }
 
         if (!row.IsSelected || ExplorerGrid.SelectedItems?.Count != 1)
@@ -2174,6 +2181,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void MainWin_DragOver(object sender, DragEventArgs e)
     {
+        if (Settings.DragDropMethod < AppSettings.DragMethod.ReceiveOnly)
+            return;
+
         var prevPoint = LastDragPoint;
         LastDragPoint = e.GetPosition(ExplorerCanvas);
 
@@ -2190,11 +2200,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_DragEnter(object sender, DragEventArgs e)
     {
-        if (e.Data.GetDataPresent("DragImageBits") && e.Data.GetData("DragImageBits") is var dragImage && dragImage is MemoryStream stream)
+        if (Settings.DragDropMethod < AppSettings.DragMethod.ReceiveOnly)
+            return;
+
+        if (e.Data.GetDataPresent(NativeMethods.CFSTR_DRAGIMAGE) && e.Data.GetData(NativeMethods.CFSTR_DRAGIMAGE) is var dragImage && dragImage is MemoryStream stream)
         {
             var dragBitmap = VirtualFileDataObject.GetBitmapFromShell(stream);
 
-            RuntimeSettings.DragBitmap = dragBitmap.Bitmap;
+            RuntimeSettings.DragBitmap = dragBitmap.BitmapSource;
             RuntimeSettings.DragOffset = dragBitmap.Offset;
 
             if (RuntimeSettings.DragBitmap is not null && e.KeyStates.HasFlag(DragDropKeyStates.LeftMouseButton))
@@ -2212,7 +2225,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         CursorBorder.Visible(false);
     }
 
-    private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+    private void AppDataHyperlink_Click(object sender, RoutedEventArgs e)
     {
         if (DateTime.Now - appDataClick < TimeSpan.FromMilliseconds(300))
             return;

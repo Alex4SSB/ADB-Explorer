@@ -4,8 +4,6 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-using HANDLE = IntPtr;
-
 public class DiskUsage : ViewModelBase
 {
     public DateTime TimeStamp { get; set; }

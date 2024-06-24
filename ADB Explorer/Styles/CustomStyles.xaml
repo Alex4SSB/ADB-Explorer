@@ -779,9 +779,13 @@
         BasedOn="{StaticResource DefaultWindowStyle}"
         TargetType="Window">
         <Setter Property="Title" Value="{x:Static app_prop:Resources.AppDisplayName}" />
+        <Setter Property="AllowDrop" Value="True" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRootActive}" Value="True">
                 <Setter Property="ui:TitleBar.Background" Value="OrangeRed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=DragDropMethod}" Value="None">
+                <Setter Property="AllowDrop" Value="False" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

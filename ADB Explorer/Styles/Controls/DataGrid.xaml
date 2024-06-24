@@ -429,6 +429,9 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
                 <Setter Property="AllowDrop" Value="True" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=DragDropMethod}" Value="None">
+                <Setter Property="AllowDrop" Value="False" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
@@ -504,6 +507,9 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                 <Setter Property="AllowDrop" Value="True" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=DragDropMethod}" Value="None">
+                <Setter Property="AllowDrop" Value="False" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>

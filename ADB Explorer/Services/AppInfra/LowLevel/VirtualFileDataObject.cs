@@ -2,13 +2,11 @@
 // https://dlaa.me/blog/post/9913083
 // Used and modified under the MIT license
 
-using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
+using static ADB_Explorer.Services.NativeMethods;
 
 namespace ADB_Explorer.Services;
-
-using HANDLE = IntPtr;
 
 /// <summary>
 /// Handles everything related to Shell Drag & Drop (including clipboard) 
@@ -19,6 +17,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// Gets or sets a value indicating whether the data object can be used asynchronously.
     /// </summary>
     public bool IsAsynchronous { get; set; }
+
+    private static readonly short DRAGIMAGE = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_DRAGIMAGE).Id);
 
     private static readonly short FILECONTENTS = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILECONTENTS).Id);
 
@@ -782,7 +782,9 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
     public class DragBitmap
     {
-        public BitmapSource Bitmap { get; internal set; }
+        public System.Drawing.Bitmap Bitmap { get; internal set; }
+
+        public BitmapSource BitmapSource { get; internal set; }
 
         public Point Offset { get; internal set; }
 
@@ -791,44 +793,14 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
     public static DragBitmap GetBitmapFromShell(MemoryStream stream)
     {
-        var shImage = NativeMethods.SHDRAGIMAGE.FromStream(stream, out var bitmap);
-
-        // Remove opacity effects
-        for (int i = 0; i < bitmap.Length; i += 4)
-        {
-            var bgra = bitmap[i..(i + 4)];
-
-            // Opacity = 0%   ->  leave as is
-            if (bgra[3] == 0)
-                continue;
-
-            // Color = Black   ->   Bump up opacity to 100%
-            if (bgra[0..3].Max() == 0)
-            {
-                // if the opacity isn't 255 - 64, then it wasn't originally black - leave as is
-                if (bgra[3] == 191)
-                    bitmap[i + 3] = 255;
-
-                continue;
-            }
-
-            var hsv = ColorHelper.BgrToHsv(bgra[0..3]);
-
-            // Increase value by ~34%
-            hsv[2] = Math.Clamp(hsv[2] / 0.745, 0, 1);
-            var bgr = ColorHelper.HsvToBgr(hsv);
-
-            // Increase Opacity by 25%
-            bitmap[i + 3] = (byte)Math.Clamp(bgra[3] + 64, 0, 255);
-
-            Array.Copy(bgr, 0, bitmap, i, 3);
-        }
+        var shImage = SHDRAGIMAGE.FromStream(stream);
+        var bitmap = shImage.bitmapArray;
 
         var bitmapSource = BitmapSource.Create(shImage.sizeDragImage.Width,
                                                shImage.sizeDragImage.Height,
                                                shImage.sizeDragImage.Width,
                                                shImage.sizeDragImage.Height,
-                                               PixelFormats.Bgra32,
+                                               PixelFormats.Pbgra32,
                                                null,
                                                bitmap,
                                                shImage.sizeDragImage.Width * 4);
@@ -836,16 +808,28 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         return New(bitmapSource, shImage);
 
 
-        static DragBitmap New(BitmapSource bitmapSource, NativeMethods.SHDRAGIMAGE shImage)
+        static DragBitmap New(BitmapSource bitmapSource, SHDRAGIMAGE shImage)
         {
             DragBitmap bitmap = new()
             {
-                Bitmap = bitmapSource,
+                BitmapSource = bitmapSource,
                 Offset = shImage.ptOffset,
+                // For some reason, File Explorer returns white even when bacground is transparent
                 Background = (shImage.sizeDragImage.Width == 96 && shImage.sizeDragImage.Height == 96) ? Colors.White : Colors.Transparent,
             };
 
             return bitmap;
         }
+    }
+
+    public void SendDragBitmapToShell(DragBitmap bitmap)
+    {
+        SHDRAGIMAGE image = new(bitmap.Bitmap)
+        {
+            ptOffset = bitmap.Offset,
+            crColorKey = bitmap.Background == Colors.White ? 0xFFFFFFFF : 0x00000000,
+        };
+
+        SetData(DRAGIMAGE, image.Bytes);
     }
 }
