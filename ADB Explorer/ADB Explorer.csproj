@@ -61,9 +61,9 @@
 
   <ItemGroup>
   	 <Resource Include="app_icon_black_2023_256px.png" />
-  	 <Resource Include="PortableLauncher.bat">
-  	   <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  	 </Resource>
+  	 <Content Include="PortableLauncher.bat">
+  	   <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  	 </Content>
   </ItemGroup>
 
 	<ItemGroup>
