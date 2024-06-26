@@ -69,8 +69,6 @@ public static class Strings
     public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
     public const string S_REDIRECTION = "Progress Redirection ";
     public const string S_LS_ERROR_TITLE = "List Directory Error";
-    public const string S_ILLEGAL_UNIX_NAME = "A file cannot be named '.' or '..'";
-    public const string S_ILLEGAL_UNIX_NAME_TITLE = "Illegal File Name";
     public const string S_WIN_ROOT_ILLEGAL = "Some of the selected files cannot be created under a Windows drive root.";
     public const string S_WIN_ROOT_ILLEGAL_TITLE = "Pull To Windows Drive Root";
 

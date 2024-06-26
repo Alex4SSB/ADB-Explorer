@@ -408,6 +408,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isApkWebSearchEnabled, value);
     }
 
+    private bool isRenameUnixLegal = false;
+    public bool IsRenameUnixLegal
+    {
+        get => isRenameUnixLegal;
+        set => Set(ref isRenameUnixLegal, value);
+    }
+
     private bool isRenameFuseLegal = false;
     public bool IsRenameFuseLegal
     {

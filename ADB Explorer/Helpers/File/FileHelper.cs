@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using System.Xml.Linq;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.FileClass;
 
@@ -211,24 +212,48 @@ public static class FileHelper
         return result;
     }
 
+    public enum RenameTarget
+    {
+        Unix,
+        FUSE,
+        Windows,
+    }
+
     static readonly Func<string, bool> FileNamePredicateWindows = (name) => 
         !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
         && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
+        && name.Length > 0
         && name[^1] is not ' ' and not '.'
         && name[0] is not ' ';
 
-    static readonly Func<string, bool> FileNamePredicateFuse = (file) =>
-        !file.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c));
+    static readonly Func<string, bool> FileNamePredicateFuse = (name) =>
+        !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c))
+        && name.Length > 0
+        && name is not "." and not "..";
 
-    public static bool FileNameLegal(string fileName, bool isWindows = false)
-        => FileNameLegal(new[] { fileName }, isWindows);
+    static readonly Func<string, bool> FileNamePredicateUnix = (name) =>
+        name.Length > 0
+        && name is not "." and not "..";
 
-    public static bool FileNameLegal(FilePath file, bool isWindows = false)
-        => FileNameLegal(new[] { file }, isWindows);
+    public static bool FileNameLegal(string fileName, RenameTarget target)
+        => FileNameLegal(new[] { fileName }, target);
 
-    public static bool FileNameLegal(IEnumerable<FilePath> files, bool isWindows = false)
-        => FileNameLegal(files.Select(f => f.FullName), isWindows);
+    public static bool FileNameLegal(FilePath file, RenameTarget target)
+        => FileNameLegal(new[] { file }, target);
 
-    public static bool FileNameLegal(IEnumerable<string> names, bool isWindows = false)
-        => names.AnyAll(isWindows ? FileNamePredicateWindows : FileNamePredicateFuse);
+    public static bool FileNameLegal(IEnumerable<FilePath> files, RenameTarget target)
+        => FileNameLegal(files.Select(f => f.FullName), target);
+
+    public static bool FileNameLegal(IEnumerable<string> names, RenameTarget target)
+    {
+        var predicate = target switch
+        {
+            RenameTarget.Unix => FileNamePredicateUnix,
+            RenameTarget.FUSE => FileNamePredicateFuse,
+            RenameTarget.Windows => FileNamePredicateWindows,
+            _ => throw new NotSupportedException(),
+        };
+
+        return names.AnyAll(predicate);
+    }
 }

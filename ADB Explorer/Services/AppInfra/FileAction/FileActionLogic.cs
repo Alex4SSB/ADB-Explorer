@@ -314,7 +314,7 @@ internal static class FileActionLogic
         }
 
         Data.FileActions.IsPastingIllegalOnFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true
-            && !FileHelper.FileNameLegal(Data.CutItems);
+            && !FileHelper.FileNameLegal(Data.CutItems, FileHelper.RenameTarget.FUSE);
 
         if (Data.FileActions.IsPastingIllegalOnFuse)
             return false;
@@ -467,13 +467,10 @@ internal static class FileActionLogic
         FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
         var name = FileHelper.DisplayName(textBox);
 
-        if (textBox.Text is "." or "..")
+
+        if (!Data.FileActions.IsRenameUnixLegal
+            || (Data.CurrentDrive?.IsFUSE is true && !Data.FileActions.IsRenameFuseLegal))
         {
-            if (file.IsTemp)
-                Data.DirList.FileList.Remove(file);
-
-            DialogService.ShowMessage(Strings.S_ILLEGAL_UNIX_NAME, Strings.S_ILLEGAL_UNIX_NAME_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
-
             return;
         }
 
@@ -777,7 +774,7 @@ internal static class FileActionLogic
         Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_EMPTY_TRASH : Strings.S_DELETE_ACTION;
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : Strings.S_RESTORE_ACTION;
 
-        Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, true);
+        Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
 
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)

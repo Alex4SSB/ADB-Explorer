@@ -26,6 +26,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <ui:FontIcon>
                 <ui:FontIcon.Style>
@@ -34,7 +35,7 @@
                         <Setter Property="Glyph" Value="&#xF13D;" />
                         <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRenameFuseLegal}" Value="True">
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRenameUnixLegal}" Value="True">
                                 <Setter Property="Glyph" Value="&#xF13E;" />
                                 <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                             </DataTrigger>
@@ -49,7 +50,7 @@
                         <Setter Property="Glyph" Value="&#xF13D;" />
                         <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRenameWindowsLegal}" Value="True">
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRenameFuseLegal}" Value="True">
                                 <Setter Property="Glyph" Value="&#xF13E;" />
                                 <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                             </DataTrigger>
@@ -58,6 +59,21 @@
                 </ui:FontIcon.Style>
             </ui:FontIcon>
             <ui:FontIcon Grid.Row="2">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Glyph" Value="&#xF13D;" />
+                        <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRenameWindowsLegal}" Value="True">
+                                <Setter Property="Glyph" Value="&#xF13E;" />
+                                <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+            <ui:FontIcon Grid.Row="3">
                 <ui:FontIcon.Style>
                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                         <Setter Property="FontWeight" Value="Bold" />
@@ -75,14 +91,19 @@
             <TextBlock
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Adheres to FUSE naming rules" />
+                Text="Adheres to Unix naming rules (via ADB)" />
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Adheres to Windows naming rules" />
+                Text="Adheres to FUSE naming rules" />
             <TextBlock
                 Grid.Row="2"
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Text="Adheres to Windows naming rules" />
+            <TextBlock
+                Grid.Row="3"
                 Grid.Column="2"
                 VerticalAlignment="Center"
                 Text="Adheres to Windows drive root naming rules" />

@@ -1792,11 +1792,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var textBox = sender as TextBox;
         textBox.FilterString(CurrentDrive.IsFUSE
             ? INVALID_NTFS_CHARS
-            : new[] { '/', '\\' });
+            : INVALID_UNIX_CHARS);
 
-        FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text);
+        FileActions.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
 
-        FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, true);
+        FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
+
+        FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
         
         FileActions.IsRenameDriveRootLegal = FileActions.IsRenameWindowsLegal
                                              && !INVALID_WINDOWS_ROOT_PATHS.Contains(textBox.Text);
