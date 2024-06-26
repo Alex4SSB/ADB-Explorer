@@ -25,6 +25,7 @@
     <UserControl.Resources>
         <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
             <EventSetter Event="Click" Handler="RadioButton_Checked" />
+            <Setter Property="ToolTip" Value="Select an option to display explanation" />
         </Style>
     </UserControl.Resources>
     <Border Background="#FF80C9E4" DataContext="{Binding ElementName=splashScreen}">
@@ -116,7 +117,7 @@
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
                         ToolTip="Continue">
-                        <ui:FontIcon Glyph="&#xE65F;" />
+                        <ui:FontIcon Glyph="&#xe73e;" />
                     </Button>
                 </ui:SimpleStackPanel>
                 <ui:SimpleStackPanel
@@ -156,7 +157,7 @@
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
                         ToolTip="Continue">
-                        <ui:FontIcon Glyph="&#xE65F;" />
+                        <ui:FontIcon Glyph="&#xe73e;" />
                     </Button>
                 </ui:SimpleStackPanel>
             </Grid>
