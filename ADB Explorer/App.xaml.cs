@@ -86,6 +86,8 @@ public partial class App : Application
                 }
             }
         }
+
+        ClearDrag();
     }
 
     private void Application_Exit(object sender, ExitEventArgs e)
@@ -95,6 +97,18 @@ public partial class App : Application
 
         if (Data.Settings.UnrootOnDisconnect is true)
             ADBService.Unroot(Data.CurrentADBDevice);
+
+        App.Current.Dispatcher.Invoke(ClearDrag);
+    }
+
+    private static void ClearDrag()
+    {
+        try
+        {
+            Directory.GetDirectories(Data.AppDataPath).ForEach(Directory.Delete);
+        }
+        catch
+        { }
     }
 
     private void WriteSettings()

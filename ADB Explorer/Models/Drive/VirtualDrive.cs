@@ -12,7 +12,7 @@ public class VirtualDrive : Drive
     public override bool IsFUSE => Type switch
     {
         // Temp drive is under the root filesystem
-        DriveType.Temp => Data.DevicesObject.Current.Drives.Find(d => d.Type is DriveType.Root).IsFUSE,
+        DriveType.Temp => Data.DevicesObject.Current?.Drives?.Find(d => d.Type is DriveType.Root).IsFUSE is true,
         // App drive isn't really a drive, and the recycle bin doesn't allow any of the actions limited on FUSE
         // So it is useless to display the icon
         _ => false,

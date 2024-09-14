@@ -46,8 +46,6 @@ public abstract class AbstractFile : ViewModelBase
         { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown", "Broken Link" };
 
     public static string GetFileTypeName(FileType type) => names[(int)type];
-
-    public static readonly char[] Separators = new [] { '\\', '/' };
 }
 
 public class FilePath : AbstractFile, IBaseFile

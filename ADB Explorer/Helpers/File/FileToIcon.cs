@@ -317,19 +317,25 @@ public class FileToIconConverter
         }
     }
 
-    public static Bitmap GetBitmap(FilePath file)
+    private static T GetImage<T>(FilePath file)
     {
         var specialType = file.SpecialType;
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
         {
             Icon apkIcon = new(Properties.Resources.APK_icon, IconToSize(IconSize.Jumbo));
 
-            return AddToDic<Bitmap>(apkIcon, IconSize.Jumbo, AbstractFile.SpecialFileType.Apk);
+            return AddToDic<T>(apkIcon, IconSize.Jumbo, AbstractFile.SpecialFileType.Apk);
         }
         else
         {
             // Get icon without link overlay
-            return AddToDic<Bitmap>(file.FullName, IconSize.Jumbo, 96, specialType & ~AbstractFile.SpecialFileType.LinkOverlay);
+            return AddToDic<T>(file.FullName, IconSize.Jumbo, 96, specialType & ~AbstractFile.SpecialFileType.LinkOverlay);
         }
     }
+
+    public static Bitmap GetBitmap(FilePath file)
+        => GetImage<Bitmap>(file);
+
+    public static BitmapSource GetBitmapSource(FilePath file)
+        => GetImage<BitmapSource>(file);
 }

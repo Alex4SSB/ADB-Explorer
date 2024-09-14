@@ -14,9 +14,9 @@ public partial class ADBService
 
     // find /sdcard/.Trash-AdbExplorer/ -maxdepth 1 -mindepth 1 \( -iname "\*" ! -iname ".RecycleIndex" ! -iname ".RecycleIndex.bak" \) 2>/dev/null | wc -l
     // Exclude the recycle folder, exclude content of sub-folders, include all files (including hidden), exclude the recycle index file, discard errors, count lines
-    private static readonly string[] FIND_COUNT_PARAMS_1 = { "-maxdepth", "1", "-mindepth", "1", "\\(" };
-    private static readonly string[] FIND_COUNT_PARAMS_2 = { "\\)", @"2>/dev/null" };
-    private static readonly string[] FIND_COUNT_PARAMS_3 = { "|", "wc", "-l" };
+    private static readonly string[] FIND_COUNT_PARAMS_1 = ["-maxdepth", "1", "-mindepth", "1", "\\("];
+    private static readonly string[] FIND_COUNT_PARAMS_2 = ["\\)", @"2>/dev/null"];
+    private static readonly string[] FIND_COUNT_PARAMS_3 = ["|", "wc", "-l"];
 
     public static bool IsMdnsEnabled { get; set; }
 
@@ -97,13 +97,13 @@ public partial class ADBService
 
     public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, new[] { deviceSerial, cmd }.Concat(args).ToArray());
+        return ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceSerial, cmd, .. args]);
     }
 
     public static async Task<string> ExecuteDeviceAdbCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
     {
         string stdout = "", stderr = "";
-        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, new[] { deviceId, cmd }.Concat(args).ToArray()), cancellationToken);
+        var res = await Task.Run(() => ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceId, cmd, .. args]), cancellationToken);
 
         if (res == 0)
             return "";
@@ -221,12 +221,12 @@ public partial class ADBService
 
     public static IEnumerable<string> ExecuteDeviceAdbCommandAsync(string deviceSerial, string cmd, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteAdbCommandAsync("-s", cancellationToken, new[] { deviceSerial, cmd }.Concat(args).ToArray());
+        return ExecuteAdbCommandAsync("-s", cancellationToken, [deviceSerial, cmd, .. args]);
     }
 
     public static int ExecuteDeviceAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, new[] { cmd }.Concat(args).ToArray());
+        return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, [cmd, .. args]);
     }
 
     /// <summary>
@@ -367,7 +367,7 @@ public partial class ADBService
 
     public static bool WhoAmI(string deviceId)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out string stderr, new()) != 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out _, new()) != 0)
             return false;
 
         return stdout.Trim() == "root";
@@ -388,58 +388,62 @@ public partial class ADBService
 
         ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), args);
 
-        return stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
     public static string[] FindFiles(string deviceID, IEnumerable<string> paths)
     {
         ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
 
-        return stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
     private static string[] PrepFindArgs(string path, IEnumerable<string> includeNames, IEnumerable<string> excludeNames, bool countOnly)
     {
         if (includeNames is not null && excludeNames is not null)
-            throw new ArgumentException("Valid combinations include:\n• includeNames = null, excludeNames = null\n• includeNames != null, excludeNames = null\n• includeNames = null, excludeNames != null");
+            throw new ArgumentException("""
+                Valid combinations include:
+                • includeNames = null, excludeNames = null
+                • includeNames != null, excludeNames = null
+                • includeNames = null, excludeNames != null
+                """);
 
         if (!path.EndsWith('/'))
             path += "/";
 
-        string[] args = { EscapeAdbShellString(path) };
-        args = args.Concat(FIND_COUNT_PARAMS_1).ToArray();
+        string[] args = [EscapeAdbShellString(path), .. FIND_COUNT_PARAMS_1];
 
         if (includeNames is not null)
         {
             for (int i = 0; i < includeNames.Count(); i++)
             {
                 if (i > 0)
-                    args = args.Append("-o").ToArray();
+                    args = [.. args, "-o"];
 
-                args = args.Concat(new[] { "-iname", EscapeAdbShellString(includeNames.ElementAt(i)) }).ToArray();
+                args = [.. args, "-iname", EscapeAdbShellString(includeNames.ElementAt(i))];
             }
         }
         else
-            args = args.Concat(new[] { "-iname", "\"\\*\"" }).ToArray();
+            args = [.. args, "-iname", "\"\\*\""];
 
         if (excludeNames is not null)
         {
             foreach (var item in excludeNames)
             {
-                args = args.Concat(new[] { "!", "-iname", EscapeAdbShellString(item) }).ToArray();
+                args = [.. args, "!", "-iname", EscapeAdbShellString(item)];
             }
         }
 
-        args = args.Concat(FIND_COUNT_PARAMS_2).ToArray();
+        args = [.. args, .. FIND_COUNT_PARAMS_2];
         if (countOnly)
-            args = args.Concat(FIND_COUNT_PARAMS_3).ToArray();
+            args = [.. args, .. FIND_COUNT_PARAMS_3];
 
         return args;
     }
 
     public static long CountRecycle(string deviceID)
     {
-        return (long)CountFiles(deviceID, RECYCLE_PATH, excludeNames: new[] { "*" + RECYCLE_INDEX_SUFFIX });
+        return (long)CountFiles(deviceID, RECYCLE_PATH, excludeNames: ["*" + RECYCLE_INDEX_SUFFIX]);
     }
 
     public static ulong CountPackages(string deviceID)

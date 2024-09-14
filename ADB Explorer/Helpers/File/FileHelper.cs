@@ -2,7 +2,6 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
-using System.Xml.Linq;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.FileClass;
 
@@ -109,7 +108,7 @@ public static class FileHelper
 
     public static string ConcatPaths(string path1, string path2, char separator = '/')
     {
-        return $"{path1.TrimEnd(Separators)}{separator}{path2.TrimStart(Separators)}";
+        return $"{path1.TrimEnd(separator)}{separator}{path2.TrimStart(separator)}";
     }
 
     public static string ExtractRelativePath(string fullPath, string parent)
@@ -131,10 +130,11 @@ public static class FileHelper
 
     public static string GetFullName(string fullPath)
     {
-        if (fullPath.Length < 2)
+        var separator = GetSeparator(fullPath);
+        if (fullPath.IndexOf(separator) == fullPath.Length - 1)
             return fullPath;
 
-        fullPath = fullPath.TrimEnd(Separators);
+        fullPath = fullPath.TrimEnd(separator);
         var index = LastSeparatorIndex(fullPath);
 
         if (index.IsFromEnd)
@@ -143,11 +143,21 @@ public static class FileHelper
         return fullPath[(index.Value + 1)..];
     }
 
+    public static char GetSeparator(string path)
+    {
+        if (path.Contains('/'))
+            return '/';
+        else if (path.Contains('\\'))
+            return '\\';
+        else
+            return '\0';
+    }
+
     public static Index LastSeparatorIndex(string path)
-        => IndexAdjust(path.LastIndexOfAny(Separators));
+        => IndexAdjust(path.LastIndexOf(GetSeparator(path)));
 
     public static Index NextSeparatorIndex(string parentPath, string childPath)
-        => IndexAdjust(childPath.IndexOfAny(Separators, parentPath.Length + 1));
+        => IndexAdjust(childPath.IndexOf(GetSeparator(childPath), parentPath.Length + 1));
 
     public static Index IndexAdjust(int originalIndex) => originalIndex switch
     {

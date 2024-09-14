@@ -32,4 +32,15 @@ internal static class ListHelper
     {
         return source.Any() && source.All(predicate);
     }
+
+    /// <summary>
+    /// Performs the specified <see cref="Action"/> on each element of the collection
+    /// </summary>
+    public static void ForEach<T>(this IEnumerable<T> self, Action<T> action)
+    {
+        foreach (var item in self)
+        {
+            action(item);
+        }
+    }
 }

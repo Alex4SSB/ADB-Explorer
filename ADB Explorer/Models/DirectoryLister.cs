@@ -6,10 +6,10 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Models;
 
-public class DirectoryLister : ViewModelBase
+public class DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null) : ViewModelBase
 {
-    public ADBService.AdbDevice Device { get; }
-    public ObservableList<FileClass> FileList { get; }
+    public ADBService.AdbDevice Device { get; } = adbDevice;
+    public ObservableList<FileClass> FileList { get; } = [];
 
     private string currentPath;
     public string CurrentPath
@@ -39,24 +39,16 @@ public class DirectoryLister : ViewModelBase
         private set => Set(ref isLinkListingFinished, value);
     }
 
-    private Dispatcher Dispatcher { get; }
+    private Dispatcher Dispatcher { get; } = dispatcher;
     private Task UpdateTask { get; set; }
     private TimeSpan UpdateInterval { get; set; }
     private int MinUpdateThreshold { get; set; }
     private Task ReadTask { get; set; } = null;
     private CancellationTokenSource CurrentCancellationToken { get; set; }
     private CancellationTokenSource LinkListCancellation { get; set; }
-    private Func<FileClass, FileClass> FileManipulator { get; }
+    private Func<FileClass, FileClass> FileManipulator { get; } = fileManipulator;
 
     private ConcurrentQueue<FileStat> currentFileQueue;
-
-    public DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, Func<FileClass, FileClass> fileManipulator = null)
-    {
-        Dispatcher = dispatcher;
-        FileList = new();
-        Device = adbDevice;
-        FileManipulator = fileManipulator;
-    }
 
     public void Navigate(string path)
     {

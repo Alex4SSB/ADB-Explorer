@@ -8,22 +8,27 @@ namespace ADB_Explorer.Services;
 
 public partial class ADBService
 {
+    public static readonly char[] LINE_SEPARATORS = ['\n', '\r'];
+
     private const string GET_PROP = "getprop";
     private const string ANDROID_VERSION = "ro.build.version.release";
     private const string BATTERY = "dumpsys battery";
     private const string MMC_PROP = "vold.microsd.uuid";
     private const string OTG_PROP = "vold.otgstorage.uuid";
 
-    /// <summary>
-    /// First partition of MMC block device 0 / 1
-    /// </summary>
-    private static readonly string[] MMC_BLOCK_DEVICES = { "/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1" };
+    // First partition of MMC block device 0 / 1
+    private static readonly string[] MMC_BLOCK_DEVICES = ["/dev/block/mmcblk0p1", "/dev/block/mmcblk1p1"];
+    private static readonly string[] EMULATED_DRIVES_GREP = ["|", "grep", "-E", "'/mnt/media_rw/|/storage/'"];
 
-    private static readonly string[] EMULATED_DRIVES_GREP = { "|", "grep", "-E", "'/mnt/media_rw/|/storage/'" };
+    private static readonly string[] READLINK_ARGS1 = ["link", "in"]; // Preceded by 'for'
+    private static readonly string[] READLINK_ARGS2 = [";", "do", "target=$(readlink", "-f", "$link", "2>&1);", "echo", "/// $link /// $target ///;", "done"];
+    private static readonly string[] STAT_LINKMODE_ARGS = ["-c", "'/// %n /// %f ///'", "2>&1"];
 
-    public class AdbDevice : Device
+    private static readonly string[] INET_ARGS = ["-f", "inet", "addr", "show", "wlan0"];
+
+    public class AdbDevice(LogicalDeviceViewModel other) : Device
     {
-        public LogicalDeviceViewModel Device { get; private set; }
+        public LogicalDeviceViewModel Device { get; private set; } = other;
 
         public override string ID => Device.ID;
 
@@ -33,15 +38,9 @@ public partial class ADBService
         
         public override string IpAddress => Device.IpAddress;
 
-        public AdbDevice(LogicalDeviceViewModel other)
-        {
-            Device = other;
-        }
-
         private const string CURRENT_DIR = ".";
         private const string PARENT_DIR = "..";
-        private static readonly string[] SPECIAL_DIRS = { CURRENT_DIR, PARENT_DIR };
-        private static readonly char[] LINE_SEPARATORS = { '\n', '\r' };
+        private static readonly string[] SPECIAL_DIRS = [CURRENT_DIR, PARENT_DIR];
 
         private enum UnixFileMode : UInt32
         {
@@ -95,24 +94,44 @@ public partial class ADBService
 
         public IEnumerable<(string, FileType)> GetLinkType(IEnumerable<string> filePaths, CancellationToken cancellationToken)
         {
-            var args = new[] { "`readlink", "-f" }
-                .Concat(filePaths.Select(f => EscapeAdbShellString(f)))
-                .Concat(new[] { "`", "-c", "'%n ; %f'", "2>&1" }).ToArray();
+            // Run readlink in a loop to support single param version
+            ExecuteDeviceAdbShellCommand(ID,
+                                         "for",
+                                         out string stdout,
+                                         out string stderr,
+                                         cancellationToken,
+                                         [.. READLINK_ARGS1, .. filePaths.Select(f => EscapeAdbShellString(f)), .. READLINK_ARGS2]);
 
-            ExecuteDeviceAdbShellCommand(ID, "stat", out string stdout, out string stderr, cancellationToken, args);
+            // Prepare a link->target dictionary, where the RegEx matched
+            var links = AdbRegEx.RE_LINK_TARGETS().Matches(stdout);
+            var linkDict = links.Where(match => match.Success).ToDictionary(match => match.Groups["Source"].Value, match => match.Groups["Target"].Value);
+            var uniqueLinks = linkDict.Values.Distinct();
 
-            var matches = AdbRegEx.RE_LIST_LINKS().Matches(stdout);
+            // Get file mode of all unique links
+            ExecuteDeviceAdbShellCommand(ID, "stat", out string statStdout, out string statStderr, cancellationToken, [.. uniqueLinks, .. STAT_LINKMODE_ARGS]);
+            var modes = AdbRegEx.RE_LINK_MODE().Matches(statStdout);
 
-            foreach (Match match in matches)
+            // Prepare a target->mode dictionary, where the RegEx matches
+            var linkTypes = modes.Where(match => match.Success).ToDictionary(
+                match => match.Groups["Target"].Value,
+                match => ParseFileMode(UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber)));
+
+            // Iterate over input files using the dictionaries
+            foreach (var file in filePaths)
             {
-                if (!match.Success)
+                if (linkDict.TryGetValue(file, out var target))
+                {
+                    if (linkTypes.TryGetValue(target, out var type))
+                    {
+                        yield return (target, type);
+                        continue;
+                    }
+
+                    yield return (target, FileType.BrokenLink);
                     continue;
-
-                if (string.IsNullOrEmpty(match.Groups["Error"].Value))
-                    yield return (match.Groups["Path"].Value, ParseFileMode(UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber)));
-
-                else
-                    yield return (match.Groups["ErrorPath"].Value, match.Groups["Error"].Value.Contains("No such file or directory") ? FileType.BrokenLink : FileType.Unknown);
+                }
+                
+                yield return ("", FileType.Unknown);
             }
         }
 
@@ -163,14 +182,14 @@ public partial class ADBService
                 cancellationToken,
                 cmdProcess,
                 workingDir,
-                args: new string[] {
+                args: [
                     "-s",
                     ID,
                     cmd,
                     arg,
                     EscapeAdbString(source),
                     _target
-                });
+                ]);
             
             // Each line should be a progress update (but sometimes the output can be weird)
             string lastStdoutLine = null;
@@ -221,7 +240,7 @@ public partial class ADBService
 
         public List<LogicalDrive> GetDrives()
         {
-            List<LogicalDrive> drives = new();
+            List<LogicalDrive> drives = [];
 
             var root = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE(), "/");
             if (root is null)
@@ -278,13 +297,13 @@ public partial class ADBService
                     int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr, new());
                     if (exitCode == 0)
                     {
-                        props = stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(
+                        props = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(
                             l => l[0] == '[' && l[^1] == ']').TryToDictionary(
                                 line => line.Split(':')[0].Trim('[', ']', ' '),
                                 line => line.Split(':')[1].Trim('[', ']', ' '));
                     }
                     else
-                        props = new Dictionary<string, string>();
+                        props = [];
 
                 }
 
@@ -292,8 +311,8 @@ public partial class ADBService
             }
         }
 
-        public string MmcProp => Props.ContainsKey(MMC_PROP) ? Props[MMC_PROP] : null;
-        public string OtgProp => Props.ContainsKey(OTG_PROP) ? Props[OTG_PROP] : null;
+        public string MmcProp => Props.TryGetValue(MMC_PROP, out string value) ? value : null;
+        public string OtgProp => Props.TryGetValue(OTG_PROP, out string value) ? value : null;
 
         public Task<string> GetAndroidVersion() => Task.Run(() =>
         {
@@ -307,7 +326,7 @@ public partial class ADBService
         {
             if (ExecuteDeviceAdbShellCommand(device.ID, BATTERY, out string stdout, out string stderr, new()) == 0)
             {
-                return stdout.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
+                return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
                     line => line.Split(':')[0].Trim(),
                     line => line.Split(':')[1].Trim());
             }
@@ -322,7 +341,7 @@ public partial class ADBService
 
         public static bool GetDeviceIp(DeviceViewModel device)
         {
-            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new(), new[] { "-f", "inet", "addr", "show", "wlan0" }) != 0)
+            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new(), INET_ARGS) != 0)
                 return false;
 
             var match = AdbRegEx.RE_DEVICE_WLAN_INET().Match(stdout);

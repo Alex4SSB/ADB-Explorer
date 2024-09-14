@@ -151,8 +151,8 @@ internal static class FileActionLogic
     public static void RestoreItems()
     {
         var restoreItems = (!Data.SelectedFiles.Any() ? Data.DirList.FileList : Data.SelectedFiles).Where(file => file.TrashIndex is not null && !string.IsNullOrEmpty(file.TrashIndex.OriginalPath));
-        string[] existingItems = Array.Empty<string>();
-        List<FileClass> existingFiles = new();
+        string[] existingItems = [];
+        List<FileClass> existingFiles = [];
         bool merge = false;
 
         var restoreTask = Task.Run(() =>
@@ -173,7 +173,7 @@ internal static class FileActionLogic
 
                 if (restoreItems.Count(file => file.FullName == item.FullName && file.TrashIndex.OriginalPath == item.TrashIndex.OriginalPath) > 1)
                 {
-                    existingItems = existingItems.Append(item.FullName).ToArray();
+                    existingItems = [.. existingItems, item.FullName];
                     existingFiles.Add(item);
                     if (item.IsDirectory)
                         merge = true;
@@ -970,7 +970,7 @@ internal static class FileActionLogic
         Data.RuntimeSettings.RefreshFileOpControls = true;
     }
 
-    private static Mutex FileOpControlsMutex = new();
+    private static readonly Mutex FileOpControlsMutex = new();
 
     public static void UpdateFileOpControls()
     {
