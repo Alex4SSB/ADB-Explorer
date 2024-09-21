@@ -105,7 +105,7 @@ public partial class App : Application
     {
         try
         {
-            Directory.GetDirectories(Data.AppDataPath).ForEach(Directory.Delete);
+            Directory.GetDirectories(Data.AppDataPath).ForEach(dir => Directory.Delete(dir, true));
         }
         catch
         { }

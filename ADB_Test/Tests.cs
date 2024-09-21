@@ -119,16 +119,16 @@ namespace ADB_Test
         [TestMethod]
         public void ExistingIndexesTest()
         {
-            string[] names = { "", "1" };
-            string[] names1 = { "", "2" };
+            string[] names = ["", "1"];
+            string[] names1 = ["", "2"];
 
             Assert.AreEqual("", FileHelper.ExistingIndexes(names[..0])); // empty array
-            Assert.AreEqual(" 1", FileHelper.ExistingIndexes(new [] { "" }));
+            Assert.AreEqual(" 1", FileHelper.ExistingIndexes([""]));
             Assert.AreEqual(" 2", FileHelper.ExistingIndexes(names));
             Assert.AreEqual(" 1", FileHelper.ExistingIndexes(names1));
 
             Assert.AreEqual("", FileHelper.ExistingIndexes(names[..0], FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes(new[] { "" }, FileClass.CutType.Copy));
+            Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes([""], FileClass.CutType.Copy));
             Assert.AreEqual(" - Copy 2", FileHelper.ExistingIndexes(names, FileClass.CutType.Copy));
             Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes(names1, FileClass.CutType.Copy));
         }
@@ -264,6 +264,17 @@ namespace ADB_Test
             Assert.AreEqual("ASUS", FileHelper.GetFullName(@"/sdcard/ASUS/"));
 
             Assert.AreEqual("/", FileHelper.GetFullName("/"));
+
+            Assert.AreEqual(@"C:\", FileHelper.GetFullName(@"C:\"));
+        }
+
+        [TestMethod]
+        public void ParentNameTest()
+        {
+            Assert.AreEqual("/sdcard", FileHelper.GetParentPath("/sdcard/a"));
+            Assert.AreEqual("/", FileHelper.GetParentPath("/sdcard"));
+            Assert.AreEqual("E:", FileHelper.GetParentPath("E:\\New folder"));
+            Assert.AreEqual("E:", FileHelper.GetParentPath("E:\\"));
         }
     }
 }

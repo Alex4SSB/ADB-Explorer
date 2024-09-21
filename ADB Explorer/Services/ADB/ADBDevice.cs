@@ -168,14 +168,14 @@ public partial class ADBService
             Process cmdProcess,
             ref ObservableList<FileOpProgressInfo> updates, CancellationToken cancellationToken)
         {
-            string workingDir = "", _target = "";
-            if (target[1] == ':' && target.Split('\\').Count(s => s.Length > 0) < 3)
+            string workingDir = "", _target = target;
+            if (target[1] == ':')
             {
-                workingDir = target[..(target.IndexOf('\\') + 1)];
-                target = "./";
+                workingDir = FileHelper.GetParentPath(target);
+                _target = target.Split('\\').Count(s => s.Length > 0) < 2 ? "./" : FileHelper.GetFullName(target);
             }
-            else
-                _target = EscapeAdbString(target);
+
+            _target = EscapeAdbString(_target);
 
             var stdout = RedirectCommandAsync(
                 Data.RuntimeSettings.AdbPath,

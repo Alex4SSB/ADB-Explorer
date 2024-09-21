@@ -405,7 +405,20 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ui:FontIcon Foreground="{DynamicResource NewDeviceAltBorder}" Glyph="&#xF13E;" />
+            <ui:FontIcon>
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                        <Setter Property="Glyph" Value="&#xF13E;" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Message}" Value="Finished with no confirmation">
+                                <Setter Property="Foreground" Value="{StaticResource EditorTextChangedBrush}" />
+                                <Setter Property="Glyph" Value="&#xF142;" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
             <TextBlock Grid.Column="1" Text="{Binding Message}" />
         </Grid>
     </DataTemplate>

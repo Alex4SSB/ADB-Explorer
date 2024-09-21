@@ -315,7 +315,11 @@ public class FileClass : FilePath, IFileStat
 
     public void PrepareDescriptors()
     {
-        SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'));
+        SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'))
+    {
+            PathType = FilePathType.Windows,
+        };
+
         var fileOp = FileSyncOperation.PullFile(new(this), target, Data.CurrentADBDevice, App.Current.Dispatcher);
         
         // When a folder isn't empty, there's no need creating a file descriptor for it, since all folders are automatcally created

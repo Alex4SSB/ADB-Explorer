@@ -50,7 +50,7 @@ public abstract class AbstractFile : ViewModelBase
 
 public class FilePath : AbstractFile, IBaseFile
 {
-    public FilePathType PathType { get; protected set; }
+    public FilePathType PathType { get; set; }
 
     public SpecialFileType SpecialType { get; protected set; }
 
