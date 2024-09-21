@@ -167,6 +167,9 @@ public class FileSyncOperation : FileOperation
         }
 
         cancelTokenSource.Cancel();
+
+        if (AdbProcess?.Process is Process proc)
+            ProcessHandling.KillProcess(proc);
     }
 
     public override void ClearChildren()

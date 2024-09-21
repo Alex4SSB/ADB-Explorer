@@ -42,5 +42,7 @@ public class ProcessHandling
             else
                 yield return proc;
         }
+
+        yield return process;
     }
 }
