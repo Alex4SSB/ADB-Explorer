@@ -168,7 +168,19 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public void UpdateDevice(LogicalDevice other)
     {
+        //if (Device.Name != other.Name)
+        //{
+        //    Device.Name = other.Name;
+
+        //    if (IsOpen)
+        //    {
+        //        FolderHelper.CombineDisplayNames();
+
+        //    }
+        //}
+
         Device.Name = other.Name;
+
         SetStatus(other.Status);
     }
 

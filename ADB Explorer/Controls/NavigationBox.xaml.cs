@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Controls;
 
@@ -21,7 +22,7 @@ public partial class NavigationBox : UserControl
     {
         InitializeComponent();
 
-        Breadcrumbs = new();
+        Breadcrumbs = [];
 
         Mode = ViewMode.None;
     }
@@ -138,6 +139,23 @@ public partial class NavigationBox : UserControl
             PopulateButtons(path);
         else
             PopulateButtons(driveView + path);
+
+        if (string.IsNullOrWhiteSpace(driveView) && Data.DevicesObject.Current is LogicalDeviceViewModel device)
+        {
+            Data.DevicesObject.Current.PropertyChanged += Device_PropertyChanged;
+        }
+    }
+
+    private void Device_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(LogicalDevice.Name))
+        {
+            FolderHelper.CombineDisplayNames();
+            Refresh();
+
+            if (!string.IsNullOrWhiteSpace(Data.DevicesObject?.Current?.Name))
+                Data.DevicesObject.Current.PropertyChanged -= Device_PropertyChanged;
+        }
     }
 
     public void Refresh() => AddDevice(Path);
@@ -148,8 +166,8 @@ public partial class NavigationBox : UserControl
             return;
 
         var expectedLength = 0.0;
-        List<MenuItem> tempButtons = new();
-        List<string> pathItems = new();
+        List<MenuItem> tempButtons = [];
+        List<string> pathItems = [];
 
         if (path.StartsWith(NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView)))
         {
@@ -228,7 +246,7 @@ public partial class NavigationBox : UserControl
             expectedLength += ControlSize.GetWidth(CreateExcessButton());
 
         double excessLength = expectedLength - PathBox.ActualWidth;
-        List<MenuItem> excessButtons = new();
+        List<MenuItem> excessButtons = [];
         BreadcrumbMenu.Items.Clear();
 
         if (excessLength > 0)

@@ -9,7 +9,11 @@ internal class FolderHelper
 {
     public static void CombineDisplayNames()
     {
-        Data.CurrentDisplayNames.TryAdd(NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView), Data.DevicesObject.Current.Name);
+        var driveView = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
+        if (Data.CurrentDisplayNames.ContainsKey(driveView))
+            Data.CurrentDisplayNames[driveView] = Data.DevicesObject.Current.Name;
+        else
+            Data.CurrentDisplayNames.Add(driveView, Data.DevicesObject.Current.Name);
 
         foreach (var drive in Data.DevicesObject.Current.Drives.OfType<LogicalDriveViewModel>().Where(d => d.Type 
             is not AbstractDrive.DriveType.Root 

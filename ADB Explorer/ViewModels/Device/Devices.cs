@@ -223,8 +223,7 @@ public class Devices : AbstractDevice
         }
         else
         {
-            if (RootDevices.Contains(deviceID))
-                RootDevices.Remove(deviceID);
+            RootDevices.Remove(deviceID);
         }
     }
 

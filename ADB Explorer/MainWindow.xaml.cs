@@ -817,8 +817,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void SelectionTimer_Tick(object sender, EventArgs e)
     {
-        SelectedFiles = FileActions.IsAppDrive ? Enumerable.Empty<FileClass>() : ExplorerGrid.SelectedItems.OfType<FileClass>();
-        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : Enumerable.Empty<Package>();
+        SelectedFiles = FileActions.IsAppDrive ? [] : ExplorerGrid.SelectedItems.OfType<FileClass>();
+        SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : [];
         OnPropertyChanged(nameof(SelectedFilesTotalSize));
         OnPropertyChanged(nameof(SelectedFilesCount));
         FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
@@ -911,8 +911,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActions.IsLogToggleVisible.Value = Settings.EnableLog;
         });
 
-        Settings.RootArgs ??= new[] { "root" };
-        Settings.UnrootArgs ??= new[] { "unroot" };
+        Settings.RootArgs ??= ["root"];
+        Settings.UnrootArgs ??= ["unroot"];
         Settings.UnrootOnDisconnect ??= false;
 
         RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();

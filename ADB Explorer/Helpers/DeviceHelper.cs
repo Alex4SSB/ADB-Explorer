@@ -508,7 +508,7 @@ public static class DeviceHelper
     public static void DeviceListSetup(IEnumerable<LogicalDeviceViewModel> devices, string selectedAddress = "")
     {
         devices = ReconnectFileOpDevice(devices);
-        var init = !Data.DevicesObject.UpdateDevices(devices);
+        Data.DevicesObject.UpdateDevices(devices);
         Data.RuntimeSettings.FilterDevices = true;
 
         if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)
