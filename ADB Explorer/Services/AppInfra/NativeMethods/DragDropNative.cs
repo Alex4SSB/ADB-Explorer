@@ -1,6 +1,7 @@
 ﻿namespace ADB_Explorer.Services;
 
-using System.Drawing.Imaging;
+using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
@@ -34,7 +35,7 @@ public static partial class NativeMethods
     [DllImport("Ole32.dll", CharSet = CharSet.Auto, ExactSpelling = true, PreserveSig = false)]
     private static extern void DoDragDrop(IDataObject dataObject, IDropSource dropSource, int allowedEffects, int[] finalEffect);
 
-    public static void DoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects, int[] finalEffect)
+    public static void MDoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects, int[] finalEffect)
     => DoDragDrop(dataObject, dropSource, (int)allowedEffects, finalEffect);
 
     [DllImport("Kernel32.dll")]
@@ -46,6 +47,7 @@ public static partial class NativeMethods
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("Kernel32.dll")]
     private static extern bool GlobalUnlock(HANDLE hMem);
+
     public static void MGlobalUnlock(HANDLE hMem)
     => GlobalUnlock(hMem);
 
@@ -70,8 +72,7 @@ public static partial class NativeMethods
         {
             get
             {
-                List<byte> bytes = new();
-                bytes.AddRange(BytesFromStructure(cItems));
+                List<byte> bytes = [.. BytesFromStructure(cItems)];
 
                 foreach (var item in descriptors)
                 {
@@ -94,7 +95,7 @@ public static partial class NativeMethods
             {
                 cItems = StructureFromBytes<UInt32>(bytes.Take(sizeof(UInt32))),
                 descriptors = bytes.Skip(sizeof(UInt32))
-                                   .Chunk(Marshal.SizeOf(typeof(FILEDESCRIPTOR)))
+                                   .Chunk(Marshal.SizeOf<FILEDESCRIPTOR>())
                                    .Select(FILEDESCRIPTOR.FromBytes)
                                    .ToArray()
             };
@@ -102,7 +103,7 @@ public static partial class NativeMethods
         public static FILEGROUPDESCRIPTOR FromStream(MemoryStream stream)
         {
             FILEGROUPDESCRIPTOR fgd = new();
-            var fdSize = Marshal.SizeOf(typeof(FILEDESCRIPTOR));
+            var fdSize = Marshal.SizeOf<FILEDESCRIPTOR>();
             using BinaryReader reader = new(stream);
 
             try
@@ -138,16 +139,13 @@ public static partial class NativeMethods
     {
         public FD_FLAGS dwFlags;
         public Guid clsid;
-        public Int32 sizelcx;
-        public Int32 sizelcy;
-        public Int32 pointlx;
-        public Int32 pointly;
+        public SIZE sizel;
+        public POINT pointl;
         public FileFlagsAndAttributes dwFileAttributes;
         public FILETIME ftCreationTime;
         public FILETIME ftLastAccessTime;
         public FILETIME ftLastWriteTime;
-        public UInt32 nFileSizeHigh;
-        public UInt32 nFileSizeLow;
+        public FILESIZE nFileSize;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
         public string cFileName;
 
@@ -157,28 +155,19 @@ public static partial class NativeMethods
         {
             cFileName = file.Name;
 
+            dwFlags |= FD_FLAGS.FD_ATTRIBUTES | FD_FLAGS.FD_PROGRESSUI;
+            dwFileAttributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_VIRTUAL;
+
             // Set optional directory flag
             if (file.IsDirectory)
-            {
-                dwFlags |= FD_FLAGS.FD_ATTRIBUTES;
-
                 dwFileAttributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY;
-            }
 
             // Set optional timestamp
             if (file.ChangeTimeUtc.HasValue)
             {
-                dwFlags |= FD_FLAGS.FD_CREATETIME | FD_FLAGS.FD_WRITESTIME;
+                dwFlags |= FD_FLAGS.FD_WRITESTIME;
 
-                var changeTime = file.ChangeTimeUtc.Value.ToLocalTime().ToFileTime();
-                var changeTimeFileTime = new FILETIME
-                {
-                    dwLowDateTime = (int)(changeTime & 0xffffffff),
-                    dwHighDateTime = (int)(changeTime >> 32),
-                };
-
-                ftLastWriteTime = changeTimeFileTime;
-                ftCreationTime = changeTimeFileTime;
+                ftLastWriteTime = new(file.ChangeTimeUtc.Value);
             }
 
             // Set optional length
@@ -186,91 +175,63 @@ public static partial class NativeMethods
             {
                 dwFlags |= FD_FLAGS.FD_FILESIZE;
 
-                nFileSizeLow = (uint)(file.Length & 0xffffffff);
-                nFileSizeHigh = (uint)(file.Length >> 32);
+                nFileSize = new(file.Length.Value);
             }
         }
 
         public static FILEDESCRIPTOR FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<FILEDESCRIPTOR>(bytes);
     }
 
-    //
-    //  https://learn.microsoft.com/en-us/windows/win32/shell/clipboard
-    //
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct SHDRAGIMAGE : IByteStruct
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    public struct ADBDRAGLIST(ADBService.AdbDevice device, IEnumerable<FileClass> files) : IByteStruct
     {
-        public SIZE sizeDragImage;
-        public POINT ptOffset;
-        public HANDLE hbmpDragImage;
-        public uint crColorKey;
-        public byte[] bitmapArray;
+        public string deviceId = device.ID;
+        public string parentFolder = files.First().ParentPath;
+        public string[] items = files.Select(f => f.FullName).ToArray();
 
-        public readonly IEnumerable<byte> Bytes => BytesFromStructure(this).Concat(bitmapArray);
-
-        //public static SHDRAGIMAGE FromBytes(IEnumerable<byte> bytes) => StructureFromBytes<SHDRAGIMAGE>(bytes);
-
-        public SHDRAGIMAGE(System.Drawing.Bitmap bitmap)
+        public readonly IEnumerable<byte> Bytes
         {
-            sizeDragImage.Width = bitmap.Width;
-            sizeDragImage.Height = bitmap.Height;
+            get
+            {
+                var joinedItems = string.Join("\0", items);
+                var combined = string.Join("\0", deviceId, parentFolder, joinedItems, '\0');
+                var bytes = Encoding.Unicode.GetBytes(combined);
 
-            System.Drawing.Rectangle rect = new(0, 0, bitmap.Width, bitmap.Height);
-            var argbBtimap = bitmap.Clone(rect, PixelFormat.Format32bppPArgb);
-            argbBtimap.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY);
-
-            //hbmpDragImage = argbBtimap.GetHbitmap();
-
-            var bitmapData = argbBtimap.LockBits(rect, ImageLockMode.ReadOnly, PixelFormat.Format32bppPArgb);
-
-            int bytes = bitmapData.Stride * argbBtimap.Height;
-            bitmapArray = new byte[bytes];
-
-            var ptr = bitmapData.Scan0;
-            Marshal.Copy(ptr, bitmapArray, 0, bytes);
-
-            hbmpDragImage = ptr;
-
-            //bitmap.UnlockBits(bitmapData);
+                return bytes;
+            }
         }
 
-        public static SHDRAGIMAGE FromStream(MemoryStream stream)
+        public static ADBDRAGLIST FromStream(MemoryStream stream)
         {
-            SHDRAGIMAGE image = new();
-            using BinaryReader reader = new(stream);
-            List<byte[]> bytes = new();
+            ADBDRAGLIST dragList = new();
+            var bytes = stream.ToArray();
 
-            try
+            int i = 0;
+            List<string> strings = [];
+
+            while (i < bytes.Length)
             {
-                image.sizeDragImage.Width = reader.ReadInt32();
-                image.sizeDragImage.Height = reader.ReadInt32();
-                image.ptOffset.X = reader.ReadInt32();
-                image.ptOffset.Y = reader.ReadInt32();
-                image.hbmpDragImage = new(reader.ReadInt32());
-                image.crColorKey = reader.ReadUInt32();
+                var index = ByteHelper.PatternAt(bytes, [0, 0], i);
 
-                // Row length in bytes
-                var stride = image.sizeDragImage.Width * 4;
+                if (index < 0)
+                    break;
 
-                while (reader.ReadBytes(stride) is byte[] arr && arr.Length == stride)
-                {
-                    // Read a whole row
-                    bytes.Add(arr);
-                }
+                index++;
+
+                string item = Encoding.Unicode.GetString(bytes[i..index]);
+                if (string.IsNullOrEmpty(item) || bytes[i..index].Sum(b => (decimal)b) == 0)
+                    break;
+
+                strings.Add(item);
+
+                i = index + 2;
             }
-            catch
-            { }
 
-            List<byte> tmp = new();
+            dragList.deviceId = strings[0];
+            dragList.parentFolder = strings[1];
+            dragList.items = strings.Skip(2).ToArray();
 
-            // Reverse row order to flip image vertically
-            bytes.Reverse();
-            bytes.ForEach(tmp.AddRange);
-
-            image.bitmapArray = tmp.ToArray();
-
-            return image;
+            return dragList;
         }
     }
 

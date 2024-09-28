@@ -2,9 +2,9 @@
 // https://dlaa.me/blog/post/9913083
 // Used and modified under the MIT license
 
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
-using static ADB_Explorer.Services.NativeMethods;
 
 namespace ADB_Explorer.Services;
 
@@ -30,10 +30,38 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
     private static readonly short PREFERREDDROPEFFECT = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PREFERREDDROPEFFECT).Id);
 
+    private static readonly short FILENAME = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILENAME).Id);
+
+    private static readonly short FILENAMEW = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILENAMEW).Id);
+
+    private static readonly short DRAGLOOP = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_DRAGLOOP).Id);
+
+    private static readonly short FILEDROP = (short)(DataFormats.GetDataFormat(DataFormats.FileDrop).Id); // 15;
+
+    private static readonly short SHELLIDLIST = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_SHELLIDLIST).Id);
+
+    private static readonly short ADBDROP = (short)(DataFormats.GetDataFormat(AdbExplorerConst.ADB_DRAG_FORMAT).Id);
+
+    private static Dictionary<short, string> DataFormatKeys => new()
+    {
+        { FILECONTENTS, nameof(FILECONTENTS) },
+        { FILEDESCRIPTORW, nameof(FILEDESCRIPTORW) },
+        { PASTESUCCEEDED, nameof(PASTESUCCEEDED) },
+        { PERFORMEDDROPEFFECT, nameof(PERFORMEDDROPEFFECT) },
+        { PREFERREDDROPEFFECT, nameof(PREFERREDDROPEFFECT) },
+        { DRAGLOOP, nameof(DRAGLOOP) },
+        { FILEDROP, nameof(FILEDROP) },
+        { DRAGIMAGE, nameof(DRAGIMAGE) },
+        { FILENAME, nameof(FILENAME) },
+        { FILENAMEW, nameof(FILENAMEW) },
+        { SHELLIDLIST, nameof(SHELLIDLIST) },
+        { ADBDROP, nameof(ADBDROP) },
+    };
+
     /// <summary>
     /// In-order list of registered data objects.
     /// </summary>
-    private readonly List<DataObject> _dataObjects = new List<DataObject>();
+    private readonly List<DataObject> _dataObjects = [];
 
     /// <summary>
     /// Tracks whether an asynchronous operation is ongoing.
@@ -43,7 +71,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <summary>
     /// Stores the user-specified start action.
     /// </summary>
-    public readonly Action<VirtualFileDataObject> _startAction;
+    private readonly Action<VirtualFileDataObject> _startAction;
 
     /// <summary>
     /// Stores the user-specified end action.
@@ -55,12 +83,14 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     /// <param name="startAction">Optional action to run at the start of the data transfer.</param>
     /// <param name="endAction">Optional action to run at the end of the data transfer.</param>
-    public VirtualFileDataObject(Action<VirtualFileDataObject> startAction, Action<VirtualFileDataObject> endAction)
+    public VirtualFileDataObject(Action<VirtualFileDataObject> startAction, Action<VirtualFileDataObject> endAction, DragDropEffects preferredDropEffect = DragDropEffects.All)
     {
         IsAsynchronous = true;
 
         _startAction = startAction;
         _endAction = endAction;
+
+        PreferredDropEffect = preferredDropEffect;
     }
 
     public VirtualFileDataObject() : this((vfdo) => { }, (vfdo) => { })
@@ -151,12 +181,20 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <param name="medium">When this method returns, contains a pointer to the STGMEDIUM structure that indicates the storage medium containing the returned data through its tymed member, and the responsibility for releasing the medium through the value of its pUnkForRelease member.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.GetData(ref FORMATETC format, out STGMEDIUM medium)
     {
-        medium = new STGMEDIUM();
+        var formatCopy = format;
+        medium = new();
+
         var hr = ((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
+
+        if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
+        {
+            if (DataFormatKeys.TryGetValue(formatCopy.cfFormat, out string value))
+                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Query cfFormat = {value}\n");
+        }
+
         if (NativeMethods.SUCCEEDED(hr))
         {
             // Find the best match
-            var formatCopy = format; // Cannot use ref or out parameter inside an anonymous method, lambda expression, or query expression
             var dataObject = _dataObjects.FirstOrDefault(d =>
                     (d.FORMATETC.cfFormat == formatCopy.cfFormat)
                     && (d.FORMATETC.dwAspect == formatCopy.dwAspect)
@@ -171,9 +209,13 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                     _startAction?.Invoke(this);
                 }
 
+                if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
+                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data, cfFormat = {DataFormatKeys[formatCopy.cfFormat]}\n");
+
                 // Populate the STGMEDIUM
                 medium.tymed = dataObject.FORMATETC.tymed;
                 var result = dataObject.GetData(); // Possible call to user code
+
                 hr = result.Item2;
                 if (NativeMethods.SUCCEEDED(hr))
                 {
@@ -311,27 +353,24 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <param name="dataFormat">Data format.</param>
     /// <param name="data">Sequence of data.</param>
     public void SetData(short dataFormat, IEnumerable<byte> data)
-    {
-        _dataObjects.Add(
-            new DataObject
+        => _dataObjects.Add(new()
+        {
+            FORMATETC = new FORMATETC
             {
-                FORMATETC = new FORMATETC
-                {
-                    cfFormat = dataFormat,
-                    ptd = IntPtr.Zero,
-                    dwAspect = DVASPECT.DVASPECT_CONTENT,
-                    lindex = -1,
-                    tymed = TYMED.TYMED_HGLOBAL
-                },
-                GetData = () =>
-                {
-                    var dataArray = data.ToArray();
-                    var ptr = Marshal.AllocHGlobal(dataArray.Length);
-                    Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-                    return (ptr, NativeMethods.S_OK);
-                },
-            });
-    }
+                cfFormat = dataFormat,
+                ptd = IntPtr.Zero,
+                dwAspect = DVASPECT.DVASPECT_CONTENT,
+                lindex = -1,
+                tymed = TYMED.TYMED_HGLOBAL
+            },
+            GetData = () =>
+            {
+                var dataArray = data.ToArray();
+                var ptr = Marshal.AllocHGlobal(dataArray.Length);
+                Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
+                return (ptr, NativeMethods.S_OK);
+            },
+        });
 
     public void UpdateData(short dataFormat, IEnumerable<Action<Stream>> dataStreams)
     {
@@ -358,38 +397,35 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// to be natural for the expected scenarios.
     /// </remarks>
     public void SetData(short dataFormat, int index, Action<Stream> streamData)
-    {
-        _dataObjects.Add(
-            new DataObject
+        => _dataObjects.Add(new()
+        {
+            FORMATETC = new FORMATETC
             {
-                FORMATETC = new FORMATETC
+                cfFormat = dataFormat,
+                ptd = IntPtr.Zero,
+                dwAspect = DVASPECT.DVASPECT_CONTENT,
+                lindex = index,
+                tymed = TYMED.TYMED_ISTREAM
+            },
+            GetData = () =>
+            {
+                // Create IStream for data
+                var ptr = IntPtr.Zero;
+                var iStream = NativeMethods.MCreateStreamOnHGlobal(IntPtr.Zero, true);
+                if (streamData != null)
                 {
-                    cfFormat = dataFormat,
-                    ptd = IntPtr.Zero,
-                    dwAspect = DVASPECT.DVASPECT_CONTENT,
-                    lindex = index,
-                    tymed = TYMED.TYMED_ISTREAM
-                },
-                GetData = () =>
-                {
-                    // Create IStream for data
-                    var ptr = IntPtr.Zero;
-                    var iStream = NativeMethods.MCreateStreamOnHGlobal(IntPtr.Zero, true);
-                    if (streamData != null)
+                    // Wrap in a .NET-friendly Stream and call provided code to fill it
+                    using (var stream = new IStreamWrapper(iStream))
                     {
-                        // Wrap in a .NET-friendly Stream and call provided code to fill it
-                        using (var stream = new IStreamWrapper(iStream))
-                        {
-                            streamData(stream);
-                        }
+                        streamData(stream);
                     }
-                    // Return an IntPtr for the IStream
-                    ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
-                    Marshal.ReleaseComObject(iStream);
-                    return (ptr, NativeMethods.S_OK);
-                },
-            });
-    }
+                }
+                // Return an IntPtr for the IStream
+                ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
+                Marshal.ReleaseComObject(iStream);
+                return (ptr, NativeMethods.S_OK);
+            },
+        });
 
     /// <summary>
     /// Provides data for the specified data format (FILEGROUPDESCRIPTOR/FILEDESCRIPTOR)
@@ -397,18 +433,18 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <param name="fileDescriptors">Collection of virtual files.</param>
     public void SetData(IEnumerable<FileDescriptor> fileDescriptors)
     {
-        // Prepare buffer
-
-        // Add FILEGROUPDESCRIPTOR header
-
-        // Add n FILEDESCRIPTORs
-        // Update file descriptors to preserve the pointer if already set
-        
         FileGroup group = new(fileDescriptors);
 
         UpdateData(FILEDESCRIPTORW, group.GroupDescriptorBytes);
 
         UpdateData(FILECONTENTS, group.DataStreams);
+    }
+
+    public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
+    {
+        NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
+
+        SetData(ADBDROP, adbDrag.Bytes);
     }
 
     /// <summary>
@@ -602,21 +638,13 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <summary>
     /// Simple class that exposes a write-only IStream as a Stream.
     /// </summary>
-    private class IStreamWrapper : Stream
+    /// <param name="iStream">IStream instance to wrap.</param>
+    private class IStreamWrapper(IStream iStream) : Stream
     {
         /// <summary>
         /// IStream instance being wrapped.
         /// </summary>
-        private readonly IStream _iStream;
-
-        /// <summary>
-        /// Initializes a new instance of the IStreamWrapper class.
-        /// </summary>
-        /// <param name="iStream">IStream instance to wrap.</param>
-        public IStreamWrapper(IStream iStream)
-        {
-            _iStream = iStream;
-        }
+        private readonly IStream _iStream = iStream;
 
         public override bool CanRead => false;
 
@@ -667,7 +695,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         Clipboard,
     }
 
-    public static void SendObjectToSystem(VirtualFileDataObject vfdo, SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
+    public void SendObjectToShell(SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
     {
 
 #if DEBUG
@@ -679,9 +707,9 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         try
         {
             if (method == SendMethod.DragDrop)
-                DoDragDrop(dragSource, vfdo, allowedEffects);
+                DoDragDrop(dragSource, this, allowedEffects);
             else if (method == SendMethod.Clipboard)
-                Clipboard.SetDataObject(vfdo);
+                Clipboard.SetDataObject(this);
             else
                 throw new NotSupportedException();
         }
@@ -695,9 +723,6 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
     public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files)
     {
-        if (files.Any(f => f.Descriptors is null))
-            return null;
-
         try
         {
             Directory.Delete(Data.RuntimeSettings.TempDragPath, true);
@@ -707,9 +732,39 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
         Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
 
-        VirtualFileDataObject vfdo = new() { PreferredDropEffect = DragDropEffects.Copy };
+        VirtualFileDataObject vfdo = new((vfdo) => { }, (vfdo) => { }, DragDropEffects.Move);
 
-        vfdo.SetData(files.SelectMany(f => f.Descriptors));
+        if (files.Any(f => f.IsDirectory))
+        {
+            //var fileOps = files.Select(file => file.PrepareDescriptors());
+
+            Data.RuntimeSettings.MainCursor = Cursors.AppStarting;
+            Task.Run(() =>
+            {
+                files.ForEach(f => f.PrepareDescriptors());
+            }).ContinueWith((t) =>
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    vfdo.SetData(files.SelectMany(f => f.Descriptors));
+                    Data.RuntimeSettings.MainCursor = Cursors.Arrow;
+                });
+                vfdo.SetData(files.SelectMany(f => f.Descriptors));
+            });
+
+            // Add these empty formats as placeholders, the data will be replaced once it is ready
+            vfdo.SetData(FILEDESCRIPTORW, []);
+            vfdo.SetData(FILECONTENTS, []);
+        }
+        else
+        {
+            // Get the descriptors immediately if no folders are selected
+
+            files.ForEach(f => f.PrepareDescriptors());
+            vfdo.SetData(files.SelectMany(f => f.Descriptors));
+        }
+
+        vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
 
         return vfdo;
     }
@@ -729,7 +784,12 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         int[] finalEffect = new int[1];
         try
         {
-            NativeMethods.DoDragDrop(dataObject, new DropSource(), allowedEffects, finalEffect);
+            NativeMethods.MDoDragDrop(dataObject, new DropSource(), allowedEffects, finalEffect);
+        }
+        catch (Exception e)
+        {
+            if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
+                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Exception in DoDragDrop: {e.Message}\n");
         }
         finally
         {
@@ -778,58 +838,5 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         {
             return NativeMethods.DRAGDROP_S_USEDEFAULTCURSORS;
         }
-    }
-
-    public class DragBitmap
-    {
-        public System.Drawing.Bitmap Bitmap { get; internal set; }
-
-        public BitmapSource BitmapSource { get; internal set; }
-
-        public Point Offset { get; internal set; }
-
-        public Color Background { get; internal set; }
-    }
-
-    public static DragBitmap GetBitmapFromShell(MemoryStream stream)
-    {
-        var shImage = SHDRAGIMAGE.FromStream(stream);
-        var bitmap = shImage.bitmapArray;
-
-        var bitmapSource = BitmapSource.Create(shImage.sizeDragImage.Width,
-                                               shImage.sizeDragImage.Height,
-                                               shImage.sizeDragImage.Width,
-                                               shImage.sizeDragImage.Height,
-                                               PixelFormats.Pbgra32,
-                                               null,
-                                               bitmap,
-                                               shImage.sizeDragImage.Width * 4);
-
-        return New(bitmapSource, shImage);
-
-
-        static DragBitmap New(BitmapSource bitmapSource, SHDRAGIMAGE shImage)
-        {
-            DragBitmap bitmap = new()
-            {
-                BitmapSource = bitmapSource,
-                Offset = shImage.ptOffset,
-                // For some reason, File Explorer returns white even when bacground is transparent
-                Background = (shImage.sizeDragImage.Width == 96 && shImage.sizeDragImage.Height == 96) ? Colors.White : Colors.Transparent,
-            };
-
-            return bitmap;
-        }
-    }
-
-    public void SendDragBitmapToShell(DragBitmap bitmap)
-    {
-        SHDRAGIMAGE image = new(bitmap.Bitmap)
-        {
-            ptOffset = bitmap.Offset,
-            crColorKey = bitmap.Background == Colors.White ? 0xFFFFFFFF : 0x00000000,
-        };
-
-        SetData(DRAGIMAGE, image.Bytes);
     }
 }

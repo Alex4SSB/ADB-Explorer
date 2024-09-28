@@ -35,6 +35,11 @@ public static partial class NativeMethods
     public const string CFSTR_PERFORMEDDROPEFFECT = "Performed DropEffect";
     public const string CFSTR_PREFERREDDROPEFFECT = "Preferred DropEffect";
 
+    public const string CFSTR_DRAGLOOP = "InShellDragLoop";
+    public const string CFSTR_FILENAME = "FileName";
+    public const string CFSTR_FILENAMEW = "FileNameW";
+    public const string CFSTR_SHELLIDLIST = "Shell IDList Array";
+
     #endregion
 
     #region Enums
@@ -140,13 +145,207 @@ public static partial class NativeMethods
         /// </summary>
         FILE_ATTRIBUTE_TEMPORARY = 0x00000100,
 
-        // The following flags are omitted
+        /// <summary>A file that is a sparse file.</summary>
+        FILE_ATTRIBUTE_SPARSE_FILE = 0x00000200,
+
+        /// <summary>A file or directory that has an associated reparse point, or a file that is a symbolic link.</summary>
+        FILE_ATTRIBUTE_REPARSE_POINT = 0x00000400,
+
+        /// <summary>
+        /// A file or directory that is compressed. For a file, all of the data in the file is compressed. For a directory, compression is the
+        /// default for newly created files and subdirectories.
+        /// </summary>
+        FILE_ATTRIBUTE_COMPRESSED = 0x00000800,
+
+        /// <summary>
+        /// The data of a file is not available immediately. This attribute indicates that the file data is physically moved to offline storage.
+        /// This attribute is used by Remote Storage, which is the hierarchical storage management software. Applications should not arbitrarily
+        /// change this attribute.
+        /// </summary>
+        FILE_ATTRIBUTE_OFFLINE = 0x00001000,
+
+        /// <summary>The file or directory is not to be indexed by the content indexing service.</summary>
+        FILE_ATTRIBUTE_NOT_CONTENT_INDEXED = 0x00002000,
+
+        /// <summary>
+        /// A file or directory that is encrypted. For a file, all data streams in the file are encrypted. For a directory, encryption is the
+        /// default for newly created files and subdirectories.
+        /// </summary>
+        FILE_ATTRIBUTE_ENCRYPTED = 0x00004000,
+
+        /// <summary>
+        /// The directory or user data stream is configured with integrity (only supported on ReFS volumes). It is not included in an ordinary
+        /// directory listing. The integrity setting persists with the file if it's renamed. If a file is copied the destination file will have
+        /// integrity set if either the source file or destination directory have integrity set.
+        /// <para>
+        /// <c>Windows Server 2008 R2, Windows 7, Windows Server 2008, Windows Vista, Windows Server 2003 and Windows XP:</c> This flag is not
+        /// supported until Windows Server 2012.
+        /// </para>
+        /// </summary>
+        FILE_ATTRIBUTE_INTEGRITY_STREAM = 0x00008000,
+
+        /// <summary>This value is reserved for system use.</summary>
+        FILE_ATTRIBUTE_VIRTUAL = 0x00010000,
+
+        /// <summary>
+        /// The user data stream not to be read by the background data integrity scanner (AKA scrubber). When set on a directory it only provides
+        /// inheritance. This flag is only supported on Storage Spaces and ReFS volumes. It is not included in an ordinary directory listing.
+        /// <para>
+        /// <c>Windows Server 2008 R2, Windows 7, Windows Server 2008, Windows Vista, Windows Server 2003 and Windows XP:</c> This flag is not
+        /// supported until Windows 8 and Windows Server 2012.
+        /// </para>
+        /// </summary>
+        FILE_ATTRIBUTE_NO_SCRUB_DATA = 0x00020000,
+
+        /// <summary>
+        /// This attribute only appears in directory enumeration classes (FILE_DIRECTORY_INFORMATION, FILE_BOTH_DIR_INFORMATION, etc.). When this
+        /// attribute is set, it means that the file or directory has no physical representation on the local system; the item is virtual.
+        /// Opening the item will be more expensive than normal, e.g. it will cause at least some of it to be fetched from a remote store.
+        /// </summary>
+        FILE_ATTRIBUTE_RECALL_ON_OPEN = 0x00040000,
+
+        /// <summary>Used to prevent the file from being purged from local storage when running low on disk space.</summary>
+        FILE_ATTRIBUTE_PINNED = 0x00080000,
+
+        /// <summary>Indicate that the file is not stored locally.</summary>
+        FILE_ATTRIBUTE_UNPINNED = 0x00100000,
+
+        /// <summary>
+        /// When this attribute is set, it means that the file or directory is not fully present locally. For a file that means that not all of
+        /// its data is on local storage (e.g. it may be sparse with some data still in remote storage). For a directory it means that some of
+        /// the directory contents are being virtualized from another location. Reading the file / enumerating the directory will be more
+        /// expensive than normal, e.g. it will cause at least some of the file/directory content to be fetched from a remote store. Only
+        /// kernel-mode callers can set this bit.
+        /// </summary>
+        FILE_ATTRIBUTE_RECALL_ON_DATA_ACCESS = 0x00400000,
+
+        /// <summary>
+        /// The file or device is being opened with no system caching for data reads and writes. This flag does not affect hard disk caching or
+        /// memory mapped files.
+        /// <para>
+        /// There are strict requirements for successfully working with files opened with CreateFile using the FILE_FLAG_NO_BUFFERING flag, for
+        /// details see File Buffering.
+        /// </para>
+        /// </summary>
+        FILE_FLAG_NO_BUFFERING = 0x20000000,
+
+        /// <summary>
+        /// Write operations will not go through any intermediate cache, they will go directly to disk.
+        /// <para>For additional information, see the Caching Behavior section of this topic.</para>
+        /// </summary>
+        FILE_FLAG_WRITE_THROUGH = 0x80000000,
+
+        /// <summary>
+        /// The file or device is being opened or created for asynchronous I/O.
+        /// <para>
+        /// When subsequent I/O operations are completed on this handle, the event specified in the OVERLAPPED structure will be set to the
+        /// signaled state.
+        /// </para>
+        /// <para>If this flag is specified, the file can be used for simultaneous read and write operations.</para>
+        /// <para>
+        /// If this flag is not specified, then I/O operations are serialized, even if the calls to the read and write functions specify an
+        /// OVERLAPPED structure.
+        /// </para>
+        /// <para>
+        /// For information about considerations when using a file handle created with this flag, see the Synchronous and Asynchronous I/O
+        /// Handles section of this topic.
+        /// </para>
+        /// </summary>
+        FILE_FLAG_OVERLAPPED = 0x40000000,
+
+        /// <summary>
+        /// Access is intended to be random. The system can use this as a hint to optimize file caching.
+        /// <para>This flag has no effect if the file system does not support cached I/O and FILE_FLAG_NO_BUFFERING.</para>
+        /// <para>For more information, see the Caching Behavior section of this topic.</para>
+        /// </summary>
+        FILE_FLAG_RANDOM_ACCESS = 0x10000000,
+
+        /// <summary>
+        /// Access is intended to be sequential from beginning to end. The system can use this as a hint to optimize file caching.
+        /// <para>This flag should not be used if read-behind (that is, reverse scans) will be used.</para>
+        /// <para>This flag has no effect if the file system does not support cached I/O and FILE_FLAG_NO_BUFFERING.</para>
+        /// <para>For more information, see the Caching Behavior section of this topic.</para>
+        /// </summary>
+        FILE_FLAG_SEQUENTIAL_SCAN = 0x08000000,
+
+        /// <summary>
+        /// The file is to be deleted immediately after all of its handles are closed, which includes the specified handle and any other open or
+        /// duplicated handles.
+        /// <para>If there are existing open handles to a file, the call fails unless they were all opened with the FILE_SHARE_DELETE share mode.</para>
+        /// <para>Subsequent open requests for the file fail, unless the FILE_SHARE_DELETE share mode is specified.</para>
+        /// </summary>
+        FILE_FLAG_DELETE_ON_CLOSE = 0x04000000,
+
+        /// <summary>
+        /// The file is being opened or created for a backup or restore operation. The system ensures that the calling process overrides file
+        /// security checks when the process has SE_BACKUP_NAME and SE_RESTORE_NAME privileges. For more information, see Changing Privileges in
+        /// a Token.
+        /// <para>
+        /// You must set this flag to obtain a handle to a directory. A directory handle can be passed to some functions instead of a file
+        /// handle. For more information, see the Remarks section.
+        /// </para>
+        /// </summary>
+        FILE_FLAG_BACKUP_SEMANTICS = 0x02000000,
+
+        /// <summary>
+        /// Access will occur according to POSIX rules. This includes allowing multiple files with names, differing only in case, for file
+        /// systems that support that naming. Use care when using this option, because files created with this flag may not be accessible by
+        /// applications that are written for MS-DOS or 16-bit Windows.
+        /// </summary>
+        FILE_FLAG_POSIX_SEMANTICS = 0x01000000,
+
+        /// <summary>
+        /// The file or device is being opened with session awareness. If this flag is not specified, then per-session devices (such as a device
+        /// using RemoteFX USB Redirection) cannot be opened by processes running in session 0. This flag has no effect for callers not in
+        /// session 0. This flag is supported only on server editions of Windows.
+        /// <para><c>Windows Server 2008 R2 and Windows Server 2008:</c> This flag is not supported before Windows Server 2012.</para>
+        /// </summary>
+        FILE_FLAG_SESSION_AWARE = 0x00800000,
+
+        /// <summary>
+        /// Normal reparse point processing will not occur; CreateFile will attempt to open the reparse point. When a file is opened, a file
+        /// handle is returned, whether or not the filter that controls the reparse point is operational.
+        /// <para>This flag cannot be used with the CREATE_ALWAYS flag.</para>
+        /// <para>If the file is not a reparse point, then this flag is ignored.</para>
+        /// </summary>
+        FILE_FLAG_OPEN_REPARSE_POINT = 0x00200000,
+
+        // Duplicate flags have been omitted
     }
 
     private enum MonitorType
     {
         Primary = 0x00000001,
         Nearest = 0x00000002,
+    }
+
+    private enum WinHooks
+    {
+        WH_MSGFILTER = -1,
+        WH_JOURNALRECORD = 0,
+        WH_JOURNALPLAYBACK = 1,
+        WH_KEYBOARD = 2,
+        WH_GETMESSAGE = 3,
+        WH_CALLWNDPROC = 4,
+        WH_CBT = 5,
+        WH_SYSMSGFILTER = 6,
+        WH_MOUSE = 7,
+        WH_DEBUG = 9,
+        WH_SHELL = 10,
+        WH_FOREGROUNDIDLE = 11,
+        WH_CALLWNDPROCRET = 12,
+        WH_KEYBOARD_LL = 13,
+        WH_MOUSE_LL = 14,
+    }
+
+    public enum MouseMessages
+    {
+        WM_LBUTTONDOWN = 0x0201,
+        WM_LBUTTONUP = 0x0202,
+        WM_MOUSEMOVE = 0x0200,
+        WM_MOUSEWHEEL = 0x020A,
+        WM_RBUTTONDOWN = 0x0204,
+        WM_RBUTTONUP = 0x0205
     }
 
     #endregion
@@ -157,16 +356,10 @@ public static partial class NativeMethods
     /// An integer version of <see cref="Point"/>
     /// </summary>
     [StructLayout(LayoutKind.Sequential)]
-    public struct POINT
+    public struct POINT(int x, int y)
     {
-        public Int32 X;
-        public Int32 Y;
-
-        public POINT(int x, int y)
-        {
-            X = x;
-            Y = y;
-        }
+        public Int32 X = x;
+        public Int32 Y = y;
 
         public static implicit operator Point(POINT self)
             => new(self.X, self.Y);
@@ -188,6 +381,24 @@ public static partial class NativeMethods
             => new(self.Width, self.Height);
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILETIME(DateTime dateUTC)
+    {
+        public long dwDateTime = dateUTC.ToLocalTime().ToFileTime();
+
+        public readonly DateTime DateTimeUTC => DateTime.FromFileTime(dwDateTime).ToUniversalTime();
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct FILESIZE(long size)
+    {
+        // 64-bit Int as 2 swapped Little Endian DWORDs
+        // So as a whole, cannot be treated neither as LE nor BE
+
+        public UInt32 nFileSizeHigh = (uint)(size >> 32);
+        public UInt32 nFileSizeLow = (uint)(size & 0xffffffff);
+    }
+
     #endregion
 
     #region Icon
@@ -197,7 +408,7 @@ public static partial class NativeMethods
     {
         public HANDLE hIcon;
         public int iIcon;
-        public uint dwAttributes;
+        public FileFlagsAndAttributes dwAttributes;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH)]
         public string szDisplayName;
         [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
@@ -348,7 +559,7 @@ public static partial class NativeMethods
     /// </summary>
     /// <param name="source">Structure to return.</param>
     /// <returns>In-memory representation of structure.</returns>
-    private static IEnumerable<byte> BytesFromStructure<T>(T source)
+    private static byte[] BytesFromStructure<T>(T source)
     {
         // Set up for call to StructureToPtr
         var size = Marshal.SizeOf(source.GetType());

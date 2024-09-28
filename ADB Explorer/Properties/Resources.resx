@@ -139,4 +139,7 @@
   <data name="ProgressRedirectionHash_x64" xml:space="preserve">
     <value>2BF11C22BA3658C8C0E5B92F31F2D6CF</value>
   </data>
+  <data name="DragDropLogPath" xml:space="preserve">
+    <value />
+  </data>
 </root>

@@ -149,7 +149,8 @@
                         ContextMenuClosing="ExplorerGrid_ContextMenuClosing"
                         ContextMenuOpening="ExplorerGrid_ContextMenuOpening"
                         DragEnter="ExplorerGrid_DragEnter"
-                        Drop="ExplorerGrid_Drop"
+                        DragOver="ExplorerGrid_DragOver"
+                        Drop="DataGridRow_Drop"
                         GridLinesVisibility="None"
                         HeadersVisibility="Column"
                         IsReadOnly="False"
@@ -320,23 +321,6 @@
                             MouseMove="ExplorerGrid_MouseMove"
                             Style="{StaticResource SelectionBorderStyle}"
                             Visibility="Collapsed" />
-                        <Border
-                            x:Name="CursorBorder"
-                            ClipToBounds="False"
-                            IsHitTestVisible="False">
-                            <Grid>
-                                <Border
-                                    x:Name="DragBackground"
-                                    Margin="-3"
-                                    Style="{StaticResource DragBackgroundStyle}" />
-                                <Image
-                                    x:Name="DragImage"
-                                    IsHitTestVisible="False"
-                                    RenderOptions.BitmapScalingMode="HighQuality"
-                                    Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
-                                    Stretch="Fill" />
-                            </Grid>
-                        </Border>
                         <controls:RenameTooltip x:Name="RenameTooltip" Visibility="Hidden" />
                     </Canvas>
                     <controls:PasteAndPullTooltip

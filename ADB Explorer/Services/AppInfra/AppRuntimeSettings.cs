@@ -356,9 +356,16 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragOffset, value);
     }
 
+    private Cursor cursor = Cursors.Arrow;
+    public Cursor MainCursor
+    {
+        get => cursor;
+        set => Set(ref cursor, value);
+    }
+
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch
     {
-        Architecture.Arm64 or Architecture.Arm => true,
+        Architecture.Arm64 or Architecture.Arm or Architecture.Armv6 => true,
         Architecture.X64 or Architecture.X86 => false,
         _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
     };

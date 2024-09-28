@@ -347,9 +347,6 @@ internal static class FileActionLogic
 
     public static void UpdateClipboardDropItems()
     {
-        if (Data.Settings.DragDropMethod < AppSettings.DragMethod.ReceiveOnly)
-            return;
-
         FileHelper.ClearCutFiles(i => i.PathType is FilePathType.Windows);
 
         if (!Clipboard.ContainsFileDropList())
@@ -389,20 +386,20 @@ internal static class FileActionLogic
         UpdateFileActions();
     }
 
-    public static async void PasteFiles(bool isLink = false)
+    public static async void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
-        var firstSelectedFile = Data.SelectedFiles.Any() ? Data.SelectedFiles.First() : null;
+        var firstSelectedFile = selectedFiles.Any() ? selectedFiles.First() : null;
         string targetName, targetPath = "";
 
-        if (Data.SelectedFiles.Count() != 1 || (firstSelectedFile is not null && !firstSelectedFile.IsDirectory))
+        if (selectedFiles.Count() != 1 || (firstSelectedFile is not null && !firstSelectedFile.IsDirectory))
         {
             targetPath = Data.CurrentPath;
             targetName = FileHelper.GetFullName(Data.CurrentPath);
         }
         else
         {
-            targetPath = Data.SelectedFiles.First().FullPath;
-            targetName = FileHelper.DisplayName(Data.SelectedFiles.First());
+            targetPath = selectedFiles.First().FullPath;
+            targetName = FileHelper.DisplayName(selectedFiles.First());
         }
 
         if (Data.CutItems.First().PathType is FilePathType.Windows)
@@ -452,13 +449,13 @@ internal static class FileActionLogic
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
-        if (isCopy && Data.Settings.DragDropMethod > AppSettings.DragMethod.ReceiveOnly)
+        if (isCopy)
         {
             var vfdo = VirtualFileDataObject.PrepareTransfer(Data.CutItems);
             if (vfdo is null)
                 return;
 
-            VirtualFileDataObject.SendObjectToSystem(vfdo, VirtualFileDataObject.SendMethod.Clipboard);
+            vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.Clipboard);
         }
     }
 

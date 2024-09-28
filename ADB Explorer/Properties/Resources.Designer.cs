@@ -109,6 +109,15 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        public static string DragDropLogPath {
+            get {
+                return ResourceManager.GetString("DragDropLogPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to 1BB31666C3F85E667A42270B0C600C84.
         /// </summary>
         public static string ProgressRedirectionHash_ARM {

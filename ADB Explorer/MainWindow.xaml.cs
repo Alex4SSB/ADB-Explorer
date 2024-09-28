@@ -23,7 +23,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly DispatcherTimer ConnectTimer = new() { Interval = CONNECT_TIMER_INIT };
     private readonly DispatcherTimer SelectionTimer = new() { Interval = SELECTION_CHANGED_DELAY };
     private readonly DispatcherTimer DiskUsageTimer = new() { Interval = DISK_USAGE_INTERVAL_ACTIVE };
-    private readonly DispatcherTimer DragExitTimer = new() { Interval = DRAG_EXIT_INTERVAL };
 
     private readonly Mutex DiskUsageMutex = new();
     private readonly Mutex ConnectTimerMutex = new();
@@ -57,6 +56,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private FileToIconConverter FileToIcon;
 
     private DateTime appDataClick;
+
+    DragWindow dw = new();
 
     private bool IsInEditMode
     {
@@ -103,7 +104,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ServerWatchdogTimer.Tick += ServerWatchdogTimer_Tick;
         DiskUsageTimer.Tick += DiskUsageTimer_Tick;
         SelectionTimer.Tick += SelectionTimer_Tick;
-        DragExitTimer.Tick += DragExitTimer_Tick;
 
         Settings.PropertyChanged += Settings_PropertyChanged;
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
@@ -137,13 +137,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             launchTask.Wait();
             RuntimeSettings.IsWindowLoaded = true;
-        });
-    }
 
-    private void DragExitTimer_Tick(object sender, EventArgs e)
-    {
-        if (CursorBorder.Visible())
-            CursorBorder.Visible(MonitorInfo.IsMouseWithinElement(ExplorerCanvas));
+            //Dispatcher.Invoke(dw.Show);
+        });
     }
 
     private void FinalizeSplash()
@@ -158,7 +154,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ConnectTimer.Start();
         ServerWatchdogTimer.Start();
         DiskUsageTimer.Start();
-        DragExitTimer.Start();
+        //DragExitTimer.Start();
     }
 
     private void DiskUsageTimer_Tick(object sender, EventArgs e)
@@ -425,6 +421,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.FinalizeSplash):
                     FinalizeSplash();
                     break;
+
+                case nameof(AppRuntimeSettings.MainCursor):
+                    Cursor = RuntimeSettings.MainCursor;
+                    break;
             }
         });
     }
@@ -674,8 +674,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 if (ExplorerGrid.Items.Count > 0)
                     ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
             }
-
-            PrepareFileDescriptors();
         }
     });
 
@@ -685,6 +683,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void Window_Closing(object sender, CancelEventArgs e)
     {
         DirList?.Stop();
+
+        dw.Close();
 
         ConnectTimer.Stop();
         ServerWatchdogTimer.Stop();
@@ -1554,22 +1554,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
                 collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
             }
-
-            PrepareFileDescriptors();
         }
-    }
-
-    private void PrepareFileDescriptors()
-    {
-        if (FileActions.IsAppDrive || FileActions.IsRecycleBin || Settings.DragDropMethod < AppSettings.DragMethod.ZipFolders)
-            return;
-
-        Cursor = Cursors.AppStarting;
-        var items = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource).Cast<FileClass>().Where(f => f.Descriptors is null).ToList();
-
-        // PrepareDescriptors accesses the Children, which in turn executes the find command and builds the tree
-        Task.Run(() => items.ForEach(f => f.PrepareDescriptors()))
-            .ContinueWith((t) => Dispatcher.Invoke(() => Cursor = Cursors.Arrow));
     }
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)
@@ -1765,7 +1750,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (ExplorerGrid.SelectedItems.Count < 1)
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
 
-        if (IsDragInProgress && Settings.DragDropMethod > AppSettings.DragMethod.ReceiveOnly)
+        if (IsDragInProgress)
         {
             if (ExplorerGrid.SelectedItems.Count < 1 || ExplorerGrid.SelectedItems[0] is not FileClass)
                 return;
@@ -1776,14 +1761,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (vfdo is null)
                 return;
 
-            vfdo.SendDragBitmapToShell(new VirtualFileDataObject.DragBitmap()
-            {
-                Bitmap = FileToIconConverter.GetBitmap(selectedItems.First()),
-                Offset = DRAG_OFFSET_DEFAULT,
-                Background = Colors.White,
-            });
+            vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Move);
 
-            VirtualFileDataObject.SendObjectToSystem(vfdo, VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy);
+            //RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
         }
     }
 
@@ -2020,38 +2000,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         MouseDownPoint = NullPoint;
     }
 
-    private void ExplorerGrid_Drop(object sender, DragEventArgs e)
-    {
-        if (e.Data.GetData(DataFormats.FileDrop) is not string[] items)
-            return;
-
-        if (FileActions.IsAppDrive)
-        {
-            DropPackages(items);
-            return;
-        }
-
-        FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), CurrentPath);
-    }
-
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
-        Dictionary<string, object> data = new();
+        var formats = e.Data.GetFormats();
 
-        foreach (var item in e.Data.GetFormats())
-        {
-            try
-            {
-                data.Add(item, e.Data.GetData(item));
-            }
-            catch (Exception)
-            {
-                data.Add(item, null);
-                continue;
-            }
-        }
-
-        if (data.TryGetValue(DataFormats.FileDrop, out var val) && val is string[] items)
+        // TODO: Add support for receiving streams (Ctrl+V as well)
+        //e.Effects
+        if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
         {
             if (FileActions.IsAppDrive)
             {
@@ -2059,17 +2014,57 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return;
             }
 
-            if (((DataGridRow)sender).DataContext is not FileClass target
-                || !target.IsDirectory)
+            string target = ((FrameworkElement)sender).DataContext switch
+            {
+                null => CurrentPath,
+                FileClass file when file.IsDirectory => file.FullPath,
+                _ => null,
+            };
+
+            if (target is null)
                 return;
 
-            FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target.FullPath);
+            FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target);
+
+            e.Handled = true;
+        }
+        else if (formats.Contains(ADB_DRAG_FORMAT))
+        {
+            var dragList = NativeMethods.ADBDRAGLIST.FromStream((MemoryStream)e.Data.GetData(ADB_DRAG_FORMAT));
+            
+            // TODO: Add support for dragging from another device
+            if (dragList.deviceId != CurrentADBDevice.ID)
+                return;
+
+            FileClass targetFolder = null;
+            string target = CurrentPath;
+            if (((FrameworkElement)sender).DataContext is FileClass file)
+            {
+                if (file.IsDirectory)
+                {
+                    targetFolder = file;
+                    target = file.FullPath;
+                }
+                else
+                    return;
+            }
+            else if (((FrameworkElement)sender).DataContext is not null)
+                return;
+
+            // TODO: Add support for dragging from other folders (only available with another instance of the app)
+            if (dragList.parentFolder != CurrentPath)
+                return;
+
+            FileActionLogic.CutFiles(DirList.FileList.Where(f => dragList.items.Contains(f.FullName)), !IsDragInProgress);
+            FileActionLogic.PasteFiles(targetFolder is null ? null : [targetFolder]);
+
+            e.Handled = true;
         }
     }
 
     private void DropPackages(string[] items)
     {
-        if (items.AnyAll(i => i.Contains('.') && APK_NAMES.Any(n => n[1..] == i.Split('.').Last().ToUpper())))
+        if (FileHelper.AllFilesAreApks(items))
             ShellFileOperation.PushPackages(CurrentADBDevice, items.Select(ShellObject.FromParsingName), Dispatcher);
     }
 
@@ -2183,48 +2178,34 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void MainWin_DragOver(object sender, DragEventArgs e)
     {
-        if (Settings.DragDropMethod < AppSettings.DragMethod.ReceiveOnly)
-            return;
+        //var prevPoint = LastDragPoint;
+        //LastDragPoint = e.GetPosition(ExplorerCanvas);
 
-        var prevPoint = LastDragPoint;
-        LastDragPoint = e.GetPosition(ExplorerCanvas);
+        //// Set relative position using offset received from the shell
+        //Canvas.SetTop(CursorBorder, LastDragPoint.Y - RuntimeSettings.DragOffset.Y);
+        //Canvas.SetLeft(CursorBorder, LastDragPoint.X - RuntimeSettings.DragOffset.X);
 
-        // Set relative position using offset received from the shell
-        Canvas.SetTop(CursorBorder, LastDragPoint.Y - RuntimeSettings.DragOffset.Y);
-        Canvas.SetLeft(CursorBorder, LastDragPoint.X - RuntimeSettings.DragOffset.X);
+        //// Compare with mouse position at 5 times the current vector to reduce exit misdetection
+        //var nextPoint = LastDragPoint + 5 * (LastDragPoint - prevPoint);
+        //Size size = new(ExplorerGrid.ActualWidth, ExplorerGrid.ActualHeight);
 
-        // Compare with mouse position at 5 times the current vector to reduce exit misdetection
-        var nextPoint = LastDragPoint + 5 * (LastDragPoint - prevPoint);
-        Size size = new(ExplorerGrid.ActualWidth, ExplorerGrid.ActualHeight);
-
-        CursorBorder.Visible(new Rect(size).Contains(nextPoint));
+        //CursorBorder.Visible(new Rect(size).Contains(nextPoint));
     }
 
     private void ExplorerGrid_DragEnter(object sender, DragEventArgs e)
     {
-        if (Settings.DragDropMethod < AppSettings.DragMethod.ReceiveOnly)
-            return;
+        //var formats = e.Data.GetFormats();
 
-        if (e.Data.GetDataPresent(NativeMethods.CFSTR_DRAGIMAGE) && e.Data.GetData(NativeMethods.CFSTR_DRAGIMAGE) is var dragImage && dragImage is MemoryStream stream)
-        {
-            var dragBitmap = VirtualFileDataObject.GetBitmapFromShell(stream);
+        //if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] files && files.Length > 0)
+        //{
 
-            RuntimeSettings.DragBitmap = dragBitmap.BitmapSource;
-            RuntimeSettings.DragOffset = dragBitmap.Offset;
+        //    RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(new(ShellObject.FromParsingName(files[0])));
 
-            if (RuntimeSettings.DragBitmap is not null && e.KeyStates.HasFlag(DragDropKeyStates.LeftMouseButton))
-            {
-                CursorBorder.Height = RuntimeSettings.DragBitmap.PixelHeight;
-                CursorBorder.Width = RuntimeSettings.DragBitmap.PixelWidth;
-                CursorBorder.Visible(true);
-                DragBackground.Background = new SolidColorBrush(dragBitmap.Background);
+        //    return;
+        //}
 
-                return;
-            }
-        }
-
-        RuntimeSettings.DragBitmap = null;
-        CursorBorder.Visible(false);
+        //RuntimeSettings.DragBitmap = null;
+        //CursorBorder.Visible(false);
     }
 
     private void AppDataHyperlink_Click(object sender, RoutedEventArgs e)
@@ -2234,5 +2215,20 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         appDataClick = DateTime.Now;
         Process.Start("explorer.exe", AppDataPath);
+    }
+
+    private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
+    {
+        var formats = e.Data.GetFormats();
+
+        if (FileActions.IsAppDrive && formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
+        {
+            e.Effects = FileHelper.AllFilesAreApks(items)
+                ? DragDropEffects.Copy
+                : DragDropEffects.None;
+
+            e.Handled = true;
+            return;
+        }
     }
 }

@@ -266,4 +266,9 @@ public static class FileHelper
 
         return names.AnyAll(predicate);
     }
+
+    public static string[] ApkExtensions => [.. AdbExplorerConst.APK_NAMES.Select(n => n[1..])];
+
+    public static bool AllFilesAreApks(string[] items) =>
+        items.AnyAll(i => i.Contains('.') && ApkExtensions.Any(n => n == i.Split('.').Last().ToUpper()));
 }

@@ -313,10 +313,10 @@ public class FileClass : FilePath, IFileStat
             return name;
     }
 
-    public void PrepareDescriptors()
+    public FileSyncOperation PrepareDescriptors()
     {
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'))
-    {
+        {
             PathType = FilePathType.Windows,
         };
 
@@ -348,7 +348,7 @@ public class FileClass : FilePath, IFileStat
                 {
                     Thread.Sleep(100);
                 }
-
+                
                 var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item, '\\');
 
                 // Try 10 times to read from the file and write to the stream,
@@ -368,6 +368,8 @@ public class FileClass : FilePath, IFileStat
                 }
             }
         });
+
+        return fileOp;
     }
 
     public void GetIcon()
@@ -412,7 +414,7 @@ public class FileClass : FilePath, IFileStat
 }
 
 public class FileNameSort(string name) : IComparable
-    {
+{
     public string Name { get; } = name;
 
     public override string ToString()

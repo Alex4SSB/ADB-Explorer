@@ -25,7 +25,7 @@ public class FileToIconConverter
     private const int UNKNOWN_ICON_INDEX = 175;
     private const int BROKEN_LINK_ICON_INDEX = 271;
 
-    private static readonly Dictionary<string, object> iconDic = new();
+    private static readonly Dictionary<string, object> iconDic = [];
     private static readonly SysImageList _imgList = new SysImageList(SysImageListSize.SHIL_JUMBO);
 
     public FileToIconConverter()
@@ -231,7 +231,7 @@ public class FileToIconConverter
         Icon icon;
         string lookup;
 
-        if (!ReturnKey(fileName, size, specialType).StartsWith("."))
+        if (!ReturnKey(fileName, size, specialType).StartsWith('.'))
             lookup = fileName;
         else
             lookup = $"aaa{Path.GetExtension(fileName).ToLower()}";
