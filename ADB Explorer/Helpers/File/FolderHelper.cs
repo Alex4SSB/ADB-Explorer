@@ -37,6 +37,8 @@ internal class FolderHelper
             if (names.Any())
                 Data.CurrentDisplayNames.TryAdd(item.Key, names.First().Value);
         }
+
+        Data.RuntimeSettings.RefreshBreadcrumbs = true;
     }
 
     public static string FolderExists(string path)

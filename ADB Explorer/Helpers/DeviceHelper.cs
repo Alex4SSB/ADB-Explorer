@@ -533,9 +533,28 @@ public static class DeviceHelper
                 return;
         }
 
-        Data.DevicesObject.SetOpenDevice(Data.DevicesObject.Current ?? devices.First());
-        Data.CurrentADBDevice = new(Data.DevicesObject.Current);
-        Data.RuntimeSettings.InitLister = true;
+        var startTime = DateTime.Now;
+        var device = Data.DevicesObject.Current ?? devices.First();
+
+        Task.Run(() =>
+        {
+            while (device.Status is not DeviceStatus.Ok)
+            {
+                if (DateTime.Now - startTime > TimeSpan.FromSeconds(6))
+                    return false;
+
+                Thread.Sleep(500);
+            }
+            return true;
+        }).ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
+        {
+            if (!t.Result)
+                return;
+
+            Data.DevicesObject.SetOpenDevice(device);
+            Data.CurrentADBDevice = new(Data.DevicesObject.Current);
+            Data.RuntimeSettings.InitLister = true;
+        }));
 
         static void DisconnectDevice()
         {

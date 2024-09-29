@@ -425,6 +425,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 case nameof(AppRuntimeSettings.MainCursor):
                     Cursor = RuntimeSettings.MainCursor;
                     break;
+
+                case nameof(AppRuntimeSettings.RefreshBreadcrumbs):
+                    NavigationBox.Refresh();
+                    break;
             }
         });
     }

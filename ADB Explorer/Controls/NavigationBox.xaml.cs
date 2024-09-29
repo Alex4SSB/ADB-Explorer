@@ -139,23 +139,6 @@ public partial class NavigationBox : UserControl
             PopulateButtons(path);
         else
             PopulateButtons(driveView + path);
-
-        if (string.IsNullOrWhiteSpace(driveView) && Data.DevicesObject.Current is LogicalDeviceViewModel device)
-        {
-            Data.DevicesObject.Current.PropertyChanged += Device_PropertyChanged;
-        }
-    }
-
-    private void Device_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(LogicalDevice.Name))
-        {
-            FolderHelper.CombineDisplayNames();
-            Refresh();
-
-            if (!string.IsNullOrWhiteSpace(Data.DevicesObject?.Current?.Name))
-                Data.DevicesObject.Current.PropertyChanged -= Device_PropertyChanged;
-        }
     }
 
     public void Refresh() => AddDevice(Path);

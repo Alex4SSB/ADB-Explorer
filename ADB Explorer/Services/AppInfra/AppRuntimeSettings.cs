@@ -412,6 +412,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool SortFileOps { get => false; set => OnPropertyChanged(); }
     public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
     public bool FinalizeSplash { get => false; set => OnPropertyChanged(); }
+    public bool RefreshBreadcrumbs { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }
