@@ -49,6 +49,12 @@
                 <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=HidePasteNamingInfo}" Value="True">
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="True">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
             </Style.Triggers>
         </Style>
     </UserControl.Style>

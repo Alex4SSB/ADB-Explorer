@@ -105,7 +105,7 @@ public partial class ADBService
             // Prepare a link->target dictionary, where the RegEx matched
             var links = AdbRegEx.RE_LINK_TARGETS().Matches(stdout);
             var linkDict = links.Where(match => match.Success).ToDictionary(match => match.Groups["Source"].Value, match => match.Groups["Target"].Value);
-            var uniqueLinks = linkDict.Values.Distinct();
+            var uniqueLinks = linkDict.Values.Distinct().Select(l => EscapeAdbShellString(l));
 
             // Get file mode of all unique links
             ExecuteDeviceAdbShellCommand(ID, "stat", out string statStdout, out string statStderr, cancellationToken, [.. uniqueLinks, .. STAT_LINKMODE_ARGS]);

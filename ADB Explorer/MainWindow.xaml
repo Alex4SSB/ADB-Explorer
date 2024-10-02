@@ -323,11 +323,13 @@
                             Visibility="Collapsed" />
                         <controls:RenameTooltip x:Name="RenameTooltip" Visibility="Hidden" />
                     </Canvas>
-                    <controls:PasteAndPullTooltip
-                        x:Name="PasteTooltip"
+                    <Grid
+                        x:Name="PasteGrid"
                         Margin="0,34,20,0"
                         HorizontalAlignment="Right"
-                        VerticalAlignment="Top" />
+                        VerticalAlignment="Top">
+                        <controls:PasteAndPullTooltip x:Name="PasteTooltip" />
+                    </Grid>
                     <Grid>
                         <Grid.Style>
                             <Style TargetType="Grid">

@@ -652,7 +652,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             Task.Run(() =>
             {
-                Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
+                if (!DirList.InProgress)
+                    Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
+
                 Dispatcher.Invoke(() => FileActions.ListingInProgress = DirList.InProgress);
             });
 
@@ -829,6 +831,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileActionLogic.UpdateFileActions();
         MainToolBar.Items?.Refresh();
+        PasteGrid.Visibility = Visibility.Visible;
 
         SelectionTimer.Stop();
     }
@@ -1098,6 +1101,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool _navigateToPath(string realPath)
     {
+        PasteGrid.Visibility = Visibility.Collapsed;
+        FileActions.ListingInProgress = true;
+
         NavHistory.Navigate(realPath);
 
         SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);
@@ -1141,10 +1147,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SizeColumn.Visibility = Visible(!FileActions.IsAppDrive);
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? S_COPY_APK_NAME : S_COPY_PATH;
-
+        
         if (FileActions.IsRecycleBin)
         {
-            FileActions.ListingInProgress = true;
             TrashHelper.ParseIndexers().ContinueWith((t) => DirList.Navigate(realPath));
 
             FileActions.DeleteDescription.Value = S_EMPTY_TRASH;

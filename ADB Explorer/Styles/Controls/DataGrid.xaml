@@ -505,9 +505,6 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                 <Setter Property="AllowDrop" Value="True" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=DragDropMethod}" Value="None">
-                <Setter Property="AllowDrop" Value="False" />
-            </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
