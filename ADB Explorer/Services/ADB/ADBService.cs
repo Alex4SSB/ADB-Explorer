@@ -97,7 +97,13 @@ public partial class ADBService
 
     public static int ExecuteDeviceAdbCommand(string deviceSerial, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceSerial, cmd, .. args]);
+        var result = ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceSerial, cmd, .. args]);
+        if (stdout.TrimEnd().EndsWith($"{args.FirstOrDefault()}: not found"))
+        {
+            // Command not found, retrying as a busybox applet
+            result = ExecuteAdbCommand("-s", out stdout, out stderr, cancellationToken, [deviceSerial, cmd, "busybox", .. args]);
+        }
+        return result;
     }
 
     public static async Task<string> ExecuteDeviceAdbCommand(string deviceId, CancellationToken cancellationToken, string cmd, params string[] args)
