@@ -533,6 +533,9 @@ public static class DeviceHelper
                 return;
         }
 
+        if (!devices.Any() && Data.DevicesObject.Current is null)
+            return;
+
         var startTime = DateTime.Now;
         var device = Data.DevicesObject.Current ?? devices.First();
 

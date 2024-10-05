@@ -775,7 +775,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (file.Type is FileType.Folder)
         {
             bfNavigation = false;
-            NavigateToPath(file.FullPath, file.IsLink);
+            NavigateToPath(file);
 
             return;
         }
@@ -1080,7 +1080,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Dispatcher.BeginInvoke(new Action<IEnumerable<ServiceDevice>>(DeviceHelper.ListServices), WiFiPairingService.GetServices()).Wait();
     }
 
-    public bool NavigateToPath(string path, bool isLink = false)
+    public bool NavigateToPath(FileClass file)
+    {
+        if (file is null)
+            return false;
+
+        if (!bfNavigation)
+            prevPath = file.FullPath;
+
+        string realPath = !string.IsNullOrEmpty(file.LinkTarget)
+            ? file.LinkTarget
+            : file.FullPath;
+
+        return realPath is not null && _navigateToPath(realPath);
+    }
+
+    public bool NavigateToPath(string path)
     {
         if (path is null)
             return false;
@@ -1088,14 +1103,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (!bfNavigation)
             prevPath = path;
 
-        string realPath;
-        if (isLink && ADBService.ReadLink(CurrentADBDevice.ID, path) is string linkTarget && !string.IsNullOrEmpty(linkTarget))
-            realPath = linkTarget;
-        else
-            realPath = FolderHelper.FolderExists(path);
-
-        FileActions.ExplorerFilter = "";
-
+        var realPath = FolderHelper.FolderExists(path);
         return realPath is not null && _navigateToPath(realPath);
     }
 
@@ -1104,6 +1112,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PasteGrid.Visibility = Visibility.Collapsed;
         FileActions.ListingInProgress = true;
 
+        FileActions.ExplorerFilter = "";
         NavHistory.Navigate(realPath);
 
         SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, -1);

@@ -38,9 +38,9 @@ internal static class TrashHelper
 
         var indexers = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID,
                                                   AdbExplorerConst.RECYCLE_PATH,
-                                                  new[] { "*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX });
+                                                  ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
 
-        var lines = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, indexers).Split(new[] { '\r', '\n' },
+        var lines = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, indexers).Split(ADBService.LINE_SEPARATORS,
                                                                                           StringSplitOptions.RemoveEmptyEntries);
 
         lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));

@@ -53,7 +53,7 @@
         [GeneratedRegex(@"^(?<Hash>\w+)[ -]+(?<Path>.+)$", RegexOptions.Multiline)]
         public static partial Regex RE_ANDROID_FIND_HASH();
 
-        [GeneratedRegex("\\/\\/\\/ (?<Source>[\\s\\S]+?) \\/\\/\\/ (?<Target>\\/[\\s\\S]+?) \\/\\/\\/", RegexOptions.Multiline)]
+        [GeneratedRegex("\\/\\/\\/ (?<Source>[\\s\\S]+?) \\/\\/\\/(?:(?: )|(?: (?<Target>\\/[\\s\\S]+?) ))\\/\\/\\/", RegexOptions.Multiline)]
         public static partial Regex RE_LINK_TARGETS();
 
         [GeneratedRegex("\\/\\/\\/ (?<Target>[\\s\\S]+?) \\/\\/\\/ (?<Mode>.*) \\/\\/\\/", RegexOptions.Multiline)]

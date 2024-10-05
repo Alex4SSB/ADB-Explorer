@@ -41,7 +41,7 @@ public static class ShellFileOperation
 
     public static void SilentDelete(ADBService.AdbDevice device, params string[] items)
     {
-        var args = new[] { "-rf" }.Concat(items.Select(item => ADBService.EscapeAdbShellString(item))).ToArray();
+        string[] args = [ "-rf", .. items.Select(item => ADBService.EscapeAdbShellString(item))];
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, new(), args);
     }
 
@@ -125,7 +125,12 @@ public static class ShellFileOperation
 
     public static bool SilentMove(ADBService.AdbDevice device, string fullPath, string targetPath, bool throwOnError = true)
     {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "mv", out string stdout, out string stderr, new(), new[] { ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath) });
+        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
+                                                               "mv",
+                                                               out string stdout,
+                                                               out string stderr,
+                                                               new(),
+                                                               [ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath)]);
 
         if (exitCode != 0 && throwOnError)
         {
@@ -137,7 +142,7 @@ public static class ShellFileOperation
 
     public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, FileClass.CutType cutType = FileClass.CutType.None)
     {
-        List<FileOperation> fileops = new();
+        List<FileOperation> fileops = [];
 
         if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
         {
@@ -247,43 +252,40 @@ public static class ShellFileOperation
 
     public static void MakeDir(ADBService.AdbDevice device, string fullPath)
     {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                               "mkdir",
-                                                               out string stdout,
-                                                               out string stderr,
-                                                               new(), new[] { "-p", ADBService.EscapeAdbShellString(fullPath) });
+        var result = ADBService.ExecuteVoidShellCommand(device.ID,
+                                                        new(),
+                                                        "mkdir",
+                                                        ["-p", ADBService.EscapeAdbShellString(fullPath)]).Result;
 
-        if (exitCode != 0)
+        if (!string.IsNullOrEmpty(result))
         {
-            throw new Exception(stderr);
+            throw new Exception(result);
         }
     }
 
     public static void MakeFile(ADBService.AdbDevice device, string fullPath)
     {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                               "touch",
-                                                               out string stdout,
-                                                               out string stderr,
-                                                               new(), ADBService.EscapeAdbShellString(fullPath));
+        var result = ADBService.ExecuteVoidShellCommand(device.ID,
+                                                        new(),
+                                                        "touch",
+                                                        ADBService.EscapeAdbShellString(fullPath)).Result;
 
-        if (exitCode != 0)
+        if (!string.IsNullOrEmpty(result))
         {
-            throw new Exception(stderr);
+            throw new Exception(result);
         }
     }
 
     public static void WriteLine(ADBService.AdbDevice device, string fullPath, string newLine)
     {
-        var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                               "echo",
-                                                               out string stdout,
-                                                               out string stderr,
-                                                               new(), new[] { newLine, ">>", ADBService.EscapeAdbShellString(fullPath) });
+        var result = ADBService.ExecuteVoidShellCommand(device.ID,
+                                                        new(),
+                                                        "echo",
+                                                        [newLine, ">>", ADBService.EscapeAdbShellString(fullPath)]).Result;
 
-        if (exitCode != 0)
+        if (!string.IsNullOrEmpty(result))
         {
-            throw new Exception(stderr);
+            throw new Exception(result);
         }
     }
 
@@ -311,7 +313,7 @@ public static class ShellFileOperation
                                        string currentPath)
     {
         bool merge = false;
-        string[] existingItems = Array.Empty<string>();
+        string[] existingItems = [];
         string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : targetName;
 
         await Task.Run(() =>
@@ -449,7 +451,7 @@ public static class ShellFileOperation
 
     public static ulong? GetPackagesCount(ADBService.AdbDevice device)
     {
-        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, new(), new[] { "list", "packages", "|", "wc", "-l" });
+        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, new(), ["list", "packages", "|", "wc", "-l"]);
         if (result != 0 || !ulong.TryParse(stdout, out ulong value))
             return null;
 
@@ -460,11 +462,11 @@ public static class ShellFileOperation
     {
         // More package-specific info can be acquired using dumpsys package [package_name]
 
-        ObservableList<Package> packages = new();
+        ObservableList<Package> packages = [];
         string stdout = "";
-        string[] args = { "list", "packages", "-s" };
+        string[] args = ["list", "packages", "-s"];
         if (optionalParams)
-            args = args.Concat(new[] { "-U", "--show-versioncode" }).ToArray();
+            args = [.. args, "-U", "--show-versioncode"];
 
         if (includeSystem)
         {
@@ -472,7 +474,7 @@ public static class ShellFileOperation
             var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, new(), args);
 
             if (systemExitCode == 0)
-                packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
+                packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
         }
 
         args[2] = "-3";
@@ -480,14 +482,14 @@ public static class ShellFileOperation
         var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, new(), args);
 
         if (userExitCode == 0)
-            packages.AddRange(stdout.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
+            packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
 
         return packages;
     }
 
     public static void ChangeDateFromName(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
     {
-        List<FileOperation> operations = new();
+        List<FileOperation> operations = [];
 
         foreach (var item in items)
         {

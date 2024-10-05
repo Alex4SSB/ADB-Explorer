@@ -42,16 +42,50 @@ public partial class ADBService
         private const string PARENT_DIR = "..";
         private static readonly string[] SPECIAL_DIRS = [CURRENT_DIR, PARENT_DIR];
 
-        private enum UnixFileMode : UInt32
+        /// <summary>Represents the Unix filesystem permissions and file type.<br />
+        /// Since the file type flags overlap, they CANNOT be used as flags.</summary>
+        public enum UnixFileMode
         {
-            S_IFMT = 0b1111 << 12,   // bit mask for the file type bit fields
-            S_IFSOCK = 0b1100 << 12, // socket
-            S_IFLNK = 0b1010 << 12,  // symbolic link
-            S_IFREG = 0b1000 << 12,  // regular file
-            S_IFBLK = 0b0110 << 12,  // block device
-            S_IFDIR = 0b0100 << 12,  // directory
-            S_IFCHR = 0b0010 << 12,  // character device
-            S_IFIFO = 0b0001 << 12   // FIFO
+            /// <summary>No permissions.</summary>
+            None = 0x0,
+            /// <summary>Execute permission for others.</summary>
+            OtherExecute = 0x1,
+            /// <summary>Write permission for others.</summary>
+            OtherWrite = 0x2,
+            /// <summary>Read permission for others.</summary>
+            OtherRead = 0x4,
+            /// <summary>Execute permission for group.</summary>
+            GroupExecute = 0x8,
+            /// <summary>Write permission for group.</summary>
+            GroupWrite = 0x10,
+            /// <summary>Read permission for group.</summary>
+            GroupRead = 0x20,
+            /// <summary>Execute permission for owner.</summary>
+            UserExecute = 0x40,
+            /// <summary>Write permission for owner.</summary>
+            UserWrite = 0x80,
+            /// <summary>Read permission for owner.</summary>
+            UserRead = 0x100,
+            /// <summary>Sticky bit permission.</summary>
+            StickyBit = 0x200,
+            /// <summary>Set group permission.</summary>
+            SetGroup = 0x400,
+            /// <summary>Set user permission.</summary>
+            SetUser = 0x800,
+            /// <summary>FIFO.</summary>
+            S_IFIFO = 0x1000,
+            /// <summary>Character device.</summary>
+            S_IFCHR = 0x2000,
+            /// <summary>Directory.</summary>
+            S_IFDIR = 0x4000,
+            /// <summary>Block device.</summary>
+            S_IFBLK = 0x6000,
+            /// <summary>Regular file.</summary>
+            S_IFREG = 0x8000,
+            /// <summary>Symbolic link.</summary>
+            S_IFLNK = 0xA000,
+            /// <summary>Socket.</summary>
+            S_IFSOCK = 0xC000,
         }
 
         private static FileStat CreateFile(string path, string stdoutLine)
@@ -65,7 +99,7 @@ public partial class ADBService
             var name = match.Groups["Name"].Value;
             var size = UInt64.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
             var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
-            var mode = UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
+            var mode = (UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
 
             if (SPECIAL_DIRS.Contains(name))
                 return null;
@@ -76,21 +110,21 @@ public partial class ADBService
                 type: ParseFileMode(mode),
                 size: (mode != 0) ? size : new UInt64?(),
                 modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : new DateTime?(),
-                isLink: (mode & (UInt32)UnixFileMode.S_IFMT) == (UInt32)UnixFileMode.S_IFLNK);
+                isLink: mode.HasFlag(UnixFileMode.S_IFLNK));
         }
 
-        private static FileType ParseFileMode(uint mode) => 
-            (UnixFileMode)(mode & (UInt32)UnixFileMode.S_IFMT) switch
+        private static FileType ParseFileMode(UnixFileMode mode)
         {
-            UnixFileMode.S_IFSOCK => FileType.Socket,
-            UnixFileMode.S_IFLNK => FileType.Unknown,
-            UnixFileMode.S_IFREG => FileType.File,
-            UnixFileMode.S_IFBLK => FileType.BlockDevice,
-            UnixFileMode.S_IFDIR => FileType.Folder,
-            UnixFileMode.S_IFCHR => FileType.CharDevice,
-            UnixFileMode.S_IFIFO => FileType.FIFO,
-            _ => FileType.Unknown,
-        };
+            if (mode.HasFlag(UnixFileMode.S_IFSOCK)) return FileType.Socket;
+            if (mode.HasFlag(UnixFileMode.S_IFLNK)) return FileType.Unknown;
+            if (mode.HasFlag(UnixFileMode.S_IFREG)) return FileType.File;
+            if (mode.HasFlag(UnixFileMode.S_IFBLK)) return FileType.BlockDevice;
+            if (mode.HasFlag(UnixFileMode.S_IFDIR)) return FileType.Folder;
+            if (mode.HasFlag(UnixFileMode.S_IFCHR)) return FileType.CharDevice;
+            if (mode.HasFlag(UnixFileMode.S_IFIFO)) return FileType.FIFO;
+
+            return FileType.Unknown;
+        }
 
         public IEnumerable<(string, FileType)> GetLinkType(IEnumerable<string> filePaths, CancellationToken cancellationToken)
         {
@@ -105,7 +139,7 @@ public partial class ADBService
             // Prepare a link->target dictionary, where the RegEx matched
             var links = AdbRegEx.RE_LINK_TARGETS().Matches(stdout);
             var linkDict = links.Where(match => match.Success).ToDictionary(match => match.Groups["Source"].Value, match => match.Groups["Target"].Value);
-            var uniqueLinks = linkDict.Values.Distinct().Select(l => EscapeAdbShellString(l));
+            var uniqueLinks = linkDict.Values.Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().Select(l => EscapeAdbShellString(l));
 
             // Get file mode of all unique links
             ExecuteDeviceAdbShellCommand(ID, "stat", out string statStdout, out string statStderr, cancellationToken, [.. uniqueLinks, .. STAT_LINKMODE_ARGS]);
@@ -114,7 +148,7 @@ public partial class ADBService
             // Prepare a target->mode dictionary, where the RegEx matches
             var linkTypes = modes.Where(match => match.Success).ToDictionary(
                 match => match.Groups["Target"].Value,
-                match => ParseFileMode(UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber)));
+                match => ParseFileMode((UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber)));
 
             // Iterate over input files using the dictionaries
             foreach (var file in filePaths)

@@ -1030,7 +1030,7 @@ internal static class FileActionLogic
 
     public static async void FollowLink()
     {
-        var target = ADBService.ReadLink(Data.CurrentADBDevice.ID, Data.SelectedFiles.First().FullPath);
+        var target = Data.SelectedFiles.First().LinkTarget;
 
         if (string.IsNullOrEmpty(target))
             return;
