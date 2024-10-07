@@ -29,35 +29,6 @@ public class FileSyncOperation : FileOperation
         OperationName = operationName;
         FilePath = sourcePath;
         TargetPath = targetPath;
-
-        var procTask = AsyncHelper.WaitUntil(() => !string.IsNullOrEmpty(AdbProcess.Process.StartInfo.Arguments),
-                                             TimeSpan.FromSeconds(10),
-                                             TimeSpan.FromMilliseconds(100),
-                                             new());
-
-        procTask.ContinueWith((t) =>
-        {
-            if (AdbProcess.Process.StartInfo.FileName == Data.ProgressRedirectionPath)
-            {
-                try
-                {
-                    var id = AdbProcess.Process.Id;
-                }
-                catch
-                {
-                    // if we can't get the pid without throwing an exception, the process is useless
-                    return;
-                }
-
-                var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
-                var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
-
-                if (adbProc is not null)
-                    AdbProcess = new(adbProc);
-            }
-
-            AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
-        });
     }
 
     private void AdbProcess_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -91,8 +62,37 @@ public class FileSyncOperation : FileOperation
         StatusInfo = new InProgSyncProgressViewModel();
         cancelTokenSource = new CancellationTokenSource();
 
-        progressUpdates = new();
+        progressUpdates = [];
         progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
+
+        var procTask = AsyncHelper.WaitUntil(() => !string.IsNullOrEmpty(AdbProcess.Process.StartInfo.Arguments),
+                                             TimeSpan.FromSeconds(10),
+                                             TimeSpan.FromMilliseconds(100),
+                                             cancelTokenSource.Token);
+
+        procTask.ContinueWith((t) =>
+        {
+            if (AdbProcess.Process.StartInfo.FileName == Data.ProgressRedirectionPath)
+            {
+                try
+                {
+                    var id = AdbProcess.Process.Id;
+                }
+                catch
+                {
+                    // if we can't get the pid without throwing an exception, the process is useless
+                    return;
+                }
+
+                var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
+                var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
+
+                if (adbProc is not null)
+                    AdbProcess = new(adbProc);
+            }
+
+            AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
+        });
 
         string cmd = "", arg = "";
         if (OperationName is OperationType.Push)
