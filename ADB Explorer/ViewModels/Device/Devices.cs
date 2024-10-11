@@ -197,6 +197,8 @@ public class Devices : AbstractDevice
             {
                 // And add the new devices
                 self.Add(item);
+                if (item.Status is DeviceStatus.Ok)
+                    Task.Run(() => ShellCommands.FindCommands(item.ID));
             }
         }
 

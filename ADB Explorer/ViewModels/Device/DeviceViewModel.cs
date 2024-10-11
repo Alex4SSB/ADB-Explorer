@@ -122,6 +122,13 @@ public abstract class DeviceViewModel : AbstractDevice
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(StatusIcon));
 
+            if (this is LogicalDeviceViewModel)
+            {
+                ShellCommands.DeviceCommands.Remove(ID);
+                if (status is DeviceStatus.Ok)
+                    Task.Run(() => ShellCommands.FindCommands(ID));
+            }
+
             if (status is DeviceStatus.Offline)
                 Data.FileOpQ.MoveOperationsToPast(true, this);
 

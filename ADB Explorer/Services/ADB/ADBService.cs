@@ -226,7 +226,16 @@ public partial class ADBService
 
     public static int ExecuteDeviceAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, [cmd, .. args]);
+        var actualCmd = cmd;
+
+        if (Enum.TryParse<ShellCommands.ShellCmd>(cmd, out var enumCmd)
+            && ShellCommands.DeviceCommands.TryGetValue(deviceId, out var dict)
+            && dict.TryGetValue(enumCmd, out var deviceCmd))
+        {
+            actualCmd = deviceCmd;
+        }
+
+        return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, [actualCmd, .. args]);
     }
 
     /// <summary>

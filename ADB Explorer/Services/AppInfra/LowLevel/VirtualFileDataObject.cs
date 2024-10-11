@@ -749,7 +749,6 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                     vfdo.SetData(files.SelectMany(f => f.Descriptors));
                     Data.RuntimeSettings.MainCursor = Cursors.Arrow;
                 });
-                vfdo.SetData(files.SelectMany(f => f.Descriptors));
             });
 
             // Add these empty formats as placeholders, the data will be replaced once it is ready

@@ -64,5 +64,8 @@
 
         [GeneratedRegex(@"^\w:\\$")]
         public static partial Regex RE_WINDOWS_DRIVE_ROOT();
+
+        [GeneratedRegex(@"(?<Alias>[^=\s]+)='(?<Target>.+)'")]
+        public static partial Regex RE_GET_ALIAS();
     }
 }

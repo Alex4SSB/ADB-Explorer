@@ -32,7 +32,7 @@ public class LogicalDevice : Device
         protected set => Set(ref battery, value);
     }
 
-    private ObservableList<DriveViewModel> drives = new();
+    private ObservableList<DriveViewModel> drives = [];
     public ObservableList<DriveViewModel> Drives
     {
         get => drives;
