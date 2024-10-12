@@ -47,7 +47,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool bfNavigation = false;
 
     private int ClickCount = 0;
-    private bool IsDragInProgress = false;
+    private DragState DragStatus = DragState.None;
     private bool WasSelected = false;
     private bool WasEditing = false;
     private Point MouseDownPoint;
@@ -58,6 +58,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private DateTime appDataClick;
 
     DragWindow dw = new();
+
+    private enum DragState
+    {
+        None,
+        Pending,
+        Active,
+    }
 
     private bool IsInEditMode
     {
@@ -1361,7 +1368,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         var row = sender as DataGridRow;
 
-        IsDragInProgress = e.OriginalSource is TextBlock or Image || row.IsSelected;
+        DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
+                     ? DragState.Pending
+                     : DragState.None;
 
         SelectionHelper.SetIndexSingle(ExplorerGrid, row.GetIndex());
     }
@@ -1381,7 +1390,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (RowHeight is null && ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(0) is DataGridRow row)
             RowHeight = row.ActualHeight;
 
-        IsDragInProgress = e.OriginalSource is TextBlock or Image;
+        DragStatus = e.OriginalSource is TextBlock or Image
+                     ? DragState.Pending
+                     : DragState.None;
 
         var point = e.GetPosition(ExplorerGrid);
         MouseDownPoint = point;
@@ -1742,8 +1753,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var row = DataGridRow.GetRowContainingElement(cell);
         var current = row.GetIndex();
 
-        IsDragInProgress = e.OriginalSource is TextBlock or Image || row.IsSelected;
         WasSelected = row.IsSelected;
+        DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
+                     ? DragState.Pending
+                     : DragState.None;
 
         MouseDownPoint = e.GetPosition(ExplorerGrid);
         e.Handled = true;
@@ -1757,7 +1770,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         RuntimeSettings.IsPathBoxFocused = false;
 
-        if (!row.IsSelected && IsDragInProgress)
+        if (!row.IsSelected && DragStatus is not DragState.None)
         {
             ExplorerGrid.UnselectAll();
             row.IsSelected = true;
@@ -1767,22 +1780,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
         if (ExplorerGrid.SelectedItems.Count < 1)
             SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, current);
-
-        if (IsDragInProgress)
-        {
-            if (ExplorerGrid.SelectedItems.Count < 1 || ExplorerGrid.SelectedItems[0] is not FileClass)
-                return;
-
-            var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
-            var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems);
-
-            if (vfdo is null)
-                return;
-
-            vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Move);
-
-            //RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
-        }
     }
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
@@ -1896,17 +1893,41 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         var point = e.GetPosition(ExplorerCanvas);
         bool withinEditingCell = false;
+        DataGridCell cell = ExplorerGrid.SelectedCells.Count > 0
+                            ? CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1])
+                            : null;
 
         if (IsInEditMode)
         {
-            DataGridCell editingCell = CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1]);
-            withinEditingCell = VisualTreeHelper.GetDescendantBounds(editingCell).Contains(e.GetPosition(editingCell));
+            withinEditingCell = VisualTreeHelper.GetDescendantBounds(cell).Contains(e.GetPosition(cell));
+        }
+
+        if (DragStatus is DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
+        {
+            if (ExplorerGrid.SelectedItems.Count > 0
+                && ExplorerGrid.SelectedItems[0] is FileClass
+                && MouseDownPoint != NullPoint)
+            {
+                DragStatus = DragState.Active;
+
+                var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
+                var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems);
+
+                if (vfdo is not null)
+                {
+                    vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Move);
+
+                    //RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
+                }
+            }
+            else
+                DragStatus = DragState.None;
         }
 
         if (e.LeftButton == MouseButtonState.Released
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
-            || IsDragInProgress
+            || DragStatus is not DragState.None
             || withinEditingCell)
         {
             SelectionRect.Visibility = Visibility.Collapsed;
@@ -2021,9 +2042,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
         var formats = e.Data.GetFormats();
+        e.Effects = DragDropEffects.None;
 
         // TODO: Add support for receiving streams (Ctrl+V as well)
-        //e.Effects
         if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
         {
             if (FileActions.IsAppDrive)
@@ -2058,13 +2079,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             string target = CurrentPath;
             if (((FrameworkElement)sender).DataContext is FileClass file)
             {
-                if (file.IsDirectory)
-                {
-                    targetFolder = file;
-                    target = file.FullPath;
-                }
-                else
+                if (!file.IsDirectory)
                     return;
+
+                if (dragList.parentFolder == CurrentPath
+                    && dragList.items.Length == 1
+                    && dragList.items[0] == file.FullName)
+                    return;
+
+                targetFolder = file;
+                target = file.FullPath;
             }
             else if (((FrameworkElement)sender).DataContext is not null)
                 return;
@@ -2073,7 +2097,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (dragList.parentFolder != CurrentPath)
                 return;
 
-            FileActionLogic.CutFiles(DirList.FileList.Where(f => dragList.items.Contains(f.FullName)), !IsDragInProgress);
+            FileActionLogic.CutFiles(DirList.FileList.Where(f => dragList.items.Contains(f.FullName)), DragStatus is DragState.None);
             FileActionLogic.PasteFiles(targetFolder is null ? null : [targetFolder]);
 
             e.Handled = true;
@@ -2098,7 +2122,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         e.Handled = CellMouseUp(sender, e);
 
-        IsDragInProgress = false;
+        DragStatus = DragState.None;
     }
 
     private bool CellMouseUp(object sender, MouseButtonEventArgs e)
@@ -2154,10 +2178,32 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 && ((FileClass)cell.DataContext).Type is not (FileType.File or FileType.Folder)))
             return;
 
-        if (ClickCount == 1 && ExplorerGrid.SelectedItems.Count == 1 && WasSelected && !WasEditing)
+        var path = ((FileClass)ExplorerGrid.SelectedItem).FullPath;
+
+        if (ExplorerGrid.SelectedItems.Count == 1 && WasSelected && !WasEditing)
         {
-            cell.IsEditing = true;
-            FileActions.IsExplorerEditing = true;
+            Task.Run(() =>
+            {
+                var start = DateTime.Now;
+
+                while (true)
+                {
+                    Task.Delay(100);
+
+                    if (DateTime.Now - start > RENAME_CLICK_DELAY)
+                        break;
+
+                    var currentPath = Dispatcher.Invoke(() => ((FileClass)ExplorerGrid.SelectedItem).FullPath);
+                    if (ClickCount > 1 || currentPath != path)
+                        return;
+                }
+
+                Dispatcher.Invoke(() =>
+                {
+                    cell.IsEditing = true;
+                    FileActions.IsExplorerEditing = true;
+                });
+            });
         }
     }
 
@@ -2228,7 +2274,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void AppDataHyperlink_Click(object sender, RoutedEventArgs e)
     {
-        if (DateTime.Now - appDataClick < TimeSpan.FromMilliseconds(300))
+        if (DateTime.Now - appDataClick < LINK_CLICK_DELAY)
             return;
 
         appDataClick = DateTime.Now;
@@ -2238,15 +2284,53 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
     {
         var formats = e.Data.GetFormats();
+        var dataContext = ((FrameworkElement)sender).DataContext;
+        e.Effects = DragDropEffects.None;
 
-        if (FileActions.IsAppDrive && formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
+        string[] dropFiles = [];
+        if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
+            dropFiles = items;
+
+        // TODO: Add support for receiving streams (Ctrl+V as well)
+        if (dropFiles.Length > 0)
         {
-            e.Effects = FileHelper.AllFilesAreApks(items)
-                ? DragDropEffects.Copy
-                : DragDropEffects.None;
-
             e.Handled = true;
-            return;
+
+            if (FileActions.IsAppDrive)
+            {
+                if (FileHelper.AllFilesAreApks(dropFiles))
+                    e.Effects = DragDropEffects.Copy;
+            }
+            else if (dataContext is null || (dataContext is FileClass file && file.IsDirectory))
+            {
+                e.Effects = DragDropEffects.Move | DragDropEffects.Copy;
+            }
+        }
+        else if (formats.Contains(ADB_DRAG_FORMAT))
+        {
+            e.Handled = true;
+
+            var dragList = NativeMethods.ADBDRAGLIST.FromStream((MemoryStream)e.Data.GetData(ADB_DRAG_FORMAT));
+
+            // TODO: Add support for dragging from another device
+            if (dragList.deviceId != CurrentADBDevice.ID)
+                return;
+
+            if (dataContext is FileClass file && file.IsDirectory)
+            {
+                if (dragList.parentFolder == CurrentPath
+                    && dragList.items.Length == 1
+                    && dragList.items[0] == file.FullName)
+                    return;
+            }
+            else if (dataContext is not null)
+                return;
+
+            // TODO: Add support for dragging from other folders (only available with another instance of the app)
+            if (dragList.parentFolder != CurrentPath)
+                return;
+
+            e.Effects = DragDropEffects.Move | DragDropEffects.Copy;
         }
     }
 }

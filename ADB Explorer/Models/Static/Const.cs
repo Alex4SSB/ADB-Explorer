@@ -61,7 +61,8 @@ public static class AdbExplorerConst
     public static readonly int DIR_LIST_UPDATE_START_THRESHOLD_MIN = 10;
     public static readonly int DIR_LIST_UPDATE_THRESHOLD_MAX = 500;
     public static readonly TimeSpan MOUSE_DOWN_VALID = TimeSpan.FromMilliseconds(150);
-
+    public static readonly TimeSpan LINK_CLICK_DELAY = TimeSpan.FromMilliseconds(300);
+    public static readonly TimeSpan RENAME_CLICK_DELAY = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan CONNECT_TIMER_INTERVAL = TimeSpan.FromMilliseconds(2000);
     public static readonly TimeSpan CONNECT_TIMER_INIT = TimeSpan.FromMilliseconds(50);
     public static readonly TimeSpan DRIVE_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(2000);

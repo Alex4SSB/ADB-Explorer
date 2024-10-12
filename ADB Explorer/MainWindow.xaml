@@ -55,6 +55,7 @@
             <EventSetter Event="KeyDown" Handler="DataGridRow_KeyDown" />
             <EventSetter Event="Drop" Handler="DataGridRow_Drop" />
             <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
+            <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
         </Style>
     </Window.Resources>
     <Window.TaskbarItemInfo>
