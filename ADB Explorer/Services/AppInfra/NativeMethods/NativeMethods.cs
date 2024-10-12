@@ -338,6 +338,21 @@ public static partial class NativeMethods
         WH_MOUSE_LL = 14,
     }
 
+    public enum ClipboardNotificationMessage
+    {
+        WM_ASKCBFORMATNAME = 0x030C,
+        WM_CHANGECBCHAIN = 0x030D,
+        WM_CLIPBOARDUPDATE = 0x031D,
+        WM_DESTROYCLIPBOARD = 0x0307,
+        WM_DRAWCLIPBOARD = 0x0308,
+        WM_HSCROLLCLIPBOARD = 0x030E,
+        WM_PAINTCLIPBOARD = 0x0309,
+        WM_RENDERALLFORMATS = 0x0306,
+        WM_RENDERFORMAT = 0x0305,
+        WM_SIZECLIPBOARD = 0x030B,
+        WM_VSCROLLCLIPBOARD = 0x030A,
+    }
+
     public enum MouseMessages
     {
         WM_LBUTTONDOWN = 0x0201,

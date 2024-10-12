@@ -16,24 +16,24 @@ public static partial class NativeMethods
         public HANDLE dwExtraInfo;
     }
 
-    private static LowLevelMouseProc _proc = HookCallback;
-    private static HANDLE _hookID = IntPtr.Zero;
-    private static Action<int, int> _externalAction;
-    private static MouseMessages _requestedEvent;
+    private static LowLevelMouseProc _mouseProc = HookCallback;
+    private static HANDLE _mouseHookID = IntPtr.Zero;
+    private static Action<int, int> _externalMouseAction;
+    private static MouseMessages _requestedMouseEvent;
 
     private delegate HANDLE LowLevelMouseProc(int nCode, MouseMessages wParam, HANDLE lParam);
 
     public static void InitInterceptMouse(MouseMessages mouseEvent, Action<int, int> action)
     {
-        _requestedEvent = mouseEvent;
-        _externalAction = action;
+        _requestedMouseEvent = mouseEvent;
+        _externalMouseAction = action;
 
-        _hookID = SetHook(_proc);
+        _mouseHookID = SetHook(_mouseProc);
     }
 
     public static void CloseInterceptMouse()
     {
-        UnhookWindowsHookEx(_hookID);
+        UnhookWindowsHookEx(_mouseHookID);
     }
 
     private static HANDLE SetHook(LowLevelMouseProc proc)
@@ -46,14 +46,14 @@ public static partial class NativeMethods
 
     private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
     {
-        if (nCode >= 0 && wParam == _requestedEvent)
+        if (nCode >= 0 && wParam == _requestedMouseEvent)
         {
             var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
 
-            _externalAction?.Invoke(hookStruct.pt.X, hookStruct.pt.Y);
+            _externalMouseAction?.Invoke(hookStruct.pt.X, hookStruct.pt.Y);
         }
 
-        return CallNextHookEx(_hookID, nCode, wParam, lParam);
+        return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
     }
 
     [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]

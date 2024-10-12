@@ -133,6 +133,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ((DataGrid)FindResource("CurrentOperationDataGrid")).ItemsSource = FileOpQ.Operations;
         UpdateFileOp();
 
+        NativeMethods.InitInterceptCB(this, FileActionLogic.UpdateClipboardDropItems);
+
 #if DEBUG
         DeviceHelper.TestDevices();
 #endif
@@ -698,6 +700,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DirList?.Stop();
 
         dw.Close();
+        NativeMethods.CloseInterceptCB();
 
         ConnectTimer.Stop();
         ServerWatchdogTimer.Stop();
@@ -2109,11 +2112,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (FileHelper.AllFilesAreApks(items))
             ShellFileOperation.PushPackages(CurrentADBDevice, items.Select(ShellObject.FromParsingName), Dispatcher);
-    }
-
-    private void MainWin_Activated(object sender, EventArgs e)
-    {
-        FileActionLogic.UpdateClipboardDropItems();
     }
 
     private void DataGridCell_MouseUp(object sender, MouseButtonEventArgs e)
