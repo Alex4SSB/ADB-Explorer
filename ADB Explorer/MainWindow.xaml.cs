@@ -1735,7 +1735,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton != MouseButton.Left)
+        if (e.ChangedButton is not MouseButton.Left)
             return;
 
         if (e.OriginalSource is Border)
@@ -1902,11 +1902,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             withinEditingCell = VisualTreeHelper.GetDescendantBounds(cell).Contains(e.GetPosition(cell));
         }
 
+        var abortDrag = e.LeftButton == MouseButtonState.Released
+            || !RuntimeSettings.IsExplorerLoaded
+            || MouseDownPoint == NullPoint
+            || withinEditingCell;
+
         if (DragStatus is DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
             if (ExplorerGrid.SelectedItems.Count > 0
                 && ExplorerGrid.SelectedItems[0] is FileClass
-                && MouseDownPoint != NullPoint)
+                && !abortDrag)
             {
                 DragStatus = DragState.Active;
 
@@ -1924,11 +1929,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 DragStatus = DragState.None;
         }
 
-        if (e.LeftButton == MouseButtonState.Released
-            || !RuntimeSettings.IsExplorerLoaded
-            || MouseDownPoint == NullPoint
-            || DragStatus is not DragState.None
-            || withinEditingCell)
+        if (abortDrag || DragStatus is not DragState.None)
         {
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
