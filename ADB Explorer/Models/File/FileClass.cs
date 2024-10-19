@@ -105,9 +105,19 @@ public class FileClass : FilePath, IFileStat
 
     #endregion
 
-    public bool ExtensionIsGlyph { get; set; }
+    private bool extensionIsGlyph = false;
+    public bool ExtensionIsGlyph
+    {
+        get => extensionIsGlyph;
+        set => Set(ref extensionIsGlyph, value);
+    }
 
-    public bool ExtensionIsFontIcon { get; set; }
+    private bool extensionIsFontIcon = false;
+    public bool ExtensionIsFontIcon
+    {
+        get => extensionIsFontIcon;
+        set => Set(ref extensionIsFontIcon, value);
+    }
 
     public bool IsTemp { get; set; }
 
@@ -310,7 +320,12 @@ public class FileClass : FilePath, IFileStat
             return $"{ShortExtension} File";
         }
         else
+        {
+            ExtensionIsGlyph =
+            ExtensionIsFontIcon = false;
+
             return name;
+    }
     }
 
     public FileSyncOperation PrepareDescriptors()
