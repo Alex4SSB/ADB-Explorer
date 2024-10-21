@@ -565,8 +565,7 @@ public static class DeviceHelper
 
             Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
 
-            Data.CutItems.Clear();
-            Data.FileActions.PasteState = FileClass.CutType.None;
+            Data.CopyPaste.GetClipboardPasteItems();
 
             FileActionLogic.ClearExplorer();
             Data.FileActions.IsExplorerVisible = false;
@@ -585,7 +584,7 @@ public static class DeviceHelper
         Data.RuntimeSettings.DriveViewNav = true;
         NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
 
-        FileHelper.ClearCutFiles(Data.CutItems);
+        Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;
 
         Data.RuntimeSettings.CurrentDevice = Data.DevicesObject.Current;

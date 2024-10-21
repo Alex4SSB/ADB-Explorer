@@ -7,6 +7,9 @@ public class CommandHandler : ICommand
     private readonly Action _action;
     private readonly Func<bool> _canExecute;
 
+    /// <summary>
+    /// Raises an event when the command is executed.
+    /// </summary>
     public ObservableProperty<bool> OnExecute { get; set; } = new();
 
     public void Execute(object parameter)

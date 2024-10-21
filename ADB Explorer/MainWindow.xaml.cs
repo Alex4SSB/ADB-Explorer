@@ -133,7 +133,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ((DataGrid)FindResource("CurrentOperationDataGrid")).ItemsSource = FileOpQ.Operations;
         UpdateFileOp();
 
-        NativeMethods.InitInterceptCB(this, FileActionLogic.UpdateClipboardDropItems);
+        NativeMethods.InitInterceptCB(this, CopyPaste.GetClipboardPasteItems);
 
 #if DEBUG
         DeviceHelper.TestDevices();
@@ -2045,73 +2045,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
-        var formats = e.Data.GetFormats();
-        e.Effects = DragDropEffects.None;
-
-        // TODO: Add support for receiving streams (Ctrl+V as well)
-        if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
-        {
-            if (FileActions.IsAppDrive)
-            {
-                DropPackages(items);
-                return;
-            }
-
-            string target = ((FrameworkElement)sender).DataContext switch
-            {
-                null => CurrentPath,
-                FileClass file when file.IsDirectory => file.FullPath,
-                _ => null,
-            };
-
-            if (target is null)
-                return;
-
-            FileActionLogic.PushShellObjects(items.Select(ShellObject.FromParsingName), target);
-
-            e.Handled = true;
-        }
-        else if (formats.Contains(ADB_DRAG_FORMAT))
-        {
-            var dragList = NativeMethods.ADBDRAGLIST.FromStream((MemoryStream)e.Data.GetData(ADB_DRAG_FORMAT));
-            
-            // TODO: Add support for dragging from another device
-            if (dragList.deviceId != CurrentADBDevice.ID)
-                return;
-
-            FileClass targetFolder = null;
-            string target = CurrentPath;
-            if (((FrameworkElement)sender).DataContext is FileClass file)
-            {
-                if (!file.IsDirectory)
-                    return;
-
-                if (dragList.parentFolder == CurrentPath
-                    && dragList.items.Length == 1
-                    && dragList.items[0] == file.FullName)
-                    return;
-
-                targetFolder = file;
-                target = file.FullPath;
-            }
-            else if (((FrameworkElement)sender).DataContext is not null)
-                return;
-
-            // TODO: Add support for dragging from other folders (only available with another instance of the app)
-            if (dragList.parentFolder != CurrentPath)
-                return;
-
-            FileActionLogic.CutFiles(DirList.FileList.Where(f => dragList.items.Contains(f.FullName)), DragStatus is DragState.None);
-            FileActionLogic.PasteFiles(targetFolder is null ? null : [targetFolder]);
-
-            e.Handled = true;
-        }
-    }
-
-    private void DropPackages(string[] items)
-    {
-        if (FileHelper.AllFilesAreApks(items))
-            ShellFileOperation.PushPackages(CurrentADBDevice, items.Select(ShellObject.FromParsingName), Dispatcher);
+        CopyPaste.AcceptDataObject(e.Data, (FrameworkElement)sender);
+        e.Handled = true;
     }
 
     private void DataGridCell_MouseUp(object sender, MouseButtonEventArgs e)
@@ -2192,7 +2127,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     if (DateTime.Now - start > RENAME_CLICK_DELAY)
                         break;
 
-                    var currentPath = Dispatcher.Invoke(() => ((FileClass)ExplorerGrid.SelectedItem).FullPath);
+                    var currentPath = Dispatcher.Invoke(() => ((FileClass)ExplorerGrid.SelectedItem)?.FullPath);
                     if (ClickCount > 1 || currentPath != path)
                         return;
                 }
@@ -2282,54 +2217,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
     {
-        var formats = e.Data.GetFormats();
-        var dataContext = ((FrameworkElement)sender).DataContext;
-        e.Effects = DragDropEffects.None;
-
-        string[] dropFiles = [];
-        if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] items)
-            dropFiles = items;
-
-        // TODO: Add support for receiving streams (Ctrl+V as well)
-        if (dropFiles.Length > 0)
-        {
-            e.Handled = true;
-
-            if (FileActions.IsAppDrive)
-            {
-                if (FileHelper.AllFilesAreApks(dropFiles))
-                    e.Effects = DragDropEffects.Copy;
-            }
-            else if (dataContext is null || (dataContext is FileClass file && file.IsDirectory))
-            {
-                e.Effects = DragDropEffects.Move | DragDropEffects.Copy;
-            }
-        }
-        else if (formats.Contains(ADB_DRAG_FORMAT))
-        {
-            e.Handled = true;
-
-            var dragList = NativeMethods.ADBDRAGLIST.FromStream((MemoryStream)e.Data.GetData(ADB_DRAG_FORMAT));
-
-            // TODO: Add support for dragging from another device
-            if (dragList.deviceId != CurrentADBDevice.ID)
-                return;
-
-            if (dataContext is FileClass file && file.IsDirectory)
-            {
-                if (dragList.parentFolder == CurrentPath
-                    && dragList.items.Length == 1
-                    && dragList.items[0] == file.FullName)
-                    return;
-            }
-            else if (dataContext is not null)
-                return;
-
-            // TODO: Add support for dragging from other folders (only available with another instance of the app)
-            if (dragList.parentFolder != CurrentPath)
-                return;
-
-            e.Effects = DragDropEffects.Move | DragDropEffects.Copy;
-        }
+        e.Effects = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
+        e.Handled = true;
     }
 }

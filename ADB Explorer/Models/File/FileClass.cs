@@ -6,14 +6,6 @@ namespace ADB_Explorer.Models;
 
 public class FileClass : FilePath, IFileStat
 {
-    public enum CutType
-    {
-        None,
-        Cut,
-        Copy,
-        Link,
-    }
-
     #region Notify Properties
 
     private ulong? size;
@@ -325,7 +317,7 @@ public class FileClass : FilePath, IFileStat
             ExtensionIsFontIcon = false;
 
             return name;
-    }
+        }
     }
 
     public FileSyncOperation PrepareDescriptors()

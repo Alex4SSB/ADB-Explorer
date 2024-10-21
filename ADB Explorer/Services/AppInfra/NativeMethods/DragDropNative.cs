@@ -211,12 +211,11 @@ public static partial class NativeMethods
 
             while (i < bytes.Length)
             {
-                var index = ByteHelper.PatternAt(bytes, [0, 0], i);
+                // Index of Unicode chars must be even
+                var index = ByteHelper.PatternAt(bytes, [0, 0], i, true);
 
                 if (index < 0)
                     break;
-
-                index++;
 
                 string item = Encoding.Unicode.GetString(bytes[i..index]);
                 if (string.IsNullOrEmpty(item) || bytes[i..index].Sum(b => (decimal)b) == 0)

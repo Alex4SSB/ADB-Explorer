@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
-using System.Drawing;
 
 namespace ADB_Explorer.Models;
 
@@ -16,19 +15,21 @@ internal static class Data
 
     public static FileOperationQueue FileOpQ { get; set; }
 
-    public static Dictionary<string, string> CurrentDisplayNames { get; set; } = new();
+    public static Dictionary<string, string> CurrentDisplayNames { get; set; } = [];
 
     public static AppSettings Settings { get; set; } = new();
 
     public static AppRuntimeSettings RuntimeSettings { get; set; } = new();
 
-    public static ObservableList<FileClass> CutItems { get; private set; } = new();
+    //public static ObservableList<FileClass> CutItems { get; private set; } = [];
 
-    public static ObservableCollection<Log> CommandLog { get; set; } = new();
+    public static CopyPasteService CopyPaste { get; } = new();
 
-    public static ObservableList<TrashIndexer> RecycleIndex { get; set; } = new();
+    public static ObservableCollection<Log> CommandLog { get; set; } = [];
 
-    public static ObservableList<Package> Packages { get; set; } = new();
+    public static ObservableList<TrashIndexer> RecycleIndex { get; set; } = [];
+
+    public static ObservableList<Package> Packages { get; set; } = [];
 
     public static Version AppVersion => new(Properties.Resources.AppVersion);
 

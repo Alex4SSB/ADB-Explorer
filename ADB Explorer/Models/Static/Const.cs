@@ -10,7 +10,7 @@ public static class AdbExplorerConst
     public const string DEFAULT_PATH = "/sdcard";
     public const string TEMP_PATH = "/data/local/tmp";
     public const string RECYCLE_FOLDER = ".Trash-AdbExplorer";
-    public static readonly string RECYCLE_PATH = $"/sdcard/{RECYCLE_FOLDER}";
+    public const string RECYCLE_PATH = $"/sdcard/{RECYCLE_FOLDER}";
     public const string RECYCLE_INDEX_SUFFIX = ".index";
 
     public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()

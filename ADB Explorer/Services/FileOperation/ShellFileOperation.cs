@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
+using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services;
 
@@ -71,7 +72,8 @@ public static class ShellFileOperation
             if (op.Device.ID == Data.CurrentADBDevice.ID)
             {
                 // remove file from cut items and clear its trash indexer if current device
-                FileActionLogic.RemoveFile(op.FilePath);
+                op.FilePath.CutState = CutType.None;
+                op.FilePath.TrashIndex = null;
 
                 // update UI if current path
                 if (op.TargetPath.ParentPath == Data.CurrentPath)
@@ -117,7 +119,7 @@ public static class ShellFileOperation
                     Data.FileActions.ItemToSelect = file;
             }
 
-            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
+            op.PropertyChanged -= RenameFileOp_PropertyChanged;
         }
     }
 
@@ -142,17 +144,16 @@ public static class ShellFileOperation
 
     public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, FileClass.CutType cutType = FileClass.CutType.None)
     {
-        List<FileOperation> fileops = [];
-
-        if (targetPath == AdbExplorerConst.RECYCLE_PATH) // Recycle
+        IEnumerable<FileMoveOperation> Recycle()
         {
             foreach (var item in items)
             {
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, item.FullName), item.Type);
-                fileops.Add(new FileMoveOperation(item, target, device, dispatcher));
+                yield return new(item, target, device, dispatcher);
             }
         }
-        else if (targetPath is null && currentPath == AdbExplorerConst.RECYCLE_PATH) // Restore
+
+        IEnumerable<FileMoveOperation> Restore()
         {
             foreach (var item in items)
             {
@@ -160,10 +161,11 @@ public static class ShellFileOperation
                     continue;
 
                 SyncFile target = new(FileHelper.ConcatPaths(item.TrashIndex.ParentPath, item.FullName));
-                fileops.Add(new FileMoveOperation(item, target, device, dispatcher));
+                yield return new(item, target, device, dispatcher);
             }
         }
-        else // copy & cut
+
+        IEnumerable<FileMoveOperation> Move()
         {
             foreach (var item in items)
             {
@@ -172,12 +174,22 @@ public static class ShellFileOperation
                     targetName = $"{item.NoExtName}{FileHelper.ExistingIndexes(fileList, item.NoExtName, cutType)}{item.Extension}";
 
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
-                fileops.Add(new FileMoveOperation(item, target, device, dispatcher, cutType));
+                yield return new(item, target, device, dispatcher, cutType);
             }
         }
 
-        fileops.ForEach(op => op.PropertyChanged += MoveFileOp_PropertyChanged);
-        Data.FileOpQ.AddOperations(fileops);
+        var fileops = (targetPath switch
+        {
+            AdbExplorerConst.RECYCLE_PATH => Recycle(),
+            null when currentPath == AdbExplorerConst.RECYCLE_PATH => Restore(),
+            _ => Move(),
+        }).ToList();
+
+        dispatcher.Invoke(() =>
+        {
+            fileops.ForEach(op => op.PropertyChanged += MoveFileOp_PropertyChanged);
+            Data.FileOpQ.AddOperations(fileops);
+        });
     }
 
     private static void MoveFileOp_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -204,7 +216,8 @@ public static class ShellFileOperation
                 // remove file from cut items and clear its trash indexer if restore / recycle on current device
                 if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
                 {
-                    FileActionLogic.RemoveFile(op.FilePath);
+                    op.FilePath.CutState = CutType.None;
+                    op.FilePath.TrashIndex = null;
                 }
 
                 // update UI when copy / cut target is current path
@@ -303,18 +316,37 @@ public static class ShellFileOperation
         return stdout;
     }
 
-    public static async Task MoveItems(FileClass.CutType cutType,
-                                       string targetPath,
-                                       IEnumerable<FileClass> pasteItems,
-                                       string targetName,
-                                       ObservableList<FileClass> fileList,
-                                       Dispatcher dispatcher,
-                                       ADBService.AdbDevice device,
-                                       string currentPath)
+    public static async Task VerifyAndPaste(CutType cutType,
+                                            string targetPath,
+                                            IEnumerable<FileClass> pasteItems,
+                                            ObservableList<FileClass> fileList,
+                                            Dispatcher dispatcher,
+                                            ADBService.AdbDevice device,
+                                            string currentPath)
     {
+        // Check for pasting in descendant or self
+        var ancestor = pasteItems.FirstOrDefault(f => f.Relation(targetPath) is RelationType.Self or RelationType.Descendant);
+        pasteItems = cutType is CutType.Link
+            ? pasteItems
+            : pasteItems.Except([ancestor]);
+
+        if (ancestor is not null)
+        {
+            var result = await DialogService.ShowConfirmation(
+                Strings.S_PASTE_ANCESTOR(ancestor),
+                $"{(Data.CopyPaste.IsDrag ? "Drop" : "Paste")} Conflict",
+                "Skip",
+                cancelText: "Abort",
+                icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 is not ContentDialogResult.Primary)
+                return;
+        }
+
+        // Check for file merge conflicts
         bool merge = false;
         string[] existingItems = [];
-        string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : targetName;
+        string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : FileHelper.GetFullName(targetPath);
 
         await Task.Run(() =>
         {
@@ -334,47 +366,44 @@ public static class ShellFileOperation
             }
         });
 
-        await dispatcher.BeginInvoke(async () =>
+        string primaryText = "";
+        if (merge)
         {
-            string primaryText = "";
-            if (merge)
-            {
-                if (pasteItems.All(item => item.IsDirectory))
-                    primaryText = "Merge";
-                else
-                    primaryText = "Merge or Replace";
-            }
+            if (pasteItems.All(item => item.IsDirectory))
+                primaryText = "Merge";
             else
-                primaryText = "Replace";
+                primaryText = "Merge or Replace";
+        }
+        else
+            primaryText = "Replace";
 
-            if (existingItems.Length is int count and > 0)
+        if (existingItems.Length is int count and > 0)
+        {
+            var result = await DialogService.ShowConfirmation(
+                $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
+                "Paste Conflicts",
+                primaryText: primaryText,
+                secondaryText: count == pasteItems.Count() ? "" : "Skip",
+                cancelText: "Cancel",
+                icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 is ContentDialogResult.None)
             {
-                var result = await DialogService.ShowConfirmation(
-                    $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
-                    "Paste Conflicts",
-                    primaryText: primaryText,
-                    secondaryText: count == pasteItems.Count() ? "" : "Skip",
-                    cancelText: "Cancel",
-                    icon: DialogService.DialogIcon.Exclamation);
-
-                if (result.Item1 is ContentDialogResult.None)
-                {
-                    return;
-                }
-                else if (result.Item1 is ContentDialogResult.Secondary)
-                {
-                    pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
-                }
+                return;
             }
+            else if (result.Item1 is ContentDialogResult.Secondary)
+            {
+                pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
+            }
+        }
 
-            MoveItems(device: device,
-                      items: pasteItems,
-                      targetPath: targetPath,
-                      currentPath: currentPath,
-                      fileList: fileList,
-                      dispatcher: dispatcher,
-                      cutType: cutType);
-        });
+        MoveItems(device: device,
+                  items: pasteItems,
+                  targetPath: targetPath,
+                  currentPath: currentPath,
+                  fileList: fileList,
+                  dispatcher: dispatcher,
+                  cutType: cutType);
     }
 
     public static string GetPackageName(ADBService.AdbDevice device, string fullPath)

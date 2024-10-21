@@ -321,20 +321,6 @@ internal class FileActionsEnable : ViewModelBase
 
     #endregion
 
-    private FileClass.CutType isCopyPasteAction = FileClass.CutType.None;
-    public FileClass.CutType PasteState
-    {
-        get => isCopyPasteAction;
-        set
-        {
-            if (Set(ref isCopyPasteAction, value))
-            {
-                IsCutState.Value = value is FileClass.CutType.Cut;
-                IsCopyState.Value = value is FileClass.CutType.Copy;
-            }
-        }
-    }
-
     private string originalEditorText;
     public string OriginalEditorText
     {
@@ -512,7 +498,7 @@ internal class FileActionsEnable : ViewModelBase
     public bool MoreEnabled => EditFileEnabled || UpdateModifiedEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
-    public bool IsPasteStateVisible => IsExplorerVisible && !IsRecycleBin && !IsAppDrive;
+    public bool IsPasteStateVisible => IsExplorerVisible && !IsRecycleBin && !IsAppDrive && Data.CopyPaste.PasteSource is not CopyPasteService.DataSource.None;
     public bool IsEditorTextChanged => OriginalEditorText != EditorText;
 
     #endregion

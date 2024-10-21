@@ -3,7 +3,6 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using static ADB_Explorer.Models.AbstractFile;
-using static ADB_Explorer.Models.FileClass;
 
 namespace ADB_Explorer.Helpers;
 
@@ -11,15 +10,12 @@ public static class FileHelper
 {
     public static FileClass ListerFileManipulator(FileClass item)
     {
-        if (Data.CutItems.Count > 0 && (Data.CutItems[0].ParentPath == Data.DirList.CurrentPath))
+        if (Data.CopyPaste.Files.Length > 0
+            && Data.CopyPaste.IsSelfClipboard
+            && Data.CopyPaste.ParentFolder == Data.DirList.CurrentPath
+            && Data.CopyPaste.Files.FirstOrDefault(f => f == item.FullPath) is not null)
         {
-            var cutItem = Data.CutItems.Where(f => f.FullPath == item.FullPath);
-            if (cutItem.Any())
-            {
-                item.CutState = cutItem.First().CutState;
-                Data.CutItems.Remove(cutItem.First());
-                Data.CutItems.Add(item);
-            }
+            item.CutState = Data.CopyPaste.PasteState;
         }
 
         if (Data.FileActions.IsRecycleBin)
@@ -86,22 +82,6 @@ public static class FileHelper
     public static string DisplayName(FilePath file) => Data.Settings.ShowExtensions ? file?.FullName : file?.NoExtName;
 
     public static FileClass GetFromCell(DataGridCellInfo cell) => CellConverter.GetDataGridCell(cell).DataContext as FileClass;
-
-    public static void ClearCutFiles(Func<FileClass, bool> predicate)
-        => ClearCutFiles(Data.CutItems.Where(predicate));
-
-    public static void ClearCutFiles(IEnumerable<FileClass> items)
-    {
-        foreach (var item in items)
-        {
-            item.CutState = CutType.None;
-        }
-
-        Data.CutItems.RemoveAll(items.ToList());
-
-        if (!Data.CutItems.Any())
-            Data.FileActions.PasteState = CutType.None;
-    }
 
     public static string ConcatPaths(FilePath path1, string path2) => 
         ConcatPaths(path1.FullPath, path2, path1.PathType is FilePathType.Android ? '/' : '\\');
@@ -271,4 +251,26 @@ public static class FileHelper
 
     public static bool AllFilesAreApks(string[] items) =>
         items.AnyAll(i => i.Contains('.') && ApkExtensions.Any(n => n == i.Split('.').Last().ToUpper()));
+
+    /// <summary>
+    /// Returns the relation of <paramref name="other"/> to <paramref name="self"/>.<br />
+    /// Example: RelationFrom(File, File.Parent) = Ancestor</summary>
+    /// <param name="self"></param>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public static RelationType RelationFrom(string self, string other)
+    {
+        var separator = GetSeparator(self);
+
+        if (other == self)
+            return RelationType.Self;
+
+        if (other.StartsWith(self) && other[self.Length..(self.Length + 1)][0] == separator)
+            return RelationType.Descendant;
+
+        if (self.StartsWith(other))
+            return RelationType.Ancestor;
+
+        return RelationType.Unrelated;
+    }
 }

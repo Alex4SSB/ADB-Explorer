@@ -43,14 +43,14 @@ internal static class FileActionLogic
 
     public static void CopyToTemp()
     {
-        _ = ShellFileOperation.MoveItems(FileClass.CutType.Copy,
-                                         AdbExplorerConst.TEMP_PATH,
-                                         Data.SelectedFiles,
-                                         FileHelper.DisplayName(Data.SelectedFiles.First()),
-                                         Data.DirList.FileList,
-                                         App.Current.Dispatcher,
-                                         Data.CurrentADBDevice,
-                                         Data.CurrentPath);
+        _ = ShellFileOperation.VerifyAndPaste(
+            CutType.Copy,
+            AdbExplorerConst.TEMP_PATH,
+            Data.SelectedFiles,
+            Data.DirList.FileList,
+            App.Current.Dispatcher,
+            Data.CurrentADBDevice,
+            Data.CurrentPath);
     }
 
     public static void PushPackages()
@@ -273,12 +273,12 @@ internal static class FileActionLogic
 
     public static bool IsPasteEnabled(bool isKeyboard = false)
     {
-        // Explorer view but not trash or app drive
+        // Explorer view but not trash or app drive AND source is clipboard (also when clipboard + drag)
         if (Data.FileActions.IsPasteStateVisible)
         {
-            Data.FileActions.CutItemsCount.Value = Data.CutItems.Count > 0 ? Data.CutItems.Count.ToString() : "";
-            Data.FileActions.IsCutState.Value = Data.FileActions.PasteState is FileClass.CutType.Cut;
-            Data.FileActions.IsCopyState.Value = Data.FileActions.PasteState is FileClass.CutType.Copy;
+            Data.FileActions.CutItemsCount.Value = Data.CopyPaste.Files.Length > 0 ? Data.CopyPaste.Files.Length.ToString() : "";
+            Data.FileActions.IsCutState.Value = Data.CopyPaste.PasteState is CutType.Cut;
+            Data.FileActions.IsCopyState.Value = Data.CopyPaste.PasteState is CutType.Copy;
         }
         else
         {
@@ -289,13 +289,13 @@ internal static class FileActionLogic
             return false;
         }
 
-        Data.FileActions.PasteDescription.Value = $"Paste {Data.CutItems.Count} {FileClass.CutTypeString(Data.FileActions.PasteState)} {PluralityConverter.Convert(Data.CutItems, "Item")}";
+        Data.FileActions.PasteDescription.Value = $"Paste {Data.CopyPaste.Files.Length} {FileClass.CutTypeString(Data.CopyPaste.PasteState)} {PluralityConverter.Convert(Data.CopyPaste.Files, "Item")}";
 
-        if (Data.CutItems.Count < 1)
+        if (Data.CopyPaste.Files.Length < 1)
             return false;
 
-        Data.FileActions.IsPastingInDescendant = Data.CutItems.Count == 1
-            && Data.CutItems[0].Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+        Data.FileActions.IsPastingInDescendant = Data.CopyPaste.Files.Length == 1
+            && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
 
         if (Data.FileActions.IsPastingInDescendant)
             return false;
@@ -314,7 +314,7 @@ internal static class FileActionLogic
         }
 
         Data.FileActions.IsPastingIllegalOnFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true
-            && !FileHelper.FileNameLegal(Data.CutItems, FileHelper.RenameTarget.FUSE);
+            && !FileHelper.FileNameLegal(Data.CopyPaste.Files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.FUSE);
 
         if (Data.FileActions.IsPastingIllegalOnFuse)
             return false;
@@ -322,20 +322,20 @@ internal static class FileActionLogic
         switch (selected)
         {
             case 0:
-                Data.FileActions.IsPastingInDescendant = Data.CutItems[0].ParentPath == Data.CurrentPath
-                    && Data.FileActions.PasteState is FileClass.CutType.Cut;
+                Data.FileActions.IsPastingInDescendant = Data.CopyPaste.ParentFolder == Data.CurrentPath
+                    && Data.CopyPaste.PasteState is CutType.Cut;
 
                 break;
             case 1:
-                if (isKeyboard && Data.FileActions.PasteState is FileClass.CutType.Copy && Data.CutItems[0].RelationFrom(Data.SelectedFiles.First()) is RelationType.Self)
+                if (isKeyboard && Data.CopyPaste.PasteState is CutType.Copy && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.SelectedFiles.First().FullPath) is RelationType.Self)
                     return true;
 
                 var item = Data.SelectedFiles.First();
                 if (!item.IsDirectory)
                     return false;
 
-                Data.FileActions.IsPastingInDescendant = (Data.CutItems.Count == 1 && Data.CutItems[0].FullPath == item.FullPath)
-                    || (Data.CutItems[0].ParentPath == item.FullPath);
+                Data.FileActions.IsPastingInDescendant = (Data.CopyPaste.Files.Length == 1 && Data.CopyPaste.Files[0] == item.FullPath)
+                    || (Data.CopyPaste.ParentFolder == item.FullPath);
 
                 break;
             default:
@@ -345,103 +345,17 @@ internal static class FileActionLogic
         return !Data.FileActions.IsPastingInDescendant;
     }
 
-    public static void UpdateClipboardDropItems()
+    public static void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
-        FileHelper.ClearCutFiles(i => i.PathType is FilePathType.Windows);
+        Data.CopyPaste.AcceptDataObject(Clipboard.GetDataObject(), selectedFiles, isLink);
 
-        if (!Clipboard.ContainsFileDropList())
-        {
-            if (!Data.CutItems.Any())
-                Data.FileActions.PasteState = FileClass.CutType.None;
-
-            return;
-        }
-
-        int newItems = 0;
-        foreach (var item in Clipboard.GetFileDropList())
-        {
-            if (item is null)
-                continue;
-
-            try
-            {
-                var windowsPath = ShellObject.FromParsingName(item);
-                Data.CutItems.Add(new(windowsPath)
-                {
-                    ShellObject = windowsPath,
-                    CutState = FileClass.CutType.Copy
-                });
-                newItems++;
-            }
-            catch
-            { }
-        }
-
-        if (newItems == 0)
-            return;
-
-        FileHelper.ClearCutFiles(i => i.PathType is FilePathType.Android);
-
-        Data.FileActions.PasteState = FileClass.CutType.Copy;
-        UpdateFileActions();
-    }
-
-    public static async void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
-    {
-        var firstSelectedFile = selectedFiles.Any() ? selectedFiles.First() : null;
-        string targetName, targetPath = "";
-
-        if (selectedFiles.Count() != 1 || (firstSelectedFile is not null && !firstSelectedFile.IsDirectory))
-        {
-            targetPath = Data.CurrentPath;
-            targetName = FileHelper.GetFullName(Data.CurrentPath);
-        }
-        else
-        {
-            targetPath = selectedFiles.First().FullPath;
-            targetName = FileHelper.DisplayName(selectedFiles.First());
-        }
-
-        if (Data.CutItems.First().PathType is FilePathType.Windows)
-        {
-            PushShellObjects(Data.CutItems.Where(f => !f.IsLink).Select(f => f.ShellObject), targetPath);
-        }
-        else
-        {
-            var pasteItems = isLink
-                ? Data.CutItems
-                : Data.CutItems.Where(f => f.Relation(targetPath) is not (RelationType.Self or RelationType.Descendant));
-
-            await ShellFileOperation.MoveItems(isLink ? FileClass.CutType.Link : Data.FileActions.PasteState,
-                                               targetPath,
-                                               pasteItems,
-                                               targetName,
-                                               Data.DirList.FileList,
-                                               App.Current.Dispatcher,
-                                               Data.CurrentADBDevice,
-                                               Data.CurrentPath);
-
-            if (Data.FileActions.PasteState is FileClass.CutType.Cut)
-                FileHelper.ClearCutFiles(pasteItems);
-        }
-        
         Data.FileActions.PasteEnabled = IsPasteEnabled();
     }
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
     {
-        FileHelper.ClearCutFiles(Data.CutItems);
-        Data.FileActions.PasteState = isCopy ? FileClass.CutType.Copy : FileClass.CutType.Cut;
-
         var itemsToCut = Data.DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
                     ? items.Where(file => file.Type is FileType.File or FileType.Folder) : items;
-
-        foreach (var item in itemsToCut)
-        {
-            item.CutState = Data.FileActions.PasteState;
-        }
-
-        Data.CutItems.AddRange(itemsToCut);
 
         Data.FileActions.CopyEnabled = !isCopy;
         Data.FileActions.CutEnabled = isCopy;
@@ -449,14 +363,8 @@ internal static class FileActionLogic
         Data.FileActions.PasteEnabled = IsPasteEnabled();
         Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
 
-        if (isCopy)
-        {
-            var vfdo = VirtualFileDataObject.PrepareTransfer(Data.CutItems);
-            if (vfdo is null)
-                return;
-
-            vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.Clipboard);
-        }
+        var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCut, isCopy ? DragDropEffects.Copy : DragDropEffects.Move);
+        vfdo?.SendObjectToShell(VirtualFileDataObject.SendMethod.Clipboard);
     }
 
     public static void Rename(TextBox textBox)
@@ -510,7 +418,8 @@ internal static class FileActionLogic
         else
         {
             itemsToDelete = Data.DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
-                    ? Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder) : Data.SelectedFiles;
+                ? Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)
+                : Data.SelectedFiles;
         }
 
         string deletedString;
@@ -564,18 +473,6 @@ internal static class FileActionLogic
                 }
             }
         }
-    }
-
-    public static void RemoveFile(FileClass file)
-    {
-        file.CutState = FileClass.CutType.None;
-
-        Data.CutItems.RemoveAll(cutItem => cutItem.RelationFrom(file) is RelationType.Ancestor or RelationType.Self);
-
-        if (Data.CutItems.Count == 0)
-            Data.FileActions.PasteState = FileClass.CutType.None;
-
-        file.TrashIndex = null;
     }
 
     public static void RefreshDrives(bool asyncClassify = false)
@@ -785,14 +682,17 @@ internal static class FileActionLogic
                                          && Data.FileActions.IsRegularItem
                                          && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
-        var allSelectedAreCut = Data.SelectedFiles.Any() && Data.CutItems.All(item => Data.SelectedFiles.Contains(item)) && Data.CutItems.Count == Data.SelectedFiles.Count();
+        var allSelectedAreCut = Data.CopyPaste.IsSelf
+                                && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.AnyAll(f => f.FullPath == item))
+                                && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
+        
         Data.FileActions.CutEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                      && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Cut)
+                                      && !(allSelectedAreCut && Data.CopyPaste.PasteState is CutType.Cut)
                                       && Data.FileActions.IsRegularItem
                                       && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
         Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                       && !(allSelectedAreCut && Data.FileActions.PasteState is FileClass.CutType.Copy)
+                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is CutType.Copy)
                                        && Data.FileActions.IsRegularItem
                                        && !Data.FileActions.IsRecycleBin;
 
@@ -829,9 +729,9 @@ internal static class FileActionLogic
 
         Data.FileActions.IsPasteLinkEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.RuntimeSettings.IsRootActive
-            && Data.CutItems.Count == 1
-            && Data.CutItems[0].PathType is FilePathType.Android
-            && Data.FileActions.PasteState is FileClass.CutType.Copy
+            && Data.CopyPaste.Files.Length == 1
+            && Data.CopyPaste.IsSelf
+            && Data.CopyPaste.PasteState is CutType.Copy
             && (!Data.SelectedFiles.Any() ||
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 

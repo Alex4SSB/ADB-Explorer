@@ -51,8 +51,8 @@ internal static class AppActions
         { FileActionType.SearchApkOnWeb, "\uF6FA" },
     };
 
-    public static List<ToggleMenu> ToggleActions { get; } = new()
-    {
+    public static List<ToggleMenu> ToggleActions { get; } =
+    [
         new(FileActionType.FileOpFilter,
             () => !Data.FileOpQ.IsActive,
             "Filter File Operations",
@@ -94,10 +94,10 @@ internal static class AppActions
             "\uE756",
             () => Data.RuntimeSettings.IsLogOpen ^= true,
             isVisible: Data.FileActions.IsLogToggleVisible),
-    };
+    ];
 
-    public static List<FileAction> List { get; } = new()
-    {
+    public static List<FileAction> List { get; } =
+    [
         new(FileActionType.Home,
             () => Data.FileActions.HomeEnabled,
             () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.DriveView,
@@ -149,25 +149,30 @@ internal static class AppActions
             () => FileActionLogic.PullFiles(),
             Data.FileActions.PullDescription,
             new(Key.C, ModifierKeys.Alt),
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.Push,
             () => Data.FileActions.PushEnabled,
             () => { },
-            "Push"),
+            "Push",
+            clearClipboard: true),
         new(FileActionType.ContextPush,
             () => Data.FileActions.ContextPushEnabled,
             () => { },
-            "Push"),
+            "Push",
+            clearClipboard: true),
         new(FileActionType.PushFolders,
             () => Data.FileActions.PushFilesFoldersEnabled,
             () => FileActionLogic.PushItems(true, false),
-            "Folders"),
+            "Folders",
+            clearClipboard: true),
         new(FileActionType.PushFiles,
             () => Data.FileActions.PushFilesFoldersEnabled,
             () => FileActionLogic.PushItems(false, false),
             "Files",
             new(Key.V, ModifierKeys.Alt),
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.Refresh,
             () => Data.FileActions.IsRefreshEnabled,
             () => Data.RuntimeSettings.Refresh = true,
@@ -200,11 +205,13 @@ internal static class AppActions
         new(FileActionType.NewFolder,
             () => Data.FileActions.NewEnabled,
             () => Data.RuntimeSettings.NewFolder = true,
-            "Folder"),
+            "Folder",
+            clearClipboard: true),
         new(FileActionType.NewFile,
             () => Data.FileActions.NewEnabled,
             () => Data.RuntimeSettings.NewFile = true,
-            "File"),
+            "File",
+            clearClipboard: true),
         new(FileActionType.SelectAll,
             () => Data.FileActions.IsExplorerVisible && !Data.FileActions.IsExplorerEditing,
             () => Data.RuntimeSettings.SelectAll = true,
@@ -255,29 +262,34 @@ internal static class AppActions
             () => Data.RuntimeSettings.Rename = true,
             "Rename",
             new(Key.F2),
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.KeyboardRestore,
             () => Data.FileActions.RestoreEnabled && !Data.FileActions.IsExplorerEditing,
             FileActionLogic.RestoreItems,
             Data.FileActions.RestoreDescription,
             Gestures[FileActionType.Restore],
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.Restore,
             () => Data.FileActions.RestoreEnabled,
             FileActionLogic.RestoreItems,
             Data.FileActions.RestoreDescription,
-            Gestures[FileActionType.Restore]),
+            Gestures[FileActionType.Restore],
+            clearClipboard: true),
         new(FileActionType.KeyboardDelete,
             () => Data.FileActions.DeleteEnabled && !Data.FileActions.IsExplorerEditing,
             FileActionLogic.DeleteFiles,
             Data.FileActions.DeleteDescription,
             Gestures[FileActionType.Delete],
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.Delete,
             () => Data.FileActions.DeleteEnabled,
             FileActionLogic.DeleteFiles,
             Data.FileActions.DeleteDescription,
-            Gestures[FileActionType.Delete]),
+            Gestures[FileActionType.Delete],
+            clearClipboard: true),
         new(FileActionType.CopyItemPath,
             () => Data.FileActions.IsCopyItemPathEnabled,
             FileActionLogic.CopyItemPath,
@@ -311,7 +323,8 @@ internal static class AppActions
             FileActionLogic.SaveEditorText,
             "Save Changes",
             new(Key.S, ModifierKeys.Control),
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.Install,
             () => Data.FileActions.InstallPackageEnabled,
             FileActionLogic.InstallPackages,
@@ -334,7 +347,8 @@ internal static class AppActions
             FileActionLogic.CopyToTemp,
             "Copy To Temp",
             new(Key.F12, ModifierKeys.Shift),
-            true),
+            true,
+            clearClipboard: true),
         new(FileActionType.PushPackages,
             () => Data.FileActions.PushPackageEnabled,
             FileActionLogic.PushPackages,
@@ -405,7 +419,7 @@ internal static class AppActions
             "Search In Browser",
             new(Key.O, ModifierKeys.Control),
             true)
-    };
+    ];
 
     public static List<KeyBinding> Bindings =>
         List.Where(a => a.UseForGesture)
@@ -543,7 +557,12 @@ internal class FileAction : ViewModelBase
         }
     }
 
-    public FileAction(FileActionType name, BaseAction command, string description, KeyGesture gesture = null, bool useForGesture = false)
+    public FileAction(FileActionType name,
+                      BaseAction command,
+                      string description,
+                      KeyGesture gesture = null,
+                      bool useForGesture = false,
+                      bool clearClipboard = false)
     {
         Name = name;
         Command = command;
@@ -554,14 +573,32 @@ internal class FileAction : ViewModelBase
             KeyBinding = new(Command.Command, gesture);
 
         UseForGesture = useForGesture;
+
+        ((CommandHandler)Command.Command).OnExecute.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) =>
+        {
+            if (clearClipboard && Data.CopyPaste.IsSelf)
+                Data.CopyPaste.Clear();
+        };
     }
 
-    public FileAction(FileActionType name, Func<bool> canExecute, Action action, string description = "", KeyGesture gesture = null, bool useForGesture = false)
-        : this(name, new(canExecute, action), description, gesture, useForGesture)
+    public FileAction(FileActionType name,
+                      Func<bool> canExecute,
+                      Action action,
+                      string description = "",
+                      KeyGesture gesture = null,
+                      bool useForGesture = false,
+                      bool clearClipboard = false)
+        : this(name, new(canExecute, action), description, gesture, useForGesture, clearClipboard)
     { }
 
-    public FileAction(FileActionType name, Func<bool> canExecute, Action action, ObservableProperty<string> description, KeyGesture gesture = null, bool useForGesture = false)
-        : this(name, new(canExecute, action), description.Value, gesture, useForGesture)
+    public FileAction(FileActionType name,
+                      Func<bool> canExecute,
+                      Action action,
+                      ObservableProperty<string> description,
+                      KeyGesture gesture = null,
+                      bool useForGesture = false,
+                      bool clearClipboard = false)
+        : this(name, new(canExecute, action), description.Value, gesture, useForGesture, clearClipboard)
     {
         description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Description = e.NewValue;
     }

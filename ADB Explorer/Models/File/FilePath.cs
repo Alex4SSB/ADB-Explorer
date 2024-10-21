@@ -11,6 +11,14 @@ public abstract class AbstractFile : ViewModelBase
         Windows,
     }
 
+    public enum CutType
+    {
+        None,
+        Cut,
+        Copy,
+        Link,
+    }
+
     public enum RelationType
     {
         Ancestor,
@@ -158,19 +166,7 @@ public class FilePath : AbstractFile, IBaseFile
     /// </summary>
     public RelationType RelationFrom(FilePath other) => Relation(other.FullPath);
 
-    public RelationType Relation(string other)
-    {
-        if (other == FullPath)
-            return RelationType.Self;
-
-        if (other.StartsWith(FullPath) && other[FullPath.Length..(FullPath.Length + 1)] == "/")
-            return RelationType.Descendant;
-
-        if (FullPath.StartsWith(other))
-            return RelationType.Ancestor;
-
-        return RelationType.Unrelated;
-    }
+    public RelationType Relation(string other) => FileHelper.RelationFrom(FullPath, other);
 
     public override string ToString()
     {

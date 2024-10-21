@@ -28,18 +28,6 @@ public static partial class NativeMethods
     public const int VARIANT_FALSE = 0;
     public const int VARIANT_TRUE = -1;
 
-    public const string CFSTR_DRAGIMAGE = "DragImageBits";
-    public const string CFSTR_FILECONTENTS = "FileContents";
-    public const string CFSTR_FILEDESCRIPTORW = "FileGroupDescriptorW";
-    public const string CFSTR_PASTESUCCEEDED = "Paste Succeeded";
-    public const string CFSTR_PERFORMEDDROPEFFECT = "Performed DropEffect";
-    public const string CFSTR_PREFERREDDROPEFFECT = "Preferred DropEffect";
-
-    public const string CFSTR_DRAGLOOP = "InShellDragLoop";
-    public const string CFSTR_FILENAME = "FileName";
-    public const string CFSTR_FILENAMEW = "FileNameW";
-    public const string CFSTR_SHELLIDLIST = "Shell IDList Array";
-
     #endregion
 
     #region Enums
@@ -574,7 +562,7 @@ public static partial class NativeMethods
     /// </summary>
     /// <param name="source">Structure to return.</param>
     /// <returns>In-memory representation of structure.</returns>
-    private static byte[] BytesFromStructure<T>(T source)
+    public static byte[] BytesFromStructure<T>(T source)
     {
         // Set up for call to StructureToPtr
         var size = Marshal.SizeOf(source.GetType());
@@ -593,7 +581,7 @@ public static partial class NativeMethods
         return bytes;
     }
 
-    private static T StructureFromBytes<T>(IEnumerable<byte> bytes)
+    public static T StructureFromBytes<T>(IEnumerable<byte> bytes)
     {
         var handle = GCHandle.Alloc(bytes.ToArray(), GCHandleType.Pinned);
 

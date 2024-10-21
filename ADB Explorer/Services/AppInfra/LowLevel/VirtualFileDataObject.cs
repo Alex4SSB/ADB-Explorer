@@ -18,46 +18,6 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     public bool IsAsynchronous { get; set; }
 
-    private static readonly short DRAGIMAGE = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_DRAGIMAGE).Id);
-
-    private static readonly short FILECONTENTS = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILECONTENTS).Id);
-
-    private static readonly short FILEDESCRIPTORW = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILEDESCRIPTORW).Id);
-
-    private static readonly short PASTESUCCEEDED = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PASTESUCCEEDED).Id);
-
-    private static readonly short PERFORMEDDROPEFFECT = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PERFORMEDDROPEFFECT).Id);
-
-    private static readonly short PREFERREDDROPEFFECT = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_PREFERREDDROPEFFECT).Id);
-
-    private static readonly short FILENAME = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILENAME).Id);
-
-    private static readonly short FILENAMEW = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_FILENAMEW).Id);
-
-    private static readonly short DRAGLOOP = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_DRAGLOOP).Id);
-
-    private static readonly short FILEDROP = (short)(DataFormats.GetDataFormat(DataFormats.FileDrop).Id); // 15;
-
-    private static readonly short SHELLIDLIST = (short)(DataFormats.GetDataFormat(NativeMethods.CFSTR_SHELLIDLIST).Id);
-
-    private static readonly short ADBDROP = (short)(DataFormats.GetDataFormat(AdbExplorerConst.ADB_DRAG_FORMAT).Id);
-
-    private static Dictionary<short, string> DataFormatKeys => new()
-    {
-        { FILECONTENTS, nameof(FILECONTENTS) },
-        { FILEDESCRIPTORW, nameof(FILEDESCRIPTORW) },
-        { PASTESUCCEEDED, nameof(PASTESUCCEEDED) },
-        { PERFORMEDDROPEFFECT, nameof(PERFORMEDDROPEFFECT) },
-        { PREFERREDDROPEFFECT, nameof(PREFERREDDROPEFFECT) },
-        { DRAGLOOP, nameof(DRAGLOOP) },
-        { FILEDROP, nameof(FILEDROP) },
-        { DRAGIMAGE, nameof(DRAGIMAGE) },
-        { FILENAME, nameof(FILENAME) },
-        { FILENAMEW, nameof(FILENAMEW) },
-        { SHELLIDLIST, nameof(SHELLIDLIST) },
-        { ADBDROP, nameof(ADBDROP) },
-    };
-
     /// <summary>
     /// In-order list of registered data objects.
     /// </summary>
@@ -188,7 +148,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
         if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
         {
-            if (DataFormatKeys.TryGetValue(formatCopy.cfFormat, out string value))
+            if (AdbDataFormats.GetFormatName(formatCopy.cfFormat) is string value)
                 File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Query cfFormat = {value}\n");
         }
 
@@ -202,7 +162,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                     && (d.FORMATETC.lindex == formatCopy.lindex));
             if (dataObject != null)
             {
-                if (!IsAsynchronous && (FILEDESCRIPTORW == dataObject.FORMATETC.cfFormat) && !_inOperation)
+                if (!IsAsynchronous && (dataObject.FORMATETC.cfFormat == AdbDataFormats.FileDescriptor) && !_inOperation)
                 {
                     // Enter the operation and call the start action
                     _inOperation = true;
@@ -210,7 +170,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                 }
 
                 if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data, cfFormat = {DataFormatKeys[formatCopy.cfFormat]}\n");
+                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data, cfFormat = {AdbDataFormats.GetFormatName(formatCopy.cfFormat)}\n");
 
                 // Populate the STGMEDIUM
                 medium.tymed = dataObject.FORMATETC.tymed;
@@ -230,7 +190,14 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
         if (!NativeMethods.SUCCEEDED(hr)) // Not redundant; hr gets updated in the block above
         {
-            Marshal.ThrowExceptionForHR(hr);
+            // Even without FileContents, we sometimes get invalid DV_E_DVASPECT.
+            // This doesn't seem to prevent AdbDragList from working as expected though.
+            var ex = Marshal.GetExceptionForHR(hr);
+#if DEBUG
+            Trace.WriteLine(ex.Message);
+#elif RELEASE
+            throw ex;
+#endif
         }
     }
 
@@ -310,7 +277,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
 
         // Handle synchronous mode
-        if (!IsAsynchronous && (PERFORMEDDROPEFFECT == formatIn.cfFormat) && _inOperation)
+        if (!IsAsynchronous && (formatIn.cfFormat == AdbDataFormats.PerformedDropEffect) && _inOperation)
         {
             // Call the end action and exit the operation
             _endAction?.Invoke(this);
@@ -324,7 +291,21 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
     }
 
-    #endregion
+#endregion
+
+    /// <summary>
+    /// Creates a format on HGlobal, or as a stream if index is provided
+    /// </summary>
+    public static FORMATETC CreateFormat(short dataFormat, int index = -1) => new()
+    {
+        cfFormat = dataFormat,
+        ptd = IntPtr.Zero,
+        dwAspect = DVASPECT.DVASPECT_CONTENT,
+        lindex = index,
+        tymed = index == -1
+            ? TYMED.TYMED_HGLOBAL
+            : TYMED.TYMED_ISTREAM,
+    };
 
     public void UpdateData(short dataFormat, IEnumerable<byte> data)
     {
@@ -355,14 +336,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     public void SetData(short dataFormat, IEnumerable<byte> data)
         => _dataObjects.Add(new()
         {
-            FORMATETC = new FORMATETC
-            {
-                cfFormat = dataFormat,
-                ptd = IntPtr.Zero,
-                dwAspect = DVASPECT.DVASPECT_CONTENT,
-                lindex = -1,
-                tymed = TYMED.TYMED_HGLOBAL
-            },
+            FORMATETC = CreateFormat(dataFormat),
             GetData = () =>
             {
                 var dataArray = data.ToArray();
@@ -399,14 +373,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     public void SetData(short dataFormat, int index, Action<Stream> streamData)
         => _dataObjects.Add(new()
         {
-            FORMATETC = new FORMATETC
-            {
-                cfFormat = dataFormat,
-                ptd = IntPtr.Zero,
-                dwAspect = DVASPECT.DVASPECT_CONTENT,
-                lindex = index,
-                tymed = TYMED.TYMED_ISTREAM
-            },
+            FORMATETC = CreateFormat(dataFormat, index),
             GetData = () =>
             {
                 // Create IStream for data
@@ -435,16 +402,22 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     {
         FileGroup group = new(fileDescriptors);
 
-        UpdateData(FILEDESCRIPTORW, group.GroupDescriptorBytes);
-
-        UpdateData(FILECONTENTS, group.DataStreams);
+#if DEBUG
+        Trace.WriteLine("Sending VFDO to the system is not allowed in DEBUG (DragDrop / Clipboard)");
+        // The cause for this is probably the FileContents data format, which is an async stream
+        // compared to all other data formats which are just byte arrays on HGlobal, already populated with the data
+        return;
+#elif RELEASE
+        UpdateData(AdbDataFormats.FileDescriptor, group.GroupDescriptorBytes);
+        UpdateData(AdbDataFormats.FileContents, group.DataStreams);
+#endif
     }
 
     public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
     {
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
 
-        SetData(ADBDROP, adbDrag.Bytes);
+        SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
 
     /// <summary>
@@ -452,8 +425,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     public DragDropEffects? PasteSucceeded
     {
-        get => GetDropEffect(PASTESUCCEEDED);
-        set => SetData(PASTESUCCEEDED, BitConverter.GetBytes((UInt32)value));
+        get => GetDropEffect(AdbDataFormats.PasteSucceeded);
+        set => SetData(AdbDataFormats.PasteSucceeded, BitConverter.GetBytes((UInt32)value));
     }
 
     /// <summary>
@@ -461,8 +434,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     public DragDropEffects? PerformedDropEffect
     {
-        get => GetDropEffect(PERFORMEDDROPEFFECT);
-        set => SetData(PERFORMEDDROPEFFECT, BitConverter.GetBytes((UInt32)value));
+        get => GetDropEffect(AdbDataFormats.PerformedDropEffect);
+        set => SetData(AdbDataFormats.PerformedDropEffect, BitConverter.GetBytes((UInt32)value));
     }
 
     /// <summary>
@@ -470,8 +443,17 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </summary>
     public DragDropEffects? PreferredDropEffect
     {
-        get => GetDropEffect(PREFERREDDROPEFFECT);
-        set => SetData(PREFERREDDROPEFFECT, BitConverter.GetBytes((UInt32)value));
+        get => GetDropEffect(AdbDataFormats.PreferredDropEffect);
+        set => SetData(AdbDataFormats.PreferredDropEffect, BitConverter.GetBytes((UInt32)value));
+    }
+
+    public static DragDropEffects GetPreferredDropEffect(System.Windows.IDataObject dataObject)
+    {
+        if (!dataObject.GetDataPresent(AdbDataFormats.PreferredDropEffect)
+            || dataObject.GetData(AdbDataFormats.PreferredDropEffect) is not MemoryStream stream)
+            return DragDropEffects.None;
+
+        return (DragDropEffects)BitConverter.ToInt32(stream.ToArray());
     }
 
     /// <summary>
@@ -697,13 +679,6 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
     public void SendObjectToShell(SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
     {
-
-#if DEBUG
-        Trace.WriteLine("Sending VFDO to the system is not allowed in DEBUG (DragDrop / Clipboard)");
-        return;
-
-#elif RELEASE
-
         try
         {
             if (method == SendMethod.DragDrop)
@@ -717,11 +692,9 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         {
             // Failure; no way to recover
         }
-
-#endif
     }
 
-    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files)
+    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Move)
     {
         try
         {
@@ -732,7 +705,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
         Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
 
-        VirtualFileDataObject vfdo = new((vfdo) => { }, (vfdo) => { }, DragDropEffects.Move);
+        VirtualFileDataObject vfdo = new((vfdo) => { }, (vfdo) => { }, preferredEffect);
 
         if (files.Any(f => f.IsDirectory))
         {
@@ -752,8 +725,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             });
 
             // Add these empty formats as placeholders, the data will be replaced once it is ready
-            vfdo.SetData(FILEDESCRIPTORW, []);
-            vfdo.SetData(FILECONTENTS, []);
+            vfdo.SetData(AdbDataFormats.FileDescriptor, []);
+            vfdo.SetData(AdbDataFormats.FileContents, []);
         }
         else
         {

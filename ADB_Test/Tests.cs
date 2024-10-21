@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace ADB_Test
 {
@@ -275,6 +276,14 @@ namespace ADB_Test
             Assert.AreEqual("/", FileHelper.GetParentPath("/sdcard"));
             Assert.AreEqual("E:", FileHelper.GetParentPath("E:\\New folder"));
             Assert.AreEqual("E:", FileHelper.GetParentPath("E:\\"));
+        }
+
+        [TestMethod]
+        public void BytePatternTest()
+        {
+            Assert.AreEqual(-1, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar"), [0, 0]));
+            Assert.AreEqual(11, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar\0"), [0, 0]));
+            Assert.AreEqual(12, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar\0"), [0, 0], evenAlign: true));
         }
     }
 }

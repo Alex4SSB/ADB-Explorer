@@ -18,7 +18,7 @@ public partial class DragWindow : Window
         NativeMethods.InitInterceptMouse(NativeMethods.MouseMessages.WM_MOUSEMOVE,
             (int x, int y) =>
             {
-                if ( Data.RuntimeSettings.DragBitmap is null) //Mouse.LeftButton is MouseButtonState.Released ||
+                if (Data.RuntimeSettings.DragBitmap is null)
                     return;
                 
                 Top = y - (ActualHeight / 2);
