@@ -190,8 +190,9 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
         if (!NativeMethods.SUCCEEDED(hr)) // Not redundant; hr gets updated in the block above
         {
-            // Even without FileContents, we sometimes get invalid DV_E_DVASPECT.
-            // This doesn't seem to prevent AdbDragList from working as expected though.
+            // We seem unable to send data to File Explorer in DEBUG, even when not debugging.
+            // This might be because of the FileContents data format, which is an async stream
+            // compared to all other data formats which are just byte arrays on HGlobal, already populated with the data
             var ex = Marshal.GetExceptionForHR(hr);
 #if DEBUG
             Trace.WriteLine(ex.Message);
@@ -372,27 +373,27 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// </remarks>
     public void SetData(short dataFormat, int index, Action<Stream> streamData)
         => _dataObjects.Add(new()
+    {
+        FORMATETC = CreateFormat(dataFormat, index),
+        GetData = () =>
         {
-            FORMATETC = CreateFormat(dataFormat, index),
-            GetData = () =>
+            // Create IStream for data
+            var ptr = IntPtr.Zero;
+            var iStream = NativeMethods.MCreateStreamOnHGlobal(IntPtr.Zero, true);
+            if (streamData != null)
             {
-                // Create IStream for data
-                var ptr = IntPtr.Zero;
-                var iStream = NativeMethods.MCreateStreamOnHGlobal(IntPtr.Zero, true);
-                if (streamData != null)
+                // Wrap in a .NET-friendly Stream and call provided code to fill it
+                using (var stream = new IStreamWrapper(iStream))
                 {
-                    // Wrap in a .NET-friendly Stream and call provided code to fill it
-                    using (var stream = new IStreamWrapper(iStream))
-                    {
-                        streamData(stream);
-                    }
+                    streamData(stream);
                 }
-                // Return an IntPtr for the IStream
-                ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
-                Marshal.ReleaseComObject(iStream);
-                return (ptr, NativeMethods.S_OK);
-            },
-        });
+            }
+            // Return an IntPtr for the IStream
+            ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
+            Marshal.ReleaseComObject(iStream);
+            return (ptr, NativeMethods.S_OK);
+        },
+    });
 
     /// <summary>
     /// Provides data for the specified data format (FILEGROUPDESCRIPTOR/FILEDESCRIPTOR)
@@ -402,15 +403,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     {
         FileGroup group = new(fileDescriptors);
 
-#if DEBUG
-        Trace.WriteLine("Sending VFDO to the system is not allowed in DEBUG (DragDrop / Clipboard)");
-        // The cause for this is probably the FileContents data format, which is an async stream
-        // compared to all other data formats which are just byte arrays on HGlobal, already populated with the data
-        return;
-#elif RELEASE
         UpdateData(AdbDataFormats.FileDescriptor, group.GroupDescriptorBytes);
         UpdateData(AdbDataFormats.FileContents, group.DataStreams);
-#endif
     }
 
     public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)

@@ -1908,7 +1908,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var abortDrag = e.LeftButton == MouseButtonState.Released
             || !RuntimeSettings.IsExplorerLoaded
             || MouseDownPoint == NullPoint
-            || withinEditingCell;
+            || withinEditingCell
+            || SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu);
 
         if (DragStatus is DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
