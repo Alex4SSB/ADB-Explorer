@@ -422,6 +422,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isRenameDriveRootLegal, value);
     }
 
+    private bool isRenameUnique = false;
+    public bool IsRenameUnique
+    {
+        get => isRenameUnique;
+        set => Set(ref isRenameUnique, value);
+    }
+
     private int selectedFilesCount = 0;
     public int SelectedItemsCount
     {
@@ -469,7 +476,7 @@ internal class FileActionsEnable : ViewModelBase
     public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };
 
 
-    public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = Enumerable.Empty<FileOperation>() };
+    public ObservableProperty<IEnumerable<FileOperation>> SelectedFileOps = new() { Value = [] };
 
 
     public ObservableProperty<string> CopyPathDescription = new();

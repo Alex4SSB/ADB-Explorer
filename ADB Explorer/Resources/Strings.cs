@@ -36,7 +36,6 @@ public static class Strings
     public const string S_ROOT_FORBID_TITLE = "Root Access";
     public const string S_DEL_CONF_TITLE = "Confirm Delete";
     public const string S_PERM_DEL = "Permanently Delete";
-    public const string S_RENAME_CONF_TITLE = "Rename conflict";
     public const string S_RENAME_ERR_TITLE = "Rename Error";
     public const string S_CREATE_ERR_TITLE = "Create Error";
     public const string S_RESTORE_CONF_TITLE = "Restore Conflicts";
@@ -76,6 +75,7 @@ public static class Strings
     public const string S_FUSE_DRIVE_TOOLTIP = "FUSE drive." +
         "\n• Symbolic links are not supported" +
         "\n• File names cannot contain \" * / : < > ? \\ |" +
+        "\n• File names are case insensitive" +
         "\n• Installation of APKs is not supported";
 
     public static string S_ADB_LEARN_MORE => Data.RuntimeSettings.IsAppDeployed
@@ -109,9 +109,6 @@ public static class Strings
 
     public static string S_DELETE_CONF(bool permanent, string deletedString) =>
         $"The following will be{(permanent ? " permanently" : "")} deleted:\n{deletedString}";
-
-    public static string S_PATH_EXIST(string newPath) =>
-        $"{newPath} already exists in the current location";
 
     public static string S_NEW_ITEM(bool isFolder) =>
         $"New {(isFolder ? "Folder" : "File")}";

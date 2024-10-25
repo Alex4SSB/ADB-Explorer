@@ -1788,6 +1788,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
         var textBox = sender as TextBox;
+        var file = (FileClass)textBox.DataContext;
         textBox.FilterString(CurrentDrive.IsFUSE
             ? INVALID_NTFS_CHARS
             : INVALID_UNIX_CHARS);
@@ -1800,6 +1801,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         
         FileActions.IsRenameDriveRootLegal = FileActions.IsRenameWindowsLegal
                                              && !INVALID_WINDOWS_ROOT_PATHS.Contains(textBox.Text);
+
+        var fullName = Settings.ShowExtensions
+            ? textBox.Text
+            : textBox.Text + file.Extension;
+
+        var comparison = CurrentDrive.IsFUSE
+            ? StringComparison.InvariantCultureIgnoreCase
+            : StringComparison.InvariantCulture;
+
+        FileActions.IsRenameUnique = !DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
     }
 
     private void NewItem(bool isFolder)

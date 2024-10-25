@@ -372,9 +372,9 @@ internal static class FileActionLogic
         FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
         var name = FileHelper.DisplayName(textBox);
 
-
         if (!Data.FileActions.IsRenameUnixLegal
-            || (Data.CurrentDrive?.IsFUSE is true && !Data.FileActions.IsRenameFuseLegal))
+            || (Data.CurrentDrive?.IsFUSE is true && !Data.FileActions.IsRenameFuseLegal)
+            || !Data.FileActions.IsRenameUnique)
         {
             return;
         }

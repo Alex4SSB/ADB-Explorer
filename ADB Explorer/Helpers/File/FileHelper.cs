@@ -68,12 +68,6 @@ public static class FileHelper
         if (!Data.Settings.ShowExtensions)
             newPath += file.Extension;
 
-        if (Data.DirList.FileList.Any(file => file.DisplayName == newName))
-        {
-            DialogService.ShowMessage(Strings.S_PATH_EXIST(newName), Strings.S_RENAME_CONF_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
-            return;
-        }
-
         ShellFileOperation.Rename(file, newPath, Data.CurrentADBDevice);
     }
 

@@ -21,8 +21,6 @@ internal static class Data
 
     public static AppRuntimeSettings RuntimeSettings { get; set; } = new();
 
-    //public static ObservableList<FileClass> CutItems { get; private set; } = [];
-
     public static CopyPasteService CopyPaste { get; } = new();
 
     public static ObservableCollection<Log> CommandLog { get; set; } = [];

@@ -27,6 +27,7 @@
                 <RowDefinition />
                 <RowDefinition />
                 <RowDefinition />
+                <RowDefinition />
             </Grid.RowDefinitions>
             <ui:FontIcon>
                 <ui:FontIcon.Style>
@@ -88,6 +89,21 @@
                     </Style>
                 </ui:FontIcon.Style>
             </ui:FontIcon>
+            <ui:FontIcon Grid.Row="4">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Glyph" Value="&#xF13D;" />
+                        <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRenameUnique}" Value="True">
+                                <Setter Property="Glyph" Value="&#xF13E;" />
+                                <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
             <TextBlock
                 Grid.Column="2"
                 VerticalAlignment="Center"
@@ -107,6 +123,11 @@
                 Grid.Column="2"
                 VerticalAlignment="Center"
                 Text="Adheres to Windows drive root naming rules" />
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="2"
+                VerticalAlignment="Center"
+                Text="Unique in current location" />
         </Grid>
     </Border>
 </UserControl>
