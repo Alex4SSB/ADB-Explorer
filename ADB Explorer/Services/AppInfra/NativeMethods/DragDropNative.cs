@@ -183,11 +183,21 @@ public static partial class NativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    public struct ADBDRAGLIST(ADBService.AdbDevice device, IEnumerable<FileClass> files) : IByteStruct
+    public struct ADBDRAGLIST : IByteStruct
     {
-        public string deviceId = device.ID;
-        public string parentFolder = files.First().ParentPath;
-        public string[] items = files.Select(f => f.FullName).ToArray();
+        public string deviceId;
+        public string parentFolder;
+        public string[] items;
+
+        public ADBDRAGLIST(ADBService.AdbDevice device, IEnumerable<FileClass> files)
+        {
+            deviceId = device.ID;
+            parentFolder = files.First().ParentPath;
+            
+            items = (parentFolder == AdbExplorerConst.RECYCLE_PATH
+                ? files.Select(f => FileHelper.GetFullName(f.FullPath))
+                : files.Select(f => f.FullName)).ToArray();
+        }
 
         public readonly IEnumerable<byte> Bytes
         {

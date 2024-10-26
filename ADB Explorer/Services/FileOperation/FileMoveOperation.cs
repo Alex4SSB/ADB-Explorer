@@ -50,6 +50,11 @@ public class FileMoveOperation : AbstractShellFileOperation
             TargetPath.UpdatePath(FileHelper.ConcatPaths(TargetPath.ParentPath, RecycleName));
             IndexerPath = $"{AdbExplorerConst.RECYCLE_PATH}/.{RecycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
         }
+        else if (OperationName is OperationType.Restore)
+        {
+            RecycleName = FilePath.TrashIndex.RecycleName;
+            IndexerPath = FilePath.TrashIndex.IndexerPath;
+        }
 
         var cmd = OperationName is OperationType.Copy ? "cp" : "mv";
         var flag = "";

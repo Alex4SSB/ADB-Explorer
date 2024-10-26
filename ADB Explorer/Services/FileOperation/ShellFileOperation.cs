@@ -160,7 +160,16 @@ public static class ShellFileOperation
                 if (item.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
                     continue;
 
-                SyncFile target = new(FileHelper.ConcatPaths(item.TrashIndex.ParentPath, item.FullName));
+                var indexer = Data.RecycleIndex.FirstOrDefault(f => f.RecycleName == item.FullName);
+                if (indexer is null)
+                    continue;
+
+                item.TrashIndex = indexer;
+                var targetParent = string.IsNullOrEmpty(targetPath)
+                    ? indexer.ParentPath
+                    : targetPath;
+
+                SyncFile target = new(FileHelper.ConcatPaths(targetParent, item.FullName));
                 yield return new(item, target, device, dispatcher);
             }
         }
@@ -178,12 +187,14 @@ public static class ShellFileOperation
             }
         }
 
-        var fileops = (targetPath switch
-        {
-            AdbExplorerConst.RECYCLE_PATH => Recycle(),
-            null when currentPath == AdbExplorerConst.RECYCLE_PATH => Restore(),
-            _ => Move(),
-        }).ToList();
+        List<FileMoveOperation> fileops = [];
+
+        if (items.First().ParentPath == AdbExplorerConst.RECYCLE_PATH || currentPath == AdbExplorerConst.RECYCLE_PATH)
+            fileops = Restore().ToList();
+        else if (targetPath == AdbExplorerConst.RECYCLE_PATH)
+            fileops = Recycle().ToList();
+        else
+            fileops = Move().ToList();
 
         dispatcher.Invoke(() =>
         {
@@ -263,12 +274,12 @@ public static class ShellFileOperation
         }
     }
 
-    public static void MakeDir(ADBService.AdbDevice device, string fullPath)
+    public static async void MakeDir(ADBService.AdbDevice device, string fullPath)
     {
-        var result = ADBService.ExecuteVoidShellCommand(device.ID,
+        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                         new(),
                                                         "mkdir",
-                                                        ["-p", ADBService.EscapeAdbShellString(fullPath)]).Result;
+                                                              ["-p", ADBService.EscapeAdbShellString(fullPath)]);
 
         if (!string.IsNullOrEmpty(result))
         {
@@ -276,12 +287,12 @@ public static class ShellFileOperation
         }
     }
 
-    public static void MakeFile(ADBService.AdbDevice device, string fullPath)
+    public static async void MakeFile(ADBService.AdbDevice device, string fullPath)
     {
-        var result = ADBService.ExecuteVoidShellCommand(device.ID,
+        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                         new(),
                                                         "touch",
-                                                        ADBService.EscapeAdbShellString(fullPath)).Result;
+                                                              ADBService.EscapeAdbShellString(fullPath));
 
         if (!string.IsNullOrEmpty(result))
         {
@@ -289,12 +300,12 @@ public static class ShellFileOperation
         }
     }
 
-    public static void WriteLine(ADBService.AdbDevice device, string fullPath, string newLine)
+    public static async void WriteLine(ADBService.AdbDevice device, string fullPath, string newLine)
     {
-        var result = ADBService.ExecuteVoidShellCommand(device.ID,
+        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
                                                         new(),
                                                         "echo",
-                                                        [newLine, ">>", ADBService.EscapeAdbShellString(fullPath)]).Result;
+                                                              [newLine, ">>", ADBService.EscapeAdbShellString(fullPath)]);
 
         if (!string.IsNullOrEmpty(result))
         {

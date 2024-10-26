@@ -91,7 +91,7 @@ public class FileClass : FilePath, IFileStat
         {
             Set(ref trashIndex, value);
             if (value is not null)
-                FullName = value.OriginalPath.Split('/')[^1];
+                FullName = FileHelper.GetFullName(value.OriginalPath);
         }
     }
 
