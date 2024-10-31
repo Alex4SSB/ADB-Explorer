@@ -103,10 +103,6 @@ HANDLE CreateChildProcess(const std::wstring& cmd, const std::wstring& args) {
 	return proc_info.hProcess;
 }
 
-bool IsLinePrintable(const std::wstring& line) {
-	return std::all_of(line.begin(), line.end(), [](const auto& wch) { return iswprint(wch); });
-}
-
 std::wstring TrimString(const std::wstring& string, const wchar_t* chars_to_trim = L" \t\n\r\v") {
 	auto start_index = string.find_first_not_of(chars_to_trim);
 	if (start_index == std::wstring::npos) {
@@ -204,7 +200,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	while (WaitForSingleObject(child_handle, 0) == WAIT_TIMEOUT) {
 		// Read current line, where the cursor is
 		if (auto line_str = TrimString(ReadConsoleLine(console_handle, 0));
-			(line_str != prev_line_str) && IsLinePrintable(line_str)) {
+			(line_str != prev_line_str)) {
 			std::wcout << line_str << std::endl;
 			prev_line_str = line_str;
 			Sleep(CAPTURE_INTERVAL_MS);
@@ -213,7 +209,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 
 	// Read previous line to get the final message
 	if (auto line_str = TrimString(ReadConsoleLine(console_handle, -1));
-		(line_str != prev_line_str) && IsLinePrintable(line_str)) {
+		(line_str != prev_line_str)) {
 		std::wcout << line_str << std::endl;
 	}
 

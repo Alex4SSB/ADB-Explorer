@@ -118,7 +118,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 1BB31666C3F85E667A42270B0C600C84.
+        ///   Looks up a localized string similar to 82FF56F4D68C1AB82970C370A9710593.
         /// </summary>
         public static string ProgressRedirectionHash_ARM {
             get {
@@ -127,7 +127,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 2BF11C22BA3658C8C0E5B92F31F2D6CF.
+        ///   Looks up a localized string similar to 9D9C454DA3A072FE91AE800981CBB83C.
         /// </summary>
         public static string ProgressRedirectionHash_x64 {
             get {

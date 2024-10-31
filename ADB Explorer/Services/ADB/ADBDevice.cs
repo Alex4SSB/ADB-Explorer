@@ -202,12 +202,10 @@ public partial class ADBService
             Process cmdProcess,
             ref ObservableList<FileOpProgressInfo> updates, CancellationToken cancellationToken)
         {
-            string workingDir = "", _target = target;
-            if (target[1] == ':')
-            {
-                workingDir = FileHelper.GetParentPath(target);
-                _target = target.Split('\\').Count(s => s.Length > 0) < 2 ? "./" : FileHelper.GetFullName(target);
-            }
+            string _target = target;
+
+            if (target[1] == ':' && target.Count(c => c == '\\') < 2)
+                _target = FileHelper.ConcatPaths(target, ".", '\\');
 
             _target = EscapeAdbString(_target);
 
@@ -215,7 +213,6 @@ public partial class ADBService
                 Data.RuntimeSettings.AdbPath,
                 cancellationToken,
                 cmdProcess,
-                workingDir,
                 args: [
                     "-s",
                     ID,
