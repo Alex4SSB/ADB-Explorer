@@ -39,3 +39,11 @@ The settings file contains user app settings as well as other settings not direc
 The file can be edited, but the format must be preserved.
 An unrecognized entry will be overwritten.
 The file can be deleted to restore app settings to their defaults.
+
+<h2 align="left"/>Compiling AdbProgressRedirection</h2>
+
+1. [Download GCC 13.3 with UCRT64](https://github.com/brechtsanders/winlibs_mingw/releases/tag/13.3.0posix-11.0.1-ucrt-r1)
+2. Extract somewhere
+3. Add to environment Path `[extracted path]\mingw64\bin`
+4. Open the AdbProgressRedirection folder in VS Code
+5. Build (Ctrl+Shift+B)
