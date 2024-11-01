@@ -41,6 +41,9 @@ An unrecognized entry will be overwritten.
 The file can be deleted to restore app settings to their defaults.
 
 <h2 align="left"/>Compiling AdbProgressRedirection for x64</h2>
+To minimize false positive AV detection of AdbProgressRedirection.exe, the x64 build is not done in Visual Studio, but using a specific version of UCRT. <br />
+This leaves us with only Bkav Pro detection which is (aparently) infamous for its false positives. <br />
+<br />
 
 1. [Download GCC 13.3 with UCRT64](https://github.com/brechtsanders/winlibs_mingw/releases/tag/13.3.0posix-11.0.1-ucrt-r1)
 2. Extract somewhere
