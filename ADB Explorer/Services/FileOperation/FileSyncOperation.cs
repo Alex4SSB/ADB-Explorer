@@ -77,18 +77,17 @@ public class FileSyncOperation : FileOperation
                 try
                 {
                     var id = AdbProcess.Process.Id;
+                    var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
+                    var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
+
+                    if (adbProc is not null)
+                        AdbProcess = new(adbProc);
                 }
                 catch
                 {
-                    // if we can't get the pid without throwing an exception, the process is useless
+                    // if we can't get the pid or process name without throwing an exception, the process is useless
                     return;
                 }
-
-                var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
-                var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
-
-                if (adbProc is not null)
-                    AdbProcess = new(adbProc);
             }
 
             AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;

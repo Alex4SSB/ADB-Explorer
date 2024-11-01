@@ -62,7 +62,7 @@ public partial class ADBService
 
         if (IsMdnsEnabled)
             cmdProcess.StartInfo.EnvironmentVariables[ENABLE_MDNS] = "1";
-
+        
         cmdProcess.Start();
 
         if (Settings.EnableLog && !RuntimeSettings.IsLogPaused)
@@ -131,61 +131,39 @@ public partial class ADBService
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, redirect, process, workingDir, args: args);
+        cancellationToken.Register(() => ProcessHandling.KillProcess(cmdProcess));
 
-        Task<string?> stdoutLineTask = null;
-        string stdoutLine = null;
-        do
+        BlockingCollection<string> outputQueue = [];
+        string stderr = "";
+        cmdProcess.OutputDataReceived += (sender, e) =>
         {
-            if (stdoutLine != null)
+            if (e.Data is null)
             {
-                yield return stdoutLine;
+                outputQueue.CompleteAdding();
+            }
+            else
+            {
+                outputQueue.Add(e.Data);
             }
 
-            try
-            {
-                if (redirect)
-                {
-                    stdoutLineTask = cmdProcess.StandardOutput.ReadLineAsync();
-                    stdoutLineTask.Wait(cancellationToken);
-                }
-                else
-                {
-                    stdoutLineTask = Task.Run(async () =>
-                    {
-                        await cmdProcess.WaitForExitAsync(cancellationToken);
+            RuntimeSettings.LastServerResponse = DateTime.Now;
+        };
+        cmdProcess.ErrorDataReceived += (sender, e) =>
+        {
+            if (e.Data is not null)
+                stderr += e.Data;
+        };
 
-                        return (string)null;
-                    });
-                }
-
-
-                RuntimeSettings.LastServerResponse = DateTime.Now;
-            }
-            catch (OperationCanceledException)
-            {
-                ProcessHandling.KillProcess(cmdProcess);
-                throw;
-            }
+        cmdProcess.BeginOutputReadLine();
+        foreach (string output in outputQueue.GetConsumingEnumerable(cancellationToken))
+        {
+            yield return output;
         }
-        while ((stdoutLine = stdoutLineTask.Result) != null);
 
         if (!redirect)
         {
             yield return null;
             yield break;
-        }
-
-        string stderr = null;
-        try
-        {
-            var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
-            stderrTask.Wait(cancellationToken);
-            stderr = stderrTask.Result;
-        }
-        catch (OperationCanceledException)
-        {
-            ProcessHandling.KillProcess(cmdProcess);
-            throw;
         }
 
         cmdProcess.WaitForExit();

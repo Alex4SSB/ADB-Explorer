@@ -14,10 +14,19 @@ public class ProcessHandling
 
     public static IEnumerable<Process> GetChildProcesses(Process process, bool recursive = true)
     {
-        ManagementObjectSearcher searcher = new(
-            "SELECT * " +
-            "FROM Win32_Process " +
-            "WHERE ParentProcessId=" + process.Id);
+        ManagementObjectSearcher searcher;
+        try
+        {
+            searcher = new(
+                "SELECT * " +
+                "FROM Win32_Process " +
+                "WHERE ParentProcessId=" + process.Id);
+        }
+        catch
+        {
+            // if we can't get the pid without throwing an exception, the process is useless
+            yield break;
+        }
 
         foreach (var item in searcher.Get())
         {
