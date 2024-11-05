@@ -43,11 +43,10 @@ internal static class FileActionLogic
 
     public static void CopyToTemp()
     {
-        _ = ShellFileOperation.VerifyAndPaste(
+        Data.CopyPaste.VerifyAndPaste(
             CutType.Copy,
             AdbExplorerConst.TEMP_PATH,
-            Data.SelectedFiles,
-            Data.DirList.FileList,
+            Data.SelectedFiles.Select(f => f.FullPath),
             App.Current.Dispatcher,
             Data.CurrentADBDevice,
             Data.CurrentPath);
@@ -300,7 +299,7 @@ internal static class FileActionLogic
         if (Data.FileActions.IsPastingInDescendant)
             return false;
 
-        var selected = isKeyboard & Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
+        var selected = isKeyboard && Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
 
         string targetPath;
         if (selected == 1)
@@ -327,7 +326,8 @@ internal static class FileActionLogic
 
                 break;
             case 1:
-                if (isKeyboard && Data.CopyPaste.PasteState is CutType.Copy && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.SelectedFiles.First().FullPath) is RelationType.Self)
+                // When duplicating a file multiple times using the keyboard, the selection is the previous copy
+                if (isKeyboard && Data.CopyPaste.PasteState is CutType.Copy && Data.DirList.FileList.Any(f => f.FullPath == Data.CopyPaste.Files[0]))
                     return true;
 
                 var item = Data.SelectedFiles.First();
@@ -798,11 +798,12 @@ internal static class FileActionLogic
         }
     }
 
-    public static void PullFiles(string targetPath = "")
+    // Pull that is performed without interacting with File Explorer
+    public static async void PullFiles(string targetPath = "")
     {
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
-        int itemsCount = Data.SelectedFiles.Count();
+        var pullItems = Data.SelectedFiles;
         ShellObject path;
 
         if (!string.IsNullOrEmpty(targetPath))
@@ -816,21 +817,29 @@ internal static class FileActionLogic
                 IsFolderPicker = true,
                 Multiselect = false,
                 DefaultDirectory = Data.Settings.DefaultFolder,
-                Title = Strings.S_ITEMS_DESTINATION(itemsCount > 1, Data.SelectedFiles.First()),
+                Title = Strings.S_ITEMS_DESTINATION(pullItems.Count() > 1, pullItems.First()),
             };
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
-
-            path = dialog.FileAsShellObject;
-
-            var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
             
-            if (match.Success && Data.SelectedFiles.Any(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName)))
-            {
-                DialogService.ShowMessage(Strings.S_WIN_ROOT_ILLEGAL, Strings.S_WIN_ROOT_ILLEGAL_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+            path = dialog.FileAsShellObject;
+        }
+
+        var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
+        var invalidFiles = pullItems.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
+
+        if (match.Success && invalidFiles.Any())
+        {
+            var result = await DialogService.ShowConfirmation(Strings.S_WIN_ROOT_ILLEGAL(invalidFiles),
+                                                 Strings.S_WIN_ROOT_ILLEGAL_TITLE,
+                                                 primaryText: "Skip",
+                                                 icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 is not ContentDialogResult.Primary)
                 return;
-            }
+
+            pullItems = pullItems.Except(invalidFiles);
         }
 
         if (!Directory.Exists(path.ParsingName))
@@ -846,7 +855,13 @@ internal static class FileActionLogic
             }
         }
 
-        foreach (var item in Data.SelectedFiles)
+        var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), path.ParsingName);
+        if (files.Count() < pullItems.Count())
+        {
+            pullItems = pullItems.Where(f => files.Contains(f.FullName));
+        }
+
+        foreach (var item in pullItems)
         {
             SyncFile target = new(path);
             target.UpdatePath(FileHelper.ConcatPaths(target, item.FullName));

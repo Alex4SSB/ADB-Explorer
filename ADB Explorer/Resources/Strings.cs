@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Resources;
@@ -68,7 +69,6 @@ public static class Strings
     public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
     public const string S_REDIRECTION = "Progress Redirection ";
     public const string S_LS_ERROR_TITLE = "List Directory Error";
-    public const string S_WIN_ROOT_ILLEGAL = "Some of the selected files cannot be created under a Windows drive root.";
     public const string S_WIN_ROOT_ILLEGAL_TITLE = "Pull To Windows Drive Root";
 
 
@@ -85,6 +85,8 @@ public static class Strings
     public static string S_DEPLOY_REDIRECTION => $"A helper program for reading push/pull progress from ADB.\n{(Data.RuntimeSettings.IsArm
         ? "Might falsely trigger some anti-virus programs."
         : $"Copied to %LocalAppData%\\{AdbExplorerConst.APP_DATA_FOLDER}\\")}";
+
+    public static string S_WIN_ROOT_ILLEGAL(IEnumerable<FileClass> files) => $"{files.Count()} of the selected files cannot be created under a Windows drive root.";
 
     public static string S_PROGRESS_METHOD_INFO() =>
         $"• {S_DEPLOY_REDIRECTION_TITLE}\n" +
@@ -170,6 +172,6 @@ public static class Strings
         return $"{(string.IsNullOrEmpty(e.Message) ? "" : e.Message + "\n\n")}An error occured while trying to list the contents of this folder.\n Visible content may be incomplete.";
     }
 
-    public static string S_PASTE_ANCESTOR(FileClass ancestor) =>
-        $"{ancestor.FullName} is an ancestor of the destination folder.";
+    public static string S_PASTE_ANCESTOR(string ancestor) =>
+        $"{FileHelper.GetFullName(ancestor)} is an ancestor of the destination folder.";
 }

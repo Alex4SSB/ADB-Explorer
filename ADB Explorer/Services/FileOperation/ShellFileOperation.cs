@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -42,7 +41,7 @@ public static class ShellFileOperation
 
     public static void SilentDelete(ADBService.AdbDevice device, params string[] items)
     {
-        string[] args = [ "-rf", .. items.Select(item => ADBService.EscapeAdbShellString(item))];
+        string[] args = ["-rf", .. items.Select(item => ADBService.EscapeAdbShellString(item))];
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, new(), args);
     }
 
@@ -110,7 +109,7 @@ public static class ShellFileOperation
 
                 // update UI when on current device and current path
                 op.Dispatcher.Invoke(() => file.UpdatePath(op.TargetPath.FullPath));
-                
+
                 if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
                     Data.FileActions.ItemToSelect = null;
 
@@ -142,7 +141,42 @@ public static class ShellFileOperation
         return exitCode == 0;
     }
 
-    public static void MoveItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, string targetPath, string currentPath, ObservableList<FileClass> fileList, Dispatcher dispatcher, FileClass.CutType cutType = FileClass.CutType.None)
+    public static void MoveItems(ADBService.AdbDevice device,
+                                 IEnumerable<string> items,
+                                 string targetPath,
+                                 string currentPath,
+                                 Dispatcher dispatcher,
+                                 CutType cutType = CutType.None)
+        => MoveItems(device,
+                     items.Select(f => new FileClass(new FilePath(f))),
+                     targetPath,
+                     currentPath,
+                     Array.Empty<string>(),
+                     dispatcher,
+                     cutType);
+
+    public static void MoveItems(ADBService.AdbDevice device,
+                                 IEnumerable<FileClass> items,
+                                 string targetPath,
+                                 string currentPath,
+                                 ObservableList<FileClass> fileList,
+                                 Dispatcher dispatcher,
+                                 CutType cutType = CutType.None)
+        => MoveItems(device,
+                     items,
+                     targetPath,
+                     currentPath,
+                     fileList.Select(f => f.FullPath),
+                     dispatcher,
+                     cutType);
+
+    public static void MoveItems(ADBService.AdbDevice device,
+                                 IEnumerable<FileClass> items,
+                                 string targetPath,
+                                 string currentPath,
+                                 IEnumerable<string> existingItems,
+                                 Dispatcher dispatcher,
+                                 CutType cutType = CutType.None)
     {
         IEnumerable<FileMoveOperation> Recycle()
         {
@@ -180,7 +214,7 @@ public static class ShellFileOperation
             {
                 var targetName = item.FullName;
                 if (currentPath == targetPath)
-                    targetName = $"{item.NoExtName}{FileHelper.ExistingIndexes(fileList, item.NoExtName, cutType)}{item.Extension}";
+                    targetName = FileHelper.DuplicateFile(existingItems, targetName, cutType);
 
                 SyncFile target = new(FileHelper.ConcatPaths(targetPath, targetName));
                 yield return new(item, target, device, dispatcher, cutType);
@@ -277,8 +311,8 @@ public static class ShellFileOperation
     public static async void MakeDir(ADBService.AdbDevice device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                        new(),
-                                                        "mkdir",
+                                                              new(),
+                                                              "mkdir",
                                                               ["-p", ADBService.EscapeAdbShellString(fullPath)]);
 
         if (!string.IsNullOrEmpty(result))
@@ -290,8 +324,8 @@ public static class ShellFileOperation
     public static async void MakeFile(ADBService.AdbDevice device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                        new(),
-                                                        "touch",
+                                                              new(),
+                                                              "touch",
                                                               ADBService.EscapeAdbShellString(fullPath));
 
         if (!string.IsNullOrEmpty(result))
@@ -303,8 +337,8 @@ public static class ShellFileOperation
     public static async void WriteLine(ADBService.AdbDevice device, string fullPath, string newLine)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                        new(),
-                                                        "echo",
+                                                              new(),
+                                                              "echo",
                                                               [newLine, ">>", ADBService.EscapeAdbShellString(fullPath)]);
 
         if (!string.IsNullOrEmpty(result))
@@ -316,105 +350,15 @@ public static class ShellFileOperation
     public static string ReadAllText(ADBService.AdbDevice device, params string[] paths)
     {
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
-                                                                "cat",
-                                                                out string stdout,
-                                                                out string stderr,
-                                                                new(), paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
+                                                               "cat",
+                                                               out string stdout,
+                                                               out string stderr,
+                                                               new(), paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
 
         if (exitCode != 0)
             throw new Exception(stderr);
 
         return stdout;
-    }
-
-    public static async Task VerifyAndPaste(CutType cutType,
-                                            string targetPath,
-                                            IEnumerable<FileClass> pasteItems,
-                                            ObservableList<FileClass> fileList,
-                                            Dispatcher dispatcher,
-                                            ADBService.AdbDevice device,
-                                            string currentPath)
-    {
-        // Check for pasting in descendant or self
-        var ancestor = pasteItems.FirstOrDefault(f => f.Relation(targetPath) is RelationType.Self or RelationType.Descendant);
-        pasteItems = cutType is CutType.Link
-            ? pasteItems
-            : pasteItems.Except([ancestor]);
-
-        if (ancestor is not null)
-        {
-            var result = await DialogService.ShowConfirmation(
-                Strings.S_PASTE_ANCESTOR(ancestor),
-                $"{(Data.CopyPaste.IsDrag ? "Drop" : "Paste")} Conflict",
-                "Skip",
-                cancelText: "Abort",
-                icon: DialogService.DialogIcon.Exclamation);
-
-            if (result.Item1 is not ContentDialogResult.Primary)
-                return;
-        }
-
-        // Check for file merge conflicts
-        bool merge = false;
-        string[] existingItems = [];
-        string destination = targetPath == AdbExplorerConst.TEMP_PATH ? "Temp" : FileHelper.GetFullName(targetPath);
-
-        await Task.Run(() =>
-        {
-            if (targetPath == currentPath)
-                return;
-
-            if (!targetPath.EndsWith('/'))
-                targetPath += "/";
-
-            existingItems = ADBService.FindFiles(device.ID, pasteItems.Select(file => $"{targetPath}{file.FullName}"));
-            if (existingItems?.Length > 0)
-            {
-                existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
-
-                if (pasteItems.Any(item => item.IsDirectory && existingItems.Contains(item.FullName)))
-                    merge = true;
-            }
-        });
-
-        string primaryText = "";
-        if (merge)
-        {
-            if (pasteItems.All(item => item.IsDirectory))
-                primaryText = "Merge";
-            else
-                primaryText = "Merge or Replace";
-        }
-        else
-            primaryText = "Replace";
-
-        if (existingItems.Length is int count and > 0)
-        {
-            var result = await DialogService.ShowConfirmation(
-                $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
-                "Paste Conflicts",
-                primaryText: primaryText,
-                secondaryText: count == pasteItems.Count() ? "" : "Skip",
-                cancelText: "Cancel",
-                icon: DialogService.DialogIcon.Exclamation);
-
-            if (result.Item1 is ContentDialogResult.None)
-            {
-                return;
-            }
-            else if (result.Item1 is ContentDialogResult.Secondary)
-            {
-                pasteItems = pasteItems.Where(item => !existingItems.Contains(item.FullName));
-            }
-        }
-
-        MoveItems(device: device,
-                  items: pasteItems,
-                  targetPath: targetPath,
-                  currentPath: currentPath,
-                  fileList: fileList,
-                  dispatcher: dispatcher,
-                  cutType: cutType);
     }
 
     public static string GetPackageName(ADBService.AdbDevice device, string fullPath)

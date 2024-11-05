@@ -81,16 +81,7 @@ public class FilePath : AbstractFile, IBaseFile
         get => fullName;
         protected set => Set(ref fullName, value);
     }
-    public string NoExtName
-    {
-        get
-        {
-            if (!IsRegularFile || HiddenOrWithoutExt(FullName))
-                return FullName;
-            else
-                return FullName[..^Extension.Length];
-        }
-    }
+    public string NoExtName => IsRegularFile ? FullName[..^Extension.Length] : FullName;
 
     public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
 
@@ -102,22 +93,7 @@ public class FilePath : AbstractFile, IBaseFile
     /// Returns the extension (including the period ".").<br />
     /// Returns an empty string if file has no extension.
     /// </summary>
-    public virtual string Extension
-    {
-        get
-        {
-            var lastDot = FullName.LastIndexOf('.');
-            if (lastDot < 1)
-                return "";
-
-            var secondLast = FullName[..lastDot].LastIndexOf(".");
-
-            if (secondLast > 0 && FullName[(secondLast + 1)..lastDot] == "tar")
-                return FullName[secondLast..];
-
-            return FullName[lastDot..];
-        }
-    }
+    public virtual string Extension => FileHelper.GetExtension(FullName);
 
     public FilePath(ShellObject windowsPath)
     {
@@ -152,13 +128,6 @@ public class FilePath : AbstractFile, IBaseFile
 
         OnPropertyChanged(nameof(NoExtName));
     }
-
-    private static bool HiddenOrWithoutExt(string fullName) => fullName.Count(c => c == '.') switch
-    {
-        0 => true,
-        1 when fullName.StartsWith('.') => true,
-        _ => false,
-    };
 
     /// <summary>
     /// Returns the relation of the <paramref name="other"/> file to <see langword="this"/> file.<br />

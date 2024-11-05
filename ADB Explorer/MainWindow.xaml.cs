@@ -1815,10 +1815,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NewItem(bool isFolder)
     {
-        var namePrefix = S_NEW_ITEM(isFolder);
-        var index = FileHelper.ExistingIndexes(DirList.FileList, namePrefix);
-
-        var fileName = $"{namePrefix}{index}";
+        var fileName = FileHelper.DuplicateFile(DirList.FileList, S_NEW_ITEM(isFolder));
         FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), isFolder ? FileType.Folder : FileType.File, isTemp: true);
         DirList.FileList.Insert(0, newItem);
 

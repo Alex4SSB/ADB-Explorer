@@ -36,7 +36,7 @@ public static class DialogService
         }
 
         if (copyToClipboard)
-            Clipboard.SetText(content);
+            Data.FileActions.MessageToCopy = content;
 
         ShowDialog(content, title, icon, hidePanes, copyToClipboard);
     }
@@ -54,7 +54,6 @@ public static class DialogService
         windowDialog.PrimaryButtonText = null;
         windowDialog.CloseButtonText = "Ok";
         DialogHelper.SetDialogIcon(windowDialog, Icon(icon));
-        DialogHelper.SetIsClipboardIconVisible(windowDialog, copyToClipboard);
 
         if (hidePanes)
             HidePanes();
@@ -124,7 +123,6 @@ public static class DialogService
         windowDialog.SecondaryButtonText = secondaryText;
         windowDialog.CloseButtonText = cancelText;
         DialogHelper.SetDialogIcon(windowDialog, Icon(icon));
-        DialogHelper.SetIsClipboardIconVisible(windowDialog, false);
 
         if (hidePanes)
             HidePanes();

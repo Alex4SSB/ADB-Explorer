@@ -36,9 +36,9 @@ public static class Security
     public static Dictionary<string, string> CalculateWindowsFolderHash(string path, string parent = "")
     {
         if (!Path.Exists(path))
-            return new();
+            return [];
 
-        if (!File.GetAttributes(path).HasFlag(System.IO.FileAttributes.Directory))
+        if (!File.GetAttributes(path).HasFlag(FileAttributes.Directory))
         {
             return new() { { Path.GetFileName(path), CalculateWindowsFileHash(path) } };
         }
@@ -58,7 +58,7 @@ public static class Security
     public static Dictionary<string, string> CalculateAndroidFolderHash(FilePath path, Device device)
     {
         // find ./ -mindepth 1 -type f -exec md5sum {} \;
-        string[] args = { ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;" };
+        string[] args = [ ADBService.EscapeAdbShellString(path.FullPath), "-type", "f", "-exec", "md5sum", "{}", @"\;" ];
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "find", out string stdout, out string stderr, new(), args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH().Matches(stdout);
@@ -70,7 +70,7 @@ public static class Security
     public static Dictionary<string, string> CalculateAndroidArchiveHash(FilePath path, Device device)
     {
         // tar -xf *.tar.gz --to-command='echo $(md5sum) $TAR_FILENAME'
-        string[] args = { "xf", ADBService.EscapeAdbShellString(path.FullPath), "--to-command='echo $(md5sum) $TAR_FILENAME'" };
+        string[] args = [ "xf", ADBService.EscapeAdbShellString(path.FullPath), "--to-command='echo $(md5sum) $TAR_FILENAME'" ];
         ADBService.ExecuteDeviceAdbShellCommand(device.ID, "tar", out string stdout, out string stderr, new(), args);
 
         var list = AdbRegEx.RE_ANDROID_FIND_HASH().Matches(stdout);

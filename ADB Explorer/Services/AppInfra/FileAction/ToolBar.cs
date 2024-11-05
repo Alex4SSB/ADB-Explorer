@@ -340,3 +340,11 @@ internal static class PeekDetailed
             () => true,
             () => Data.RuntimeSettings.IsDetailedPeekMode = true);
 }
+
+internal static class DialogExtraButtons
+{
+    public static ObservableList<IMenuItem> List { get; } =
+    [
+        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyMessageToClipboard), "\uF0E3"),
+    ];
+}

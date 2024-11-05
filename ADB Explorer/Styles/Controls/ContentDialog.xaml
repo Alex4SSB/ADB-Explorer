@@ -130,23 +130,12 @@
                                                             </Grid>
                                                         </Grid>
                                                     </ScrollViewer>
-                                                    <ui:FontIcon
+                                                    <Menu
                                                         Grid.Row="1"
                                                         Margin="0,10,-20,-18"
                                                         HorizontalAlignment="Right"
                                                         VerticalAlignment="Bottom"
-                                                        Glyph="&#xF0E3;"
-                                                        ToolTip="Message copied to clipboard">
-                                                        <ui:FontIcon.Style>
-                                                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:ContentDialog}, Path=(helpers:DialogHelper.IsClipboardIconVisible)}" Value="False">
-                                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </ui:FontIcon.Style>
-                                                    </ui:FontIcon>
+                                                        Style="{StaticResource DialogExtraButtonsStyle}" />
                                                 </Grid>
                                             </Border>
                                             <Grid
@@ -458,7 +447,6 @@
     <Style BasedOn="{StaticResource DefaultContentDialogStyle}" TargetType="ui:ContentDialog">
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="helpers:DialogHelper.DialogIcon" Value="" />
-        <Setter Property="helpers:DialogHelper.IsClipboardIconVisible" Value="False" />
         <Style.Resources>
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Style.Triggers>

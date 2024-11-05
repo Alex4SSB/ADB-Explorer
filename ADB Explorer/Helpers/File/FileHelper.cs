@@ -154,23 +154,47 @@ public static class FileHelper
         return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
     }
 
-    public static string ExistingIndexes(ObservableList<FileClass> fileList, string namePrefix, CutType cutType = CutType.None)
+    /// <summary>
+    /// Returns the extension (including the period ".").<br />
+    /// Returns an empty string if file has no extension.
+    /// </summary>
+    public static string GetExtension(string fullName)
     {
-        var existingItems = fileList.Where(item => item.NoExtName.StartsWith(namePrefix));
-        var suffixes = existingItems.Select(item => item.NoExtName[namePrefix.Length..].Trim());
+        var lastDot = fullName.LastIndexOf('.');
+        if (lastDot < 1)
+            return "";
 
-        if (cutType is CutType.Copy or CutType.Link)
-        {
-            suffixes = suffixes.Select(item => item.Replace("- Copy", "").Trim());
-        }
+        var secondLast = fullName[..lastDot].LastIndexOf('.');
 
-        return ExistingIndexes(suffixes, cutType);
+        if (secondLast > 0 && fullName[(secondLast + 1)..lastDot] == "tar")
+            return fullName[secondLast..];
+
+        return fullName[lastDot..];
     }
 
-    public static string ExistingIndexes(IEnumerable<string> suffixes, CutType cutType = CutType.None)
-    {
-        var copySuffix = cutType is CutType.Copy or CutType.Link ? " - Copy" : "";
+    public static string DuplicateFile(ObservableList<FileClass> fileList, string fullName, CutType cutType = CutType.None)
+        => DuplicateFile(fileList.Select(f => f.FullName), fullName, cutType);
 
+    public static string DuplicateFile(IEnumerable<string> fileList, string fullName, CutType cutType = CutType.None)
+    {
+        // None - new file
+        var copySuffix = cutType is CutType.None ? "" : " - Copy";
+        var extension = GetExtension(fullName);
+        var noExtName = fullName[..^extension.Length];
+
+        // Has the exact same name before the suffix, optionally has the suffix which is optionally iterated, and has the exact same extension
+        Regex re = new($"^{noExtName}(?:{copySuffix}(?: (?<iter>\\d+))?)?{extension.Replace(".", "\\.")}$");
+
+        var items = from i in fileList
+                    let match = re.Match(i)
+                    where match.Success
+                    select match.Groups["iter"].Value;
+
+        return $"{noExtName}{ExistingIndexes(items, copySuffix)}{extension}";
+    }
+
+    public static string ExistingIndexes(IEnumerable<string> suffixes, string copySuffix = "")
+    {
         var indexes = (from i in suffixes
                        where int.TryParse(i, out _)
                        select int.Parse(i)).ToList();

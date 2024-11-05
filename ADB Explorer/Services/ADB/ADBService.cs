@@ -369,9 +369,9 @@ public partial class ADBService
         return ulong.TryParse(stdout, out var count) ? count : 0;
     }
 
-    public static string[] FindFilesInPath(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null)
+    public static string[] FindFilesInPath(string deviceID, string path, IEnumerable<string> includeNames = null, IEnumerable<string> excludeNames = null, bool caseSensitive = false)
     {
-        string[] args = PrepFindArgs(path, includeNames, excludeNames, false);
+        string[] args = PrepFindArgs(path, includeNames, excludeNames, false, caseSensitive);
 
         ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), args);
 
@@ -385,7 +385,7 @@ public partial class ADBService
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
-    private static string[] PrepFindArgs(string path, IEnumerable<string> includeNames, IEnumerable<string> excludeNames, bool countOnly)
+    private static string[] PrepFindArgs(string path, IEnumerable<string> includeNames, IEnumerable<string> excludeNames, bool countOnly, bool caseSensitive = false)
     {
         if (includeNames is not null && excludeNames is not null)
             throw new ArgumentException("""
@@ -398,6 +398,8 @@ public partial class ADBService
         if (!path.EndsWith('/'))
             path += "/";
 
+        var nameArg = caseSensitive ? "-name" : "-iname";
+
         string[] args = [EscapeAdbShellString(path), .. FIND_COUNT_PARAMS_1];
 
         if (includeNames is not null)
@@ -407,17 +409,17 @@ public partial class ADBService
                 if (i > 0)
                     args = [.. args, "-o"];
 
-                args = [.. args, "-iname", EscapeAdbShellString(includeNames.ElementAt(i))];
+                args = [.. args, nameArg, EscapeAdbShellString(includeNames.ElementAt(i))];
             }
         }
         else
-            args = [.. args, "-iname", "\"\\*\""];
+            args = [.. args, nameArg, "\"\\*\""];
 
         if (excludeNames is not null)
         {
             foreach (var item in excludeNames)
             {
-                args = [.. args, "!", "-iname", EscapeAdbShellString(item)];
+                args = [.. args, "!", nameArg, EscapeAdbShellString(item)];
             }
         }
 

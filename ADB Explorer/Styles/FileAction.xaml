@@ -403,4 +403,17 @@
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="0" />
     </Style>
+    <Style
+        x:Key="DialogExtraButtonsStyle"
+        BasedOn="{StaticResource ToolBarStyle}"
+        TargetType="Menu">
+        <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:DialogExtraButtons.List}}" />
+        <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
+        <Setter Property="helpers:MenuHelper.ItemPadding" Value="4" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=MessageToCopy.Length}" Value="0">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

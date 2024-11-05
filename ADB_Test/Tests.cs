@@ -118,20 +118,29 @@ namespace ADB_Test
         }
 
         [TestMethod]
-        public void ExistingIndexesTest()
+        public void DuplicateFileTest()
         {
-            string[] names = ["", "1"];
-            string[] names1 = ["", "2"];
+            string[] names = ["New File", "New File 1", "New File.txt"];
+            string[] names1 = ["New File", "New File 2"];
 
-            Assert.AreEqual("", FileHelper.ExistingIndexes(names[..0])); // empty array
-            Assert.AreEqual(" 1", FileHelper.ExistingIndexes([""]));
-            Assert.AreEqual(" 2", FileHelper.ExistingIndexes(names));
-            Assert.AreEqual(" 1", FileHelper.ExistingIndexes(names1));
+            // New file
+            Assert.AreEqual("New File", FileHelper.DuplicateFile(Array.Empty<string>(), "New File"));
+            Assert.AreEqual("New File 1", FileHelper.DuplicateFile(["New File"], "New File"));
+            Assert.AreEqual("New File 2", FileHelper.DuplicateFile(names, "New File"));
+            Assert.AreEqual("New File 1", FileHelper.DuplicateFile(names1, "New File"));
+            Assert.AreEqual("New File.pdf", FileHelper.DuplicateFile(names, "New File.pdf"));
+            Assert.AreEqual("New File 1.txt", FileHelper.DuplicateFile(names, "New File.txt"));
 
-            Assert.AreEqual("", FileHelper.ExistingIndexes(names[..0], FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes([""], FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 2", FileHelper.ExistingIndexes(names, FileClass.CutType.Copy));
-            Assert.AreEqual(" - Copy 1", FileHelper.ExistingIndexes(names1, FileClass.CutType.Copy));
+            string[] names2 = ["New File", "New File - Copy 1", "New File.txt"];
+            string[] names3 = ["New File", "New File - Copy 2"];
+
+            // Copy
+            Assert.AreEqual("New File", FileHelper.DuplicateFile(Array.Empty<string>(), "New File", AbstractFile.CutType.Copy));
+            Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(["New File"], "New File", AbstractFile.CutType.Copy));
+            Assert.AreEqual("New File - Copy 2", FileHelper.DuplicateFile(names2, "New File", AbstractFile.CutType.Copy));
+            Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(names3, "New File", AbstractFile.CutType.Copy));
+            Assert.AreEqual("New File.pdf", FileHelper.DuplicateFile(names2, "New File.pdf", AbstractFile.CutType.Copy));
+            Assert.AreEqual("New File - Copy 1.txt", FileHelper.DuplicateFile(names2, "New File.txt", AbstractFile.CutType.Copy));
         }
 
         [TestMethod]

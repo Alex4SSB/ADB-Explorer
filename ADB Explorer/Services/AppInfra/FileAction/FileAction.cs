@@ -418,7 +418,15 @@ internal static class AppActions
             FileActionLogic.ApkWebSearch,
             "Search In Browser",
             new(Key.O, ModifierKeys.Control),
-            true)
+            true),
+        new(FileActionType.CopyMessageToClipboard,
+            () => !string.IsNullOrEmpty(Data.FileActions.MessageToCopy),
+            () =>
+            {
+                Clipboard.SetText(Data.FileActions.MessageToCopy);
+                Data.FileActions.MessageToCopy = "";
+            },
+            "Copy to clipboard")
     ];
 
     public static List<KeyBinding> Bindings =>
@@ -511,6 +519,7 @@ internal class FileAction : ViewModelBase
         FollowLink,
         PasteLink,
         SearchApkOnWeb,
+        CopyMessageToClipboard,
     }
 
     public FileActionType Name { get; }

@@ -26,7 +26,6 @@
                 <ResourceDictionary Source="Styles\Controls\Expander.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
                 <ResourceDictionary Source="Styles\Controls\DataGrid.xaml" />
-                <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
                 <ResourceDictionary Source="Styles\Controls\SplitView.xaml" />
                 <ResourceDictionary Source="Styles\FileAction.xaml" />
                 <ResourceDictionary Source="Styles\Settings.xaml" />
@@ -34,6 +33,7 @@
                 <ResourceDictionary Source="Styles\Device.xaml" />
                 <ResourceDictionary Source="Styles\FileOp.xaml" />
                 <ResourceDictionary Source="Styles\FileOpColumn.xaml" />
+                <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
                 <!--  Other merged dictionaries here  -->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->

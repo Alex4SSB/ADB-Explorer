@@ -2,19 +2,6 @@
 
 public static class DialogHelper
 {
-    public static bool GetIsClipboardIconVisible(ContentDialog control) =>
-        (bool)control.GetValue(IsClipboardIconVisibleProperty);
-
-    public static void SetIsClipboardIconVisible(ContentDialog control, bool value) =>
-        control.SetValue(IsClipboardIconVisibleProperty, value);
-
-    public static readonly DependencyProperty IsClipboardIconVisibleProperty =
-        DependencyProperty.RegisterAttached(
-            "IsClipboardIconVisible",
-            typeof(bool),
-            typeof(DialogHelper),
-            null);
-
     public static string GetDialogIcon(ContentDialog control) =>
         (string)control.GetValue(DialogIconProperty);
 

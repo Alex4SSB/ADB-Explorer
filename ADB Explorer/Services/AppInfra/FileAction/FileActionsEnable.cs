@@ -457,6 +457,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isPastingInDescendant, value);
     }
 
+    public string messageToCopy = "";
+    public string MessageToCopy
+    {
+        get => messageToCopy;
+        set => Set(ref messageToCopy, value);
+    }
+
     #region Observable properties
 
     public ObservableProperty<bool> IsCutState = new();
