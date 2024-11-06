@@ -745,24 +745,29 @@ internal static class FileActionLogic
     {
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
-        SyncFile targetPath;
+        string targetPath, targetName = "";
         if (isContextMenu && Data.SelectedFiles.Count() == 1)
-            targetPath = (SyncFile)Data.SelectedFiles.First();
+        {
+            targetPath = Data.SelectedFiles.First().FullPath;
+            targetName = Data.SelectedFiles.First().FullName;
+        }
         else
-            targetPath = new(Data.CurrentPath, FileType.Folder);
+        {
+            targetPath = Data.CurrentPath;
+        }
 
         var dialog = new CommonOpenFileDialog()
         {
             IsFolderPicker = isFolderPicker,
             Multiselect = true,
             DefaultDirectory = Data.Settings.DefaultFolder,
-            Title = Strings.S_PUSH_BROWSE_TITLE(isFolderPicker, targetPath.FullPath == Data.CurrentPath ? "" : targetPath.FullName),
+            Title = Strings.S_PUSH_BROWSE_TITLE(isFolderPicker, targetName),
         };
 
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        PushShellObjects(dialog.FilesAsShellObject, targetPath.FullPath);
+        CopyPasteService.VerifyAndPush(targetPath, dialog.FilesAsShellObject);
     }
 
     public static void PushShellObjects(IEnumerable<ShellObject> items, string targetPath)

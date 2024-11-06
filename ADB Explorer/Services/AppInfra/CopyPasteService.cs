@@ -324,6 +324,20 @@ public class CopyPasteService : ViewModelBase
             ClearDrag();
     }
 
+    public static async void VerifyAndPush(string targetPath, IEnumerable<ShellObject> pasteItems)
+    {
+        var files = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
+        if (!files.Any())
+            return;
+
+        if (files.Count() < pasteItems.Count())
+        {
+            pasteItems = pasteItems.Where(f => files.Contains(f.ParsingName));
+        }
+
+        FileActionLogic.PushShellObjects(pasteItems, targetPath);
+    }
+
     public static async void VerifyAndPush(string targetPath, IEnumerable<string> pasteItems)
     {
         pasteItems = await MergeFiles(pasteItems, targetPath);
@@ -358,13 +372,14 @@ public class CopyPasteService : ViewModelBase
 
     public static async Task<IEnumerable<string>> MergeFiles(IEnumerable<string> fileNames, string targetPath)
     {
-        // Figure out whether the target is Windows or Android
-        var sep = FileHelper.GetSeparator(targetPath);
         IEnumerable<string> existingItems = [];
-        var fuse = DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
         StringComparison comparisonType = StringComparison.InvariantCultureIgnoreCase;
 
-        if (sep == '/') // Android
+        // Figure out whether the target is Windows or Android
+        var sep = FileHelper.GetSeparator(targetPath);
+        var fuse = sep is '/' && DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
+
+        if (sep is '/') // Android
         {
             comparisonType = fuse ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
 
