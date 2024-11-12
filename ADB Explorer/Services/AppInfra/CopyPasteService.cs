@@ -421,7 +421,7 @@ public class CopyPasteService : ViewModelBase
             }
             else if (result.Item1 is ContentDialogResult.Secondary) // Skip
             {
-                fileNames = fileNames.Where(item => !existingItems.Contains(FileHelper.GetFullName(item)));
+                fileNames = fileNames.Where(item => !existingItems.Any(existing => FileHelper.GetFullName(existing).Equals(FileHelper.GetFullName(item), comparisonType))).ToList();
             }
         }
         
