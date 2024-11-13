@@ -225,10 +225,19 @@ public static class FileHelper
         Unix,
         FUSE,
         Windows,
+        WinRoot,
     }
 
     static readonly Func<string, bool> FileNamePredicateWindows = (name) => 
         !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
+        && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
+        && name.Length > 0
+        && name[^1] is not ' ' and not '.'
+        && name[0] is not ' ';
+
+    static readonly Func<string, bool> FileNamePredicateWinRoot = (name) =>
+        !AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(name)
+        && !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
         && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
         && name.Length > 0
         && name[^1] is not ' ' and not '.'
@@ -259,6 +268,7 @@ public static class FileHelper
             RenameTarget.Unix => FileNamePredicateUnix,
             RenameTarget.FUSE => FileNamePredicateFuse,
             RenameTarget.Windows => FileNamePredicateWindows,
+            RenameTarget.WinRoot => FileNamePredicateWinRoot,
             _ => throw new NotSupportedException(),
         };
 

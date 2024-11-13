@@ -278,6 +278,7 @@
                                 x:Name="OriginalDate"
                                 Width="Auto"
                                 Binding="{Binding TrashIndex.ModifiedTimeString}"
+                                ElementStyle="{StaticResource DirectoryGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="Date Deleted"
                                 IsReadOnly="True" />

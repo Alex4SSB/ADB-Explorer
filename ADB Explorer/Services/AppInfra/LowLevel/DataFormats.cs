@@ -1,7 +1,4 @@
 ﻿using ADB_Explorer.Models;
-using static ADB_Explorer.Services.NativeMethods;
-using static ADB_Explorer.Services.VirtualFileDataObject;
-using System.Windows;
 
 namespace ADB_Explorer.Services;
 
@@ -35,6 +32,25 @@ public static class AdbDataFormats
         { FileDrop, nameof(FileDrop) },
         { AdbDrop, nameof(AdbDrop) },
     };
+
+    private static Dictionary<short, AdbDataFormat> FormatObjects => new()
+    {
+        { DragImage, DragImage },
+        { FileContents, FileContents },
+        { FileDescriptor, FileDescriptor },
+        { PasteSucceeded, PasteSucceeded },
+        { PerformedDropEffect, PerformedDropEffect },
+        { PreferredDropEffect, PreferredDropEffect },
+        { DragLoop, DragLoop },
+        { FileName, FileName },
+        { FileNameW, FileNameW },
+        { ShellidList, ShellidList },
+        { FileDrop, FileDrop },
+        { AdbDrop, AdbDrop },
+    };
+
+    public static AdbDataFormat GetFormat(short id) =>
+        FormatObjects.TryGetValue(id, out var format) ? format : null;
 
     public static string GetFormatName(short id) =>
         DataFormatKeys.TryGetValue(id, out var format) ? format : null;

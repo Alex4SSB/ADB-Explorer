@@ -141,6 +141,7 @@ public class CopyPasteService : ViewModelBase
         {
             PasteState = CutType.None;
             PasteSource = DataSource.None;
+            Files = [];
             return;
         }
 
@@ -209,6 +210,9 @@ public class CopyPasteService : ViewModelBase
         else
             PasteSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
 
+        if (Data.CurrentADBDevice is null)
+            return;
+
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
 
@@ -244,6 +248,11 @@ public class CopyPasteService : ViewModelBase
             DragFiles = fileGroup.descriptors.Select(d => d.cFileName).ToArray();
 
             PasteSource |= DataSource.Virtual;
+        }
+        else
+        {
+            DragFiles = [];
+            UpdateUI();
         }
 
         if (oldFiles != DragFiles && IsDrag)

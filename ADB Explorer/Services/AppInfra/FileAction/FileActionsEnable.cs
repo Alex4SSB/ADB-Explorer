@@ -450,6 +450,34 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isSelectionIllegalOnWindows, value);
     }
 
+    private bool isSelectionIllegalOnFuse = false;
+    public bool IsSelectionIllegalOnFuse
+    {
+        get => isSelectionIllegalOnFuse;
+        set => Set(ref isSelectionIllegalOnFuse, value);
+    }
+
+    private bool isSelectionIllegalOnWinRoot = false;
+    public bool IsSelectionIllegalOnWinRoot
+    {
+        get => isSelectionIllegalOnWinRoot;
+        set => Set(ref isSelectionIllegalOnWinRoot, value);
+    }
+
+    private bool isSelectionConflictingOnFuse = false;
+    public bool IsSelectionConflictingOnFuse
+    {
+        get => isSelectionConflictingOnFuse;
+        set => Set(ref isSelectionConflictingOnFuse, value);
+    }
+
+    private bool isPastingConflictingOnFuse = false;
+    public bool IsPastingConflictingOnFuse
+    {
+        get => isPastingConflictingOnFuse;
+        set => Set(ref isPastingConflictingOnFuse, value);
+    }
+
     private bool isPastingInDescendant = false;
     public bool IsPastingInDescendant
     {

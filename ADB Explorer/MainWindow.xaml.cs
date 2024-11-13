@@ -1794,13 +1794,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             : INVALID_UNIX_CHARS);
 
         FileActions.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
-
         FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
-
         FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
-        
-        FileActions.IsRenameDriveRootLegal = FileActions.IsRenameWindowsLegal
-                                             && !INVALID_WINDOWS_ROOT_PATHS.Contains(textBox.Text);
+        FileActions.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
 
         var fullName = Settings.ShowExtensions
             ? textBox.Text

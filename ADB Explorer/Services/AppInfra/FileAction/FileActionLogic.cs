@@ -312,10 +312,15 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        Data.FileActions.IsPastingIllegalOnFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true
+        bool isFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true;
+        Data.FileActions.IsPastingIllegalOnFuse = isFuse
             && !FileHelper.FileNameLegal(Data.CopyPaste.Files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.FUSE);
 
-        if (Data.FileActions.IsPastingIllegalOnFuse)
+        Data.FileActions.IsPastingConflictingOnFuse = isFuse
+            && Data.CopyPaste.Files.Distinct(StringComparer.InvariantCultureIgnoreCase)
+            .Count() != Data.CopyPaste.Files.Length;
+
+        if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
             return false;
 
         switch (selected)
@@ -669,11 +674,17 @@ internal static class FileActionLogic
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : Strings.S_RESTORE_ACTION;
 
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
+        Data.FileActions.IsSelectionIllegalOnFuse = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.FUSE);
+        Data.FileActions.IsSelectionIllegalOnWinRoot = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
+        Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)
+            .Distinct(StringComparer.InvariantCultureIgnoreCase)
+            .Count() != Data.SelectedFiles.Count();
 
         Data.FileActions.PullEnabled = !Data.FileActions.IsRecycleBin
                                        && Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
                                        && Data.FileActions.IsRegularItem
-                                       && !Data.FileActions.IsSelectionIllegalOnWindows;
+                                       && !Data.FileActions.IsSelectionIllegalOnWindows
+                                       && !Data.FileActions.IsSelectionConflictingOnFuse;
 
         Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 

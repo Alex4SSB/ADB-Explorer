@@ -304,7 +304,7 @@ public static class ShellFileOperation
                 }
             }
 
-            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
+            op.PropertyChanged -= MoveFileOp_PropertyChanged;
         }
     }
 
@@ -429,7 +429,7 @@ public static class ShellFileOperation
                     Data.FileActions.RefreshPackages = true;
             }
 
-            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
+            op.PropertyChanged -= InstallOp_PropertyChanged;
         }
     }
 
@@ -524,7 +524,7 @@ public static class ShellFileOperation
                 op.FilePath.ModifiedTime = op.NewDate;
             }
 
-            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
+            op.PropertyChanged -= ChangeModifiedOp_PropertyChanged;
         }
     }
 }

@@ -13,13 +13,31 @@
     DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Glyph" Value="&#xF13D;" />
-            <Setter Property="Margin" Value="0,0,4,0" />
-            <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
-        </Style>
         <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button" />
+        <Grid
+            x:Key="WarningIcon"
+            Margin="0,-4,4,0"
+            x:Shared="False">
+            <ui:FontIcon
+                FontWeight="Bold"
+                Foreground="{StaticResource EditorTextChangedBrush}"
+                Glyph="&#xF13A;" />
+            <ui:FontIcon
+                FontWeight="Bold"
+                Foreground="Black"
+                Glyph="&#xF13B;" />
+        </Grid>
+        <Grid x:Key="ErrorIcon" x:Shared="False">
+            <ui:FontIcon Margin="0,0,4,0">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="FontWeight" Value="Bold" />
+                        <Setter Property="Glyph" Value="&#xF13D;" />
+                        <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+        </Grid>
     </UserControl.Resources>
     <UserControl.Style>
         <Style TargetType="UserControl">
@@ -27,6 +45,9 @@
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="False" />
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False" />
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False" />
+                        <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False" />
                         <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRegularItem}" Value="True" />
                     </MultiDataTrigger.Conditions>
                     <Setter Property="Visibility" Value="Collapsed" />
@@ -35,6 +56,9 @@
                     <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
+                    <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="True">
                     <Setter Property="Visibility" Value="Visible" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
@@ -59,7 +83,7 @@
         </Style>
     </UserControl.Style>
     <Border
-        Background="{DynamicResource SelectedInactiveBackground}"
+        Background="{DynamicResource DeviceConnectionPanelBackground}"
         BorderBrush="Black"
         BorderThickness="1,1,1,0"
         Style="{StaticResource BorderStyle}">
@@ -72,23 +96,21 @@
                     <RowDefinition />
                     <RowDefinition Height="6" />
                     <RowDefinition />
+                    <RowDefinition Height="10" />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
-                <Grid Margin="4,0,2,0">
-                    <CheckBox
-                        x:Name="PermanentHideCheckBox"
-                        Content="Never Show Again"
-                        ToolTip="Can be undone by reset app settings, or manually in settings file" />
-                    <Button
-                        Margin="0"
-                        HorizontalAlignment="Right"
-                        Click="Button_Click"
-                        Style="{StaticResource RestartAppButtonStyle}"
-                        ToolTip="Hide (until app reset)">
-                        <ui:FontIcon Glyph="&#xE711;" />
-                    </Button>
+                <Grid>
+                    <TextBlock
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Text="Warnings" />
                 </Grid>
-                <ui:SimpleStackPanel Grid.Row="2" Spacing="4">
-                    <Grid x:Name="Grid1" d:Visibility="Visible">
+                <Separator Grid.Row="1" Margin="-4,0,-6,0" />
+                <ui:SimpleStackPanel
+                    Grid.Row="2"
+                    Margin="2"
+                    Spacing="4">
+                    <Grid d:Visibility="Visible">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -105,13 +127,113 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <ui:FontIcon />
+                        <!--<ui:FontIcon Foreground="{StaticResource EditorTextChangedBrush}" Glyph="&#xF13A;" />
+                        <ui:FontIcon Foreground="Black" Glyph="&#xF13B;" />-->
+                        <StaticResource ResourceKey="WarningIcon" />
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
                             Text="A selected file violates Windows naming rules" />
                     </Grid>
-                    <Grid x:Name="Grid2" d:Visibility="Visible">
+                    <Grid d:Visibility="Visible">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWinRoot}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <StaticResource ResourceKey="WarningIcon" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="A selected file violates Windows drive root naming rules" />
+                    </Grid>
+                    <Grid d:Visibility="Visible">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionConflictingOnFuse}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnWindows}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <StaticResource ResourceKey="WarningIcon" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="Some selected files have conflicting names on FUSE / Windows" />
+                    </Grid>
+                    <Grid d:Visibility="Visible">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsSelectionIllegalOnFuse}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=SelectedItemsCount}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <StaticResource ResourceKey="WarningIcon" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="A selected file violates FUSE naming rules" />
+                    </Grid>
+                    <Grid d:Visibility="Visible">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingConflictingOnFuse}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsPastingIllegalOnFuse}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <StaticResource ResourceKey="ErrorIcon" />
+                        <TextBlock
+                            Grid.Column="1"
+                            VerticalAlignment="Center"
+                            Text="Some copied files have conflicting names on FUSE" />
+                    </Grid>
+                    <Grid d:Visibility="Visible">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -125,13 +247,13 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <ui:FontIcon />
+                        <StaticResource ResourceKey="ErrorIcon" />
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
                             Text="A copied file violates FUSE naming rules" />
                     </Grid>
-                    <Grid x:Name="Grid3" d:Visibility="Visible">
+                    <Grid d:Visibility="Visible">
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
@@ -148,13 +270,24 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <ui:FontIcon />
+                        <StaticResource ResourceKey="ErrorIcon" />
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
                             Text="A selected item is not a file / folder" />
                     </Grid>
                 </ui:SimpleStackPanel>
+                <Grid Grid.Row="4" Margin="2">
+                    <CheckBox
+                        x:Name="PermanentHideCheckBox"
+                        Content="Never Show Again"
+                        ToolTip="Can be undone by reset app settings, or manually in settings file" />
+                    <Button
+                        HorizontalAlignment="Right"
+                        Click="Button_Click"
+                        Content="Hide"
+                        ToolTip="Until next app launch" />
+                </Grid>
             </Grid>
         </Border>
     </Border>

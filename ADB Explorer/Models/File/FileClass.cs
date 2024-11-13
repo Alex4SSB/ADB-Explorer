@@ -122,17 +122,18 @@ public class FileClass : FilePath, IFileStat
         {
             if (children is null || !IsDirectory)
             {
-                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID,
-                                                        "cd",
-                                                        out string stdout,
-                                                        out _,
-                                                        new(),
-                                                        ParentPath,
-                                                        "&&",
-                                                        "find",
-                                                        ADBService.EscapeAdbShellString(FullName),
-                                                        "-type",
-                                                        "f");
+                var findCmd = "find";
+                if (Enum.TryParse<ShellCommands.ShellCmd>(findCmd, out var enumCmd)
+                    && ShellCommands.DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
+                    && dict.TryGetValue(enumCmd, out var deviceCmd))
+                {
+                    findCmd = deviceCmd;
+                }
+
+                var target = ADBService.EscapeAdbShellString(FullName);
+                string[] args = [ ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-type d -empty -printf '%p/\\n'"];
+                
+                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, new(), args);
 
                 children = stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
             }
