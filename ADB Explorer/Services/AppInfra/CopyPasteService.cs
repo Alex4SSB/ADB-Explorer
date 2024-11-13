@@ -396,8 +396,8 @@ public class CopyPasteService : ViewModelBase
         {
             var files = Directory.GetFiles(targetPath);
             var dirs = Directory.GetDirectories(targetPath);
-
-            existingItems = dirs.Concat(files).Where(f => fileNames.Any(name => FileHelper.GetFullName(name).Equals(FileHelper.GetFullName(f), comparisonType)));
+            var fileNamesFullPaths = new HashSet<string>(fileNames.Select(name => FileHelper.GetFullName(name)),   StringComparer.InvariantCultureIgnoreCase); // Case-insensitive comparison
+            existingItems = dirs.Concat(files).Where(f => fileNamesFullPaths.Contains(FileHelper.GetFullName(f))).ToList();
         }
 
         var count = existingItems.Count();
@@ -421,7 +421,13 @@ public class CopyPasteService : ViewModelBase
             }
             else if (result.Item1 is ContentDialogResult.Secondary) // Skip
             {
-                fileNames = fileNames.Where(item => !existingItems.Any(existing => FileHelper.GetFullName(existing).Equals(FileHelper.GetFullName(item), comparisonType))).ToList();
+                // Create a HashSet of full names from existingItems for fast lookup
+                var existingFullNames = new HashSet<string>(
+                    existingItems.Select(existing => FileHelper.GetFullName(existing)),
+                    StringComparer.InvariantCultureIgnoreCase); // Case-insensitive comparison
+                fileNames = fileNames
+                    .Where(item => !existingFullNames.Contains(FileHelper.GetFullName(item)))
+                    .ToList();
             }
         }
         
