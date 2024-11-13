@@ -333,20 +333,22 @@ public class FileClass : FilePath, IFileStat
         // When a folder isn't empty, there's no need creating a file descriptor for it, since all folders are automatcally created
         var items = IsDirectory && Children?.Length > 0 ? Children : [FullName];
 
-        // Set directory flag only for an empty folder
-        bool isDir = IsDirectory && (Children is null || Children.Length < 1);
+        var items = Children ?? [FullName + (IsDirectory ? '/' : "")];
 
         // We only know the size of a single file beforehand
         long? size = IsDirectory ? null : (long?)Size;
 
-        Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor()
+        Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor
         {
-            Name = item,
+            Name = item.TrimEnd('/'),
             SourcePath = FullPath,
-            IsDirectory = isDir,
+            IsDirectory = item[^1] is '/',
             Length = size,
             StreamContents = (stream) =>
             {
+                if (DateTime.Now.Subtract(fileOp.TimeStamp) < TimeSpan.FromMilliseconds(100))
+                    return;
+
                 // Start the operation if it hasn't been started yet
                 if (fileOp.Status is FileOperation.OperationStatus.Waiting)
                     App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(fileOp));
