@@ -874,7 +874,7 @@ internal static class FileActionLogic
         var files = await CopyPasteService.MergeFiles(pullItems.Select(f => f.FullPath), path.ParsingName);
         if (files.Count() < pullItems.Count())
         {
-            pullItems = pullItems.Where(f => files.Contains(f.FullName));
+            pullItems = pullItems.Where(f => files.Contains(f.FullPath));
         }
 
         foreach (var item in pullItems)

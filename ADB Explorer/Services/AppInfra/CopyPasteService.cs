@@ -379,6 +379,27 @@ public class CopyPasteService : ViewModelBase
                   cutType: cutType);
     }
 
+   public static StringComparer GetStringComparer(StringComparison comparison)
+    {
+        switch (comparison)
+        {
+            case StringComparison.Ordinal:
+                return StringComparer.Ordinal;
+            case StringComparison.OrdinalIgnoreCase:
+                return StringComparer.OrdinalIgnoreCase;
+            case StringComparison.InvariantCulture:
+                return StringComparer.InvariantCulture;
+            case StringComparison.InvariantCultureIgnoreCase:
+                return StringComparer.InvariantCultureIgnoreCase;
+            case StringComparison.CurrentCulture:
+                return StringComparer.CurrentCulture;
+            case StringComparison.CurrentCultureIgnoreCase:
+                return StringComparer.CurrentCultureIgnoreCase;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
+        }
+    }
+
     public static async Task<IEnumerable<string>> MergeFiles(IEnumerable<string> fileNames, string targetPath)
     {
         IEnumerable<string> existingItems = [];
@@ -405,8 +426,8 @@ public class CopyPasteService : ViewModelBase
         {
             var files = Directory.GetFiles(targetPath);
             var dirs = Directory.GetDirectories(targetPath);
-
-            existingItems = dirs.Concat(files).Where(f => fileNames.Any(name => FileHelper.GetFullName(name).Equals(FileHelper.GetFullName(f), comparisonType)));
+            var fileNamesFullPaths = new HashSet<string>(fileNames.Select(name => FileHelper.GetFullName(name)), GetStringComparer(comparisonType)); // Case-insensitive comparison
+            existingItems = dirs.Concat(files).Where(f => fileNamesFullPaths.Contains(FileHelper.GetFullName(f))).ToList();
         }
 
         var count = existingItems.Count();
@@ -430,7 +451,13 @@ public class CopyPasteService : ViewModelBase
             }
             else if (result.Item1 is ContentDialogResult.Secondary) // Skip
             {
-                fileNames = fileNames.Where(item => !existingItems.Contains(FileHelper.GetFullName(item)));
+                // Create a HashSet of full names from existingItems for fast lookup
+                var existingFullNames = new HashSet<string>(
+                    existingItems.Select(existing => FileHelper.GetFullName(existing)),
+                    GetStringComparer(comparisonType));
+                fileNames = fileNames
+                    .Where(item => !existingFullNames.Contains(FileHelper.GetFullName(item)))
+                    .ToList();
             }
         }
         

@@ -10,7 +10,20 @@ public class DiskUsage : ViewModelBase
 
     public Process Process { get; }
 
-    public int? PID => Process?.Id;
+    public int? PID
+    {
+        get
+        {
+            try
+            {
+                return Process?.Id;
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
+    }
 
     private ulong? readRate;
     public ulong? ReadRate
@@ -155,8 +168,18 @@ internal static class DiskUsageHelper
         {
             if (usage is null || usage.Process is null)
                 continue;
+            try
+            {
+                var matchingProcess = newUsages.FirstOrDefault(proc => proc.PID == usage.PID);
 
-            usage.Update(newUsages.FirstOrDefault(proc => proc.PID == usage.PID));
+                if (matchingProcess != null)
+                {
+                    usage.Update(matchingProcess);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
 
         var newUsage = DiskUsage.Consolidate(newUsages);
