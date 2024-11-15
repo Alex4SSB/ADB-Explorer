@@ -379,58 +379,57 @@ public class CopyPasteService : ViewModelBase
                   cutType: cutType);
     }
 
-   public static StringComparer GetStringComparer(StringComparison comparison)
+    /// <summary>
+    /// Check for existing top level items in the target location. <br />
+    /// Asks the user whether to abort, continue, or exclude the conflicting items.
+    /// </summary>
+    /// <param name="filePaths">Full paths of the files to be transferred.</param>
+    /// <param name="targetPath">Full path of the target location.</param>
+    /// <returns>
+    /// An empty list if user selected Cancel. <br />
+    /// The original list if user selected Merge or Replace. <br />
+    /// The file list excluding the top level conflicting items if user selected Skip.
+    /// </returns>
+    public static async Task<IEnumerable<string>> MergeFiles(IEnumerable<string> filePaths, string targetPath)
     {
-        switch (comparison)
-        {
-            case StringComparison.Ordinal:
-                return StringComparer.Ordinal;
-            case StringComparison.OrdinalIgnoreCase:
-                return StringComparer.OrdinalIgnoreCase;
-            case StringComparison.InvariantCulture:
-                return StringComparer.InvariantCulture;
-            case StringComparison.InvariantCultureIgnoreCase:
-                return StringComparer.InvariantCultureIgnoreCase;
-            case StringComparison.CurrentCulture:
-                return StringComparer.CurrentCulture;
-            case StringComparison.CurrentCultureIgnoreCase:
-                return StringComparer.CurrentCultureIgnoreCase;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
-        }
-    }
-
-    public static async Task<IEnumerable<string>> MergeFiles(IEnumerable<string> fileNames, string targetPath)
-    {
-        IEnumerable<string> existingItems = [];
-        StringComparison comparisonType = StringComparison.InvariantCultureIgnoreCase;
-
         // Figure out whether the target is Windows or Android
         var sep = FileHelper.GetSeparator(targetPath);
-        var fuse = sep is '/' && DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
+
+        // File names on (non virtual) Unix file systems are case sensitive
+        var isUnix = sep is '/' && !DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
+        StringComparer comparer = isUnix
+            ? StringComparer.InvariantCulture
+            : StringComparer.InvariantCultureIgnoreCase;
+
+        // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts only.
+        // We receive full paths of the top level items in AdbDragList and FileDrop.
+
+        // TODO: FileGroupDescriptor gives full hierarchy, so GetFullName is not good
+
+        HashSet<string> fileNames = new(filePaths.Select(FileHelper.GetFullName), comparer);
+        HashSet<string> existingItems;
 
         if (sep is '/') // Android
         {
-            comparisonType = fuse ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture;
-
             if (targetPath == Data.CurrentPath)
             {
-                existingItems = Data.DirList.FileList.Where(f => fileNames.Any(name => FileHelper.GetFullName(name).Equals(f.FullName, comparisonType))).Select(f => f.FullPath);
+                existingItems = Data.DirList.FileList.Select(f => f.FullPath).Intersect(fileNames).ToHashSet(comparer);
             }
             else
             {
-                existingItems = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID, targetPath, includeNames: fileNames.Select(FileHelper.GetFullName), caseSensitive: !fuse);
+                var foundFiles = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
+                existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
             }
         }
         else // Windows
         {
             var files = Directory.GetFiles(targetPath);
             var dirs = Directory.GetDirectories(targetPath);
-            var fileNamesFullPaths = new HashSet<string>(fileNames.Select(name => FileHelper.GetFullName(name)), GetStringComparer(comparisonType)); // Case-insensitive comparison
-            existingItems = dirs.Concat(files).Where(f => fileNamesFullPaths.Contains(FileHelper.GetFullName(f))).ToList();
+
+            existingItems = dirs.Concat(files).Select(Path.GetFileName).Intersect(fileNames).ToHashSet(comparer);
         }
 
-        var count = existingItems.Count();
+        var count = existingItems.Count;
         if (count > 0)
         {
             string destination = FileHelper.GetFullName(targetPath);
@@ -441,7 +440,7 @@ public class CopyPasteService : ViewModelBase
                 $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
                 "Paste Conflicts",
                 primaryText: "Merge or Replace",
-                secondaryText: count == fileNames.Count() ? "" : "Skip",
+                secondaryText: count == filePaths.Count() ? "" : "Skip",
                 cancelText: "Cancel",
                 icon: DialogService.DialogIcon.Exclamation);
 
@@ -451,17 +450,11 @@ public class CopyPasteService : ViewModelBase
             }
             else if (result.Item1 is ContentDialogResult.Secondary) // Skip
             {
-                // Create a HashSet of full names from existingItems for fast lookup
-                var existingFullNames = new HashSet<string>(
-                    existingItems.Select(existing => FileHelper.GetFullName(existing)),
-                    GetStringComparer(comparisonType));
-                fileNames = fileNames
-                    .Where(item => !existingFullNames.Contains(FileHelper.GetFullName(item)))
-                    .ToList();
+                filePaths = filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item))).ToList();
             }
         }
         
-        return fileNames;
+        return filePaths;
     }
 
     /// <summary>

@@ -402,26 +402,13 @@ public partial class ADBService
 
         string[] args = [EscapeAdbShellString(path), .. FIND_COUNT_PARAMS_1];
 
-        if (includeNames is not null)
-        {
-            for (int i = 0; i < includeNames.Count(); i++)
-            {
-                if (i > 0)
-                    args = [.. args, "-o"];
-
-                args = [.. args, nameArg, EscapeAdbShellString(includeNames.ElementAt(i))];
-            }
-        }
-        else
+        if (includeNames is null)
             args = [.. args, nameArg, "\"\\*\""];
+        else
+            args = [.. args, string.Join(" -o ", includeNames.Select(f => $"{nameArg} {EscapeAdbShellString(f)}"))];
 
         if (excludeNames is not null)
-        {
-            foreach (var item in excludeNames)
-            {
-                args = [.. args, "!", nameArg, EscapeAdbShellString(item)];
-            }
-        }
+            args = [.. args, string.Join(' ', excludeNames.Select(f => $"! {nameArg} {EscapeAdbShellString(f)}"))];
 
         args = [.. args, .. FIND_COUNT_PARAMS_2];
         if (countOnly)

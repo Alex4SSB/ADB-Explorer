@@ -253,10 +253,10 @@ public static class FileHelper
         && name is not "." and not "..";
 
     public static bool FileNameLegal(string fileName, RenameTarget target)
-        => FileNameLegal(new[] { fileName }, target);
+        => FileNameLegal([fileName], target);
 
     public static bool FileNameLegal(FilePath file, RenameTarget target)
-        => FileNameLegal(new[] { file }, target);
+        => FileNameLegal([file], target);
 
     public static bool FileNameLegal(IEnumerable<FilePath> files, RenameTarget target)
         => FileNameLegal(files.Select(f => f.FullName), target);
