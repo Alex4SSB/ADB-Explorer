@@ -699,16 +699,21 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
         Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
 
+        Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
+        Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)
+            .Distinct(StringComparer.InvariantCultureIgnoreCase)
+            .Count() != Data.SelectedFiles.Count();
+
         VirtualFileDataObject vfdo = new((vfdo) => { }, (vfdo) => { }, preferredEffect);
 
-        if (files.Any(f => f.IsDirectory))
+        if (!Data.FileActions.IsSelectionIllegalOnWindows
+            && !Data.FileActions.IsSelectionConflictingOnFuse
+            && !Data.FileActions.IsRecycleBin)
         {
-            //var fileOps = files.Select(file => file.PrepareDescriptors());
-
             Data.RuntimeSettings.MainCursor = Cursors.AppStarting;
             Task.Run(() =>
             {
-                files.ForEach(f => f.PrepareDescriptors());
+                files.ForEach(f => f.PrepareDescriptors(vfdo));
             }).ContinueWith((t) =>
             {
                 App.Current.Dispatcher.Invoke(() =>
@@ -718,16 +723,12 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                 });
             });
 
-            // Add these empty formats as placeholders, the data will be replaced once it is ready
+            // Add these empty formats as placeholders, the data will be replaced once it is ready.
+            // This is done even when no folders are selected and we have all files beforehand.
+            // When sending data to the clipboard, if all data is available immediately,
+            // File Explorer will read the file contents to memory as soon as they appear in the clipboard.
             vfdo.SetData(AdbDataFormats.FileDescriptor, []);
             vfdo.SetData(AdbDataFormats.FileContents, []);
-        }
-        else
-        {
-            // Get the descriptors immediately if no folders are selected
-
-            files.ForEach(f => f.PrepareDescriptors());
-            vfdo.SetData(files.SelectMany(f => f.Descriptors));
         }
 
         vfdo.SetAdbDrag(files, Data.CurrentADBDevice);

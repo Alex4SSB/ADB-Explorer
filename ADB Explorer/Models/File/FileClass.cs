@@ -346,9 +346,6 @@ public class FileClass : FilePath, IFileStat
             Length = size,
             StreamContents = (stream) =>
             {
-                if (DateTime.Now.Subtract(fileOp.TimeStamp) < TimeSpan.FromMilliseconds(100))
-                    return;
-
                 // Start the operation if it hasn't been started yet
                 if (fileOp.Status is FileOperation.OperationStatus.Waiting)
                     App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(fileOp));
