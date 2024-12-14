@@ -11,14 +11,6 @@ public abstract class AbstractFile : ViewModelBase
         Windows,
     }
 
-    public enum CutType
-    {
-        None,
-        Cut,
-        Copy,
-        Link,
-    }
-
     public enum RelationType
     {
         Ancestor,

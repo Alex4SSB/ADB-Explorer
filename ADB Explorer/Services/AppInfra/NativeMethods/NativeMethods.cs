@@ -12,25 +12,78 @@ public static partial class NativeMethods
 
     public const int MAX_PATH = 260;
 
-    public const int DRAGDROP_S_DROP = 0x00040100;
-    public const int DRAGDROP_S_CANCEL = 0x00040101;
-    public const int DRAGDROP_S_USEDEFAULTCURSORS = 0x00040102;
-
-    public const int DV_E_DVASPECT = -2147221397;
-    public const int DV_E_FORMATETC = -2147221404;
-    public const int DV_E_TYMED = -2147221399;
-    public const int E_FAIL = -2147467259;
-    public const int OLE_E_ADVISENOTSUPPORTED = -2147221501;
-
-    public const int S_OK = 0;
-    public const int S_FALSE = 1;
-
     public const int VARIANT_FALSE = 0;
     public const int VARIANT_TRUE = -1;
 
     #endregion
 
     #region Enums
+
+    public enum HResult : int
+    {
+        /// <summary>S_OK</summary>
+        Ok = 0x0000,
+
+        /// <summary>S_FALSE</summary>
+        False = 0x0001,
+
+        /// <summary>E_INVALIDARG</summary>
+        InvalidArguments = -2147024809, // 0x80070057
+
+        /// <summary>E_OUTOFMEMORY</summary>
+        OutOfMemory = -2147024882, // 0x8007000E
+
+        /// <summary>E_NOINTERFACE</summary>
+        NoInterface = -2147467262, // 0x80004002
+
+        /// <summary>E_FAIL</summary>
+        Fail = -2147467259, // 0x80004005
+
+        /// <summary>E_ELEMENTNOTFOUND</summary>
+        ElementNotFound = -2147023728, // 0x80070490
+
+        /// <summary>TYPE_E_ELEMENTNOTFOUND</summary>
+        TypeElementNotFound = -2147319765, // 0x8002802B
+
+        /// <summary>NO_OBJECT</summary>
+        NoObject = -2147221019, // 0x800401E5
+
+        /// <summary>Win32 Error code: ERROR_CANCELLED</summary>
+        Win32ErrorCanceled = 1223,
+
+        /// <summary>ERROR_CANCELLED</summary>
+        Canceled = -2147023673, // 0x800704C7
+
+        /// <summary>The requested resource is in use</summary>
+        ResourceInUse = -2147024726, // 0x800700AA
+
+        /// <summary>The requested resources is read-only.</summary>
+        AccessDenied = -2147287035, // 0x80030005
+
+        /// <summary>VS specific error HRESULT for "Unsupported format".</summary>
+        OLE_E_ADVISENOTSUPPORTED = -2147221501, // 0x80040003
+
+        /// <summary>Invalid FORMATETC structure</summary>
+        DV_E_FORMATETC = -2147221404, // 0x80040064
+
+        /// <summary>Invalid aspect(s)</summary>
+        DV_E_DVASPECT = -2147221397, // 0x8004006B
+
+        /// <summary>Invalid tymed</summary>
+        DV_E_TYMED = -2147221399, // 0x80040069
+
+        /// <summary>The OLE drag-and-drop operation was successful.</summary>
+        DRAGDROP_S_DROP = 0x00040100,
+
+        /// <summary>The OLE drag-and-drop operation was canceled.</summary>
+        DRAGDROP_S_CANCEL = 0x00040101,
+
+        /// <summary>Indicates successful completion of the method, and requests OLE to update the cursor using the OLE-provided default cursors.</summary>
+        DRAGDROP_S_USEDEFAULTCURSORS = 0x00040102,
+
+        /// <summary>Catastrophic failure</summary>
+        E_UNEXPECTED = -2147418113, // 0x8000FFFF
+    }
 
     [Flags]
     public enum FileInfoFlags : UInt32
@@ -423,7 +476,7 @@ public static partial class NativeMethods
         string pszPath, FileFlagsAndAttributes dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, FileInfoFlags uFlags);
 
     [DllImport("User32.dll")]
-    private static extern int DestroyIcon(HANDLE hIcon);
+    private static extern HResult DestroyIcon(HANDLE hIcon);
 
     public static int GetIconIndex(string fileName, FileFlagsAndAttributes dwAttr, FileInfoFlags dwFlags, FileInfoFlags iconState)
     {
@@ -441,39 +494,42 @@ public static partial class NativeMethods
     public static Icon GetIcon(string filePath, FileInfoFlags flags)
     {
         SHFILEINFO shinfo = new();
-        _ = SHGetFileInfo(
+        SHGetFileInfo(
             filePath,
             FileFlagsAndAttributes.FILE_ATTRIBUTE_NORMAL,
             ref shinfo,
             (uint)Marshal.SizeOf(shinfo),
             FileInfoFlags.SHGFI_ICON | flags);
 
+        if (shinfo.hIcon == IntPtr.Zero)
+            return null;
+
         Icon icon = (Icon)Icon.FromHandle(shinfo.hIcon).Clone();
-        _ = DestroyIcon(shinfo.hIcon);
+        DestroyIcon(shinfo.hIcon);
 
         return icon;
     }
 
     [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
-    private static extern int ExtractIconEx(string lpszFile, int nIconIndex, out HANDLE phiconLarge, HANDLE phiconSmall, int nIcons);
+    private static extern HResult ExtractIconEx(string lpszFile, int nIconIndex, out HANDLE phiconLarge, HANDLE phiconSmall, int nIcons);
 
     [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
-    private static extern int ExtractIconEx(string lpszFile, int nIconIndex, HANDLE phiconLarge, out HANDLE phiconSmall, int nIcons);
+    private static extern HResult ExtractIconEx(string lpszFile, int nIconIndex, HANDLE phiconLarge, out HANDLE phiconSmall, int nIcons);
 
     public static Icon ExtractIconByIndex(string filePath, int index, FileToIconConverter.IconSize iconSize)
     {
         HANDLE hIcon;
         if (iconSize == FileToIconConverter.IconSize.Large)
         {
-            _ = ExtractIconEx(filePath, index, out hIcon, IntPtr.Zero, 1);
+            ExtractIconEx(filePath, index, out hIcon, IntPtr.Zero, 1);
         }
         else
         {
-            _ = ExtractIconEx(filePath, index, IntPtr.Zero, out hIcon, 1);
+            ExtractIconEx(filePath, index, IntPtr.Zero, out hIcon, 1);
         }
 
         Icon icon = (Icon)Icon.FromHandle(hIcon).Clone();
-        _ = DestroyIcon(hIcon);
+        DestroyIcon(hIcon);
 
         return icon;
     }
@@ -592,6 +648,8 @@ public static partial class NativeMethods
         return data;
     }
 
+    public static void ThrowExceptionForHR(HResult hr)
+        => Marshal.ThrowExceptionForHR((int)hr);
 }
 
 /// <summary>

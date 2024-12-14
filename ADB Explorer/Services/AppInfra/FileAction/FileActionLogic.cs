@@ -44,7 +44,7 @@ internal static class FileActionLogic
     public static void CopyToTemp()
     {
         Data.CopyPaste.VerifyAndPaste(
-            CutType.Copy,
+            DragDropEffects.Copy,
             AdbExplorerConst.TEMP_PATH,
             Data.SelectedFiles.Select(f => f.FullPath),
             App.Current.Dispatcher,
@@ -270,14 +270,16 @@ internal static class FileActionLogic
         Data.FileActions.ItemToSelect = file;
     }
 
-    public static bool IsPasteEnabled(bool isKeyboard = false)
+    public static void IsPasteEnabled()
     {
-        // Explorer view but not trash or app drive AND source is clipboard (also when clipboard + drag)
-        if (Data.FileActions.IsPasteStateVisible)
+        // Do not update if drag is active
+        if (Data.CopyPaste.IsDrag)
+            return;
+
+        // Explorer view but not app drive AND source is clipboard
+        if (Data.FileActions.IsPasteStateVisible && Data.CopyPaste.Files.Length > 0)
         {
-            Data.FileActions.CutItemsCount.Value = Data.CopyPaste.Files.Length > 0 ? Data.CopyPaste.Files.Length.ToString() : "";
-            Data.FileActions.IsCutState.Value = Data.CopyPaste.PasteState is CutType.Cut;
-            Data.FileActions.IsCopyState.Value = Data.CopyPaste.PasteState is CutType.Copy;
+            Data.FileActions.CutItemsCount.Value = Data.CopyPaste.Files.Length.ToString();
         }
         else
         {
@@ -285,21 +287,27 @@ internal static class FileActionLogic
             Data.FileActions.IsCopyState.Value = false;
             Data.FileActions.IsCutState.Value = false;
 
-            return false;
+            Data.FileActions.PasteEnabled = false;
+            Data.FileActions.IsKeyboardPasteEnabled = false;
+
+            return;
         }
 
         Data.FileActions.PasteDescription.Value = $"Paste {Data.CopyPaste.Files.Length} {FileClass.CutTypeString(Data.CopyPaste.PasteState)} {PluralityConverter.Convert(Data.CopyPaste.Files, "Item")}";
 
-        if (Data.CopyPaste.Files.Length < 1)
-            return false;
+        Data.FileActions.PasteEnabled = EnableUiPaste();
+        Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
+    }
 
+    public static bool EnableUiPaste()
+    {
         Data.FileActions.IsPastingInDescendant = Data.CopyPaste.Files.Length == 1
             && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
 
         if (Data.FileActions.IsPastingInDescendant)
             return false;
 
-        var selected = isKeyboard && Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
+        var selected = Data.SelectedFiles?.Count();
 
         string targetPath;
         if (selected == 1)
@@ -312,13 +320,7 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        bool isFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true;
-        Data.FileActions.IsPastingIllegalOnFuse = isFuse
-            && !FileHelper.FileNameLegal(Data.CopyPaste.Files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.FUSE);
-
-        Data.FileActions.IsPastingConflictingOnFuse = isFuse
-            && Data.CopyPaste.Files.Distinct(StringComparer.InvariantCultureIgnoreCase)
-            .Count() != Data.CopyPaste.Files.Length;
+        PastingOnFuse(targetPath, Data.CopyPaste.Files);
 
         if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
             return false;
@@ -327,12 +329,61 @@ internal static class FileActionLogic
         {
             case 0:
                 Data.FileActions.IsPastingInDescendant = Data.CopyPaste.ParentFolder == Data.CurrentPath
-                    && Data.CopyPaste.PasteState is CutType.Cut;
+                    && Data.CopyPaste.PasteState is DragDropEffects.Move;
+
+                break;
+            case 1:
+                var item = Data.SelectedFiles.First();
+                if (!item.IsDirectory)
+                    return false;
+
+                Data.FileActions.IsPastingInDescendant = (Data.CopyPaste.Files.Length == 1 && Data.CopyPaste.Files[0] == item.FullPath)
+                    || (Data.CopyPaste.ParentFolder == item.FullPath);
+
+                break;
+            default:
+                return false;
+        }
+
+        return !Data.FileActions.IsPastingInDescendant;
+    }
+
+    public static bool EnableKeyboardPaste()
+    {
+        Data.FileActions.IsPastingInDescendant = Data.CopyPaste.Files.Length == 1
+            && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+
+        if (Data.FileActions.IsPastingInDescendant)
+            return false;
+
+        var selected = Data.SelectedFiles?.Count() > 1 ? 0 : Data.SelectedFiles?.Count();
+
+        string targetPath;
+        if (selected == 1)
+        {
+            var targetFile = Data.SelectedFiles.First();
+            targetPath = targetFile.IsLink ? targetFile.LinkTarget : targetFile.FullPath;
+        }
+        else
+        {
+            targetPath = Data.CurrentPath;
+        }
+
+        PastingOnFuse(targetPath, Data.CopyPaste.Files);
+
+        if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
+            return false;
+
+        switch (selected)
+        {
+            case 0:
+                Data.FileActions.IsPastingInDescendant = Data.CopyPaste.ParentFolder == Data.CurrentPath
+                    && Data.CopyPaste.PasteState is DragDropEffects.Move;
 
                 break;
             case 1:
                 // When duplicating a file multiple times using the keyboard, the selection is the previous copy
-                if (isKeyboard && Data.CopyPaste.PasteState is CutType.Copy && Data.DirList.FileList.Any(f => f.FullPath == Data.CopyPaste.Files[0]))
+                if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList.FileList.Any(f => f.FullPath == Data.CopyPaste.Files[0]))
                     return true;
 
                 var item = Data.SelectedFiles.First();
@@ -350,11 +401,65 @@ internal static class FileActionLogic
         return !Data.FileActions.IsPastingInDescendant;
     }
 
+    public static DragDropEffects EnableDropPaste(FileClass target = null)
+    {
+        var pastingInDescendant = Data.CopyPaste.DragFiles.Length == 1
+            && FileHelper.RelationFrom(Data.CopyPaste.DragFiles[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+
+        if (pastingInDescendant || Data.FileActions.IsRecycleBin)
+            return DragDropEffects.None;
+
+        if (FileHelper.RelationFrom(Data.CopyPaste.DragParent, AdbExplorerConst.RECYCLE_PATH) is RelationType.Self or RelationType.Ancestor)
+            return DragDropEffects.Move;
+
+        string targetPath = target switch
+        {
+            null => Data.CurrentPath,
+            _ when target.IsLink => target.LinkTarget,
+            _ => target.FullPath,
+        };
+
+        PastingOnFuse(targetPath, Data.CopyPaste.DragFiles);
+
+        if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
+            return DragDropEffects.None;
+
+        if (target is null)
+        {
+            if (Data.CopyPaste.DragParent == Data.CurrentPath)
+                return DragDropEffects.Copy;
+        }
+        else
+        {
+            if (!target.IsDirectory)
+                return DragDropEffects.None;
+
+            pastingInDescendant = (Data.CopyPaste.DragFiles.Length == 1 && Data.CopyPaste.DragFiles[0] == target.FullPath)
+                || (Data.CopyPaste.DragParent == target.FullPath);
+        }
+
+        return pastingInDescendant
+            ? DragDropEffects.None
+            : DragDropEffects.Copy | DragDropEffects.Move;
+    }
+
+    private static void PastingOnFuse(string targetPath, string[] files)
+    {
+        bool isFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true;
+
+        Data.FileActions.IsPastingIllegalOnFuse = isFuse
+            && !FileHelper.FileNameLegal(files.Select(FileHelper.GetFullName), FileHelper.RenameTarget.FUSE);
+
+        Data.FileActions.IsPastingConflictingOnFuse = isFuse
+            && files.Distinct(StringComparer.InvariantCultureIgnoreCase)
+            .Count() != files.Length;
+    }
+
     public static void PasteFiles(IEnumerable<FileClass> selectedFiles, bool isLink = false)
     {
         Data.CopyPaste.AcceptDataObject(Clipboard.GetDataObject(), selectedFiles, isLink);
 
-        Data.FileActions.PasteEnabled = IsPasteEnabled();
+        IsPasteEnabled();
     }
 
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
@@ -365,11 +470,11 @@ internal static class FileActionLogic
         Data.FileActions.CopyEnabled = !isCopy;
         Data.FileActions.CutEnabled = isCopy;
 
-        Data.FileActions.PasteEnabled = IsPasteEnabled();
-        Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
+        IsPasteEnabled();
 
-        var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCut, isCopy ? DragDropEffects.Copy : DragDropEffects.Move);
-        vfdo?.SendObjectToShell(VirtualFileDataObject.SendMethod.Clipboard);
+        var dropEffect = isCopy ? DragDropEffects.Copy : DragDropEffects.Move;
+        var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCut, dropEffect);
+        vfdo?.SendObjectToShell(VirtualFileDataObject.SendMethod.Clipboard, allowedEffects: dropEffect);
     }
 
     public static void Rename(TextBox textBox)
@@ -698,17 +803,16 @@ internal static class FileActionLogic
                                 && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
         
         Data.FileActions.CutEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                      && !(allSelectedAreCut && Data.CopyPaste.PasteState is CutType.Cut)
+                                      && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Move)
                                       && Data.FileActions.IsRegularItem
                                       && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
         Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is CutType.Copy)
+                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy)
                                        && Data.FileActions.IsRegularItem
                                        && !Data.FileActions.IsRecycleBin;
 
-        Data.FileActions.PasteEnabled = IsPasteEnabled();
-        Data.FileActions.IsKeyboardPasteEnabled = IsPasteEnabled(true);
+        IsPasteEnabled();
 
         // APK enabled in settings
         // All selected files are installable
@@ -742,7 +846,7 @@ internal static class FileActionLogic
             && Data.RuntimeSettings.IsRootActive
             && Data.CopyPaste.Files.Length == 1
             && Data.CopyPaste.IsSelf
-            && Data.CopyPaste.PasteState is CutType.Copy
+            && Data.CopyPaste.PasteState is DragDropEffects.Copy
             && (!Data.SelectedFiles.Any() ||
             (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
@@ -781,7 +885,7 @@ internal static class FileActionLogic
         CopyPasteService.VerifyAndPush(targetPath, dialog.FilesAsShellObject);
     }
 
-    public static void PushShellObjects(IEnumerable<ShellObject> items, string targetPath)
+    public static void PushShellObjects(IEnumerable<ShellObject> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
         foreach (var item in items)
         {
@@ -789,6 +893,7 @@ internal static class FileActionLogic
             var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
             
             var pushOpeartion = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+            pushOpeartion.VFDO = new() { CurrentEffect = dropEffects };
             pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOpeartion);
         }
@@ -798,20 +903,37 @@ internal static class FileActionLogic
     {
         var op = sender as FileSyncOperation;
 
-        // If operation completed now and current path is where the new file was pushed to and it is not shown yet
-        if (e.PropertyName is nameof(FileOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed)
+        if (e.PropertyName != nameof(FileOperation.Status)
+            || op.Status is FileOperation.OperationStatus.Waiting
+            or FileOperation.OperationStatus.InProgress)
+            return;
+
+        // If operation was cancelled or had failed - don't delete the source, but still perform cleanup
+        if (op.Status is FileOperation.OperationStatus.Completed)
         {
+            // Current path (and device) is where the new file was pushed to and it is not shown yet
             if (op.Device.ID == Data.CurrentADBDevice.ID
                 && op.TargetPath.ParentPath == Data.CurrentPath
                 && !Data.DirList.FileList.Any(f => f.FullName == op.FilePath.FullName))
             {
-                Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject));
+                op.Dispatcher.Invoke(() =>
+                    Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject)));
             }
 
-            op.FilePath.ShellObject = null;
-            op.PropertyChanged -= PushOpeartion_PropertyChanged;
+            // In push we can delete the source once the operation has completed
+            if (op.VFDO.CurrentEffect is DragDropEffects.Move)
+            {
+                try
+                {
+                    File.Delete(op.FilePath.FullPath);
+                }
+                catch
+                { }
+            }
         }
+
+        op.FilePath.ShellObject = null;
+        op.PropertyChanged -= PushOpeartion_PropertyChanged;
     }
 
     // Pull that is performed without interacting with File Explorer

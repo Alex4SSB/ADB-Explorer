@@ -150,7 +150,7 @@
             <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
                 <Setter Property="FontFamily" Value="Segoe UI Symbol" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding CutState}" Value="Cut">
+            <DataTrigger Binding="{Binding CutState}" Value="Move">
                 <Setter Property="Opacity" Value="0.5" />
             </DataTrigger>
             <DataTrigger Binding="{Binding CutState}" Value="Copy">
@@ -406,7 +406,7 @@
                                 </MultiDataTrigger.Conditions>
                                 <Setter Property="Visibility" Value="Visible" />
                             </MultiDataTrigger>
-                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
+                            <DataTrigger Binding="{Binding CutState}" Value="Move">
                                 <Setter Property="Opacity" Value="0.5" />
                             </DataTrigger>
                         </Style.Triggers>
@@ -440,7 +440,7 @@
                                 <Setter Property="Visibility" Value="Visible" />
                                 <Setter Property="Margin" Value="-1,-6,0,0" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding CutState}" Value="Cut">
+                            <DataTrigger Binding="{Binding CutState}" Value="Move">
                                 <Setter Property="Opacity" Value="0.5" />
                             </DataTrigger>
                         </Style.Triggers>

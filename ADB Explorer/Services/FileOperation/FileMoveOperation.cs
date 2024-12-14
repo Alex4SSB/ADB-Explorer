@@ -12,10 +12,10 @@ public class FileMoveOperation : AbstractShellFileOperation
     public DateTime? DateModified;
     public readonly bool isLink;
 
-    public FileMoveOperation(FileClass filePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher, FileClass.CutType cutType = FileClass.CutType.None)
+    public FileMoveOperation(FileClass filePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher, DragDropEffects cutType = DragDropEffects.None)
         : base(filePath, adbDevice, dispatcher)
     {
-        if (cutType is FileClass.CutType.Copy or FileClass.CutType.Link)
+        if (cutType is DragDropEffects.Copy or DragDropEffects.Link)
             OperationName = OperationType.Copy;
         else if (targetPath.FullPath.StartsWith(AdbExplorerConst.RECYCLE_PATH))
         {
@@ -31,7 +31,7 @@ public class FileMoveOperation : AbstractShellFileOperation
             OperationName = OperationType.Move;
 
         TargetPath = targetPath;
-        isLink = cutType is FileClass.CutType.Link;
+        isLink = cutType is DragDropEffects.Link;
     }
 
     public override void Start()

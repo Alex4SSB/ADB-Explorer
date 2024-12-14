@@ -19,6 +19,8 @@ internal class DriveHelper
 
     public static DriveViewModel GetCurrentDrive(string path)
     {
+        if (string.IsNullOrEmpty(path)) return null;
+
         var currentDrive = AdbExplorerConst.DRIVE_TYPES.FirstOrDefault(kv => path.StartsWith(kv.Key)).Value;
         return Data.DevicesObject.Current.Drives.FirstOrDefault(d => d.Type == currentDrive);
     }

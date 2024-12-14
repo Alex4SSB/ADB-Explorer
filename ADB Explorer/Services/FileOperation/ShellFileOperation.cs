@@ -71,7 +71,7 @@ public static class ShellFileOperation
             if (op.Device.ID == Data.CurrentADBDevice.ID)
             {
                 // remove file from cut items and clear its trash indexer if current device
-                op.FilePath.CutState = CutType.None;
+                op.FilePath.CutState = DragDropEffects.None;
                 op.FilePath.TrashIndex = null;
 
                 // update UI if current path
@@ -146,7 +146,7 @@ public static class ShellFileOperation
                                  string targetPath,
                                  string currentPath,
                                  Dispatcher dispatcher,
-                                 CutType cutType = CutType.None)
+                                 DragDropEffects cutType = DragDropEffects.None)
         => MoveItems(device,
                      items.Select(f => new FileClass(new FilePath(f))),
                      targetPath,
@@ -161,7 +161,7 @@ public static class ShellFileOperation
                                  string currentPath,
                                  ObservableList<FileClass> fileList,
                                  Dispatcher dispatcher,
-                                 CutType cutType = CutType.None)
+                                 DragDropEffects cutType = DragDropEffects.None)
         => MoveItems(device,
                      items,
                      targetPath,
@@ -176,7 +176,7 @@ public static class ShellFileOperation
                                  string currentPath,
                                  IEnumerable<string> existingItems,
                                  Dispatcher dispatcher,
-                                 CutType cutType = CutType.None)
+                                 DragDropEffects cutType = DragDropEffects.None)
     {
         IEnumerable<FileMoveOperation> Recycle()
         {
@@ -261,7 +261,7 @@ public static class ShellFileOperation
                 // remove file from cut items and clear its trash indexer if restore / recycle on current device
                 if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
                 {
-                    op.FilePath.CutState = CutType.None;
+                    op.FilePath.CutState = DragDropEffects.None;
                     op.FilePath.TrashIndex = null;
                 }
 

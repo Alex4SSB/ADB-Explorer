@@ -20,9 +20,9 @@ public static partial class NativeMethods
     }
 
     [DllImport("Shell32.dll")]
-    private static extern int SHCreateStdEnumFmtEtc(uint cfmt, FORMATETC[] afmt, out IEnumFORMATETC ppenumFormatEtc);
+    private static extern HResult SHCreateStdEnumFmtEtc(uint cfmt, FORMATETC[] afmt, out IEnumFORMATETC ppenumFormatEtc);
 
-    public static int SHCreateStdEnumFmtEtc(int cfmt, IEnumerable<FORMATETC> afmt, out IEnumFORMATETC ppenumFormatEtc)
+    public static HResult SHCreateStdEnumFmtEtc(int cfmt, IEnumerable<FORMATETC> afmt, out IEnumFORMATETC ppenumFormatEtc)
         => SHCreateStdEnumFmtEtc((uint)cfmt, afmt.ToArray(), out ppenumFormatEtc);
 
     [return: MarshalAs(UnmanagedType.Interface)]
@@ -33,23 +33,27 @@ public static partial class NativeMethods
         => CreateStreamOnHGlobal(hGlobal, fDeleteOnRelease);
 
     [DllImport("Ole32.dll", CharSet = CharSet.Auto, ExactSpelling = true, PreserveSig = false)]
-    private static extern void DoDragDrop(IDataObject dataObject, IDropSource dropSource, int allowedEffects, int[] finalEffect);
+    private static extern HResult DoDragDrop(IDataObject dataObject, IDropSource dropSource, int allowedEffects, out DragDropEffects finalEffect);
 
-    public static void MDoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects, int[] finalEffect)
-    => DoDragDrop(dataObject, dropSource, (int)allowedEffects, finalEffect);
+    public static DragDropEffects MDoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects)
+    {
+        DoDragDrop(dataObject, dropSource, (int)allowedEffects, out var finalEffect);
+
+        return finalEffect;
+    }
 
     [DllImport("Kernel32.dll")]
     private static extern HANDLE GlobalLock(HANDLE hMem);
 
     public static HANDLE MGlobalLock(HANDLE hMem)
-    => GlobalLock(hMem);
+        => GlobalLock(hMem);
 
     [return: MarshalAs(UnmanagedType.Bool)]
     [DllImport("Kernel32.dll")]
     private static extern bool GlobalUnlock(HANDLE hMem);
 
     public static void MGlobalUnlock(HANDLE hMem)
-    => GlobalUnlock(hMem);
+        => GlobalUnlock(hMem);
 
     [DllImport("Kernel32.dll")]
     private static extern HANDLE GlobalSize(HANDLE handle);
@@ -242,13 +246,5 @@ public static partial class NativeMethods
 
             return dragList;
         }
-    }
-
-    /// <summary>
-    /// Returns true if the HRESULT is a success code.
-    /// </summary>
-    public static bool SUCCEEDED(int hr)
-    {
-        return 0 <= hr;
     }
 }

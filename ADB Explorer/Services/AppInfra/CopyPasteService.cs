@@ -18,17 +18,27 @@ public class CopyPasteService : ViewModelBase
         Virtual = 0x4,      // 0 for immediately available files
     }
 
-    private CutType pasteState = CutType.None;
-    public CutType PasteState
+    private DragDropEffects pasteState = DragDropEffects.None;
+    public DragDropEffects PasteState
     {
         get => pasteState;
         set
         {
             if (Set(ref pasteState, value))
             {
-                Data.FileActions.IsCutState.Value = value is CutType.Cut;
-                Data.FileActions.IsCopyState.Value = value is CutType.Copy;
+                Data.FileActions.IsCutState.Value = value is DragDropEffects.Move;
+                Data.FileActions.IsCopyState.Value = value is DragDropEffects.Copy;
             }
+        }
+    }
+
+    private DragDropEffects dropEffect = DragDropEffects.None;
+    public DragDropEffects DropEffect
+    {
+        get => dropEffect;
+        set
+        {
+            Set(ref dropEffect, value);
         }
     }
 
@@ -66,10 +76,12 @@ public class CopyPasteService : ViewModelBase
 
     public bool IsDrag => DragPasteSource is not DataSource.None;
     public bool IsClipboard => PasteSource is not DataSource.None && !IsDrag;
-    public bool IsSelf => PasteSource.HasFlag(DataSource.Self);
+    public DataSource CurrentSource => IsDrag ? DragPasteSource : PasteSource;
+    public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
+    public bool IsSelf => CurrentSource.HasFlag(DataSource.Self);
     public bool IsSelfClipboard => IsSelf && IsClipboard;
-    public bool IsWindows => !PasteSource.HasFlag(DataSource.None) && !PasteSource.HasFlag(DataSource.Android);
-    public bool IsVirtual => PasteSource.HasFlag(DataSource.Virtual);
+    public bool IsWindows => !CurrentSource.HasFlag(DataSource.None) && !CurrentSource.HasFlag(DataSource.Android);
+    public bool IsVirtual => CurrentSource.HasFlag(DataSource.Virtual);
 
     private string parentFolder = "";
     public string ParentFolder
@@ -108,18 +120,19 @@ public class CopyPasteService : ViewModelBase
             cutItems = Data.DirList.FileList.Where(f => Files.Contains(f.FullPath));
 
         cutItems.ForEach(file => file.CutState = PasteState);
-        Data.DirList?.FileList.Except(cutItems).ForEach(file => file.CutState = CutType.None);
+        Data.DirList?.FileList.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
     }
 
     public void Clear()
     {
         if (IsClipboard)
+        {
             Clipboard.Clear();
-
-        PasteState = CutType.None;
-        PasteSource = DataSource.None;
-        Files = [];
-        ParentFolder = "";
+            PasteState = DragDropEffects.None;
+            PasteSource = DataSource.None;
+            Files = [];
+            ParentFolder = "";
+        }
 
         ClearDrag();
         UpdateUI();
@@ -127,6 +140,7 @@ public class CopyPasteService : ViewModelBase
 
     public void ClearDrag()
     {
+        DropEffect = DragDropEffects.None;
         DragPasteSource = DataSource.None;
         DragFiles = [];
         DragParent = "";
@@ -135,11 +149,14 @@ public class CopyPasteService : ViewModelBase
     public void GetClipboardPasteItems()
     {
         var CPDO = Clipboard.GetDataObject();
-        
+
+        if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
+            File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Clipboard formats: {string.Join(", ", CPDO.GetFormats())}\n");
+
         var allowedEffect = GetAllowedDragEffects(CPDO);
         if (allowedEffect is DragDropEffects.None)
         {
-            PasteState = CutType.None;
+            PasteState = DragDropEffects.None;
             PasteSource = DataSource.None;
             Files = [];
             return;
@@ -149,11 +166,11 @@ public class CopyPasteService : ViewModelBase
 
         // Link is only allowed depending on the target
         if (prefDropEffect.HasFlag(DragDropEffects.Copy))
-            PasteState = CutType.Copy;
+            PasteState = DragDropEffects.Copy;
         else if (prefDropEffect.HasFlag(DragDropEffects.Move))
-            PasteState = CutType.Cut;
+            PasteState = DragDropEffects.Move;
         else
-            PasteState = CutType.None;
+            PasteState = DragDropEffects.None;
 
         Files = DragFiles;
         ParentFolder = DragParent;
@@ -181,20 +198,19 @@ public class CopyPasteService : ViewModelBase
         if (Data.FileActions.IsAppDrive)
         {
             // TODO: Add support for sources other than Windows
-            if (!PasteSource.HasFlag(DataSource.Android) && FileHelper.AllFilesAreApks(DragFiles))
+            if (!CurrentSource.HasFlag(DataSource.Android) && FileHelper.AllFilesAreApks(DragFiles))
                 return DragDropEffects.Copy;
         }
         else if (dataContext is null || file?.IsDirectory is true)
         {
-            if (PasteSource.HasFlag(DataSource.Android))
+            if (CurrentSource.HasFlag(DataSource.Android))
             {
                 // TODO: Add support for dragging from another device
-                if (!PasteSource.HasFlag(DataSource.Self))
+                if (!CurrentSource.HasFlag(DataSource.Self))
                     return DragDropEffects.None;
 
-                // Only one file and trying to drag into itself
-                if (file is not null && DragFiles.Length == 1 && DragFiles[0] == file.FullPath)
-                    return DragDropEffects.None;
+                if (IsDrag)
+                    return FileActionLogic.EnableDropPaste(file);
             }
             
             return DragDropEffects.Move | DragDropEffects.Copy;
@@ -223,7 +239,7 @@ public class CopyPasteService : ViewModelBase
         else if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
         {
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
-            
+
             if (!IsDrag)
             {
                 if (!Data.DevicesObject.UIList.Any(d => d.ID == dragList.deviceId && d.Status is AbstractDevice.DeviceStatus.Ok))
@@ -235,19 +251,33 @@ public class CopyPasteService : ViewModelBase
 
             DragParent = dragList.parentFolder;
             DragFiles = dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f)).ToArray();
-            
-            PasteSource |= DataSource.Android;
-            if (dragList.deviceId == Data.CurrentADBDevice.ID)
-                PasteSource |= DataSource.Self;
+
+            if (IsDrag)
+            {
+                DragPasteSource |= DataSource.Android;
+                if (dragList.deviceId == Data.CurrentADBDevice.ID)
+                    DragPasteSource |= DataSource.Self;
+                else
+                    DragPasteSource |= DataSource.Virtual;
+            }
             else
-                PasteSource |= DataSource.Virtual;
+            {
+                PasteSource |= DataSource.Android;
+                if (dragList.deviceId == Data.CurrentADBDevice.ID)
+                    PasteSource |= DataSource.Self;
+                else
+                    PasteSource |= DataSource.Virtual;
+            }
         }
         else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor) && dataObject.GetData(AdbDataFormats.FileDescriptor) is MemoryStream fdStream)
         {
             var fileGroup = NativeMethods.FILEGROUPDESCRIPTOR.FromStream(fdStream);
             DragFiles = fileGroup.descriptors.Select(d => d.cFileName).ToArray();
 
-            PasteSource |= DataSource.Virtual;
+            if (IsDrag)
+                DragPasteSource |= DataSource.Virtual;
+            else
+                PasteSource |= DataSource.Virtual;
         }
         else
         {
@@ -303,12 +333,9 @@ public class CopyPasteService : ViewModelBase
             }
             else if (IsWindows)
             {
-                VerifyAndPush(targetFolder, DragFiles);
-
-                if (PasteState is CutType.Cut)
-                {
-                    // TODO: handle cut from File Explorer - notify of the operation completion and if not enough, clear the CB and delete the files
-                }
+                VerifyAndPush(targetFolder, DragFiles, CurrentEffect);
+                if (CurrentEffect is DragDropEffects.Move)
+                    Clear();
             }
             else if (IsSelf)
             {
@@ -316,19 +343,20 @@ public class CopyPasteService : ViewModelBase
                 if (DragFiles.Length == 1 && DragFiles[0] == targetFolder && IsDrag)
                     return;
 
-                VerifyAndPaste(isLink ? CutType.Link : PasteState,
+                VerifyAndPaste(isLink ? DragDropEffects.Link : CurrentEffect,
                                targetFolder,
                                DragFiles,
                                App.Current.Dispatcher,
                                Data.CurrentADBDevice,
                                Data.CurrentPath);
                 
-                if (PasteState is CutType.Cut)
+                if (CurrentEffect is DragDropEffects.Move)
                     Clear();
             }
         }
 
         ReadObject();
+
         if (IsDrag)
             ClearDrag();
     }
@@ -347,16 +375,16 @@ public class CopyPasteService : ViewModelBase
         FileActionLogic.PushShellObjects(pasteItems, targetPath);
     }
 
-    public static async void VerifyAndPush(string targetPath, IEnumerable<string> pasteItems)
+    public static async void VerifyAndPush(string targetPath, IEnumerable<string> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
         pasteItems = await MergeFiles(pasteItems, targetPath);
         if (!pasteItems.Any())
             return;
 
-        FileActionLogic.PushShellObjects(pasteItems.Select(ShellObject.FromParsingName), targetPath);
+        FileActionLogic.PushShellObjects(pasteItems.Select(ShellObject.FromParsingName), targetPath, dropEffects);
     }
 
-    public async void VerifyAndPaste(CutType cutType,
+    public async void VerifyAndPaste(DragDropEffects cutType,
                                string targetPath,
                                IEnumerable<string> pasteItems,
                                Dispatcher dispatcher,
@@ -381,7 +409,7 @@ public class CopyPasteService : ViewModelBase
 
     /// <summary>
     /// Check for existing top level items in the target location. <br />
-    /// Asks the user whether to abort, continue, or exclude the conflicting items.
+    /// Ask the user whether to abort, continue, or exclude the conflicting items.
     /// </summary>
     /// <param name="filePaths">Full paths of the files to be transferred.</param>
     /// <param name="targetPath">Full path of the target location.</param>
@@ -401,7 +429,7 @@ public class CopyPasteService : ViewModelBase
             ? StringComparer.InvariantCulture
             : StringComparer.InvariantCultureIgnoreCase;
 
-        // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts only.
+        // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts.
         // We receive full paths of the top level items in AdbDragList and FileDrop.
 
         // TODO: FileGroupDescriptor gives full hierarchy, so GetFullName is not good
@@ -460,9 +488,9 @@ public class CopyPasteService : ViewModelBase
     /// <summary>
     /// Check for pasting in descendant or self
     /// </summary>
-    public async Task<IEnumerable<string>> RemoveAncestor(IEnumerable<string> pasteItems, string targetPath, CutType cutType)
+    public async Task<IEnumerable<string>> RemoveAncestor(IEnumerable<string> pasteItems, string targetPath, DragDropEffects cutType)
     {
-        if (cutType is CutType.Link || !IsSelf)
+        if (cutType is DragDropEffects.Link || !IsSelf)
             return pasteItems;
 
         var ancestor = pasteItems.FirstOrDefault(f => FileHelper.RelationFrom(f, targetPath) is RelationType.Self or RelationType.Descendant);

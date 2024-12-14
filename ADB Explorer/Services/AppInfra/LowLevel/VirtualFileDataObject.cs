@@ -4,6 +4,7 @@
 
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.ViewModels;
 using System.Runtime.InteropServices.ComTypes;
 
 namespace ADB_Explorer.Services;
@@ -11,7 +12,7 @@ namespace ADB_Explorer.Services;
 /// <summary>
 /// Handles everything related to Shell Drag & Drop (including clipboard) 
 /// </summary>
-public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTypes.IDataObject, IAsyncOperation
+public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.InteropServices.ComTypes.IDataObject, IAsyncOperation
 {
     /// <summary>
     /// Gets or sets a value indicating whether the data object can be used asynchronously.
@@ -71,7 +72,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.DAdvise(ref FORMATETC pFormatetc, ADVF advf, IAdviseSink adviseSink, out int connection)
     {
-        Marshal.ThrowExceptionForHR(NativeMethods.OLE_E_ADVISENOTSUPPORTED);
+        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -81,7 +82,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <param name="connection">A DWORD token that specifies the connection to remove.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.DUnadvise(int connection)
     {
-        Marshal.ThrowExceptionForHR(NativeMethods.OLE_E_ADVISENOTSUPPORTED);
+        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -92,7 +93,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.EnumDAdvise(out IEnumSTATDATA enumAdvise)
     {
-        Marshal.ThrowExceptionForHR(NativeMethods.OLE_E_ADVISENOTSUPPORTED);
+        NativeMethods.ThrowExceptionForHR(NativeMethods.HResult.OLE_E_ADVISENOTSUPPORTED);
         throw new NotImplementedException();
     }
 
@@ -112,13 +113,14 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             }
 
             // Create enumerator and return it
-            if (NativeMethods.SUCCEEDED(NativeMethods.SHCreateStdEnumFmtEtc(_dataObjects.Count, _dataObjects.Select(d => d.FORMATETC), out IEnumFORMATETC enumerator)))
+            var res = NativeMethods.SHCreateStdEnumFmtEtc(_dataObjects.Count, _dataObjects.Select(d => d.FORMATETC), out IEnumFORMATETC enumerator);
+            if (res is NativeMethods.HResult.Ok)
             {
                 return enumerator;
             }
 
             // Returning null here can cause an AV in the caller; throw instead
-            Marshal.ThrowExceptionForHR(NativeMethods.E_FAIL);
+            NativeMethods.ThrowExceptionForHR(res);
         }
         throw new NotImplementedException();
     }
@@ -141,18 +143,20 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <param name="medium">When this method returns, contains a pointer to the STGMEDIUM structure that indicates the storage medium containing the returned data through its tymed member, and the responsibility for releasing the medium through the value of its pUnkForRelease member.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.GetData(ref FORMATETC format, out STGMEDIUM medium)
     {
+        AdbDataFormat adbDataFormat = null;
         var formatCopy = format;
         medium = new();
 
-        var hr = ((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
+        var hr = (NativeMethods.HResult)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
 
         if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
         {
-            if (AdbDataFormats.GetFormatName(formatCopy.cfFormat) is string value)
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Query cfFormat = {value}\n");
+            adbDataFormat = AdbDataFormats.GetFormat(formatCopy.cfFormat);
+            if (adbDataFormat is not null)
+                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Query: {adbDataFormat.Name}\n");
         }
 
-        if (NativeMethods.SUCCEEDED(hr))
+        if (hr is NativeMethods.HResult.Ok)
         {
             // Find the best match
             var dataObject = _dataObjects.FirstOrDefault(d =>
@@ -170,14 +174,14 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                 }
 
                 if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data, cfFormat = {AdbDataFormats.GetFormatName(formatCopy.cfFormat)}\n");
+                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data: {adbDataFormat?.Name}\n");
 
                 // Populate the STGMEDIUM
                 medium.tymed = dataObject.FORMATETC.tymed;
                 var result = dataObject.GetData(); // Possible call to user code
 
                 hr = result.Item2;
-                if (NativeMethods.SUCCEEDED(hr))
+                if (hr is NativeMethods.HResult.Ok)
                 {
                     medium.unionmember = result.Item1;
                 }
@@ -185,15 +189,15 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             else
             {
                 // Couldn't find a match
-                hr = NativeMethods.DV_E_FORMATETC;
+                hr = NativeMethods.HResult.DV_E_FORMATETC;
             }
         }
-        if (!NativeMethods.SUCCEEDED(hr)) // Not redundant; hr gets updated in the block above
+        if (hr is not NativeMethods.HResult.Ok) // Not redundant; hr gets updated in the block above
         {
             // We seem unable to send data to File Explorer in DEBUG, even when not debugging.
             // This might be because of the FileContents data format, which is an async stream
             // compared to all other data formats which are just byte arrays on HGlobal, already populated with the data
-            var ex = Marshal.GetExceptionForHR(hr);
+            var ex = Marshal.GetExceptionForHR((int)hr);
 #if DEBUG
             Trace.WriteLine(ex.Message);
 #elif RELEASE
@@ -211,7 +215,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     {
         throw new NotImplementedException();
     }
-
+    
     /// <summary>
     /// Determines whether the data object is capable of rendering the data described in the FORMATETC structure.
     /// </summary>
@@ -219,23 +223,28 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <returns>HRESULT success code.</returns>
     int System.Runtime.InteropServices.ComTypes.IDataObject.QueryGetData(ref FORMATETC format)
     {
-        var formatCopy = format; // Cannot use ref or out parameter inside an anonymous method, lambda expression, or query expression
-        var formatMatches = _dataObjects.Where(d => d.FORMATETC.cfFormat == formatCopy.cfFormat);
-        if (!formatMatches.Any())
+        NativeMethods.HResult GetError(FORMATETC format)
         {
-            return NativeMethods.DV_E_FORMATETC;
+            var formatCopy = format; // Cannot use ref or out parameter inside an anonymous method, lambda expression, or query expression
+            var formatMatches = _dataObjects.Where(d => d.FORMATETC.cfFormat == formatCopy.cfFormat);
+            if (!formatMatches.Any())
+            {
+                return NativeMethods.HResult.DV_E_FORMATETC;
+            }
+            var tymedMatches = formatMatches.Where(d => 0 != (d.FORMATETC.tymed & formatCopy.tymed));
+            if (!tymedMatches.Any())
+            {
+                return NativeMethods.HResult.DV_E_TYMED;
+            }
+            var aspectMatches = tymedMatches.Where(d => d.FORMATETC.dwAspect == formatCopy.dwAspect);
+            if (!aspectMatches.Any())
+            {
+                return NativeMethods.HResult.DV_E_DVASPECT;
+            }
+            return NativeMethods.HResult.Ok;
         }
-        var tymedMatches = formatMatches.Where(d => 0 != (d.FORMATETC.tymed & formatCopy.tymed));
-        if (!tymedMatches.Any())
-        {
-            return NativeMethods.DV_E_TYMED;
-        }
-        var aspectMatches = tymedMatches.Where(d => d.FORMATETC.dwAspect == formatCopy.dwAspect);
-        if (!aspectMatches.Any())
-        {
-            return NativeMethods.DV_E_DVASPECT;
-        }
-        return NativeMethods.S_OK;
+
+        return (int)GetError(format);
     }
 
     /// <summary>
@@ -292,7 +301,10 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
     }
 
-#endregion
+    #endregion
+
+    public string[] GetFormats()
+        => [.. _dataObjects.Select(o => AdbDataFormats.GetFormatName(o.FORMATETC.cfFormat))];
 
     /// <summary>
     /// Creates a format on HGlobal, or as a stream if index is provided
@@ -325,7 +337,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             var dataArray = data.ToArray();
             var ptr = Marshal.AllocHGlobal(dataArray.Length);
             Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-            return (ptr, NativeMethods.S_OK);
+            return (ptr, NativeMethods.HResult.Ok);
         };
     }
 
@@ -336,16 +348,16 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
     /// <param name="data">Sequence of data.</param>
     public void SetData(short dataFormat, IEnumerable<byte> data)
         => _dataObjects.Add(new()
+    {
+        FORMATETC = CreateFormat(dataFormat),
+        GetData = () =>
         {
-            FORMATETC = CreateFormat(dataFormat),
-            GetData = () =>
-            {
-                var dataArray = data.ToArray();
-                var ptr = Marshal.AllocHGlobal(dataArray.Length);
-                Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
-                return (ptr, NativeMethods.S_OK);
-            },
-        });
+            var dataArray = data.ToArray();
+            var ptr = Marshal.AllocHGlobal(dataArray.Length);
+            Marshal.Copy(dataArray, 0, ptr, dataArray.Length);
+            return (ptr, NativeMethods.HResult.Ok);
+        },
+    });
 
     public void UpdateData(short dataFormat, IEnumerable<Action<Stream>> dataStreams)
     {
@@ -391,7 +403,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             // Return an IntPtr for the IStream
             ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
             Marshal.ReleaseComObject(iStream);
-            return (ptr, NativeMethods.S_OK);
+            return (ptr, NativeMethods.HResult.Ok);
         },
     });
 
@@ -413,28 +425,28 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
 
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
+    
+    public List<FileSyncOperation> Operations { get; private set; }
 
-    /// <summary>
-    /// Gets or sets the CFSTR_PASTESUCCEEDED value for the object.
-    /// </summary>
+    private DragDropEffects currentEffect = DragDropEffects.None;
+    public DragDropEffects CurrentEffect
+    {
+        get => currentEffect;
+        set => Set(ref currentEffect, value);
+    }
+
     public DragDropEffects? PasteSucceeded
     {
         get => GetDropEffect(AdbDataFormats.PasteSucceeded);
         set => SetData(AdbDataFormats.PasteSucceeded, BitConverter.GetBytes((UInt32)value));
     }
 
-    /// <summary>
-    /// Gets or sets the CFSTR_PERFORMEDDROPEFFECT value for the object.
-    /// </summary>
     public DragDropEffects? PerformedDropEffect
     {
         get => GetDropEffect(AdbDataFormats.PerformedDropEffect);
         set => SetData(AdbDataFormats.PerformedDropEffect, BitConverter.GetBytes((UInt32)value));
     }
 
-    /// <summary>
-    /// Gets or sets the CFSTR_PREFERREDDROPEFFECT value for the object.
-    /// </summary>
     public DragDropEffects? PreferredDropEffect
     {
         get => GetDropEffect(AdbDataFormats.PreferredDropEffect);
@@ -450,6 +462,9 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         return (DragDropEffects)BitConverter.ToInt32(stream.ToArray());
     }
 
+    public static void SetPreferredDropEffect(System.Windows.IDataObject dataObject, DragDropEffects dropEffects)
+        => dataObject.SetData(AdbDataFormats.PreferredDropEffect, BitConverter.GetBytes((UInt32)dropEffects));
+
     /// <summary>
     /// Gets the DragDropEffects value (if any) previously set on the object.
     /// </summary>
@@ -464,11 +479,12 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                 (DVASPECT.DVASPECT_CONTENT == d.FORMATETC.dwAspect) &&
                 (TYMED.TYMED_HGLOBAL == d.FORMATETC.tymed))
             .LastOrDefault();
-        if (null != dataObject)
+
+        if (dataObject is not null)
         {
             // Read the value and return it
             var result = dataObject.GetData();
-            if (NativeMethods.SUCCEEDED(result.Item2))
+            if (result.Item2 is NativeMethods.HResult.Ok)
             {
                 var ptr = NativeMethods.MGlobalLock(result.Item1);
                 if (IntPtr.Zero != ptr)
@@ -608,7 +624,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         /// <summary>
         /// Func returning the data as an IntPtr and an HRESULT success code.
         /// </summary>
-        public Func<(HANDLE, int)> GetData { get; set; }
+        public Func<(HANDLE, NativeMethods.HResult)> GetData { get; set; }
     }
 
     /// <summary>
@@ -665,30 +681,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
     }
 
-    public enum SendMethod
-    {
-        DragDrop,
-        Clipboard,
-    }
-
-    public void SendObjectToShell(SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
-    {
-        try
-        {
-            if (method == SendMethod.DragDrop)
-                DoDragDrop(dragSource, this, allowedEffects);
-            else if (method == SendMethod.Clipboard)
-                Clipboard.SetDataObject(this);
-            else
-                throw new NotSupportedException();
-        }
-        catch (COMException)
-        {
-            // Failure; no way to recover
-        }
-    }
-
-    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Move)
+    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Copy)
     {
         try
         {
@@ -713,7 +706,7 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
             Data.RuntimeSettings.MainCursor = Cursors.AppStarting;
             Task.Run(() =>
             {
-                files.ForEach(f => f.PrepareDescriptors(vfdo));
+                return files.Select(f => f.PrepareDescriptors(vfdo)).ToList();
             }).ContinueWith((t) =>
             {
                 App.Current.Dispatcher.Invoke(() =>
@@ -721,6 +714,8 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
                     vfdo.SetData(files.SelectMany(f => f.Descriptors));
                     Data.RuntimeSettings.MainCursor = Cursors.Arrow;
                 });
+
+                vfdo.Operations = t.Result;
             });
 
             // Add these empty formats as placeholders, the data will be replaced once it is ready.
@@ -736,22 +731,47 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         return vfdo;
     }
 
+    public enum SendMethod
+    {
+        DragDrop,
+        Clipboard,
+    }
+
+    public void SendObjectToShell(SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
+    {
+        try
+        {
+            if (method is SendMethod.DragDrop)
+                DoDragDrop(dragSource, allowedEffects);
+            else if (method is SendMethod.Clipboard)
+            {
+                CurrentEffect = allowedEffects;
+                PerformedDropEffect = allowedEffects;
+                Clipboard.SetDataObject(this);
+            }
+            else
+                throw new NotSupportedException();
+        }
+        catch (COMException)
+        {
+            // Failure; no way to recover
+        }
+    }
+
     /// <summary>
     /// Initiates a drag-and-drop operation.
     /// </summary>
     /// <param name="dragSource">A reference to the dependency object that is the source of the data being dragged.</param>
-    /// <param name="dataObject">A data object that contains the data being dragged.</param>
     /// <param name="allowedEffects">One of the DragDropEffects values that specifies permitted effects of the drag-and-drop operation.</param>
     /// <returns>One of the DragDropEffects values that specifies the final effect that was performed during the drag-and-drop operation.</returns>
     /// <remarks>
     /// Call this method instead of System.Windows.DragDrop.DoDragDrop because this method handles IDataObject better.
     /// </remarks>
-    public static DragDropEffects DoDragDrop(DependencyObject dragSource, System.Runtime.InteropServices.ComTypes.IDataObject dataObject, DragDropEffects allowedEffects)
+    public void DoDragDrop(DependencyObject dragSource, DragDropEffects allowedEffects)
     {
-        int[] finalEffect = new int[1];
         try
         {
-            NativeMethods.MDoDragDrop(dataObject, new DropSource(), allowedEffects, finalEffect);
+            NativeMethods.MDoDragDrop(this, new DropSource((value) => CurrentEffect = value), allowedEffects);
         }
         catch (Exception e)
         {
@@ -760,20 +780,19 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         }
         finally
         {
-            if ((dataObject is VirtualFileDataObject virtualFileDataObject) && !virtualFileDataObject.IsAsynchronous && virtualFileDataObject._inOperation)
+            if (!IsAsynchronous && _inOperation)
             {
                 // Call the end action and exit the operation
-                virtualFileDataObject._endAction?.Invoke(virtualFileDataObject);
-                virtualFileDataObject._inOperation = false;
+                _endAction?.Invoke(this);
+                _inOperation = false;
             }
         }
-        return (DragDropEffects)finalEffect[0];
     }
 
     /// <summary>
-    /// Contains the methods for generating visual feedback to the end user and for canceling or completing the drag-and-drop operation.
+    /// Contains the methods for generating visual feedback to the end user and for cancelling or completing the drag-and-drop operation.
     /// </summary>
-    private class DropSource : NativeMethods.IDropSource
+    private class DropSource(Action<DragDropEffects> onFeedback = null) : NativeMethods.IDropSource
     {
         /// <summary>
         /// Determines whether a drag-and-drop operation should continue.
@@ -785,15 +804,13 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         {
             var escapePressed = (0 != fEscapePressed);
             var keyStates = (DragDropKeyStates)grfKeyState;
-            if (escapePressed)
+
+            return (int)(escapePressed switch
             {
-                return NativeMethods.DRAGDROP_S_CANCEL;
-            }
-            else if (DragDropKeyStates.None == (keyStates & DragDropKeyStates.LeftMouseButton))
-            {
-                return NativeMethods.DRAGDROP_S_DROP;
-            }
-            return NativeMethods.S_OK;
+                true => NativeMethods.HResult.DRAGDROP_S_CANCEL,
+                false when !keyStates.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
+                _ => NativeMethods.HResult.Ok,
+            });
         }
 
         /// <summary>
@@ -803,7 +820,13 @@ public sealed class VirtualFileDataObject : System.Runtime.InteropServices.ComTy
         /// <returns>This method returns S_OK on success.</returns>
         public int GiveFeedback(uint dwEffect)
         {
-            return NativeMethods.DRAGDROP_S_USEDEFAULTCURSORS;
+            if (onFeedback is not null)
+                onFeedback((DragDropEffects)dwEffect);
+
+            if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
+                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | GiveFeedback dwEffect: {(DragDropEffects)dwEffect}\n");
+
+            return (int)NativeMethods.HResult.DRAGDROP_S_USEDEFAULTCURSORS;
         }
     }
 }

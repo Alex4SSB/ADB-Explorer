@@ -19,6 +19,8 @@ public class FileSyncOperation : FileOperation
 
     public DiskUsage AdbProcess { get; private set; } = new(new());
 
+    public VirtualFileDataObject VFDO { get; set; }
+
     public FileSyncOperation(
         OperationType operationName,
         SyncFile sourcePath,

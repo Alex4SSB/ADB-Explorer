@@ -172,13 +172,13 @@ public static class FileHelper
         return fullName[lastDot..];
     }
 
-    public static string DuplicateFile(ObservableList<FileClass> fileList, string fullName, CutType cutType = CutType.None)
+    public static string DuplicateFile(ObservableList<FileClass> fileList, string fullName, DragDropEffects cutType = DragDropEffects.None)
         => DuplicateFile(fileList.Select(f => f.FullName), fullName, cutType);
 
-    public static string DuplicateFile(IEnumerable<string> fileList, string fullName, CutType cutType = CutType.None)
+    public static string DuplicateFile(IEnumerable<string> fileList, string fullName, DragDropEffects cutType = DragDropEffects.None)
     {
         // None - new file
-        var copySuffix = cutType is CutType.None ? "" : " - Copy";
+        var copySuffix = cutType is DragDropEffects.None ? "" : " - Copy";
         var extension = GetExtension(fullName);
         var noExtName = fullName[..^extension.Length];
 

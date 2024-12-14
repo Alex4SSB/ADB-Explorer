@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.Models;
 
@@ -76,8 +77,8 @@ public class FileClass : FilePath, IFileStat
         private set => Set(ref iconOverlay, value);
     }
 
-    private CutType cutState = CutType.None;
-    public CutType CutState
+    private DragDropEffects cutState = DragDropEffects.None;
+    public DragDropEffects CutState
     {
         get => cutState;
         set => Set(ref cutState, value);
@@ -241,12 +242,12 @@ public class FileClass : FilePath, IFileStat
         SortName = new(FullName);
     }
 
-    public static string CutTypeString(CutType cutType) => cutType switch
+    public static string CutTypeString(DragDropEffects cutType) => cutType switch
     {
-        CutType.None => "",
-        CutType.Cut => "Cut",
-        CutType.Copy => "Copied",
-        CutType.Link => "",
+        DragDropEffects.None => "",
+        DragDropEffects.Move => "Cut",
+        DragDropEffects.Copy => "Copied",
+        DragDropEffects.Link => "",
         _ => throw new NotImplementedException(),
     };
 
@@ -321,17 +322,14 @@ public class FileClass : FilePath, IFileStat
         }
     }
 
-    public FileSyncOperation PrepareDescriptors()
+    public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo)
     {
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'))
-        {
-            PathType = FilePathType.Windows,
-        };
+            { PathType = FilePathType.Windows };
 
         var fileOp = FileSyncOperation.PullFile(new(this), target, Data.CurrentADBDevice, App.Current.Dispatcher);
-        
-        // When a folder isn't empty, there's no need creating a file descriptor for it, since all folders are automatcally created
-        var items = IsDirectory && Children?.Length > 0 ? Children : [FullName];
+        fileOp.PropertyChanged += PullOperation_PropertyChanged;
+        fileOp.VFDO = vfdo;
 
         var items = Children ?? [FullName + (IsDirectory ? '/' : "")];
 
@@ -377,6 +375,41 @@ public class FileClass : FilePath, IFileStat
         });
 
         return fileOp;
+    }
+
+    private void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        var op = sender as FileSyncOperation;
+
+        if (e.PropertyName != nameof(FileOperation.Status)
+            || op.Status is FileOperation.OperationStatus.Waiting
+            or FileOperation.OperationStatus.InProgress)
+            return;
+
+        if (op.Status is FileOperation.OperationStatus.Completed)
+        {
+            if (op.VFDO.CurrentEffect.HasFlag(DragDropEffects.Move))
+            {
+                // Delete file from device
+                ShellFileOperation.SilentDelete(op.Device, op.FilePath.FullPath);
+
+                // Remove file in UI if present
+                if (op.Device.ID == Data.CurrentADBDevice.ID
+                    && op.FilePath.ParentPath == Data.CurrentPath)
+                {
+                    op.Dispatcher.Invoke(() =>
+                    {
+                        Data.DirList.FileList.RemoveAll(f => f.FullPath == op.FilePath.FullPath);
+                        FileActionLogic.UpdateFileActions();
+                    });
+                }
+
+                if (op.VFDO.Operations.All(op => op.Status is FileOperation.OperationStatus.Completed))
+                    Data.CopyPaste.Clear();
+            }
+        }
+
+        op.PropertyChanged -= PullOperation_PropertyChanged;
     }
 
     public void GetIcon()

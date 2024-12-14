@@ -1139,7 +1139,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
-        FileActions.PasteEnabled = FileActionLogic.IsPasteEnabled();
+
+        FileActionLogic.IsPasteEnabled();
+
         FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
 
@@ -1924,11 +1926,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 DragStatus = DragState.Active;
 
                 var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
-                var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems);
+                var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move);
 
                 if (vfdo is not null)
                 {
-                    vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Move);
+                    vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);
 
                     //RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
                 }
@@ -2222,7 +2224,32 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
     {
-        e.Effects = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
+        var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
+        e.Effects = allowed;
+
+        if (allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
+        {
+            e.Effects = DragDropEffects.Move;
+            CopyPaste.DropEffect = DragDropEffects.Move;
+        }
+        else if (allowed.HasFlag(DragDropEffects.Link) && e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
+        {
+            e.Effects = DragDropEffects.Link;
+            CopyPaste.DropEffect = DragDropEffects.Link;
+        }
+        else if (allowed.HasFlag(DragDropEffects.Copy)) // copy is the default and does not require Ctrl to be activated
+        {
+            e.Effects = DragDropEffects.Copy;
+            CopyPaste.DropEffect = DragDropEffects.Copy;
+        }
+
+        if ((!allowed.HasFlag(DragDropEffects.Copy) && e.KeyStates.HasFlag(DragDropKeyStates.ControlKey))
+            || (!allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
+            || (!allowed.HasFlag(DragDropEffects.Link) && e.KeyStates.HasFlag(DragDropKeyStates.AltKey)))
+        {
+            e.Effects = DragDropEffects.None;
+        }
+
         e.Handled = true;
     }
 }
