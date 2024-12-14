@@ -925,7 +925,10 @@ internal static class FileActionLogic
             {
                 try
                 {
-                    File.Delete(op.FilePath.FullPath);
+                    if (op.FilePath.IsDirectory)
+                        Directory.Delete(op.FilePath.FullPath, true);
+                    else
+                        File.Delete(op.FilePath.FullPath);
                 }
                 catch
                 { }

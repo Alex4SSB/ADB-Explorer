@@ -33,11 +33,11 @@ public static partial class NativeMethods
         => CreateStreamOnHGlobal(hGlobal, fDeleteOnRelease);
 
     [DllImport("Ole32.dll", CharSet = CharSet.Auto, ExactSpelling = true, PreserveSig = false)]
-    private static extern HResult DoDragDrop(IDataObject dataObject, IDropSource dropSource, int allowedEffects, out DragDropEffects finalEffect);
+    private static extern HResult DoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects, out DragDropEffects finalEffect);
 
     public static DragDropEffects MDoDragDrop(IDataObject dataObject, IDropSource dropSource, DragDropEffects allowedEffects)
     {
-        DoDragDrop(dataObject, dropSource, (int)allowedEffects, out var finalEffect);
+        DoDragDrop(dataObject, dropSource, allowedEffects, out var finalEffect);
 
         return finalEffect;
     }
@@ -159,12 +159,14 @@ public static partial class NativeMethods
         {
             cFileName = file.Name;
 
-            dwFlags |= FD_FLAGS.FD_ATTRIBUTES | FD_FLAGS.FD_PROGRESSUI;
+            dwFlags |= FD_FLAGS.FD_PROGRESSUI | FD_FLAGS.FD_ATTRIBUTES | FD_FLAGS.FD_UNICODE;
             dwFileAttributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_VIRTUAL;
 
             // Set optional directory flag
             if (file.IsDirectory)
+            {
                 dwFileAttributes |= FileFlagsAndAttributes.FILE_ATTRIBUTE_DIRECTORY;
+            }
 
             // Set optional timestamp
             if (file.ChangeTimeUtc.HasValue)
