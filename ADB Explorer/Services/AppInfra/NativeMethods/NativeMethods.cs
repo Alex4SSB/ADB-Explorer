@@ -425,6 +425,20 @@ public static partial class NativeMethods
 
         public static implicit operator System.Windows.Point(POINT self)
             => new(self.X, self.Y);
+
+        public static bool operator == (POINT self, POINT other)
+            => self.X == other.X && self.Y == other.Y;
+
+        public static bool operator !=(POINT self, POINT other)
+            => self.X != other.X || self.Y != other.Y;
+
+        public override readonly bool Equals(object obj)
+            => obj is POINT other &&
+                X == other.X &&
+                Y == other.Y;
+
+        public override readonly int GetHashCode()
+            => HashCode.Combine(X, Y);
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -453,6 +467,8 @@ public static partial class NativeMethods
 
         public UInt32 nFileSizeHigh = (uint)(size >> 32);
         public UInt32 nFileSizeLow = (uint)(size & 0xffffffff);
+
+        public readonly long GetSize() => ((long)nFileSizeHigh << 32) | nFileSizeLow;
     }
 
     #endregion

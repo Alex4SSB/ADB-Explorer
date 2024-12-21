@@ -108,9 +108,14 @@ public class FilePath : AbstractFile, IBaseFile
         FullPath = androidPath;
         FullName = string.IsNullOrEmpty(fullName) ? FileHelper.GetFullName(androidPath) : fullName;
 
-        SpecialType = fileType is FileType.Folder
-            ? SpecialFileType.Folder
-            : SpecialFileType.None;
+        if (fileType is FileType.Folder)
+            SpecialType = SpecialFileType.Folder;
+        else
+        {
+            SpecialType = AdbExplorerConst.APK_NAMES.Contains(FileHelper.GetExtension(FullName).ToUpper())
+                ? SpecialFileType.Apk
+                : SpecialFileType.None;
+        }
     }
 
     public virtual void UpdatePath(string newPath)

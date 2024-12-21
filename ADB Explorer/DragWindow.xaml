@@ -8,8 +8,6 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     Title="DragWindow"
-    Width="256"
-    Height="256"
     ui:ControlHelper.CornerRadius="5"
     AllowsTransparency="True"
     Background="Transparent"
@@ -24,8 +22,9 @@
     WindowStyle="None"
     mc:Ignorable="d">
     <Border
+        HorizontalAlignment="Left"
+        VerticalAlignment="Top"
         Background="Transparent"
-        CornerRadius="5"
         MouseUp="Border_MouseUp"
         Opacity="1">
         <Border.Style>
@@ -34,16 +33,60 @@
                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}" Value="{x:Null}">
                         <Setter Property="Visibility" Value="Collapsed" />
                     </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragWithinSlave}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
                 </Style.Triggers>
             </Style>
         </Border.Style>
-        <Grid IsHitTestVisible="False">
+        <Grid
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsHitTestVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
             <Image
                 x:Name="DragImage"
+                Width="128"
+                Height="128"
                 IsHitTestVisible="False"
                 RenderOptions.BitmapScalingMode="HighQuality"
                 Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
                 Stretch="Fill" />
+            <Border
+                Grid.Row="1"
+                Grid.Column="1"
+                Margin="-25,2,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Background="{DynamicResource ContentDialogContentBackground}"
+                BorderBrush="Gray"
+                BorderThickness="1">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
+                                <Setter Property="CornerRadius" Value="3" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ElementName=DragTooltip, Path=Text}" Value="">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                </Border.Style>
+                <TextBlock
+                    x:Name="DragTooltip"
+                    Margin="4"
+                    Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}"
+                    TextWrapping="Wrap" />
+            </Border>
         </Grid>
     </Border>
 </Window>

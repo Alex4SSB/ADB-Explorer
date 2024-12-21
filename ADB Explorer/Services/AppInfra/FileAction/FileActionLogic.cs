@@ -403,8 +403,11 @@ internal static class FileActionLogic
 
     public static DragDropEffects EnableDropPaste(FileClass target = null)
     {
+        if (!Data.CopyPaste.CurrentFiles.Any())
+            return DragDropEffects.None;
+
         var pastingInDescendant = Data.CopyPaste.DragFiles.Length == 1
-            && FileHelper.RelationFrom(Data.CopyPaste.DragFiles[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+            && Data.CopyPaste.CurrentFiles.First().Relation(Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
 
         if (pastingInDescendant || Data.FileActions.IsRecycleBin)
             return DragDropEffects.None;
@@ -419,7 +422,7 @@ internal static class FileActionLogic
             _ => target.FullPath,
         };
 
-        PastingOnFuse(targetPath, Data.CopyPaste.DragFiles);
+        PastingOnFuse(targetPath, Data.CopyPaste.CurrentFiles.Select(f => f.FullPath).ToArray());
 
         if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
             return DragDropEffects.None;
@@ -434,7 +437,7 @@ internal static class FileActionLogic
             if (!target.IsDirectory)
                 return DragDropEffects.None;
 
-            pastingInDescendant = (Data.CopyPaste.DragFiles.Length == 1 && Data.CopyPaste.DragFiles[0] == target.FullPath)
+            pastingInDescendant = (Data.CopyPaste.DragFiles.Length == 1 && Data.CopyPaste.CurrentFiles.First().FullPath == target.FullPath)
                 || (Data.CopyPaste.DragParent == target.FullPath);
         }
 

@@ -116,30 +116,27 @@ public class FileClass : FilePath, IFileStat
 
     public FileNameSort SortName { get; private set; }
 
-    private string[] children = null;
     public string[] Children
     {
         get
         {
-            if (children is null || !IsDirectory)
+            if (!IsDirectory)
+                return null;
+
+            var findCmd = "find";
+            if (Enum.TryParse<ShellCommands.ShellCmd>(findCmd, out var enumCmd)
+                && ShellCommands.DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
+                && dict.TryGetValue(enumCmd, out var deviceCmd))
             {
-                var findCmd = "find";
-                if (Enum.TryParse<ShellCommands.ShellCmd>(findCmd, out var enumCmd)
-                    && ShellCommands.DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
-                    && dict.TryGetValue(enumCmd, out var deviceCmd))
-                {
-                    findCmd = deviceCmd;
-                }
-
-                var target = ADBService.EscapeAdbShellString(FullName);
-                string[] args = [ ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-type d -empty -printf '%p/\\n'"];
-                
-                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, new(), args);
-
-                children = stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
+                findCmd = deviceCmd;
             }
 
-            return children;
+            var target = ADBService.EscapeAdbShellString(FullName);
+            string[] args = [ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-type d -empty -printf '%p/\\n'"];
+
+            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, new(), args);
+
+            return stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 
@@ -215,6 +212,13 @@ public class FileClass : FilePath, IFileStat
         TypeName = GetTypeName();
 
         SortName = new(FullName);
+    }
+
+    public FileClass(VirtualFileDataObject.FileDescriptor fileDescriptor)
+        : base(fileDescriptor.SourcePath, fileDescriptor.Name, fileDescriptor.IsDirectory ? FileType.Folder : FileType.File)
+    {
+        Size = (ulong?)fileDescriptor.Length;
+        ModifiedTime = fileDescriptor.ChangeTimeUtc;
     }
 
     public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
@@ -322,7 +326,7 @@ public class FileClass : FilePath, IFileStat
         }
     }
 
-    public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo)
+    public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'))
             { PathType = FilePathType.Windows };
@@ -331,7 +335,11 @@ public class FileClass : FilePath, IFileStat
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        var items = Children ?? [FullName + (IsDirectory ? '/' : "")];
+        string[] items = [FullName + (IsDirectory ? '/' : "")];
+        if (includeContent && Children is not null)
+        {
+            items = [..items, ..Children];
+        }
 
         // We only know the size of a single file beforehand
         long? size = IsDirectory ? null : (long?)Size;
@@ -344,7 +352,8 @@ public class FileClass : FilePath, IFileStat
             Length = size,
             StreamContents = (stream) =>
             {
-                if (DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2))
+                if (DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2)
+                    || !includeContent)
                     return;
 
                 // Start the operation if it hasn't been started yet

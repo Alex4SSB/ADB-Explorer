@@ -36,10 +36,21 @@ public class CopyPasteService : ViewModelBase
     public DragDropEffects DropEffect
     {
         get => dropEffect;
-        set
-        {
-            Set(ref dropEffect, value);
-        }
+        set => Set(ref dropEffect, value);
+    }
+
+    private DragDropEffects currentDropEffect = DragDropEffects.None;
+    public DragDropEffects CurrentDropEffect
+    {
+        get => currentDropEffect;
+        set => Set(ref currentDropEffect, value);
+    }
+
+    private string dropTarget = null;
+    public string DropTarget
+    {
+        get => dropTarget;
+        set => Set(ref dropTarget, value);
     }
 
     private DataSource pasteSource = DataSource.None;
@@ -74,10 +85,20 @@ public class CopyPasteService : ViewModelBase
         }
     }
 
+    public enum DragState
+    {
+        None,
+        Pending,
+        Active,
+    }
+
+    public DragState DragStatus = DragState.None;
+
     public bool IsDrag => DragPasteSource is not DataSource.None;
     public bool IsClipboard => PasteSource is not DataSource.None && !IsDrag;
     public DataSource CurrentSource => IsDrag ? DragPasteSource : PasteSource;
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
+    public string CurrentParent => IsDrag ? DragParent : ParentFolder;
     public bool IsSelf => CurrentSource.HasFlag(DataSource.Self);
     public bool IsSelfClipboard => IsSelf && IsClipboard;
     public bool IsWindows => !CurrentSource.HasFlag(DataSource.None) && !CurrentSource.HasFlag(DataSource.Android);
@@ -109,6 +130,40 @@ public class CopyPasteService : ViewModelBase
     {
         get => dragFiles;
         set => Set(ref dragFiles, value);
+    }
+
+    private VirtualFileDataObject.FileDescriptor[] descriptors = [];
+    public VirtualFileDataObject.FileDescriptor[] Descriptors
+    {
+        get => descriptors;
+        set => Set(ref descriptors, value);
+    }
+
+    public IEnumerable<FileClass> CurrentFiles
+    {
+        get
+        {
+            if (IsWindows && !IsVirtual)
+            {
+                foreach (var file in DragFiles)
+                {
+                    yield return new(ShellObject.FromParsingName(file));
+                }
+            }
+            else
+            {
+                foreach (var desc in Descriptors)
+                {
+                    desc.SourcePath = FileHelper.ConcatPaths(CurrentParent, desc.Name);
+                    yield return new(desc)
+                    {
+                        PathType = IsWindows
+                            ? FilePathType.Windows
+                            : FilePathType.Android
+                    };
+                }
+            }
+        }
     }
 
     public void UpdateUI()
@@ -203,6 +258,10 @@ public class CopyPasteService : ViewModelBase
         }
         else if (dataContext is null || file?.IsDirectory is true)
         {
+            Data.CopyPaste.DropTarget = dataContext is null
+                ? Data.CurrentPath
+                : file.FullPath;
+
             if (CurrentSource.HasFlag(DataSource.Android))
             {
                 // TODO: Add support for dragging from another device
@@ -268,16 +327,29 @@ public class CopyPasteService : ViewModelBase
                 else
                     PasteSource |= DataSource.Virtual;
             }
+
+            // This calls VDFO.GetData() which will throw in debug
+#if RELEASE
+            if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
+                GetDescriptors(dataObject);
+#endif
         }
-        else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor) && dataObject.GetData(AdbDataFormats.FileDescriptor) is MemoryStream fdStream)
+        else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
         {
-            var fileGroup = NativeMethods.FILEGROUPDESCRIPTOR.FromStream(fdStream);
-            DragFiles = fileGroup.descriptors.Select(d => d.cFileName).ToArray();
+            GetDescriptors(dataObject);
 
             if (IsDrag)
+            {
                 DragPasteSource |= DataSource.Virtual;
+                if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
+                    DragPasteSource &= ~DataSource.Android;
+            }
             else
+            {
                 PasteSource |= DataSource.Virtual;
+                if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
+                    PasteSource &= ~DataSource.Android;
+            }
         }
         else
         {
@@ -287,6 +359,15 @@ public class CopyPasteService : ViewModelBase
 
         if (oldFiles != DragFiles && IsDrag)
             UpdateUI();
+    }
+
+    public void GetDescriptors(IDataObject dataObject)
+    {
+        if (dataObject.GetData(AdbDataFormats.FileDescriptor) is not MemoryStream fdStream)
+            return;
+
+        var fileGroup = NativeMethods.FILEGROUPDESCRIPTOR.FromStream(fdStream);
+        Descriptors = fileGroup.descriptors.Select(NativeMethods.FILEDESCRIPTOR.GetFile).ToArray();
     }
 
     public void AcceptDataObject(IDataObject dataObject, FrameworkElement sender, bool isLink = false)

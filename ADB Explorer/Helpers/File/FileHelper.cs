@@ -99,11 +99,20 @@ public static class FileHelper
         return result.TrimStart('/', '\\');
     }
 
-    public static string GetParentPath(string fullPath) =>
-        fullPath[..LastSeparatorIndex(fullPath)];
+    public static string GetParentPath(string fullPath)
+    {
+        var index = LastSeparatorIndex(fullPath);
+        if (index.Value == 0)
+            index = 1;
+
+        return fullPath[..index];
+    }
 
     public static string GetFullName(string fullPath)
     {
+        if (string.IsNullOrEmpty(fullPath))
+            return fullPath;
+
         var separator = GetSeparator(fullPath);
         if (fullPath.IndexOf(separator) == fullPath.Length - 1)
             return fullPath;
@@ -135,7 +144,6 @@ public static class FileHelper
 
     public static Index IndexAdjust(int originalIndex) => originalIndex switch
     {
-        0 => 1,
         < 0 => ^0,
         _ => originalIndex,
     };

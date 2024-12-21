@@ -349,18 +349,25 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragBitmap, value);
     }
 
-    private Point dragOffset = new(0, 0);
-    public Point DragOffset
-    {
-        get => dragOffset;
-        set => Set(ref dragOffset, value);
-    }
-
     private Cursor cursor = Cursors.Arrow;
     public Cursor MainCursor
     {
         get => cursor;
         set => Set(ref cursor, value);
+    }
+
+    private Rect mainWinRect;
+    public Rect MainWinRect
+    {
+        get => mainWinRect;
+        set => Set(ref mainWinRect, value);
+    }
+
+    private bool dragWithinSlave = false;
+    public bool DragWithinSlave
+    {
+        get => dragWithinSlave;
+        set => Set(ref dragWithinSlave, value);
     }
 
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch

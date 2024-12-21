@@ -47,24 +47,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool bfNavigation = false;
 
     private int ClickCount = 0;
-    private DragState DragStatus = DragState.None;
     private bool WasSelected = false;
     private bool WasEditing = false;
     private Point MouseDownPoint;
-    private Point LastDragPoint;
-
     private FileToIconConverter FileToIcon;
-
     private DateTime appDataClick;
-
-    DragWindow dw = new();
-
-    private enum DragState
-    {
-        None,
-        Pending,
-        Active,
-    }
+    private readonly DragWindow dw = new();
 
     private bool IsInEditMode
     {
@@ -147,7 +135,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             launchTask.Wait();
             RuntimeSettings.IsWindowLoaded = true;
 
-            //Dispatcher.Invoke(dw.Show);
+            Dispatcher.Invoke(dw.Show);
         });
     }
 
@@ -163,7 +151,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ConnectTimer.Start();
         ServerWatchdogTimer.Start();
         DiskUsageTimer.Start();
-        //DragExitTimer.Start();
+
+        RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
     }
 
     private void DiskUsageTimer_Tick(object sender, EventArgs e)
@@ -1373,9 +1362,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         var row = sender as DataGridRow;
 
-        DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
-                     ? DragState.Pending
-                     : DragState.None;
+        CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
+            ? CopyPasteService.DragState.Pending
+            : CopyPasteService.DragState.None;
 
         SelectionHelper.SetIndexSingle(ExplorerGrid, row.GetIndex());
     }
@@ -1395,9 +1384,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (RowHeight is null && ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(0) is DataGridRow row)
             RowHeight = row.ActualHeight;
 
-        DragStatus = e.OriginalSource is TextBlock or Image
-                     ? DragState.Pending
-                     : DragState.None;
+        CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image
+                     ? CopyPasteService.DragState.Pending
+                     : CopyPasteService.DragState.None;
 
         var point = e.GetPosition(ExplorerGrid);
         MouseDownPoint = point;
@@ -1442,9 +1431,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         EnableSplitViewAnimation();
         SearchBoxMaxWidth();
 
+        if (!RuntimeSettings.IsWindowLoaded)
+            return;
+
         Size maximizedSize = new(SystemParameters.MaximizedPrimaryScreenWidth, SystemParameters.MaximizedPrimaryScreenHeight);
         if (e.NewSize != maximizedSize && e.PreviousSize != maximizedSize)
             FileActions.IsEditorOpen = false;
+
+        RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
     }
 
     private void SearchBoxMaxWidth()
@@ -1759,9 +1753,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var current = row.GetIndex();
 
         WasSelected = row.IsSelected;
-        DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
-                     ? DragState.Pending
-                     : DragState.None;
+        CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
+                     ? CopyPasteService.DragState.Pending
+                     : CopyPasteService.DragState.None;
 
         MouseDownPoint = e.GetPosition(ExplorerGrid);
         e.Handled = true;
@@ -1775,7 +1769,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         RuntimeSettings.IsPathBoxFocused = false;
 
-        if (!row.IsSelected && DragStatus is not DragState.None)
+        if (!row.IsSelected && CopyPaste.DragStatus is not CopyPasteService.DragState.None)
         {
             ExplorerGrid.UnselectAll();
             row.IsSelected = true;
@@ -1917,29 +1911,29 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             || withinEditingCell
             || SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu);
 
-        if (DragStatus is DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
+        if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
             if (ExplorerGrid.SelectedItems.Count > 0
                 && ExplorerGrid.SelectedItems[0] is FileClass
                 && !abortDrag)
             {
-                DragStatus = DragState.Active;
+                CopyPaste.DragStatus = CopyPasteService.DragState.Active;
 
                 var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
                 var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move);
 
                 if (vfdo is not null)
                 {
-                    vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);
+                    RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
 
-                    //RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
+                    vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);
                 }
             }
             else
-                DragStatus = DragState.None;
+                CopyPaste.DragStatus = CopyPasteService.DragState.None;
         }
 
-        if (abortDrag || DragStatus is not DragState.None)
+        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None)
         {
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
@@ -2063,7 +2057,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         e.Handled = CellMouseUp(sender, e);
 
-        DragStatus = DragState.None;
+        CopyPaste.DragStatus = CopyPasteService.DragState.None;
     }
 
     private bool CellMouseUp(object sender, MouseButtonEventArgs e)
@@ -2181,38 +2175,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return false;
     }
 
-    private void MainWin_DragOver(object sender, DragEventArgs e)
-    {
-        //var prevPoint = LastDragPoint;
-        //LastDragPoint = e.GetPosition(ExplorerCanvas);
-
-        //// Set relative position using offset received from the shell
-        //Canvas.SetTop(CursorBorder, LastDragPoint.Y - RuntimeSettings.DragOffset.Y);
-        //Canvas.SetLeft(CursorBorder, LastDragPoint.X - RuntimeSettings.DragOffset.X);
-
-        //// Compare with mouse position at 5 times the current vector to reduce exit misdetection
-        //var nextPoint = LastDragPoint + 5 * (LastDragPoint - prevPoint);
-        //Size size = new(ExplorerGrid.ActualWidth, ExplorerGrid.ActualHeight);
-
-        //CursorBorder.Visible(new Rect(size).Contains(nextPoint));
-    }
-
-    private void ExplorerGrid_DragEnter(object sender, DragEventArgs e)
-    {
-        //var formats = e.Data.GetFormats();
-
-        //if (formats.Contains(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is string[] files && files.Length > 0)
-        //{
-
-        //    RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(new(ShellObject.FromParsingName(files[0])));
-
-        //    return;
-        //}
-
-        //RuntimeSettings.DragBitmap = null;
-        //CursorBorder.Visible(false);
-    }
-
     private void AppDataHyperlink_Click(object sender, RoutedEventArgs e)
     {
         if (DateTime.Now - appDataClick < LINK_CLICK_DELAY)
@@ -2250,6 +2212,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             e.Effects = DragDropEffects.None;
         }
 
+        CopyPaste.CurrentDropEffect = e.Effects;
+
+        if (CopyPaste.CurrentFiles.Any())
+            RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(CopyPaste.CurrentFiles.First());
+
         e.Handled = true;
+    }
+
+    private void MainWin_LocationChanged(object sender, EventArgs e)
+    {
+        if (!RuntimeSettings.IsWindowLoaded)
+            return;
+
+        RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
+    }
+
+    private void MainWin_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (CopyPaste.IsDrag && CopyPaste.IsWindows && e.Key is Key.Escape)
+            RuntimeSettings.DragBitmap = null;
     }
 }

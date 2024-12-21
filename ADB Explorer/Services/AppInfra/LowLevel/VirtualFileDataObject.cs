@@ -411,18 +411,19 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// Provides data for the specified data format (FILEGROUPDESCRIPTOR/FILEDESCRIPTOR)
     /// </summary>
     /// <param name="fileDescriptors">Collection of virtual files.</param>
-    public void SetData(IEnumerable<FileDescriptor> fileDescriptors)
+    public void SetData(IEnumerable<FileDescriptor> fileDescriptors, bool includeContent = true)
     {
         FileGroup group = new(fileDescriptors);
 
         UpdateData(AdbDataFormats.FileDescriptor, group.GroupDescriptorBytes);
-        UpdateData(AdbDataFormats.FileContents, group.DataStreams);
+
+        if (includeContent)
+            UpdateData(AdbDataFormats.FileContents, group.DataStreams);
     }
 
     public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
     {
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
-
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
     
@@ -432,7 +433,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     public DragDropEffects CurrentEffect
     {
         get => currentEffect;
-        set => Set(ref currentEffect, value);
+        set
+        {
+            if (Set(ref currentEffect, value))
+                Data.CopyPaste.CurrentDropEffect = value & ~DragDropEffects.Scroll;
+        }
     }
 
     public DragDropEffects? PasteSucceeded
@@ -725,6 +730,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             vfdo.SetData(AdbDataFormats.FileDescriptor, []);
             vfdo.SetData(AdbDataFormats.FileContents, []);
         }
+        else
+        {
+            files.ForEach(f => f.PrepareDescriptors(vfdo, false));
+            vfdo.SetData(files.SelectMany(f => f.Descriptors), false);
+        }
 
         vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
 
@@ -805,12 +815,19 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             var escapePressed = (0 != fEscapePressed);
             var keyStates = (DragDropKeyStates)grfKeyState;
 
-            return (int)(escapePressed switch
+            var res = escapePressed switch
             {
                 true => NativeMethods.HResult.DRAGDROP_S_CANCEL,
                 false when !keyStates.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
                 _ => NativeMethods.HResult.Ok,
-            });
+            };
+
+            if (res is not NativeMethods.HResult.Ok)
+            {
+                Data.RuntimeSettings.DragBitmap = null;
+            }
+
+            return (int)res;
         }
 
         /// <summary>

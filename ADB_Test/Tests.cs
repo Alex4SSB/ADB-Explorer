@@ -135,12 +135,12 @@ namespace ADB_Test
             string[] names3 = ["New File", "New File - Copy 2"];
 
             // Copy
-            Assert.AreEqual("New File", FileHelper.DuplicateFile(Array.Empty<string>(), "New File", AbstractFile.CutType.Copy));
-            Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(["New File"], "New File", AbstractFile.CutType.Copy));
-            Assert.AreEqual("New File - Copy 2", FileHelper.DuplicateFile(names2, "New File", AbstractFile.CutType.Copy));
-            Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(names3, "New File", AbstractFile.CutType.Copy));
-            Assert.AreEqual("New File.pdf", FileHelper.DuplicateFile(names2, "New File.pdf", AbstractFile.CutType.Copy));
-            Assert.AreEqual("New File - Copy 1.txt", FileHelper.DuplicateFile(names2, "New File.txt", AbstractFile.CutType.Copy));
+            Assert.AreEqual("New File", FileHelper.DuplicateFile(Array.Empty<string>(), "New File", System.Windows.DragDropEffects.Copy));
+            Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(["New File"], "New File", System.Windows.DragDropEffects.Copy));
+            Assert.AreEqual("New File - Copy 2", FileHelper.DuplicateFile(names2, "New File", System.Windows.DragDropEffects.Copy));
+            Assert.AreEqual("New File - Copy 1", FileHelper.DuplicateFile(names3, "New File", System.Windows.DragDropEffects.Copy));
+            Assert.AreEqual("New File.pdf", FileHelper.DuplicateFile(names2, "New File.pdf", System.Windows.DragDropEffects.Copy));
+            Assert.AreEqual("New File - Copy 1.txt", FileHelper.DuplicateFile(names2, "New File.txt", System.Windows.DragDropEffects.Copy));
         }
 
         [TestMethod]
@@ -273,6 +273,8 @@ namespace ADB_Test
 
             Assert.AreEqual("ASUS", FileHelper.GetFullName(@"/sdcard/ASUS/"));
 
+            Assert.AreEqual("sdcard", FileHelper.GetFullName(@"/sdcard/"));
+
             Assert.AreEqual("/", FileHelper.GetFullName("/"));
 
             Assert.AreEqual(@"C:\", FileHelper.GetFullName(@"C:\"));
@@ -293,6 +295,15 @@ namespace ADB_Test
             Assert.AreEqual(-1, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar"), [0, 0]));
             Assert.AreEqual(11, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar\0"), [0, 0]));
             Assert.AreEqual(12, ByteHelper.PatternAt(Encoding.Unicode.GetBytes("foobar\0"), [0, 0], evenAlign: true));
+        }
+
+        [TestMethod]
+        public void FileSizeTest()
+        {
+            long number = (long)Math.Pow(Math.Pow(9, 9), 2);
+            NativeMethods.FILESIZE size = new(number);
+
+            Assert.AreEqual(number, size.GetSize());
         }
     }
 }
