@@ -89,6 +89,7 @@ public class FilePath : AbstractFile, IBaseFile
 
     public FilePath(ShellObject windowsPath)
     {
+        ShellObject = windowsPath;
         PathType = FilePathType.Windows;
 
         FullPath = windowsPath.ParsingName;

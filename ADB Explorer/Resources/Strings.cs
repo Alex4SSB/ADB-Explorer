@@ -172,6 +172,6 @@ public static class Strings
         return $"{(string.IsNullOrEmpty(e.Message) ? "" : e.Message + "\n\n")}An error occured while trying to list the contents of this folder.\n Visible content may be incomplete.";
     }
 
-    public static string S_PASTE_ANCESTOR(string ancestor) =>
-        $"{FileHelper.GetFullName(ancestor)} is an ancestor of the destination folder.";
+    public static string S_PASTE_ANCESTOR(FileClass ancestor) =>
+        $"{ancestor.FullName} is an ancestor of the destination folder.";
 }

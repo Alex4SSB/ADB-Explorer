@@ -46,7 +46,7 @@ internal static class FileActionLogic
         Data.CopyPaste.VerifyAndPaste(
             DragDropEffects.Copy,
             AdbExplorerConst.TEMP_PATH,
-            Data.SelectedFiles.Select(f => f.FullPath),
+            Data.SelectedFiles,
             App.Current.Dispatcher,
             Data.CurrentADBDevice,
             Data.CurrentPath);

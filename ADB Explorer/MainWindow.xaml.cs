@@ -135,7 +135,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             launchTask.Wait();
             RuntimeSettings.IsWindowLoaded = true;
 
-            Dispatcher.Invoke(dw.Show);
+            Dispatcher.Invoke(() =>
+            {
+                dw.Show();
+
+                App.Current.MainWindow = this;
+            });
         });
     }
 

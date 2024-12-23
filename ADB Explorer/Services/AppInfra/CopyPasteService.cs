@@ -328,11 +328,14 @@ public class CopyPasteService : ViewModelBase
                     PasteSource |= DataSource.Virtual;
             }
 
-            // This calls VDFO.GetData() which will throw in debug
-#if RELEASE
             if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
-                GetDescriptors(dataObject);
-#endif
+            {
+                Task.Run(() =>
+                {
+                    Task.Delay(500);
+                    App.Current.Dispatcher.Invoke(() => GetDescriptors(dataObject));
+                });
+            }
         }
         else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
         {
@@ -414,7 +417,7 @@ public class CopyPasteService : ViewModelBase
             }
             else if (IsWindows)
             {
-                VerifyAndPush(targetFolder, DragFiles, CurrentEffect);
+                VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect);
                 if (CurrentEffect is DragDropEffects.Move)
                     Clear();
             }
@@ -426,7 +429,7 @@ public class CopyPasteService : ViewModelBase
 
                 VerifyAndPaste(isLink ? DragDropEffects.Link : CurrentEffect,
                                targetFolder,
-                               DragFiles,
+                               CurrentFiles,
                                App.Current.Dispatcher,
                                Data.CurrentADBDevice,
                                Data.CurrentPath);
@@ -456,18 +459,18 @@ public class CopyPasteService : ViewModelBase
         FileActionLogic.PushShellObjects(pasteItems, targetPath);
     }
 
-    public static async void VerifyAndPush(string targetPath, IEnumerable<string> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
         pasteItems = await MergeFiles(pasteItems, targetPath);
         if (!pasteItems.Any())
             return;
 
-        FileActionLogic.PushShellObjects(pasteItems.Select(ShellObject.FromParsingName), targetPath, dropEffects);
+        FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellObject), targetPath, dropEffects);
     }
 
     public async void VerifyAndPaste(DragDropEffects cutType,
                                string targetPath,
-                               IEnumerable<string> pasteItems,
+                               IEnumerable<FileClass> pasteItems,
                                Dispatcher dispatcher,
                                ADBService.AdbDevice device,
                                string currentPath)
@@ -484,6 +487,7 @@ public class CopyPasteService : ViewModelBase
                   items: pasteItems,
                   targetPath: targetPath,
                   currentPath: currentPath,
+                  existingItems: [],
                   dispatcher: dispatcher,
                   cutType: cutType);
     }
@@ -567,14 +571,92 @@ public class CopyPasteService : ViewModelBase
     }
 
     /// <summary>
+    /// Check for existing top level items in the target location. <br />
+    /// Ask the user whether to abort, continue, or exclude the conflicting items.
+    /// </summary>
+    /// <param name="filePaths">Full paths of the files to be transferred.</param>
+    /// <param name="targetPath">Full path of the target location.</param>
+    /// <returns>
+    /// An empty list if user selected Cancel. <br />
+    /// The original list if user selected Merge or Replace. <br />
+    /// The file list excluding the top level conflicting items if user selected Skip.
+    /// </returns>
+    public static async Task<IEnumerable<FileClass>> MergeFiles(IEnumerable<FileClass> filePaths, string targetPath)
+    {
+        // Figure out whether the target is Windows or Android
+        var sep = FileHelper.GetSeparator(targetPath);
+
+        // File names on (non virtual) Unix file systems are case sensitive
+        var isUnix = sep is '/' && !DriveHelper.GetCurrentDrive(targetPath).IsFUSE;
+        StringComparer comparer = isUnix
+            ? StringComparer.InvariantCulture
+            : StringComparer.InvariantCultureIgnoreCase;
+
+        // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts.
+        // We receive full paths of the top level items in AdbDragList and FileDrop.
+
+        // TODO: FileGroupDescriptor gives full hierarchy, so GetFullName is not good
+
+        HashSet<string> fileNames = new(filePaths.Select(f => f.FullName), comparer);
+        HashSet<string> existingItems;
+
+        if (sep is '/') // Android
+        {
+            if (targetPath == Data.CurrentPath)
+            {
+                existingItems = Data.DirList.FileList.Select(f => f.FullPath).Intersect(fileNames).ToHashSet(comparer);
+            }
+            else
+            {
+                var foundFiles = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID, targetPath, includeNames: fileNames, caseSensitive: isUnix);
+                existingItems = foundFiles.Select(FileHelper.GetFullName).ToHashSet(comparer);
+            }
+        }
+        else // Windows
+        {
+            var files = Directory.GetFiles(targetPath);
+            var dirs = Directory.GetDirectories(targetPath);
+
+            existingItems = dirs.Concat(files).Select(Path.GetFileName).Intersect(fileNames).ToHashSet(comparer);
+        }
+
+        var count = existingItems.Count;
+        if (count > 0)
+        {
+            string destination = FileHelper.GetFullName(targetPath);
+            if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
+                destination = drive;
+
+            var result = await DialogService.ShowConfirmation(
+                $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
+                "Paste Conflicts",
+                primaryText: "Merge or Replace",
+                secondaryText: count == filePaths.Count() ? "" : "Skip",
+                cancelText: "Cancel",
+                icon: DialogService.DialogIcon.Exclamation);
+
+            if (result.Item1 is ContentDialogResult.None) // Cancel
+            {
+                return [];
+            }
+            else if (result.Item1 is ContentDialogResult.Secondary) // Skip
+            {
+                filePaths = filePaths.Where(item => !existingItems.Contains(item.FullName)).ToList();
+            }
+        }
+
+        return filePaths;
+    }
+
+    /// <summary>
     /// Check for pasting in descendant or self
     /// </summary>
-    public async Task<IEnumerable<string>> RemoveAncestor(IEnumerable<string> pasteItems, string targetPath, DragDropEffects cutType)
+    public async Task<IEnumerable<FileClass>> RemoveAncestor(IEnumerable<FileClass> pasteItems, string targetPath, DragDropEffects cutType)
     {
         if (cutType is DragDropEffects.Link || !IsSelf)
             return pasteItems;
 
-        var ancestor = pasteItems.FirstOrDefault(f => FileHelper.RelationFrom(f, targetPath) is RelationType.Self or RelationType.Descendant);
+        var ancestor = pasteItems.FirstOrDefault(f => f.Relation(targetPath) is RelationType.Self or RelationType.Descendant);
 
         if (ancestor is null)
             return pasteItems;

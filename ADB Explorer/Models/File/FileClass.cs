@@ -219,6 +219,7 @@ public class FileClass : FilePath, IFileStat
     {
         Size = (ulong?)fileDescriptor.Length;
         ModifiedTime = fileDescriptor.ChangeTimeUtc;
+        Type = fileDescriptor.IsDirectory ? FileType.Folder : FileType.File;
     }
 
     public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
@@ -343,6 +344,7 @@ public class FileClass : FilePath, IFileStat
 
         // We only know the size of a single file beforehand
         long? size = IsDirectory ? null : (long?)Size;
+        DateTime? date = IsDirectory ? null : ModifiedTime;
 
         Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor
         {
@@ -350,6 +352,7 @@ public class FileClass : FilePath, IFileStat
             SourcePath = FullPath,
             IsDirectory = item[^1] is '/',
             Length = size,
+            ChangeTimeUtc = date,
             StreamContents = (stream) =>
             {
                 if (DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2)
