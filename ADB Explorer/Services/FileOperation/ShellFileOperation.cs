@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
-using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services;
 
@@ -11,7 +10,7 @@ public abstract class AbstractShellFileOperation : FileOperation
 
     public override SyncFile AndroidPath => TargetPath;
 
-    public AbstractShellFileOperation(FileClass filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
+    protected AbstractShellFileOperation(FileClass filePath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
         : base(filePath, adbDevice, dispatcher)
     {
         if (filePath is not null)
@@ -42,7 +41,7 @@ public static class ShellFileOperation
     public static void SilentDelete(ADBService.AdbDevice device, params string[] items)
     {
         string[] args = ["-rf", .. items.Select(item => ADBService.EscapeAdbShellString(item))];
-        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, new(), args);
+        ADBService.ExecuteDeviceAdbShellCommand(device.ID, "rm", out _, out _, CancellationToken.None, args);
     }
 
     public static void DeleteItems(ADBService.AdbDevice device, IEnumerable<FileClass> items, Dispatcher dispatcher)
@@ -61,29 +60,28 @@ public static class ShellFileOperation
         var op = sender as FileDeleteOperation;
 
         // when operation completes, remove this event handler anyway
-        if (e.PropertyName is nameof(FileOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed)
+        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
+
+        // delete file trash indexer if present, even if not current device
+        if (op.FilePath.TrashIndex is TrashIndexer indexer)
+            SilentDelete(op.Device, indexer.IndexerPath);
+
+        if (op.Device.ID == Data.CurrentADBDevice.ID)
         {
-            // delete file trash indexer if present, even if not current device
-            if (op.FilePath.TrashIndex is TrashIndexer indexer)
-                SilentDelete(op.Device, indexer.IndexerPath);
+            // remove file from cut items and clear its trash indexer if current device
+            op.FilePath.CutState = DragDropEffects.None;
+            op.FilePath.TrashIndex = null;
 
-            if (op.Device.ID == Data.CurrentADBDevice.ID)
+            // update UI if current path
+            if (op.TargetPath.ParentPath == Data.CurrentPath)
             {
-                // remove file from cut items and clear its trash indexer if current device
-                op.FilePath.CutState = DragDropEffects.None;
-                op.FilePath.TrashIndex = null;
-
-                // update UI if current path
-                if (op.TargetPath.ParentPath == Data.CurrentPath)
-                {
-                    Data.DirList.FileList.Remove(op.FilePath);
-                    FileActionLogic.UpdateFileActions();
-                }
+                Data.DirList.FileList.Remove(op.FilePath);
+                FileActionLogic.UpdateFileActions();
             }
-
-            op.PropertyChanged -= DeleteFileOp_PropertyChanged;
         }
+
+        op.PropertyChanged -= DeleteFileOp_PropertyChanged;
     }
 
     public static void Rename(FileClass item, string targetPath, ADBService.AdbDevice device)
@@ -99,27 +97,26 @@ public static class ShellFileOperation
         var op = sender as FileRenameOperation;
 
         // when operation completes, remove this event handler anyway
-        if (e.PropertyName is nameof(FileOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed)
+        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
+
+        if (op.Device.ID == Data.CurrentADBDevice.ID
+            && op.FilePath.ParentPath == Data.CurrentPath)
         {
-            if (op.Device.ID == Data.CurrentADBDevice.ID
-                && op.FilePath.ParentPath == Data.CurrentPath)
-            {
-                var file = Data.DirList.FileList.Find(f => f.FullPath == op.FilePath.FullPath);
+            var file = Data.DirList.FileList.Find(f => f.FullPath == op.FilePath.FullPath);
 
-                // update UI when on current device and current path
-                op.Dispatcher.Invoke(() => file.UpdatePath(op.TargetPath.FullPath));
+            // update UI when on current device and current path
+            op.Dispatcher.Invoke(() => file.UpdatePath(op.TargetPath.FullPath));
 
-                if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
-                    Data.FileActions.ItemToSelect = null;
+            if (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First() == file)
+                Data.FileActions.ItemToSelect = null;
 
-                // only select the item if there aren't any other operations
-                if (Data.FileOpQ.TotalCount == 1)
-                    Data.FileActions.ItemToSelect = file;
-            }
-
-            op.PropertyChanged -= RenameFileOp_PropertyChanged;
+            // only select the item if there aren't any other operations
+            if (Data.FileOpQ.TotalCount == 1)
+                Data.FileActions.ItemToSelect = file;
         }
+
+        op.PropertyChanged -= RenameFileOp_PropertyChanged;
     }
 
     public static bool SilentMove(ADBService.AdbDevice device, FilePath item, string targetPath) => SilentMove(device, item.FullPath, targetPath);
@@ -128,10 +125,11 @@ public static class ShellFileOperation
     {
         var exitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID,
                                                                "mv",
-                                                               out string stdout,
-                                                               out string stderr,
-                                                               new(),
-                                                               [ADBService.EscapeAdbShellString(fullPath), ADBService.EscapeAdbShellString(targetPath)]);
+                                                               out _,
+                                                               out var stderr,
+                                                               CancellationToken.None,
+                                                               ADBService.EscapeAdbShellString(fullPath),
+                                                               ADBService.EscapeAdbShellString(targetPath));
 
         if (exitCode != 0 && throwOnError)
         {
@@ -311,7 +309,7 @@ public static class ShellFileOperation
     public static async void MakeDir(ADBService.AdbDevice device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                              new(),
+                                                              CancellationToken.None,
                                                               "mkdir",
                                                               ["-p", ADBService.EscapeAdbShellString(fullPath)]);
 
@@ -324,7 +322,7 @@ public static class ShellFileOperation
     public static async void MakeFile(ADBService.AdbDevice device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                              new(),
+                                                              CancellationToken.None,
                                                               "touch",
                                                               ADBService.EscapeAdbShellString(fullPath));
 
@@ -337,7 +335,7 @@ public static class ShellFileOperation
     public static async void WriteLine(ADBService.AdbDevice device, string fullPath, string newLine)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,
-                                                              new(),
+                                                              CancellationToken.None,
                                                               "echo",
                                                               [newLine, ">>", ADBService.EscapeAdbShellString(fullPath)]);
 
@@ -353,7 +351,7 @@ public static class ShellFileOperation
                                                                "cat",
                                                                out string stdout,
                                                                out string stderr,
-                                                               new(), paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
+                                                               CancellationToken.None, paths.Select(path => ADBService.EscapeAdbShellString(path)).ToArray());
 
         if (exitCode != 0)
             throw new Exception(stderr);
@@ -367,7 +365,7 @@ public static class ShellFileOperation
                                                 "pm",
                                                 out string stdout,
                                                 out _,
-                                                new(),
+                                                CancellationToken.None,
                                                 "install",
                                                 "-R",
                                                 "--pkg",
@@ -416,26 +414,25 @@ public static class ShellFileOperation
         var op = sender as PackageInstallOperation;
 
         // when operation completes, remove this event handler anyway
-        if (e.PropertyName is nameof(FileOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed)
-        {
-            if (op.Device.ID == Data.CurrentADBDevice.ID
-                && Data.FileActions.IsAppDrive)
-            {
-                // update UI when on current device and current path
-                if (op.IsUninstall)
-                    Data.Packages.RemoveAll(pkg => pkg.Name == op.PackageName);
-                else if (op.PushPackage)
-                    Data.FileActions.RefreshPackages = true;
-            }
+        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
 
-            op.PropertyChanged -= InstallOp_PropertyChanged;
+        if (op.Device.ID == Data.CurrentADBDevice.ID
+            && Data.FileActions.IsAppDrive)
+        {
+            // update UI when on current device and current path
+            if (op.IsUninstall)
+                Data.Packages.RemoveAll(pkg => pkg.Name == op.PackageName);
+            else if (op.PushPackage)
+                Data.FileActions.RefreshPackages = true;
         }
+
+        op.PropertyChanged -= InstallOp_PropertyChanged;
     }
 
     public static ulong? GetPackagesCount(ADBService.AdbDevice device)
     {
-        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, new(), ["list", "packages", "|", "wc", "-l"]);
+        var result = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out string stdout, out _, CancellationToken.None, ["list", "packages", "|", "wc", "-l"]);
         if (result != 0 || !ulong.TryParse(stdout, out ulong value))
             return null;
 
@@ -455,7 +452,7 @@ public static class ShellFileOperation
         if (includeSystem)
         {
             // get system packages
-            var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, new(), args);
+            var systemExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, CancellationToken.None, args);
 
             if (systemExitCode == 0)
                 packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.System)));
@@ -463,7 +460,7 @@ public static class ShellFileOperation
 
         args[2] = "-3";
         // get user packages
-        var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, new(), args);
+        var userExitCode = ADBService.ExecuteDeviceAdbShellCommand(device.ID, "pm", out stdout, out _, CancellationToken.None, args);
 
         if (userExitCode == 0)
             packages.AddRange(stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Select(pkg => Package.New(pkg, Package.PackageType.User)));
@@ -514,17 +511,16 @@ public static class ShellFileOperation
         var op = sender as FileChangeModifiedOperation;
 
         // when operation completes, remove this event handler anyway
-        if (e.PropertyName is nameof(FileOperation.Status)
-            && op.Status is FileOperation.OperationStatus.Completed)
-        {
-            if (op.Device.ID == Data.CurrentADBDevice.ID
-                && op.FilePath.ParentPath == Data.CurrentPath)
-            {
-                // update UI when on current device and current path
-                op.FilePath.ModifiedTime = op.NewDate;
-            }
+        if (e.PropertyName is not nameof(FileOperation.Status) || op.Status is not FileOperation.OperationStatus.Completed)
+            return;
 
-            op.PropertyChanged -= ChangeModifiedOp_PropertyChanged;
+        if (op.Device.ID == Data.CurrentADBDevice.ID
+            && op.FilePath.ParentPath == Data.CurrentPath)
+        {
+            // update UI when on current device and current path
+            op.FilePath.ModifiedTime = op.NewDate;
         }
+
+        op.PropertyChanged -= ChangeModifiedOp_PropertyChanged;
     }
 }

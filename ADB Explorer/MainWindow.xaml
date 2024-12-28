@@ -36,7 +36,6 @@
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <CollectionViewSource x:Key="FileListView" Source="{Binding Source={x:Static Member=models:Data.DirList}, Path=FileList}" />
         <ContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
-        <ContextMenu x:Key="PathButtonsMenu" Style="{StaticResource PathBoxContextMenuStyle}" />
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
@@ -59,7 +58,7 @@
         </Style>
     </Window.Resources>
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo x:Name="TaskBarInfo" ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
+        <TaskbarItemInfo ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
     </Window.TaskbarItemInfo>
     <Grid Margin="0,2,0,0">
         <Grid>

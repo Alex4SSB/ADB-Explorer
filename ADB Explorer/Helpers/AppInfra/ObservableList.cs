@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Helpers;
+﻿using System;
+
+namespace ADB_Explorer.Helpers;
 
 public class ObservableList<T> : ObservableCollection<T> where T : INotifyPropertyChanged
 {
@@ -13,24 +15,26 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
     }
 
     /// <summary>
-    /// Adds a collection of items to the end of the list. <br />
-    /// *** USE OptimizeForOne ONLY WHEN THE COLLECTION HAS BEEN ALREADY ENUMERATED ***
+    /// Adds a collection of items to the end of the list.
     /// </summary>
     /// <param name="items"></param>
-    /// <param name="OptimizeForOne">Use regular Add if there's 1 or less items to add.</param>
-    public void AddRange(IEnumerable<T> items, bool OptimizeForOne = true)
+    public void AddRange(IEnumerable<T> items)
     {
-        if (OptimizeForOne && items.Count() < 2)
+        var itemsList = items.ToArray();
+        switch (itemsList.Length)
         {
-            if (items.Any())
-                Add(items.First());
-
-            return;
+            case < 1:
+                return;
+            case < 2:
+                // When adding one item, we can skip the notification suppression mechanism
+                Add(itemsList[0]);
+                return;
         }
 
+        // When adding more than one item, we suppress the notification mechanism while items are being added
         suppressOnCollectionChanged = true;
 
-        foreach (T item in items)
+        foreach (T item in itemsList)
         {
             Add(item);
         }
@@ -59,52 +63,63 @@ public class ObservableList<T> : ObservableCollection<T> where T : INotifyProper
         if (Count == 0 || predicate is null)
             return default;
 
-        if (this.Where(predicate) is IEnumerable<T> result && result.Any())
-            return result.First();
-
-        return default;
+        var resultList = this.Where(predicate).ToArray();
+        return resultList.Length > 0
+            ? resultList[0]
+            : default;
     }
 
+    /// <summary>
+    /// Removes all items that match the predicate.
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns><see langword="true"/> if at least one item was removed, otherwise <see langword="false"/></returns>
     public bool RemoveAll(Func<T, bool> predicate)
     {
-        if (this.Where(predicate) is IEnumerable<T> result && result.Any())
+        var resultList = this.Where(predicate).ToArray();
+        switch (resultList.Length)
         {
-            if (result.Count() == 1)
-            {
-                Remove(result.First());
+            case < 1:
+                return false;
+            case 1:
+                // When removing one item, we can skip the notification suppression mechanism
+                Remove(resultList[0]);
                 return true;
-            }
-
-            suppressOnCollectionChanged = true;
-
-            foreach (T item in result.ToList())
-            {
-                Remove(item);
-            }
-
-            suppressOnCollectionChanged = false;
-
-            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-
-            return true;
         }
 
-        return false;
+        // When removing more than one item, we suppress the notification mechanism while items are being removed
+        suppressOnCollectionChanged = true;
+
+        foreach (T item in resultList)
+        {
+            Remove(item);
+        }
+
+        suppressOnCollectionChanged = false;
+
+        OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+        return true;
+
     }
 
     public void RemoveAll(IEnumerable<T> items)
     {
-        if (items.Count() < 2)
+        var resultList = items.ToArray();
+        switch (resultList.Length)
         {
-            if (items.Any())
-                Remove(items.First());
-
-            return;
+            case < 1:
+                return;
+            case 1:
+                // When removing one item, we can skip the notification suppression mechanism
+                Remove(resultList[0]);
+                return;
         }
 
+        // When removing more than one item, we suppress the notification mechanism while items are being removed
         suppressOnCollectionChanged = true;
 
-        foreach (var item in items)
+        foreach (var item in resultList)
         {
             Remove(item);
         }

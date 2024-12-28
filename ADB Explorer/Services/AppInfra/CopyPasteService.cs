@@ -170,9 +170,9 @@ public class CopyPasteService : ViewModelBase
     {
         FileActionLogic.UpdateFileActions();
 
-        IEnumerable<FileClass> cutItems = [];
+        List<FileClass> cutItems = [];
         if (PasteSource is not DataSource.None && PasteSource.HasFlag(DataSource.Self))
-            cutItems = Data.DirList.FileList.Where(f => Files.Contains(f.FullPath));
+            cutItems = Data.DirList.FileList.Where(f => Files.Contains(f.FullPath)).ToList();
 
         cutItems.ForEach(file => file.CutState = PasteState);
         Data.DirList?.FileList.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
@@ -199,6 +199,8 @@ public class CopyPasteService : ViewModelBase
         DragPasteSource = DataSource.None;
         DragFiles = [];
         DragParent = "";
+
+        Data.RuntimeSettings.DragBitmap = null;
     }
 
     public void GetClipboardPasteItems()
@@ -366,18 +368,28 @@ public class CopyPasteService : ViewModelBase
 
     public void GetDescriptors(IDataObject dataObject)
     {
-        if (dataObject.GetData(AdbDataFormats.FileDescriptor) is not MemoryStream fdStream)
-            return;
+        try
+        {
+            if (dataObject.GetData(AdbDataFormats.FileDescriptor) is not MemoryStream fdStream)
+                return;
 
-        var fileGroup = NativeMethods.FILEGROUPDESCRIPTOR.FromStream(fdStream);
-        Descriptors = fileGroup.descriptors.Select(NativeMethods.FILEDESCRIPTOR.GetFile).ToArray();
+            var fileGroup = NativeMethods.FILEGROUPDESCRIPTOR.FromStream(fdStream);
+            Descriptors = fileGroup.descriptors.Select(NativeMethods.FILEDESCRIPTOR.GetFile).ToArray();
+        }
+        catch (Exception ex)
+        {
+            // In DEBUG this will happen when trying to read our own VFDO
+#if RELEASE
+            DialogService.ShowMessage(ex.Message, "Unable to acquire file descriptors", DialogService.DialogIcon.Critical);
+#endif
+        }
     }
 
     public void AcceptDataObject(IDataObject dataObject, FrameworkElement sender, bool isLink = false)
     {
         var dataContext = sender.DataContext;
 
-        string targetFolder = dataContext is FileClass file && file.IsDirectory
+        string targetFolder = dataContext is FileClass { IsDirectory: true } file
             ? file.FullPath
             : Data.CurrentPath;
         AcceptDataObject(dataObject, targetFolder, isLink);
@@ -543,30 +555,30 @@ public class CopyPasteService : ViewModelBase
         }
 
         var count = existingItems.Count;
-        if (count > 0)
+        if (count < 1)
+            return filePaths;
+
+        string destination = FileHelper.GetFullName(targetPath);
+        if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
+            destination = drive;
+
+        var result = await DialogService.ShowConfirmation(
+            $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
+            "Paste Conflicts",
+            primaryText: "Merge or Replace",
+            secondaryText: count == filePaths.Count() ? "" : "Skip",
+            cancelText: "Cancel",
+            icon: DialogService.DialogIcon.Exclamation);
+
+        if (result.Item1 is ContentDialogResult.None) // Cancel
         {
-            string destination = FileHelper.GetFullName(targetPath);
-            if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
-                destination = drive;
-
-            var result = await DialogService.ShowConfirmation(
-                $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
-                "Paste Conflicts",
-                primaryText: "Merge or Replace",
-                secondaryText: count == filePaths.Count() ? "" : "Skip",
-                cancelText: "Cancel",
-                icon: DialogService.DialogIcon.Exclamation);
-
-            if (result.Item1 is ContentDialogResult.None) // Cancel
-            {
-                return [];
-            }
-            else if (result.Item1 is ContentDialogResult.Secondary) // Skip
-            {
-                filePaths = filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item))).ToList();
-            }
+            return [];
         }
-        
+        if (result.Item1 is ContentDialogResult.Secondary) // Skip
+        {
+            filePaths = filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item))).ToList();
+        }
+
         return filePaths;
     }
 
@@ -621,28 +633,28 @@ public class CopyPasteService : ViewModelBase
         }
 
         var count = existingItems.Count;
-        if (count > 0)
+        if (count <= 0)
+            return filePaths;
+
+        string destination = FileHelper.GetFullName(targetPath);
+        if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
+            destination = drive;
+
+        var result = await DialogService.ShowConfirmation(
+            $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
+            "Paste Conflicts",
+            primaryText: "Merge or Replace",
+            secondaryText: count == filePaths.Count() ? "" : "Skip",
+            cancelText: "Cancel",
+            icon: DialogService.DialogIcon.Exclamation);
+
+        if (result.Item1 is ContentDialogResult.None) // Cancel
         {
-            string destination = FileHelper.GetFullName(targetPath);
-            if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
-                destination = drive;
-
-            var result = await DialogService.ShowConfirmation(
-                $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
-                "Paste Conflicts",
-                primaryText: "Merge or Replace",
-                secondaryText: count == filePaths.Count() ? "" : "Skip",
-                cancelText: "Cancel",
-                icon: DialogService.DialogIcon.Exclamation);
-
-            if (result.Item1 is ContentDialogResult.None) // Cancel
-            {
-                return [];
-            }
-            else if (result.Item1 is ContentDialogResult.Secondary) // Skip
-            {
-                filePaths = filePaths.Where(item => !existingItems.Contains(item.FullName)).ToList();
-            }
+            return [];
+        }
+        if (result.Item1 is ContentDialogResult.Secondary) // Skip
+        {
+            filePaths = filePaths.Where(item => !existingItems.Contains(item.FullName)).ToList();
         }
 
         return filePaths;

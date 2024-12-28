@@ -77,7 +77,7 @@ public class FilePath : AbstractFile, IBaseFile
 
     public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
 
-    public ShellObject ShellObject { get; set; } = null;
+    public ShellObject ShellObject { get; set; }
 
     public bool IsHidden => FullName.StartsWith('.');
 

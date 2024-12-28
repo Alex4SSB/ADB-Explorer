@@ -8,7 +8,7 @@ namespace ADB_Explorer.Controls;
 /// <summary>
 /// Interaction logic for NavigationBox.xaml
 /// </summary>
-public partial class NavigationBox : UserControl
+public partial class NavigationBox
 {
     public enum ViewMode
     {
@@ -26,6 +26,10 @@ public partial class NavigationBox : UserControl
         Mode = ViewMode.None;
     }
 
+    private bool isFuse;
+
+    #region Dependency Properties
+
     public string Path
     {
         get => (string)GetValue(PathProperty);
@@ -40,10 +44,8 @@ public partial class NavigationBox : UserControl
         }
     }
 
-    private bool isFuse = false;
-
     public static readonly DependencyProperty PathProperty =
-        DependencyProperty.Register("Path", typeof(string),
+        DependencyProperty.Register(nameof(Path), typeof(string),
           typeof(NavigationBox), new PropertyMetadata(null));
 
     public string DisplayPath
@@ -53,7 +55,7 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty DisplayPathProperty =
-        DependencyProperty.Register("DisplayPath", typeof(string),
+        DependencyProperty.Register(nameof(DisplayPath), typeof(string),
           typeof(NavigationBox), new PropertyMetadata(null));
 
     public Dictionary<string, string> DisplayNames
@@ -63,7 +65,7 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty DisplayNamesProperty =
-        DependencyProperty.Register("DisplayNames", typeof(Dictionary<string, string>),
+        DependencyProperty.Register(nameof(DisplayNames), typeof(Dictionary<string, string>),
           typeof(NavigationBox), new PropertyMetadata(null));
 
     public List<MenuItem> Breadcrumbs
@@ -73,7 +75,7 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty BreadcrumbsProperty =
-        DependencyProperty.Register("Breadcrumbs", typeof(List<MenuItem>),
+        DependencyProperty.Register(nameof(Breadcrumbs), typeof(List<MenuItem>),
           typeof(NavigationBox), new PropertyMetadata(null));
 
     public bool IsLoadingProgressVisible
@@ -83,7 +85,7 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty IsLoadingProgressVisibleProperty =
-        DependencyProperty.Register("IsLoadingProgressVisible", typeof(bool),
+        DependencyProperty.Register(nameof(IsLoadingProgressVisible), typeof(bool),
           typeof(NavigationBox), new PropertyMetadata(false));
 
     public UIElement UnfocusTarget
@@ -93,7 +95,7 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty UnfocusTargetProperty =
-        DependencyProperty.Register("UnfocusTarget", typeof(UIElement),
+        DependencyProperty.Register(nameof(UnfocusTarget), typeof(UIElement),
           typeof(NavigationBox), new PropertyMetadata(null));
 
     public Thickness MenuPadding
@@ -103,8 +105,10 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty MenuPaddingProperty =
-        DependencyProperty.Register("MenuPadding", typeof(Thickness),
+        DependencyProperty.Register(nameof(MenuPadding), typeof(Thickness),
           typeof(NavigationBox), new PropertyMetadata(null));
+
+    #endregion
 
     public ViewMode Mode
     {
@@ -121,12 +125,10 @@ public partial class NavigationBox : UserControl
     }
 
     public static readonly DependencyProperty ModeProperty =
-        DependencyProperty.Register("Mode", typeof(ViewMode),
+        DependencyProperty.Register(nameof(Mode), typeof(ViewMode),
           typeof(NavigationBox), new PropertyMetadata(ViewMode.None));
 
     public double MenuHeight => Height - MenuPadding.Top - MenuPadding.Bottom;
-
-    public Thickness MenuMargin => new(MenuPadding.Left, 0, 0, 0);
 
     private void AddDevice(string path)
     {
@@ -196,25 +198,25 @@ public partial class NavigationBox : UserControl
         Breadcrumbs.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
 
         ConsolidateButtons(expectedLength);
+    }
 
-        void AddSpecialButton(ref string path,
-                              ref double expectedLength,
-                              ref List<MenuItem> tempButtons,
-                              KeyValuePair<string, string> specialPair,
-                              bool trimStart = true)
-        {
-            if (specialPair.Key is null)
-                return;
+    private void AddSpecialButton(ref string path,
+        ref double expectedLength,
+        ref List<MenuItem> tempButtons,
+        KeyValuePair<string, string> specialPair,
+        bool trimStart = true)
+    {
+        if (specialPair.Key is null)
+            return;
 
-            MenuItem button = CreatePathButton(specialPair);
-            tempButtons.Add(button);
+        MenuItem button = CreatePathButton(specialPair);
+        tempButtons.Add(button);
 
-            path = path[specialPair.Key.Length..];
-            if (trimStart)
-                path = path.TrimStart();
+        path = path[specialPair.Key.Length..];
+        if (trimStart)
+            path = path.TrimStart();
 
-            expectedLength += ControlSize.GetWidth(button);
-        }
+        expectedLength += ControlSize.GetWidth(button);
     }
 
     private void ConsolidateButtons(double expectedLength)
@@ -325,7 +327,7 @@ public partial class NavigationBox : UserControl
     {
         MenuItem button = new()
         {
-            Header = new TextBlock() { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
+            Header = new TextBlock { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
             VerticalAlignment = VerticalAlignment.Center,
             Margin = new(0),
             Padding = new(8, 0, 8, 0),

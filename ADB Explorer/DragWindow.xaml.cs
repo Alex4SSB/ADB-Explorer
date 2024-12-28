@@ -7,11 +7,11 @@ namespace ADB_Explorer;
 /// <summary>
 /// Interaction logic for DragWindow.xaml
 /// </summary>
-public partial class DragWindow : Window
+public partial class DragWindow
 {
     private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
 
-    public bool MouseWithinApp = false;
+    public bool MouseWithinApp;
 
     public DragWindow()
     {
@@ -37,18 +37,18 @@ public partial class DragWindow : Window
         });
     }
 
-    private string ProcessUnderMouse = "";
+    private string processUnderMouse = "";
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         NativeMethods.InitInterceptMouse(NativeMethods.MouseMessages.WM_MOUSEMOVE,
-            (NativeMethods.POINT point) =>
+            point =>
             {
                 if (Data.RuntimeSettings.DragBitmap is null)
                     return;
                 
                 Top = point.Y - DragImage.ActualHeight - 4;
-                Left = point.X - (DragImage.ActualWidth / 2);
+                Left = point.X - DragImage.ActualWidth / 2;
 
                 MouseWithinApp = Data.RuntimeSettings.MainWinRect.Contains(point);
                 if (!MouseWithinApp)
@@ -59,11 +59,11 @@ public partial class DragWindow : Window
                     if (NativeMethods.GetPidFromPoint() is int pid
                         && Process.GetProcessById(pid) is Process proc)
                     {
-                        ProcessUnderMouse = proc.ProcessName;
-                        Data.RuntimeSettings.DragWithinSlave = ProcessUnderMouse == Properties.Resources.AppDisplayName;
+                        processUnderMouse = proc.ProcessName;
+                        Data.RuntimeSettings.DragWithinSlave = processUnderMouse == Properties.Resources.AppDisplayName;
                     }
                     else
-                        ProcessUnderMouse = "";
+                        processUnderMouse = "";
                 }
                 else
                     Data.RuntimeSettings.DragWithinSlave = false;

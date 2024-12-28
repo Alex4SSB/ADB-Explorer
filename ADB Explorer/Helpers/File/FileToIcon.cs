@@ -26,12 +26,7 @@ public class FileToIconConverter
     private const int BROKEN_LINK_ICON_INDEX = 271;
 
     private static readonly Dictionary<string, object> iconDic = [];
-    private static readonly SysImageList _imgList = new SysImageList(SysImageListSize.SHIL_JUMBO);
-
-    public FileToIconConverter()
-    {
-
-    }
+    private static readonly SysImageList _imgList = new(SysImageListSize.SHIL_JUMBO);
 
     // <summary>
     /// Return large file icon of the specified file.
@@ -229,12 +224,9 @@ public class FileToIconConverter
     private static Bitmap GetBitmap(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
     {
         Icon icon;
-        string lookup;
-
-        if (!ReturnKey(fileName, size, specialType).StartsWith('.'))
-            lookup = fileName;
-        else
-            lookup = $"aaa{Path.GetExtension(fileName).ToLower()}";
+        var lookup = !ReturnKey(fileName, size, specialType).StartsWith('.')
+            ? fileName
+            : $"aaa{Path.GetExtension(fileName).ToLower()}";
 
         var specialIndex = SpecialTypeIndex(specialType);
 

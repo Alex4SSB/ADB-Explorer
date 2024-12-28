@@ -51,14 +51,30 @@
                 <RowDefinition />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Image
-                x:Name="DragImage"
-                Width="128"
-                Height="128"
-                IsHitTestVisible="False"
-                RenderOptions.BitmapScalingMode="HighQuality"
-                Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
-                Stretch="Fill" />
+            <Grid>
+                <Image
+                    x:Name="DragImage"
+                    Width="128"
+                    Height="128"
+                    IsHitTestVisible="False"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
+                    Stretch="Fill" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="DEBUG">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
             <Border
                 Grid.Row="1"
                 Grid.Column="1"

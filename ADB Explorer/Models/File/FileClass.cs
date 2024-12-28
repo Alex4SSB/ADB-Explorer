@@ -134,13 +134,13 @@ public class FileClass : FilePath, IFileStat
             var target = ADBService.EscapeAdbShellString(FullName);
             string[] args = [ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-type d -empty -printf '%p/\\n'"];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, new(), args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, CancellationToken.None, args);
 
             return stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
         }
     }
 
-    public IEnumerable<VirtualFileDataObject.FileDescriptor> Descriptors { get; private set; } = null;
+    public IEnumerable<VirtualFileDataObject.FileDescriptor> Descriptors { get; private set; }
 
     #region Read Only Properties
 
@@ -222,8 +222,7 @@ public class FileClass : FilePath, IFileStat
         Type = fileDescriptor.IsDirectory ? FileType.Folder : FileType.File;
     }
 
-    public static FileClass GenerateAndroidFile(FileStat fileStat) => new FileClass
-    (
+    public static FileClass GenerateAndroidFile(FileStat fileStat) => new(
         fileName: fileStat.FullName,
         path: fileStat.FullPath,
         type: fileStat.Type,
@@ -249,11 +248,9 @@ public class FileClass : FilePath, IFileStat
 
     public static string CutTypeString(DragDropEffects cutType) => cutType switch
     {
-        DragDropEffects.None => "",
         DragDropEffects.Move => "Cut",
         DragDropEffects.Copy => "Copied",
-        DragDropEffects.Link => "",
-        _ => throw new NotImplementedException(),
+        _ => "",
     };
 
     public void UpdateType()
@@ -264,14 +261,13 @@ public class FileClass : FilePath, IFileStat
 
     public void UpdateSpecialType()
     {
-        if (Type is FileType.Folder)
-            SpecialType = SpecialFileType.Folder;
-        else if (Type is FileType.Unknown)
-            SpecialType = SpecialFileType.Unknown;
-        else if (Type is FileType.BrokenLink)
-            SpecialType = SpecialFileType.BrokenLink;
-        else
-            SpecialType = SpecialFileType.None; // Regular file or some /dev
+        SpecialType = Type switch
+        {
+            FileType.Folder => SpecialFileType.Folder,
+            FileType.Unknown => SpecialFileType.Unknown,
+            FileType.BrokenLink => SpecialFileType.BrokenLink,
+            _ => SpecialFileType.None
+        };
 
         if (IsApk)
             SpecialType |= SpecialFileType.Apk;
@@ -353,7 +349,7 @@ public class FileClass : FilePath, IFileStat
             IsDirectory = item[^1] is '/',
             Length = size,
             ChangeTimeUtc = date,
-            StreamContents = (stream) =>
+            StreamContents = stream =>
             {
                 if (DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2)
                     || !includeContent)
@@ -392,7 +388,7 @@ public class FileClass : FilePath, IFileStat
         return fileOp;
     }
 
-    private void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileSyncOperation;
 

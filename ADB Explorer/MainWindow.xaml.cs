@@ -282,7 +282,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                             if (!InitNavigation(RuntimeSettings.PathBoxNavigation))
                             {
                                 DriveViewNav();
-                                return;
                             }
                         }
                     }
@@ -309,8 +308,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                                 FileActionLogic.RefreshDrives(true);
                             else
                                 NavigateToLocation(RuntimeSettings.LocationToNavigate);
-                            break;
-                        default:
                             break;
                     }
                     break;
@@ -339,9 +336,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.IsPathBoxFocused):
-                    IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused is null
-                        ? NavigationBox.Mode is NavigationBox.ViewMode.Breadcrumbs
-                        : RuntimeSettings.IsPathBoxFocused.Value);
+                    IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused
+                                     ?? NavigationBox.Mode
+                                     is NavigationBox.ViewMode.Breadcrumbs);
 
                     RuntimeSettings.AutoHideSearchBox = true;
                     break;
@@ -530,9 +527,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return FileOpFilters.List.Find(f => f.Type == fileOp.Filter).IsChecked is true;
         };
 
-        collectionView.Filter = new(predicate);
+        collectionView.Filter = predicate;
 
-        if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(FileOperation.Filter)))
+        if (collectionView.SortDescriptions.All(d => d.PropertyName != nameof(FileOperation.Filter)))
             collectionView.SortDescriptions.Add(new(nameof(FileOperation.Filter), ListSortDirection.Ascending));
     }
 
@@ -638,50 +635,51 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             case nameof(AppSettings.UseProgressRedirection):
                 AdbHelper.VerifyProgressRedirection();
                 break;
-
-            default:
-                break;
         }
     }
 
     private void DirectoryLister_PropertyChanged(object sender, PropertyChangedEventArgs e) => Dispatcher.Invoke(() =>
     {
-        if (e.PropertyName == nameof(DirectoryLister.IsProgressVisible))
+        switch (e.PropertyName)
         {
-            UnfinishedBlock.Visible(DirList.IsProgressVisible);
-            NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
-        }
-        else if (e.PropertyName == nameof(DirectoryLister.InProgress))
-        {
-            Task.Run(() =>
+            case nameof(DirectoryLister.IsProgressVisible):
+                UnfinishedBlock.Visible(DirList.IsProgressVisible);
+                NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
+                break;
+
+            case nameof(DirectoryLister.InProgress):
             {
-                if (!DirList.InProgress)
-                    Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
+                Task.Run(() =>
+                {
+                    if (!DirList.InProgress)
+                        Task.Delay(EMPTY_FOLDER_NOTICE_DELAY);
 
-                Dispatcher.Invoke(() => FileActions.ListingInProgress = DirList.InProgress);
-            });
+                    Dispatcher.Invoke(() => FileActions.ListingInProgress = DirList.InProgress);
+                });
 
-            if (DirList.InProgress)
-                return;
+                if (DirList.InProgress)
+                    return;
 
-            if (FileActions.IsRecycleBin)
-            {
-                TrashHelper.EnableRecycleButtons();
+                if (FileActions.IsRecycleBin)
+                {
+                    TrashHelper.EnableRecycleButtons();
+                }
+
+                break;
             }
-        }
-        else if (e.PropertyName == nameof(DirectoryLister.IsLinkListingFinished))
-        {
-            if (ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished)
+            case nameof(DirectoryLister.IsLinkListingFinished) when ExplorerGrid.Items.Count < 1 || !DirList.IsLinkListingFinished:
                 return;
 
-            if (bfNavigation && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null)
-            {
+            case nameof(DirectoryLister.IsLinkListingFinished) when bfNavigation
+                && !string.IsNullOrEmpty(prevPath) && DirList.FileList.FirstOrDefault(item => item.FullPath == prevPath) is var prevItem and not null:
                 FileActions.ItemToSelect = prevItem;
-            }
-            else
+                break;
+
+            case nameof(DirectoryLister.IsLinkListingFinished):
             {
                 if (ExplorerGrid.Items.Count > 0)
                     ExplorerGrid.ScrollIntoView(ExplorerGrid.Items[0]);
+                break;
             }
         }
     });
@@ -861,7 +859,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 return menu.Action.Command.IsEnabled && menu.Children.Any(child => child.Action.Command.IsEnabled);
         };
 
-        collectionView.Filter = new(predicate);
+        collectionView.Filter = predicate;
     });
 
     private void Window_MouseDown(object sender, MouseButtonEventArgs e)
@@ -993,9 +991,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         UpdateFileOp();
 
-        Task.Delay(EXPLORER_NAV_DELAY).ContinueWith((t) => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
+        Task.Delay(EXPLORER_NAV_DELAY).ContinueWith(_ => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
 
-        Task.Delay(INIT_NAV_HIDE_FILTER_DELAY).ContinueWith((t) => Dispatcher.Invoke(() =>
+        Task.Delay(INIT_NAV_HIDE_FILTER_DELAY).ContinueWith(_ => Dispatcher.Invoke(() =>
         {
             if (!SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
                 RuntimeSettings.IsSearchBoxFocused = false;
@@ -1007,7 +1005,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return _navigateToPath(realPath);
     }
 
-    private void ListDevices(IEnumerable<LogicalDevice> devices)
+    private static void ListDevices(IEnumerable<LogicalDevice> devices)
     {
         if (devices is null)
             return;
@@ -1054,7 +1052,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 {
                     Dispatcher.Invoke(() => FileActionLogic.RefreshDrives(true));
                 }
-                catch (Exception)
+                catch
                 { }
             }
 
@@ -1165,7 +1163,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         
         if (FileActions.IsRecycleBin)
         {
-            TrashHelper.ParseIndexers().ContinueWith((t) => DirList.Navigate(realPath));
+            TrashHelper.ParseIndexers().ContinueWith(_ => DirList.Navigate(realPath));
 
             FileActions.DeleteDescription.Value = S_EMPTY_TRASH;
             FileActions.RestoreDescription.Value = S_RESTORE_ALL;
@@ -1229,35 +1227,39 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
     {
         var key = e.Key;
-        if (key is Key.Enter)
+        switch (key)
         {
-            if (IsInEditMode)
+            case Key.Enter when IsInEditMode:
                 return;
+            case Key.Enter:
+            {
+                if (ExplorerGrid.SelectedItems.Count == 1 && ExplorerGrid.SelectedItem is FilePath { IsDirectory: true })
+                    DoubleClick(ExplorerGrid.SelectedItem);
+                break;
+            }
+            case Key.Back:
+                NavHistory.NavigateBF(NavHistory.SpecialLocation.Back);
+                break;
 
-            if (ExplorerGrid.SelectedItems.Count == 1 && ExplorerGrid.SelectedItem is FilePath file && file.IsDirectory)
-                DoubleClick(ExplorerGrid.SelectedItem);
-        }
-        else if (key == Key.Back)
-        {
-            NavHistory.NavigateBF(NavHistory.SpecialLocation.Back);
-        }
-        else if (key == Key.Delete && FileActions.DeleteEnabled)
-        {
-            FileActionLogic.DeleteFiles();
-        }
-        else if (key is Key.Up or Key.Down)
-        {
-            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            case Key.Delete when FileActions.DeleteEnabled:
+                FileActionLogic.DeleteFiles();
+                break;
+
+            case Key.Up or Key.Down when Keyboard.Modifiers.HasFlag(ModifierKeys.Shift):
                 ExplorerGrid.MultiSelect(key);
-            else
+                break;
+
+            case Key.Up or Key.Down:
                 ExplorerGrid.SingleSelect(key);
+                break;
+
+            case Key.F2:
+                AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
+                break;
+
+            default:
+                return;
         }
-        else if (key is Key.F2)
-        {
-            AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
-        }
-        else
-            return;
 
         e.Handled = true;
     }
@@ -1292,30 +1294,37 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (DriveList.SelectedItems.Count == 0)
         {
-            if (key is Key.Left or Key.Up)
-                DriveList.SelectedIndex = DriveList.Items.Count - 1;
-            else if (key is Key.Right or Key.Down)
-                DriveList.SelectedIndex = 0;
-            else
-                return false;
+            switch (key)
+            {
+                case Key.Left or Key.Up:
+                    DriveList.SelectedIndex = DriveList.Items.Count - 1;
+                    break;
+
+                case Key.Right or Key.Down:
+                    DriveList.SelectedIndex = 0;
+                    break;
+
+                default:
+                    return false;
+            }
 
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
             return true;
         }
 
-        if (key is Key.Enter)
+        switch (key)
         {
-            ((DriveViewModel)DriveList.SelectedItem).BrowseCommand.Execute();
-            return true;
-        }
+            case Key.Enter:
+                ((DriveViewModel)DriveList.SelectedItem).BrowseCommand.Execute();
+                return true;
 
-        if (key is Key.Escape)
-        {
-            // Should've been clear selected drives, but causes inconsistent behavior
-            return true;
-        }
+            case Key.Escape:
+                // Should've been clear selected drives, but causes inconsistent behavior
+                return true;
 
-        return false;
+            default:
+                return false;
+        }
     }
 
     private bool ExplorerGridKeyNavigation(Key key)
@@ -1396,13 +1405,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var point = e.GetPosition(ExplorerGrid);
         MouseDownPoint = point;
 
-        var actualRowWidth = 0.0;
         int selectionIndex = ExplorerGrid.SelectedIndex;
 
-        foreach (var item in ExplorerGrid.Columns.Where(col => col.Visibility == Visibility.Visible))
-        {
-            actualRowWidth += item.ActualWidth;
-        }
+        var actualRowWidth = ExplorerGrid.Columns
+            .Where(col => col.Visibility == Visibility.Visible)
+            .Sum(item => item.ActualWidth);
 
         if (point.Y > (ExplorerGrid.Items.Count * RowHeight + ColumnHeaderHeight)
             || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % RowHeight)
@@ -1463,7 +1470,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         // Read value to force IsAnimated to update
         _ = Settings.DisableAnimation;
 
-        bool enableAnimation = Settings.IsAnimated && (MonitorInfo.IsPrimaryMonitor(this) is bool and true || WindowState is not WindowState.Maximized);
+        bool enableAnimation = Settings.IsAnimated && (MonitorInfo.IsPrimaryMonitor(this) is true || WindowState is not WindowState.Maximized);
         StyleHelper.SetActivateAnimation(SettingsSplitView, enableAnimation);
         StyleHelper.SetActivateAnimation(DevicesSplitView, enableAnimation);
     }
@@ -1472,7 +1479,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         double windowHeight = WindowState == WindowState.Maximized ? ActualHeight : Height;
 
-        if (DetailedViewSize() is sbyte val && val == -1)
+        if (DetailedViewSize() is var val && val == -1)
         {
             FileOpDetailedGrid.Height = windowHeight * MIN_PANE_HEIGHT_RATIO;
         }
@@ -1506,9 +1513,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             };
         };
 
-        collectionView.Filter = new(predicate);
+        collectionView.Filter = predicate;
 
-        if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(DriveViewModel.Type)))
+        if (collectionView.SortDescriptions.All(d => d.PropertyName != nameof(DriveViewModel.Type)))
             collectionView.SortDescriptions.Add(new(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
     }
 
@@ -1531,11 +1538,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             e.Handled = true;
         }
-    }
-
-    private void PaneCollapse_Click(object sender, RoutedEventArgs e)
-    {
-        RuntimeSettings.IsSettingsPaneOpen = false;
     }
 
     private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
@@ -1561,10 +1563,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (FileActions.IsAppDrive)
         {
             collectionView.Filter = Settings.ShowSystemPackages
-                ? new(FileHelper.PkgFilter())
-                : new(pkg => ((Package)pkg).Type is Package.PackageType.User);
+                ? FileHelper.PkgFilter()
+                : pkg => ((Package)pkg).Type is Package.PackageType.User;
 
-            if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(Package.Type)))
+            if (collectionView.SortDescriptions.All(d => d.PropertyName != nameof(Package.Type)))
             {
                 ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
 
@@ -1574,12 +1576,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         else
         {
             collectionView.Filter = !Settings.ShowHiddenItems
-                ? new(FileHelper.HideFiles())
-                : new(file => !FileHelper.IsHiddenRecycleItem((FileClass)file));
+                ? FileHelper.HideFiles()
+                : file => !FileHelper.IsHiddenRecycleItem((FileClass)file);
 
-            if (!collectionView.SortDescriptions.Any(d => d.PropertyName == nameof(FileClass.IsTemp)
-                                                          || d.PropertyName == nameof(FileClass.IsDirectory)
-                                                          || d.PropertyName == nameof(FileClass.SortName)))
+            if (!collectionView.SortDescriptions.Any(d => d.PropertyName
+                    is nameof(FileClass.IsTemp)
+                    or nameof(FileClass.IsDirectory)
+                    or nameof(FileClass.SortName)))
             {
                 ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
 
@@ -1872,8 +1875,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             collectionView.Filter = null;
         else
         {
-            collectionView.Filter = new(sett => ((AbstractSetting)sett).Description.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase)
-            || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase))));
+            collectionView.Filter = sett => ((AbstractSetting)sett).Description.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase)
+                                            || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase)));
         }
     }
 
@@ -2070,26 +2073,32 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DataGridCell cell;
         DataGridRow row;
 
-        if (sender is DataGridCell c)
-        {
-            cell = c;
-            row = DataGridRow.GetRowContainingElement(cell);
+        if (CopyPaste.DragStatus is CopyPasteService.DragState.Active)
+            return false;
 
-            if (cell.IsEditing)
+        switch (sender)
+        {
+            case DataGridCell c:
+            {
+                cell = c;
+                row = DataGridRow.GetRowContainingElement(cell);
+
+                if (cell.IsEditing)
+                    return false;
+                break;
+            }
+            case DataGridRow r:
+                row = r;
+                cell = null;
+                break;
+            default:
                 return false;
         }
-        else if (sender is DataGridRow r)
-        {
-            row = r;
-            cell = null;
-        }
-        else
-            return false;
 
         var current = row.GetIndex();
         SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, current);
 
-        if (MultiRowSelect(row)) // && !IsDragInProgress
+        if (MultiRowSelect(row))
             return true;
 
         if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0

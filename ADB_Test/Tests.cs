@@ -5,8 +5,11 @@ using ADB_Explorer.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Windows.Documents;
 
 namespace ADB_Test
 {
@@ -304,6 +307,72 @@ namespace ADB_Test
             NativeMethods.FILESIZE size = new(number);
 
             Assert.AreEqual(number, size.GetSize());
+        }
+
+        public class TestItem(int value) : INotifyPropertyChanged
+        {
+            public event PropertyChangedEventHandler PropertyChanged;
+
+            public int Value { get; set; } = value;
+        }
+
+        [TestMethod]
+        public void AddRange_TimingCheck()
+        {
+            // Arrange
+            var list = new ObservableList<TestItem>();
+            var singleItem = new List<TestItem> { new(1) };
+            var multipleItems = Enumerable.Range(0, 10).Select(i => new TestItem(i)).ToList();
+
+            var multipleItemsTime = TimeSpan.Zero;
+            for (int i = 0; i < 1000; i++)
+            {
+                list = [];
+
+                var stopwatch = Stopwatch.StartNew();
+                list.AddRange(multipleItems);
+                stopwatch.Stop();
+
+                multipleItemsTime += stopwatch.Elapsed;
+            }
+            
+            // Ensure items were added correctly
+            Assert.AreEqual(10, list.Count);
+
+            var singleItemTime = TimeSpan.Zero;
+            for (int i = 0; i < 1000; i++)
+            {
+                list = [];
+
+                var stopwatch = Stopwatch.StartNew();
+                list.AddRange(singleItem);
+                stopwatch.Stop();
+
+                singleItemTime += stopwatch.Elapsed;
+            }
+
+            // Output the timing results
+            var oneItemTime = singleItemTime.TotalMilliseconds;
+            var totalMulti = multipleItemsTime.TotalMilliseconds;
+
+            Console.WriteLine($"1 vs each of 10 overhead:       {oneItemTime - totalMulti / 10:F3} ns");
+            Console.WriteLine($"Average for 1 item:             {oneItemTime:F3} ns");
+            Console.WriteLine($"Average for each of 10 items:   {totalMulti / 10:F3} ns");
+            Console.WriteLine($"Average for 10 items:           {totalMulti:F3} ns");
+
+            // Ensure items were added correctly
+            Assert.AreEqual(1, list.Count);
+        }
+
+        [TestMethod]
+        public void FindTest()
+        {
+            ObservableList<TestItem> list = [new(8), new(3), new(22)];
+            ObservableList<TestItem> emptyList = [];
+
+            Assert.AreEqual(3, list.Find(i => i.Value == 3).Value);
+            Assert.AreEqual(null, list.Find(i => i.Value == 50));
+            Assert.AreEqual(null, emptyList.Find(i => i.Value == 50));
         }
     }
 }

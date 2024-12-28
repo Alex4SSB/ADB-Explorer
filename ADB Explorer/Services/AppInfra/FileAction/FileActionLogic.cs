@@ -895,14 +895,14 @@ internal static class FileActionLogic
             var source = new SyncFile(item) { ShellObject = item };
             var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
             
-            var pushOpeartion = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
-            pushOpeartion.VFDO = new() { CurrentEffect = dropEffects };
-            pushOpeartion.PropertyChanged += PushOpeartion_PropertyChanged;
-            Data.FileOpQ.AddOperation(pushOpeartion);
+            var pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+            pushOperation.VFDO = new() { CurrentEffect = dropEffects };
+            pushOperation.PropertyChanged += PushOperation_PropertyChanged;
+            Data.FileOpQ.AddOperation(pushOperation);
         }
     }
 
-    private static void PushOpeartion_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    private static void PushOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         var op = sender as FileSyncOperation;
 
@@ -917,7 +917,7 @@ internal static class FileActionLogic
             // Current path (and device) is where the new file was pushed to and it is not shown yet
             if (op.Device.ID == Data.CurrentADBDevice.ID
                 && op.TargetPath.ParentPath == Data.CurrentPath
-                && !Data.DirList.FileList.Any(f => f.FullName == op.FilePath.FullName))
+                && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
                 op.Dispatcher.Invoke(() =>
                     Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject)));
@@ -939,7 +939,7 @@ internal static class FileActionLogic
         }
 
         op.FilePath.ShellObject = null;
-        op.PropertyChanged -= PushOpeartion_PropertyChanged;
+        op.PropertyChanged -= PushOperation_PropertyChanged;
     }
 
     // Pull that is performed without interacting with File Explorer

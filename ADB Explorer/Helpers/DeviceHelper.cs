@@ -22,21 +22,22 @@ public static class DeviceHelper
     {
         if (status == "recovery")
             return DeviceType.Recovery;
-        else if (status == "sideload")
-            return DeviceType.Sideload;
-        else if (id.Contains("._adb-tls-"))
-            return DeviceType.Service;
-        else if (id.Contains(':'))
-        {
-            if (AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(id.Split(':')[0]))
-                return DeviceType.WSA;
 
-            return DeviceType.Remote;
+        if (status == "sideload")
+            return DeviceType.Sideload;
+
+        if (id.Contains("._adb-tls-"))
+            return DeviceType.Service;
+        if (id.Contains(':'))
+        {
+            return AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(id.Split(':')[0])
+                ? DeviceType.WSA
+                : DeviceType.Remote;
         }
-        else if (id.Contains("emulator"))
-            return DeviceType.Emulator;
-        else
-            return DeviceType.Local;
+
+        return id.Contains("emulator")
+            ? DeviceType.Emulator
+            : DeviceType.Local;
     }
 
     public static LogicalDrive GetMmcDrive(IEnumerable<LogicalDrive> drives, string deviceID)
@@ -53,7 +54,7 @@ public static class DeviceHelper
         else if (Data.CurrentADBDevice.OtgProp is not null)
             return null;
 
-        var externalDrives = drives.Where(d => d.Type == AbstractDrive.DriveType.Unknown);
+        var externalDrives = drives.Where(d => d.Type is AbstractDrive.DriveType.Unknown);
 
         switch (externalDrives.Count())
         {
@@ -94,7 +95,7 @@ public static class DeviceHelper
         return name.Replace('_', ' ');
     }
 
-    public static void BrosweDeviceAction(LogicalDeviceViewModel device)
+    public static void BrowseDeviceAction(LogicalDeviceViewModel device)
     {
         Data.RuntimeSettings.DeviceToOpen = device;
     }
@@ -178,12 +179,8 @@ public static class DeviceHelper
             if (!device.IsIpAddressValid && !device.IsHostNameValid)
                 return false;
 
-            if (device is not null
-                && device.IsPairingEnabled
-                && (!device.IsPairingCodeValid || !device.IsPairingPortValid))
-                return false;
-
-            return true;
+            return !device.IsPairingEnabled
+                   || (device.IsPairingCodeValid && device.IsPairingPortValid);
         },
         () => Data.RuntimeSettings.ConnectNewDevice = device);
 
@@ -227,7 +224,7 @@ public static class DeviceHelper
             var device = (DeviceViewModel)d;
 
             // current device cannot be hidden
-            if (device is LogicalDeviceViewModel ui && ui.IsOpen)
+            if (device is LogicalDeviceViewModel { IsOpen: true })
                 return true;
 
             if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service)
@@ -235,7 +232,7 @@ public static class DeviceHelper
                 if (device.Status is DeviceStatus.Offline)
                 {
                     // if a logical service is offline, and we have one of its services - hide the logical service
-                    return !Data.DevicesObject.ServiceDeviceViewModels.Any(s => s.IpAddress == device.IpAddress);
+                    return Data.DevicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
                 }
 
                 // if there's a logical service and a remote device with the same IP - hide the logical service
@@ -288,9 +285,7 @@ public static class DeviceHelper
             }
 
             // if there's an offline WSA device - hide it
-            if (device is LogicalDeviceViewModel logical
-                && logical.Type is DeviceType.WSA
-                && logical.Status is DeviceStatus.Offline)
+            if (device is LogicalDeviceViewModel { Type: DeviceType.WSA, Status: DeviceStatus.Offline })
                 return false;
 
             if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
@@ -330,18 +325,18 @@ public static class DeviceHelper
 
         var viewModels = services.Select(ServiceDeviceViewModel.New);
 
-        if (Data.DevicesObject.ServicesChanged(viewModels))
+        if (!Data.DevicesObject.ServicesChanged(viewModels))
+            return;
+
+        Data.DevicesObject.UpdateServices(viewModels);
+
+        var qrServices = Data.DevicesObject.ServiceDeviceViewModels.Where(service =>
+            service.MdnsType == ServiceDevice.ServiceType.QrCode
+            && service.ID == Data.QrClass.ServiceName);
+
+        if (qrServices.Any())
         {
-            Data.DevicesObject.UpdateServices(viewModels);
-
-            var qrServices = Data.DevicesObject.ServiceDeviceViewModels.Where(service =>
-                service.MdnsType == ServiceDevice.ServiceType.QrCode
-                && service.ID == Data.QrClass.ServiceName);
-
-            if (qrServices.Any())
-            {
-                await PairService(qrServices.First());
-            }
+            await PairService(qrServices.First());
         }
     }
 
@@ -407,7 +402,7 @@ public static class DeviceHelper
                 App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
-        }).ContinueWith((t) =>
+        }).ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
@@ -448,7 +443,7 @@ public static class DeviceHelper
 
                 return false;
             }
-        }).ContinueWith((t) =>
+        }).ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
@@ -520,7 +515,17 @@ public static class DeviceHelper
         if (Data.DevicesObject.DevicesAvailable(true))
             return;
 
-        DisconnectDevice();
+        CollapseDevices();
+
+        Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+
+        Data.CopyPaste.GetClipboardPasteItems();
+
+        FileActionLogic.ClearExplorer();
+        Data.FileActions.IsExplorerVisible = false;
+
+        NavHistory.Reset();
+        DriveHelper.ClearDrives();
 
         if (string.IsNullOrEmpty(selectedAddress))
         {
@@ -549,7 +554,7 @@ public static class DeviceHelper
                 Thread.Sleep(500);
             }
             return true;
-        }).ContinueWith((t) => App.Current.Dispatcher.Invoke(() =>
+        }).ContinueWith(t => App.Current.Dispatcher.Invoke(() =>
         {
             if (!t.Result)
                 return;
@@ -558,21 +563,6 @@ public static class DeviceHelper
             Data.CurrentADBDevice = new(Data.DevicesObject.Current);
             Data.RuntimeSettings.InitLister = true;
         }));
-
-        static void DisconnectDevice()
-        {
-            CollapseDevices();
-
-            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
-
-            Data.CopyPaste.GetClipboardPasteItems();
-
-            FileActionLogic.ClearExplorer();
-            Data.FileActions.IsExplorerVisible = false;
-
-            NavHistory.Reset();
-            DriveHelper.ClearDrives();
-        }
     }
 
     public static void InitDevice()
@@ -605,7 +595,7 @@ public static class DeviceHelper
     public static void SetAndroidVersion()
     {
         var versionTask = Task.Run(Data.CurrentADBDevice.GetAndroidVersion);
-        versionTask.ContinueWith((t) =>
+        versionTask.ContinueWith(t =>
         {
             if (t.IsCanceled)
                 return;
@@ -689,7 +679,7 @@ public static class DeviceHelper
                                                 out string stdout,
                                                 out _,
                                                 Encoding.UTF8,
-                                                new(), new[] { "\"netstat", "-nao", "|", "findstr", $"{wsaPid.Value}\"" });
+                                                CancellationToken.None, "\"netstat", "-nao", "|", "findstr", $"{wsaPid.Value}\"");
 
         if (retCode != 0)
             return;

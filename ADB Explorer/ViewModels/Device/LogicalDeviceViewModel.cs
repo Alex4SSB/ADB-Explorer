@@ -127,7 +127,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
             UseIdForName = true;
 
         BrowseCommand = new(() => !IsOpen && device.Status is DeviceStatus.Ok && device.Type is not DeviceType.Sideload,
-                            () => DeviceHelper.BrosweDeviceAction(this));
+                            () => DeviceHelper.BrowseDeviceAction(this));
 
         RemoveCommand = DeviceHelper.RemoveDeviceCommand(this);
 

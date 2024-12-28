@@ -92,7 +92,6 @@
                         Spacing="10">
                         <Button Click="EditButton_Click" Content="Change" />
                         <TextBox
-                            Grid.Column="1"
                             Width="200"
                             ui:ControlHelper.PlaceholderText="Select ADB Path"
                             IsReadOnly="True"
@@ -131,13 +130,12 @@
                         HorizontalAlignment="Center"
                         FontSize="20"
                         Text="Select Progress Method:" />
-                    <ui:SimpleStackPanel Grid.Row="1" Spacing="2">
+                    <ui:SimpleStackPanel Spacing="2">
                         <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION_TITLE}}" />
                         <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS_TITLE}}" />
                     </ui:SimpleStackPanel>
                     <StackPanel
                         x:Name="ExplanationPanel"
-                        Grid.Row="2"
                         d:Visibility="Visible"
                         Orientation="Horizontal"
                         Visibility="Hidden">

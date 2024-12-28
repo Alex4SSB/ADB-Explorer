@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.Services;
 
-using ADB_Explorer.Helpers;
+using Helpers;
 using System.Drawing;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -432,12 +432,12 @@ public static partial class NativeMethods
         public static bool operator !=(POINT self, POINT other)
             => self.X != other.X || self.Y != other.Y;
 
-        public override readonly bool Equals(object obj)
+        public readonly override bool Equals(object obj)
             => obj is POINT other &&
                 X == other.X &&
                 Y == other.Y;
 
-        public override readonly int GetHashCode()
+        public readonly override int GetHashCode()
             => HashCode.Combine(X, Y);
     }
 

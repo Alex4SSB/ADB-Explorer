@@ -120,20 +120,19 @@ public static class FileHelper
         fullPath = fullPath.TrimEnd(separator);
         var index = LastSeparatorIndex(fullPath);
 
-        if (index.IsFromEnd)
-            return fullPath;
-
-        return fullPath[(index.Value + 1)..];
+        return index.IsFromEnd
+            ? fullPath
+            : fullPath[(index.Value + 1)..];
     }
 
     public static char GetSeparator(string path)
     {
         if (path.Contains('/'))
             return '/';
-        else if (path.Contains('\\'))
-            return '\\';
-        else
-            return '\0';
+
+        return path.Contains('\\')
+            ? '\\'
+            : '\0';
     }
 
     public static Index LastSeparatorIndex(string path)
@@ -216,11 +215,11 @@ public static class FileHelper
         var result = "";
         for (int i = 0; i < indexes.Count; i++)
         {
-            if (indexes[i] > i)
-            {
-                result = $"{copySuffix} {i}";
-                break;
-            }
+            if (indexes[i] <= i)
+                continue;
+
+            result = $"{copySuffix} {i}";
+            break;
         }
         if (result == "")
             result = $"{copySuffix} {indexes.Count}";
@@ -236,14 +235,14 @@ public static class FileHelper
         WinRoot,
     }
 
-    static readonly Func<string, bool> FileNamePredicateWindows = (name) => 
+    private static readonly Func<string, bool> FileNamePredicateWindows = (name) => 
         !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
         && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
         && name.Length > 0
         && name[^1] is not ' ' and not '.'
         && name[0] is not ' ';
 
-    static readonly Func<string, bool> FileNamePredicateWinRoot = (name) =>
+    private static readonly Func<string, bool> FileNamePredicateWinRoot = (name) =>
         !AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(name)
         && !AdbExplorerConst.INVALID_WINDOWS_FILENAMES.Contains(name)
         && !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c))
@@ -251,20 +250,17 @@ public static class FileHelper
         && name[^1] is not ' ' and not '.'
         && name[0] is not ' ';
 
-    static readonly Func<string, bool> FileNamePredicateFuse = (name) =>
+    private static readonly Func<string, bool> FileNamePredicateFuse = (name) =>
         !name.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Contains(c))
         && name.Length > 0
         && name is not "." and not "..";
 
-    static readonly Func<string, bool> FileNamePredicateUnix = (name) =>
+    private static readonly Func<string, bool> FileNamePredicateUnix = (name) =>
         name.Length > 0
         && name is not "." and not "..";
 
     public static bool FileNameLegal(string fileName, RenameTarget target)
         => FileNameLegal([fileName], target);
-
-    public static bool FileNameLegal(FilePath file, RenameTarget target)
-        => FileNameLegal([file], target);
 
     public static bool FileNameLegal(IEnumerable<FilePath> files, RenameTarget target)
         => FileNameLegal(files.Select(f => f.FullName), target);

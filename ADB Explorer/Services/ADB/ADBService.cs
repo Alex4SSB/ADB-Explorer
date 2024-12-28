@@ -80,7 +80,7 @@ public partial class ADBService
         
         using var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
 
-        Task.WaitAll(stdoutTask, stderrTask, processTask);
+        Task.WaitAll([stdoutTask, stderrTask, processTask], cancellationToken);
 
         stdout = stdoutTask.Result;
         stderr = stderrTask.Result;
@@ -143,7 +143,7 @@ public partial class ADBService
             }
             else
             {
-                outputQueue.Add(e.Data);
+                outputQueue.Add(e.Data, cancellationToken);
             }
 
             RuntimeSettings.LastServerResponse = DateTime.Now;
@@ -168,29 +168,29 @@ public partial class ADBService
 
         cmdProcess.WaitForExit();
 
-        if (cmdProcess.ExitCode != 0)
+        if (cmdProcess.ExitCode == 0)
+            yield break;
+
+        if (args.Length > 0
+            && args[0] == "-s"
+            && ExecuteDeviceAdbCommand(args[1], "get-state", out _, out string error, cancellationToken) != 0
+            && error.StartsWith("error: device"))
         {
-            if (args.Length > 0
-                && args[0] == "-s"
-                && ExecuteDeviceAdbCommand(args[1], "get-state", out _, out string error, cancellationToken) != 0
-                && error.StartsWith("error: device"))
+            // device is disconnected
+            // return without throwing
+            // command results are no longer relevant and will be cleared by DeviceListSetup()
+        }
+        else
+        {
+            if (!string.IsNullOrEmpty(stderr) && stderr[1] == '\0')
             {
-                // device is disconnected
-                // return without throwing
-                // command results are no longer relevant and will be cleared by DeviceListSetup()
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(stderr) && stderr[1] == '\0')
-                {
-                    stderr = Encoding.Unicode.GetString(Encoding.UTF8.GetBytes(stderr));
+                stderr = Encoding.Unicode.GetString(Encoding.UTF8.GetBytes(stderr));
 
-                    if (stderr.StartsWith("Error"))
-                        stderr = Strings.S_REDIRECTION + stderr;
-                }
-
-                throw new ProcessFailedException(cmdProcess.ExitCode, stderr.Trim());
+                if (stderr.StartsWith("Error"))
+                    stderr = Strings.S_REDIRECTION + stderr;
             }
+
+            throw new ProcessFailedException(cmdProcess.ExitCode, stderr.Trim());
         }
     }
 
@@ -238,7 +238,7 @@ public partial class ADBService
             c switch
             {
                 '"' => "\\\\\\\"",
-                var ch when ESCAPE_ADB_SHELL_CHARS.Contains(ch) => @"\" + ch,
+                _ when ESCAPE_ADB_SHELL_CHARS.Contains(c) => @"\" + c,
                 _ => new string(c, 1)
             }));
 
@@ -249,7 +249,7 @@ public partial class ADBService
 
     public static IEnumerable<LogicalDevice> GetDevices()
     {
-        ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, new(), "-l");
+        ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, CancellationToken.None, "-l");
 
         return RE_DEVICE_NAME().Matches(stdout).Select(
             m => LogicalDevice.New(
@@ -266,19 +266,14 @@ public partial class ADBService
 
     public static void PairNetworkDevice(string fullAddress, string pairingCode) => NetworkDeviceOperation("pair", fullAddress, pairingCode);
 
-    public static void KillEmulator(string emulatorName) => ExecuteDeviceAdbCommand(emulatorName, "emu", out _, out _, new(), "kill");
+    public static void KillEmulator(string emulatorName) => ExecuteDeviceAdbCommand(emulatorName, "emu", out _, out _, CancellationToken.None, "kill");
 
-    /// <summary>
-    /// 
-    /// </summary>
     /// <param name="cmd">connect / disconnect</param>
-    /// <param name="host">IP address of remote device</param>
-    /// <param name="port">ADB port of remote device</param>
     /// <exception cref="ConnectionRefusedException"></exception>
     /// <exception cref="ConnectionTimeoutException"></exception>
     private static void NetworkDeviceOperation(string cmd, string fullAddress, string pairingCode = null)
     {
-        ExecuteAdbCommand(cmd, out string stdout, out _, new(), fullAddress, pairingCode);
+        ExecuteAdbCommand(cmd, out string stdout, out _, CancellationToken.None, fullAddress, pairingCode);
         if (stdout.ToLower() is string lower
             && (lower.Contains("cannot connect") || lower.Contains("error") || lower.Contains("failed")))
         {
@@ -291,7 +286,7 @@ public partial class ADBService
     public static GroupCollection GetMmcNode(string deviceID)
     {
         // Check whether the MMC block device (first partition) exists (MMC0 / MMC1)
-        ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, new(), @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
+        ExecuteDeviceAdbShellCommand(deviceID, "stat", out string stdout, out _, CancellationToken.None, @"-c""%t,%T""", MMC_BLOCK_DEVICES[0], MMC_BLOCK_DEVICES[1]);
         // Exit code will always be 1 since we are searching for both possibilities, and only one of them can exist
 
         // Get major and minor nodes in hex and return
@@ -439,9 +434,9 @@ public partial class ADBService
         string stdout = "";
         try
         {
-            exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8, new());
+            exitCode = ExecuteCommand(adbPath, "version", out stdout, out _, Encoding.UTF8, CancellationToken.None);
         }
-        catch (Exception) { }
+        catch { }
 
         if (exitCode != 0)
         {
@@ -450,9 +445,9 @@ public partial class ADBService
         }
 
         var match = RE_ADB_VERSION().Match(stdout);
-        RuntimeSettings.AdbPath = match.Groups["Path"]?.Value.Trim();
+        RuntimeSettings.AdbPath = match.Groups["Path"].Value.Trim();
 
-        string version = match.Groups["version"]?.Value;
+        string version = match.Groups["version"].Value;
         if (!string.IsNullOrEmpty(version))
             RuntimeSettings.AdbVersion = new(version);
     }

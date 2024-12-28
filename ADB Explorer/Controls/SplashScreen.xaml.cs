@@ -6,7 +6,7 @@ namespace ADB_Explorer.Controls;
 /// <summary>
 /// Interaction logic for SplashScreen.xaml
 /// </summary>
-public partial class SplashScreen : UserControl
+public partial class SplashScreen
 {
     public SplashScreen()
     {
@@ -17,7 +17,7 @@ public partial class SplashScreen : UserControl
 
     public async void Init()
     {
-        await AsyncHelper.WaitUntil(() => Data.RuntimeSettings.AdbVersion is not null, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(200), new());
+        await AsyncHelper.WaitUntil(() => Data.RuntimeSettings.AdbVersion is not null, TimeSpan.FromSeconds(5), TimeSpan.FromMilliseconds(200), CancellationToken.None);
 
         MissingAdbGrid.Visibility = Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION
             ? Visibility.Collapsed

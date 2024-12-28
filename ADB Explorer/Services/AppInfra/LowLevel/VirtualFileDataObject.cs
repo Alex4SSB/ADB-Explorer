@@ -54,7 +54,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         PreferredDropEffect = preferredDropEffect;
     }
 
-    public VirtualFileDataObject() : this((vfdo) => { }, (vfdo) => { })
+    public VirtualFileDataObject() : this(_ => { }, _ => { })
     {
         // Usually this would have Dispatcher.BeginInvoke() in each of the actions
     }
@@ -104,24 +104,24 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// <returns>IEnumFORMATETC interface.</returns>
     IEnumFORMATETC System.Runtime.InteropServices.ComTypes.IDataObject.EnumFormatEtc(DATADIR direction)
     {
-        if (direction == DATADIR.DATADIR_GET)
+        if (direction != DATADIR.DATADIR_GET)
+            throw new NotImplementedException();
+
+        if (0 == _dataObjects.Count)
         {
-            if (0 == _dataObjects.Count)
-            {
-                // Note: SHCreateStdEnumFmtEtc fails for a count of 0; throw helpful exception
-                throw new InvalidOperationException("VirtualFileDataObject requires at least one data object to enumerate.");
-            }
-
-            // Create enumerator and return it
-            var res = NativeMethods.SHCreateStdEnumFmtEtc(_dataObjects.Count, _dataObjects.Select(d => d.FORMATETC), out IEnumFORMATETC enumerator);
-            if (res is NativeMethods.HResult.Ok)
-            {
-                return enumerator;
-            }
-
-            // Returning null here can cause an AV in the caller; throw instead
-            NativeMethods.ThrowExceptionForHR(res);
+            // Note: SHCreateStdEnumFmtEtc fails for a count of 0; throw helpful exception
+            throw new InvalidOperationException("VirtualFileDataObject requires at least one data object to enumerate.");
         }
+
+        // Create enumerator and return it
+        var res = NativeMethods.SHCreateStdEnumFmtEtc(_dataObjects.Count, _dataObjects.Select(d => d.FORMATETC), out IEnumFORMATETC enumerator);
+        if (res is NativeMethods.HResult.Ok)
+        {
+            return enumerator;
+        }
+
+        // Returning null here can cause an AV in the caller; throw instead
+        NativeMethods.ThrowExceptionForHR(res);
         throw new NotImplementedException();
     }
 
@@ -192,18 +192,20 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                 hr = NativeMethods.HResult.DV_E_FORMATETC;
             }
         }
-        if (hr is not NativeMethods.HResult.Ok) // Not redundant; hr gets updated in the block above
-        {
-            // We seem unable to send data to File Explorer in DEBUG, even when not debugging.
-            // This might be because of the FileContents data format, which is an async stream
-            // compared to all other data formats which are just byte arrays on HGlobal, already populated with the data
-            var ex = Marshal.GetExceptionForHR((int)hr);
+
+        // Not redundant; hr gets updated in the block above
+        if (hr is NativeMethods.HResult.Ok)
+            return;
+
+        // We seem unable to send data to File Explorer in DEBUG, even when not debugging.
+        // This might be because of the FileContents data format, which is an async stream
+        // compared to all other data formats which are just byte arrays on HGlobal, already populated with the data
+        var ex = Marshal.GetExceptionForHR((int)hr);
 #if DEBUG
-            Trace.WriteLine(ex.Message);
+        Trace.WriteLine(ex?.Message);
 #elif RELEASE
-            throw ex;
+        throw ex;
 #endif
-        }
     }
 
     /// <summary>
@@ -256,9 +258,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     void System.Runtime.InteropServices.ComTypes.IDataObject.SetData(ref FORMATETC formatIn, ref STGMEDIUM medium, bool release)
     {
         var handled = false;
-        if ((formatIn.dwAspect == DVASPECT.DVASPECT_CONTENT) &&
-            (formatIn.tymed == TYMED.TYMED_HGLOBAL) &&
-            (medium.tymed == formatIn.tymed))
+        if (medium.tymed == formatIn.tymed
+            && formatIn is {
+                dwAspect: DVASPECT.DVASPECT_CONTENT, 
+                tymed: TYMED.TYMED_HGLOBAL
+            })
         {
             // Supported format; capture the data
             var ptr = NativeMethods.MGlobalLock(medium.unionmember);
@@ -395,10 +399,8 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             if (streamData != null)
             {
                 // Wrap in a .NET-friendly Stream and call provided code to fill it
-                using (var stream = new IStreamWrapper(iStream))
-                {
-                    streamData(stream);
-                }
+                using var stream = new IStreamWrapper(iStream);
+                streamData(stream);
             }
             // Return an IntPtr for the IStream
             ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
@@ -478,12 +480,12 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     private DragDropEffects? GetDropEffect(short format)
     {
         // Get the most recent setting
-        var dataObject = _dataObjects
-            .Where(d =>
-                (format == d.FORMATETC.cfFormat) &&
-                (DVASPECT.DVASPECT_CONTENT == d.FORMATETC.dwAspect) &&
-                (TYMED.TYMED_HGLOBAL == d.FORMATETC.tymed))
-            .LastOrDefault();
+        var dataObject = _dataObjects.LastOrDefault(d =>
+            format == d.FORMATETC.cfFormat
+            && d.FORMATETC is {
+                dwAspect: DVASPECT.DVASPECT_CONTENT,
+                tymed: TYMED.TYMED_HGLOBAL
+            });
 
         if (dataObject is not null)
         {
@@ -523,7 +525,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// <param name="fDoOpAsync">A Boolean value that is set to VARIANT_TRUE to indicate that an asynchronous operation is supported, or VARIANT_FALSE otherwise.</param>
     void IAsyncOperation.SetAsyncMode(int fDoOpAsync)
     {
-        IsAsynchronous = !(NativeMethods.VARIANT_FALSE == fDoOpAsync);
+        IsAsynchronous = NativeMethods.VARIANT_FALSE != fDoOpAsync;
     }
 
     /// <summary>
@@ -624,7 +626,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         /// <summary>
         /// FORMATETC structure for the data.
         /// </summary>
-        public FORMATETC FORMATETC { get; set; }
+        public FORMATETC FORMATETC { get; init; }
 
         /// <summary>
         /// Func returning the data as an IntPtr and an HRESULT success code.
@@ -654,15 +656,12 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             throw new NotImplementedException();
         }
 
-        public override long Length
-        {
-            get { throw new NotImplementedException(); }
-        }
+        public override long Length => throw new NotImplementedException();
 
         public override long Position
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
@@ -702,7 +701,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
             .Count() != Data.SelectedFiles.Count();
 
-        VirtualFileDataObject vfdo = new((vfdo) => { }, (vfdo) => { }, preferredEffect);
+        VirtualFileDataObject vfdo = new(_ => { }, _ => { }, preferredEffect);
 
         if (!Data.FileActions.IsSelectionIllegalOnWindows
             && !Data.FileActions.IsSelectionConflictingOnFuse
@@ -837,8 +836,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         /// <returns>This method returns S_OK on success.</returns>
         public int GiveFeedback(uint dwEffect)
         {
-            if (onFeedback is not null)
-                onFeedback((DragDropEffects)dwEffect);
+            onFeedback?.Invoke((DragDropEffects)dwEffect);
 
             if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
                 File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | GiveFeedback dwEffect: {(DragDropEffects)dwEffect}\n");

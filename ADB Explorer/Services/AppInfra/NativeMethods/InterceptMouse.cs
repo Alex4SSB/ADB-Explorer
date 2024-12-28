@@ -47,16 +47,16 @@ public static partial class NativeMethods
 
     private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
     {
-        if (nCode >= 0 && wParam == _requestedMouseEvent)
-        {
-            var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+        if (nCode < 0 || wParam != _requestedMouseEvent)
+            return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
 
-            POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
-            if (newPoint != _mousePosition)
-                _externalMouseAction?.Invoke(_mousePosition);
+        var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
 
-            _mousePosition = newPoint;
-        }
+        POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
+        if (newPoint != _mousePosition)
+            _externalMouseAction?.Invoke(_mousePosition);
+
+        _mousePosition = newPoint;
 
         return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
     }
