@@ -207,8 +207,10 @@ public class CopyPasteService : ViewModelBase
     {
         var CPDO = Clipboard.GetDataObject();
 
+#if !DEPLOY
         if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
             File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Clipboard formats: {string.Join(", ", CPDO.GetFormats())}\n");
+#endif
 
         var allowedEffect = GetAllowedDragEffects(CPDO);
         if (allowedEffect is DragDropEffects.None)
@@ -378,10 +380,7 @@ public class CopyPasteService : ViewModelBase
         }
         catch (Exception ex)
         {
-            // In DEBUG this will happen when trying to read our own VFDO
-#if RELEASE
-            DialogService.ShowMessage(ex.Message, "Unable to acquire file descriptors", DialogService.DialogIcon.Critical);
-#endif
+            // This happens when GetData in our own VFDO isn't ready yet
         }
     }
 

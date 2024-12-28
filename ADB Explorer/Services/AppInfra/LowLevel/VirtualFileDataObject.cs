@@ -149,32 +149,36 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
         var hr = (NativeMethods.HResult)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
 
+#if !DEPLOY
         if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
         {
             adbDataFormat = AdbDataFormats.GetFormat(formatCopy.cfFormat);
             if (adbDataFormat is not null)
                 File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Query: {adbDataFormat.Name}\n");
         }
+#endif
 
         if (hr is NativeMethods.HResult.Ok)
         {
             // Find the best match
             var dataObject = _dataObjects.FirstOrDefault(d =>
-                    (d.FORMATETC.cfFormat == formatCopy.cfFormat)
-                    && (d.FORMATETC.dwAspect == formatCopy.dwAspect)
+                    d.FORMATETC.cfFormat == formatCopy.cfFormat
+                    && d.FORMATETC.dwAspect == formatCopy.dwAspect
                     && 0 != (d.FORMATETC.tymed & formatCopy.tymed)
-                    && (d.FORMATETC.lindex == formatCopy.lindex));
+                    && d.FORMATETC.lindex == formatCopy.lindex);
             if (dataObject != null)
             {
-                if (!IsAsynchronous && (dataObject.FORMATETC.cfFormat == AdbDataFormats.FileDescriptor) && !_inOperation)
+                if (!IsAsynchronous && dataObject.FORMATETC.cfFormat == AdbDataFormats.FileDescriptor && !_inOperation)
                 {
                     // Enter the operation and call the start action
                     _inOperation = true;
                     _startAction?.Invoke(this);
                 }
 
+#if !DEPLOY
                 if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
                     File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data: {adbDataFormat?.Name}\n");
+#endif
 
                 // Populate the STGMEDIUM
                 medium.tymed = dataObject.FORMATETC.tymed;
@@ -203,7 +207,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         var ex = Marshal.GetExceptionForHR((int)hr);
 #if DEBUG
         Trace.WriteLine(ex?.Message);
-#elif RELEASE
+#else
         throw ex;
 #endif
     }
@@ -305,7 +309,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
     }
 
-    #endregion
+#endregion
 
     public string[] GetFormats()
         => [.. _dataObjects.Select(o => AdbDataFormats.GetFormatName(o.FORMATETC.cfFormat))];
@@ -457,7 +461,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     public DragDropEffects? PreferredDropEffect
     {
         get => GetDropEffect(AdbDataFormats.PreferredDropEffect);
-        set => SetData(AdbDataFormats.PreferredDropEffect, BitConverter.GetBytes((UInt32)value));
+        set => UpdateData(AdbDataFormats.PreferredDropEffect, BitConverter.GetBytes((UInt32)value));
     }
 
     public static DragDropEffects GetPreferredDropEffect(System.Windows.IDataObject dataObject)
@@ -711,7 +715,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             Task.Run(() =>
             {
                 return files.Select(f => f.PrepareDescriptors(vfdo)).ToList();
-            }).ContinueWith((t) =>
+            }).ContinueWith(t =>
             {
                 App.Current.Dispatcher.Invoke(() =>
                 {
@@ -778,14 +782,34 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// </remarks>
     public void DoDragDrop(DependencyObject dragSource, DragDropEffects allowedEffects)
     {
+        Action<DragDropEffects> dragFeedback = value =>
+        {
+            if (PreferredDropEffect is not null
+                && PreferredDropEffect.Value.HasFlag(DragDropEffects.Move)
+                && PreferredDropEffect.Value.HasFlag(DragDropEffects.Copy))
+            {
+                if (value == DragDropEffects.Move
+                    && !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.ShiftKey))
+                {
+                    // Override default since Windows gives Move as default
+                    CurrentEffect = DragDropEffects.Copy;
+                    return;
+                }
+            }
+
+            CurrentEffect = value;
+        };
+
         try
         {
-            NativeMethods.MDoDragDrop(this, new DropSource((value) => CurrentEffect = value), allowedEffects);
+            NativeMethods.MDoDragDrop(this, new DropSource(dragFeedback), allowedEffects);
         }
         catch (Exception e)
         {
+#if !DEPLOY
             if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
                 File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Exception in DoDragDrop: {e.Message}\n");
+#endif
         }
         finally
         {
@@ -812,12 +836,12 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         public int QueryContinueDrag(int fEscapePressed, uint grfKeyState)
         {
             var escapePressed = (0 != fEscapePressed);
-            var keyStates = (DragDropKeyStates)grfKeyState;
+            Data.RuntimeSettings.DragModifiers = (DragDropKeyStates)grfKeyState;
 
             var res = escapePressed switch
             {
                 true => NativeMethods.HResult.DRAGDROP_S_CANCEL,
-                false when !keyStates.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
+                false when !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
                 _ => NativeMethods.HResult.Ok,
             };
 
@@ -833,15 +857,22 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         /// Gives visual feedback to an end user during a drag-and-drop operation.
         /// </summary>
         /// <param name="dwEffect">The DROPEFFECT value returned by the most recent call to IDropTarget::DragEnter, IDropTarget::DragOver, or IDropTarget::DragLeave. </param>
-        /// <returns>This method returns S_OK on success.</returns>
         public int GiveFeedback(uint dwEffect)
         {
-            onFeedback?.Invoke((DragDropEffects)dwEffect);
+            var dragDropEffects = (DragDropEffects)dwEffect & ~DragDropEffects.Scroll;
+            onFeedback?.Invoke(dragDropEffects);
 
+#if !DEPLOY
             if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | GiveFeedback dwEffect: {(DragDropEffects)dwEffect}\n");
+                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | GiveFeedback dwEffect: {dragDropEffects}\n");
+#endif
 
-            return (int)NativeMethods.HResult.DRAGDROP_S_USEDEFAULTCURSORS;
+            if (dragDropEffects is DragDropEffects.None)
+                return (int)NativeMethods.HResult.DRAGDROP_S_USEDEFAULTCURSORS;
+
+            // Set default cursor when cursor control is manual
+            Mouse.SetCursor(Cursors.Arrow);
+            return (int)NativeMethods.HResult.Ok;
         }
     }
 }

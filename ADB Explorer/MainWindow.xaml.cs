@@ -2247,4 +2247,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (CopyPaste.IsDrag && CopyPaste.IsWindows && e.Key is Key.Escape)
             RuntimeSettings.DragBitmap = null;
     }
+
+    private void MainWindow_OnPreviewQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+    {
+        if (e.EscapePressed)
+            RuntimeSettings.DragBitmap = null;
+    }
 }

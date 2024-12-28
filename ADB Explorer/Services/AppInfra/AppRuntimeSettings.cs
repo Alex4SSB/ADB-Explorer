@@ -349,6 +349,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragBitmap, value);
     }
 
+    private DragDropKeyStates dragModifiers = DragDropKeyStates.None;
+    public DragDropKeyStates DragModifiers
+    {
+        get => dragModifiers;
+        set => Set(ref dragModifiers, value);
+    }
+
     private Cursor cursor = Cursors.Arrow;
     public Cursor MainCursor
     {

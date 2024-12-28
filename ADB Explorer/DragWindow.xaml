@@ -10,17 +10,18 @@
     Title="DragWindow"
     ui:ControlHelper.CornerRadius="5"
     AllowsTransparency="True"
-    Background="Transparent"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
     MouseUp="Border_MouseUp"
-    Opacity="0.8"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
     Topmost="True"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None"
     mc:Ignorable="d">
+    <Window.Background>
+        <SolidColorBrush Opacity="0" Color="White" />
+    </Window.Background>
     <Border
         HorizontalAlignment="Left"
         VerticalAlignment="Top"
@@ -57,12 +58,16 @@
                     Width="128"
                     Height="128"
                     IsHitTestVisible="False"
+                    Opacity="0.8"
                     RenderOptions.BitmapScalingMode="HighQuality"
                     Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
                     Stretch="Fill" />
                 <TextBlock
+                    x:Name="DebugLabel"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
+                    Background="White"
+                    Foreground="Black"
                     Text="DEBUG">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -79,6 +84,7 @@
                 Grid.Row="1"
                 Grid.Column="1"
                 Margin="-25,2,0,0"
+                Padding="4"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Background="{DynamicResource ContentDialogContentBackground}"
@@ -97,11 +103,40 @@
                         <Setter Property="CornerRadius" Value="0" />
                     </Style>
                 </Border.Style>
-                <TextBlock
-                    x:Name="DragTooltip"
-                    Margin="4"
-                    Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}"
-                    TextWrapping="Wrap" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="30" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon
+                        HorizontalAlignment="Left"
+                        FontSize="12"
+                        Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Copy">
+                                        <Setter Property="Glyph" Value="&#xE710;" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Move">
+                                        <Setter Property="Glyph" Value="&#xE72A;" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <TextBlock
+                        Grid.Column="1"
+                        HorizontalAlignment="Center"
+                        Foreground="DodgerBlue"
+                        Text="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" />
+                    <TextBlock
+                        x:Name="DragTooltip"
+                        Grid.Column="2"
+                        Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}"
+                        TextWrapping="Wrap" />
+                </Grid>
             </Border>
         </Grid>
     </Border>

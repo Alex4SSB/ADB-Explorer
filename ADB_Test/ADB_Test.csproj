@@ -8,6 +8,8 @@
     <Platforms>AnyCPU;x64</Platforms>
 
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
+
+    <Configurations>Debug;Release;Deploy</Configurations>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

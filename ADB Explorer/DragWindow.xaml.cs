@@ -30,7 +30,7 @@ public partial class DragWindow
                     ? " to " + FileHelper.GetFullName(Data.CopyPaste.DropTarget)
                     : "";
 
-                DragTooltip.Text = $"{Data.CopyPaste.CurrentDropEffect} {Data.CopyPaste.DragFiles.Length} item(s){target}";
+                DragTooltip.Text = $" {Data.CopyPaste.DragFiles.Length} item(s){target}";
             }
             else
                 DragTooltip.Text = "";
