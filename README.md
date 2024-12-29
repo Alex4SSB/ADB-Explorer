@@ -34,6 +34,7 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 * App.txt - persistent settings file.
 * AdbProgressRedirection.exe - a pipe for getting progress updates while executing ADB push & pull commands.
 * TEMP - a folder to which edited files are transferred temporarily.
+* TempDrag... - folder(s) to which files are temporarily transferred for Drag & Drop / Clipboard transfer to PC.
 
 The settings file contains user app settings as well as other settings not directly accessible.
 The file can be edited, but the format must be preserved.
