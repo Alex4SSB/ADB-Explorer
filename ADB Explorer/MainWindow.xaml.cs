@@ -144,7 +144,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         });
     }
 
-    private void FinalizeSplash()
+    private async void FinalizeSplash()
     {
         SetTheme();
 
@@ -158,6 +158,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DiskUsageTimer.Start();
 
         RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
+
+        Version version = new(Properties.Resources.AppVersion);
+        if (version > Settings.LastVersion)
+        {
+            var res = await DialogService.ShowConfirmation(
+                S_NEW_VERSION_MSG, 
+                "New Version",
+                "Go To Release Notes",
+                cancelText:"Close");
+
+            if (res.Item1 is ContentDialogResult.Primary)
+                Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.Resources.AppVersion}\"");
+
+            Settings.LastVersion = version;
+        }
     }
 
     private void DiskUsageTimer_Tick(object sender, EventArgs e)

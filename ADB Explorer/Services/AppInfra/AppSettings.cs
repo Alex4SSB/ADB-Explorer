@@ -330,6 +330,14 @@ public class AppSettings : ViewModelBase
         set => Set(ref showWelcomeScreen, value);
     }
 
+    private Version lastVersion;
+
+    public Version LastVersion
+    {
+        get => Get(ref lastVersion, new(0, 0, 0));
+        set => Set(ref lastVersion, value);
+    }
+
     private bool showLaunchWsaMessage;
     public bool ShowLaunchWsaMessage
     {
@@ -391,14 +399,16 @@ public class AppSettings : ViewModelBase
         {
             var value = storage switch
             {
+                Version => new Version((string)Storage.RetrieveValue(propertyName)),
                 Enum => Storage.RetrieveEnum<T>(propertyName),
                 bool => Storage.RetrieveBool(propertyName),
                 null when typeof(T) == typeof(string) => Storage.RetrieveValue(propertyName),
                 null when typeof(T) == typeof(bool?) => Storage.RetrieveBool(propertyName),
+                null when typeof(T) == typeof(Version) => new Version((string)Storage.RetrieveValue(propertyName)),
                 _ => Storage.RetrieveValue(propertyName),
             };
 
-            storage = (T)(value is null ? defaultValue : value);
+            storage = (T)(value ?? defaultValue);
         }
 
         return storage;

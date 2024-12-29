@@ -20,7 +20,6 @@ public static class Strings
     public const string S_OVERRIDE_ADB_BROWSE = "Select ADB Executable";
     public const string S_RESET_SETTINGS = "All app settings will be reset upon closing the app.\nThis cannot be undone. Are you sure?";
     public const string S_RESET_SETTINGS_TITLE = "Reset App Settings";
-    public const string S_NO_DEVICES_TITLE = " - NO CONNECTED DEVICES";
     public const string S_NEW_VERSION_TITLE = "New App Version";
     public const string S_NAV_ERR_TITLE = "Navigation Error";
     public const string S_COPY_APK_NAME = "Copy Package Name";
@@ -37,7 +36,6 @@ public static class Strings
     public const string S_ROOT_FORBID_TITLE = "Root Access";
     public const string S_DEL_CONF_TITLE = "Confirm Delete";
     public const string S_PERM_DEL = "Permanently Delete";
-    public const string S_RENAME_ERR_TITLE = "Rename Error";
     public const string S_CREATE_ERR_TITLE = "Create Error";
     public const string S_RESTORE_CONF_TITLE = "Restore Conflicts";
     public const string S_CONF_UNI_TITLE = "Confirm Uninstall";
@@ -57,7 +55,6 @@ public static class Strings
     public const string S_DISABLE_MDNS_TITLE = "Disable mDNS";
     public const string S_WSA_PKG_TIP = "Launch WSA in background";
     public const string S_WSA_LAUNCH = "Select Launch if ADB is already authorized in WSA.\nTo approve ADB, open WSA advanced settings.";
-    public const string S_FOLLOW_LINK_ERROR_TITLE = "Unable To Follow Link";
     public const string S_PULL_ACTION = "Pull";
     public const string S_PULL_ACTION_LINK = "Pull (Link Target)";
     public const string S_RESTORE_ACTION = "Restore";
@@ -66,10 +63,15 @@ public static class Strings
     public const string S_DISK_USAGE_PROGRESS_TITLE = "Disk Usage Only";
     public const string S_PROGRESS_METHOD_TITLE = "Progress Method";
     public const string S_DEPLOY_REDIRECTION_ERROR = "Unable to deploy executable.\nDisk usage progress method will be used instead.\n\n";
-    public const string S_REDIRECTION_ERROR_TITLE = "Deploy AdbProgressRedirection Error";
     public const string S_REDIRECTION = "Progress Redirection ";
     public const string S_LS_ERROR_TITLE = "List Directory Error";
     public const string S_WIN_ROOT_ILLEGAL_TITLE = "Pull To Windows Drive Root";
+    public const string S_NEW_VERSION_MSG =
+        """
+        Welcome to a new ADB Explorer version!
+        The release notes are available on GitHub.
+        """;
+
 
 
     public const string S_FUSE_DRIVE_TOOLTIP = "FUSE drive." +
