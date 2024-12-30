@@ -160,7 +160,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
 
         Version version = new(Properties.Resources.AppVersion);
-        if (version > Settings.LastVersion)
+        if (version > new Version(Settings.LastVersion))
         {
             var res = await DialogService.ShowConfirmation(
                 S_NEW_VERSION_MSG, 
@@ -171,7 +171,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (res.Item1 is ContentDialogResult.Primary)
                 Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.Resources.AppVersion}\"");
 
-            Settings.LastVersion = version;
+            Settings.LastVersion = Properties.Resources.AppVersion;
         }
     }
 

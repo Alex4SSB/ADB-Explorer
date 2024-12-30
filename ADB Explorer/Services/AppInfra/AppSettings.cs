@@ -330,11 +330,11 @@ public class AppSettings : ViewModelBase
         set => Set(ref showWelcomeScreen, value);
     }
 
-    private Version lastVersion;
+    private string lastVersion;
 
-    public Version LastVersion
+    public string LastVersion
     {
-        get => Get(ref lastVersion, new(0, 0, 0));
+        get => Get(ref lastVersion, "0.0.0");
         set => Set(ref lastVersion, value);
     }
 
