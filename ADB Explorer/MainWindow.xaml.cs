@@ -725,14 +725,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             Storage.StoreValue(AppSettings.SystemVals.detailedHeight, FileOpDetailedGrid.Height);
     }
 
-    private void SetTheme()
-    {
-        SetTheme(Settings.Theme is AppSettings.AppTheme.windowsDefault
-            ? ThemeService.WindowsTheme
-            : ThemeManager.Current.ApplicationTheme.Value);
-    }
+    private void SetTheme() => SetTheme(Settings.Theme);
 
-    private void SetTheme(AppSettings.AppTheme theme) => SetTheme(AppThemeToActual(theme));
+    private void SetTheme(AppSettings.AppTheme theme) => SetTheme(ThemeService.AppThemeToActual(theme));
 
     private void SetTheme(ApplicationTheme theme) => Dispatcher.Invoke(() =>
     {
@@ -949,14 +944,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         else if (RenderOptions.ProcessRenderMode == RenderMode.SoftwareOnly)
             RenderOptions.ProcessRenderMode = RenderMode.Default;
     });
-
-    private ApplicationTheme AppThemeToActual(AppSettings.AppTheme appTheme) => appTheme switch
-    {
-        AppSettings.AppTheme.light => ApplicationTheme.Light,
-        AppSettings.AppTheme.dark => ApplicationTheme.Dark,
-        AppSettings.AppTheme.windowsDefault => ThemeService.WindowsTheme,
-        _ => throw new NotSupportedException(),
-    };
 
     private void InitFileOpColumns() => Dispatcher.Invoke(() =>
     {

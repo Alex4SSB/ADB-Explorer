@@ -10,8 +10,8 @@ internal class ThemeService : ViewModelBase
     private const string RegistryValueName = "AppsUseLightTheme";
     private const string QueryPrefix = "SELECT * FROM RegistryValueChangeEvent WHERE Hive = 'HKEY_USERS' AND KeyPath";
 
-    private ApplicationTheme? windowsTheme = null;
-    public ApplicationTheme WindowsTheme
+    private AppSettings.AppTheme? windowsTheme;
+    public AppSettings.AppTheme WindowsTheme
     {
         get
         {
@@ -40,9 +40,17 @@ internal class ThemeService : ViewModelBase
         WindowsTheme = GetWindowsTheme();
     }
 
-    private static ApplicationTheme GetWindowsTheme()
+    private static AppSettings.AppTheme GetWindowsTheme()
     {
         using var key = Registry.CurrentUser.OpenSubKey(RegistryKeyPath);
-        return (key?.GetValue(RegistryValueName)) is int and < 1 ? ApplicationTheme.Dark : ApplicationTheme.Light;
+        return key?.GetValue(RegistryValueName) is < 1 ? AppSettings.AppTheme.dark : AppSettings.AppTheme.light;
     }
+
+    public ApplicationTheme AppThemeToActual(AppSettings.AppTheme appTheme) => appTheme switch
+    {
+        AppSettings.AppTheme.light => ApplicationTheme.Light,
+        AppSettings.AppTheme.dark => ApplicationTheme.Dark,
+        AppSettings.AppTheme.windowsDefault => AppThemeToActual(WindowsTheme),
+        _ => throw new NotSupportedException(),
+    };
 }
