@@ -41,6 +41,9 @@ public partial class DragWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+#if DEBUG
+        MouseWithinApp = true;
+#else
         NativeMethods.InitInterceptMouse(NativeMethods.MouseMessages.WM_MOUSEMOVE,
             point =>
             {
@@ -69,12 +72,16 @@ public partial class DragWindow
                     Data.RuntimeSettings.DragWithinSlave = false;
             });
 
+#endif
+
         DragTimer.Start();
     }
 
     private void Window_Closing(object sender, CancelEventArgs e)
     {
+#if !DEBUG
         NativeMethods.CloseInterceptMouse();
+#endif
     }
 
     private void Border_MouseUp(object sender, MouseButtonEventArgs e)
