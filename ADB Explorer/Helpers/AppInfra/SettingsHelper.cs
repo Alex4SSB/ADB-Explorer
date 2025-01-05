@@ -92,16 +92,44 @@ internal static class SettingsHelper
         Data.RuntimeSettings.FinalizeSplash = true;
     }
 
-    public static async void CheckForUpdates()
+    public static async void CheckAppVersions()
     {
+        Version currentVersion = new(Properties.Resources.AppVersion);
+        if (currentVersion > new Version(Data.Settings.LastVersion))
+        {
+            await App.Current.Dispatcher.Invoke(async () =>
+            {
+                var res = await DialogService.ShowConfirmation(
+                    Strings.S_NEW_VERSION_MSG,
+                    "New Version",
+                    "Go To Release Notes",
+                    cancelText: "Close");
+
+                if (res.Item1 is ContentDialogResult.Primary)
+                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.Resources.AppVersion}\"");
+            });
+
+            Data.Settings.LastVersion = Properties.Resources.AppVersion;
+        }
+
         if (Data.RuntimeSettings.IsAppDeployed || !Data.Settings.CheckForUpdates)
             return;
 
-        var version = await Network.LatestAppReleaseAsync();
-        if (version is null || version <= Data.AppVersion)
+        var latestVersion = await Network.LatestAppReleaseAsync();
+        if (latestVersion is null || latestVersion <= Data.AppVersion)
             return;
 
-        App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_NEW_VERSION(version), Strings.S_NEW_VERSION_TITLE, DialogService.DialogIcon.Informational));
+        await App.Current.Dispatcher.Invoke(async () =>
+        {
+            var res = await DialogService.ShowConfirmation(Strings.S_NEW_VERSION(latestVersion),
+                Strings.S_NEW_VERSION_TITLE,
+                "Go To Version Page",
+                cancelText: "Close",
+                icon: DialogService.DialogIcon.Informational);
+
+            if (res.Item1 is ContentDialogResult.Primary)
+                Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
+        });
     }
 
     public static void ShowAndroidRobotLicense()

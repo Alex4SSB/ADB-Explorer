@@ -301,7 +301,7 @@ public partial class ADBService
 
         // Get a list of all volumes (and their nodes)
         // The public flag reduces execution time significantly
-        int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out string stdout, out _, new(), "list-volumes", "public");
+        int exitCode = ExecuteDeviceAdbShellCommand(deviceID, "sm", out string stdout, out _, CancellationToken.None, "list-volumes", "public");
         if (exitCode != 0)
             return "";
 
@@ -314,33 +314,33 @@ public partial class ADBService
 
     public static bool CheckMDNS()
     {
-        var res = ExecuteAdbCommandAsync("mdns", new(), "check");
+        var res = ExecuteAdbCommandAsync("mdns", CancellationToken.None, "check");
 
         return res.First().Contains("mdns daemon version");
     }
 
     public static void KillAdbServer(bool restart = false)
     {
-        ExecuteAdbCommand("kill-server", out _, out _, new());
+        ExecuteAdbCommand("kill-server", out _, out _, CancellationToken.None);
 
         if (restart)
-            ExecuteAdbCommand("start-server", out _, out _, new());
+            ExecuteAdbCommand("start-server", out _, out _, CancellationToken.None);
     }
 
     public static bool KillAdbProcess()
     {
-        return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, new(), "/im", "\"adb.exe\"") == 0;
+        return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, CancellationToken.None, "/im", "\"adb.exe\"") == 0;
     }
 
     public static bool Root(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, new(), Settings.RootArgs);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, Settings.RootArgs);
         return !stdout.Contains("cannot run as root");
     }
 
     public static bool Unroot(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, new(), Settings.UnrootArgs);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, Settings.UnrootArgs);
         var result = stdout.Contains("restarting adbd as non root");
         DevicesObject.UpdateDeviceRoot(device.ID, result);
 
@@ -349,7 +349,7 @@ public partial class ADBService
 
     public static bool WhoAmI(string deviceId)
     {
-        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out _, new()) != 0)
+        if (ExecuteDeviceAdbShellCommand(deviceId, "whoami", out string stdout, out _, CancellationToken.None) != 0)
             return false;
 
         return stdout.Trim() == "root";
@@ -359,7 +359,7 @@ public partial class ADBService
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, true);
 
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), args);
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, CancellationToken.None, args);
 
         return ulong.TryParse(stdout, out var count) ? count : 0;
     }
@@ -368,14 +368,14 @@ public partial class ADBService
     {
         string[] args = PrepFindArgs(path, includeNames, excludeNames, false, caseSensitive);
 
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), args);
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, CancellationToken.None, args);
 
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
 
     public static string[] FindFiles(string deviceID, IEnumerable<string> paths)
     {
-        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, new(), paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
+        ExecuteDeviceAdbShellCommand(deviceID, "find", out string stdout, out _, CancellationToken.None, paths.Select(item => EscapeAdbShellString(item)).Append(@"2>/dev/null").ToArray());
 
         return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
     }
