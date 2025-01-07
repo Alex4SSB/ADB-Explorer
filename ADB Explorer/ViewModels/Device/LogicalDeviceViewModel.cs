@@ -15,7 +15,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
         set => Set(ref device, value);
     }
 
-    private bool isOpen = false;
+    private bool isOpen;
     /// <summary>
     /// Device is open for browsing
     /// </summary>
@@ -35,21 +35,19 @@ public class LogicalDeviceViewModel : DeviceViewModel
         }
     }
 
-    private byte? androidVersion = null;
+    private byte? androidVersion;
     public byte? AndroidVersion
     {
         get => androidVersion;
         private set => Set(ref androidVersion, value);
     }
 
-    private bool useIdForName = false;
+    private bool useIdForName;
     public bool UseIdForName
     {
         get => useIdForName;
         set => Set(ref useIdForName, value);
     }
-
-    public DateTime DiscoverTime { get; private set; }
 
     #endregion
 
@@ -67,9 +65,9 @@ public class LogicalDeviceViewModel : DeviceViewModel
         }
     }
 
-    public string BaseID => Type == DeviceType.Service ? ID.Split('.')[0] : ID;
+    public string BaseID => Type is DeviceType.Service ? ID.Split('.')[0] : ID;
 
-    public string LogicalID => Type == DeviceType.Service && ID.Count(c => c == '-') > 1 ? ID.Split('-')[1] : ID;
+    public string LogicalID => Type is DeviceType.Service && ID.Count(c => c is '-') > 1 ? ID.Split('-')[1] : ID;
 
     public RootStatus Root => Device.Root;
 
@@ -111,6 +109,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     #endregion
 
+    public DateTime DiscoverTime { get; }
+
     #region Commands
 
     public DeviceAction BrowseCommand { get; }
@@ -122,6 +122,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public LogicalDeviceViewModel(LogicalDevice device) : base(device)
     {
+        DiscoverTime = DateTime.Now;
+
         Device = device;
         if (Device.Type is DeviceType.Emulator)
             UseIdForName = true;

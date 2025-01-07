@@ -9,6 +9,7 @@ public static class ShellCommands
 
     public enum ShellCmd
     {
+        am,
         cat,
         cp,
         df,
@@ -39,16 +40,16 @@ public static class ShellCommands
     {
         int returnCode = 0;
 
-        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out string helpResult, out _, new(), "--help");
+        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox", out string helpResult, out _, CancellationToken.None, "--help");
         BusyBoxExists = returnCode == 0;
 
-        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "echo", out string echoResult, out _, new(), "$PATH");
+        returnCode = ADBService.ExecuteDeviceAdbShellCommand(deviceID, "echo", out string echoResult, out _, CancellationToken.None, "$PATH");
         if (returnCode == 127)
         {
             if (!BusyBoxExists)
                 throw new Exception("echo command not found");
 
-            if (ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox echo", out echoResult, out _, new(), "$PATH") != 0)
+            if (ADBService.ExecuteDeviceAdbShellCommand(deviceID, "busybox echo", out echoResult, out _, CancellationToken.None, "$PATH") != 0)
                 echoResult = null;
         }
 
@@ -70,7 +71,7 @@ public static class ShellCommands
                                                              "find",
                                                              out string findResult,
                                                              out _,
-                                                             new(),
+                                                             CancellationToken.None,
                                                              [.. Commands.Select(c => FileHelper.ConcatPaths(mainPath, c)), "2>/dev/null"]);
         if (returnCode == 127)
         {
@@ -82,7 +83,7 @@ public static class ShellCommands
                                                     "busybox find",
                                                     out findResult,
                                                     out _,
-                                                    new(),
+                                                    CancellationToken.None,
                                                     [.. Commands.Select(c => FileHelper.ConcatPaths(mainPath, c)), "2>/dev/null"]);
         }
 
@@ -101,7 +102,7 @@ public static class ShellCommands
                                                     $"{(findExists ? "" : "busybox ")}find",
                                                     out findResult,
                                                     out _,
-                                                    new(),
+                                                    CancellationToken.None,
                                                     [.. missingCmds.Select(c => FileHelper.ConcatPaths(cmdPath, c)), "2>/dev/null"]);
 
             var newCmds = findResult.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries)
@@ -116,7 +117,7 @@ public static class ShellCommands
 
         if (missingCmds.Count > 0)
         {
-            ADBService.ExecuteDeviceAdbShellCommand(deviceID, "alias", out string aliasResult, out _, new());
+            ADBService.ExecuteDeviceAdbShellCommand(deviceID, "alias", out string aliasResult, out _, CancellationToken.None);
 
             var matches = AdbRegEx.RE_GET_ALIAS().Matches(aliasResult);
 

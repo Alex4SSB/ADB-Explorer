@@ -28,7 +28,7 @@ public partial class ADBService
 
     public class AdbDevice(LogicalDeviceViewModel other) : Device
     {
-        public LogicalDeviceViewModel Device { get; private set; } = other;
+        public LogicalDeviceViewModel Device { get; } = other;
 
         public override string ID => Device.ID;
 
@@ -108,8 +108,8 @@ public partial class ADBService
                 fileName: name,
                 path: FileHelper.ConcatPaths(path, name),
                 type: ParseFileMode(mode),
-                size: (mode != 0) ? size : new UInt64?(),
-                modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : new DateTime?(),
+                size: (mode != 0) ? size : null,
+                modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : null,
                 isLink: mode.HasFlag(UnixFileMode.S_IFLNK));
         }
 
@@ -261,7 +261,7 @@ public partial class ADBService
             if (path.StartsWith("//"))
                 path = path[1..];
 
-            int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, new(), EscapeAdbShellString(path), "&&", "pwd");
+            int exitCode = ExecuteDeviceAdbShellCommand(ID, "cd", out string stdout, out string stderr, CancellationToken.None, EscapeAdbShellString(path), "&&", "pwd");
             if (exitCode != 0)
             {
                 throw new Exception(stderr);
@@ -282,26 +282,25 @@ public partial class ADBService
             var intStorage = ReadDrives(AdbRegEx.RE_EMULATED_STORAGE_SINGLE(), "/sdcard");
             if (intStorage is null)
                 return drives;
-            else if (intStorage.Any())
+            if (intStorage.Any())
                 drives.Add(intStorage.First());
 
             var extStorage = ReadDrives(AdbRegEx.RE_EMULATED_ONLY(), EMULATED_DRIVES_GREP);
             if (extStorage is null)
                 return drives;
-            else
-            {
-                Func<LogicalDrive, bool> predicate = drives.Any(drive => drive.Type is AbstractDrive.DriveType.Internal)
-                    ? d => d.Type is not AbstractDrive.DriveType.Internal or AbstractDrive.DriveType.Root
-                    : d => d.Type is not AbstractDrive.DriveType.Root;
-                drives.AddRange(extStorage.Where(predicate));
-            }
 
-            if (!drives.Any(d => d.Type == AbstractDrive.DriveType.Internal))
+            Func<LogicalDrive, bool> predicate = drives.Any(drive => drive.Type is AbstractDrive.DriveType.Internal)
+                ? d => d.Type is not AbstractDrive.DriveType.Internal and not AbstractDrive.DriveType.Root
+                : d => d.Type is not AbstractDrive.DriveType.Root;
+
+            drives.AddRange(extStorage.Where(predicate));
+
+            if (drives.All(d => d.Type != AbstractDrive.DriveType.Internal))
             {
                 drives.Insert(0, new(path: AdbExplorerConst.DEFAULT_PATH));
             }
 
-            if (!drives.Any(d => d.Type == AbstractDrive.DriveType.Root))
+            if (drives.All(d => d.Type != AbstractDrive.DriveType.Root))
             {
                 drives.Insert(0, new(path: "/"));
             }
@@ -311,7 +310,7 @@ public partial class ADBService
 
         private IEnumerable<LogicalDrive> ReadDrives(Regex re, params string[] args)
         {
-            int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr, new(), args);
+            int exitCode = ExecuteDeviceAdbShellCommand(ID, "df", out string stdout, out string stderr, CancellationToken.None, args);
             if (exitCode != 0)
                 return null;
 
@@ -325,7 +324,7 @@ public partial class ADBService
             {
                 if (props is null)
                 {
-                    int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr, new());
+                    int exitCode = ExecuteDeviceAdbShellCommand(ID, GET_PROP, out string stdout, out string stderr, CancellationToken.None);
                     if (exitCode == 0)
                     {
                         props = stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(
@@ -342,20 +341,14 @@ public partial class ADBService
             }
         }
 
-        public string MmcProp => Props.TryGetValue(MMC_PROP, out string value) ? value : null;
-        public string OtgProp => Props.TryGetValue(OTG_PROP, out string value) ? value : null;
+        public string MmcProp => Props.GetValueOrDefault(MMC_PROP);
+        public string OtgProp => Props.GetValueOrDefault(OTG_PROP);
 
-        public Task<string> GetAndroidVersion() => Task.Run(() =>
-        {
-            if (Props.TryGetValue(ANDROID_VERSION, out string value))
-                return value;
-            else
-                return "";
-        });
+        public Task<string> GetAndroidVersion() => Task.Run(() => Props.GetValueOrDefault(ANDROID_VERSION, ""));
 
         public static Dictionary<string, string> GetBatteryInfo(LogicalDevice device)
         {
-            if (ExecuteDeviceAdbShellCommand(device.ID, BATTERY, out string stdout, out string stderr, new()) == 0)
+            if (ExecuteDeviceAdbShellCommand(device.ID, BATTERY, out string stdout, out string stderr, CancellationToken.None) == 0)
             {
                 return stdout.Split(LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries).Where(l => l.Contains(':')).ToDictionary(
                     line => line.Split(':')[0].Trim(),
@@ -366,13 +359,13 @@ public partial class ADBService
 
         public static void Reboot(string deviceId, string arg)
         {
-            if (ExecuteDeviceAdbCommand(deviceId, "reboot", out string stdout, out string stderr, new(), arg) != 0)
+            if (ExecuteDeviceAdbCommand(deviceId, "reboot", out string stdout, out string stderr, CancellationToken.None, arg) != 0)
                 throw new Exception(string.IsNullOrEmpty(stderr) ? stdout : stderr);
         }
 
         public static bool GetDeviceIp(DeviceViewModel device)
         {
-            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, new(), INET_ARGS) != 0)
+            if (ExecuteDeviceAdbShellCommand(device.ID, "ip", out string stdout, out _, CancellationToken.None, INET_ARGS) != 0)
                 return false;
 
             var match = AdbRegEx.RE_DEVICE_WLAN_INET().Match(stdout);
@@ -382,6 +375,29 @@ public partial class ADBService
             device.SetIpAddress(match.Groups["IP"].Value);
 
             return true;
+        }
+
+        public static bool ForceMediaScan(LogicalDeviceViewModel device, string path)
+        {
+            var linkRetVal = ExecuteDeviceAdbShellCommand(device.ID,
+                "readlink", out var stdout, out _, CancellationToken.None, "-f", path);
+
+            var target = linkRetVal == 0
+                ? stdout.TrimEnd(LINE_SEPARATORS)
+                : path;
+
+            // am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE --receiver-include-background -d file:///storage/emulated/0/...
+            var res = ExecuteDeviceAdbShellCommand(device.ID,
+                "am", 
+                out _, 
+                out _, 
+                CancellationToken.None,
+                "broadcast -a",
+                "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
+                "--receiver-include-background -d",
+                EscapeAdbShellString($"file://{target}"));
+
+            return res == 0;
         }
     }
 }

@@ -222,6 +222,13 @@ public class AppSettings : ViewModelBase
         set => Set(ref allowMultiOp, value);
     }
 
+    private bool rescanOnPush;
+    public bool RescanOnPush
+    {
+        get => Get(ref rescanOnPush, true);
+        set => Set(ref rescanOnPush, value);
+    }
+
     #endregion
 
     #region about

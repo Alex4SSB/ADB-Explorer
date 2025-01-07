@@ -135,6 +135,9 @@ public abstract class FileOperation : ViewModelBase
         }
     }
 
+    /// <summary>
+    /// The type of operation and the device ID it is being performed on.
+    /// </summary>
     public string TypeOnDevice => $"{OperationName}@{Device.ID}";
 
     public ObservableList<SyncFile> Children => AndroidPath.Children;

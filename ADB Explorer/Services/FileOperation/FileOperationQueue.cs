@@ -8,7 +8,7 @@ public class FileOperationQueue : ViewModelBase
 {
     #region Full properties
 
-    private bool isActive = false;
+    private bool isActive;
     public bool IsActive
     {
         get => isActive;
@@ -45,11 +45,11 @@ public class FileOperationQueue : ViewModelBase
 
     #region Read only properties
 
-    public ObservableList<FileOperation> Operations { get; } = new();
+    public ObservableList<FileOperation> Operations { get; } = [];
 
     public bool CurrentChanged { get => false; set => OnPropertyChanged(); }
 
-    public static string[] NotifyProperties => new[] { nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress) };
+    public static string[] NotifyProperties => [nameof(IsActive), nameof(AnyFailedOperations), nameof(Progress)];
 
     public bool HasIncompleteOperations => Operations.Any(op => op.Status
         is FileOperation.OperationStatus.Waiting
@@ -249,6 +249,20 @@ public class FileOperationQueue : ViewModelBase
         }
     }
 
+    private void CheckForRescan(FileOperation fileOp)
+    {
+        var target = fileOp.TargetPath.ParentPath;
+        if (Operations.Any(op =>
+                op.TypeOnDevice == fileOp.TypeOnDevice
+                && op.TargetPath.ParentPath == target
+                && op.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress))
+        {
+            return;
+        }
+
+        ADBService.AdbDevice.ForceMediaScan(fileOp.Device.Device, target);
+    }
+
     private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         var op = (FileOperation)sender;
@@ -266,13 +280,15 @@ public class FileOperationQueue : ViewModelBase
 
                 if (IsAutoPlayOn)
                     MoveToNextOperation();
+
+                if (op.OperationName is FileOperation.OperationType.Push)
+                    Task.Run(() => CheckForRescan(op));
             }
         }
 
         if (e.PropertyName is nameof(FileOperation.StatusInfo)
             && op.Status is FileOperation.OperationStatus.InProgress
-            && op.StatusInfo is InProgSyncProgressViewModel status
-            && status.TotalPercentage is int percentage)
+            && op.StatusInfo is InProgSyncProgressViewModel { TotalPercentage: int percentage })
         {
             op.LastProgress = percentage;
             UpdateProgress();
