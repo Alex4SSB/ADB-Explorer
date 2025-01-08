@@ -92,7 +92,13 @@ public class CopyPasteService : ViewModelBase
         Active,
     }
 
-    public DragState DragStatus = DragState.None;
+    private DragState dragStatus = DragState.None;
+
+    public DragState DragStatus
+    {
+        get => dragStatus;
+        set => Set(ref dragStatus, value);
+    }
 
     public bool IsDrag => DragPasteSource is not DataSource.None;
     public bool IsClipboard => PasteSource is not DataSource.None && !IsDrag;

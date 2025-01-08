@@ -848,6 +848,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             if (res is not NativeMethods.HResult.Ok)
             {
                 Data.RuntimeSettings.DragBitmap = null;
+                Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
             }
 
             return (int)res;
