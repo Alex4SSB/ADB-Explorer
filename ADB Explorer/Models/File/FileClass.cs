@@ -132,7 +132,7 @@ public class FileClass : FilePath, IFileStat
             }
 
             var target = ADBService.EscapeAdbShellString(FullName);
-            string[] args = [ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-type d -empty -printf '%p/\\n'"];
+            string[] args = [ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-mindepth 1 -type d -empty -printf '%p/\\n'"];
 
             ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, CancellationToken.None, args);
 
