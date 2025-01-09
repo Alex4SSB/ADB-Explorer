@@ -44,7 +44,7 @@ public partial class DragWindow
 #if DEBUG
         MouseWithinApp = true;
 #else
-        NativeMethods.InitInterceptMouse(NativeMethods.MouseMessages.WM_MOUSEMOVE,
+        NativeMethods.InterceptMouse.Init(NativeMethods.MouseMessages.WM_MOUSEMOVE,
             point =>
             {
                 if (Data.RuntimeSettings.DragBitmap is null)
@@ -59,7 +59,7 @@ public partial class DragWindow
                     if (Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
                         Data.RuntimeSettings.DragBitmap = null;
 
-                    if (NativeMethods.GetPidFromPoint() is int pid
+                    if (NativeMethods.InterceptMouse.GetPidFromPoint() is int pid
                         && Process.GetProcessById(pid) is Process proc)
                     {
                         processUnderMouse = proc.ProcessName;
@@ -80,7 +80,7 @@ public partial class DragWindow
     private void Window_Closing(object sender, CancelEventArgs e)
     {
 #if !DEBUG
-        NativeMethods.CloseInterceptMouse();
+        NativeMethods.InterceptMouse.Close();
 #endif
     }
 

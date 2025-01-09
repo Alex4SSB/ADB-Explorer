@@ -4,94 +4,101 @@
 
 public static partial class NativeMethods
 {
-    // https://learn.microsoft.com/en-us/archive/blogs/toub/low-level-mouse-hook-in-c
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MSLLHOOKSTRUCT
+    public sealed class InterceptMouse : IDisposable
     {
-        public POINT pt;
-        public uint mouseData;
-        public uint flags;
-        public uint time;
-        public HANDLE dwExtraInfo;
-    }
+        // https://learn.microsoft.com/en-us/archive/blogs/toub/low-level-mouse-hook-in-c
 
-    private static LowLevelMouseProc _mouseProc = HookCallback;
-    private static HANDLE _mouseHookID = IntPtr.Zero;
-    private static Action<POINT> _externalMouseAction;
-    private static MouseMessages _requestedMouseEvent;
-    private static POINT _mousePosition;
+        [StructLayout(LayoutKind.Sequential)]
+        private struct MSLLHOOKSTRUCT
+        {
+            public POINT pt;
+            public uint mouseData;
+            public uint flags;
+            public uint time;
+            public HANDLE dwExtraInfo;
+        }
 
-    private delegate HANDLE LowLevelMouseProc(int nCode, MouseMessages wParam, HANDLE lParam);
+        private static LowLevelMouseProc _mouseProc = HookCallback;
+        private static HANDLE _mouseHookID = IntPtr.Zero;
+        private static Action<POINT> _externalMouseAction;
+        private static MouseMessages _requestedMouseEvent;
+        private static POINT _mousePosition;
+        
+        public static HANDLE WindowUnderMouse { get; private set; }
 
-    public static void InitInterceptMouse(MouseMessages mouseEvent, Action<POINT> action)
-    {
-        _requestedMouseEvent = mouseEvent;
-        _externalMouseAction = action;
+        private delegate HANDLE LowLevelMouseProc(int nCode, MouseMessages wParam, HANDLE lParam);
 
-        _mouseHookID = SetHook(_mouseProc);
-    }
+        public static void Init(MouseMessages mouseEvent, Action<POINT> action)
+        {
+            _requestedMouseEvent = mouseEvent;
+            _externalMouseAction = action;
 
-    public static void CloseInterceptMouse()
-    {
-        UnhookWindowsHookEx(_mouseHookID);
-    }
+            _mouseHookID = SetHook(_mouseProc);
+        }
 
-    private static HANDLE SetHook(LowLevelMouseProc proc)
-    {
-        using Process curProcess = Process.GetCurrentProcess();
-        using ProcessModule curModule = curProcess.MainModule;
+        public static void Close()
+        {
+            UnhookWindowsHookEx(_mouseHookID);
+        }
 
-        return SetWindowsHookEx(WinHooks.WH_MOUSE_LL, proc, GetModuleHandle(curModule.ModuleName), 0);
-    }
+        public void Dispose() => Close();
 
-    private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
-    {
-        if (nCode < 0 || wParam != _requestedMouseEvent)
+        private static HANDLE SetHook(LowLevelMouseProc proc)
+        {
+            using Process curProcess = Process.GetCurrentProcess();
+            using ProcessModule curModule = curProcess.MainModule;
+
+            return SetWindowsHookEx(WinHooks.WH_MOUSE_LL, proc, GetModuleHandle(curModule.ModuleName), 0);
+        }
+
+        private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
+        {
+            if (nCode < 0 || wParam != _requestedMouseEvent)
+                return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+
+            var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+
+            POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
+            if (newPoint != _mousePosition)
+                _externalMouseAction?.Invoke(_mousePosition);
+
+            _mousePosition = newPoint;
+
             return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+        }
 
-        var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
+        public static int? GetPidFromPoint()
+        {
+            WindowUnderMouse = WindowFromPoint(_mousePosition);
 
-        POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
-        if (newPoint != _mousePosition)
-            _externalMouseAction?.Invoke(_mousePosition);
+            if (WindowUnderMouse == IntPtr.Zero)
+                return null;
 
-        _mousePosition = newPoint;
+            if (GetWindowThreadProcessId(WindowUnderMouse, out var pid) == 0)
+                return null;
 
-        return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+            return (int)pid;
+        }
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern HANDLE SetWindowsHookEx(WinHooks idHook,
+            LowLevelMouseProc lpfn, HANDLE hMod, uint dwThreadId);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool UnhookWindowsHookEx(HANDLE hhk);
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern HANDLE CallNextHookEx(HANDLE hhk, int nCode,
+            MouseMessages wParam, HANDLE lParam);
+
+        [DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern HANDLE GetModuleHandle(string lpModuleName);
+
+        [DllImport("User32.dll")]
+        private static extern HANDLE WindowFromPoint(POINT Point);
+
+        [DllImport("User32.dll", SetLastError = true)]
+        private static extern uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
     }
-
-    public static int? GetPidFromPoint()
-    {
-        var hWnd = WindowFromPoint(_mousePosition);
-
-        if (hWnd == IntPtr.Zero)
-            return null;
-
-        if (GetWindowThreadProcessId(hWnd, out var pid) == 0)
-            return null;
-
-        return (int)pid;
-    }
-
-    [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern HANDLE SetWindowsHookEx(WinHooks idHook,
-        LowLevelMouseProc lpfn, HANDLE hMod, uint dwThreadId);
-
-    [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool UnhookWindowsHookEx(HANDLE hhk);
-
-    [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern HANDLE CallNextHookEx(HANDLE hhk, int nCode,
-        MouseMessages wParam, HANDLE lParam);
-
-    [DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern HANDLE GetModuleHandle(string lpModuleName);
-
-    [DllImport("User32.dll")]
-    private static extern HANDLE WindowFromPoint(POINT Point);
-
-    [DllImport("User32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
 }

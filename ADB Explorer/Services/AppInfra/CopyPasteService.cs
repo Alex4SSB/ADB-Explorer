@@ -689,4 +689,23 @@ public class CopyPasteService : ViewModelBase
             ? pasteItems.Except([ancestor])
             : [];
     }
+
+    public enum IpcMessage
+    {
+        DragCanceled,
+
+    }
+
+    public void AcceptIpcMessage(string message)
+    {
+        if (!Enum.TryParse(typeof(IpcMessage), message.Split('|')[0], true, out var res))
+            return;
+
+        switch ((IpcMessage)res)
+        {
+            case IpcMessage.DragCanceled:
+                ClearDrag();
+                break;
+        }
+    }
 }

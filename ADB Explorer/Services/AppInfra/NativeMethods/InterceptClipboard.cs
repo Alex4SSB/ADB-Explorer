@@ -4,48 +4,64 @@
 
 public static partial class NativeMethods
 {
-    private static Action _externalClipAction;
-    private static HANDLE _clipWindowHandle = IntPtr.Zero;
-
-    public static void InitInterceptCB(Window window, Action action)
+    public sealed class InterceptClipboard : IDisposable
     {
-        _externalClipAction = action;
-        RoutedEventHandler handler = null;
+        private static Action _externalClipAction;
+        private static Action<string> _externalIpcAction;
+        private static HANDLE _mainWindowHandle = IntPtr.Zero;
+        private static HwndSource _hwndSource;
 
-        handler = (object sender, RoutedEventArgs e) =>
+        public static void Init(Window window, Action clipboardAction, Action<string> ipcAction)
         {
-            _clipWindowHandle = new WindowInteropHelper(window).Handle;
+            _externalClipAction = clipboardAction;
+            _externalIpcAction = ipcAction;
+            RoutedEventHandler handler = null;
 
-            var hwndSource = HwndSource.FromHwnd(_clipWindowHandle);
-            hwndSource.AddHook(WndProc);
+            handler = (object sender, RoutedEventArgs e) =>
+            {
+                _mainWindowHandle = new WindowInteropHelper(window).Handle;
 
-            AddClipboardFormatListener(_clipWindowHandle);
+                _hwndSource = HwndSource.FromHwnd(_mainWindowHandle);
+                _hwndSource.AddHook(WndProc);
 
-            window.Loaded -= handler;
-        };
+                AddClipboardFormatListener(_mainWindowHandle);
 
-        window.Loaded += handler;
-    }
+                window.Loaded -= handler;
+            };
 
-    public static void CloseInterceptCB()
-    {
-        RemoveClipboardFormatListener(_clipWindowHandle);
-    }
-
-    private static HANDLE WndProc(HANDLE hwnd, int msg, HANDLE wParam, HANDLE lParam, ref bool handled)
-    {
-        if ((ClipboardNotificationMessage)msg is ClipboardNotificationMessage.WM_CLIPBOARDUPDATE)
-        {
-            _externalClipAction();
-            handled = true;
+            window.Loaded += handler;
         }
 
-        return IntPtr.Zero;
+        public static void Close()
+        {
+            RemoveClipboardFormatListener(_mainWindowHandle);
+            _hwndSource?.RemoveHook(WndProc);
+            _hwndSource?.Dispose();
+        }
+
+        private static HANDLE WndProc(HANDLE hwnd, int msg, HANDLE wParam, HANDLE lParam, ref bool handled)
+        {
+            if ((ClipboardNotificationMessage)msg is ClipboardNotificationMessage.WM_CLIPBOARDUPDATE)
+            {
+                _externalClipAction();
+                handled = true;
+            }
+            else if ((WindowsMessages)msg is WindowsMessages.WM_COPYDATA)
+            // Since we already have a hook for MainWindow, we'll use it for IPC as well
+            {
+                var cds = Marshal.PtrToStructure<COPYDATASTRUCT>(lParam);
+                _externalIpcAction(cds.lpData);
+            }
+
+            return IntPtr.Zero;
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool AddClipboardFormatListener(HANDLE hwnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool RemoveClipboardFormatListener(HANDLE hwnd);
+
+        public void Dispose() => Close();
     }
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool AddClipboardFormatListener(HANDLE hwnd);
-
-    [DllImport("user32.dll", SetLastError = true)]
-    private static extern bool RemoveClipboardFormatListener(HANDLE hwnd);
 }

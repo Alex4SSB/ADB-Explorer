@@ -141,7 +141,7 @@ public static partial class NativeMethods
         #region UnmanagedCode
 
         [DllImport("ComCtl32.dll")]
-        private extern static int ImageList_Draw(
+        private static extern int ImageList_Draw(
             HANDLE hIml,
             int i,
             HANDLE hdcDst,
@@ -150,17 +150,11 @@ public static partial class NativeMethods
             int fStyle);
 
         [DllImport("ComCtl32.dll")]
-        private extern static int ImageList_DrawIndirect(
+        private static extern int ImageList_DrawIndirect(
             ref IMAGELISTDRAWPARAMS pimldp);
 
         [DllImport("ComCtl32.dll")]
-        private extern static int ImageList_GetIconSize(
-            HANDLE himl,
-            ref int cx,
-            ref int cy);
-
-        [DllImport("ComCtl32.dll")]
-        private extern static HANDLE ImageList_GetIcon(
+        private static extern HANDLE ImageList_GetIcon(
             HANDLE himl,
             int i,
             int flags);
@@ -171,14 +165,14 @@ public static partial class NativeMethods
         /// Apparently (and hopefully) ordinal 727 isn't going to change.
         /// </summary>
         [DllImport("Shell32.dll", EntryPoint = "#727")]
-        private extern static int SHGetImageList(
+        private static extern int SHGetImageList(
             int iImageList,
             ref Guid riid,
             ref IImageList ppv
             );
 
         [DllImport("Shell32.dll", EntryPoint = "#727")]
-        private extern static int SHGetImageListHandle(
+        private static extern int SHGetImageListHandle(
             int iImageList,
             ref Guid riid,
             ref HANDLE handle
@@ -395,9 +389,9 @@ public static partial class NativeMethods
 
         #region Member Variables
         private HANDLE hIml = IntPtr.Zero;
-        private IImageList iImageList = null;
+        private IImageList iImageList;
         private SysImageListSize size = SysImageListSize.SHIL_SMALL;
-        private bool disposed = false;
+        private bool disposed;
         #endregion
 
         #region Implementation
@@ -406,22 +400,14 @@ public static partial class NativeMethods
         /// <summary>
         /// Gets the hImageList handle
         /// </summary>
-        public HANDLE Handle
-        {
-            get
-            {
-                return this.hIml;
-            }
-        }
+        public HANDLE Handle => hIml;
+
         /// <summary>
         /// Gets/sets the size of System Image List to retrieve.
         /// </summary>
         public SysImageListSize ImageListSize
         {
-            get
-            {
-                return size;
-            }
+            get => size;
             set
             {
                 size = value;
@@ -429,7 +415,6 @@ public static partial class NativeMethods
             }
 
         }
-
 
         #endregion
 
@@ -474,10 +459,7 @@ public static partial class NativeMethods
         /// </summary>
         /// <param name="fileName">Filename to get icon for</param>
         /// <returns>Index of the icon</returns>
-        public int IconIndex(string fileName)
-        {
-            return IconIndex(fileName, false);
-        }
+        public int IconIndex(string fileName) => IconIndex(fileName, false);
 
         /// <summary>
         /// Returns the index of the icon for the specified file

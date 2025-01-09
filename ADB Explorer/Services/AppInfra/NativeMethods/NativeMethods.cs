@@ -404,6 +404,20 @@ public static partial class NativeMethods
         WM_RBUTTONUP = 0x0205
     }
 
+    public enum WindowsMessages
+    {
+        WM_COPYDATA = 0x004A,
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct COPYDATASTRUCT
+    {
+        public HANDLE dwData;
+        public int cbData;
+        [MarshalAs(UnmanagedType.LPStr)]
+        public string lpData;
+    }
+
     #endregion
 
     #region General Use Structs
@@ -628,6 +642,15 @@ public static partial class NativeMethods
     }
 
     #endregion
+
+    [DllImport("User32.dll", CharSet = CharSet.Auto)]
+    private static extern IntPtr SendMessage(HANDLE hWnd, uint Msg, IntPtr wParam, ref COPYDATASTRUCT lParam);
+
+    public static bool SendMessage(HANDLE windowHandle, WindowsMessages messageType, ref COPYDATASTRUCT data)
+    {
+        var result = SendMessage(windowHandle, (uint)messageType, IntPtr.Zero, ref data);
+        return result != IntPtr.Zero;
+    }
 
     /// <summary>
     /// Returns the in-memory representation of an interop structure.

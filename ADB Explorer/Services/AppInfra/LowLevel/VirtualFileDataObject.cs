@@ -811,15 +811,23 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                 File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Exception in DoDragDrop: {e.Message}\n");
 #endif
         }
-        finally
+    }
+
+    public static void NotifyDropCancel()
         {
-            if (!IsAsynchronous && _inOperation)
+        if (!Data.RuntimeSettings.DragWithinSlave)
+            return;
+
+        var message = Enum.GetName(CopyPasteService.IpcMessage.DragCanceled) + '|';
+
+        NativeMethods.COPYDATASTRUCT cds = new()
             {
-                // Call the end action and exit the operation
-                _endAction?.Invoke(this);
-                _inOperation = false;
-            }
-        }
+            dwData = IntPtr.Zero,
+            cbData = Encoding.ASCII.GetByteCount(message) + 1,
+            lpData = message
+        };
+
+        NativeMethods.SendMessage(NativeMethods.InterceptMouse.WindowUnderMouse, NativeMethods.WindowsMessages.WM_COPYDATA, ref cds);
     }
 
     /// <summary>
@@ -849,6 +857,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             {
                 Data.RuntimeSettings.DragBitmap = null;
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
+                NotifyDropCancel();
             }
 
             return (int)res;

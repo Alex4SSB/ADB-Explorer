@@ -121,7 +121,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ((DataGrid)FindResource("CurrentOperationDataGrid")).ItemsSource = FileOpQ.Operations;
         UpdateFileOp();
 
-        NativeMethods.InitInterceptCB(this, CopyPaste.GetClipboardPasteItems);
+        NativeMethods.InterceptClipboard.Init(this, CopyPaste.GetClipboardPasteItems, CopyPaste.AcceptIpcMessage);
 
 #if DEBUG
         DeviceHelper.TestDevices();
@@ -694,7 +694,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DirList?.Stop();
 
         dw.Close();
-        NativeMethods.CloseInterceptCB();
+        NativeMethods.InterceptClipboard.Close();
 
         ConnectTimer.Stop();
         ServerWatchdogTimer.Stop();
@@ -1205,11 +1205,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     }
 
     private void Window_MouseUp(object sender, MouseButtonEventArgs e) => e.Handled = e.ChangedButton switch
-    {
-        MouseButton.XButton1 => NavHistory.NavigateBF(NavHistory.SpecialLocation.Back),
-        MouseButton.XButton2 => NavHistory.NavigateBF(NavHistory.SpecialLocation.Forward),
-        _ => false,
-    };
+        {
+            MouseButton.XButton1 => NavHistory.NavigateBF(NavHistory.SpecialLocation.Back),
+            MouseButton.XButton2 => NavHistory.NavigateBF(NavHistory.SpecialLocation.Forward),
+            _ => false,
+        };
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
     {
@@ -1889,6 +1889,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
     {
+        if (Mouse.LeftButton is MouseButtonState.Released)
+            CopyPaste.ClearDrag();
+
         var point = e.GetPosition(ExplorerCanvas);
         bool withinEditingCell = false;
         DataGridCell cell = ExplorerGrid.SelectedCells.Count > 0
@@ -2231,7 +2234,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void MainWin_PreviewKeyDown(object sender, KeyEventArgs e)
     {
-        if (CopyPaste.IsDrag && CopyPaste.IsWindows && e.Key is Key.Escape)
+        if (CopyPaste.IsDrag && CopyPaste.DragStatus is not CopyPasteService.DragState.Active && e.Key is Key.Escape)
             RuntimeSettings.DragBitmap = null;
     }
 
