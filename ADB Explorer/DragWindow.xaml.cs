@@ -13,11 +13,18 @@ public partial class DragWindow
 
     public bool MouseWithinApp;
 
+    private HANDLE windowHandle;
+
     public DragWindow()
     {
         InitializeComponent();
 
         DragTimer.Tick += DragTimer_Tick;
+
+#if !DEPLOY
+        MainBorder.BorderThickness = new Thickness(1);
+        MainBorder.BorderBrush = Brushes.OrangeRed;
+#endif
     }
 
     private void DragTimer_Tick(object sender, EventArgs e)
@@ -41,19 +48,23 @@ public partial class DragWindow
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        windowHandle = new WindowInteropHelper(this).Handle;
+
 #if DEBUG
-        MouseWithinApp = true;
+                MouseWithinApp = true;
 #else
         NativeMethods.InterceptMouse.Init(NativeMethods.MouseMessages.WM_MOUSEMOVE,
             point =>
             {
                 if (Data.RuntimeSettings.DragBitmap is null)
                     return;
-                
-                Top = point.Y - DragImage.ActualHeight - 4;
-                Left = point.X - DragImage.ActualWidth / 2;
 
-                MouseWithinApp = Data.RuntimeSettings.MainWinRect.Contains(point);
+                var actualPoint = NativeMethods.MonitorInfo.MousePositionToDpi(point, windowHandle);
+
+                Top = actualPoint.Y - DragImage.ActualHeight - 4;
+                Left = actualPoint.X - DragImage.ActualWidth / 2;
+
+                MouseWithinApp = NativeMethods.MonitorInfo.IsPointInMainWin(point);
                 if (!MouseWithinApp)
                 {
                     if (Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)

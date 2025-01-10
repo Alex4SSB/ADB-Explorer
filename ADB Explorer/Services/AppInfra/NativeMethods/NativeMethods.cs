@@ -354,12 +354,6 @@ public static partial class NativeMethods
         // Duplicate flags have been omitted
     }
 
-    private enum MonitorType
-    {
-        Primary = 0x00000001,
-        Nearest = 0x00000002,
-    }
-
     private enum WinHooks
     {
         WH_MSGFILTER = -1,
@@ -453,6 +447,9 @@ public static partial class NativeMethods
 
         public readonly override int GetHashCode()
             => HashCode.Combine(X, Y);
+
+        public readonly override string ToString()
+            => $"{X},{Y}";
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -463,6 +460,18 @@ public static partial class NativeMethods
 
         public static implicit operator Size(SIZE self)
             => new(self.Width, self.Height);
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct RECT
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+
+        public override string ToString()
+            => $"{Left},{Top},{Right},{Bottom}";
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -594,27 +603,6 @@ public static partial class NativeMethods
             return "File";
 
         return shInfo.szTypeName;
-    }
-
-    #endregion
-
-    #region Monitor Info
-
-    [DllImport("User32.dll")]
-    private static extern HANDLE MonitorFromWindow(HANDLE handle, MonitorType flags);
-
-    public static HANDLE NearestMonitor(HANDLE handle) => MonitorFromWindow(handle, MonitorType.Nearest);
-
-    public static HANDLE PrimaryMonitor() => MonitorFromWindow(IntPtr.Zero, MonitorType.Primary);
-
-    [DllImport("User32.dll")]
-    private static extern bool GetCursorPos(out POINT lpPoint);
-
-    public static System.Windows.Point GetCursorPos()
-    {
-        GetCursorPos(out var lpPoint);
-
-        return lpPoint;
     }
 
     #endregion

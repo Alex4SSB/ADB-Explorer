@@ -363,11 +363,11 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref cursor, value);
     }
 
-    private Rect mainWinRect;
-    public Rect MainWinRect
+    private float dpiScalingFactor = 1.0f;
+    public float DpiScalingFactor
     {
-        get => mainWinRect;
-        set => Set(ref mainWinRect, value);
+        get => dpiScalingFactor;
+        set => Set(ref dpiScalingFactor, value);
     }
 
     private bool dragWithinSlave = false;

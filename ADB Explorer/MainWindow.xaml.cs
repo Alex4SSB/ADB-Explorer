@@ -44,11 +44,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     /// <summary>
     /// Back / Forward Navigation
     /// </summary>
-    private bool bfNavigation = false;
+    private bool bfNavigation;
 
     private int ClickCount = 0;
-    private bool WasSelected = false;
-    private bool WasEditing = false;
+    private bool WasSelected;
+    private bool WasEditing;
+    private bool WasDragging;
     private Point MouseDownPoint;
     private FileToIconConverter FileToIcon;
     private DateTime appDataClick;
@@ -156,8 +157,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ConnectTimer.Start();
         ServerWatchdogTimer.Start();
         DiskUsageTimer.Start();
-
-        RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
 
         SettingsHelper.CheckAppVersions();
     }
@@ -1361,6 +1360,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             return;
         }
 
+        WasDragging = false;
         var row = sender as DataGridRow;
 
         CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
@@ -1385,6 +1385,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (RowHeight is null && ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(0) is DataGridRow row)
             RowHeight = row.ActualHeight;
 
+        WasDragging = false;
         CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image
                      ? CopyPasteService.DragState.Pending
                      : CopyPasteService.DragState.None;
@@ -1436,8 +1437,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Size maximizedSize = new(SystemParameters.MaximizedPrimaryScreenWidth, SystemParameters.MaximizedPrimaryScreenHeight);
         if (e.NewSize != maximizedSize && e.PreviousSize != maximizedSize)
             FileActions.IsEditorOpen = false;
-
-        RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
     }
 
     private void SearchBoxMaxWidth()
@@ -1457,7 +1456,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         // Read value to force IsAnimated to update
         _ = Settings.DisableAnimation;
 
-        bool enableAnimation = Settings.IsAnimated && (MonitorInfo.IsPrimaryMonitor(this) is true || WindowState is not WindowState.Maximized);
+        bool enableAnimation = Settings.IsAnimated
+            && (NativeMethods.MonitorInfo.IsPrimaryMonitor(this) is true
+            || WindowState is not WindowState.Maximized);
+
         StyleHelper.SetActivateAnimation(SettingsSplitView, enableAnimation);
         StyleHelper.SetActivateAnimation(DevicesSplitView, enableAnimation);
     }
@@ -1916,6 +1918,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 && !abortDrag)
             {
                 CopyPaste.DragStatus = CopyPasteService.DragState.Active;
+                WasDragging = true;
 
                 var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
                 var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move);
@@ -1931,7 +1934,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 CopyPaste.DragStatus = CopyPasteService.DragState.None;
         }
 
-        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None)
+        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None || WasDragging)
         {
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
@@ -2006,7 +2009,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
         SelectionRect.Visibility = Visibility.Collapsed;
-
+        
         if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
             || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
@@ -2063,7 +2066,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DataGridCell cell;
         DataGridRow row;
 
-        if (CopyPaste.DragStatus is CopyPasteService.DragState.Active)
+        if (CopyPaste.DragStatus is CopyPasteService.DragState.Active || WasDragging)
             return false;
 
         switch (sender)
@@ -2228,8 +2231,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (!RuntimeSettings.IsWindowLoaded)
             return;
-
-        RuntimeSettings.MainWinRect = new Rect(PointToScreen(new(0, 0)), new Size(ActualWidth, ActualHeight));
     }
 
     private void MainWin_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -2242,5 +2243,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (e.EscapePressed)
             RuntimeSettings.DragBitmap = null;
+    }
+
+    private void MainWindow_OnPreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.LeftAlt or Key.RightAlt or Key.System && CopyPaste.IsDrag)
+            e.Handled = true;
     }
 }

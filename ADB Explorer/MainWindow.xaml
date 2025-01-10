@@ -26,6 +26,7 @@
     MouseDown="Window_MouseDown"
     MouseUp="Window_MouseUp"
     PreviewKeyDown="MainWin_PreviewKeyDown"
+    PreviewKeyUp="MainWindow_OnPreviewKeyUp"
     PreviewQueryContinueDrag="MainWindow_OnPreviewQueryContinueDrag"
     SizeChanged="Window_SizeChanged"
     SourceInitialized="Window_SourceInitialized"
