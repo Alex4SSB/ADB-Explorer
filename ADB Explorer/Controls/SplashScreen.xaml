@@ -81,11 +81,19 @@
                         <TextBlock FontSize="20" Text="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_ADB_VERSION}}" />
                         <TextBlock FontSize="20" Text=" at least):" />
                     </StackPanel>
-                    <ui:HyperlinkButton
+                    <ui:SimpleStackPanel
                         HorizontalAlignment="Center"
-                        Content="{Binding Source={x:Static Member=resources:Strings.S_ADB_LEARN_MORE}}"
-                        NavigateUri="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}"
-                        ToolTip="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}" />
+                        Orientation="Horizontal"
+                        Spacing="10">
+                        <Button Click="HelpButton_OnClick" ToolTip="Help On ADB">
+                            <ui:FontIcon FontSize="14" Glyph="&#xE897;" />
+                        </Button>
+                        <ui:HyperlinkButton
+                            HorizontalAlignment="Center"
+                            Content="{Binding Source={x:Static Member=resources:Strings.S_ADB_LEARN_MORE}}"
+                            NavigateUri="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}"
+                            ToolTip="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}" />
+                    </ui:SimpleStackPanel>
                     <ui:SimpleStackPanel
                         HorizontalAlignment="Center"
                         Orientation="Horizontal"

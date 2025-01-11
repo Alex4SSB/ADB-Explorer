@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Controls;
 
@@ -81,5 +82,16 @@ public partial class SplashScreen
             FirstLaunchGrid.Visibility = Visibility.Visible;
         else
             CloseSplashScreen();
+    }
+
+    private void HelpButton_OnClick(object sender, RoutedEventArgs e)
+    {
+        DialogService.ShowMessage("""
+                                  This app is a UI for ADB - Android Debug Bridge.
+                                  To use the app, you need to have ADB on your PC.
+                                  ADB is available as part of the Android SDK Platform Tools.
+                                  You can use the provided link to download the SDK Platform Tools.
+                                  Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
+                                  """, "Help On ADB", DialogService.DialogIcon.Informational);
     }
 }
