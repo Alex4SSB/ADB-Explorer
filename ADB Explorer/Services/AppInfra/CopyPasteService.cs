@@ -3,6 +3,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using AdbDataObject;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services;
@@ -351,6 +352,9 @@ public class CopyPasteService : ViewModelBase
         {
             GetDescriptors(dataObject);
 
+            DragFiles = Descriptors.Where(d => !d.Name.Contains('\\'))
+                .Select(d => d.Name).ToArray();
+
             if (IsDrag)
             {
                 DragPasteSource |= DataSource.Virtual;
@@ -426,10 +430,53 @@ public class CopyPasteService : ViewModelBase
                 {
                     // TODO: add support for Android to Android transfers
                 }
-                else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor)
-                    && dataObject.GetDataPresent(AdbDataFormats.FileContents))
+                else if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 {
                     // TODO: add support for writing virtual streams to files in the temp folder and then pushing them
+
+                    try
+                    {
+                        Directory.Delete(Data.RuntimeSettings.TempDragPath, true);
+                    }
+                    catch
+                    { }
+
+                    Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
+
+                    var dirExist = Descriptors.Any(d => d.Name.Contains('\\'));
+
+                    int complete = 0;
+                    int failed = 0;
+                    Task.Run(() =>
+                    {
+                        for (int i = 0; i < Descriptors.Length; i++)
+                        {
+                            if (!Descriptors[i].IsDirectory)
+                            {
+                                FileContentsStream stream;
+                                try
+                                {
+                                    stream = VirtualFileDataObject.GetFileContents(dataObject, i);
+                                }
+                                catch (COMException e)
+                                {
+                                    Trace.WriteLine($"{e.Message}   -   {Descriptors[i].Name}");
+                                    failed++;
+                                    continue;
+                                }
+
+                                complete++;
+
+                                var fullPath = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
+                                Directory.CreateDirectory(FileHelper.GetParentPath(fullPath));
+
+                                stream.Save(fullPath);
+                                stream.Dispose();
+                            }
+                        }
+
+                        Trace.WriteLine($"Completed files: {complete}, failed files: {failed}");
+                    });
                 }
             }
             else if (IsWindows)

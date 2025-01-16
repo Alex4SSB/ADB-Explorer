@@ -480,6 +480,8 @@ public static partial class NativeMethods
         public long dwDateTime = dateUTC.ToLocalTime().ToFileTime();
 
         public readonly DateTime DateTimeUTC => DateTime.FromFileTime(dwDateTime).ToUniversalTime();
+
+        public override string ToString() => DateTimeUTC.ToString(CultureInfo.CurrentCulture);
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -492,6 +494,8 @@ public static partial class NativeMethods
         public UInt32 nFileSizeLow = (uint)(size & 0xffffffff);
 
         public readonly long GetSize() => ((long)nFileSizeHigh << 32) | nFileSizeLow;
+
+        public override string ToString() => Converters.UnitConverter.ToSize(GetSize());
     }
 
     #endregion

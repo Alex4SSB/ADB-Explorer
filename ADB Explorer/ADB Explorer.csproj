@@ -67,6 +67,10 @@
   	 </Content>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AdbDataObject\AdbDataObject.csproj" />
+  </ItemGroup>
+
 	<ItemGroup>
 		<Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
 		<Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />

@@ -2,12 +2,14 @@ using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra.NativeMethods;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace ADB_Test
@@ -372,6 +374,38 @@ namespace ADB_Test
             Assert.AreEqual(3, list.Find(i => i.Value == 3).Value);
             Assert.AreEqual(null, list.Find(i => i.Value == 50));
             Assert.AreEqual(null, emptyList.Find(i => i.Value == 50));
+        }
+
+        [TestMethod]
+        public void FileClassFromDescriptor()
+        {
+            var descriptor = new VirtualFileDataObject.FileDescriptor
+            {
+                ChangeTimeUtc = DateTime.Now,
+                Length = 1024,
+                Name = "example.txt",
+            };
+            var file = new FileClass(descriptor);
+
+            Assert.AreEqual("example.txt", file.FullName);
+            Assert.AreEqual((ulong)1024, file.Size.Value);
+            Assert.AreEqual(descriptor.ChangeTimeUtc, file.ModifiedTime);
+            Assert.AreEqual(AbstractFile.FileType.File, file.Type);
+
+            var emptyDirDescriptor = new VirtualFileDataObject.FileDescriptor
+            {
+                ChangeTimeUtc = DateTime.Now,
+                Name = "Directory",
+                IsDirectory = true,
+            };
+            var emptyDir = new FileClass(emptyDirDescriptor)
+                { PathType = AbstractFile.FilePathType.Windows };
+
+            Assert.AreEqual("Directory", emptyDir.FullName);
+            Assert.AreEqual(emptyDirDescriptor.ChangeTimeUtc, emptyDir.ModifiedTime);
+            Assert.IsTrue(emptyDir.IsDirectory);
+            Assert.AreEqual(AbstractFile.FileType.Folder, emptyDir.Type);
+            Assert.AreEqual(AbstractFile.FilePathType.Windows, emptyDir.PathType);
         }
     }
 }

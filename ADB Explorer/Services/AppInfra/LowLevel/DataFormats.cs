@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using System.Runtime.InteropServices.ComTypes;
+using ADB_Explorer.Models;
 
 namespace ADB_Explorer.Services;
 
@@ -64,6 +65,11 @@ public static class AdbDataFormats
 
 public class AdbDataFormat(string name)
 {
+    public AdbDataFormat(short id) : this(null)
+    {
+        Id = id;
+    }
+
     public string Name { get; } = name;
 
     public short Id { get; } = (short)DataFormats.GetDataFormat(name).Id;
@@ -73,4 +79,8 @@ public class AdbDataFormat(string name)
 
     public static implicit operator string(AdbDataFormat self)
         => self.Name;
+
+    public TYMED tymed => this == AdbDataFormats.FileContents
+        ? TYMED.TYMED_ISTREAM
+        : TYMED.TYMED_HGLOBAL;
 }
