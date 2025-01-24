@@ -232,4 +232,46 @@ public static class TextHelper
 
         altText = output;
     }
+
+    /// <summary>
+    /// Checks if the character is a right-to-left character, except for the RTL mark 200F
+    /// </summary>
+    /// <param name="c"></param>
+    /// <returns></returns>
+    public static bool IsRtlCharacter(char c)
+    {
+        // From http://www.unicode.org/Public/6.0.0/ucd/UnicodeData.txt
+
+        int[][] ranges =
+        [
+            [0x0590, 0x07B1], // Hebrew, Arabic, Syriac, Thaana
+            [0xFB1D, 0xFDFD], // Hebrew & Arabic ligatures
+            [0xFE70, 0xFEFC]  // More Arabic
+        ];
+
+        foreach (var range in ranges)
+        {
+            if (c >= range[0] && c <= range[1])
+                return true;
+        }
+        return false;
+    }
+
+    /// <summary>
+    /// Checks if the text contains at least one right-to-left character, except for the RTL mark 200F
+    /// </summary>
+    /// <param name="text"></param>
+    /// <returns></returns>
+    public static bool ContainsRtl(string text)
+    {
+        foreach (char c in text)
+        {
+            if (IsRtlCharacter(c))
+                return true;
+        }
+        return false;
+    }
+
+    public const char LTR_MARK = '\u200E';
+    public const char RTL_MARK = '\u200F';
 }

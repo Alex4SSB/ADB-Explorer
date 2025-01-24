@@ -195,12 +195,7 @@
                                 </DataGridTextColumn.EditingElementStyle>
                                 <DataGridTextColumn.ElementStyle>
                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
-                                                <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
+                                        <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>

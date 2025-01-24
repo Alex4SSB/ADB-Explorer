@@ -257,6 +257,8 @@ public class FileClass : FilePath, IFileStat
     {
         TypeName = GetTypeName();
         GetIcon();
+        OnPropertyChanged(nameof(ExtensionIsGlyph));
+        OnPropertyChanged(nameof(ExtensionIsFontIcon));
     }
 
     public void UpdateSpecialType()
@@ -300,17 +302,22 @@ public class FileClass : FilePath, IFileStat
         if (string.IsNullOrEmpty(fileName) || (IsHidden && FullName.Count(c => c == '.') == 1))
             return "File";
 
-        if (Extension.ToLower() == ".exe")
+        if (Extension.Equals(".exe", StringComparison.CurrentCultureIgnoreCase))
             return "Windows Executable";
 
-        var name = NativeMethods.GetShellFileType(fileName);
-
-        if (name.EndsWith("? File"))
+        if (!Ascii.IsValid(Extension))
         {
             if (ShortExtension.Length == 1)
                 ExtensionIsGlyph = true;
-            else
+            else if (ShortExtension.Length > 1)
                 ExtensionIsFontIcon = true;
+            else
+            {
+                ExtensionIsGlyph =
+                ExtensionIsFontIcon = false;
+
+                return $"{Extension[1..]} File";
+            }
 
             return $"{ShortExtension} File";
         }
@@ -319,7 +326,7 @@ public class FileClass : FilePath, IFileStat
             ExtensionIsGlyph =
             ExtensionIsFontIcon = false;
 
-            return name;
+            return NativeMethods.GetShellFileType(fileName);
         }
     }
 

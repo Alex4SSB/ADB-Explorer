@@ -514,7 +514,11 @@ internal static class FileActionLogic
         {
             try
             {
-                FileHelper.RenameFile(file, textBox.Text);
+                string text = textBox.Text;
+                if (text.Count(c => c == TextHelper.RTL_MARK) == 1)
+                    text = text.Replace($"{TextHelper.RTL_MARK}", "");
+
+                FileHelper.RenameFile(file, text);
             }
             catch (Exception)
             { }

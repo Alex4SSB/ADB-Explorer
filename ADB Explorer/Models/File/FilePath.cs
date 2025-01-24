@@ -75,7 +75,24 @@ public class FilePath : AbstractFile, IBaseFile
     }
     public string NoExtName => IsRegularFile ? FullName[..^Extension.Length] : FullName;
 
-    public string DisplayName => Data.Settings.ShowExtensions ? FullName : NoExtName;
+    public string DisplayName
+    {
+        get
+        {
+            var noExtName = NoExtName;
+            // Add RTL mark to end of RTL file names with LTR extensions.
+            // This prevents numbers and punctuation from breaking the RTL ordering.
+            if (TextHelper.ContainsRtl(NoExtName)
+                && NoExtName[^1] != TextHelper.RTL_MARK
+                && !TextHelper.ContainsRtl(Extension))
+            {
+                noExtName = $"{NoExtName}{TextHelper.RTL_MARK}";
+            }
+            return Data.Settings.ShowExtensions ? $"{noExtName}{Extension}" : noExtName;
+        }
+    }
+
+    public bool IsRtlName => TextHelper.ContainsRtl(FullName);
 
     public ShellObject ShellObject { get; set; }
 
@@ -117,6 +134,14 @@ public class FilePath : AbstractFile, IBaseFile
                 ? SpecialFileType.Apk
                 : SpecialFileType.None;
         }
+
+        Data.Settings.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(Data.Settings.ShowExtensions))
+            {
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        };
     }
 
     public virtual void UpdatePath(string newPath)
@@ -125,6 +150,8 @@ public class FilePath : AbstractFile, IBaseFile
         FullName = FileHelper.GetFullName(newPath);
 
         OnPropertyChanged(nameof(NoExtName));
+        OnPropertyChanged(nameof(Extension));
+        OnPropertyChanged(nameof(DisplayName));
     }
 
     /// <summary>

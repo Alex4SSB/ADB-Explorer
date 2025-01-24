@@ -940,12 +940,11 @@
         x:Key="FileNameEditingElementStyle"
         BasedOn="{StaticResource TextBoxFluentStyle}"
         TargetType="TextBox">
-        <Setter Property="Text" Value="{Binding FullName, Mode=OneWay}" />
+        <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />
         <Setter Property="HorizontalAlignment" Value="Left" />
-
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=ShowExtensions}" Value="False">
-                <Setter Property="Text" Value="{Binding NoExtName, Mode=OneWay}" />
+            <DataTrigger Binding="{Binding IsRtlName}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
