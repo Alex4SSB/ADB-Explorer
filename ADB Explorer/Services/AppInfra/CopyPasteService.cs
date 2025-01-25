@@ -187,6 +187,8 @@ public class CopyPasteService : ViewModelBase
         }
     }
 
+    public string UserTemp => $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\";
+
     public void UpdateUI()
     {
         FileActionLogic.UpdateFileActions();
@@ -318,7 +320,11 @@ public class CopyPasteService : ViewModelBase
         // File Drop - the best format since it gives the actual paths
         if (dataObject.GetDataPresent(AdbDataFormats.FileDrop) && dataObject.GetData(AdbDataFormats.FileDrop) is string[] dropFiles)
         {
-            DragFiles = dropFiles;
+            // Drag from 7-Zip File Manager is not supported
+            if (dropFiles.Length == 1 && dropFiles[0].StartsWith(UserTemp + "7z"))
+                DragFiles = [];
+            else
+                DragFiles = dropFiles;
         }
         // ADB Drop - for all Android to Android transfers (including self)
         else if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
