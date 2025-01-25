@@ -119,8 +119,9 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 		return HandleError(ErrorType::NO_ARGS);  // No arguments to execute were provided!
 	}
 
-	// Get the original stdout to pipe data to
+	// Get the original stdout & stderr to pipe data to
 	HANDLE stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+	HANDLE stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
 
 	// Set stdout to UTF-16
 	fflush(stdout);
@@ -162,19 +163,31 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[]) {
 	// Create a child process with inherited console screen buffer as its stdout
 	HANDLE child_handle;
 	{
-		// Replace stdout with the created console buffer so the child process will inherite it as its stdout
+		// Replace stdout with the created console buffer so the child process will inherit it as its stdout
 		if (!SetStdHandle(STD_OUTPUT_HANDLE, console_handle)) {
 			return HandleError(ErrorType::CON_BUFF_SET);  // Couldn't set STDOUT to the created console screen buffer!
+		}
+
+		if (!SetStdHandle(STD_ERROR_HANDLE, console_handle)) {
+			return HandleError(ErrorType::CON_BUFF_SET);  // Couldn't set STDERR to the created console screen buffer!
 		}
 
 		// RAII guard that will restore stdout to the original one
 		auto stdout_restore = [](HANDLE* h) { SetStdHandle(STD_OUTPUT_HANDLE, *h); };
 		auto stdout_restore_guard = MakeScopeFinallyGuard(&stdout_handle, stdout_restore);
 
+		auto stderr_restore = [](HANDLE* h) { SetStdHandle(STD_ERROR_HANDLE, *h); };
+		auto stderr_restore_guard = MakeScopeFinallyGuard(&stderr_handle, stderr_restore);
+
 		// Set our created console to UTF-16
 		fflush(stdout);
 		if (_setmode(_fileno(stdout), _O_U16TEXT) == -1) {
-			return HandleError(ErrorType::CON_BUFF_UTF16_SWITCH);  // Couldn't set the created console screen buffer's mode to UTF16!
+			return HandleError(ErrorType::CON_BUFF_UTF16_SWITCH);  // Couldn't set the created console stdout screen buffer's mode to UTF16!
+		}
+
+		fflush(stderr);
+		if (_setmode(_fileno(stderr), _O_U16TEXT) == -1) {
+			return HandleError(ErrorType::CON_BUFF_UTF16_SWITCH);  // Couldn't set the created console stderr screen buffer's mode to UTF16!
 		}
 
 		// Build child process command line for execution
