@@ -253,7 +253,7 @@ namespace ADB_Test
 /sdcard/Download/DCIM/New Folder 1/Screenshot_20170401-135422.png|96|77|
 /sdcard/Download/DCIM/New Folder 1/Screenshot_20170406-082707.png|98|11|
 /sdcard/Download/DCIM/New Folder 1/Screenshot_20170409-163142.png|99|54|";
-            var updatesStringRows = updatesRaw.Split('\n').Select(r => r.Split('|'));
+            var updatesStringRows = updatesRaw.Split("\r\n").Select(r => r.Split('|', StringSplitOptions.RemoveEmptyEntries));
             var updates = updatesStringRows.Select(u => new AdbSyncProgressInfo(u[0], int.Parse(u[1]), int.Parse(u[2]), null));
             SyncFile file = new("/sdcard/Download/DCIM", AbstractFile.FileType.Folder);
 
@@ -377,7 +377,7 @@ namespace ADB_Test
         [TestMethod]
         public void FileClassFromDescriptor()
         {
-            var descriptor = new VirtualFileDataObject.FileDescriptor
+            var descriptor = new FileDescriptor
             {
                 ChangeTimeUtc = DateTime.Now,
                 Length = 1024,
@@ -390,7 +390,7 @@ namespace ADB_Test
             Assert.AreEqual(descriptor.ChangeTimeUtc, file.ModifiedTime);
             Assert.AreEqual(AbstractFile.FileType.File, file.Type);
 
-            var emptyDirDescriptor = new VirtualFileDataObject.FileDescriptor
+            var emptyDirDescriptor = new FileDescriptor
             {
                 ChangeTimeUtc = DateTime.Now,
                 Name = "Directory",

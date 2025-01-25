@@ -21,6 +21,18 @@ public class FileSyncOperation : FileOperation
 
     public VirtualFileDataObject VFDO { get; set; }
 
+    public FileSyncOperation(OperationType operationName, SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FileOpProgressViewModel status)
+        : base(sourcePath, adbDevice, App.Current.Dispatcher)
+    {
+        OperationName = operationName;
+        FilePath = sourcePath;
+        TargetPath = targetPath;
+
+        StatusInfo = status;
+        if (status is FailedOpProgressViewModel)
+            Status = OperationStatus.Failed;
+    }
+
     public FileSyncOperation(
         OperationType operationName,
         SyncFile sourcePath,
@@ -66,6 +78,15 @@ public class FileSyncOperation : FileOperation
 
         progressUpdates = [];
         progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
+
+        if (OperationName is OperationType.Push &&
+            (!File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath)))
+        {
+            Status = OperationStatus.Failed;
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: "File not found", total: true));
+
+            return;
+        }
 
         var procTask = AsyncHelper.WaitUntil(() => !string.IsNullOrEmpty(AdbProcess.Process.StartInfo.Arguments),
                                              TimeSpan.FromSeconds(10),

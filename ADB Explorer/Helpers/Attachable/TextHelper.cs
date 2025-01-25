@@ -240,11 +240,11 @@ public static class TextHelper
     /// <returns></returns>
     public static bool IsRtlCharacter(char c)
     {
-        // From http://www.unicode.org/Public/6.0.0/ucd/UnicodeData.txt
+        // http://www.unicode.org/Public/6.0.0/ucd/UnicodeData.txt
 
         int[][] ranges =
         [
-            [0x0590, 0x07B1], // Hebrew, Arabic, Syriac, Thaana
+            [0x0590, 0x07B1], // Hebrew, Arabic, Syriac, & Thaana
             [0xFB1D, 0xFDFD], // Hebrew & Arabic ligatures
             [0xFE70, 0xFEFC]  // More Arabic
         ];

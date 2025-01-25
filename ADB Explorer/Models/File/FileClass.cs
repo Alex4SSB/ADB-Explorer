@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
@@ -140,7 +141,7 @@ public class FileClass : FilePath, IFileStat
         }
     }
 
-    public IEnumerable<VirtualFileDataObject.FileDescriptor> Descriptors { get; private set; }
+    public IEnumerable<FileDescriptor> Descriptors { get; private set; }
 
     #region Read Only Properties
 
@@ -200,12 +201,12 @@ public class FileClass : FilePath, IFileStat
         : this(other.FullName, other.FullPath, other.IsDirectory ? FileType.Folder : FileType.File)
     { }
 
-    public FileClass(ShellObject windowsPath)
+    public FileClass(ShellItem windowsPath)
         : base(windowsPath)
     {
         Type = IsDirectory ? FileType.Folder : FileType.File;
-        Size = windowsPath.GetSize();
-        ModifiedTime = windowsPath.GetDateModified();
+        Size = IsDirectory ? null : (ulong?)windowsPath.FileInfo.Length;
+        ModifiedTime = windowsPath.FileInfo?.LastWriteTime;
         IsLink = windowsPath.IsLink;
 
         GetIcon();
@@ -214,7 +215,7 @@ public class FileClass : FilePath, IFileStat
         SortName = new(FullName);
     }
 
-    public FileClass(VirtualFileDataObject.FileDescriptor fileDescriptor)
+    public FileClass(FileDescriptor fileDescriptor)
         : base(fileDescriptor.SourcePath, fileDescriptor.Name, fileDescriptor.IsDirectory ? FileType.Folder : FileType.File)
     {
         Size = (ulong?)fileDescriptor.Length;
@@ -231,11 +232,11 @@ public class FileClass : FilePath, IFileStat
         isLink: fileStat.IsLink
     );
 
-    public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellObject windowsPath) =>
+    public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellItem windowsPath) =>
         new(androidTargetPath)
     {
-        Size = windowsPath.GetSize(),
-        ModifiedTime = windowsPath.GetDateModified(),
+        Size = windowsPath.IsFolder ? null : (ulong?)windowsPath.FileInfo.Length,
+        ModifiedTime = windowsPath.FileInfo?.LastWriteTime,
     };
 
     public override void UpdatePath(string androidPath)
@@ -349,7 +350,7 @@ public class FileClass : FilePath, IFileStat
         long? size = IsDirectory ? null : (long?)Size;
         DateTime? date = IsDirectory ? null : ModifiedTime;
 
-        Descriptors = items.Select(item => new VirtualFileDataObject.FileDescriptor
+        Descriptors = items.Select(item => new FileDescriptor
         {
             Name = item.TrimEnd('/'),
             SourcePath = FullPath,

@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services.AppInfra;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
 
@@ -387,7 +388,7 @@ public static class ShellFileOperation
         }
     }
 
-    public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellObject> items, Dispatcher dispatcher)
+    public static void PushPackages(ADBService.AdbDevice device, IEnumerable<ShellItem> items, Dispatcher dispatcher)
     {
         foreach (var item in items.Select(file => new FilePath(file)))
         {

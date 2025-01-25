@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
+using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services.AppInfra;
@@ -66,7 +67,8 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        ShellFileOperation.PushPackages(Data.CurrentADBDevice, dialog.FilesAsShellObject, App.Current.Dispatcher);
+        var shItems = dialog.FileNames.Select(ShellItem.Open);
+        ShellFileOperation.PushPackages(Data.CurrentADBDevice, shItems, App.Current.Dispatcher);
     }
 
     public static void UpdateModifiedDates()
@@ -889,14 +891,16 @@ internal static class FileActionLogic
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;
 
-        CopyPasteService.VerifyAndPush(targetPath, dialog.FilesAsShellObject);
+        var shItems = dialog.FileNames.Select(ShellItem.Open);
+        
+        CopyPasteService.VerifyAndPush(targetPath, shItems);
     }
 
-    public static void PushShellObjects(IEnumerable<ShellObject> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static void PushShellObjects(IEnumerable<ShellItem> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
         foreach (var item in items)
         {
-            var source = new SyncFile(item) { ShellObject = item };
+            var source = new SyncFile(item) { ShellItem = item };
             var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
             
             var pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
@@ -924,7 +928,7 @@ internal static class FileActionLogic
                 && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
                 op.Dispatcher.Invoke(() =>
-                    Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellObject)));
+                    Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellItem)));
             }
 
             // In push we can delete the source once the operation has completed
@@ -942,7 +946,7 @@ internal static class FileActionLogic
             }
         }
 
-        op.FilePath.ShellObject = null;
+        op.FilePath.ShellItem = null;
         op.PropertyChanged -= PushOperation_PropertyChanged;
     }
 
@@ -952,11 +956,11 @@ internal static class FileActionLogic
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
         var pullItems = Data.SelectedFiles;
-        ShellObject path;
+        ShellItem path;
 
         if (!string.IsNullOrEmpty(targetPath))
         {
-            path = ShellObject.FromParsingName(targetPath);
+            path = ShellItem.Open(targetPath);
         }
         else
         {
@@ -971,7 +975,7 @@ internal static class FileActionLogic
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
             
-            path = dialog.FileAsShellObject;
+            path = ShellItem.Open(dialog.FileName);
         }
 
         var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);

@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.ViewModels;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
@@ -94,7 +95,7 @@ public class FilePath : AbstractFile, IBaseFile
 
     public bool IsRtlName => TextHelper.ContainsRtl(FullName);
 
-    public ShellObject ShellObject { get; set; }
+    public ShellItem ShellItem { get; set; }
 
     public bool IsHidden => FullName.StartsWith('.');
 
@@ -104,15 +105,15 @@ public class FilePath : AbstractFile, IBaseFile
     /// </summary>
     public virtual string Extension => FileHelper.GetExtension(FullName);
 
-    public FilePath(ShellObject windowsPath)
+    public FilePath(ShellItem windowsPath)
     {
-        ShellObject = windowsPath;
+        ShellItem = windowsPath;
         PathType = FilePathType.Windows;
 
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.Name;
-        
-        SpecialType = File.GetAttributes(FullPath).HasFlag(FileAttributes.Directory)
+
+        SpecialType = windowsPath.IsFolder
             ? SpecialFileType.Folder
             : SpecialFileType.None;
     }

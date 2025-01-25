@@ -147,6 +147,15 @@ public static class FileHelper
         _ => originalIndex,
     };
 
+    public static string DirectChildPath(string parentPath, string childPath)
+    {
+        if (childPath is null || !childPath.Contains(parentPath) || childPath.Length - parentPath.Length < 2)
+            return null;
+
+        var index = NextSeparatorIndex(parentPath, childPath);
+        return childPath[..index];
+    }
+
     public static ulong? GetSize(this ShellObject shellObject)
         => shellObject.Properties.System.Size.Value;
 

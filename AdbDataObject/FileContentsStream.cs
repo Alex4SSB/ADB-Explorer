@@ -1,5 +1,7 @@
 ﻿// Copied and modified from https://github.com/asklar/clipview under MIT License
 
+#pragma warning disable CA1416 // Validate platform compatibility
+
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 
@@ -48,11 +50,13 @@ namespace AdbDataObject
             }
         }
 
-        public void Save(string filepath)
+        public void Save(string filepath, bool disposeAfter = true)
         {
             using var file = File.Create(filepath);
-
             SaveToStream(file);
+            
+            if (disposeAfter)
+                Dispose();
         }
 
         public void Dispose()

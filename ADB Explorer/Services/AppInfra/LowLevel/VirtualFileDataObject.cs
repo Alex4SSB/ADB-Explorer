@@ -528,56 +528,6 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
     #endregion
 
-    public class FileGroup
-    {
-        private readonly IEnumerable<FileDescriptor> FileDescriptors;
-
-        private NativeMethods.FILEGROUPDESCRIPTOR GroupDescriptor;
-
-        public IEnumerable<byte> GroupDescriptorBytes => GroupDescriptor.Bytes;
-
-        public IEnumerable<Action<Stream>> DataStreams => FileDescriptors.Select(f => f.StreamContents);
-
-        public FileGroup(IEnumerable<FileDescriptor> fileDescriptors)
-        {
-            FileDescriptors = fileDescriptors;
-
-            GroupDescriptor = new(FileDescriptors);
-        }
-    }
-
-    /// <summary>
-    /// Class representing a virtual file for use by drag/drop or the clipboard.
-    /// </summary>
-    public class FileDescriptor
-    {
-        /// <summary>
-        /// Gets or sets the name of the file.
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Gets or sets the (optional) length of the file.
-        /// </summary>
-        public Int64? Length { get; set; }
-
-        /// <summary>
-        /// Gets or sets the (optional) change time of the file.
-        /// </summary>
-        public DateTime? ChangeTimeUtc { get; set; }
-
-        /// <summary>
-        /// Gets or sets an Action that returns the contents of the file.
-        /// </summary>
-        public Action<Stream> StreamContents { get; set; }
-
-        public bool IsDirectory { get; set; }
-
-        public string SourcePath { get; set; }
-
-        public override string ToString() => Name;
-    }
-
     /// <summary>
     /// Class representing the result of a SetData call.
     /// </summary>
@@ -647,15 +597,8 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
     public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Copy)
     {
-        try
-        {
-            Directory.Delete(Data.RuntimeSettings.TempDragPath, true);
-        }
-        catch
-        { }
+        CopyPasteService.ClearTempFolder();
 
-        Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
-        
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
         Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)
             .Distinct(StringComparer.InvariantCultureIgnoreCase)

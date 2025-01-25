@@ -8,8 +8,9 @@ public static partial class NativeMethods
     {
         private static Action _externalClipAction;
         private static Action<string> _externalIpcAction;
-        private static HANDLE _mainWindowHandle = IntPtr.Zero;
         private static HwndSource _hwndSource;
+
+        public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 
         public static void Init(Window window, Action clipboardAction, Action<string> ipcAction)
         {
@@ -19,12 +20,12 @@ public static partial class NativeMethods
 
             handler = (object sender, RoutedEventArgs e) =>
             {
-                _mainWindowHandle = new WindowInteropHelper(window).Handle;
+                MainWindowHandle = new WindowInteropHelper(window).Handle;
 
-                _hwndSource = HwndSource.FromHwnd(_mainWindowHandle);
+                _hwndSource = HwndSource.FromHwnd(MainWindowHandle);
                 _hwndSource.AddHook(WndProc);
 
-                AddClipboardFormatListener(_mainWindowHandle);
+                AddClipboardFormatListener(MainWindowHandle);
 
                 window.Loaded -= handler;
             };
@@ -34,7 +35,7 @@ public static partial class NativeMethods
 
         public static void Close()
         {
-            RemoveClipboardFormatListener(_mainWindowHandle);
+            RemoveClipboardFormatListener(MainWindowHandle);
             _hwndSource?.RemoveHook(WndProc);
             _hwndSource?.Dispose();
         }

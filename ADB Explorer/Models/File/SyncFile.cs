@@ -1,13 +1,14 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
 public class SyncFile : FilePath
 {
-    public ObservableList<FileOpProgressInfo> ProgressUpdates { get; } = new();
+    public ObservableList<FileOpProgressInfo> ProgressUpdates { get; } = [];
 
-    public ObservableList<SyncFile> Children { get; } = new();
+    public ObservableList<SyncFile> Children { get; } = [];
 
     public ulong? Size { get; }
 
@@ -17,10 +18,10 @@ public class SyncFile : FilePath
 
     }
 
-    public SyncFile(ShellObject windowsPath)
+    public SyncFile(ShellItem windowsPath)
         : base(windowsPath)
     {
-        Size = windowsPath.Properties.System.Size.Value;
+        Size = IsDirectory ? null : (ulong?)windowsPath.FileInfo.Length;
     }
 
     public SyncFile(FileClass fileClass)
@@ -78,13 +79,7 @@ public class SyncFile : FilePath
     }
 
     public string DirectChildPath(string fullPath)
-    {
-        if (fullPath is null || !fullPath.Contains(FullPath) || fullPath.Length - FullPath.Length < 2)
-            return null;
-
-        var index = FileHelper.NextSeparatorIndex(FullPath, fullPath);
-        return fullPath[..index];
-    }
+        => FileHelper.DirectChildPath(FullPath, fullPath);
 }
 
 public class SyncFileComparer : IEqualityComparer<SyncFile>

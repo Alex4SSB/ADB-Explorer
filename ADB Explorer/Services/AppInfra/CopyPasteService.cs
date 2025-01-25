@@ -4,6 +4,8 @@ using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using AdbDataObject;
+using Vanara.PInvoke;
+using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Services;
@@ -103,7 +105,19 @@ public class CopyPasteService : ViewModelBase
 
     public bool IsDrag => DragPasteSource is not DataSource.None;
     public bool IsClipboard => PasteSource is not DataSource.None && !IsDrag;
-    public DataSource CurrentSource => IsDrag ? DragPasteSource : PasteSource;
+    
+    public DataSource CurrentSource
+    {
+        get => IsDrag ? DragPasteSource : PasteSource;
+        set
+        {
+            if (IsDrag)
+                DragPasteSource = value;
+            else
+                PasteSource = value;
+        }
+    }
+
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
     public string CurrentParent => IsDrag ? DragParent : ParentFolder;
     public bool IsSelf => CurrentSource.HasFlag(DataSource.Self);
@@ -139,8 +153,8 @@ public class CopyPasteService : ViewModelBase
         set => Set(ref dragFiles, value);
     }
 
-    private VirtualFileDataObject.FileDescriptor[] descriptors = [];
-    public VirtualFileDataObject.FileDescriptor[] Descriptors
+    private FileDescriptor[] descriptors = [];
+    public FileDescriptor[] Descriptors
     {
         get => descriptors;
         set => Set(ref descriptors, value);
@@ -154,7 +168,7 @@ public class CopyPasteService : ViewModelBase
             {
                 foreach (var file in DragFiles)
                 {
-                    yield return new(ShellObject.FromParsingName(file));
+                    yield return new(ShellItem.Open(file));
                 }
             }
             else
@@ -282,6 +296,8 @@ public class CopyPasteService : ViewModelBase
                 if (IsDrag)
                     return FileActionLogic.EnableDropPaste(file);
             }
+            else if (CurrentSource.HasFlag(DataSource.Virtual))
+                return DragDropEffects.Copy;
             
             return DragDropEffects.Move | DragDropEffects.Copy;
         }
@@ -291,10 +307,7 @@ public class CopyPasteService : ViewModelBase
 
     public void PreviewDataObject(IDataObject dataObject)
     {
-        if (IsDrag)
-            DragPasteSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
-        else
-            PasteSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
+        CurrentSource &= ~(DataSource.Android | DataSource.Self | DataSource.Virtual);
 
         if (Data.CurrentADBDevice is null)
             return;
@@ -302,10 +315,12 @@ public class CopyPasteService : ViewModelBase
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
 
+        // File Drop - the best format since it gives the actual paths
         if (dataObject.GetDataPresent(AdbDataFormats.FileDrop) && dataObject.GetData(AdbDataFormats.FileDrop) is string[] dropFiles)
         {
             DragFiles = dropFiles;
         }
+        // ADB Drop - for all Android to Android transfers (including self)
         else if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
         {
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
@@ -322,22 +337,11 @@ public class CopyPasteService : ViewModelBase
             DragParent = dragList.parentFolder;
             DragFiles = dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f)).ToArray();
 
-            if (IsDrag)
-            {
-                DragPasteSource |= DataSource.Android;
-                if (dragList.deviceId == Data.CurrentADBDevice.ID)
-                    DragPasteSource |= DataSource.Self;
-                else
-                    DragPasteSource |= DataSource.Virtual;
-            }
+            CurrentSource |= DataSource.Android;
+            if (dragList.deviceId == Data.CurrentADBDevice.ID)
+                CurrentSource |= DataSource.Self;
             else
-            {
-                PasteSource |= DataSource.Android;
-                if (dragList.deviceId == Data.CurrentADBDevice.ID)
-                    PasteSource |= DataSource.Self;
-                else
-                    PasteSource |= DataSource.Virtual;
-            }
+                CurrentSource |= DataSource.Virtual;
 
             if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
             {
@@ -348,6 +352,21 @@ public class CopyPasteService : ViewModelBase
                 });
             }
         }
+        // Shell ID List - the only format Microsoft supports for anything added after Windows XP (non-ZIP archives, UNC paths, etc.)
+        else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
+        {
+            var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
+            if (shItems is not null)
+            {
+                Descriptors = shItems.Select(sh => new FileDescriptor(sh)).ToArray();
+                DragFiles = shItems.Select(sh => sh.ParsingName).ToArray();
+
+                CurrentSource |= DataSource.Virtual;
+                CurrentSource &= ~DataSource.Android;
+            }
+        }
+        // VFDO (FileGroupDescriptor + FileContents) - the only viable format for virtual files not mapped to a drive.
+        // This is the format we supply to File Explorer. Also provided by File Explorer for contents of ZIP archives (introduced in Windows ME).
         else if (dataObject.GetDataPresent(AdbDataFormats.FileDescriptor))
         {
             GetDescriptors(dataObject);
@@ -355,18 +374,9 @@ public class CopyPasteService : ViewModelBase
             DragFiles = Descriptors.Where(d => !d.Name.Contains('\\'))
                 .Select(d => d.Name).ToArray();
 
-            if (IsDrag)
-            {
-                DragPasteSource |= DataSource.Virtual;
-                if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
-                    DragPasteSource &= ~DataSource.Android;
-            }
-            else
-            {
-                PasteSource |= DataSource.Virtual;
-                if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
-                    PasteSource &= ~DataSource.Android;
-            }
+            CurrentSource |= DataSource.Virtual;
+            if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
+                CurrentSource &= ~DataSource.Android;
         }
         else
         {
@@ -380,18 +390,9 @@ public class CopyPasteService : ViewModelBase
 
     public void GetDescriptors(IDataObject dataObject)
     {
-        try
-        {
-            if (dataObject.GetData(AdbDataFormats.FileDescriptor) is not MemoryStream fdStream)
-                return;
-
-            var fileGroup = NativeMethods.FILEGROUPDESCRIPTOR.FromStream(fdStream);
-            Descriptors = fileGroup.descriptors.Select(NativeMethods.FILEDESCRIPTOR.GetFile).ToArray();
-        }
-        catch (Exception ex)
-        {
-            // This happens when GetData in our own VFDO isn't ready yet
-        }
+        var fds = FileDescriptor.GetDescriptors(dataObject);
+        if (fds is not null)
+            Descriptors = fds;
     }
 
     public void AcceptDataObject(IDataObject dataObject, FrameworkElement sender, bool isLink = false)
@@ -419,67 +420,99 @@ public class CopyPasteService : ViewModelBase
             if (Data.FileActions.IsAppDrive)
             {
                 if (IsWindows && !IsVirtual && FileHelper.AllFilesAreApks(DragFiles))
-                    ShellFileOperation.PushPackages(Data.CurrentADBDevice, DragFiles.Select(ShellObject.FromParsingName), App.Current.Dispatcher);
+                    ShellFileOperation.PushPackages(Data.CurrentADBDevice, DragFiles.Select(ShellItem.Open), App.Current.Dispatcher);
 
                 return;
             }
 
+            // For all cases where the files aren't immediately available on disk
             if (IsVirtual)
             {
+                ClearTempFolder();
+
+                // Transfer from another Android device
                 if (!IsWindows)
                 {
                     // TODO: add support for Android to Android transfers
                 }
+                // From archives or UNC paths
+                else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
+                {
+                    Vanara.Windows.Shell.ShellFolder tempDrag = new(Data.RuntimeSettings.TempDragPath);
+                    var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
+
+                    ShellFileOperations shFileOp = new(NativeMethods.InterceptClipboard.MainWindowHandle);
+
+                    shItems.ForEach(shia => shFileOp.QueueCopyOperation(shia, tempDrag));
+
+                    ShellItem lastTopItem = null;
+                    shFileOp.PostCopyItem += (s, e) =>
+                    {
+                        // Skip non top level items
+                        if (e.DestItem.Parent.ParsingName != Data.RuntimeSettings.TempDragPath)
+                            return;
+                        
+                        if (lastTopItem is not null && lastTopItem.ParsingName != e.DestItem.ParsingName)
+                        {
+                            // A new top level item means the previous one is done
+                            VerifyAndPush(targetFolder, [new FileClass(lastTopItem)], CurrentEffect);
+                        }
+
+                        lastTopItem = e.DestItem;
+                    };
+
+                    shFileOp.FinishOperations += (s, e) =>
+                    {
+                        // The last item is not caught by the PostCopyItem event
+                        if (lastTopItem is not null)
+                            VerifyAndPush(targetFolder, [new FileClass(lastTopItem)], CurrentEffect);
+                    };
+
+                    shFileOp.PerformOperations();
+                }
+                // Was supposed to be the main method for zip archives, but Vanara covers that in ShellItemArray.
+                // Will be left in to support any virtual files that don't provide ShellID List Array.
                 else if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 {
-                    // TODO: add support for writing virtual streams to files in the temp folder and then pushing them
-
-                    try
-                    {
-                        Directory.Delete(Data.RuntimeSettings.TempDragPath, true);
-                    }
-                    catch
-                    { }
-
-                    Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
-
-                    var dirExist = Descriptors.Any(d => d.Name.Contains('\\'));
-
-                    int complete = 0;
-                    int failed = 0;
                     Task.Run(() =>
                     {
                         for (int i = 0; i < Descriptors.Length; i++)
                         {
-                            if (!Descriptors[i].IsDirectory)
+                            if (Descriptors[i].IsDirectory)
+                                continue;
+
+                            FileContentsStream stream;
+                            try
                             {
-                                FileContentsStream stream;
-                                try
-                                {
-                                    stream = VirtualFileDataObject.GetFileContents(dataObject, i);
-                                }
-                                catch (COMException e)
-                                {
-                                    Trace.WriteLine($"{e.Message}   -   {Descriptors[i].Name}");
-                                    failed++;
-                                    continue;
-                                }
-
-                                complete++;
-
-                                var fullPath = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
-                                Directory.CreateDirectory(FileHelper.GetParentPath(fullPath));
-
-                                stream.Save(fullPath);
-                                stream.Dispose();
+                                stream = VirtualFileDataObject.GetFileContents(dataObject, i);
                             }
+                            catch (COMException e)
+                            {
+                                App.Current.Dispatcher.Invoke(() =>
+                                {
+                                    Data.FileOpQ.AddOperation(
+                                        new FileSyncOperation(
+                                            FileOperation.OperationType.Push,
+                                            new(new FileClass(Descriptors[i])),
+                                            new(targetFolder),
+                                            Data.CurrentADBDevice,
+                                            new FailedOpProgressViewModel(e.Message)));
+                                });
+
+                                continue;
+                            }
+
+                            var fullPath = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
+                            Directory.CreateDirectory(FileHelper.GetParentPath(fullPath));
+
+                            stream.Save(fullPath);
                         }
 
-                        Trace.WriteLine($"Completed files: {complete}, failed files: {failed}");
+                        VerifyAndPush(targetFolder, CurrentFiles.Where(f => DragFiles.Contains(f.FullName)), CurrentEffect);
                     });
                 }
             }
-            else if (IsWindows)
+            else if (IsWindows) // FileDrop format
             {
                 VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect);
                 if (CurrentEffect is DragDropEffects.Move)
@@ -497,7 +530,7 @@ public class CopyPasteService : ViewModelBase
                                App.Current.Dispatcher,
                                Data.CurrentADBDevice,
                                Data.CurrentPath);
-                
+
                 if (CurrentEffect is DragDropEffects.Move)
                     Clear();
             }
@@ -509,7 +542,7 @@ public class CopyPasteService : ViewModelBase
             ClearDrag();
     }
 
-    public static async void VerifyAndPush(string targetPath, IEnumerable<ShellObject> pasteItems)
+    public static async void VerifyAndPush(string targetPath, IEnumerable<ShellItem> pasteItems)
     {
         var files = await MergeFiles(pasteItems.Select(f => f.ParsingName), targetPath);
         if (!files.Any())
@@ -529,7 +562,7 @@ public class CopyPasteService : ViewModelBase
         if (!pasteItems.Any())
             return;
 
-        FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellObject), targetPath, dropEffects);
+        FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
     }
 
     public async void VerifyAndPaste(DragDropEffects cutType,
@@ -754,5 +787,17 @@ public class CopyPasteService : ViewModelBase
                 ClearDrag();
                 break;
         }
+    }
+
+    public static void ClearTempFolder()
+    {
+        try
+        {
+            Directory.Delete(Data.RuntimeSettings.TempDragPath, true);
+        }
+        catch
+        { }
+
+        Directory.CreateDirectory(Data.RuntimeSettings.TempDragPath);
     }
 }

@@ -83,6 +83,9 @@ public static partial class NativeMethods
 
         /// <summary>Catastrophic failure</summary>
         E_UNEXPECTED = -2147418113, // 0x8000FFFF
+
+        /// <summary>Path too long</summary>
+        PATH_TOO_LONG = -2147417803, // 0x80010135
     }
 
     [Flags]
@@ -109,7 +112,7 @@ public static partial class NativeMethods
     }
 
     // https://github.com/dahall/Vanara/blob/master/PInvoke/Shell32/Clipboard.cs
-    /// <summary>An array of flags that indicate which of the <see cref="FILEDESCRIPTOR"/> structure members contain valid data.</summary>
+    /// <summary>An array of flags that indicate which of the FILEDESCRIPTOR structure members contain valid data.</summary>
     [Flags]
     public enum FD_FLAGS : uint
     {

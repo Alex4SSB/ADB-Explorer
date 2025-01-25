@@ -63,16 +63,22 @@ public static class AdbDataFormats
     }
 }
 
-public class AdbDataFormat(string name)
+public class AdbDataFormat
 {
-    public AdbDataFormat(short id) : this(null)
+    public AdbDataFormat(string name)
+    {
+        Name = name;
+        Id = (short)DataFormats.GetDataFormat(name).Id;
+    }
+
+    public AdbDataFormat(short id)
     {
         Id = id;
     }
 
-    public string Name { get; } = name;
+    public string Name { get; }
 
-    public short Id { get; } = (short)DataFormats.GetDataFormat(name).Id;
+    public short Id { get; }
 
     public static implicit operator short(AdbDataFormat self)
         => self.Id;
