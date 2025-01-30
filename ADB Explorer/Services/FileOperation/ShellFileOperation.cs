@@ -175,7 +175,8 @@ public static class ShellFileOperation
                                  string currentPath,
                                  IEnumerable<string> existingItems,
                                  Dispatcher dispatcher,
-                                 DragDropEffects cutType = DragDropEffects.None)
+                                 DragDropEffects cutType = DragDropEffects.None,
+                                 int masterPid = 0)
     {
         IEnumerable<FileMoveOperation> Recycle()
         {
@@ -188,15 +189,23 @@ public static class ShellFileOperation
 
         IEnumerable<FileMoveOperation> Restore()
         {
+            if (Data.RecycleIndex.Count == 0)
+                TrashHelper.ParseIndexers();
+
             foreach (var item in items)
             {
                 if (item.Extension == AdbExplorerConst.RECYCLE_INDEX_SUFFIX)
                     continue;
 
-                var indexer = Data.RecycleIndex.FirstOrDefault(f => f.RecycleName == item.FullName);
+                var recycleName = item.TrashIndex is null
+                    ? item.FullName
+                    : FileHelper.GetFullName(item.TrashIndex.RecycleName);
+
+                var indexer = Data.RecycleIndex.FirstOrDefault(f => f.RecycleName == recycleName);
                 if (indexer is null)
                     continue;
 
+                item.UpdatePath(FileHelper.ConcatPaths(AdbExplorerConst.RECYCLE_PATH, recycleName));
                 item.TrashIndex = indexer;
                 var targetParent = string.IsNullOrEmpty(targetPath)
                     ? indexer.ParentPath
@@ -229,6 +238,8 @@ public static class ShellFileOperation
         else
             fileops = Move().ToList();
 
+        fileops.ForEach(op => op.MasterPid = masterPid);
+
         dispatcher.Invoke(() =>
         {
             fileops.ForEach(op => op.PropertyChanged += MoveFileOp_PropertyChanged);
@@ -257,6 +268,12 @@ public static class ShellFileOperation
 
             if (op.Device.ID == Data.CurrentADBDevice.ID)
             {
+                // notify master process of completion
+                if (op.MasterPid > 0 && op.OperationName is not FileOperation.OperationType.Copy)
+                {
+                    IpcService.NotifyFileMoved(op.MasterPid, op.Device, op.FilePath);
+                }
+
                 // remove file from cut items and clear its trash indexer if restore / recycle on current device
                 if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
                 {

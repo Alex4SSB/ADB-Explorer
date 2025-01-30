@@ -92,7 +92,7 @@ public class FileClass : FilePath, IFileStat
         set
         {
             Set(ref trashIndex, value);
-            if (value is not null)
+            if (value is not null && value.OriginalPath is not null)
                 FullName = FileHelper.GetFullName(value.OriginalPath);
         }
     }
@@ -341,8 +341,8 @@ public class FileClass : FilePath, IFileStat
         fileOp.VFDO = vfdo;
 
         string[] items = [FullName + (IsDirectory ? '/' : "")];
-        if (includeContent && Children is not null)
-        {
+            if (includeContent && Children is not null)
+            {
             items = [..items, ..Children];
         }
 

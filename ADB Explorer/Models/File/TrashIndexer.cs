@@ -47,6 +47,9 @@ public class TrashIndexer : ViewModelBase
         }
     }
 
+    public TrashIndexer()
+    { }
+
     public TrashIndexer(string recycleIndex) : this(recycleIndex.Split('|'))
     { }
 

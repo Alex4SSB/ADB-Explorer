@@ -173,21 +173,31 @@ public class CopyPasteService : ViewModelBase
             }
             else
             {
-                foreach (var desc in Descriptors)
+                for (int i = 0; i < Descriptors.Length; i++)
                 {
+                    TrashIndexer indexer = null;
+                    if (DragFiles.Length == Descriptors.Length && CurrentParent is AdbExplorerConst.RECYCLE_PATH)
+                        indexer = new() { RecycleName = DragFiles[i] };
+
+                    var desc = Descriptors[i];
                     desc.SourcePath = FileHelper.ConcatPaths(CurrentParent, desc.Name);
                     yield return new(desc)
                     {
                         PathType = IsWindows
                             ? FilePathType.Windows
-                            : FilePathType.Android
+                            : FilePathType.Android,
+                        TrashIndex = indexer,
                     };
                 }
             }
         }
     }
 
-    public string UserTemp => $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\";
+    public int MasterPid { get; private set; }
+
+    public bool IsDragFromMaster => MasterPid != Environment.ProcessId;
+
+    public static string UserTemp => $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\";
 
     public void UpdateUI()
     {
@@ -331,15 +341,13 @@ public class CopyPasteService : ViewModelBase
         {
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
 
-            if (!IsDrag)
+            if (!IsDrag && !Data.DevicesObject.UIList.Any(d => d.ID == dragList.deviceId && d.Status is AbstractDevice.DeviceStatus.Ok))
             {
-                if (!Data.DevicesObject.UIList.Any(d => d.ID == dragList.deviceId && d.Status is AbstractDevice.DeviceStatus.Ok))
-                {
-                    Clear();
-                    return;
-                }
+                Clear();
+                return;
             }
 
+            MasterPid = dragList.pid;
             DragParent = dragList.parentFolder;
             DragFiles = dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f)).ToArray();
 
@@ -530,15 +538,20 @@ public class CopyPasteService : ViewModelBase
                 if (DragFiles.Length == 1 && DragFiles[0] == targetFolder && IsDrag)
                     return;
 
+                var masterPid = IsDragFromMaster ? MasterPid : 0;
+
                 VerifyAndPaste(isLink ? DragDropEffects.Link : CurrentEffect,
                                targetFolder,
                                CurrentFiles,
                                App.Current.Dispatcher,
                                Data.CurrentADBDevice,
-                               Data.CurrentPath);
+                               Data.CurrentPath,
+                               masterPid);
 
                 if (CurrentEffect is DragDropEffects.Move)
+                {
                     Clear();
+                }
             }
         }
 
@@ -576,7 +589,8 @@ public class CopyPasteService : ViewModelBase
                                IEnumerable<FileClass> pasteItems,
                                Dispatcher dispatcher,
                                ADBService.AdbDevice device,
-                               string currentPath)
+                               string currentPath,
+                               int masterPid = 0)
     {
         pasteItems = await RemoveAncestor(pasteItems, targetPath, cutType);
         if (!pasteItems.Any())
@@ -592,7 +606,8 @@ public class CopyPasteService : ViewModelBase
                   currentPath: currentPath,
                   existingItems: [],
                   dispatcher: dispatcher,
-                  cutType: cutType);
+                  cutType: cutType,
+                  masterPid: masterPid);
     }
 
     /// <summary>
@@ -774,25 +789,6 @@ public class CopyPasteService : ViewModelBase
         return result.Item1 is ContentDialogResult.Primary
             ? pasteItems.Except([ancestor])
             : [];
-    }
-
-    public enum IpcMessage
-    {
-        DragCanceled,
-
-    }
-
-    public void AcceptIpcMessage(string message)
-    {
-        if (!Enum.TryParse(typeof(IpcMessage), message.Split('|')[0], true, out var res))
-            return;
-
-        switch ((IpcMessage)res)
-        {
-            case IpcMessage.DragCanceled:
-                ClearDrag();
-                break;
-        }
     }
 
     public static void ClearTempFolder()

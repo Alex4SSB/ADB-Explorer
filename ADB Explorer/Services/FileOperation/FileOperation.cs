@@ -110,6 +110,8 @@ public abstract class FileOperation : ViewModelBase
 
     public DateTime TimeStamp { get; }
 
+    public int MasterPid { get; set; }
+
     #endregion
 
     #region Read-only Properties

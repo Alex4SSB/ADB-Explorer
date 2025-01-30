@@ -69,17 +69,19 @@ public static partial class NativeMethods
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct ADBDRAGLIST : IByteStruct
     {
+        public int pid;
         public string deviceId;
         public string parentFolder;
         public string[] items;
 
         public ADBDRAGLIST(ADBService.AdbDevice device, IEnumerable<FileClass> files)
         {
+            pid = Environment.ProcessId;
             deviceId = device.ID;
             parentFolder = files.First().ParentPath;
             
             items = (parentFolder == AdbExplorerConst.RECYCLE_PATH
-                ? files.Select(f => FileHelper.GetFullName(f.FullPath))
+                ? files.Select(f => f.TrashIndex.RecycleName)
                 : files.Select(f => f.FullName)).ToArray();
         }
 
@@ -89,9 +91,8 @@ public static partial class NativeMethods
             {
                 var joinedItems = string.Join("\0", items);
                 var combined = string.Join("\0", deviceId, parentFolder, joinedItems, '\0');
-                var bytes = Encoding.Unicode.GetBytes(combined);
 
-                return bytes;
+                return [.. BitConverter.GetBytes(pid), .. Encoding.Unicode.GetBytes(combined)];
             }
         }
 
@@ -100,8 +101,10 @@ public static partial class NativeMethods
             ADBDRAGLIST dragList = new();
             var bytes = stream.ToArray();
 
-            int i = 0;
+            int i = 4;
             List<string> strings = [];
+
+            dragList.pid = BitConverter.ToInt32(bytes[..4]);
 
             while (i < bytes.Length)
             {

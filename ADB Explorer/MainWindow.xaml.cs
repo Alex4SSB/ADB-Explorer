@@ -122,7 +122,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ((DataGrid)FindResource("CurrentOperationDataGrid")).ItemsSource = FileOpQ.Operations;
         UpdateFileOp();
 
-        NativeMethods.InterceptClipboard.Init(this, CopyPaste.GetClipboardPasteItems, CopyPaste.AcceptIpcMessage);
+        NativeMethods.InterceptClipboard.Init(this, CopyPaste.GetClipboardPasteItems, IpcService.AcceptIpcMessage);
 
 #if DEBUG
         DeviceHelper.TestDevices();
@@ -1149,7 +1149,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         
         if (FileActions.IsRecycleBin)
         {
-            TrashHelper.ParseIndexers().ContinueWith(_ => DirList.Navigate(realPath));
+            TrashHelper.ParseIndexersAsync().ContinueWith(_ => DirList.Navigate(realPath));
 
             FileActions.DeleteDescription.Value = S_EMPTY_TRASH;
             FileActions.RestoreDescription.Value = S_RESTORE_ALL;

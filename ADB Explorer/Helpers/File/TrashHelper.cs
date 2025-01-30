@@ -32,7 +32,7 @@ internal static class TrashHelper
         });
     }
 
-    public static Task ParseIndexers() => Task.Run(() =>
+    public static Task ParseIndexersAsync() => Task.Run(() =>
     {
         Data.RecycleIndex.Clear();
 
@@ -45,4 +45,18 @@ internal static class TrashHelper
 
         lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
     });
+
+    public static void ParseIndexers()
+    {
+        Data.RecycleIndex.Clear();
+
+        var indexers = ADBService.FindFilesInPath(Data.CurrentADBDevice.ID,
+                                                  AdbExplorerConst.RECYCLE_PATH,
+                                                  includeNames: ["*" + AdbExplorerConst.RECYCLE_INDEX_SUFFIX]);
+
+        var lines = ShellFileOperation.ReadAllText(Data.CurrentADBDevice, indexers).Split(ADBService.LINE_SEPARATORS,
+                                                                                          StringSplitOptions.RemoveEmptyEntries);
+
+        lines.ToList().ForEach(line => Data.RecycleIndex.Add(new(line)));
+    }
 }

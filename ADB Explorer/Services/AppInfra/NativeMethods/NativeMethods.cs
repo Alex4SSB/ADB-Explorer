@@ -411,7 +411,7 @@ public static partial class NativeMethods
     {
         public HANDLE dwData;
         public int cbData;
-        [MarshalAs(UnmanagedType.LPStr)]
+        [MarshalAs(UnmanagedType.LPTStr)]
         public string lpData;
     }
 

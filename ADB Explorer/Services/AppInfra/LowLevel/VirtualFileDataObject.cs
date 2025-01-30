@@ -7,6 +7,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Runtime.InteropServices.ComTypes;
 using AdbDataObject;
+using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.Services;
 
@@ -712,23 +713,6 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
     }
 
-    public static void NotifyDropCancel()
-    {
-        if (!Data.RuntimeSettings.DragWithinSlave)
-            return;
-
-        var message = Enum.GetName(CopyPasteService.IpcMessage.DragCanceled) + '|';
-
-        NativeMethods.COPYDATASTRUCT cds = new()
-        {
-            dwData = IntPtr.Zero,
-            cbData = Encoding.ASCII.GetByteCount(message) + 1,
-            lpData = message
-        };
-
-        NativeMethods.SendMessage(NativeMethods.InterceptMouse.WindowUnderMouse, NativeMethods.WindowsMessages.WM_COPYDATA, ref cds);
-    }
-
     /// <summary>
     /// Contains the methods for generating visual feedback to the end user and for cancelling or completing the drag-and-drop operation.
     /// </summary>
@@ -756,7 +740,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             {
                 Data.RuntimeSettings.DragBitmap = null;
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
-                NotifyDropCancel();
+                IpcService.NotifyDropCancel(res);
             }
 
             return (int)res;
