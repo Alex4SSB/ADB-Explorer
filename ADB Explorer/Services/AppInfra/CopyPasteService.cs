@@ -197,6 +197,8 @@ public class CopyPasteService : ViewModelBase
 
     public bool IsDragFromMaster => MasterPid != Environment.ProcessId;
 
+    public LogicalDeviceViewModel SourceDevice { get; private set; }
+
     public static string UserTemp => $"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\Temp\\";
 
     public void UpdateUI()
@@ -301,10 +303,6 @@ public class CopyPasteService : ViewModelBase
 
             if (CurrentSource.HasFlag(DataSource.Android))
             {
-                // TODO: Add support for dragging from another device
-                if (!CurrentSource.HasFlag(DataSource.Self))
-                    return DragDropEffects.None;
-
                 if (IsDrag)
                     return FileActionLogic.EnableDropPaste(file);
             }
@@ -340,19 +338,23 @@ public class CopyPasteService : ViewModelBase
         else if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
         {
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
+            var deviceId = dragList.deviceId;
 
-            if (!IsDrag && !Data.DevicesObject.UIList.Any(d => d.ID == dragList.deviceId && d.Status is AbstractDevice.DeviceStatus.Ok))
+            var device = Data.DevicesObject.UIList.OfType<LogicalDeviceViewModel>().FirstOrDefault(d => d.ID == deviceId && d.Status is AbstractDevice.DeviceStatus.Ok);
+            if (!IsDrag && device is null)
             {
                 Clear();
                 return;
             }
+            else
+                SourceDevice = device;
 
             MasterPid = dragList.pid;
             DragParent = dragList.parentFolder;
             DragFiles = dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f)).ToArray();
 
             CurrentSource |= DataSource.Android;
-            if (dragList.deviceId == Data.CurrentADBDevice.ID)
+            if (deviceId == Data.CurrentADBDevice.ID)
                 CurrentSource |= DataSource.Self;
             else
                 CurrentSource |= DataSource.Virtual;
@@ -406,7 +408,10 @@ public class CopyPasteService : ViewModelBase
     {
         var fds = FileDescriptor.GetDescriptors(dataObject);
         if (fds is not null)
+        {
             Descriptors = fds;
+            UpdateUI();
+        }
     }
 
     public void AcceptDataObject(IDataObject dataObject, FrameworkElement sender, bool isLink = false)
@@ -447,16 +452,49 @@ public class CopyPasteService : ViewModelBase
                 // Transfer from another Android device
                 if (!IsWindows)
                 {
-                    // TODO: add support for Android to Android transfers
+                    ADBService.AdbDevice sourceDevice = new(SourceDevice);
+                    foreach (var item in CurrentFiles)
+                    {
+                        SyncFile target = new(item) { PathType = FilePathType.Windows };
+                        target.UpdatePath(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item.FullName, '\\'));
+
+                        // Pull the file from the source device to the temp folder
+                        var pullOp = FileSyncOperation.PullFile(new(item), target, sourceDevice, App.Current.Dispatcher);
+                        pullOp.PropertyChanged += (s, e) =>
+                        {
+                            if (e.PropertyName != nameof(FileSyncOperation.Status)
+                                || pullOp.Status is not FileOperation.OperationStatus.Completed)
+                                return;
+
+                            // Once done, create a shell item and push it to the target device (current)
+                            FileClass file = new(target) { ShellItem = ShellItem.Open(target.FullPath) };
+                            var verifyOps = VerifyAndPush(targetFolder, [file], CurrentEffect);
+                            if (verifyOps?.FirstOrDefault() is not FileSyncOperation pushOp || CurrentEffect is not DragDropEffects.Move)
+                                return;
+
+                            pushOp.PropertyChanged += (s, e) =>
+                            {
+                                if (e.PropertyName != nameof(FileSyncOperation.Status)
+                                    || pushOp.Status is not FileOperation.OperationStatus.Completed)
+                                    return;
+
+                                // Once the second part is done, delete the file from the source device if needed, and notify if its another window
+                                ShellFileOperation.SilentDelete(sourceDevice, item.FullName);
+                                if (IsDragFromMaster)
+                                    IpcService.NotifyFileMoved(MasterPid, sourceDevice, item);
+                            };
+                        };
+
+                        Data.FileOpQ.AddOperation(pullOp);
+                    }
                 }
-                // From archives or UNC paths
+                // From archives, UNC paths, & DLNA servers
                 else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
                 {
                     Vanara.Windows.Shell.ShellFolder tempDrag = new(Data.RuntimeSettings.TempDragPath);
                     var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
 
                     ShellFileOperations shFileOp = new(NativeMethods.InterceptClipboard.MainWindowHandle);
-
                     shItems.ForEach(shia => shFileOp.QueueCopyOperation(shia, tempDrag));
 
                     ShellItem lastTopItem = null;
@@ -498,10 +536,12 @@ public class CopyPasteService : ViewModelBase
                             FileContentsStream stream;
                             try
                             {
+                                // Try to acquire the stream of each descriptor
                                 stream = VirtualFileDataObject.GetFileContents(dataObject, i);
                             }
                             catch (COMException e)
                             {
+                                // If failed, add a failed operation to the queue
                                 App.Current.Dispatcher.Invoke(() =>
                                 {
                                     Data.FileOpQ.AddOperation(
@@ -516,6 +556,7 @@ public class CopyPasteService : ViewModelBase
                                 continue;
                             }
 
+                            // Save the stream to the temp folder, create the parent folder if it doesn't exist
                             var fullPath = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
                             Directory.CreateDirectory(FileHelper.GetParentPath(fullPath));
 
@@ -529,8 +570,6 @@ public class CopyPasteService : ViewModelBase
             else if (IsWindows) // FileDrop format
             {
                 VerifyAndPush(targetFolder, CurrentFiles, CurrentEffect);
-                if (CurrentEffect is DragDropEffects.Move)
-                    Clear();
             }
             else if (IsSelf)
             {
@@ -547,12 +586,15 @@ public class CopyPasteService : ViewModelBase
                                Data.CurrentADBDevice,
                                Data.CurrentPath,
                                masterPid);
-
-                if (CurrentEffect is DragDropEffects.Move)
-                {
-                    Clear();
-                }
             }
+            else
+            {
+                // Not supported
+                return;
+            }
+
+            if (CurrentEffect is DragDropEffects.Move)
+                Clear();
         }
 
         ReadObject();
@@ -575,13 +617,13 @@ public class CopyPasteService : ViewModelBase
         FileActionLogic.PushShellObjects(pasteItems, targetPath);
     }
 
-    public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static IEnumerable<FileSyncOperation> VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
-        pasteItems = await MergeFiles(pasteItems, targetPath);
+        pasteItems = MergeFiles(pasteItems, targetPath).Result;
         if (!pasteItems.Any())
-            return;
+            return null;
 
-        FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
+        return FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
     }
 
     public async void VerifyAndPaste(DragDropEffects cutType,

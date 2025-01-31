@@ -808,7 +808,7 @@ internal static class FileActionLogic
                                          && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
         var allSelectedAreCut = Data.CopyPaste.IsSelf
-                                && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.AnyAll(f => f.FullPath == item))
+                                && Data.CopyPaste.Files.AnyAll(item => Data.SelectedFiles.Any(f => f.FullPath == item))
                                 && Data.CopyPaste.Files.Length == Data.SelectedFiles.Count();
         
         Data.FileActions.CutEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
@@ -896,7 +896,7 @@ internal static class FileActionLogic
         CopyPasteService.VerifyAndPush(targetPath, shItems);
     }
 
-    public static void PushShellObjects(IEnumerable<ShellItem> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static IEnumerable<FileSyncOperation> PushShellObjects(IEnumerable<ShellItem> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
         foreach (var item in items)
         {
@@ -907,6 +907,8 @@ internal static class FileActionLogic
             pushOperation.VFDO = new() { CurrentEffect = dropEffects };
             pushOperation.PropertyChanged += PushOperation_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOperation);
+
+            yield return pushOperation;
         }
     }
 
