@@ -157,6 +157,20 @@ public abstract class FileOperation : ViewModelBase
             if (OperationName is OperationType.Rename)
                 return FileHelper.ConcatPaths(FilePath.ParentPath, FilePath.DisplayName);
             
+            // Display the original path instead of the temp folder for virtual items
+            if (this is FileSyncOperation sync && sync.OriginalShellItem is not null)
+            {
+                var originalPath = sync.OriginalShellItem.GetDisplayName(Vanara.Windows.Shell.ShellItemDisplayString.DesktopAbsoluteEditing);
+                if (originalPath is not null)
+                {
+                    originalPath = FileHelper.GetParentPath(originalPath);
+                    if (originalPath.StartsWith("This PC"))
+                        originalPath = originalPath[(originalPath.IndexOf('\\') + 1)..];
+
+                    return originalPath;
+                }
+            }
+
             return FilePath.ParentPath;
         }
     }
@@ -260,7 +274,12 @@ public abstract class FileOperation : ViewModelBase
         if (location is FilePath file)
         {
             if (file.PathType is AbstractFile.FilePathType.Windows)
-                Process.Start("explorer.exe", file.ParentPath);
+            {
+                if (this is FileSyncOperation sync && sync.OriginalShellItem is not null)
+                    sync.OriginalShellItem.ViewInExplorer();
+                else
+                    Process.Start("explorer.exe", file.ParentPath);
+            }
             else
             {
                 if (!Device.Device.IsOpen)

@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
 
@@ -20,6 +21,8 @@ public class FileSyncOperation : FileOperation
     public DiskUsage AdbProcess { get; private set; } = new(new());
 
     public VirtualFileDataObject VFDO { get; set; }
+
+    public ShellItem OriginalShellItem { get; set; }
 
     public FileSyncOperation(OperationType operationName, SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FileOpProgressViewModel status)
         : base(sourcePath, adbDevice, App.Current.Dispatcher)

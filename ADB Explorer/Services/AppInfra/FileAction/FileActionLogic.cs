@@ -303,8 +303,16 @@ internal static class FileActionLogic
 
     public static bool EnableUiPaste()
     {
-        Data.FileActions.IsPastingInDescendant = Data.CopyPaste.Files.Length == 1
-            && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+        string[] files = Data.CopyPaste.Files;
+        if (Data.CopyPaste.IsWindows
+            && Data.CopyPaste.IsVirtual
+            && Data.CopyPaste.Descriptors.Length == files.Length)
+        {
+            files = Data.CopyPaste.Descriptors.Select(d => d.Name).ToArray();
+        }
+
+        Data.FileActions.IsPastingInDescendant = files.Length == 1
+            && FileHelper.RelationFrom(files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
 
         if (Data.FileActions.IsPastingInDescendant)
             return false;
@@ -322,7 +330,7 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        PastingOnFuse(targetPath, Data.CopyPaste.Files);
+        PastingOnFuse(targetPath, files);
 
         if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
             return false;
@@ -339,7 +347,7 @@ internal static class FileActionLogic
                 if (!item.IsDirectory)
                     return false;
 
-                Data.FileActions.IsPastingInDescendant = (Data.CopyPaste.Files.Length == 1 && Data.CopyPaste.Files[0] == item.FullPath)
+                Data.FileActions.IsPastingInDescendant = (files.Length == 1 && files[0] == item.FullPath)
                     || (Data.CopyPaste.ParentFolder == item.FullPath);
 
                 break;
@@ -352,8 +360,16 @@ internal static class FileActionLogic
 
     public static bool EnableKeyboardPaste()
     {
-        Data.FileActions.IsPastingInDescendant = Data.CopyPaste.Files.Length == 1
-            && FileHelper.RelationFrom(Data.CopyPaste.Files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
+        string[] files = Data.CopyPaste.Files;
+        if (Data.CopyPaste.IsWindows
+            && Data.CopyPaste.IsVirtual
+            && Data.CopyPaste.Descriptors.Length == files.Length)
+        {
+            files = Data.CopyPaste.Descriptors.Select(d => d.Name).ToArray();
+        }
+
+        Data.FileActions.IsPastingInDescendant = files.Length == 1
+            && FileHelper.RelationFrom(files[0], Data.CurrentPath) is RelationType.Descendant or RelationType.Self;
 
         if (Data.FileActions.IsPastingInDescendant)
             return false;
@@ -371,7 +387,7 @@ internal static class FileActionLogic
             targetPath = Data.CurrentPath;
         }
 
-        PastingOnFuse(targetPath, Data.CopyPaste.Files);
+        PastingOnFuse(targetPath, files);
 
         if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
             return false;
@@ -385,14 +401,14 @@ internal static class FileActionLogic
                 break;
             case 1:
                 // When duplicating a file multiple times using the keyboard, the selection is the previous copy
-                if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList.FileList.Any(f => f.FullPath == Data.CopyPaste.Files[0]))
+                if (Data.CopyPaste.PasteState is DragDropEffects.Copy && Data.DirList.FileList.Any(f => f.FullPath == files[0]))
                     return true;
 
                 var item = Data.SelectedFiles.First();
                 if (!item.IsDirectory)
                     return false;
 
-                Data.FileActions.IsPastingInDescendant = (Data.CopyPaste.Files.Length == 1 && Data.CopyPaste.Files[0] == item.FullPath)
+                Data.FileActions.IsPastingInDescendant = (files.Length == 1 && files[0] == item.FullPath)
                     || (Data.CopyPaste.ParentFolder == item.FullPath);
 
                 break;
@@ -896,21 +912,22 @@ internal static class FileActionLogic
         CopyPasteService.VerifyAndPush(targetPath, shItems);
     }
 
-    public static IEnumerable<FileSyncOperation> PushShellObjects(IEnumerable<ShellItem> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static FileSyncOperation PushShellObject(ShellItem item, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
     {
-        foreach (var item in items)
-        {
-            var source = new SyncFile(item) { ShellItem = item };
-            var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
-            
-            var pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
-            pushOperation.VFDO = new() { CurrentEffect = dropEffects };
-            pushOperation.PropertyChanged += PushOperation_PropertyChanged;
-            Data.FileOpQ.AddOperation(pushOperation);
+        var source = new SyncFile(item) { ShellItem = item };
+        var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
 
-            yield return pushOperation;
-        }
+        var pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+        pushOperation.VFDO = new() { CurrentEffect = dropEffects };
+        pushOperation.OriginalShellItem = originalShellItem;
+        pushOperation.PropertyChanged += PushOperation_PropertyChanged;
+        Data.FileOpQ.AddOperation(pushOperation);
+
+        return pushOperation;
     }
+
+    public static void PushShellObjects(IEnumerable<ShellItem> items, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy)
+        => items.ForEach(item => PushShellObject(item, targetPath, dropEffects));
 
     private static void PushOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {

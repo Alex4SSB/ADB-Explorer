@@ -7,6 +7,7 @@ using AdbDataObject;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
+using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Services;
 
@@ -468,8 +469,8 @@ public class CopyPasteService : ViewModelBase
 
                             // Once done, create a shell item and push it to the target device (current)
                             FileClass file = new(target) { ShellItem = ShellItem.Open(target.FullPath) };
-                            var verifyOps = VerifyAndPush(targetFolder, [file], CurrentEffect);
-                            if (verifyOps?.FirstOrDefault() is not FileSyncOperation pushOp || CurrentEffect is not DragDropEffects.Move)
+                            var pushOp = VerifyAndPush(targetFolder, file, CurrentEffect);
+                            if (pushOp is not null || CurrentEffect is not DragDropEffects.Move)
                                 return;
 
                             pushOp.PropertyChanged += (s, e) =>
@@ -498,6 +499,7 @@ public class CopyPasteService : ViewModelBase
                     shItems.ForEach(shia => shFileOp.QueueCopyOperation(shia, tempDrag));
 
                     ShellItem lastTopItem = null;
+                    ShellItem lastTopSource = null;
                     shFileOp.PostCopyItem += (s, e) =>
                     {
                         // Skip non top level items
@@ -507,17 +509,18 @@ public class CopyPasteService : ViewModelBase
                         if (lastTopItem is not null && lastTopItem.ParsingName != e.DestItem.ParsingName)
                         {
                             // A new top level item means the previous one is done
-                            VerifyAndPush(targetFolder, [new FileClass(lastTopItem)], CurrentEffect);
+                            VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
                         }
 
                         lastTopItem = e.DestItem;
+                        lastTopSource = e.SourceItem;
                     };
 
                     shFileOp.FinishOperations += (s, e) =>
                     {
                         // The last item is not caught by the PostCopyItem event
                         if (lastTopItem is not null)
-                            VerifyAndPush(targetFolder, [new FileClass(lastTopItem)], CurrentEffect);
+                            VerifyAndPush(targetFolder, new FileClass(lastTopItem), CurrentEffect, lastTopSource);
                     };
 
                     shFileOp.PerformOperations();
@@ -617,13 +620,22 @@ public class CopyPasteService : ViewModelBase
         FileActionLogic.PushShellObjects(pasteItems, targetPath);
     }
 
-    public static IEnumerable<FileSyncOperation> VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
+    public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
-        pasteItems = MergeFiles(pasteItems, targetPath).Result;
+        pasteItems = await MergeFiles(pasteItems, targetPath);
         if (!pasteItems.Any())
+            return;
+
+        FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
+    }
+
+    public static FileSyncOperation VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
+    {
+        var items = MergeFiles([pasteItem], targetPath).Result;
+        if (!items.Any())
             return null;
 
-        return FileActionLogic.PushShellObjects(pasteItems.Select(f => f.ShellItem), targetPath, dropEffects);
+        return FileActionLogic.PushShellObject(pasteItem.ShellItem, targetPath, dropEffects, originalShellItem);
     }
 
     public async void VerifyAndPaste(DragDropEffects cutType,
