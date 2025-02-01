@@ -150,45 +150,70 @@ public class CopyPasteService : ViewModelBase
     public string[] DragFiles
     {
         get => dragFiles;
-        set => Set(ref dragFiles, value);
+        set
+        {
+            // The Set method only compares instances
+            if (dragFiles.SequenceEqual(value))
+                return;
+
+            Set(ref dragFiles, value);
+            _currentFiles = null;
+        }
     }
 
     private FileDescriptor[] descriptors = [];
     public FileDescriptor[] Descriptors
     {
         get => descriptors;
-        set => Set(ref descriptors, value);
+        set
+        {
+            // The Set method only compares instances
+            if (descriptors.SequenceEqual(value))
+                return;
+
+            Set(ref descriptors, value);
+            _currentFiles = null;
+        }
     }
 
+    private IEnumerable<FileClass> _currentFiles = [];
     public IEnumerable<FileClass> CurrentFiles
     {
         get
         {
-            if (IsWindows && !IsVirtual)
-            {
-                foreach (var file in DragFiles)
-                {
-                    yield return new(ShellItem.Open(file));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < Descriptors.Length; i++)
-                {
-                    TrashIndexer indexer = null;
-                    if (DragFiles.Length == Descriptors.Length && CurrentParent is AdbExplorerConst.RECYCLE_PATH)
-                        indexer = new() { RecycleName = DragFiles[i] };
+            if (_currentFiles is null)
+                _currentFiles = GetCurrentFiles();
 
-                    var desc = Descriptors[i];
-                    desc.SourcePath = FileHelper.ConcatPaths(CurrentParent, desc.Name);
-                    yield return new(desc)
-                    {
-                        PathType = IsWindows
-                            ? FilePathType.Windows
-                            : FilePathType.Android,
-                        TrashIndex = indexer,
-                    };
-                }
+            return _currentFiles;
+        }
+    }
+
+    private IEnumerable<FileClass> GetCurrentFiles()
+    {
+        if (IsWindows && !IsVirtual)
+        {
+            foreach (var file in DragFiles)
+            {
+                yield return new(ShellItem.Open(file));
+            }
+        }
+        else
+        {
+            for (int i = 0; i < Descriptors.Length; i++)
+            {
+                TrashIndexer indexer = null;
+                if (DragFiles.Length == Descriptors.Length && CurrentParent is AdbExplorerConst.RECYCLE_PATH)
+                    indexer = new() { RecycleName = DragFiles[i] };
+
+                var desc = Descriptors[i];
+                desc.SourcePath = FileHelper.ConcatPaths(CurrentParent, desc.Name);
+                yield return new(desc)
+                {
+                    PathType = IsWindows
+                        ? FilePathType.Windows
+                        : FilePathType.Android,
+                    TrashIndex = indexer,
+                };
             }
         }
     }
@@ -281,7 +306,7 @@ public class CopyPasteService : ViewModelBase
         }
         else
             DragPasteSource &= ~DataSource.None;
-
+        
         PreviewDataObject(dataObject);
         if (DragFiles.Length < 1)
             return DragDropEffects.None;
@@ -504,7 +529,7 @@ public class CopyPasteService : ViewModelBase
                         // Skip non top level items
                         if (e.DestItem.Parent.ParsingName != Data.RuntimeSettings.TempDragPath)
                             return;
-                        
+
                         if (lastTopItem is not null && lastTopItem.ParsingName != e.DestItem.ParsingName)
                         {
                             // A new top level item means the previous one is done
