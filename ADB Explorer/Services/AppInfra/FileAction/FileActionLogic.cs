@@ -914,14 +914,18 @@ internal static class FileActionLogic
 
     public static FileSyncOperation PushShellObject(ShellItem item, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
     {
-        var source = new SyncFile(item) { ShellItem = item };
-        var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
+        FileSyncOperation pushOperation = null;
+        App.Current.Dispatcher.Invoke(() =>
+        {
+            var source = new SyncFile(item) { ShellItem = item };
+            var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
 
-        var pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
-        pushOperation.VFDO = new() { CurrentEffect = dropEffects };
-        pushOperation.OriginalShellItem = originalShellItem;
-        pushOperation.PropertyChanged += PushOperation_PropertyChanged;
-        Data.FileOpQ.AddOperation(pushOperation);
+            pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
+            pushOperation.VFDO = new() { CurrentEffect = dropEffects };
+            pushOperation.OriginalShellItem = originalShellItem;
+            pushOperation.PropertyChanged += PushOperation_PropertyChanged;
+            Data.FileOpQ.AddOperation(pushOperation);
+        });
 
         return pushOperation;
     }

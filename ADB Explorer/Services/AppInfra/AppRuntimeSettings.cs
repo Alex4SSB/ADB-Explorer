@@ -377,6 +377,20 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragWithinSlave, value);
     }
 
+    private float transferProgress = 0;
+    public float TransferProgress
+    {
+        get => transferProgress;
+        set => Set(ref transferProgress, value);
+    }
+
+    private string currentTransferFile = "";
+    public string CurrentTransferFile
+    {
+        get => currentTransferFile;
+        set => Set(ref currentTransferFile, value);
+    }
+
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch
     {
         Architecture.Arm64 or Architecture.Arm or Architecture.Armv6 => true,

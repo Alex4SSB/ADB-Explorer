@@ -6,7 +6,6 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Runtime.InteropServices.ComTypes;
-using AdbDataObject;
 using ADB_Explorer.Services.AppInfra;
 
 namespace ADB_Explorer.Services;

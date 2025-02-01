@@ -3,7 +3,6 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
-using AdbDataObject;
 using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
@@ -529,12 +528,30 @@ public class CopyPasteService : ViewModelBase
                 // Will be left in to support any virtual files that don't provide ShellID List Array.
                 else if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 {
+                    var abort = false;
+                    var dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), "Extracting Files", buttonText: "Abort");
+                    dialog.Closed += (s, e) =>
+                    {
+                        abort = true;
+                    };
+
                     Task.Run(() =>
                     {
+                        string[] files = new string[Descriptors.Length];
+
                         for (int i = 0; i < Descriptors.Length; i++)
                         {
+                            if (abort)
+                                break;
+
+                            files[i] = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
                             if (Descriptors[i].IsDirectory)
                                 continue;
+
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+                                Data.RuntimeSettings.CurrentTransferFile = Descriptors[i].Name;
+                            });
 
                             FileContentsStream stream;
                             try
@@ -560,13 +577,25 @@ public class CopyPasteService : ViewModelBase
                             }
 
                             // Save the stream to the temp folder, create the parent folder if it doesn't exist
-                            var fullPath = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
-                            Directory.CreateDirectory(FileHelper.GetParentPath(fullPath));
+                            Directory.CreateDirectory(FileHelper.GetParentPath(files[i]));
 
-                            stream.Save(fullPath);
+                            stream.Save(files[i]);
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+                                Data.RuntimeSettings.TransferProgress = 100 * (i / (float)Descriptors.Length);
+                            });
                         }
 
-                        VerifyAndPush(targetFolder, CurrentFiles.Where(f => DragFiles.Contains(f.FullName)), CurrentEffect);
+                        if (abort)
+                            return;
+
+                        App.Current.Dispatcher.Invoke(dialog.Hide);
+
+                        var shItems = files
+                            .Where(d => FileHelper.GetParentPath(d) == Data.RuntimeSettings.TempDragPath)
+                            .Select(d => new FileClass(ShellItem.Open(d)));
+                        
+                        VerifyAndPush(targetFolder, shItems, CurrentEffect);
                     });
                 }
             }

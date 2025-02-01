@@ -38,7 +38,7 @@ public static class DialogService
         if (copyToClipboard)
             Data.FileActions.MessageToCopy = content;
 
-        ShowDialog(content, title, icon, hidePanes, copyToClipboard);
+        ShowDialog(content, title, icon, hidePanes);
     }
 
     private static void HidePanes()
@@ -47,18 +47,19 @@ public static class DialogService
         Data.RuntimeSettings.IsDevicesPaneOpen = false;
     }
 
-    public static void ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true, bool copyToClipboard = false)
+    public static ContentDialog ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true, string buttonText = "Ok")
     {
         windowDialog.Content = content;
         windowDialog.Title = title;
         windowDialog.PrimaryButtonText = null;
-        windowDialog.CloseButtonText = "Ok";
+        windowDialog.CloseButtonText = buttonText;
         DialogHelper.SetDialogIcon(windowDialog, Icon(icon));
 
         if (hidePanes)
             HidePanes();
 
         windowDialog.ShowAsync();
+        return windowDialog;
     }
 
     private static TextBlock DialogContentTextBlock;
