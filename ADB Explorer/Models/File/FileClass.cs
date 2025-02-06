@@ -381,7 +381,11 @@ public class FileClass : FilePath, IFileStat
                 {
                     try
                     {
-                        stream.Write(File.ReadAllBytes(file));
+                        using (FileStream fs = new(file, FileMode.Open, FileAccess.Read))
+                        {
+                            // This uses a 85K buffer, which is a pain for large files, but it gets cleared automatically
+                            fs.CopyTo(stream);
+                        }
                         break;
                     }
                     catch (Exception)

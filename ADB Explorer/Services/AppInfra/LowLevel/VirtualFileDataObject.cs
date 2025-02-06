@@ -683,17 +683,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     {
         Action<DragDropEffects> dragFeedback = value =>
         {
-            if (PreferredDropEffect is not null
-                && PreferredDropEffect.Value.HasFlag(DragDropEffects.Move)
-                && PreferredDropEffect.Value.HasFlag(DragDropEffects.Copy))
+            if (value.HasFlag(DragDropEffects.Move)
+                && !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.ShiftKey))
             {
-                if (value == DragDropEffects.Move
-                    && !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.ShiftKey))
-                {
-                    // Override default since Windows gives Move as default
-                    CurrentEffect = DragDropEffects.Copy;
-                    return;
-                }
+                // Override default since Windows gives Move as default
+                value = DragDropEffects.Copy;
             }
 
             CurrentEffect = value;
