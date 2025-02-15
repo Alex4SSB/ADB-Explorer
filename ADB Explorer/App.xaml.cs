@@ -49,6 +49,11 @@ public partial class App : Application
                 using StreamReader reader = new(stream);
                 ReadSettingsFile(reader);
             }
+
+            if (!File.Exists(ADB_Explorer.Properties.Resources.DragDropLogPath))
+            {
+                File.WriteAllText(ADB_Explorer.Properties.Resources.DragDropLogPath, "");
+            }
         }
         catch
         {

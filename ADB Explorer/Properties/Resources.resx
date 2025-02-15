@@ -125,7 +125,7 @@
     <value>ADB Explorer</value>
   </data>
   <data name="AppVersion" xml:space="preserve">
-    <value>0.9.25021</value>
+    <value>0.9.25022</value>
   </data>
   <data name="ProgressRedirectionHash_ARM" xml:space="preserve">
     <value>CB3D9C2E879572CEEA9601531FD532C6</value>
@@ -134,7 +134,7 @@
     <value>A80EA21FAB8CD745642BCAEEB6A91EB2</value>
   </data>
   <data name="DragDropLogPath" xml:space="preserve">
-    <value />
+    <value>E:\Log\log.txt</value>
   </data>
   <data name="AdbProgressRedirection_ARM" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AdbProgressRedirection_ARM;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>

@@ -100,7 +100,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.9.25021.
+        ///   Looks up a localized string similar to 0.9.25022.
         /// </summary>
         public static string AppVersion {
             get {
@@ -109,7 +109,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to E:\Log\log.txt.
         /// </summary>
         public static string DragDropLogPath {
             get {

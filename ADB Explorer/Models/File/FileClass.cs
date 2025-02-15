@@ -383,8 +383,13 @@ public class FileClass : FilePath, IFileStat
                     {
                         using (FileStream fs = new(file, FileMode.Open, FileAccess.Read))
                         {
-                            // This uses a 85K buffer, which is a pain for large files, but it gets cleared automatically
-                            fs.CopyTo(stream);
+                            // This uses a ~85K buffer, which is a pain for large files, but it gets cleared automatically
+                            byte[] buffer = new byte[81920];
+                            int read = 0;
+                            while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                stream.Write(buffer, 0, read);
+                            }
                         }
                         break;
                     }

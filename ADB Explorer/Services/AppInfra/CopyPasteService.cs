@@ -232,7 +232,7 @@ public class CopyPasteService : ViewModelBase
 
         List<FileClass> cutItems = [];
         if (PasteSource is not DataSource.None && PasteSource.HasFlag(DataSource.Self))
-            cutItems = Data.DirList.FileList.Where(f => Files.Contains(f.FullPath)).ToList();
+            cutItems = [.. Data.DirList.FileList.Where(f => Files.Contains(f.FullPath))];
 
         cutItems.ForEach(file => file.CutState = PasteState);
         Data.DirList?.FileList.Except(cutItems).ForEach(file => file.CutState = DragDropEffects.None);
@@ -350,17 +350,8 @@ public class CopyPasteService : ViewModelBase
         DragParent = "";
         string[] oldFiles = [.. DragFiles];
 
-        // File Drop - the best format since it gives the actual paths
-        if (dataObject.GetDataPresent(AdbDataFormats.FileDrop) && dataObject.GetData(AdbDataFormats.FileDrop) is string[] dropFiles)
-        {
-            // Drag from 7-Zip File Manager is not supported
-            if (dropFiles.Length == 1 && dropFiles[0].StartsWith(UserTemp + "7z"))
-                DragFiles = [];
-            else
-                DragFiles = dropFiles;
-        }
         // ADB Drop - for all Android to Android transfers (including self)
-        else if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
+        if (dataObject.GetDataPresent(AdbDataFormats.AdbDrop) && dataObject.GetData(AdbDataFormats.AdbDrop) is MemoryStream adbStream)
         {
             var dragList = NativeMethods.ADBDRAGLIST.FromStream(adbStream);
             var deviceId = dragList.deviceId;
@@ -376,7 +367,7 @@ public class CopyPasteService : ViewModelBase
 
             MasterPid = dragList.pid;
             DragParent = dragList.parentFolder;
-            DragFiles = dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f)).ToArray();
+            DragFiles = [.. dragList.items.Select(f => FileHelper.ConcatPaths(DragParent, f))];
 
             CurrentSource |= DataSource.Android;
             if (deviceId == Data.CurrentADBDevice.ID)
@@ -399,11 +390,12 @@ public class CopyPasteService : ViewModelBase
             var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
             if (shItems is not null)
             {
-                Descriptors = shItems.Select(sh => new FileDescriptor(sh)).ToArray();
-                DragFiles = shItems.Select(sh => sh.ParsingName).ToArray();
+                Descriptors = [.. shItems.Select(sh => new FileDescriptor(sh))];
+                DragFiles = [.. shItems.Select(sh => sh.ParsingName)];
 
-                CurrentSource |= DataSource.Virtual;
                 CurrentSource &= ~DataSource.Android;
+                if (!shItems[0].IsFileSystem)
+                    CurrentSource |= DataSource.Virtual;
             }
         }
         // VFDO (FileGroupDescriptor + FileContents) - the only viable format for virtual files not mapped to a drive.
@@ -412,13 +404,13 @@ public class CopyPasteService : ViewModelBase
         {
             GetDescriptors(dataObject);
 
-            DragFiles = Descriptors.Where(d => !d.Name.Contains('\\'))
-                .Select(d => d.Name).ToArray();
+            DragFiles = [.. Descriptors.Where(d => !d.Name.Contains('\\')).Select(d => d.Name)];
 
             CurrentSource |= DataSource.Virtual;
             if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 CurrentSource &= ~DataSource.Android;
         }
+        // If the data object only has FileDrop, then it's probably dropping by target detect, which we can't support (7-Zip, WinRAR, etc.)
         else
         {
             DragFiles = [];
