@@ -21,7 +21,6 @@ internal class DriveHelper
     {
         if (string.IsNullOrEmpty(path)) return null;
 
-        var currentDrive = AdbExplorerConst.DRIVE_TYPES.FirstOrDefault(kv => path.StartsWith(kv.Key)).Value;
-        return Data.DevicesObject.Current.Drives.FirstOrDefault(d => d.Type == currentDrive);
+        return Data.DevicesObject.Current?.Drives.FirstOrDefault(d => path.StartsWith(d.Path));
     }
 }
