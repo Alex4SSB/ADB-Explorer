@@ -2,6 +2,7 @@
 using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
@@ -11,6 +12,7 @@ using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Resources.Strings;
 using static ADB_Explorer.Services.FileAction;
+using static Vanara.PInvoke.Authz;
 
 namespace ADB_Explorer;
 
@@ -2249,5 +2251,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (e.Key is Key.LeftAlt or Key.RightAlt or Key.System && CopyPaste.IsDrag)
             e.Handled = true;
+    }
+
+    private void SponsorButton_Click(object sender, RoutedEventArgs e)
+    {
+        Process.Start(RuntimeSettings.DefaultBrowserPath, $"\"{Links.SPONSOR}\"");
     }
 }

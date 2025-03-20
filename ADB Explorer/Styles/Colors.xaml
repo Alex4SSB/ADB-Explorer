@@ -129,6 +129,9 @@
     <Color x:Key="DarkFileOpHyperLinkBrush">#FF66B3FF</Color>
     <Color x:Key="LightFileOpHyperLinkBrush">#FF246DB3</Color>
 
+    <Color x:Key="DarkSponsorIconBrush">#FFDB61A2</Color>
+    <Color x:Key="LightSponsorIconBrush">#FFBF3989</Color>
+
     <ResourceDictionary x:Key="DynamicBrushes">
         <SolidColorBrush x:Key="ControlBackground" Color="{DynamicResource LightControlBackground}" />
         <SolidColorBrush x:Key="MouseOverBackground" Color="{DynamicResource LightMouseOverBackground}" />
@@ -185,5 +188,7 @@
         <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="{DynamicResource LightHistoryDeviceBottomBorderBrush}" />
 
         <SolidColorBrush x:Key="FileOpHyperLinkBrush" Color="{DynamicResource LightHyperLinkBrush}" />
+
+        <SolidColorBrush x:Key="SponsorIconBrush" Color="{DynamicResource LightSponsorBrush}" />
     </ResourceDictionary>
 </ResourceDictionary>

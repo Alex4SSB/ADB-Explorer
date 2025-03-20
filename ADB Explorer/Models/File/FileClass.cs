@@ -359,7 +359,7 @@ public class FileClass : FilePath, IFileStat
             ChangeTimeUtc = date,
             StreamContents = stream =>
             {
-                if (DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2)
+                if ((Data.CopyPaste.IsClipboard && DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2))
                     || !includeContent)
                     return;
 
