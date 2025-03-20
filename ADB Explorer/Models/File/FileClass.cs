@@ -359,7 +359,9 @@ public class FileClass : FilePath, IFileStat
             ChangeTimeUtc = date,
             StreamContents = stream =>
             {
-                if ((Data.CopyPaste.IsClipboard && DateTime.Now - fileOp.TimeStamp < TimeSpan.FromSeconds(2))
+                var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
+
+                if ((Data.CopyPaste.IsClipboard && isActive)
                     || !includeContent)
                     return;
 
