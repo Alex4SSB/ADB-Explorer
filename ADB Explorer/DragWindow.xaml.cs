@@ -1,17 +1,20 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using System.Windows.Automation;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer;
 
 /// <summary>
 /// Interaction logic for DragWindow.xaml
 /// </summary>
-public partial class DragWindow
+public partial class DragWindow : INotifyPropertyChanged
 {
-    private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    public bool MouseWithinApp;
+    private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
     private HANDLE windowHandle;
 
@@ -29,29 +32,162 @@ public partial class DragWindow
 
     private void DragTimer_Tick(object sender, EventArgs e)
     {
+        if (Data.RuntimeSettings.DragBitmap is not null)
+            GetPathUnderMouse();
+    }
+
+    private DateTime lastUpdate;
+    private bool waitingForUpdate = false;
+
+    private void GetPathUnderMouse()
+    {
+        if (waitingForUpdate)
+            return;
+
+        if (DateTime.Now - lastUpdate < TimeSpan.FromMilliseconds(50))
+        {
+            waitingForUpdate = true;
+            Task.Delay(50);
+            waitingForUpdate = false;
+        }
+        lastUpdate = DateTime.Now;
+
         App.Current.Dispatcher.Invoke(() =>
         {
-            if (Data.CopyPaste.DragFiles.Length > 0 && Data.CopyPaste.CurrentDropEffect is not DragDropEffects.None)
+            if (Data.CopyPaste.DragFiles.Length == 0 || Data.CopyPaste.CurrentDropEffect is DragDropEffects.None)
             {
-                var target = MouseWithinApp
-                    ? " to " + FileHelper.GetFullName(Data.CopyPaste.DropTarget)
-                    : "";
+                DragTooltip.Text = "";
+                return;
+            }
 
-                DragTooltip.Text = $" {Data.CopyPaste.DragFiles.Length} item(s){target}";
+            string explorerTarget = "";
+
+            if (ElementUnderMouse is not null && !MouseWithinApp)
+            {
+                try
+                {
+                    if (ElementUnderMouse.Current.ControlType == ControlType.Pane
+                        && ElementUnderMouse.Current.Name == "PopupHost")
+                    {
+                        IsDropAllowed = true;
+                        IsObstructed = true;
+                        DragTooltip.Text = "Area obstructed - reopen Explorer window.";
+                        return;
+                    }
+                    IsObstructed = false;
+
+                    var path = ExplorerHelper.GetPathFromElement(ElementUnderMouse);
+                    if (string.IsNullOrEmpty(path))
+                    {
+                        explorerTarget = "";
+                        IsDropAllowed = false;
+                    }
+                    else
+                    {
+                        pathUnderMouse = new(path);
+                        IsDropAllowed = pathUnderMouse.IsFolder;
+
+                        explorerTarget = " to " + FileHelper.GetShortFileName(pathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay), 30);
+                    }
+                }
+                catch
+                {
+                    pathUnderMouse = null;
+                    IsDropAllowed = false;
+                }
             }
             else
-                DragTooltip.Text = "";
+            {
+                IsObstructed = false;
+                pathUnderMouse = null;
+                if (MouseWithinApp)
+                    IsDropAllowed = true;
+            }
+
+            var target = MouseWithinApp
+                ? " to " + FileHelper.GetFullName(Data.CopyPaste.DropTarget)
+                : explorerTarget;
+
+            DragTooltip.Text = $" {Data.CopyPaste.DragFiles.Length} item(s){target}";
         });
+    }
+
+    private bool isObstructed = false;
+    public bool IsObstructed
+    {
+        get => isObstructed;
+        set
+        {
+            if (isObstructed != value)
+            {
+                isObstructed = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool isDropAllowed = false;
+    public bool IsDropAllowed
+    {
+        get => isDropAllowed;
+        set
+        {
+            if (isDropAllowed != value)
+            {
+                isDropAllowed = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool mouseWithinApp = true;
+    public bool MouseWithinApp
+    {
+        get => mouseWithinApp;
+        set
+        {
+            if (mouseWithinApp == value)
+                return;
+
+            mouseWithinApp = value;
+            GetPathUnderMouse();
+        }
     }
 
     private string processUnderMouse = "";
 
+    private AutomationElement elementUnderMouse = null;
+    public AutomationElement ElementUnderMouse
+    {
+        get => elementUnderMouse;
+        set
+        {
+            if (elementUnderMouse is not null && value is not null && Automation.Compare(elementUnderMouse, value))
+                return;
+
+            elementUnderMouse = value;
+            GetPathUnderMouse();
+        }
+    }
+
+    private ShellItem pathUnderMouse = null;
+
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
+        Data.CopyPaste.PropertyChanged += (s, e) =>
+        {
+            if ((e.PropertyName == nameof(Data.CopyPaste.DragFiles)
+                || e.PropertyName == nameof(Data.CopyPaste.DropTarget))
+                && Data.RuntimeSettings.DragBitmap is not null)
+            {
+                GetPathUnderMouse();
+            }
+        };
+
         windowHandle = new WindowInteropHelper(this).Handle;
 
 #if DEBUG
-                MouseWithinApp = true;
+        MouseWithinApp = true;
 #else
         NativeMethods.InterceptMouse.Init(NativeMethods.MouseMessages.WM_MOUSEMOVE,
             point =>
@@ -61,8 +197,17 @@ public partial class DragWindow
 
                 var actualPoint = NativeMethods.MonitorInfo.MousePositionToDpi(point, windowHandle);
 
-                Top = actualPoint.Y - DragImage.ActualHeight - 4;
+                Top = actualPoint.Y - DragImage.ActualHeight - 10;
                 Left = actualPoint.X - DragImage.ActualWidth / 2;
+
+                try
+                {
+                    ElementUnderMouse = AutomationElement.FromPoint(actualPoint);
+                }
+                catch
+                {
+                    ElementUnderMouse = null;
+                }
 
                 MouseWithinApp = NativeMethods.MonitorInfo.IsPointInMainWin(point);
                 if (!MouseWithinApp)
@@ -75,6 +220,9 @@ public partial class DragWindow
                     {
                         processUnderMouse = proc.ProcessName;
                         Data.RuntimeSettings.DragWithinSlave = processUnderMouse == Properties.Resources.AppDisplayName;
+
+                        if (processUnderMouse is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
+                            Data.RuntimeSettings.DragBitmap = null;
                     }
                     else
                         processUnderMouse = "";

@@ -5,7 +5,7 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Helpers;
 
-internal class FolderHelper
+public class FolderHelper
 {
     public static void CombineDisplayNames()
     {

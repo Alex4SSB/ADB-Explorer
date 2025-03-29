@@ -405,5 +405,41 @@ namespace ADB_Test
             Assert.AreEqual(AbstractFile.FileType.Folder, emptyDir.Type);
             Assert.AreEqual(AbstractFile.FilePathType.Windows, emptyDir.PathType);
         }
+
+        [TestMethod]
+        public void KnownFolderTest()
+        {
+            var userFolder = $"C:\\Users\\{Environment.UserName}";
+
+            string[] testFolders = [ "Downloads", "Documents", "Desktop", "Pictures", "Downloads\\Shared Videos", "Libraries\\Pictures"];
+
+            foreach (var item in testFolders)
+            {
+                Assert.IsTrue(CheckPath(ExplorerHelper.GetActualPath(item), item));
+            }
+
+            Assert.AreEqual("C:", ExplorerHelper.GetActualPath("This PC\\C:"));
+            Assert.AreEqual("F:", ExplorerHelper.GetActualPath("This PC\\Sandisk Cruzer (F:)"));
+
+            // Quick access in Windows 10 can have any folder, hence it is impossible to determine the actual path
+            Assert.IsNull(ExplorerHelper.GetActualPath("Quick access\\Pictures"));
+
+            // These are virtual locations
+            Assert.IsNull(ExplorerHelper.GetActualPath("Libraries"));
+            Assert.IsNull(ExplorerHelper.GetActualPath("Network"));
+            Assert.IsNull(ExplorerHelper.GetActualPath("This PC"));
+
+            bool CheckPath(string result, string origin)
+            {
+                var index = origin.IndexOf('\\');
+                var originTop = index > -1 ? origin[..index] : origin;
+                var remainder = index > -1 ? origin[index..] : "";
+
+                return result == $"{userFolder}\\{origin}"
+                    || result == $"{userFolder}\\OneDrive\\{origin}"
+                    || result == $"{userFolder}\\AppData\\Roaming\\Microsoft\\Windows\\{origin}"
+                    || result == $"{userFolder}\\AppData\\Roaming\\Microsoft\\Windows\\Libraries\\{originTop}.library-ms{remainder}";
+            }
+        }
     }
 }

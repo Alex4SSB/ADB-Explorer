@@ -108,6 +108,18 @@ public static class FileHelper
         return fullPath[..index];
     }
 
+    public static string GetShortFileName(string fullName, int length = -1)
+    {
+        if (string.IsNullOrEmpty(fullName))
+            return fullName;
+
+        var name = GetFullName(fullName);
+        if (length < 0)
+            return name;
+
+        return name.Length > length ? name[..length] + "…" : name;
+    }
+
     public static string GetFullName(string fullPath)
     {
         if (string.IsNullOrEmpty(fullPath))

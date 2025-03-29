@@ -6,10 +6,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="DragWindow"
+    x:Name="dragWin"
+    Width="600"
+    Height="128"
     ui:ControlHelper.CornerRadius="5"
     AllowsTransparency="True"
     Closing="Window_Closing"
+    Focusable="False"
+    IsHitTestVisible="False"
+    IsTabStop="False"
     Loaded="Window_Loaded"
     MouseUp="Border_MouseUp"
     ResizeMode="NoResize"
@@ -26,6 +31,7 @@
         HorizontalAlignment="Left"
         VerticalAlignment="Top"
         Background="Transparent"
+        DataContext="{Binding ElementName=dragWin}"
         MouseUp="Border_MouseUp"
         Opacity="1">
         <Border.Style>
@@ -44,15 +50,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             IsHitTestVisible="False">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid>
+            <Grid HorizontalAlignment="Left">
                 <Image
                     x:Name="DragImage"
                     Width="128"
@@ -88,12 +86,9 @@
                 </TextBlock>
             </Grid>
             <Border
-                Grid.Row="1"
-                Grid.Column="1"
-                Margin="-25,2,0,0"
                 Padding="4"
                 HorizontalAlignment="Left"
-                VerticalAlignment="Top"
+                VerticalAlignment="Bottom"
                 Background="{DynamicResource ContentDialogContentBackground}"
                 BorderBrush="Gray"
                 BorderThickness="1">
@@ -106,17 +101,21 @@
                             <DataTrigger Binding="{Binding ElementName=DragTooltip, Path=Text}" Value="">
                                 <Setter Property="Visibility" Value="Hidden" />
                             </DataTrigger>
+                            <DataTrigger Binding="{Binding ElementName=DropEffect, Path=Text}" Value="None">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
                         </Style.Triggers>
                         <Setter Property="CornerRadius" Value="0" />
                     </Style>
                 </Border.Style>
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="16" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="30" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <ui:FontIcon
+                        Width="16"
                         HorizontalAlignment="Left"
                         FontSize="12"
                         Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}">
@@ -129,20 +128,76 @@
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Move">
                                         <Setter Property="Glyph" Value="&#xE72A;" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsObstructed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <Grid Grid.Column="1">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsObstructed}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <StaticResource ResourceKey="WarningIcon" />
+                    </Grid>
+                    <ui:FontIcon
+                        Grid.Column="1"
+                        Foreground="OrangeRed"
+                        Glyph="&#xE733;">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </ui:FontIcon.Style>
                     </ui:FontIcon>
                     <TextBlock
+                        x:Name="DropEffect"
                         Grid.Column="1"
                         HorizontalAlignment="Center"
                         Foreground="DodgerBlue"
-                        Text="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" />
+                        Text="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsObstructed}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                     <TextBlock
                         x:Name="DragTooltip"
                         Grid.Column="2"
                         Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}"
-                        TextWrapping="Wrap" />
+                        TextWrapping="Wrap">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </Grid>
             </Border>
         </Grid>

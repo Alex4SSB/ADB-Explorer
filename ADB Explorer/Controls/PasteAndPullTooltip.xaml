@@ -14,19 +14,6 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <Style BasedOn="{StaticResource AccentButtonStyle}" TargetType="Button" />
-        <Grid
-            x:Key="WarningIcon"
-            Margin="0,-4,4,0"
-            x:Shared="False">
-            <ui:FontIcon
-                FontWeight="Bold"
-                Foreground="{StaticResource EditorTextChangedBrush}"
-                Glyph="&#xF13A;" />
-            <ui:FontIcon
-                FontWeight="Bold"
-                Foreground="Black"
-                Glyph="&#xF13B;" />
-        </Grid>
         <Grid x:Key="ErrorIcon" x:Shared="False">
             <ui:FontIcon Margin="0,0,4,0">
                 <ui:FontIcon.Style>
@@ -127,8 +114,6 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <!--<ui:FontIcon Foreground="{StaticResource EditorTextChangedBrush}" Glyph="&#xF13A;" />
-                        <ui:FontIcon Foreground="Black" Glyph="&#xF13B;" />-->
                         <StaticResource ResourceKey="WarningIcon" />
                         <TextBlock
                             Grid.Column="1"

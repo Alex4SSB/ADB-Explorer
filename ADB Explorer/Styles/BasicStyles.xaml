@@ -249,4 +249,17 @@
     <Style x:Key="MarginedTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Margin" Value="0,4" />
     </Style>
+    <Grid
+        x:Key="WarningIcon"
+        Margin="0,-4,4,0"
+        x:Shared="False">
+        <ui:FontIcon
+            FontWeight="Bold"
+            Foreground="{StaticResource EditorTextChangedBrush}"
+            Glyph="&#xF13A;" />
+        <ui:FontIcon
+            FontWeight="Bold"
+            Foreground="Black"
+            Glyph="&#xF13B;" />
+    </Grid>
 </ResourceDictionary>
