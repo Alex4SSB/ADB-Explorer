@@ -15,6 +15,8 @@ namespace ADB_Explorer.Services;
 /// </summary>
 public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.InteropServices.ComTypes.IDataObject, IAsyncOperation
 {
+    public static FileGroup SelfFileGroup { get; private set; }
+
     /// <summary>
     /// In-order list of registered data objects.
     /// </summary>
@@ -375,6 +377,10 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     public void SetData(IEnumerable<FileDescriptor> fileDescriptors, bool includeContent = true)
     {
         FileGroup group = new(fileDescriptors);
+
+#if DEBUG
+        SelfFileGroup = group;
+#endif
 
         UpdateData(AdbDataFormats.FileDescriptor, group.GroupDescriptorBytes);
 

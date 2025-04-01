@@ -8,7 +8,7 @@ namespace ADB_Explorer.Services;
 
 public class FileGroup
 {
-    private readonly IEnumerable<FileDescriptor> FileDescriptors;
+    public readonly IEnumerable<FileDescriptor> FileDescriptors;
 
     private FILEGROUPDESCRIPTOR GroupDescriptor;
 
@@ -78,13 +78,18 @@ public class FileDescriptor
 
     public static FileDescriptor[] GetDescriptors(IDataObject dataObject)
     {
+#if DEBUG
+        if (Data.CopyPaste.IsSelf)
+            return VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
+#endif
+
         try
         {
             if (dataObject.GetData(AdbDataFormats.FileDescriptor) is not MemoryStream fdStream)
                 return null;
 
             var fileGroup = FILEGROUPDESCRIPTOR.FromStream(fdStream);
-            return fileGroup.descriptors.Select(FILEDESCRIPTOR.GetFile).ToArray();
+            return fileGroup.descriptors.Select(FILEDESCRIPTOR.GetFile)?.ToArray();
         }
         catch (COMException)
         {
