@@ -381,16 +381,36 @@ public class FileClass : FilePath, IFileStat
                 // in case the file is still in use by ADB or hasn't appeared yet
                 for (int i = 0; i < 10; i++)
                 {
+                    var abort = false;
+                    ContentDialog dialog = null;
+
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), "Sending To Shell", buttonText: "Abort");
+                        dialog.Closed += (s, e) =>
+                        {
+                            abort = true;
+                        };
+                    });
+
                     try
                     {
                         using (FileStream fs = new(file, FileMode.Open, FileAccess.Read))
                         {
                             // This uses a ~85K buffer, which is a pain for large files, but it gets cleared automatically
                             byte[] buffer = new byte[81920];
-                            int read = 0;
-                            while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
+                            int totalRead = 0, read = 0;
+                            Data.RuntimeSettings.CurrentTransferFile = item;
+
+                            while (!abort && (read = fs.Read(buffer, 0, buffer.Length)) > 0)
                             {
                                 stream.Write(buffer, 0, read);
+                                totalRead += read;
+
+                                App.Current.Dispatcher.Invoke(() =>
+                                {
+                                    Data.RuntimeSettings.TransferProgress = 100 * (totalRead / (float)fs.Length);
+                                });
                             }
                         }
                         break;
@@ -399,6 +419,10 @@ public class FileClass : FilePath, IFileStat
                     {
                         Thread.Sleep(100);
                         continue;
+                    }
+                    finally
+                    {
+                        App.Current.Dispatcher.Invoke(dialog.Hide);
                     }
                 }
             }
