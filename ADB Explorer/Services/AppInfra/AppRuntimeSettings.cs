@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Collections;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
 
@@ -375,6 +376,13 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => dragWithinSlave;
         set => Set(ref dragWithinSlave, value);
+    }
+
+    private ShellItem pathUnderMouse = null;
+    public ShellItem PathUnderMouse
+    {
+        get => pathUnderMouse;
+        set => Set(ref pathUnderMouse, value);
     }
 
     private float transferProgress = 0;

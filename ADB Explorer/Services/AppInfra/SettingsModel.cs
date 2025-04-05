@@ -25,8 +25,8 @@ public static class UISettings
         { ActionType.AnimationInfo, "\uE82F" },
     };
 
-    private static readonly List<SettingsAction> SettingsActions = new()
-    {
+    private static readonly List<SettingsAction> SettingsActions =
+    [
         new(ActionType.ChangeDefaultPath, () => true, SettingsHelper.ChangeDefaultPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
         new(ActionType.ClearDefaultPath, () => !string.IsNullOrEmpty(Settings.DefaultFolder), () => Settings.DefaultFolder = "", Icons[ActionType.ClearDefaultPath], "Clear"),
         new(ActionType.ChangeAdbPath, () => true, SettingsHelper.ChangeAdbPathAction, Icons[ActionType.ChangeDefaultPath], "Change"),
@@ -34,104 +34,108 @@ public static class UISettings
         new(ActionType.ResetApp, () => true, SettingsHelper.ResetAppAction, Icons[ActionType.ResetApp], Strings.S_RESTART_APP),
         new(ActionType.AnimationInfo, () => true, SettingsHelper.DisableAnimationTipAction, Icons[ActionType.AnimationInfo], "More Info"),
         new(ActionType.ProgressMethodInfo, () => true, SettingsHelper.ProgressMethodTipAction, Icons[ActionType.AnimationInfo], "More Info"),
-    };
+        new(ActionType.AdvancedDragInfo, () => true, SettingsHelper.AdvancedDragTipAction, Icons[ActionType.AnimationInfo], "More Info"),
+    ];
 
     public static void Init()
     {
         Type appSettings = Settings.GetType();
 
-        SettingsList = new()
-        {
-            new SettingsGroup("ADB", new()
-            {
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableMdns)), "Enable mDNS (experimental)"),
+        SettingsList =
+        [
+            new SettingsGroup("ADB",
+            [
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableMdns)), "Enable mDNS"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDevices)), "Poll For Devices"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), "Poll For Battery Status"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), "Enable Command Log"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.UseProgressRedirection)),
                                 Strings.S_DEPLOY_REDIRECTION_TITLE,
                                 commands: SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo)),
-            }),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("Device", new()
-            {
+            new SettingsGroup("Device",
+            [
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoRoot)), "Automatically Enable Root"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SaveDevices)), "Save Manually Connected Devices"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoOpen)), "Automatically Open For Browsing"),
-            }),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("File Operations", new()
-            {
+            new SettingsGroup("File Operations",
+            [
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableCompactView)), "Enable Compact View"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.StopPollingOnSync)), "Stop Polling On Push/Pull"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.AllowMultiOp)), "Allow Simultaneous Operations"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.RescanOnPush)), "Force Media Rescan On Push"),
-            }),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("Drives & Features", new()
-            {
+            new SettingsGroup("Drives & Features",
+            [
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDrives)), "Poll For Drives"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableRecycle)), "Enable Recycle Bin"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableApk)), "Enable APK Handling"),
-            }),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("Explorer", new()
-            {
+            new SettingsGroup("Explorer",
+            [
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), "Show File Name Extensions"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowHiddenItems)), "Show Hidden Items"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowSystemPackages)), "Show System Apps", visibleProp: appSettings.GetProperty(nameof(Settings.EnableApk))),
-            }),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.AdvancedDrag)),
+                    "Enable File Explorer Monitoring",
+                    commands: [ SettingsActions.Find(a => a.Name is ActionType.AdvancedDragInfo) ]),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("File Double Click", new()
-            {
+            new SettingsGroup("File Double Click",
+            [
                 new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), "File Double Click", new() {
                     { AppSettings.DoubleClickAction.none, "None" },
                     { AppSettings.DoubleClickAction.pull, "Pull To Default Folder" },
                     { AppSettings.DoubleClickAction.edit, "Open In Editor" } }),
-            }),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("Working Directories", new()
-            {
+            new SettingsGroup("Working Directories",
+            [
                 new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)),
                                   "Default Folder",
-                                  commands: new[] {
+                                  commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
-                                  }),
+                                  ]),
                 new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)),
                                   "Override ADB Path",
-                                  commands: new[] {
+                                  commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
-                                  }),
-            }),
+                                  ]),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("Theme", new()
-            {
+            new SettingsGroup("Theme",
+            [
                 new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), "Theme", new() {
                     { AppSettings.AppTheme.light, "Light" },
                     { AppSettings.AppTheme.dark, "Dark" },
                     { AppSettings.AppTheme.windowsDefault, "Windows Default" } }),
-            }),
+            ]),
             new SettingsSeparator(),
-            new SettingsGroup("Graphics", new()
-            {
+            new SettingsGroup("Graphics",
+            [
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), "Force Fluent Styles", visibleProp: RuntimeSettings.GetType().GetProperty(nameof(AppRuntimeSettings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), "Disable Hardware Acceleration"),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
                                 "Disable Animations",
-                                commands: new[] {
+                                commands: [
                                     SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                     SettingsActions.Find(a => a.Name is ActionType.AnimationInfo),
-                                }),
+                                ]),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableSplash)), "Display Splash Screen"),
-            }),
-            new Ungrouped(new()
-            {
+            ]),
+            new Ungrouped(
+            [
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), "Check For Updates"),
-            }),
-        };
+            ]),
+        ];
     }
 }
 
@@ -275,7 +279,7 @@ public class EnumSetting : AbstractSetting
         set => Set(ref isExpanded, value);
     }
 
-    public List<EnumRadioButton> Buttons { get; } = new();
+    public List<EnumRadioButton> Buttons { get; } = [];
 
     public EnumSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
         : base(valueProp, description, visibleProp, commands)
@@ -350,6 +354,7 @@ public class SettingsAction : BaseAction
         ResetApp,
         AnimationInfo,
         ProgressMethodInfo,
+        AdvancedDragInfo,
     }
 
     public ActionType Name { get; }

@@ -9,6 +9,8 @@ internal static class SettingsHelper
     public static void DisableAnimationTipAction() =>
         DialogService.ShowMessage(Strings.S_DISABLE_ANIMATION, Strings.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
 
+    public static void AdvancedDragTipAction() =>
+        DialogService.ShowMessage(Strings.S_ADVANCED_DRAG, Strings.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Tip);
 
     public static void ResetAppAction()
     {

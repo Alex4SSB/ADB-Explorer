@@ -66,6 +66,13 @@ public static class Strings
     public const string S_REDIRECTION = "Progress Redirection ";
     public const string S_LS_ERROR_TITLE = "List Directory Error";
     public const string S_WIN_ROOT_ILLEGAL_TITLE = "Pull To Windows Drive Root";
+    public const string S_ADVANCED_DRAG = """
+        Monitoring File Explorer enables the app to perform Drag / Clipboard Pull operations directly to the destination folder.
+
+        Otherwise, Pull is performed to the app temp folder, from which File Explorer receives the file as a stream, which has to use a small buffer.
+        These two added steps slow down the process significantly.
+        """;
+    public const string S_ADVANCED_DRAG_TITLE = "";
     public const string S_NEW_VERSION_MSG =
         """
         Welcome to a new ADB Explorer version!

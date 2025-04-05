@@ -1929,7 +1929,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 {
                     RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
 
-                    vfdo.SendObjectToShell(VirtualFileDataObject.SendMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);
+                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);
                 }
             }
             else

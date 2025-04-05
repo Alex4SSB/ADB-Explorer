@@ -130,4 +130,43 @@ public static partial class NativeMethods
             return dragList;
         }
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct CFHDROP : IByteStruct
+    {
+        public DROPFILES dropFiles;
+        public string[] fileNames;
+
+        public IEnumerable<byte> Bytes
+        {
+            get
+            {
+                List<byte> bytes = [];
+
+                dropFiles.pFiles = (uint)Marshal.SizeOf<DROPFILES>();
+                dropFiles.fWide = false;
+
+                bytes.AddRange(BytesFromStructure(dropFiles));
+
+                //bytes.AddRange(Encoding.Unicode.GetBytes(string.Join('\0', fileNames) + "\0\0"));
+                bytes.AddRange(Encoding.UTF8.GetBytes(string.Join('\0', fileNames) + "\0\0"));
+
+                return bytes;
+            }
+        }
+
+        public CFHDROP(IEnumerable<string> fileNames)
+        {
+            this.fileNames = [.. fileNames];
+        }
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct DROPFILES
+    {
+        public uint pFiles; // Offset to the file list
+        public POINT pt;    // Drop point (usually (0, 0))
+        public bool fNC;    // Non-client area flag (usually FALSE)
+        public bool fWide;  // Unicode flag (usually TRUE)
+    }
 }

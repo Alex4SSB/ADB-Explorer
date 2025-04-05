@@ -76,6 +76,13 @@ public class AppSettings : ViewModelBase
         set => Set(ref showHiddenItems, value);
     }
 
+    private bool advancedDrag;
+    public bool AdvancedDrag
+    {
+        get => Get(ref advancedDrag, true);
+        set => Set(ref advancedDrag, value);
+    }
+
     #endregion
 
     #region Double Click

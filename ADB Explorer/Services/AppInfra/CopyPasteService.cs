@@ -118,6 +118,8 @@ public class CopyPasteService : ViewModelBase
         }
     }
 
+    public NativeMethods.HResult DragResult { get; set; }
+
     public DragDropEffects CurrentEffect => IsDrag ? DropEffect : PasteState;
     public string CurrentParent => IsDrag ? DragParent : ParentFolder;
     public bool IsSelf => CurrentSource.HasFlag(DataSource.Self);

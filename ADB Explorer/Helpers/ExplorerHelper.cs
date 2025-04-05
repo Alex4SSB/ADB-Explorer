@@ -108,7 +108,7 @@ public class ExplorerHelper
 
     public static string GetPathFromTree(AutomationElement element)
     {
-        if (element.Current.IsOffscreen)
+        if (element.Current.IsOffscreen && element.Current.Name == "Desktop")
             return "";
 
         var parent = TreeWalker.ControlViewWalker.GetParent(element);

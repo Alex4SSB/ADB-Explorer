@@ -4,9 +4,11 @@
 
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using System.Runtime.InteropServices.ComTypes;
-using ADB_Explorer.Services.AppInfra;
+using Vanara.Extensions;
+using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Services;
 
@@ -16,6 +18,7 @@ namespace ADB_Explorer.Services;
 public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.InteropServices.ComTypes.IDataObject, IAsyncOperation
 {
     public static FileGroup SelfFileGroup { get; private set; }
+    public static IEnumerable<FileClass> SelfFiles { get; private set; }
 
     /// <summary>
     /// In-order list of registered data objects.
@@ -27,9 +30,12 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// </summary>
     private bool inOperation;
 
-    public VirtualFileDataObject(DragDropEffects preferredDropEffect = DragDropEffects.Copy | DragDropEffects.Move)
+    public DataObjectMethod Method { get; private set; }
+
+    public VirtualFileDataObject(DragDropEffects preferredDropEffect = DragDropEffects.Copy | DragDropEffects.Move, DataObjectMethod method = DataObjectMethod.DragDrop)
     {
         PreferredDropEffect = preferredDropEffect;
+        Method = method;
     }
 
     #region IDataObject Members
@@ -386,10 +392,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
         if (includeContent)
             UpdateData(AdbDataFormats.FileContents, group.DataStreams);
-    }
+        }
 
     public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
     {
+        SelfFiles = files;
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
@@ -601,7 +608,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
     }
 
-    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Copy)
+    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Copy, DataObjectMethod method = DataObjectMethod.DragDrop)
     {
         CopyPasteService.ClearTempFolder();
 
@@ -610,11 +617,24 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
             .Count() != Data.SelectedFiles.Count();
 
-        VirtualFileDataObject vfdo = new(preferredEffect);
+        VirtualFileDataObject vfdo = new(preferredEffect, method);
 
-        if (!Data.FileActions.IsSelectionIllegalOnWindows
+        // Format order is crucial for File Explorer which takes the first format it can handle.
+        // Hence we provide the dummy file first (after Preferred Drop Effect)
+
+        // TODO: disable this if Files App is running, and drag window when over it
+
+        bool advancedDrag = Data.Settings.AdvancedDrag && vfdo.Method is DataObjectMethod.DragDrop;
+        var includeContent =
+            !advancedDrag
+            && !Data.FileActions.IsSelectionIllegalOnWindows
             && !Data.FileActions.IsSelectionConflictingOnFuse
-            && !Data.FileActions.IsRecycleBin)
+            && !Data.FileActions.IsRecycleBin;
+
+        // Next we provide the real file descriptors and file contents.
+        // File Explorer isn't supposed to use them, but since it's already implemented,
+        // might as well leave it for any other app to use.
+        if (includeContent)
         {
             Data.RuntimeSettings.MainCursor = Cursors.AppStarting;
             Task.Run(() =>
@@ -640,28 +660,42 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
         else
         {
+            if (advancedDrag)
+                vfdo.SetData(AdbDataFormats.FileDrop, new NativeMethods.CFHDROP([$"AdbExplorerDummyDropFile"]).Bytes);
+
             files.ForEach(f => f.PrepareDescriptors(vfdo, false));
             vfdo.SetData(files.SelectMany(f => f.Descriptors), false);
         }
 
+        // Finally we provide the ADB drag data, which only we recongize
         vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
 
         return vfdo;
     }
 
-    public enum SendMethod
+    public enum DataObjectMethod
     {
         DragDrop,
         Clipboard,
     }
 
-    public void SendObjectToShell(SendMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
+    public void SendObjectToShell(DataObjectMethod method, DependencyObject dragSource = null, DragDropEffects allowedEffects = DragDropEffects.None)
     {
+        Method = method;
+
         try
         {
-            if (method is SendMethod.DragDrop)
+            if (method is DataObjectMethod.DragDrop)
+            {
                 DoDragDrop(dragSource, allowedEffects);
-            else if (method is SendMethod.Clipboard)
+                if (Data.Settings.AdvancedDrag
+                    && Data.CopyPaste.DragResult is NativeMethods.HResult.DRAGDROP_S_DROP
+                    && Data.RuntimeSettings.PathUnderMouse is not null)
+                {
+                    FileActionLogic.PullFiles(Data.RuntimeSettings.PathUnderMouse, SelfFiles);
+                }
+            }
+            else if (method is DataObjectMethod.Clipboard)
             {
                 CurrentEffect = allowedEffects;
                 PerformedDropEffect = allowedEffects;
@@ -741,6 +775,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                 Data.CopyPaste.DragStatus = CopyPasteService.DragState.None;
                 IpcService.NotifyDropCancel(res);
             }
+            Data.CopyPaste.DragResult = res;
 
             return (int)res;
         }

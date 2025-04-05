@@ -84,22 +84,22 @@ public partial class DragWindow : INotifyPropertyChanged
                     }
                     else
                     {
-                        pathUnderMouse = new(path);
-                        IsDropAllowed = pathUnderMouse.IsFolder;
+                        Data.RuntimeSettings.PathUnderMouse = new(path);
+                        IsDropAllowed = Data.RuntimeSettings.PathUnderMouse.IsFolder;
 
-                        explorerTarget = " to " + FileHelper.GetShortFileName(pathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay), 30);
+                        explorerTarget = " to " + FileHelper.GetShortFileName(Data.RuntimeSettings.PathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay), 30);
                     }
                 }
                 catch
                 {
-                    pathUnderMouse = null;
+                    Data.RuntimeSettings.PathUnderMouse = null;
                     IsDropAllowed = false;
                 }
             }
             else
             {
                 IsObstructed = false;
-                pathUnderMouse = null;
+                Data.RuntimeSettings.PathUnderMouse = null;
                 if (MouseWithinApp)
                     IsDropAllowed = true;
             }
@@ -169,8 +169,6 @@ public partial class DragWindow : INotifyPropertyChanged
             GetPathUnderMouse();
         }
     }
-
-    private ShellItem pathUnderMouse = null;
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {

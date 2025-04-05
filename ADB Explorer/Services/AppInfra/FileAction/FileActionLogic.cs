@@ -494,8 +494,8 @@ internal static class FileActionLogic
         IsPasteEnabled();
 
         var dropEffect = isCopy ? DragDropEffects.Copy : DragDropEffects.Move;
-        var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCut, dropEffect);
-        vfdo?.SendObjectToShell(VirtualFileDataObject.SendMethod.Clipboard, allowedEffects: dropEffect);
+        var vfdo = VirtualFileDataObject.PrepareTransfer(itemsToCut, dropEffect, VirtualFileDataObject.DataObjectMethod.Clipboard);
+        vfdo?.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: dropEffect);
     }
 
     public static void Rename(TextBox textBox)
@@ -973,8 +973,8 @@ internal static class FileActionLogic
         op.PropertyChanged -= PushOperation_PropertyChanged;
     }
 
-    // Pull that is performed without interacting with File Explorer
-    public static async void PullFiles(string targetPath = "")
+    // Pull where we know the actual target path
+    public static void PullFiles(string targetPath = "")
     {
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
@@ -1001,6 +1001,11 @@ internal static class FileActionLogic
             path = ShellItem.Open(dialog.FileName);
         }
 
+        PullFiles(path, pullItems);
+    }
+
+    public static async void PullFiles(ShellItem path, IEnumerable<FileClass> pullItems)
+    {
         var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
         var invalidFiles = pullItems.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
 
