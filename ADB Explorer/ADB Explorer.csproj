@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+	
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
     <RootNamespace>ADB_Explorer</RootNamespace>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>app_icon_2023_combined.ico</ApplicationIcon>
@@ -10,6 +10,7 @@
     <Platforms>AnyCPU;x64;ARM64</Platforms>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
     <Configurations>Debug;Release;Deploy</Configurations>
+	<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -25,7 +26,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-  	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,12 +42,11 @@
     <PackageReference Include="ModernWpfUI" Version="0.9.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="QRCoder.Xaml" Version="1.6.0" />
-    <PackageReference Include="System.Management" Version="9.0.3" />
-    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="Vanara.Windows.Shell" Version="4.1.1" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.1.1" />
+    <PackageReference Include="System.Management" Version="9.0.4" />
+    <PackageReference Include="Vanara.Windows.Shell" Version="4.1.2" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.1.2" />
   </ItemGroup>
-
+	
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -63,21 +63,21 @@
   </ItemGroup>
 
   <ItemGroup>
-  	 <Resource Include="app_icon_black_2023_256px.png" />
-  	 <Content Include="PortableLauncher.bat">
-  	   <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-  	 </Content>
+    <Resource Include="app_icon_black_2023_256px.png" />
+    <Content Include="PortableLauncher.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
-	<ItemGroup>
-		<Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
-		<Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
-	</ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
+    <Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
+  </ItemGroup>
 	
   <ItemGroup>
     <None Update="app_icon_2023_combined.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
+	
 </Project>

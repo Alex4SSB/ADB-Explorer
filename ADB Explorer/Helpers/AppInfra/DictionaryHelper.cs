@@ -7,20 +7,11 @@ public static class DictionaryHelper
 
     public static Dictionary<TKey, TElement> TryToDictionary<TSource, TKey, TElement>(this IEnumerable<TSource> source, Func<TSource, TKey> keySelector, Func<TSource, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
+        ArgumentNullException.ThrowIfNull(source);
 
-        if (keySelector == null)
-        {
-            throw new ArgumentNullException(nameof(keySelector));
-        }
+        ArgumentNullException.ThrowIfNull(keySelector);
 
-        if (elementSelector == null)
-        {
-            throw new ArgumentNullException(nameof(elementSelector));
-        }
+        ArgumentNullException.ThrowIfNull(elementSelector);
 
         int capacity = 0;
         if (source is ICollection<TSource> collection)
