@@ -304,5 +304,13 @@ public class FileOperationQueue : ViewModelBase
     {
         OnPropertyChanged(nameof(TotalCount));
         UpdateProgress();
+
+        if (e.NewItems is null)
+            return;
+
+        foreach (FileOperation item in e.NewItems)
+        {
+            item.BeginWaiting();
+        }
     }
 }

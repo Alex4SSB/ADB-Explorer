@@ -15,6 +15,7 @@ public abstract class FileOperation : ViewModelBase
         Completed,
         Failed,
         Canceled,
+        None,
     }
 
     public enum OperationType
@@ -47,7 +48,7 @@ public abstract class FileOperation : ViewModelBase
         }
     }
 
-    private OperationStatus status;
+    private OperationStatus status = OperationStatus.None;
     public OperationStatus Status
     {
         get => status;
@@ -128,7 +129,7 @@ public abstract class FileOperation : ViewModelBase
             return Status switch
             {
                 OperationStatus.InProgress => FileOpFilter.FilterType.Running,
-                OperationStatus.Waiting => FileOpFilter.FilterType.Pending,
+                OperationStatus.Waiting or OperationStatus.None => FileOpFilter.FilterType.Pending,
                 OperationStatus.Completed => FileOpFilter.FilterType.Completed,
                 OperationStatus.Failed => FileOpFilter.FilterType.Failed,
                 OperationStatus.Canceled => FileOpFilter.FilterType.Canceled,
@@ -242,7 +243,6 @@ public abstract class FileOperation : ViewModelBase
         Dispatcher = dispatcher;
         Device = adbDevice;
         FilePath = filePath;
-        Status = OperationStatus.Waiting;
 
         SourceAction = new(
             () => IsSourceNavigable,
@@ -312,6 +312,15 @@ public abstract class FileOperation : ViewModelBase
     }
 
     public abstract void Start();
+
+    /// <summary>
+    /// Changes the operation status from None to Waiting.
+    /// </summary>
+    public void BeginWaiting()
+    {
+        if (Status is OperationStatus.None)
+            Status = OperationStatus.Waiting;
+    }
 
     public abstract void ClearChildren();
 

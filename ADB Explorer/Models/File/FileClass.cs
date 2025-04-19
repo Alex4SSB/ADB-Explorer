@@ -341,8 +341,8 @@ public class FileClass : FilePath, IFileStat
         fileOp.VFDO = vfdo;
 
         string[] items = [FullName + (IsDirectory ? '/' : "")];
-            if (includeContent && Children is not null)
-            {
+        if (includeContent && Children is not null)
+        {
             items = [..items, ..Children];
         }
 
@@ -360,17 +360,26 @@ public class FileClass : FilePath, IFileStat
             StreamContents = stream =>
             {
                 var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
+                var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
 
                 // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
-                // To prevent this, we refuse to give data for the first file if the app is focused, and the shell doesn't ask for the next files.
-                // When a legitimate request for data is made, the app can't be focused, but it can become focused again for the next files.
-                if ((Data.CopyPaste.IsClipboard && isActive && VirtualFileDataObject.SelfFiles.First().FullPath == FullPath)
+                // To prevent this, we refuse to give data when the app is focused.
+                // When a legitimate request for data is made, the app can't be focused during the first file, but it can become focused again for the next files.
+                if ((Data.CopyPaste.IsClipboard && isActive && operations.Any())
                     || !includeContent)
                     return;
 
-                // Start the operation if it hasn't been started yet
-                if (fileOp.Status is FileOperation.OperationStatus.Waiting)
-                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(fileOp));
+#if !DEPLOY
+                if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
+                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Total uninitiated operations: {operations.Count()}\n");
+#endif
+
+                // Add all uninitiated operations to the queue.
+                // For all consecutive files this list will be empty.
+                foreach (var op in operations)
+                {
+                    App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperation(op));
+                }
 
                 // Wait for the operation to complete
                 while (fileOp.Status is not FileOperation.OperationStatus.Completed)
@@ -389,6 +398,9 @@ public class FileClass : FilePath, IFileStat
 
                     App.Current.Dispatcher.Invoke(() =>
                     {
+                        if (!App.Current.MainWindow.IsActive)
+                            return;
+
                         dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), "Sending To Shell", buttonText: "Abort");
                         dialog.Closed += (s, e) =>
                         {
@@ -416,6 +428,9 @@ public class FileClass : FilePath, IFileStat
                                 });
                             }
                         }
+                        if (dialog is not null)
+                            App.Current.Dispatcher.Invoke(dialog.Hide);
+
                         break;
                     }
                     catch (Exception)
@@ -425,7 +440,8 @@ public class FileClass : FilePath, IFileStat
                     }
                     finally
                     {
-                        App.Current.Dispatcher.Invoke(dialog.Hide);
+                        if (dialog is not null)
+                            App.Current.Dispatcher.Invoke(dialog.Hide);
                     }
                 }
             }

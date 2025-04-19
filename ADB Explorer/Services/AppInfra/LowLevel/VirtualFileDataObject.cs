@@ -150,7 +150,13 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             {
 #if !DEPLOY
                 if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data: {adbDataFormat?.Name}\n");
+                {
+                    var index = adbDataFormat == AdbDataFormats.FileContents
+                        ? $"[{dataObject.FORMATETC.lindex}]"
+                        : "";
+
+                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data: {adbDataFormat?.Name}{index}\n");
+                }
 #endif
 
                 // Populate the STGMEDIUM
