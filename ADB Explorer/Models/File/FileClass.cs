@@ -361,7 +361,10 @@ public class FileClass : FilePath, IFileStat
             {
                 var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
 
-                if ((Data.CopyPaste.IsClipboard && isActive)
+                // When a VFDO that does not contain folders is sent to the clipboard, the shell immediately requests the file contents.
+                // To prevent this, we refuse to give data for the first file if the app is focused, and the shell doesn't ask for the next files.
+                // When a legitimate request for data is made, the app can't be focused, but it can become focused again for the next files.
+                if ((Data.CopyPaste.IsClipboard && isActive && VirtualFileDataObject.SelfFiles.First().FullPath == FullPath)
                     || !includeContent)
                     return;
 
