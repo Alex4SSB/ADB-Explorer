@@ -304,7 +304,13 @@ public class Devices : AbstractDevice
 
         Data.RuntimeSettings.IsRootActive = device?.Root is RootStatus.Enabled;
 
-        return device is not null;
+        if (device is not null)
+        {
+            Data.Settings.LastDevice = device.Name;
+            return true;
+        }
+
+        return false;
     }
 
     #endregion

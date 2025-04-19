@@ -392,6 +392,13 @@ public class AppSettings : ViewModelBase
         set => Set(ref unrootOnDisconnect, value);
     }
 
+    private string lastDevice = null;
+    public string LastDevice
+    {
+        get => Get(ref lastDevice, null);
+        set => Set(ref lastDevice, value);
+    }
+
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))

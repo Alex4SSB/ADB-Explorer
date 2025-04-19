@@ -542,7 +542,17 @@ public static class DeviceHelper
             return;
 
         var startTime = DateTime.Now;
-        var device = Data.DevicesObject.Current ?? devices.First();
+        LogicalDeviceViewModel device;
+
+        if (Data.DevicesObject.Current is null)
+        {
+            if (string.IsNullOrEmpty(Data.Settings.LastDevice))
+                device = devices.First();
+            else
+                device = devices.FirstOrDefault(d => d.Name == Data.Settings.LastDevice);
+        }
+        else
+            device = Data.DevicesObject.Current;
 
         Task.Run(() =>
         {
