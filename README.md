@@ -23,6 +23,15 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 </a>
 
 <br></br>
+<h2 align="left"/>Translation</h2>
+Although the app has a wide support for file names (Unicode, emojy, right-to-left), English is the only supported display language.
+If you would like to change that, feel free to contact us (discussions / issues) about translating the app.
+<br></br>
+A review on Microsoft Store:
+
+> 超级赞！！！传输文件快、稳的一匹！！！找个方法替换一下支持中文！！！
+
+<br></br>
 <h2 align="left"/>App Files</h2>
 
 `%LocalAppData%\AdbExplorer`
