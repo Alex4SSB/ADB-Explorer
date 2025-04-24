@@ -27,7 +27,7 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 Although the app has a wide support for file names (Unicode, emojy, right-to-left), English is the only supported display language.
 If you would like to change that, feel free to contact us (discussions / issues) about translating the app.
 <br></br>
-A review on Microsoft Store:
+A Microsoft Store review:
 
 > 超级赞！！！传输文件快、稳的一匹！！！找个方法替换一下支持中文！！！
 
