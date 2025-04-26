@@ -24,16 +24,16 @@ public class FileSyncOperation : FileOperation
 
     public ShellItem OriginalShellItem { get; set; }
 
-    public FileSyncOperation(OperationType operationName, SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FileOpProgressViewModel status)
-        : base(sourcePath, adbDevice, App.Current.Dispatcher)
+    public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FailedOpProgressViewModel status)
+        : base(new FileClass(sourcePath), adbDevice, App.Current.Dispatcher)
     {
         OperationName = operationName;
-        FilePath = sourcePath;
+        FilePath = new(new FileClass(sourcePath));
         TargetPath = targetPath;
 
         StatusInfo = status;
-        if (status is FailedOpProgressViewModel)
-            Status = OperationStatus.Failed;
+        Status = OperationStatus.Failed;
+        AltSource = NavHistory.SpecialLocation.Unknown;
     }
 
     public FileSyncOperation(

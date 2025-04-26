@@ -556,6 +556,9 @@ public static class DeviceHelper
 
         Task.Run(() =>
         {
+            if (device is null)
+                return false;
+
             while (device.Status is not DeviceStatus.Ok)
             {
                 if (DateTime.Now - startTime > TimeSpan.FromSeconds(6))

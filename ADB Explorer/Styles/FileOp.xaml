@@ -32,7 +32,7 @@
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource HyperlinkButtonForegroundPointerOver}" />
             </Trigger>
-            <Trigger Property="Text" Value="Permanent Deletion">
+            <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="TextDecorations" Value="None" />
             </Trigger>
         </Style.Triggers>

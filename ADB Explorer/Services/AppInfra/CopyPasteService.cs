@@ -586,7 +586,7 @@ public class CopyPasteService : ViewModelBase
                                     Data.FileOpQ.AddOperation(
                                         new FileSyncOperation(
                                             FileOperation.OperationType.Push,
-                                            new(new FileClass(Descriptors[i])),
+                                            Descriptors[i],
                                             new(targetFolder),
                                             Data.CurrentADBDevice,
                                             new FailedOpProgressViewModel(e.Message)));
@@ -610,11 +610,19 @@ public class CopyPasteService : ViewModelBase
 
                         App.Current.Dispatcher.Invoke(dialog.Hide);
 
-                        var shItems = files
-                            .Where(d => FileHelper.GetParentPath(d) == Data.RuntimeSettings.TempDragPath)
-                            .Select(d => new FileClass(ShellItem.Open(d)));
+                        IEnumerable<FileClass> shItems = [];
+                        try
+                        {
+                            shItems = files
+                                .Where(d => FileHelper.GetParentPath(d) == Data.RuntimeSettings.TempDragPath)
+                                .Select(d => new FileClass(ShellItem.Open(d)));
+                        }
+                        catch
+                        {
+                        }
                         
-                        VerifyAndPush(targetFolder, shItems, CurrentEffect);
+                        if (shItems.Any())
+                            VerifyAndPush(targetFolder, shItems, CurrentEffect);
                     });
                 }
             }

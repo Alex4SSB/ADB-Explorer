@@ -15,6 +15,7 @@ namespace ADB_Explorer.Models
             RecycleBin,
             PackageDrive,
             devNull,
+            Unknown,
         }
 
         public static string DisplayName(this SpecialLocation location) => location switch
@@ -24,6 +25,7 @@ namespace ADB_Explorer.Models
             SpecialLocation.Back or SpecialLocation.Forward or SpecialLocation.Up => location.ToString(),
             SpecialLocation.DriveView => "Device Drives",
             SpecialLocation.devNull => "Permanent Deletion",
+            SpecialLocation.Unknown => "N/A",
             _ => "",
         };
 

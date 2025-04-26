@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.ViewModels;
 
-internal class FailedOpProgressViewModel : FileOpProgressViewModel
+public class FailedOpProgressViewModel : FileOpProgressViewModel
 {
     public string Error { get; }
 
