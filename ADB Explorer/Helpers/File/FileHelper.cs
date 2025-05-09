@@ -1,7 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
 namespace ADB_Explorer.Helpers;
@@ -20,10 +20,10 @@ public static class FileHelper
 
         if (Data.FileActions.IsRecycleBin)
         {
-            var query = Data.RecycleIndex.Where(index => index.RecycleName == item.FullName);
-            if (query.Any())
+            var indexer = Data.RecycleIndex.FirstOrDefault(index => index.RecycleName == item.FullName);
+            if (indexer is not null)
             {
-                item.TrashIndex = query.First();
+                item.TrashIndex = indexer;
                 item.UpdateType();
             }
         }
@@ -79,6 +79,9 @@ public static class FileHelper
 
     public static string ConcatPaths(FilePath path1, string path2) => 
         ConcatPaths(path1.FullPath, path2, path1.PathType is FilePathType.Android ? '/' : '\\');
+
+    public static string ConcatPaths(ShellItem path1, string path2) =>
+        ConcatPaths(path1.FileSystemPath, path2, '\\');
 
     public static string ConcatPaths(string path1, string path2, char separator = '/')
     {

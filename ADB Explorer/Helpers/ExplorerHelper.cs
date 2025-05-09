@@ -72,6 +72,11 @@ public class ExplorerHelper
 
     private static int win10ToolbarIndex = 0;
 
+    /// <summary>
+    /// Get the full path of a Windows Explorer window
+    /// </summary>
+    /// <param name="rootElement"></param>
+    /// <returns></returns>
     public static string GetPathFromWindow(AutomationElement rootElement)
     {
         // File Explorer tabs were introduced in Windows 11 22H2
@@ -106,6 +111,11 @@ public class ExplorerHelper
         }
     }
 
+    /// <summary>
+    /// Get the full path of a tree item in a Windows Explorer window
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
     public static string GetPathFromTree(AutomationElement element)
     {
         if (element.Current.IsOffscreen && element.Current.Name == "Desktop")
@@ -119,6 +129,11 @@ public class ExplorerHelper
         return $"{parentPath}\\{element.Current.Name}";
     }
 
+    /// <summary>
+    /// Try to get the full path of an item in a Windows Explorer window
+    /// </summary>
+    /// <param name="element"></param>
+    /// <returns></returns>
     public static string GetPathFromElement(AutomationElement element)
     {
         var listItem = new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)).Normalize(element);
@@ -154,5 +169,31 @@ public class ExplorerHelper
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Delete a file and notify Windows Explorer about the change
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static bool DeleteNotifyFile(string path)
+    {
+        var hPath = (nuint)Marshal.StringToHGlobalUni(path);
+        bool result = false;
+
+        try
+        {
+            File.Delete(path);
+            Vanara.PInvoke.Shell32.SHChangeNotify(Vanara.PInvoke.Shell32.SHCNE.SHCNE_DELETE, Vanara.PInvoke.Shell32.SHCNF.SHCNF_PATHW, hPath);
+            result = true;
+        }
+        catch
+        { }
+        finally
+        {
+            Marshal.FreeHGlobal((nint)hPath);
+        }
+
+        return result;
     }
 }

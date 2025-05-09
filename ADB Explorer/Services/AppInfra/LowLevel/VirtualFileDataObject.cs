@@ -19,6 +19,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 {
     public static FileGroup SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass> SelfFiles { get; private set; }
+    public static string DummyFileName { get; private set; }
 
     /// <summary>
     /// In-order list of registered data objects.
@@ -382,11 +383,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         },
     });
 
-    /// <summary>
-    /// Provides data for the specified data format (FILEGROUPDESCRIPTOR/FILEDESCRIPTOR)
-    /// </summary>
-    /// <param name="fileDescriptors">Collection of virtual files.</param>
-    public void SetData(IEnumerable<FileDescriptor> fileDescriptors, bool includeContent = true)
+    public void SetFileDescriptors(IEnumerable<FileDescriptor> fileDescriptors, bool includeContent = true)
     {
         FileGroup group = new(fileDescriptors);
 
@@ -398,7 +395,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
         if (includeContent)
             UpdateData(AdbDataFormats.FileContents, group.DataStreams);
-        }
+    }
 
     public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
     {
@@ -406,7 +403,10 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
-    
+
+    public void SetFileDrop(params IEnumerable<string> files)
+        => SetData(AdbDataFormats.FileDrop, new NativeMethods.CFHDROP(files).Bytes);
+
     public List<FileSyncOperation> Operations { get; private set; }
 
     private DragDropEffects currentEffect = DragDropEffects.None;
@@ -614,7 +614,9 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
     }
 
-    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files, DragDropEffects preferredEffect = DragDropEffects.Copy, DataObjectMethod method = DataObjectMethod.DragDrop)
+    public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files,
+                                                        DragDropEffects preferredEffect = DragDropEffects.Copy,
+                                                        DataObjectMethod method = DataObjectMethod.DragDrop)
     {
         CopyPasteService.ClearTempFolder();
 
@@ -630,9 +632,8 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
         // TODO: disable this if Files App is running, and drag window when over it
 
-        bool advancedDrag = Data.Settings.AdvancedDrag && vfdo.Method is DataObjectMethod.DragDrop;
         var includeContent =
-            !advancedDrag
+            !Data.Settings.AdvancedDrag
             && !Data.FileActions.IsSelectionIllegalOnWindows
             && !Data.FileActions.IsSelectionConflictingOnFuse
             && !Data.FileActions.IsRecycleBin;
@@ -650,7 +651,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             {
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    vfdo.SetData(files.SelectMany(f => f.Descriptors));
+                    vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
                     Data.RuntimeSettings.MainCursor = Cursors.Arrow;
                 });
 
@@ -666,11 +667,41 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
         else
         {
-            if (advancedDrag)
-                vfdo.SetData(AdbDataFormats.FileDrop, new NativeMethods.CFHDROP([$"AdbExplorerDummyDropFile"]).Bytes);
+            if (Data.Settings.AdvancedDrag)
+            {
+                if (vfdo.Method is DataObjectMethod.DragDrop)
+                    vfdo.SetFileDrop($"AdbExplorerDummyDropFile");
+                else
+                {
+                    DummyFileName = $"AdbExplorerDummyDropFile_{RandomString.GetUniqueKey(10, [.. AdbExplorerConst.WIFI_PAIRING_ALPHABET.Except(AdbExplorerConst.INVALID_NTFS_CHARS)])}";
+
+                    string path = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, DummyFileName, '\\');
+                    File.WriteAllText(path, DateTime.Now.ToString());
+
+                    vfdo.SetFileDrop(path);
+                    
+                    Data.RuntimeSettings.PropertyChanged += (_, e) =>
+                    {
+                        if (e.PropertyName is nameof(Data.RuntimeSettings.PasteDestination))
+                        {
+                            string filePath = FileHelper.ConcatPaths(Data.RuntimeSettings.PasteDestination, DummyFileName);
+                            ExplorerHelper.DeleteNotifyFile(filePath);
+
+                            App.Current.Dispatcher.Invoke(() =>
+                            {
+                                FileActionLogic.PullFiles(Data.RuntimeSettings.PasteDestination, SelfFiles);
+                            });
+
+                            // We cannot allow the user to reuse the VFDO, even if it was a copy operation
+                            CopyPasteService.ClearTempFolder();
+                            Data.CopyPaste.Clear();
+                        }
+                    };
+                }
+            }
 
             files.ForEach(f => f.PrepareDescriptors(vfdo, false));
-            vfdo.SetData(files.SelectMany(f => f.Descriptors), false);
+            vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors), false);
         }
 
         // Finally we provide the ADB drag data, which only we recongize
@@ -706,6 +737,8 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                 CurrentEffect = allowedEffects;
                 PerformedDropEffect = allowedEffects;
                 Clipboard.SetDataObject(this);
+
+                Data.RuntimeSettings.PasteDestination = null;
             }
             else
                 throw new NotSupportedException();

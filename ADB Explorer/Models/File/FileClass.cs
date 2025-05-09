@@ -480,6 +480,8 @@ public class FileClass : FilePath, IFileStat
                 if (op.VFDO.Operations.All(op => op.Status is FileOperation.OperationStatus.Completed))
                     Data.CopyPaste.Clear();
             }
+
+            op.VFDO = null;
         }
 
         op.PropertyChanged -= PullOperation_PropertyChanged;

@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Services;
+﻿using ADB_Explorer.Models;
+
+namespace ADB_Explorer.Services;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
@@ -9,6 +11,7 @@ public static partial class NativeMethods
         private static Action _externalClipAction;
         private static Action<string> _externalIpcAction;
         private static HwndSource _hwndSource;
+        private static ExplorerWatcher explorerWatcher;
 
         public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 
@@ -27,10 +30,38 @@ public static partial class NativeMethods
 
                 AddClipboardFormatListener(MainWindowHandle);
 
+                Data.CopyPaste.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(Data.CopyPaste.PasteSource))
+                    {
+                        InitWatcher();
+                    }
+                };
+
+                Data.Settings.PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == nameof(Data.Settings.AdvancedDrag))
+                    {
+                        // The DataObject will have to be recreated if the setting changes
+                        Clipboard.Clear();
+                    }
+                };
+
                 window.Loaded -= handler;
             };
 
             window.Loaded += handler;
+        }
+
+        private static void InitWatcher()
+        {
+            if (Data.CopyPaste.IsSelfClipboard && Data.Settings.AdvancedDrag)
+                explorerWatcher = new();
+            else
+            {
+                explorerWatcher?.Dispose();
+                explorerWatcher = null;
+            }
         }
 
         public static void Close()
@@ -47,7 +78,7 @@ public static partial class NativeMethods
                 _externalClipAction();
                 handled = true;
             }
-            else if ((WindowsMessages)msg is WindowsMessages.WM_COPYDATA)
+            else if ((WindowMessages)msg is WindowMessages.WM_COPYDATA)
             // Since we already have a hook for MainWindow, we'll use it for IPC as well
             {
                 var cds = Marshal.PtrToStructure<COPYDATASTRUCT>(lParam);
@@ -57,10 +88,10 @@ public static partial class NativeMethods
             return IntPtr.Zero;
         }
 
-        [DllImport("user32.dll", SetLastError = true)]
+        [DllImport("User32.dll", SetLastError = true)]
         private static extern bool AddClipboardFormatListener(HANDLE hwnd);
 
-        [DllImport("user32.dll", SetLastError = true)]
+        [DllImport("User32.dll", SetLastError = true)]
         private static extern bool RemoveClipboardFormatListener(HANDLE hwnd);
 
         public void Dispose() => Close();

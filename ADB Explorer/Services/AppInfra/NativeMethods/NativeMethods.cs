@@ -401,9 +401,35 @@ public static partial class NativeMethods
         WM_RBUTTONUP = 0x0205
     }
 
-    public enum WindowsMessages
+    public enum WindowMessages
     {
         WM_COPYDATA = 0x004A,
+    }
+
+    /// <summary>
+    /// Event Constants (Winuser.h)
+    /// </summary>
+    public enum WindowsEvents
+    {
+        /// <summary>
+        /// Sent when the foreground (active) window changes, even if it is changing
+        /// to another window in the same thread as the previous one. <br />
+        ///      hwnd       is hwndNewForeground <br />
+        ///      idObject   is OBJID_WINDOW <br />
+        ///      idChild    is INDEXID_OBJECT <br />
+        /// </summary>
+        EVENT_SYSTEM_FOREGROUND = 0x0003,
+    }
+
+    /// <summary>
+    /// dwFlags for SetWinEventHook (Winuser.h)
+    /// </summary>
+    public enum WinEventHookFlags
+    {
+        WINEVENT_OUTOFCONTEXT = 0x0000,
+        WINEVENT_SKIPOWNTHREAD = 0x0001,
+        WINEVENT_SKIPOWNPROCESS = 0x0002,
+        WINEVENT_INCONTEXT = 0x0004
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -641,7 +667,7 @@ public static partial class NativeMethods
     [DllImport("User32.dll", CharSet = CharSet.Auto)]
     private static extern IntPtr SendMessage(HANDLE hWnd, uint Msg, IntPtr wParam, ref COPYDATASTRUCT lParam);
 
-    public static bool SendMessage(HANDLE windowHandle, WindowsMessages messageType, ref COPYDATASTRUCT data)
+    public static bool SendMessage(HANDLE windowHandle, WindowMessages messageType, ref COPYDATASTRUCT data)
     {
         var result = SendMessage(windowHandle, (uint)messageType, IntPtr.Zero, ref data);
         return result != IntPtr.Zero;

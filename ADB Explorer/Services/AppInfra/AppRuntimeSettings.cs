@@ -385,6 +385,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref pathUnderMouse, value);
     }
 
+    private ShellItem pasteDestination = null;
+    public ShellItem PasteDestination
+    {
+        get => pasteDestination;
+        set => Set(ref pasteDestination, value);
+    }
+
     private float transferProgress = 0;
     public float TransferProgress
     {
@@ -397,6 +404,13 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => currentTransferFile;
         set => Set(ref currentTransferFile, value);
+    }
+
+    private FileSystemWatcher[] watchers = [];
+    public FileSystemWatcher[] Watchers
+    {
+        get => watchers;
+        set => Set(ref watchers, value);
     }
 
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch

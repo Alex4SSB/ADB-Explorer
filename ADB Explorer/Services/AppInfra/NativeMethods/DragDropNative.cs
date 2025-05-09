@@ -144,12 +144,11 @@ public static partial class NativeMethods
                 List<byte> bytes = [];
 
                 dropFiles.pFiles = (uint)Marshal.SizeOf<DROPFILES>();
-                dropFiles.fWide = false;
+                dropFiles.fWide = true;
 
                 bytes.AddRange(BytesFromStructure(dropFiles));
 
-                //bytes.AddRange(Encoding.Unicode.GetBytes(string.Join('\0', fileNames) + "\0\0"));
-                bytes.AddRange(Encoding.UTF8.GetBytes(string.Join('\0', fileNames) + "\0\0"));
+                bytes.AddRange(Encoding.Unicode.GetBytes(string.Join('\0', fileNames) + "\0\0"));
 
                 return bytes;
             }

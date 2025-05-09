@@ -198,15 +198,18 @@ public partial class DragWindow : INotifyPropertyChanged
                 Top = actualPoint.Y - DragImage.ActualHeight - 10;
                 Left = actualPoint.X - DragImage.ActualWidth / 2;
 
-                try
+                if (Data.Settings.AdvancedDrag)
                 {
-                    ElementUnderMouse = AutomationElement.FromPoint(actualPoint);
+                    try
+                    {
+                        ElementUnderMouse = AutomationElement.FromPoint(actualPoint);
+                    }
+                    catch
+                    {
+                        ElementUnderMouse = null;
+                    }
                 }
-                catch
-                {
-                    ElementUnderMouse = null;
-                }
-
+                
                 MouseWithinApp = NativeMethods.MonitorInfo.IsPointInMainWin(point);
                 if (!MouseWithinApp)
                 {

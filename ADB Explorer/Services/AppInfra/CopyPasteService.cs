@@ -678,7 +678,7 @@ public class CopyPasteService : ViewModelBase
 
     public static async void VerifyAndPush(string targetPath, IEnumerable<FileClass> pasteItems, DragDropEffects dropEffects = DragDropEffects.Copy)
     {
-        pasteItems = await MergeFiles(pasteItems, targetPath);
+        pasteItems = await MergeFiles(targetPath, pasteItems);
         if (!pasteItems.Any())
             return;
 
@@ -687,7 +687,7 @@ public class CopyPasteService : ViewModelBase
 
     public static FileSyncOperation VerifyAndPush(string targetPath, FileClass pasteItem, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
     {
-        var items = MergeFiles([pasteItem], targetPath).Result;
+        var items = MergeFiles(targetPath, pasteItem).Result;
         if (!items.Any())
             return null;
 
@@ -706,7 +706,7 @@ public class CopyPasteService : ViewModelBase
         if (!pasteItems.Any())
             return;
 
-        pasteItems = await MergeFiles(pasteItems, targetPath);
+        pasteItems = await MergeFiles(targetPath, pasteItems);
         if (!pasteItems.Any())
             return;
 
@@ -802,14 +802,14 @@ public class CopyPasteService : ViewModelBase
     /// Check for existing top level items in the target location. <br />
     /// Ask the user whether to abort, continue, or exclude the conflicting items.
     /// </summary>
-    /// <param name="filePaths">Full paths of the files to be transferred.</param>
     /// <param name="targetPath">Full path of the target location.</param>
+    /// <param name="filePaths">Full paths of the files to be transferred.</param>
     /// <returns>
     /// An empty list if user selected Cancel. <br />
     /// The original list if user selected Merge or Replace. <br />
     /// The file list excluding the top level conflicting items if user selected Skip.
     /// </returns>
-    public static async Task<IEnumerable<FileClass>> MergeFiles(IEnumerable<FileClass> filePaths, string targetPath)
+    public static async Task<IEnumerable<FileClass>> MergeFiles(string targetPath, params IEnumerable<FileClass> filePaths)
     {
         // Figure out whether the target is Windows or Android
         var sep = FileHelper.GetSeparator(targetPath);

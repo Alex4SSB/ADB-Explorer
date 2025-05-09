@@ -48,7 +48,7 @@ public class IpcService
             lpData = message
         };
 
-        return NativeMethods.SendMessage(hWnd, NativeMethods.WindowsMessages.WM_COPYDATA, ref cds);
+        return NativeMethods.SendMessage(hWnd, NativeMethods.WindowMessages.WM_COPYDATA, ref cds);
     }
 
     public static void NotifyDropCancel(NativeMethods.HResult hr)
