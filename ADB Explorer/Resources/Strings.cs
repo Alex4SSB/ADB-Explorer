@@ -79,7 +79,10 @@ public static class Strings
         The release notes are available on GitHub.
         """;
 
+    public const string S_CONFLICTING_APPS_TITLE = "Conflicting Apps";
 
+    public static string S_CONFLICTING_APPS(IEnumerable<string> apps) =>
+        $"File Explorer monitoring is not available due to the following apps running:\n\n{string.Join('\n', apps)}";
 
     public const string S_FUSE_DRIVE_TOOLTIP = "FUSE drive." +
         "\n• Symbolic links are not supported" +

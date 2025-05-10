@@ -1,4 +1,6 @@
-﻿namespace ADB_Explorer.Services;
+﻿using ADB_Explorer.Models;
+
+namespace ADB_Explorer.Services;
 
 public class ProcessHandling
 {
@@ -54,4 +56,9 @@ public class ProcessHandling
 
         yield return process;
     }
+
+    public static IEnumerable<string> GetConflictingApps()
+        => Process.GetProcesses()
+        .Where(p => AdbExplorerConst.INCOMPATIBLE_APPS.Contains(p.ProcessName))
+        .Select(p => p.ProcessName);
 }

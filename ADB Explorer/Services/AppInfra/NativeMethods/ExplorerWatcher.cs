@@ -58,7 +58,12 @@ public static partial class NativeMethods
             var proc = Process.GetProcessById(rootElement.Current.ProcessId);
 
             if (proc.ProcessName is not "explorer")
+            {
+                if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(proc.ProcessName))
+                    ExplorerHelper.CheckConflictingApps();
+
                 return;
+            }
 
             explorerWindow = rootElement;
             string path = null;

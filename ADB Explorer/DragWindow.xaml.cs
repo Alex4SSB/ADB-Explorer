@@ -215,7 +215,7 @@ public partial class DragWindow : INotifyPropertyChanged
             Left = actualPoint.X - DragImage.ActualWidth / 2;
         }
 
-        if (Data.Settings.AdvancedDrag)
+        if (Data.RuntimeSettings.IsAdvancedDragEnabled)
         {
             try
             {

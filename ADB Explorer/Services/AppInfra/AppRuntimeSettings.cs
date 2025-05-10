@@ -423,6 +423,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref watchers, value);
     }
 
+    private bool isAdvancedDragEnabled = false;
+    public bool IsAdvancedDragEnabled
+    {
+        get => isAdvancedDragEnabled;
+        set => Set(ref isAdvancedDragEnabled, value);
+    }
+
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch
     {
         Architecture.Arm64 or Architecture.Arm or Architecture.Armv6 => true,

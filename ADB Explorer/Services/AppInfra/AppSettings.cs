@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
@@ -80,7 +81,16 @@ public class AppSettings : ViewModelBase
     public bool AdvancedDrag
     {
         get => Get(ref advancedDrag, true);
-        set => Set(ref advancedDrag, value);
+        set
+        {
+            if (Set(ref advancedDrag, value))
+            {
+                if (!value)
+                    Data.RuntimeSettings.IsAdvancedDragEnabled = false;
+                else
+                    ExplorerHelper.CheckConflictingApps();
+            }
+        }
     }
 
     #endregion

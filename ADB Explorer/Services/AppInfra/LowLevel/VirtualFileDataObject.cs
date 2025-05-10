@@ -20,6 +20,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     public static FileGroup SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass> SelfFiles { get; private set; }
     public static string DummyFileName { get; private set; }
+    private static bool isFirstActivation = true;
 
     /// <summary>
     /// In-order list of registered data objects.
@@ -612,6 +613,10 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                                                         DragDropEffects preferredEffect = DragDropEffects.Copy,
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)
     {
+        ExplorerHelper.CheckConflictingApps(isFirstActivation && method is DataObjectMethod.Clipboard);
+        if (isFirstActivation)
+            isFirstActivation = false;
+
         CopyPasteService.ClearTempFolder();
 
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
@@ -627,7 +632,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         // TODO: disable this if Files App is running, and drag window when over it
 
         var includeContent =
-            !Data.Settings.AdvancedDrag
+            !Data.RuntimeSettings.IsAdvancedDragEnabled
             && !Data.FileActions.IsSelectionIllegalOnWindows
             && !Data.FileActions.IsSelectionConflictingOnFuse
             && !Data.FileActions.IsRecycleBin;
@@ -658,10 +663,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             // File Explorer will read the file contents to memory as soon as they appear in the clipboard.
             vfdo.SetData(AdbDataFormats.FileDescriptor, []);
             vfdo.SetData(AdbDataFormats.FileContents, []);
+            SelfFileGroup = new([]);
         }
         else
         {
-            if (Data.Settings.AdvancedDrag)
+            if (Data.RuntimeSettings.IsAdvancedDragEnabled)
             {
                 if (vfdo.Method is DataObjectMethod.DragDrop)
                     vfdo.SetFileDrop($"AdbExplorerDummyDropFile");
@@ -725,7 +731,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             if (method is DataObjectMethod.DragDrop)
             {
                 DoDragDrop(dragSource, allowedEffects);
-                if (Data.Settings.AdvancedDrag
+                if (Data.RuntimeSettings.IsAdvancedDragEnabled
                     && Data.CopyPaste.DragResult is NativeMethods.HResult.DRAGDROP_S_DROP
                     && Data.RuntimeSettings.PathUnderMouse is not null)
                 {

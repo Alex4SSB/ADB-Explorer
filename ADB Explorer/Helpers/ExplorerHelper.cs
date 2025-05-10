@@ -1,4 +1,6 @@
 ﻿using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
+using ADB_Explorer.Services;
 using System.Windows.Automation;
 
 namespace ADB_Explorer.Helpers;
@@ -215,5 +217,30 @@ public class ExplorerHelper
         }
 
         return result;
+    }
+
+    public static void CheckConflictingApps(bool showMessage = true)
+    {
+        if (Data.Settings.AdvancedDrag)
+        {
+            if (ProcessHandling.GetConflictingApps() is var apps && apps.Any())
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    Data.RuntimeSettings.IsAdvancedDragEnabled = false;
+
+                    if (showMessage)
+                        DialogService.ShowMessage(Strings.S_CONFLICTING_APPS(apps), Strings.S_CONFLICTING_APPS_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+                });
+            }
+            else
+            {
+                Data.RuntimeSettings.IsAdvancedDragEnabled = true;
+            }
+        }
+        else
+        {
+            Data.RuntimeSettings.IsAdvancedDragEnabled = false;
+        }
     }
 }

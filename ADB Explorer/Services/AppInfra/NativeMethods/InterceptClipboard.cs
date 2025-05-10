@@ -38,12 +38,13 @@ public static partial class NativeMethods
                     }
                 };
 
-                Data.Settings.PropertyChanged += (s, e) =>
+                Data.RuntimeSettings.PropertyChanged += (s, e) =>
                 {
-                    if (e.PropertyName == nameof(Data.Settings.AdvancedDrag))
+                    if (e.PropertyName == nameof(Data.RuntimeSettings.IsAdvancedDragEnabled))
                     {
                         // The DataObject will have to be recreated if the setting changes
-                        Clipboard.Clear();
+                        if (Data.CopyPaste.IsSelfClipboard)
+                            Data.CopyPaste.Clear();
                     }
                 };
 
@@ -55,7 +56,7 @@ public static partial class NativeMethods
 
         private static void InitWatcher()
         {
-            if (Data.CopyPaste.IsSelfClipboard && Data.Settings.AdvancedDrag)
+            if (Data.CopyPaste.IsSelfClipboard && Data.RuntimeSettings.IsAdvancedDragEnabled)
                 explorerWatcher = new();
             else
             {
