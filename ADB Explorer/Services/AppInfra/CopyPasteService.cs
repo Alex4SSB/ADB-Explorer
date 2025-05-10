@@ -201,6 +201,16 @@ public class CopyPasteService : ViewModelBase
         }
         else
         {
+            if (IsSelf && VirtualFileDataObject.SelfFiles is not null)
+            {
+                foreach (var file in VirtualFileDataObject.SelfFiles)
+                {
+                    yield return file;
+                }
+
+                yield break;
+            }
+
             for (int i = 0; i < Descriptors.Length; i++)
             {
                 TrashIndexer indexer = null;
@@ -294,6 +304,25 @@ public class CopyPasteService : ViewModelBase
 
         Files = DragFiles;
         ParentFolder = DragParent;
+
+        UpdateUI();
+    }
+
+    public void UpdateSelfVFDO()
+    {
+        if (VirtualFileDataObject.SelfFiles is null || !VirtualFileDataObject.SelfFiles.Any())
+            return;
+
+        PasteSource &= ~DataSource.None;
+        DragPasteSource = DataSource.None;
+        CurrentSource |= DataSource.Android;
+        CurrentSource |= DataSource.Self;
+
+        SourceDevice = Data.CurrentADBDevice.Device;
+        MasterPid = Environment.ProcessId;
+        DragParent = VirtualFileDataObject.SelfFiles.First().ParentPath;
+        DragFiles = [.. VirtualFileDataObject.SelfFileGroup.FileDescriptors.Select(d => d.Name)];
+        Descriptors = [.. VirtualFileDataObject.SelfFileGroup.FileDescriptors];
 
         UpdateUI();
     }

@@ -78,10 +78,8 @@ public class FileDescriptor
 
     public static FileDescriptor[] GetDescriptors(IDataObject dataObject)
     {
-#if DEBUG
         if (Data.CopyPaste.IsSelf)
             return VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
-#endif
 
         try
         {

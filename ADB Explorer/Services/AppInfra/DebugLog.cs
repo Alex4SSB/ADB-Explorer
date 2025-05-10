@@ -9,7 +9,7 @@ public static class DebugLog
         mutex.WaitOne();
         
         if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-            File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | {message}\n");
+            File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now:HH:mm:ss:fff} | {message}\n");
 
         mutex.ReleaseMutex();
     }

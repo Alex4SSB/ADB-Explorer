@@ -1927,6 +1927,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 if (vfdo is not null)
                 {
+                    CopyPaste.UpdateSelfVFDO();
                     RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
 
                     vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);

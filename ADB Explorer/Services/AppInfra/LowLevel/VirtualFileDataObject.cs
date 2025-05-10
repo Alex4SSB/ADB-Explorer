@@ -383,10 +383,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     public void SetFileDescriptors(IEnumerable<FileDescriptor> fileDescriptors, bool includeContent = true)
     {
         FileGroup group = new(fileDescriptors);
-
-#if DEBUG
         SelfFileGroup = group;
-#endif
 
         UpdateData(AdbDataFormats.FileDescriptor, group.GroupDescriptorBytes);
 

@@ -22,7 +22,7 @@ public static partial class NativeMethods
         private static HANDLE _mouseHookID = IntPtr.Zero;
         private static Action<POINT> _externalMouseAction;
         private static MouseMessages _requestedMouseEvent;
-        private static POINT _mousePosition;
+        public static POINT MousePosition { get; private set; }
         
         public static HANDLE WindowUnderMouse { get; private set; }
 
@@ -59,17 +59,17 @@ public static partial class NativeMethods
             var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
 
             POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
-            if (newPoint != _mousePosition)
-                _externalMouseAction?.Invoke(_mousePosition);
+            if (newPoint != MousePosition)
+                _externalMouseAction?.Invoke(MousePosition);
 
-            _mousePosition = newPoint;
+            MousePosition = newPoint;
 
             return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
         }
 
         public static int? GetPidFromPoint()
         {
-            WindowUnderMouse = WindowFromPoint(_mousePosition);
+            WindowUnderMouse = WindowFromPoint(MousePosition);
 
             if (WindowUnderMouse == IntPtr.Zero)
                 return null;

@@ -33,11 +33,17 @@ public partial class DragWindow : INotifyPropertyChanged
     private void DragTimer_Tick(object sender, EventArgs e)
     {
         if (Data.RuntimeSettings.DragBitmap is not null)
+        {
+            if (imageEmpty)
+                UpdateMouse(NativeMethods.InterceptMouse.MousePosition);
+
             GetPathUnderMouse();
+        }
     }
 
     private DateTime lastUpdate;
     private bool waitingForUpdate = false;
+    private bool imageEmpty = false;
 
     private void GetPathUnderMouse()
     {
@@ -189,54 +195,58 @@ public partial class DragWindow : INotifyPropertyChanged
 #if DEBUG
         MouseWithinApp = true;
 #else
-        NativeMethods.InterceptMouse.Init(NativeMethods.MouseMessages.WM_MOUSEMOVE,
-            point =>
-            {
-                if (Data.RuntimeSettings.DragBitmap is null)
-                    return;
-
-                var actualPoint = NativeMethods.MonitorInfo.MousePositionToDpi(point, windowHandle);
-
-                Top = actualPoint.Y - DragImage.ActualHeight - 2;
-                Left = actualPoint.X - DragImage.ActualWidth / 2;
-
-                if (Data.Settings.AdvancedDrag)
-                {
-                    try
-                    {
-                        ElementUnderMouse = AutomationElement.FromPoint(actualPoint);
-                    }
-                    catch
-                    {
-                        ElementUnderMouse = null;
-                    }
-                }
-                
-                MouseWithinApp = NativeMethods.MonitorInfo.IsPointInMainWin(point);
-                if (!MouseWithinApp)
-                {
-                    if (Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
-                        Data.RuntimeSettings.DragBitmap = null;
-
-                    if (NativeMethods.InterceptMouse.GetPidFromPoint() is int pid
-                        && Process.GetProcessById(pid) is Process proc)
-                    {
-                        processUnderMouse = proc.ProcessName;
-                        Data.RuntimeSettings.DragWithinSlave = processUnderMouse == Properties.Resources.AppDisplayName;
-
-                        if (processUnderMouse is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
-                            Data.RuntimeSettings.DragBitmap = null;
-                    }
-                    else
-                        processUnderMouse = "";
-                }
-                else
-                    Data.RuntimeSettings.DragWithinSlave = false;
-            });
-
+        NativeMethods.InterceptMouse.Init(NativeMethods.MouseMessages.WM_MOUSEMOVE, UpdateMouse);
 #endif
 
         DragTimer.Start();
+    }
+
+    private void UpdateMouse(NativeMethods.POINT point)
+    {
+        if (Data.RuntimeSettings.DragBitmap is null)
+            return;
+
+        var actualPoint = NativeMethods.MonitorInfo.MousePositionToDpi(point, windowHandle);
+
+        imageEmpty = DragImage.ActualHeight < 1;
+        if (!imageEmpty)
+        {
+            Top = actualPoint.Y - DragImage.ActualHeight - 2;
+            Left = actualPoint.X - DragImage.ActualWidth / 2;
+        }
+
+        if (Data.Settings.AdvancedDrag)
+        {
+            try
+            {
+                ElementUnderMouse = AutomationElement.FromPoint(actualPoint);
+            }
+            catch
+            {
+                ElementUnderMouse = null;
+            }
+        }
+
+        MouseWithinApp = NativeMethods.MonitorInfo.IsPointInMainWin(point);
+        if (!MouseWithinApp)
+        {
+            if (Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
+                Data.RuntimeSettings.DragBitmap = null;
+
+            if (NativeMethods.InterceptMouse.GetPidFromPoint() is int pid
+                && Process.GetProcessById(pid) is Process proc)
+            {
+                processUnderMouse = proc.ProcessName;
+                Data.RuntimeSettings.DragWithinSlave = processUnderMouse == Properties.Resources.AppDisplayName;
+
+                if (processUnderMouse is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
+                    Data.RuntimeSettings.DragBitmap = null;
+            }
+            else
+                processUnderMouse = "";
+        }
+        else
+            Data.RuntimeSettings.DragWithinSlave = false;
     }
 
     private void Window_Closing(object sender, CancelEventArgs e)
