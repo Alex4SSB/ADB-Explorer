@@ -156,7 +156,7 @@ public class AppRuntimeSettings : ViewModelBase
 
             try
             {
-                App.Current.Dispatcher.Invoke(() =>
+                App.Current?.Dispatcher.Invoke(() =>
                 {
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(TimeFromLastResponse));
@@ -389,7 +389,17 @@ public class AppRuntimeSettings : ViewModelBase
     public ShellItem PasteDestination
     {
         get => pasteDestination;
-        set => Set(ref pasteDestination, value);
+        set
+        {
+            // When changing to null or the same path - don't notify
+            if (value is null || pasteDestination?.FileSystemPath == value.FileSystemPath)
+            {
+                pasteDestination = value;
+                return;
+            }
+
+            Set(ref pasteDestination, value);
+        }
     }
 
     private float transferProgress = 0;

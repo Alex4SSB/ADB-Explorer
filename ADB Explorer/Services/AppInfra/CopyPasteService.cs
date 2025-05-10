@@ -270,8 +270,7 @@ public class CopyPasteService : ViewModelBase
         var CPDO = Clipboard.GetDataObject();
 
 #if !DEPLOY
-        if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-            File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Clipboard formats: {string.Join(", ", CPDO.GetFormats())}\n");
+        DebugLog.PrintLine($"Clipboard formats: {string.Join(", ", CPDO.GetFormats())}");
 #endif
 
         var allowedEffect = GetAllowedDragEffects(CPDO);

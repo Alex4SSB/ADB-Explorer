@@ -651,7 +651,7 @@ internal static class FileActionLogic
             if (t.IsCanceled || t.Result is null)
                 return;
 
-            App.Current.Dispatcher.Invoke(async () =>
+            App.Current?.Dispatcher.Invoke(async () =>
             {
                 if (await Data.DevicesObject.Current?.UpdateDrives(await t, App.Current.Dispatcher, asyncClassify))
                 {
@@ -1004,8 +1004,11 @@ internal static class FileActionLogic
         PullFiles(path, pullItems);
     }
 
-    public static async void PullFiles(ShellItem path, IEnumerable<FileClass> pullItems)
+    public static async void PullFiles(ShellItem path, IEnumerable<FileClass> pullItems, bool notify = false)
     {
+        if (pullItems is null || !pullItems.Any())
+            return;
+
         var match = AdbRegEx.RE_WINDOWS_DRIVE_ROOT().Match(path.ParsingName);
         var invalidFiles = pullItems.Where(f => AdbExplorerConst.INVALID_WINDOWS_ROOT_PATHS.Contains(f.FullName));
 
@@ -1046,8 +1049,23 @@ internal static class FileActionLogic
             SyncFile target = new(path);
             target.UpdatePath(FileHelper.ConcatPaths(target, item.FullName));
 
-            Data.FileOpQ.AddOperation(FileSyncOperation.PullFile(new(item), target, Data.CurrentADBDevice, App.Current.Dispatcher));
+            var fileOp = FileSyncOperation.PullFile(new(item), target, Data.CurrentADBDevice, App.Current.Dispatcher);
+
+            if (notify)
+                fileOp.PropertyChanged += PullOperation_PropertyChanged;
+
+            Data.FileOpQ.AddOperation(fileOp);
         }
+    }
+
+    private static void PullOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(FileOperation.Status))
+            return;
+
+        var op = sender as FileSyncOperation;
+        if (op.Status is FileOperation.OperationStatus.Completed)
+            ExplorerHelper.NotifyFileCreated(op.TargetPath.FullPath);
     }
 
     public static void ToggleFileOpQ()

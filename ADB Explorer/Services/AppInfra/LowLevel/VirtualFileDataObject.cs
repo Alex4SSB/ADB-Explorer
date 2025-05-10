@@ -123,19 +123,17 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// <param name="medium">When this method returns, contains a pointer to the STGMEDIUM structure that indicates the storage medium containing the returned data through its tymed member, and the responsibility for releasing the medium through the value of its pUnkForRelease member.</param>
     void System.Runtime.InteropServices.ComTypes.IDataObject.GetData(ref FORMATETC format, out STGMEDIUM medium)
     {
-        AdbDataFormat adbDataFormat = null;
         var formatCopy = format;
         medium = new();
 
         var hr = (NativeMethods.HResult)((System.Runtime.InteropServices.ComTypes.IDataObject)this).QueryGetData(ref format);
 
 #if !DEPLOY
-        if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-        {
-            adbDataFormat = AdbDataFormats.GetFormat(formatCopy.cfFormat);
-            if (adbDataFormat is not null)
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Query: {adbDataFormat.Name}\n");
-        }
+        AdbDataFormat adbDataFormat = AdbDataFormats.GetFormat(formatCopy.cfFormat);
+
+        // Unknown formats are not printed
+        if (adbDataFormat is not null)
+            DebugLog.PrintLine($"Query: {adbDataFormat.Name}");
 #endif
 
         if (hr is NativeMethods.HResult.Ok)
@@ -150,14 +148,13 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             if (dataObject is not null)
             {
 #if !DEPLOY
-                if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                {
-                    var index = adbDataFormat == AdbDataFormats.FileContents
+                var index = adbDataFormat == AdbDataFormats.FileContents
                         ? $"[{dataObject.FORMATETC.lindex}]"
                         : "";
 
-                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Get data: {adbDataFormat?.Name}{index}\n");
-                }
+                // Unknown formats are not printed
+                if (adbDataFormat is not null)
+                    DebugLog.PrintLine($"Get data: {adbDataFormat.Name}{index}");
 #endif
 
                 // Populate the STGMEDIUM
@@ -679,24 +676,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                     File.WriteAllText(path, DateTime.Now.ToString());
 
                     vfdo.SetFileDrop(path);
-                    
-                    Data.RuntimeSettings.PropertyChanged += (_, e) =>
-                    {
-                        if (e.PropertyName is nameof(Data.RuntimeSettings.PasteDestination))
-                        {
-                            string filePath = FileHelper.ConcatPaths(Data.RuntimeSettings.PasteDestination, DummyFileName);
-                            ExplorerHelper.DeleteNotifyFile(filePath);
-
-                            App.Current.Dispatcher.Invoke(() =>
-                            {
-                                FileActionLogic.PullFiles(Data.RuntimeSettings.PasteDestination, SelfFiles);
-                            });
-
-                            // We cannot allow the user to reuse the VFDO, even if it was a copy operation
-                            CopyPasteService.ClearTempFolder();
-                            Data.CopyPaste.Clear();
-                        }
-                    };
+                    Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
                 }
             }
 
@@ -708,6 +688,29 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
 
         return vfdo;
+    }
+
+    private static void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(Data.RuntimeSettings.PasteDestination)
+                            && Data.RuntimeSettings.PasteDestination is not null
+                            && SelfFiles is not null)
+        {
+            Data.RuntimeSettings.PropertyChanged -= RuntimeSettings_PropertyChanged;
+
+            string filePath = FileHelper.ConcatPaths(Data.RuntimeSettings.PasteDestination, DummyFileName);
+            ExplorerHelper.DeleteNotifyFile(filePath);
+
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                FileActionLogic.PullFiles(Data.RuntimeSettings.PasteDestination, SelfFiles, true);
+
+                // We cannot allow the user to reuse the VFDO, even if it was a copy operation
+                CopyPasteService.ClearTempFolder();
+                Data.CopyPaste.Clear();
+                SelfFiles = null;
+            });
+        }
     }
 
     public enum DataObjectMethod
@@ -729,7 +732,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                     && Data.CopyPaste.DragResult is NativeMethods.HResult.DRAGDROP_S_DROP
                     && Data.RuntimeSettings.PathUnderMouse is not null)
                 {
-                    FileActionLogic.PullFiles(Data.RuntimeSettings.PathUnderMouse, SelfFiles);
+                    FileActionLogic.PullFiles(Data.RuntimeSettings.PathUnderMouse, SelfFiles, true);
                 }
             }
             else if (method is DataObjectMethod.Clipboard)
@@ -779,8 +782,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         catch (Exception e)
         {
 #if !DEPLOY
-            if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Exception in DoDragDrop: {e.Message}\n");
+            DebugLog.PrintLine($"Exception in DoDragDrop: {e.Message}");
 #endif
         }
     }
@@ -829,8 +831,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             onFeedback?.Invoke(dragDropEffects);
 
 #if !DEPLOY
-            if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | GiveFeedback dwEffect: {dragDropEffects}\n");
+            DebugLog.PrintLine($"GiveFeedback dwEffect: {dragDropEffects}");
 #endif
 
             if (dragDropEffects is DragDropEffects.None)

@@ -169,6 +169,8 @@ public static partial class NativeMethods
 
                         yield return CreateFileSystemWatcher(drive.Name);
                     }
+
+                    continue;
                 }
                 
                 yield return CreateFileSystemWatcher(path);
@@ -194,8 +196,7 @@ public static partial class NativeMethods
         private static void folderWatcher_Created(object sender, FileSystemEventArgs e)
         {
 #if !DEPLOY
-            if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | File {e.ChangeType} : {e.FullPath}\n");
+            DebugLog.PrintLine($"File {e.ChangeType} : {e.FullPath}");
 #endif
 
             if (e.Name == VirtualFileDataObject.DummyFileName)
@@ -210,8 +211,7 @@ public static partial class NativeMethods
                 return;
 
 #if !DEPLOY
-            if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Paste Destination: {Data.RuntimeSettings.PasteDestination.FileSystemPath}\n");
+            DebugLog.PrintLine($"Paste Destination: {Data.RuntimeSettings.PasteDestination.FileSystemPath}");
 #endif
         }
 

@@ -370,8 +370,7 @@ public class FileClass : FilePath, IFileStat
                     return;
 
 #if !DEPLOY
-                if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-                    File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now} | Total uninitiated operations: {operations.Count()}\n");
+                DebugLog.PrintLine($"Total uninitiated operations: {operations.Count()}");
 #endif
 
                 // Add all uninitiated operations to the queue.

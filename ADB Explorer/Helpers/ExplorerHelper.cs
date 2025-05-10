@@ -196,4 +196,24 @@ public class ExplorerHelper
 
         return result;
     }
+
+    public static bool NotifyFileCreated(string path)
+    {
+        var hPath = (nuint)Marshal.StringToHGlobalUni(path);
+        bool result = false;
+
+        try
+        {
+            Vanara.PInvoke.Shell32.SHChangeNotify(Vanara.PInvoke.Shell32.SHCNE.SHCNE_CREATE, Vanara.PInvoke.Shell32.SHCNF.SHCNF_PATHW, hPath);
+            result = true;
+        }
+        catch
+        { }
+        finally
+        {
+            Marshal.FreeHGlobal((nint)hPath);
+        }
+
+        return result;
+    }
 }

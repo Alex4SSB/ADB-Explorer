@@ -50,10 +50,13 @@ public partial class App : Application
                 ReadSettingsFile(reader);
             }
 
+#if !DEPLOY
             if (!File.Exists(ADB_Explorer.Properties.Resources.DragDropLogPath))
             {
                 File.WriteAllText(ADB_Explorer.Properties.Resources.DragDropLogPath, "");
             }
+#endif
+
         }
         catch
         {
