@@ -50,6 +50,10 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             IsHitTestVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
             <Grid HorizontalAlignment="Left">
                 <Image
                     x:Name="DragImage"
@@ -86,6 +90,7 @@
                 </TextBlock>
             </Grid>
             <Border
+                Grid.Column="1"
                 Padding="4"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"

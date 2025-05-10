@@ -184,6 +184,8 @@ public partial class DragWindow : INotifyPropertyChanged
 
         windowHandle = new WindowInteropHelper(this).Handle;
 
+        Services.WindowStyle.SetWindowHidden(windowHandle);
+
 #if DEBUG
         MouseWithinApp = true;
 #else
@@ -195,7 +197,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
                 var actualPoint = NativeMethods.MonitorInfo.MousePositionToDpi(point, windowHandle);
 
-                Top = actualPoint.Y - DragImage.ActualHeight - 10;
+                Top = actualPoint.Y - DragImage.ActualHeight - 2;
                 Left = actualPoint.X - DragImage.ActualWidth / 2;
 
                 if (Data.Settings.AdvancedDrag)
