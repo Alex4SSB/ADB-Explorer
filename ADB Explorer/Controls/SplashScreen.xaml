@@ -22,12 +22,6 @@
             </Style.Triggers>
         </Style>
     </UserControl.Style>
-    <UserControl.Resources>
-        <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
-            <EventSetter Event="Click" Handler="RadioButton_Checked" />
-            <Setter Property="ToolTip" Value="Select an option to display explanation" />
-        </Style>
-    </UserControl.Resources>
     <Border Background="#FF80C9E4" DataContext="{Binding ElementName=splashScreen}">
         <Grid>
             <Grid>
@@ -73,7 +67,7 @@
                     x:Name="MissingAdbGrid"
                     Grid.Row="3"
                     Grid.Column="1"
-                    d:Visibility="Visible"
+                    d:Visibility="Hidden"
                     Spacing="14"
                     Visibility="Collapsed">
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
@@ -139,6 +133,12 @@
                         FontSize="20"
                         Text="Select Progress Method:" />
                     <ui:SimpleStackPanel Spacing="2">
+                        <ui:SimpleStackPanel.Resources>
+                            <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
+                                <EventSetter Event="Click" Handler="RadioButton_Checked" />
+                                <Setter Property="ToolTip" Value="Select an option to display explanation" />
+                            </Style>
+                        </ui:SimpleStackPanel.Resources>
                         <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION_TITLE}}" />
                         <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS_TITLE}}" />
                     </ui:SimpleStackPanel>
@@ -160,6 +160,50 @@
                         x:Name="ConfirmButton"
                         HorizontalAlignment="Center"
                         Click="ConfirmButton_Click"
+                        IsEnabled="False"
+                        Style="{StaticResource AccentButtonStyle}"
+                        ToolTip="Continue">
+                        <ui:FontIcon Glyph="&#xe73e;" />
+                    </Button>
+                </ui:SimpleStackPanel>
+                <ui:SimpleStackPanel
+                    x:Name="AdvancedDragPanel"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    d:Visibility="Visible"
+                    Spacing="10"
+                    Visibility="Collapsed">
+                    <Grid>
+                        <Button
+                            x:Name="AdvancedDragInfo"
+                            Margin="-270,0,0,0"
+                            HorizontalAlignment="Center"
+                            Click="AdvancedDragInfo_Click"
+                            ToolTip="More Info">
+                            <ui:FontIcon FontSize="14" Glyph="&#xE897;" />
+                        </Button>
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            FontSize="20"
+                            Text="File Explorer Monitoring:" />
+                    </Grid>
+                    <ui:SimpleStackPanel Spacing="2">
+                        <ui:SimpleStackPanel.Resources>
+                            <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
+                                <EventSetter Event="Click" Handler="RadioButton_Click" />
+                            </Style>
+                        </ui:SimpleStackPanel.Resources>
+                        <RadioButton x:Name="AdvancedDragEnabledRadioButton" Content="Enabled" />
+                        <RadioButton x:Name="AdvancedDragDisabledRadioButton" Content="Disabled" />
+                    </ui:SimpleStackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
+                        <TextBlock Text="{Binding Source={x:Static Member=resources:Strings.S_ADVANCED_DRAG_SPLASH}}" />
+                    </StackPanel>
+                    <Button
+                        x:Name="ConfirmAdvancedDrag"
+                        HorizontalAlignment="Center"
+                        Click="ConfirmAdvancedDrag_Click"
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
                         ToolTip="Continue">

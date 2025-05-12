@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Controls;
@@ -28,6 +29,10 @@ public partial class SplashScreen
             ? Visibility.Visible
             : Visibility.Collapsed;
 
+        AdvancedDragPanel.Visibility = !Data.Settings.AdvancedDragSet && !MissingAdbGrid.Visible() && !FirstLaunchGrid.Visible()
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
         _ = Task.Run(async () =>
         {
             while (Data.RuntimeSettings.IsSplashScreenVisible && MissingAdbGrid.Visible())
@@ -50,6 +55,8 @@ public partial class SplashScreen
 
     private void ConfirmButton_Click(object sender, RoutedEventArgs e)
     {
+        FirstLaunchGrid.Visibility = Visibility.Collapsed;
+
         if (DeployRadioButton.IsChecked is true)
             Data.Settings.UseProgressRedirection = true;
         else if (DiskUsageRadioButton.IsChecked is true)
@@ -57,12 +64,16 @@ public partial class SplashScreen
         else
             throw new NotSupportedException("Unsupported progress method");
 
-        CloseSplashScreen();
+        if (Data.Settings.AdvancedDragSet)
+            CloseSplashScreen();
+        else
+            AdvancedDragPanel.Visibility = Visibility.Visible;
     }
 
     private static void CloseSplashScreen()
     {
         Data.Settings.ShowWelcomeScreen = false;
+        Data.Settings.AdvancedDragSet = true;
         Data.RuntimeSettings.FinalizeSplash = true;
     }
 
@@ -93,5 +104,27 @@ public partial class SplashScreen
                                   You can use the provided link to download the SDK Platform Tools.
                                   Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
                                   """, "Help On ADB", DialogService.DialogIcon.Informational);
+    }
+
+    private void AdvancedDragInfo_Click(object sender, RoutedEventArgs e)
+    {
+        DialogService.ShowMessage(Strings.S_ADVANCED_DRAG, Strings.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Informational);
+    }
+
+    private void ConfirmAdvancedDrag_Click(object sender, RoutedEventArgs e)
+    {
+        AdvancedDragPanel.Visibility = Visibility.Collapsed;
+
+        if (AdvancedDragEnabledRadioButton.IsChecked is true)
+            Data.Settings.AdvancedDrag = true;
+        else if (AdvancedDragDisabledRadioButton.IsChecked is true)
+            Data.Settings.AdvancedDrag = false;
+        
+        CloseSplashScreen();
+    }
+
+    private void RadioButton_Click(object sender, RoutedEventArgs e)
+    {
+        ConfirmAdvancedDrag.IsEnabled = true;
     }
 }

@@ -354,8 +354,14 @@ public class AppSettings : ViewModelBase
         set => Set(ref showWelcomeScreen, value);
     }
 
-    private string lastVersion;
+    private bool advancedDragSet;
+    public bool AdvancedDragSet
+    {
+        get => Get(ref advancedDragSet, false);
+        set => Set(ref advancedDragSet, value);
+    }
 
+    private string lastVersion;
     public string LastVersion
     {
         get => Get(ref lastVersion, "0.0.0");

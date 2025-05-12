@@ -71,8 +71,14 @@ public static class Strings
 
         Otherwise, Pull is performed to the app temp folder, from which File Explorer receives the file as a stream, which has to use a small buffer.
         These two added steps slow down the process significantly.
+
+        The feature is auto-disabled for other selected file managers.
         """;
-    public const string S_ADVANCED_DRAG_TITLE = "";
+    public const string S_ADVANCED_DRAG_TITLE = "File Explorer Monitoring";
+    public const string S_ADVANCED_DRAG_SPLASH = """
+        Enable only if you intend to use the app with File Explorer.
+        You can always change this in the settings.
+        """;
     public const string S_NEW_VERSION_MSG =
         """
         Welcome to a new ADB Explorer version!
