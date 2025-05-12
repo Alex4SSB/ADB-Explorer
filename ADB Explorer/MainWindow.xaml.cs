@@ -1768,7 +1768,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         RuntimeSettings.IsPathBoxFocused = false;
 
-        if (!row.IsSelected && CopyPaste.DragStatus is not CopyPasteService.DragState.None)
+        if (!row.IsSelected
+            && CopyPaste.DragStatus is not CopyPasteService.DragState.None
+            && Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
         {
             ExplorerGrid.UnselectAll();
             row.IsSelected = true;
