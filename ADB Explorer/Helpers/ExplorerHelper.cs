@@ -1,13 +1,15 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using SHDocVw;
 using System.Windows.Automation;
+using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Helpers;
 
 public class ExplorerHelper
 {
-    private static readonly Dictionary<string, IKnownFolder> FoldersDict = [];
+    private static readonly Dictionary<string, Microsoft.WindowsAPICodePack.Shell.IKnownFolder> FoldersDict = [];
 
     /// <summary>
     /// Get the actual path of a Windows known folder or its subfolders
@@ -111,6 +113,39 @@ public class ExplorerHelper
 
             return null;
         }
+    }
+
+    /// <summary>
+    /// Retrieves a collection of active Windows Explorer windows and their associated paths.
+    /// </summary>
+    /// <remarks>This method enumerates all currently open Windows Explorer windows and extracts their paths. 
+    /// If a window is displaying a special view (e.g., "This PC"), the path will be represented accordingly.</remarks>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="ExplorerWindow"/> objects, where each object represents an active
+    /// Windows Explorer window and its corresponding path. The path may be a directory path or a special identifier
+    /// such as "This PC" for certain views.</returns>
+    public static IEnumerable<ExplorerWindow> GetExplorerPaths()
+    {
+        SHDocVw.ShellWindows shellWindows = new();
+        ConcurrentBag<(HANDLE, string)> results = [];
+
+        Parallel.ForEach(shellWindows.Cast<InternetExplorer>(), window =>
+        {
+            if (window.Document is not IShellFolderViewDual2 folderView)
+                return;
+
+            var folder = folderView.Folder;
+            dynamic items = folder.Items();
+            dynamic firstItem = items.Item(0);
+            string itemPath = firstItem?.Path;
+
+            string path = itemPath[^2] == ':'
+                ? "This PC"
+                : FileHelper.GetParentPath(itemPath);
+
+            results.Add(((HANDLE)window.HWND, path));
+        });
+
+        return results.GroupBy(e => e.Item1, e => e.Item2).Select(i => new ExplorerWindow(i));
     }
 
     /// <summary>

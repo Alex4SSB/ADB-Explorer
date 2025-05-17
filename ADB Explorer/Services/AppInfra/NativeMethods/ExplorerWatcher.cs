@@ -13,9 +13,12 @@ public static partial class NativeMethods
     {
         private readonly HANDLE _hookId = IntPtr.Zero;
         private readonly WinEventDelegate _delegate;
+        
+        private AutomationPropertyChangedEventHandler _titleChangeHandler;
+        private ExplorerWindow currentExplorerWindow;
+        private IEnumerable<ExplorerWindow> explorerWindows = [];
 
-        private AutomationEventHandler tabSelectionHandler;
-        private AutomationElement explorerWindow;
+        private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         private string _path = "";
         public string FocusedPath
@@ -34,116 +37,128 @@ public static partial class NativeMethods
 
         public ExplorerWatcher()
         {
-            _delegate = new WinEventDelegate(WinEventProc);
-            _hookId = SetWinEventHook(WindowsEvents.EVENT_SYSTEM_FOREGROUND, WindowsEvents.EVENT_SYSTEM_FOREGROUND,
-                IntPtr.Zero, _delegate, 0, 0, WinEventHookFlags.WINEVENT_OUTOFCONTEXT);
-
             UpdateWatchers();
+
+            _delegate = new WinEventDelegate(WinEventProc);
+            _hookId = SetWinEventHook(WindowsEvents.EVENT_SYSTEM_FOREGROUND, WindowsEvents.EVENT_SYSTEM_FOREGROUND, 
+                IntPtr.Zero, _delegate, 0, 0, WinEventHookFlags.WINEVENT_OUTOFCONTEXT);
         }
 
+        /// <summary>
+        /// Handles Windows event notifications for changes in the foreground window.
+        /// </summary>
+        /// <remarks>This method is invoked as a callback for Windows event hooks. It processes events
+        /// related to changes in the foreground window, specifically when the foreground window changes to an Explorer
+        /// window or a desktop window. If the event is triggered by an incompatible application, additional checks are
+        /// performed to handle potential conflicts.  The method updates the currently focused path and manages
+        /// subscriptions to title change events for Explorer windows.</remarks>
+        /// <param name="hWinEventHook">A handle to the event hook that triggered the callback.</param>
+        /// <param name="eventType">The type of Windows event that occurred. Only <see cref="WindowsEvents.EVENT_SYSTEM_FOREGROUND"/> is
+        /// processed.</param>
         private void WinEventProc(
             HANDLE hWinEventHook, WindowsEvents eventType,
             HANDLE hwnd, int idObject,
             int idChild, uint dwEventThread,
             uint dwmsEventTime)
         {
-            if (eventType is not WindowsEvents.EVENT_SYSTEM_FOREGROUND)
+            if (eventType != WindowsEvents.EVENT_SYSTEM_FOREGROUND
+                || hwnd == IntPtr.Zero)
                 return;
 
-            UnsubscribeFromTabEvents();
+            Task.Run(UnsubscribeFromTitleEvents);
             if (hwnd == InterceptClipboard.MainWindowHandle)
                 return;
 
-            var rootElement = AutomationElement.FromHandle(hwnd);
-            var proc = Process.GetProcessById(rootElement.Current.ProcessId);
-
-            if (proc.ProcessName is not "explorer")
+            var window = new ExplorerWindow(hwnd);
+            if (window.Process.ProcessName is not "explorer")
             {
-                if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(proc.ProcessName))
+                if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
                     ExplorerHelper.CheckConflictingApps();
 
                 return;
             }
 
-            explorerWindow = rootElement;
-            string path = null;
-            if (explorerWindow.Current.Name == "Program Manager")
+            currentExplorerWindow = window;
+            if (currentExplorerWindow.IsDesktop())
             {
-                var list = explorerWindow.FindFirst(TreeScope.Children, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List));
-                if (list.Current.Name == "Desktop")
-                {
-                    path = "Desktop";
-                }
+                FocusedPath = _desktopPath;
             }
             else
             {
-                path = ExplorerHelper.GetPathFromWindow(explorerWindow);
+                UpdateExplorerWindows();
+                FocusedPath = explorerWindows.FirstOrDefault(w => w.Hwnd == hwnd)?.Path;
+
+                SubscribeToTitleEvents();
             }
-            if (string.IsNullOrEmpty(path))
-                return;
-
-            if (Data.RuntimeSettings.Is22H2)
-                SubscribeToTabEvents();
-
-            if (path == "This PC")
-            {
-                FocusedPath = "This PC";
-                return;
-            }
-
-            FocusedPath = ExplorerHelper.GetActualPath(path);
         }
 
-        private void SubscribeToTabEvents()
+        private void SubscribeToTitleEvents()
         {
             // Hierarchy: Window -> Pane -> Tab -> List -> TabItem
 
-            // Find the TabControl within the Explorer window
-            var tabControl = explorerWindow.FindFirst(
-                TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Tab));
-            
-            if (tabControl is null)
+            if (currentExplorerWindow.RootElement is null)
                 return;
 
-            tabSelectionHandler = (object sender, AutomationEventArgs e) =>
+            _titleChangeHandler = (sender, e) =>
             {
-                // Unfortunately, automation events do not provide the change itself, in this case the selected item.
-                // The event args only contain the event id, and the sender is the tab control
-                var path = ExplorerHelper.GetPathFromWindow(explorerWindow);
-                
-                if (path == "This PC")
-                {
-                    // This PC isn't handled by GetActualPath
-                    FocusedPath = "This PC";
-                }
-                else if (!string.IsNullOrEmpty(path))
-                    FocusedPath = ExplorerHelper.GetActualPath(path);
+                // e.NewValue does provide us the new window title, but we need to refresh the full path anyway
+                if (e.Property != AutomationElement.NameProperty)
+                    return;
+
+                UpdateExplorerWindows();
+                FocusedPath = explorerWindows.FirstOrDefault(w => w.Hwnd == currentExplorerWindow.Hwnd)?.Path;
             };
 
-            Automation.AddAutomationEventHandler(
-                SelectionItemPattern.ElementSelectedEvent,
-                tabControl,
-                TreeScope.Descendants,
-                tabSelectionHandler
+            Automation.AddAutomationPropertyChangedEventHandler(
+                currentExplorerWindow.RootElement,
+                TreeScope.Element,
+                _titleChangeHandler,
+                AutomationElement.NameProperty
             );
         }
 
-        private void UnsubscribeFromTabEvents()
+        private void UnsubscribeFromTitleEvents()
         {
-            if (tabSelectionHandler is null)
+            if (_titleChangeHandler is null || currentExplorerWindow?.RootElement is null)
                 return;
 
-            Automation.RemoveAutomationEventHandler(
-                SelectionItemPattern.ElementSelectedEvent,
-                explorerWindow,
-                tabSelectionHandler);
+            try
+            {
+                Automation.RemoveAutomationPropertyChangedEventHandler(
+                currentExplorerWindow.RootElement,
+                _titleChangeHandler);
+            }
+            catch
+            {
+            }
 
-            tabSelectionHandler = null;
-            explorerWindow = null;
+            _titleChangeHandler = null;
+            currentExplorerWindow = null;
         }
 
+        /// <summary>
+        /// Updates the file system watchers to monitor the current set of paths.
+        /// </summary>
+        /// <remarks>This method ensures that the file system watchers are synchronized with the current
+        /// set of paths,  including the focused path and any paths from active explorer windows. If the set of paths
+        /// has not  changed, the method exits without making any updates. Otherwise, it disposes of the existing
+        /// watchers  and creates new ones for the updated paths.</remarks>
         public void UpdateWatchers()
+        {
+            UpdateExplorerWindows();
+
+            var oldPaths = Data.RuntimeSettings.Watchers.Select(w => w.Path);
+            var newPaths = GetUniquePaths([FocusedPath, .. explorerWindows.Select(w => w.Path)]);
+            
+            // If the focused path is not the desktop - it is one of the explorer windows
+            if (oldPaths.Order().SequenceEqual(newPaths.Order()))
+                return;
+
+            DisposeWatchers();
+            Data.RuntimeSettings.Watchers = [.. newPaths.Select(CreateFileSystemWatcher)];
+        }
+
+        private static void DisposeWatchers()
         {
             foreach (var watcher in Data.RuntimeSettings.Watchers)
             {
@@ -151,52 +166,62 @@ public static partial class NativeMethods
                 watcher.Created -= folderWatcher_Created;
                 watcher.Dispose();
             }
-
-            var paths = GetPathsFromHandles(GetExplorerWindowHandles());
-            Data.RuntimeSettings.Watchers = [.. GetFileSystemWatchers([FocusedPath, .. paths])];
+            Data.RuntimeSettings.Watchers = [];
         }
 
-        public static IEnumerable<FileSystemWatcher> GetFileSystemWatchers(IEnumerable<string> paths)
+        private void UpdateExplorerWindows() => explorerWindows = ExplorerHelper.GetExplorerPaths();
+
+        /// <summary>
+        /// Creates and returns a collection of <see cref="FileSystemWatcher"/> instances for the specified paths.
+        /// </summary>
+        /// <remarks>"This PC" is replaced with all available drive root paths (e.g., "C:\", "D:\") that are ready for use. 
+        /// The resulting collection excludes invalid paths.</remarks>
+        /// <param name="paths">A collection of file system paths for which <see cref="FileSystemWatcher"/> instances should be created.</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="FileSystemWatcher"/> instances, one for each valid and
+        /// distinct path.</returns>
+        public static IEnumerable<string> GetUniquePaths(IEnumerable<string> paths)
         {
-            foreach (var path in paths.Distinct())
+            var disctinct = paths.Distinct();
+            if (disctinct.Except(["This PC"]) is var regular && regular.Count() < disctinct.Count())
             {
-                if (string.IsNullOrEmpty(path))
-                    continue;
-
-                if (path == "This PC")
-                {
-                    // This PC is a virtual folder, so we need to watch all drives
-                    foreach (var drive in DriveInfo.GetDrives())
-                    {
-                        // For example an empty SD card reader
-                        if (!drive.IsReady)
-                            continue;
-
-                        yield return CreateFileSystemWatcher(drive.Name);
-                    }
-
-                    continue;
-                }
-                
-                yield return CreateFileSystemWatcher(path);
+                var drives = DriveInfo.GetDrives().Where(d => d.IsReady).Select(d => d.Name);
+                disctinct = [.. regular, .. drives];
+                disctinct = disctinct.Distinct();
             }
+
+            return disctinct.Where(Directory.Exists);
         }
 
-        private static FileSystemWatcher CreateFileSystemWatcher(string path) =>
-            App.Current.Dispatcher.Invoke(() =>
+        private static FileSystemWatcher CreateFileSystemWatcher(string path)
         {
-            FileSystemWatcher watcher = new(path)
-            {
-                
-                NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite,
-                
-                EnableRaisingEvents = true
-            };
 
-            watcher.Created += folderWatcher_Created;
-            watcher.Changed += folderWatcher_Created;
-            return watcher;
-        });
+#if !DEPLOY
+            DebugLog.PrintLine($"Watching {path}");
+#endif
+
+            return App.Current.Dispatcher.Invoke(() =>
+            {
+                FileSystemWatcher watcher = null;
+                try
+                {
+                    watcher = new(path)
+                    {
+
+                        NotifyFilter = NotifyFilters.CreationTime | NotifyFilters.LastWrite,
+
+                        EnableRaisingEvents = true
+                    };
+                }
+                catch
+                {
+                    return null;
+                }
+
+                watcher.Created += folderWatcher_Created;
+                watcher.Changed += folderWatcher_Created;
+                return watcher;
+            });
+        }
 
         private static void folderWatcher_Created(object sender, FileSystemEventArgs e)
         {
@@ -220,60 +245,6 @@ public static partial class NativeMethods
 #endif
         }
 
-        public static IEnumerable<string> GetPathsFromHandles(IEnumerable<HANDLE> handles)
-        {
-            foreach (var handle in handles.Distinct())
-            {
-                AutomationElement rootElement;
-                try
-                {
-                    // The element will be null if the handle is invalid or 0.
-                    // The try here is due to concurrent access to the handle (with the Shell itself)
-                    rootElement = AutomationElement.FromHandle(handle);
-                    if (rootElement is null)
-                        continue;
-                }
-                catch
-                {
-                    continue;
-                }
-                
-                var path = ExplorerHelper.GetPathFromWindow(rootElement);
-                if (string.IsNullOrEmpty(path))
-                    continue;
-
-                yield return path;
-            }
-        }
-
-        /// <summary>
-        /// Get the window handles of all open File Explorer windows
-        /// </summary>
-        public static IEnumerable<HANDLE> GetExplorerWindowHandles()
-        {
-            // Since everything here is a __ComObject, we have to use dynamic
-
-            var shellType = Type.GetTypeFromProgID("Shell.Application");
-            dynamic shellObject = Activator.CreateInstance(shellType);
-
-            try
-            {
-                var shellWindows = shellObject.Windows();
-                for (int i = 0; i < shellWindows.Count; i++)
-                {
-                    var window = shellWindows.Item(i);
-                    if (window is null)
-                        continue;
-
-                    yield return new((long)window.hwnd);
-                }
-            }
-            finally
-            {
-                Marshal.FinalReleaseComObject(shellObject);
-            }
-        }
-
         private delegate void WinEventDelegate(
             HANDLE hWinEventHook, WindowsEvents eventType,
             HANDLE hwnd, int idObject,
@@ -293,7 +264,10 @@ public static partial class NativeMethods
 
         public void Dispose()
         {
-            UnsubscribeFromTabEvents();
+            UnsubscribeFromTitleEvents();
+
+            DisposeWatchers();
+
             if (_hookId != IntPtr.Zero)
                 UnhookWinEvent(_hookId);
         }
