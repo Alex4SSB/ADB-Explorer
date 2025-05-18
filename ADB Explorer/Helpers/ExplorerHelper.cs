@@ -3,6 +3,8 @@ using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using SHDocVw;
 using System.Windows.Automation;
+using Vanara.PInvoke;
+using Vanara.Windows.Shell;
 using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Helpers;
@@ -10,6 +12,12 @@ namespace ADB_Explorer.Helpers;
 public class ExplorerHelper
 {
     private static readonly Dictionary<string, Microsoft.WindowsAPICodePack.Shell.IKnownFolder> FoldersDict = [];
+
+    private static readonly string _userLibraries = KNOWNFOLDERID.FOLDERID_UsersLibraries.GetRegistryProperty<string>("ParsingName").ToUpper(); // "::{031E4825-7B94-4DC3-B131-E946B44C8DD5}"
+    private static readonly string _thisPc = KNOWNFOLDERID.FOLDERID_ComputerFolder.GetRegistryProperty<string>("ParsingName").ToUpper(); // "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}"
+
+    public static List<string> LibrariesItems { get; private set; } = [];
+    public static List<string> ThisPcItems { get; private set; } = [];
 
     /// <summary>
     /// Get the actual path of a Windows known folder or its subfolders
@@ -133,19 +141,91 @@ public class ExplorerHelper
             if (window.Document is not IShellFolderViewDual2 folderView)
                 return;
 
-            var folder = folderView.Folder;
-            dynamic items = folder.Items();
-            dynamic firstItem = items.Item(0);
-            string itemPath = firstItem?.Path;
+            var items = folderView.Folder.Items();
+            dynamic itemPath = ((dynamic)items).Item()?.Path;
+            string path = "";
 
-            string path = itemPath[^2] == ':'
-                ? "This PC"
-                : FileHelper.GetParentPath(itemPath);
+            if (itemPath == _userLibraries)
+            {
+                path = "Libraries";
+                if (LibrariesItems.Count == 0)
+                    LibrariesItems = [.. GetFolderItems(items)];
+            }
+            else if (itemPath == _thisPc)
+            {
+                // TODO: monitor new drives
+                path = "This PC";
+                if (ThisPcItems.Count == 0)
+                    ThisPcItems = [.. GetFolderItems(items)];
+            }
+            else if (items.Count == 0) // For an empty folder get folder itself
+                path = itemPath;
+            else
+            {
+                // Get the first item
+                dynamic firstItem = items.Item(0);
+
+                path = FileHelper.GetParentPath(firstItem?.Path);
+            }
 
             results.Add(((HANDLE)window.HWND, path));
         });
 
         return results.GroupBy(e => e.Item1, e => e.Item2).Select(i => new ExplorerWindow(i));
+    }
+
+    /// <summary>
+    /// Retrieves the file system paths of items within a specified folder.
+    /// </summary>
+    /// <remarks>
+    /// This method processes each item in the provided <paramref name="items"/> collection and
+    /// attempts to retrieve its file system path. Items that are virtual collections or non-file system objects are skipped.
+    /// Empty card readers and CD/DVD drives are not skipped.
+    /// <br />
+    /// This has been tested only for "This PC" and "Libraries".
+    /// </remarks>
+    /// <param name="items">The collection of folder items to process.</param>
+    /// <returns>An enumerable collection of strings representing the file system paths of the folder items. Items that do not
+    /// have valid file system paths or meet specific conditions are excluded.</returns>
+    private static IEnumerable<string> GetFolderItems(FolderItems items)
+    {
+        for (int i = 0; i < items.Count; i++)
+        {
+            string path = "";
+            string subItem = ((dynamic)items).Item(i)?.Path;
+            if (subItem is null)
+                continue;
+
+            using (var sh = ShellItem.Open(subItem))
+            {
+                try
+                {
+                    if (sh is Vanara.Windows.Shell.ShellLibrary shLib)
+                    {
+                        // Virtual collections like "Camera Roll" will throw a COMException here.
+                        if (!shLib.DefaultSaveFolder.IsFileSystem)
+                            continue;
+
+                        path = shLib.DefaultSaveFolder.FileSystemPath;
+                    }
+                    else // ShellFolder
+                    {
+                        // This includes empty card readers that will be filtered out later.
+                        // Other items like DLNA servers are not file system items.
+                        if (!sh.IsFileSystem)
+                            continue;
+
+                        path = sh.FileSystemPath;
+                    }
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+
+            yield return path;
+        }
     }
 
     /// <summary>

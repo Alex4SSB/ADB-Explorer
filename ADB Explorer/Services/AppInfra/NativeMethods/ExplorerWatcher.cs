@@ -87,7 +87,7 @@ public static partial class NativeMethods
             {
                 UpdateExplorerWindows();
                 FocusedPath = explorerWindows.FirstOrDefault(w => w.Hwnd == hwnd)?.Path;
-
+                
                 SubscribeToTitleEvents();
             }
         }
@@ -172,24 +172,25 @@ public static partial class NativeMethods
         private void UpdateExplorerWindows() => explorerWindows = ExplorerHelper.GetExplorerPaths();
 
         /// <summary>
-        /// Creates and returns a collection of <see cref="FileSystemWatcher"/> instances for the specified paths.
+        /// Returns a collection of unique file system paths after resolving special placeholders and verifying their
+        /// existence.
         /// </summary>
-        /// <remarks>"This PC" is replaced with all available drive root paths (e.g., "C:\", "D:\") that are ready for use. 
-        /// The resulting collection excludes invalid paths.</remarks>
-        /// <param name="paths">A collection of file system paths for which <see cref="FileSystemWatcher"/> instances should be created.</param>
-        /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="FileSystemWatcher"/> instances, one for each valid and
-        /// distinct path.</returns>
-        public static IEnumerable<string> GetUniquePaths(IEnumerable<string> paths)
+        /// <remarks>If the input list contains the placeholder "This PC", it is replaced with the items
+        /// corresponding to "This PC". Similarly, the placeholder "Libraries" is replaced with the items corresponding
+        /// to "Libraries". Paths that do not exist or represent empty drives are excluded from the result.</remarks>
+        /// <param name="paths">A list of file system paths, which may include special placeholders such as "This PC" or "Libraries".</param>
+        /// <returns>An <see cref="IEnumerable{T}"/> of unique file system paths that exist.  Special placeholders are expanded
+        /// into their corresponding items, and non-existent paths are excluded.</returns>
+        public static IEnumerable<string> GetUniquePaths(List<string> paths)
         {
-            var disctinct = paths.Distinct();
-            if (disctinct.Except(["This PC"]) is var regular && regular.Count() < disctinct.Count())
-            {
-                var drives = DriveInfo.GetDrives().Where(d => d.IsReady).Select(d => d.Name);
-                disctinct = [.. regular, .. drives];
-                disctinct = disctinct.Distinct();
-            }
+            if (paths.RemoveAll(p => p == "This PC") > 0)
+                paths.AddRange(ExplorerHelper.ThisPcItems);
 
-            return disctinct.Where(Directory.Exists);
+            if (paths.RemoveAll(p => p == "Libraries") > 0)
+                paths.AddRange(ExplorerHelper.LibrariesItems);
+
+            // Verify the paths exist and are not empty drives
+            return paths.Distinct().Where(Directory.Exists);
         }
 
         private static FileSystemWatcher CreateFileSystemWatcher(string path)
