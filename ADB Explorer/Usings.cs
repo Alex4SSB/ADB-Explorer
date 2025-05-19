@@ -1,6 +1,5 @@
 ﻿global using Microsoft.Win32;
 global using Microsoft.WindowsAPICodePack.Dialogs;
-global using Microsoft.WindowsAPICodePack.Shell;
 global using ModernWpf;
 global using ModernWpf.Controls;
 global using ModernWpf.Controls.Primitives;

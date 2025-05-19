@@ -18,6 +18,8 @@ public static partial class NativeMethods
         private ExplorerWindow currentExplorerWindow;
         private IEnumerable<ExplorerWindow> explorerWindows = [];
 
+        private readonly ManagementEventWatcher _driveWatcher;
+
         private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         private string _path = "";
@@ -42,6 +44,25 @@ public static partial class NativeMethods
             _delegate = new WinEventDelegate(WinEventProc);
             _hookId = SetWinEventHook(WindowsEvents.EVENT_SYSTEM_FOREGROUND, WindowsEvents.EVENT_SYSTEM_FOREGROUND, 
                 IntPtr.Zero, _delegate, 0, 0, WinEventHookFlags.WINEVENT_OUTOFCONTEXT);
+
+            // WMI query for removable drives (DriveType=2)
+            var query = new WqlEventQuery(
+                "SELECT * FROM __InstanceOperationEvent " +
+                "WITHIN 2 " +
+                "WHERE TargetInstance ISA 'Win32_LogicalDisk' " +
+                "AND TargetInstance.DriveType = 2"
+            );
+
+            _driveWatcher = new(query);
+            _driveWatcher.EventArrived += (sender, e) =>
+            { 
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    ExplorerHelper.ThisPcItems = [.. ExplorerHelper.GetFolderItems(ExplorerHelper.ThisPc)];
+                    UpdateWatchers();
+                });
+            };
+            _driveWatcher.Start();
         }
 
         /// <summary>
@@ -268,6 +289,9 @@ public static partial class NativeMethods
             UnsubscribeFromTitleEvents();
 
             DisposeWatchers();
+
+            _driveWatcher?.Stop();
+            _driveWatcher?.Dispose();
 
             if (_hookId != IntPtr.Zero)
                 UnhookWinEvent(_hookId);

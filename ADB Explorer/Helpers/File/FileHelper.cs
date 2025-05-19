@@ -171,12 +171,6 @@ public static class FileHelper
         return childPath[..index];
     }
 
-    public static ulong? GetSize(this ShellObject shellObject)
-        => shellObject.Properties.System.Size.Value;
-
-    public static DateTime? GetDateModified(this ShellObject shellObject)
-        => shellObject.Properties.System.DateModified.Value;
-
     public static ulong TotalSize(IEnumerable<FileClass> files)
     {
         if (files.Any(f => f.Type is not FileType.File || f.IsLink))
