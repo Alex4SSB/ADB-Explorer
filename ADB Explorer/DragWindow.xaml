@@ -11,6 +11,7 @@
     Height="128"
     ui:ControlHelper.CornerRadius="5"
     AllowsTransparency="True"
+    AutomationProperties.Name="AdbExplorerDragWindow"
     Closing="Window_Closing"
     Focusable="False"
     IsHitTestVisible="False"

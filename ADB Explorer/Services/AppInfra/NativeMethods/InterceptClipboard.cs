@@ -11,7 +11,7 @@ public static partial class NativeMethods
         private static Action _externalClipAction;
         private static Action<string> _externalIpcAction;
         private static HwndSource _hwndSource;
-        private static ExplorerWatcher explorerWatcher;
+        public static ExplorerWatcher ExplorerWatcher { get; private set; } = null;
 
         public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 
@@ -56,12 +56,12 @@ public static partial class NativeMethods
 
         private static void InitWatcher()
         {
-            if (Data.CopyPaste.IsSelfClipboard && Data.RuntimeSettings.IsAdvancedDragEnabled)
-                explorerWatcher = new();
+            if (Data.CopyPaste.IsSelf && Data.RuntimeSettings.IsAdvancedDragEnabled)
+                ExplorerWatcher = new();
             else
             {
-                explorerWatcher?.Dispose();
-                explorerWatcher = null;
+                ExplorerWatcher?.Dispose();
+                ExplorerWatcher = null;
             }
         }
 

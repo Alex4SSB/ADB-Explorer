@@ -10,116 +10,47 @@ namespace ADB_Explorer.Helpers;
 
 public class ExplorerHelper
 {
-    private static readonly Dictionary<string, Microsoft.WindowsAPICodePack.Shell.IKnownFolder> FoldersDict = [];
-
     private static readonly ShellFolder UserLibraries = new(KNOWNFOLDERID.FOLDERID_UsersLibraries);
     public static readonly ShellFolder ThisPc = new(KNOWNFOLDERID.FOLDERID_ComputerFolder);
 
-    public static List<string> LibrariesItems { get; private set; } = [];
-    public static List<string> ThisPcItems { get; set; } = [];
+    public static Dictionary<string, string> LibrariesItems { get; private set; } = [];
+    public static Dictionary<string, string> ThisPcItems { get; set; } = [];
 
+    
     /// <summary>
-    /// Get the actual path of a Windows known folder or its subfolders
+    /// Converts a user-friendly file path from a Windows Explorer-like format into a standard file system path.
     /// </summary>
-    public static string GetActualPath(string path)
+    /// <remarks>This method handles paths that start with "This PC" or "Libraries" and attempts to convert
+    /// them into their corresponding file system paths. For "This PC" paths, it extracts the drive and post-drive
+    /// components. For "Libraries" paths, it maps the library name to its full path using a predefined
+    /// mapping.</remarks>
+    /// <param name="path">The input path to parse. This should be a string representing a file path in a format such as "This PC" or
+    /// "Libraries".</param>
+    /// <returns>A string representing the parsed file system path, or <see langword="null"/> if the input path cannot be parsed.</returns>
+    public static string ParseTreePath(string path)
     {
-        string[] virtualLocations = [ "Libraries", "Network", "This PC" ];
-        IEqualityComparer<string> comparer = StringComparer.CurrentCultureIgnoreCase;
-
-        var name = path;
-
-        var match = AdbRegEx.RE_WIN_ROOT_PATH().Match(name);
-        if (match.Groups["Drive"].Success)
-            return $"{match.Groups["Drive"].Value}{match.Groups["PostDrive"].Value}";
-        else if (match.Groups["Path"].Success)
+        if (path.StartsWith("This PC"))
         {
-            name = match.Groups["Path"].Value;
-            if (name.Contains(':'))
-                return name;
+            var match = AdbRegEx.RE_WIN_ROOT_PATH().Match(path);
+            return match.Groups["Drive"].Success
+                ? $"{match.Groups["Drive"].Value}{match.Groups["PostDrive"].Value}"
+                : null;
         }
-
-        if (virtualLocations.Contains(name, comparer)
-            || name.StartsWith("Quick access", StringComparison.CurrentCultureIgnoreCase))
-            return null;
-
-        name = name.Trim('\\');
-        if (name.Length == 0)
-            return null;
-
-        var index = name.IndexOf('\\');
-        var originTop = index > -1 ? name[..index] : name;
-        var remainder = index > -1 ? name[index..] : "";
-
-        if (FoldersDict.Count == 0)
+        else if (path.StartsWith("Libraries"))
         {
-            foreach (var item in Microsoft.WindowsAPICodePack.Shell.KnownFolders.All)
-            {
-                if (item.LocalizedName is null)
-                    continue;
-
-                FoldersDict.TryAdd(item.LocalizedName, item);
-            }
-            
-            // For Windows 11
-            FoldersDict.TryAdd("Libraries", Microsoft.WindowsAPICodePack.Shell.KnownFolders.Libraries);
-        }
-
-        if (originTop == "Libraries")
-        {
-            var child = remainder.Trim('\\');
-            var indexL = child.IndexOf('\\');
-            var originTopL = indexL > -1 ? child[..indexL] : child;
-            var remainderL = indexL > -1 ? child[indexL..] : "";
-
-            if (FoldersDict.TryGetValue(originTopL, out var folderL))
-                return $"{folderL.Path}{remainderL}";
-        }
-
-        if (FoldersDict.TryGetValue(originTop, out var folder))
-            return $"{folder.Path}{remainder}";
-
-        return $"{originTop}{remainder}";
-    }
-
-    private static int win10ToolbarIndex = 0;
-
-    /// <summary>
-    /// Get the full path of a Windows Explorer window
-    /// </summary>
-    /// <param name="rootElement"></param>
-    /// <returns></returns>
-    public static string GetPathFromWindow(AutomationElement rootElement)
-    {
-        // File Explorer tabs were introduced in Windows 11 22H2
-        if (Data.RuntimeSettings.Is22H2)
-        {
-            var match = AdbRegEx.RE_EXPLORER_WIN_PATH().Match(rootElement.Current.Name);
-            if (!match.Success)
+            var subItem = path[9..].Trim('\\');
+            if (subItem.Length == 0)
                 return null;
 
-            return match.Groups["Path"].Value;
-        }
-        else // Windows 10 & Windows 11 before 22H2
-        {
-            var toolbars = rootElement.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ToolBar));
-            
-            for (int i = -1; i < toolbars.Count; i++)
-            {
-                if (i == win10ToolbarIndex)
-                    continue;
+            var index = subItem.IndexOf('\\');
+            var originTop = index > -1 ? subItem[..index] : subItem;
+            var remainder = index > -1 ? subItem[index..] : "";
 
-                var toolbar = i < 0 ? toolbars[win10ToolbarIndex] : toolbars[i];
-                
-                var splitName = toolbar.Current.Name.Split("Address: ");
-                if (splitName.Length > 1 && splitName[1].Length > 0)
-                {
-                    win10ToolbarIndex = i;
-                    return splitName[1].Trim();
-                }
-            }
-
-            return null;
+            if (LibrariesItems.TryGetValue(originTop, out string fullPath))
+                return $"{fullPath}{remainder}";
         }
+
+        return null;
     }
 
     /// <summary>
@@ -148,14 +79,14 @@ public class ExplorerHelper
             {
                 path = "Libraries";
                 if (LibrariesItems.Count == 0)
-                    LibrariesItems = [.. GetFolderItems(UserLibraries)];
+                    LibrariesItems = GetFolderItems(UserLibraries).ToDictionary();
             }
             else if (ThisPc.ParsingName.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
             {
                 // TODO: monitor new drives
                 path = "This PC";
                 if (ThisPcItems.Count == 0)
-                    ThisPcItems = [.. GetFolderItems(ThisPc)];
+                    ThisPcItems = GetFolderItems(ThisPc).ToDictionary();
             }
             else if (items.Count == 0) // For an empty folder get folder itself
                 path = itemPath;
@@ -174,19 +105,21 @@ public class ExplorerHelper
     }
 
     /// <summary>
-    /// Retrieves the file system paths of items within the specified shell folder.
+    /// Retrieves a collection of key-value pairs representing the name and file system path of items within the
+    /// specified folder.
     /// </summary>
-    /// <remarks>This method filters out non-file system items, such as virtual collections or DLNA servers,
-    /// and skips items that cannot be accessed due to exceptions. For example, virtual collections like "Camera Roll"
-    /// that lack a file system path are ignored.</remarks>
-    /// <param name="parent">The <see cref="ShellFolder"/> representing the parent folder to enumerate.</param>
-    /// <returns>An enumerable collection of strings, where each string is the file system path of an item within the specified
-    /// folder. Items that are not file system objects or cannot be accessed are excluded from the results.</returns>
-    public static IEnumerable<string> GetFolderItems(ShellFolder parent)
+    /// <remarks>This method iterates through the items in the specified <paramref name="parent"/> folder and
+    /// filters out  non-file system items, such as virtual collections or inaccessible items. If an item is a <see
+    /// cref="ShellLibrary"/>,  only those with a valid default save folder in the file system are included.</remarks>
+    /// <param name="parent">The <see cref="ShellFolder"/> representing the parent folder whose items are to be retrieved.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="KeyValuePair{TKey, TValue}"/> where the key is the item's name 
+    /// and the value is its file system path. Items that are not file system objects or cannot be accessed are
+    /// excluded.</returns>
+    public static IEnumerable<KeyValuePair<string, string>> GetFolderItems(ShellFolder parent)
     {
         foreach (var item in parent)
         {
-            string path = "";
+            string name, path;
 
             try
             {
@@ -197,6 +130,7 @@ public class ExplorerHelper
                         continue;
 
                     path = shLib.DefaultSaveFolder.FileSystemPath;
+                    name = shLib.DefaultSaveFolder.Name;
                 }
                 else // ShellFolder
                 {
@@ -206,6 +140,7 @@ public class ExplorerHelper
                         continue;
 
                     path = item.FileSystemPath;
+                    name = item.Name;
                 }
             }
             catch
@@ -213,7 +148,7 @@ public class ExplorerHelper
                 continue;
             }
 
-            yield return path;
+            yield return new(name, path);
         }
     }
 
@@ -236,42 +171,52 @@ public class ExplorerHelper
     }
 
     /// <summary>
-    /// Try to get the full path of an item in a Windows Explorer window
+    /// Retrieves the file system path associated with the specified <see cref="AutomationElement"/> within the context
+    /// of the provided <see cref="ExplorerWindow"/>.
     /// </summary>
-    /// <param name="element"></param>
-    /// <returns></returns>
-    public static string GetPathFromElement(AutomationElement element)
+    /// <remarks>This method attempts to resolve the path of the given <paramref name="element"/> based on its
+    /// type and its relationship to the provided <paramref name="window"/>. Special handling is applied for elements
+    /// under "This PC" and "Libraries" to map their names to actual file system paths.</remarks>
+    /// <param name="element">The <see cref="AutomationElement"/> representing the UI element for which the path is to be determined.</param>
+    /// <param name="window">The <see cref="ExplorerWindow"/> that provides context for resolving the path.</param>
+    /// <returns>A string representing the resolved file system path of the specified element, or <see langword="null"/> if the
+    /// path cannot be determined or the element does not correspond to a valid path.</returns>
+    public static string GetPathFromElement(AutomationElement element, ExplorerWindow window)
     {
-        var listItem = new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)).Normalize(element);
-        var list = new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List)).Normalize(element);
-        var window = new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Window)).Normalize(element);
+        // TODO: This PC & Libraries might be in a different language
+        // TOSO: Add support for Quick Access (Windows 10)
 
-        string elementName = "";
+        var listItem = new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)).Normalize(element);
+        bool listExists() => new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List)).Normalize(element) is not null;
+
+        string elementName = listItem?.Current.Name;
 
         if (element.Current.ControlType == ControlType.TreeItem)
         {
             string treePath = GetPathFromTree(element);
             if (treePath.StartsWith("This PC") || treePath.StartsWith("Libraries"))
-                return GetActualPath(treePath);
+                return ParseTreePath(treePath);
 
             return null;
         }
 
-        if (listItem is not null)
+        if (window.Equals(NativeMethods.InterceptClipboard.ExplorerWatcher?.DesktopWindow)
+            || listItem is not null || listExists())
         {
-            elementName = listItem.Current.Name;
-        }
-
-        if (window is null && list is not null && list.Current.Name == "Desktop")
-        {
-            return $"{GetActualPath("Desktop")}\\{elementName}";
-        }
-
-        if ((listItem is not null || list is not null) && window is not null)
-        {
-            string currentPath = GetPathFromWindow(window);
-
-            return GetActualPath($"{currentPath}\\{elementName}");
+            if (elementName is not null)
+            {
+                if (window.Path == "This PC")
+                {
+                    if (ThisPcItems.TryGetValue(elementName, out string actualPath))
+                        return actualPath;
+                }
+                else if (window.Path == "Libraries")
+                {
+                    if (LibrariesItems.TryGetValue(elementName, out string actualPath))
+                        return actualPath;
+                }
+            }
+            return $"{window.Path}\\{elementName}";
         }
 
         return null;
@@ -290,7 +235,7 @@ public class ExplorerHelper
         try
         {
             File.Delete(path);
-            Vanara.PInvoke.Shell32.SHChangeNotify(Vanara.PInvoke.Shell32.SHCNE.SHCNE_DELETE, Vanara.PInvoke.Shell32.SHCNF.SHCNF_PATHW, hPath);
+            SHChangeNotify(SHCNE.SHCNE_DELETE, SHCNF.SHCNF_PATHW, hPath);
             result = true;
         }
         catch
@@ -310,7 +255,7 @@ public class ExplorerHelper
 
         try
         {
-            Vanara.PInvoke.Shell32.SHChangeNotify(Vanara.PInvoke.Shell32.SHCNE.SHCNE_CREATE, Vanara.PInvoke.Shell32.SHCNF.SHCNF_PATHW, hPath);
+            SHChangeNotify(SHCNE.SHCNE_CREATE, SHCNF.SHCNF_PATHW, hPath);
             result = true;
         }
         catch

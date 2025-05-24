@@ -67,17 +67,10 @@ public static partial class NativeMethods
             return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
         }
 
-        public static int? GetPidFromPoint()
+        public static HANDLE GetWindowUnderMouse()
         {
-            WindowUnderMouse = WindowFromPoint(MousePosition);
-
-            if (WindowUnderMouse == IntPtr.Zero)
-                return null;
-
-            if (GetWindowThreadProcessId(WindowUnderMouse, out var pid) == 0)
-                return null;
-
-            return (int)pid;
+            WindowUnderMouse = GetAncestor(WindowFromPoint(MousePosition), GaFlags.GA_ROOT);
+            return WindowUnderMouse;
         }
 
         [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
@@ -98,7 +91,7 @@ public static partial class NativeMethods
         [DllImport("User32.dll")]
         private static extern HANDLE WindowFromPoint(POINT Point);
 
-        [DllImport("User32.dll", SetLastError = true)]
-        private static extern uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
+        [DllImport("User32.dll", ExactSpelling = true)]
+        private static extern HANDLE GetAncestor(HANDLE hwnd, GaFlags gaFlags);
     }
 }

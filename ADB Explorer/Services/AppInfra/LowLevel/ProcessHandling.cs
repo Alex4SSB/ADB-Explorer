@@ -61,4 +61,13 @@ public class ProcessHandling
         => Process.GetProcesses()
         .Where(p => AdbExplorerConst.INCOMPATIBLE_APPS.Contains(p.ProcessName))
         .Select(p => p.ProcessName);
+
+    public static int GetProcessIdFromWindowHandle(HANDLE hwnd)
+    {
+        GetWindowThreadProcessId(hwnd, out uint processId);
+        return (int)processId;
+    }
+
+    [DllImport("User32.dll", SetLastError = true)]
+    private static extern uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
 }

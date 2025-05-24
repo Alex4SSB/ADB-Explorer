@@ -4,7 +4,7 @@ using System.Windows.Automation;
 
 namespace ADB_Explorer.Services;
 
-public class ExplorerWindow
+public class ExplorerWindow : IComparable
 {
     public HANDLE Hwnd { get; }
 
@@ -42,7 +42,12 @@ public class ExplorerWindow
         {
             if (_process is null)
             {
-                _process = Process.GetProcessById(RootElement.Current.ProcessId);
+                // Don't use automation just to get pid if it isn't ready yet
+                int processId = _fileList is null
+                    ? ProcessHandling.GetProcessIdFromWindowHandle(Hwnd)
+                    : RootElement.Current.ProcessId;
+
+                _process = Process.GetProcessById(processId);
             }
 
             return _process;
@@ -91,10 +96,6 @@ public class ExplorerWindow
         }
     }
 
-    public bool IsDesktop() =>
-        RootElement.Current.Name == "Program Manager"
-        && FileList.Current.Name == "Desktop";
-
     public ExplorerWindow(IGrouping<HANDLE, string> paths)
     {
         Hwnd = paths.Key;
@@ -105,4 +106,20 @@ public class ExplorerWindow
     {
         Hwnd = hwnd;
     }
+
+    public ExplorerWindow(nint hwnd, string path)
+    {
+        Hwnd = hwnd;
+        Paths = [ path ];
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is ExplorerWindow window &&
+               Hwnd.Equals(window.Hwnd);
+    }
+
+    public override int GetHashCode() => Hwnd.GetHashCode();
+
+    public int CompareTo(object obj) => Hwnd.CompareTo(obj);
 }

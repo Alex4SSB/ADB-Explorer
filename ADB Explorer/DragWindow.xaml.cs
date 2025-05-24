@@ -3,6 +3,7 @@ using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using System.Windows.Automation;
 using Vanara.Windows.Shell;
+using static ADB_Explorer.Services.NativeMethods;
 
 namespace ADB_Explorer;
 
@@ -16,7 +17,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private readonly DispatcherTimer DragTimer = new() { Interval = TimeSpan.FromMilliseconds(200) };
 
-    private HANDLE windowHandle;
+    private HANDLE dragWindowHandle;
 
     public DragWindow()
     {
@@ -35,7 +36,7 @@ public partial class DragWindow : INotifyPropertyChanged
         if (Data.RuntimeSettings.DragBitmap is not null)
         {
             if (imageEmpty)
-                UpdateMouse(NativeMethods.InterceptMouse.MousePosition);
+                UpdateMouse(InterceptMouse.MousePosition);
 
             GetPathUnderMouse();
         }
@@ -66,9 +67,12 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
             }
 
-            string explorerTarget = "";
+            if (WindowUnderMouse?.Hwnd == dragWindowHandle)
+                return;
 
-            if (ElementUnderMouse is not null && !MouseWithinApp)
+            string explorerTarget = "";
+            
+            if (ElementUnderMouse is not null && WindowUnderMouse is not null && !MouseWithinApp)
             {
                 try
                 {
@@ -82,7 +86,9 @@ public partial class DragWindow : INotifyPropertyChanged
                     }
                     IsObstructed = false;
 
-                    var path = ExplorerHelper.GetPathFromElement(ElementUnderMouse);
+                    var path = ExplorerHelper.GetPathFromElement(ElementUnderMouse, WindowUnderMouse);
+                    DebugLog.PrintLine($"Path under mouse: {path}");
+
                     if (string.IsNullOrEmpty(path))
                     {
                         explorerTarget = "";
@@ -160,7 +166,7 @@ public partial class DragWindow : INotifyPropertyChanged
         }
     }
 
-    private string processUnderMouse = "";
+    private ExplorerWindow WindowUnderMouse = null;
 
     private AutomationElement elementUnderMouse = null;
     public AutomationElement ElementUnderMouse
@@ -188,25 +194,25 @@ public partial class DragWindow : INotifyPropertyChanged
             }
         };
 
-        windowHandle = new WindowInteropHelper(this).Handle;
+        dragWindowHandle = new WindowInteropHelper(this).Handle;
 
-        Services.WindowStyle.SetWindowHidden(windowHandle);
+        Services.WindowStyle.SetWindowHidden(dragWindowHandle);
 
 #if DEBUG
         MouseWithinApp = true;
 #else
-        NativeMethods.InterceptMouse.Init(NativeMethods.MouseMessages.WM_MOUSEMOVE, UpdateMouse);
+        InterceptMouse.Init(MouseMessages.WM_MOUSEMOVE, UpdateMouse);
 #endif
 
         DragTimer.Start();
     }
 
-    private void UpdateMouse(NativeMethods.POINT point)
+    private void UpdateMouse(POINT point)
     {
         if (Data.RuntimeSettings.DragBitmap is null)
             return;
 
-        var actualPoint = NativeMethods.MonitorInfo.MousePositionToDpi(point, windowHandle);
+        var actualPoint = MonitorInfo.MousePositionToDpi(point, dragWindowHandle);
 
         imageEmpty = DragImage.ActualHeight < 1;
         if (!imageEmpty)
@@ -227,23 +233,32 @@ public partial class DragWindow : INotifyPropertyChanged
             }
         }
 
-        MouseWithinApp = NativeMethods.MonitorInfo.IsPointInMainWin(point);
+        var hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
+        MouseWithinApp = hwndUnderMouse == InterceptClipboard.MainWindowHandle;
+
+        if (WindowUnderMouse?.Hwnd == hwndUnderMouse)
+            return;
+
         if (!MouseWithinApp)
         {
+            if (hwndUnderMouse == dragWindowHandle)
+                return;
+
             if (Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
                 Data.RuntimeSettings.DragBitmap = null;
 
-            if (NativeMethods.InterceptMouse.GetPidFromPoint() is int pid
-                && Process.GetProcessById(pid) is Process proc)
-            {
-                processUnderMouse = proc.ProcessName;
-                Data.RuntimeSettings.DragWithinSlave = processUnderMouse == Properties.Resources.AppDisplayName;
+            var explorerWin = InterceptClipboard.ExplorerWatcher?.AllWindows.FirstOrDefault(win => win.Hwnd == hwndUnderMouse);
+            if (explorerWin is null)
+                return;
 
-                if (processUnderMouse is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
-                    Data.RuntimeSettings.DragBitmap = null;
-            }
-            else
-                processUnderMouse = "";
+            WindowUnderMouse = explorerWin;
+
+            var procName = WindowUnderMouse.Process?.ProcessName;
+
+            Data.RuntimeSettings.DragWithinSlave = procName == Properties.Resources.AppDisplayName;
+
+            if (procName is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
+                Data.RuntimeSettings.DragBitmap = null;
         }
         else
             Data.RuntimeSettings.DragWithinSlave = false;
@@ -252,7 +267,7 @@ public partial class DragWindow : INotifyPropertyChanged
     private void Window_Closing(object sender, CancelEventArgs e)
     {
 #if !DEBUG
-        NativeMethods.InterceptMouse.Close();
+        InterceptMouse.Close();
 #endif
     }
 

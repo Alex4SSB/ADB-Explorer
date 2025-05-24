@@ -484,6 +484,13 @@ public static partial class NativeMethods
         GWL_ID = -12
     }
 
+    public enum GaFlags
+    {
+        GA_PARENT = 1, // Retrieves the parent window.
+        GA_ROOT = 2, // Retrieves the root window.
+        GA_ROOTOWNER = 3 // Retrieves the owned root window.
+    }
+
     #endregion
 
     #region General Use Structs

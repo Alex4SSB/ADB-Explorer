@@ -71,7 +71,7 @@
         [GeneratedRegex("(?:.+(?<Drive>[A-Z]:)\\)|(?<Path>[^:]+?))(?: and \\d+ more tabs?)? - File Explorer")]
         public static partial Regex RE_EXPLORER_WIN_PATH();
 
-        [GeneratedRegex(@"This PC\\(?:(?:.+\((?<Drive>[A-Z]:)\)(?<PostDrive>.*))|(?<Path>.+))")]
+        [GeneratedRegex(@"This PC\\.+\((?<Drive>[A-Z]:)\)(?<PostDrive>.*)")]
         public static partial Regex RE_WIN_ROOT_PATH();
     }
 }

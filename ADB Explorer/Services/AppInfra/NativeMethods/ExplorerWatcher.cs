@@ -16,22 +16,37 @@ public static partial class NativeMethods
         
         private AutomationPropertyChangedEventHandler _titleChangeHandler;
         private ExplorerWindow currentExplorerWindow;
-        private IEnumerable<ExplorerWindow> explorerWindows = [];
+        public IEnumerable<ExplorerWindow> ExplorerWindows { get; private set; } = [];
+
+        private ExplorerWindow _desktopWindow = null;
+        public ExplorerWindow DesktopWindow
+        {
+            get
+            {
+                if (_desktopWindow is null)
+                {
+                    _desktopWindow = new(GetShellWindow(),
+                                         Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+                }
+
+                return _desktopWindow;
+            }
+        }
+
+        public IEnumerable<ExplorerWindow> AllWindows => [.. ExplorerWindows, DesktopWindow];
 
         private readonly ManagementEventWatcher _driveWatcher;
 
-        private static readonly string _desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-
-        private string _path = "";
+        private string _focusedPath = "";
         public string FocusedPath
         {
-            get => _path;
+            get => _focusedPath;
             set
             {
-                if (_path == value)
+                if (_focusedPath == value)
                     return;
 
-                _path = value;
+                _focusedPath = value;
 
                 UpdateWatchers();
             }
@@ -58,7 +73,7 @@ public static partial class NativeMethods
             { 
                 App.Current.Dispatcher.Invoke(() =>
                 {
-                    ExplorerHelper.ThisPcItems = [.. ExplorerHelper.GetFolderItems(ExplorerHelper.ThisPc)];
+                    ExplorerHelper.ThisPcItems = ExplorerHelper.GetFolderItems(ExplorerHelper.ThisPc).ToDictionary();
                     UpdateWatchers();
                 });
             };
@@ -90,25 +105,27 @@ public static partial class NativeMethods
             if (hwnd == InterceptClipboard.MainWindowHandle)
                 return;
 
-            var window = new ExplorerWindow(hwnd);
-            if (window.Process.ProcessName is not "explorer")
+            ExplorerWindow window;
+            if (hwnd == DesktopWindow.Hwnd)
             {
-                if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
-                    ExplorerHelper.CheckConflictingApps();
-
-                return;
-            }
-
-            currentExplorerWindow = window;
-            if (currentExplorerWindow.IsDesktop())
-            {
-                FocusedPath = _desktopPath;
+                currentExplorerWindow = DesktopWindow;
+                FocusedPath = DesktopWindow.Path;
             }
             else
             {
+                window = new(hwnd);
+
+                if (window.Process.ProcessName is not "explorer")
+                {
+                    if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
+                        ExplorerHelper.CheckConflictingApps();
+
+                    return;
+                }
+
                 UpdateExplorerWindows();
-                FocusedPath = explorerWindows.FirstOrDefault(w => w.Hwnd == hwnd)?.Path;
-                
+                FocusedPath = ExplorerWindows.FirstOrDefault(w => w.Hwnd == hwnd)?.Path;
+
                 SubscribeToTitleEvents();
             }
         }
@@ -117,7 +134,7 @@ public static partial class NativeMethods
         {
             // Hierarchy: Window -> Pane -> Tab -> List -> TabItem
 
-            if (currentExplorerWindow.RootElement is null)
+            if (currentExplorerWindow?.RootElement is null)
                 return;
 
             _titleChangeHandler = (sender, e) =>
@@ -127,7 +144,7 @@ public static partial class NativeMethods
                     return;
 
                 UpdateExplorerWindows();
-                FocusedPath = explorerWindows.FirstOrDefault(w => w.Hwnd == currentExplorerWindow.Hwnd)?.Path;
+                FocusedPath = ExplorerWindows.FirstOrDefault(w => w.Hwnd == currentExplorerWindow.Hwnd)?.Path;
             };
 
             Automation.AddAutomationPropertyChangedEventHandler(
@@ -169,14 +186,15 @@ public static partial class NativeMethods
             UpdateExplorerWindows();
 
             var oldPaths = Data.RuntimeSettings.Watchers.Select(w => w.Path);
-            var newPaths = GetUniquePaths([FocusedPath, .. explorerWindows.Select(w => w.Path)]);
+            var newPaths = GetUniquePaths([FocusedPath, .. ExplorerWindows.Select(w => w.Path)]);
             
             // If the focused path is not the desktop - it is one of the explorer windows
             if (oldPaths.Order().SequenceEqual(newPaths.Order()))
                 return;
 
             DisposeWatchers();
-            Data.RuntimeSettings.Watchers = [.. newPaths.Select(CreateFileSystemWatcher)];
+            if (Data.CopyPaste.IsSelfClipboard)
+                Data.RuntimeSettings.Watchers = [.. newPaths.Select(CreateFileSystemWatcher)];
         }
 
         private static void DisposeWatchers()
@@ -190,7 +208,7 @@ public static partial class NativeMethods
             Data.RuntimeSettings.Watchers = [];
         }
 
-        private void UpdateExplorerWindows() => explorerWindows = ExplorerHelper.GetExplorerPaths();
+        private void UpdateExplorerWindows() => ExplorerWindows = ExplorerHelper.GetExplorerPaths();
 
         /// <summary>
         /// Returns a collection of unique file system paths after resolving special placeholders and verifying their
@@ -205,10 +223,10 @@ public static partial class NativeMethods
         public static IEnumerable<string> GetUniquePaths(List<string> paths)
         {
             if (paths.RemoveAll(p => p == "This PC") > 0)
-                paths.AddRange(ExplorerHelper.ThisPcItems);
+                paths.AddRange(ExplorerHelper.ThisPcItems.Values);
 
             if (paths.RemoveAll(p => p == "Libraries") > 0)
-                paths.AddRange(ExplorerHelper.LibrariesItems);
+                paths.AddRange(ExplorerHelper.LibrariesItems.Values);
 
             // Verify the paths exist and are not empty drives
             return paths.Distinct().Where(Directory.Exists);
@@ -221,7 +239,7 @@ public static partial class NativeMethods
             DebugLog.PrintLine($"Watching {path}");
 #endif
 
-            return App.Current.Dispatcher.Invoke(() =>
+            return App.Current?.Dispatcher.Invoke(() =>
             {
                 FileSystemWatcher watcher = null;
                 try
@@ -248,7 +266,7 @@ public static partial class NativeMethods
         private static void folderWatcher_Created(object sender, FileSystemEventArgs e)
         {
 #if !DEPLOY
-            DebugLog.PrintLine($"File {e.ChangeType} : {e.FullPath}");
+            DebugLog.PrintLine($"File {e.ChangeType}: {e.FullPath}");
 #endif
 
             if (e.Name == VirtualFileDataObject.DummyFileName)
@@ -283,6 +301,9 @@ public static partial class NativeMethods
 
         [DllImport("User32.dll")]
         private static extern bool UnhookWinEvent(HANDLE hWinEventHook);
+
+        [DllImport("User32.dll")]
+        private static extern HANDLE GetShellWindow();
 
         public void Dispose()
         {

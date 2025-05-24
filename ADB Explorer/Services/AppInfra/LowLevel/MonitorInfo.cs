@@ -56,27 +56,8 @@ public static partial class NativeMethods
                 (int)(mousePosition.Y * Data.RuntimeSettings.DpiScalingFactor));
         }
 
-        public static bool IsPointInMainWin(POINT point) =>
-            mainWinHandle is null
-            || IsPointInWindow(mainWinHandle.Value, point);
-
-        private static bool IsPointInWindow(HANDLE hWnd, POINT point)
-        {
-            if (GetWindowRect(hWnd, out var rect))
-            {
-                return point.X >= rect.Left &&
-                       point.X <= rect.Right &&
-                       point.Y >= rect.Top &&
-                       point.Y <= rect.Bottom;
-            }
-            return false;
-        }
-
         [DllImport("User32.dll")]
         private static extern HANDLE MonitorFromWindow(HANDLE hwnd, MonitorType dwFlags);
-
-        [DllImport("User32.dll")]
-        static extern bool GetWindowRect(HANDLE hwnd, out RECT lpRect);
 
         [DllImport("User32.dll")]
         static extern uint GetDpiForWindow(HANDLE hwnd);

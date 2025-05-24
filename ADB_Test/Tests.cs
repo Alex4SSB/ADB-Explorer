@@ -415,19 +415,19 @@ namespace ADB_Test
 
             foreach (var item in testFolders)
             {
-                Assert.IsTrue(CheckPath(ExplorerHelper.GetActualPath(item), item));
+                Assert.IsTrue(CheckPath(ExplorerHelper.ParseTreePath(item), item));
             }
 
-            Assert.AreEqual("C:", ExplorerHelper.GetActualPath("This PC\\C:"));
-            Assert.AreEqual("F:", ExplorerHelper.GetActualPath("This PC\\Sandisk Cruzer (F:)"));
+            Assert.AreEqual("C:", ExplorerHelper.ParseTreePath("This PC\\C:"));
+            Assert.AreEqual("F:", ExplorerHelper.ParseTreePath("This PC\\Sandisk Cruzer (F:)"));
 
             // Quick access in Windows 10 can have any folder, hence it is impossible to determine the actual path
-            Assert.IsNull(ExplorerHelper.GetActualPath("Quick access\\Pictures"));
+            Assert.IsNull(ExplorerHelper.ParseTreePath("Quick access\\Pictures"));
 
             // These are virtual locations
-            Assert.IsNull(ExplorerHelper.GetActualPath("Libraries"));
-            Assert.IsNull(ExplorerHelper.GetActualPath("Network"));
-            Assert.IsNull(ExplorerHelper.GetActualPath("This PC"));
+            Assert.IsNull(ExplorerHelper.ParseTreePath("Libraries"));
+            Assert.IsNull(ExplorerHelper.ParseTreePath("Network"));
+            Assert.IsNull(ExplorerHelper.ParseTreePath("This PC"));
 
             bool CheckPath(string result, string origin)
             {
