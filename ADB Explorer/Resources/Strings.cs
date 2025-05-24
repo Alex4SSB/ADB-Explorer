@@ -6,7 +6,6 @@ namespace ADB_Explorer.Resources;
 
 public static class Strings
 {
-    public const string S_SAVED_DEVICES = "SavedDevices";
     public const string S_CC_NAME = "Creative Commons";
     public const string S_APACHE_NAME = "Apache";
     public const string S_ANDROID_ROBOT_LIC = "The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.";

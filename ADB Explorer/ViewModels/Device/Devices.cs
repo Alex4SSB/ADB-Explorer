@@ -76,7 +76,7 @@ public class Devices : AbstractDevice
 
     public static void RetrieveHistoryDevices(ObservableList<DeviceViewModel> uiList)
     {
-        var value = Storage.RetrieveValue(Strings.S_SAVED_DEVICES);
+        var value = Storage.RetrieveValue("SavedDevices");
         if (value is null)
             return;
 
@@ -96,7 +96,7 @@ public class Devices : AbstractDevice
 
     public static void StoreHistoryDevices(IEnumerable<HistoryDeviceViewModel> devices)
     {
-        Storage.StoreValue(Strings.S_SAVED_DEVICES, devices.Select(h => h.GetStorage()));
+        Storage.StoreValue("SavedDevices", devices.Select(h => h.GetStorage()));
     }
 
     public void AddHistoryDevice(HistoryDeviceViewModel device)
