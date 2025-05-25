@@ -222,11 +222,14 @@ public static partial class NativeMethods
         /// into their corresponding items, and non-existent paths are excluded.</returns>
         public static IEnumerable<string> GetUniquePaths(List<string> paths)
         {
-            if (paths.RemoveAll(p => p == "This PC") > 0)
+            if (paths.RemoveAll(p => p == ExplorerHelper.ThisPcTitle) > 0)
                 paths.AddRange(ExplorerHelper.ThisPcItems.Values);
 
-            if (paths.RemoveAll(p => p == "Libraries") > 0)
+            if (paths.RemoveAll(p => p == ExplorerHelper.LibrariesTitle) > 0)
                 paths.AddRange(ExplorerHelper.LibrariesItems.Values);
+
+            if (paths.RemoveAll(p => p == ExplorerHelper.QuickAccessTitle) > 0)
+                paths.AddRange(ExplorerHelper.QuickAccessItems.Values);
 
             // Verify the paths exist and are not empty drives
             return paths.Distinct().Where(Directory.Exists);

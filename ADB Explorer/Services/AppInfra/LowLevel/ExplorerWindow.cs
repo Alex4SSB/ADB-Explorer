@@ -71,27 +71,11 @@ public class ExplorerWindow : IComparable
             else
             // 22H2 with more than one tab
             {
-                var match = AdbRegEx.RE_EXPLORER_WIN_PATH().Match(RootElement.Current.Name);
-                if (!match.Success)
-                    return null;
+                var pathDict = Paths.ToDictionary(FileHelper.GetFullName, path => path);
 
-                string path = "";
+                var query = pathDict.Where(item => RootElement.Current.Name.StartsWith(item.Key));
 
-                if (match.Groups["Drive"].Success)
-                {
-                    path = match.Groups["Drive"].Value;
-                }
-                else if (match.Groups["Path"].Success)
-                {
-                    var folderName = match.Groups["Path"].Value;
-
-                    // We don't need the full path, just the name
-                    path = FileHelper.GetFullName(folderName);
-                }
-                else
-                    return null;
-
-                return Paths.FirstOrDefault(p => p.EndsWith(path));
+                return query.Any() ? query.First().Value : null;
             }
         }
     }

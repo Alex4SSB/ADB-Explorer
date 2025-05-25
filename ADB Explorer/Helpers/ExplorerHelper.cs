@@ -10,13 +10,19 @@ namespace ADB_Explorer.Helpers;
 
 public class ExplorerHelper
 {
-    private static readonly ShellFolder UserLibraries = new(KNOWNFOLDERID.FOLDERID_UsersLibraries);
-    public static readonly ShellFolder ThisPc = new(KNOWNFOLDERID.FOLDERID_ComputerFolder);
+    private static ShellFolder UserLibraries => new(KNOWNFOLDERID.FOLDERID_UsersLibraries);
+    public static ShellFolder ThisPc => new(KNOWNFOLDERID.FOLDERID_ComputerFolder);
+    private const string QuickAccessGUID = "::{679F85CB-0220-4080-B29B-5540CC05AAB6}";
 
     public static Dictionary<string, string> LibrariesItems { get; private set; } = [];
     public static Dictionary<string, string> ThisPcItems { get; set; } = [];
+    public static Dictionary<string, string> QuickAccessItems { get; private set; } = [];
 
-    
+    public static string LibrariesTitle => UserLibraries.Name;
+    public static string ThisPcTitle => ThisPc.Name;
+    public static string QuickAccessTitle { get; private set; } = "Quick Access";
+
+
     /// <summary>
     /// Converts a user-friendly file path from a Windows Explorer-like format into a standard file system path.
     /// </summary>
@@ -29,15 +35,17 @@ public class ExplorerHelper
     /// <returns>A string representing the parsed file system path, or <see langword="null"/> if the input path cannot be parsed.</returns>
     public static string ParseTreePath(string path)
     {
-        if (path.StartsWith("This PC"))
+        if (path.StartsWith(ThisPcTitle))
         {
-            var match = AdbRegEx.RE_WIN_ROOT_PATH().Match(path);
+            var match = Regex.Match(path, $@"{ThisPcTitle}\\.+\((?<Drive>[A-Z]:)\)(?<PostDrive>.*)");
             return match.Groups["Drive"].Success
                 ? $"{match.Groups["Drive"].Value}{match.Groups["PostDrive"].Value}"
                 : null;
         }
-        else if (path.StartsWith("Libraries"))
+        else if (path.StartsWith(LibrariesTitle) || path.StartsWith(QuickAccessTitle))
         {
+            var items = path.StartsWith(LibrariesTitle) ? LibrariesItems : QuickAccessItems;
+
             var subItem = path[9..].Trim('\\');
             if (subItem.Length == 0)
                 return null;
@@ -46,7 +54,7 @@ public class ExplorerHelper
             var originTop = index > -1 ? subItem[..index] : subItem;
             var remainder = index > -1 ? subItem[index..] : "";
 
-            if (LibrariesItems.TryGetValue(originTop, out string fullPath))
+            if (items.TryGetValue(originTop, out string fullPath))
                 return $"{fullPath}{remainder}";
         }
 
@@ -65,7 +73,7 @@ public class ExplorerHelper
     {
         SHDocVw.ShellWindows shellWindows = new();
         ConcurrentBag<(HANDLE, string)> results = [];
-
+        
         Parallel.ForEach(shellWindows.Cast<InternetExplorer>(), window =>
         {
             if (window.Document is not IShellFolderViewDual2 folderView)
@@ -77,16 +85,24 @@ public class ExplorerHelper
 
             if (UserLibraries.ParsingName.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
             {
-                path = "Libraries";
+                path = LibrariesTitle;
                 if (LibrariesItems.Count == 0)
                     LibrariesItems = GetFolderItems(UserLibraries).ToDictionary();
             }
             else if (ThisPc.ParsingName.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
             {
-                // TODO: monitor new drives
-                path = "This PC";
+                path = ThisPcTitle;
                 if (ThisPcItems.Count == 0)
                     ThisPcItems = GetFolderItems(ThisPc).ToDictionary();
+            }
+            else if (itemPath == QuickAccessGUID)
+            {
+                QuickAccessTitle = folderView.Folder.Title;
+                path = QuickAccessTitle;
+
+                // The frequent folders in Quick Access are not static, but it should be enough for now
+                if (QuickAccessItems.Count == 0)
+                    QuickAccessItems = GetFolderItems(items).Distinct().ToDictionary();
             }
             else if (items.Count == 0) // For an empty folder get folder itself
                 path = itemPath;
@@ -97,11 +113,24 @@ public class ExplorerHelper
 
                 path = FileHelper.GetParentPath(firstItem?.Path);
             }
-
+            
             results.Add(((HANDLE)window.HWND, path));
         });
 
         return results.GroupBy(e => e.Item1, e => e.Item2).Select(i => new ExplorerWindow(i));
+    }
+
+    public static IEnumerable<KeyValuePair<string, string>> GetFolderItems(FolderItems items)
+    {
+        for (int i = 0; i < items.Count; i++)
+        {
+            FolderItem item = ((dynamic)items).Item(i);
+            string path = item?.Path;
+            if (string.IsNullOrEmpty(path) || !item.IsFileSystem || !item.IsFolder)
+                continue;
+
+            yield return new(FileHelper.GetFullName(path), path);
+        }
     }
 
     /// <summary>
@@ -183,9 +212,6 @@ public class ExplorerHelper
     /// path cannot be determined or the element does not correspond to a valid path.</returns>
     public static string GetPathFromElement(AutomationElement element, ExplorerWindow window)
     {
-        // TODO: This PC & Libraries might be in a different language
-        // TOSO: Add support for Quick Access (Windows 10)
-
         var listItem = new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)).Normalize(element);
         bool listExists() => new TreeWalker(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List)).Normalize(element) is not null;
 
@@ -194,7 +220,7 @@ public class ExplorerHelper
         if (element.Current.ControlType == ControlType.TreeItem)
         {
             string treePath = GetPathFromTree(element);
-            if (treePath.StartsWith("This PC") || treePath.StartsWith("Libraries"))
+            if (treePath.StartsWith(ThisPcTitle) || treePath.StartsWith(LibrariesTitle) || treePath.StartsWith(QuickAccessTitle))
                 return ParseTreePath(treePath);
 
             return null;
@@ -205,14 +231,19 @@ public class ExplorerHelper
         {
             if (elementName is not null)
             {
-                if (window.Path == "This PC")
+                if (window.Path == ThisPcTitle)
                 {
                     if (ThisPcItems.TryGetValue(elementName, out string actualPath))
                         return actualPath;
                 }
-                else if (window.Path == "Libraries")
+                else if (window.Path == LibrariesTitle)
                 {
                     if (LibrariesItems.TryGetValue(elementName, out string actualPath))
+                        return actualPath;
+                }
+                else if (window.Path == QuickAccessTitle)
+                {
+                    if (QuickAccessItems.TryGetValue(elementName, out string actualPath))
                         return actualPath;
                 }
             }
