@@ -73,7 +73,9 @@ public class ExplorerHelper
     {
         SHDocVw.ShellWindows shellWindows = new();
         ConcurrentBag<(HANDLE, string)> results = [];
-        
+        string librariesGuid = UserLibraries.ParsingName;
+        string thisPcGuid = ThisPc.ParsingName;
+
         Parallel.ForEach(shellWindows.Cast<InternetExplorer>(), window =>
         {
             if (window.Document is not IShellFolderViewDual2 folderView)
@@ -83,13 +85,13 @@ public class ExplorerHelper
             string itemPath = ((dynamic)items).Item()?.Path;
             string path = "";
 
-            if (UserLibraries.ParsingName.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
+            if (librariesGuid.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
             {
                 path = LibrariesTitle;
                 if (LibrariesItems.Count == 0)
                     LibrariesItems = GetFolderItems(UserLibraries).ToDictionary();
             }
-            else if (ThisPc.ParsingName.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
+            else if (thisPcGuid.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
             {
                 path = ThisPcTitle;
                 if (ThisPcItems.Count == 0)
