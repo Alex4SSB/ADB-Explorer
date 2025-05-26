@@ -159,7 +159,7 @@
                     <ui:FontIcon
                         Grid.Column="1"
                         Foreground="OrangeRed"
-                        Glyph="&#xE733;">
+                        Glyph="&#xE25B;">
                         <ui:FontIcon.Style>
                             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                                 <Style.Triggers>
