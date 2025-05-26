@@ -581,7 +581,7 @@ public static partial class NativeMethods
 
     #region Icon
 
-    [StructLayout(LayoutKind.Sequential)]
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     public struct SHFILEINFO
     {
         public HANDLE hIcon;
@@ -593,7 +593,7 @@ public static partial class NativeMethods
         public string szTypeName;
     };
 
-    [DllImport("Shell32.dll")]
+    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
     private static extern HANDLE SHGetFileInfo(
         string pszPath, FileFlagsAndAttributes dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, FileInfoFlags uFlags);
 
