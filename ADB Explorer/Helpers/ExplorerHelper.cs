@@ -78,11 +78,34 @@ public class ExplorerHelper
 
         Parallel.ForEach(shellWindows.Cast<InternetExplorer>(), window =>
         {
-            if (window.Document is not IShellFolderViewDual2 folderView)
-                return;
+            IShellFolderViewDual2 folderView;
+            try
+            {
+                if (window.Document is not IShellFolderViewDual2 fv)
+                    return;
 
-            var items = folderView.Folder.Items();
-            string itemPath = ((dynamic)items).Item()?.Path;
+                folderView = fv;
+            }
+            catch
+            {
+                return;
+            }
+
+            FolderItems items;
+            string itemPath = "";
+            HANDLE hwnd;
+
+            try
+            {
+                items = folderView.Folder.Items();
+                itemPath = ((dynamic)items).Item()?.Path;
+                hwnd = (HANDLE)window.HWND;
+            }
+            catch
+            {
+                return;
+            }
+
             string path = "";
 
             if (librariesGuid.Equals(itemPath, StringComparison.InvariantCultureIgnoreCase))
@@ -111,12 +134,18 @@ public class ExplorerHelper
             else
             {
                 // Get the first item
-                FolderItem firstItem = ((dynamic)items).Item(0);
-
-                path = FileHelper.GetParentPath(firstItem?.Path);
+                try
+                {
+                    FolderItem firstItem = ((dynamic)items).Item(0);
+                    path = FileHelper.GetParentPath(firstItem?.Path);
+                }
+                catch
+                {
+                    return;
+                }
             }
-            
-            results.Add(((HANDLE)window.HWND, path));
+
+            results.Add((hwnd, path));
         });
 
         return results.GroupBy(e => e.Item1, e => e.Item2).Select(i => new ExplorerWindow(i));
@@ -126,11 +155,20 @@ public class ExplorerHelper
     {
         for (int i = 0; i < items.Count; i++)
         {
-            FolderItem item = ((dynamic)items).Item(i);
-            string path = item?.Path;
-            if (string.IsNullOrEmpty(path) || !item.IsFileSystem || !item.IsFolder)
-                continue;
+            string path = "";
 
+            try
+            {
+                FolderItem item = ((dynamic)items).Item(i);
+                path = item?.Path;
+                if (string.IsNullOrEmpty(path) || !item.IsFileSystem || !item.IsFolder)
+                    continue;
+            }
+            catch
+            {
+                continue;
+            }
+            
             yield return new(FileHelper.GetFullName(path), path);
         }
     }
