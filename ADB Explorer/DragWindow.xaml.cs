@@ -87,7 +87,10 @@ public partial class DragWindow : INotifyPropertyChanged
                     IsObstructed = false;
 
                     var path = ExplorerHelper.GetPathFromElement(ElementUnderMouse, WindowUnderMouse);
+
+#if !DEPLOY
                     DebugLog.PrintLine($"Path under mouse: {path}");
+#endif
 
                     if (string.IsNullOrEmpty(path))
                     {

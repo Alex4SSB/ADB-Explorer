@@ -15,8 +15,24 @@ public static partial class NativeMethods
         private readonly WinEventDelegate _delegate;
         
         private AutomationPropertyChangedEventHandler _titleChangeHandler;
-        private ExplorerWindow currentExplorerWindow;
+        
         public IEnumerable<ExplorerWindow> ExplorerWindows { get; private set; } = [];
+
+        private ExplorerWindow _currentExplorerWindow = null;
+        public ExplorerWindow CurrentExplorerWindow
+        {
+            get => _currentExplorerWindow;
+            set
+            {
+                if (_currentExplorerWindow == value)
+                    return;
+
+                Task.Run(() => UnsubscribeFromTitleEvents(_titleChangeHandler, _currentExplorerWindow));
+
+                _currentExplorerWindow = value;
+                SubscribeToTitleEvents();
+            }
+        }
 
         private ExplorerWindow _desktopWindow = null;
         public ExplorerWindow DesktopWindow
@@ -101,14 +117,13 @@ public static partial class NativeMethods
                 || hwnd == IntPtr.Zero)
                 return;
 
-            Task.Run(UnsubscribeFromTitleEvents);
             if (hwnd == InterceptClipboard.MainWindowHandle)
                 return;
 
             ExplorerWindow window;
             if (hwnd == DesktopWindow.Hwnd)
             {
-                currentExplorerWindow = DesktopWindow;
+                CurrentExplorerWindow = DesktopWindow;
                 FocusedPath = DesktopWindow.Path;
             }
             else
@@ -124,9 +139,8 @@ public static partial class NativeMethods
                 }
 
                 UpdateExplorerWindows();
-                FocusedPath = ExplorerWindows.FirstOrDefault(w => w.Hwnd == hwnd)?.Path;
-
-                SubscribeToTitleEvents();
+                CurrentExplorerWindow = ExplorerWindows.FirstOrDefault(w => w.Hwnd == hwnd);
+                FocusedPath = CurrentExplorerWindow?.Path;
             }
         }
 
@@ -134,21 +148,18 @@ public static partial class NativeMethods
         {
             // Hierarchy: Window -> Pane -> Tab -> List -> TabItem
 
-            if (currentExplorerWindow?.RootElement is null)
+            if (CurrentExplorerWindow?.RootElement is null)
                 return;
 
             _titleChangeHandler = (sender, e) =>
             {
                 // e.NewValue does provide us the new window title, but we need to refresh the full path anyway
-                if (e.Property != AutomationElement.NameProperty)
-                    return;
-
                 UpdateExplorerWindows();
-                FocusedPath = ExplorerWindows.FirstOrDefault(w => w.Hwnd == currentExplorerWindow.Hwnd)?.Path;
+                FocusedPath = ExplorerWindows.FirstOrDefault(w => w.Hwnd == CurrentExplorerWindow.Hwnd)?.Path;
             };
 
             Automation.AddAutomationPropertyChangedEventHandler(
-                currentExplorerWindow.RootElement,
+                CurrentExplorerWindow.RootElement,
                 TreeScope.Element,
                 _titleChangeHandler,
                 AutomationElement.NameProperty
@@ -157,21 +168,26 @@ public static partial class NativeMethods
 
         private void UnsubscribeFromTitleEvents()
         {
-            if (_titleChangeHandler is null || currentExplorerWindow?.RootElement is null)
+            UnsubscribeFromTitleEvents(_titleChangeHandler, _currentExplorerWindow);
+
+            _titleChangeHandler = null;
+            CurrentExplorerWindow = null;
+        }
+
+        private static void UnsubscribeFromTitleEvents(AutomationPropertyChangedEventHandler handler, ExplorerWindow window)
+        {
+            if (handler is null || window?.RootElement is null)
                 return;
 
             try
             {
                 Automation.RemoveAutomationPropertyChangedEventHandler(
-                currentExplorerWindow.RootElement,
-                _titleChangeHandler);
+                window.RootElement,
+                handler);
             }
             catch
             {
             }
-
-            _titleChangeHandler = null;
-            currentExplorerWindow = null;
         }
 
         /// <summary>
