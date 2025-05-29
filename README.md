@@ -27,9 +27,7 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 
 <br></br>
 <h2 align="left"/>Translation</h2>
-Although the app has a wide support for file names (Unicode, emojy, right-to-left), English is the only supported display language.
-If you would like to help with that, feel free to contact us (discussions / issues) about translating the app.<br></br>
-We will soon launch a Weblate.org project!
+Translation has started on https://hosted.weblate.org/engage/adb-explorer/
 <br></br>
 A Microsoft Store review:
 
