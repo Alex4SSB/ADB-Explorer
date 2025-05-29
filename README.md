@@ -3,11 +3,14 @@
   <h1 align="center">ADB Explorer</h1>
 </p>
 
-<a title="Platform" target="_blank">
-	<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
+<a href="https://hosted.weblate.org/engage/adb-explorer/">
+	<img src="https://hosted.weblate.org/widget/adb-explorer/strings/svg-badge.svg" alt="Translation status" />
 </a>
-
+<br></br>
 <p >
+  <a title="Platform" target="_blank">
+	<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
+  </a>
   <a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
     <img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" />
   </a>
