@@ -258,7 +258,7 @@ public partial class DragWindow : INotifyPropertyChanged
 
             var procName = WindowUnderMouse.Process?.ProcessName;
 
-            Data.RuntimeSettings.DragWithinSlave = procName == Properties.Resources.AppDisplayName;
+            Data.RuntimeSettings.DragWithinSlave = procName == Properties.AppGlobal.AppDisplayName;
 
             if (procName is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
                 Data.RuntimeSettings.DragBitmap = null;

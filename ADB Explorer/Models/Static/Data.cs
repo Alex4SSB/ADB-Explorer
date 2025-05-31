@@ -29,7 +29,7 @@ internal static class Data
 
     public static ObservableList<Package> Packages { get; set; } = [];
 
-    public static Version AppVersion => new(Properties.Resources.AppVersion);
+    public static Version AppVersion => new(Properties.AppGlobal.AppVersion);
 
     public static FileActionsEnable FileActions { get; set; } = new();
 

@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Controls;
@@ -97,18 +96,12 @@ public partial class SplashScreen
 
     private void HelpButton_OnClick(object sender, RoutedEventArgs e)
     {
-        DialogService.ShowMessage("""
-                                  This app is a UI for ADB - Android Debug Bridge.
-                                  To use the app, you need to have ADB on your PC.
-                                  ADB is available as part of the Android SDK Platform Tools.
-                                  You can use the provided link to download the SDK Platform Tools.
-                                  Unfortunately, we cannot provide ADB with the app due to licensing restrictions.
-                                  """, "Help On ADB", DialogService.DialogIcon.Informational);
+        DialogService.ShowMessage(Strings.Resources.S_HELP_ON_ADB, Strings.Resources.S_HELP_ON_ADB_TITLE, DialogService.DialogIcon.Informational);
     }
 
     private void AdvancedDragInfo_Click(object sender, RoutedEventArgs e)
     {
-        DialogService.ShowMessage(Strings.S_ADVANCED_DRAG, Strings.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Informational);
+        DialogService.ShowMessage(Strings.Resources.S_ADVANCED_DRAG, Strings.Resources.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Informational);
     }
 
     private void ConfirmAdvancedDrag_Click(object sender, RoutedEventArgs e)

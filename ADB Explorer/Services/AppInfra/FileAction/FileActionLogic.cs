@@ -1,7 +1,6 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
@@ -10,15 +9,25 @@ namespace ADB_Explorer.Services.AppInfra;
 
 internal static class FileActionLogic
 {
+    private static string RemoveApkMessage(IEnumerable<IBrowserItem> objects)
+    {
+        var count = objects.Count();
+
+        if (count == 1)
+            return string.Format(Strings.Resources.S_REM_APK, objects.First().DisplayName);
+
+        return string.Format(Strings.Resources.S_REM_APK_PLURAL, count);
+    }
+
     public static async void UninstallPackages()
     {
         var pkgs = Data.SelectedPackages;
         var files = Data.SelectedFiles;
 
         var result = await DialogService.ShowConfirmation(
-            Strings.S_REM_APK(Data.FileActions.IsAppDrive ? pkgs : files),
-            Strings.S_CONF_UNI_TITLE,
-            "Uninstall",
+            RemoveApkMessage(Data.FileActions.IsAppDrive ? pkgs : files),
+            Strings.Resources.S_CONF_UNI_TITLE,
+            Strings.Resources.S_UNINSTALL,
             icon: DialogService.DialogIcon.Exclamation);
 
         if (result.Item1 is not ContentDialogResult.Primary)
@@ -60,7 +69,7 @@ internal static class FileActionLogic
             IsFolderPicker = false,
             Multiselect = true,
             DefaultDirectory = Data.Settings.DefaultFolder,
-            Title = Strings.S_INSTALL_APK,
+            Title = Strings.Resources.S_INSTALL_APK,
         };
         dialog.Filters.Add(new("Android Package", string.Join(';', AdbExplorerConst.INSTALL_APK.Select(name => name[1..]))));
 
@@ -95,12 +104,12 @@ internal static class FileActionLogic
                 if (AdbHelper.SilentPull(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath, Data.FileActions.EditorWindowsPath))
                     return File.ReadAllText(Data.FileActions.EditorWindowsPath);
                 else
-                    throw new Exception(Strings.S_READ_FILE_ERROR);
+                    throw new Exception(Strings.Resources.S_READ_FILE_ERROR);
             }
             catch (Exception e)
             {
                 App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
+                    DialogService.ShowMessage(e.Message, Strings.Resources.S_READ_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
                 return "";
             }
@@ -126,12 +135,12 @@ internal static class FileActionLogic
                 if (AdbHelper.SilentPush(Data.CurrentADBDevice, Data.FileActions.EditorWindowsPath, Data.FileActions.EditorAndroidPath.FullPath))
                     return true;
                 else
-                    throw new Exception(Strings.S_WRITE_FILE_ERROR);
+                    throw new Exception(Strings.Resources.S_WRITE_FILE_ERROR);
             }
             catch (Exception e)
             {
                 App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(e.Message, Strings.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
+                    DialogService.ShowMessage(e.Message, Strings.Resources.S_WRITE_FILE_ERROR_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true));
 
                 return false;
             }
@@ -164,7 +173,7 @@ internal static class FileActionLogic
                 if (restoreItems.Any(item => item.IsDirectory && existingItems.Contains(item.TrashIndex.OriginalPath)))
                     merge = true;
 
-                existingItems = existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..]).ToArray();
+                existingItems = [.. existingItems.Select(path => path[(path.LastIndexOf('/') + 1)..])];
             }
 
             foreach (var item in restoreItems)
@@ -189,11 +198,15 @@ internal static class FileActionLogic
                 if (existingItems.Length is int count and > 0)
                 {
                     var result = await DialogService.ShowConfirmation(
-                        Strings.S_CONFLICT_ITEMS(count),
-                        Strings.S_RESTORE_CONF_TITLE,
-                        primaryText: Strings.S_MERGE_REPLACE(merge),
-                        secondaryText: count == restoreItems.Count() ? "" : "Skip",
-                        cancelText: "Cancel",
+                        count == 1
+                            ? Strings.Resources.S_CONFLICT_ITEMS
+                            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL, count),
+                        Strings.Resources.S_RESTORE_CONF_TITLE,
+                        primaryText: merge
+                            ? Strings.Resources.S_MERGE_OR_REPLACE
+                            : Strings.Resources.S_REPLACE,
+                        secondaryText: count == restoreItems.Count() ? "" : Strings.Resources.S_SKIP,
+                        cancelText: Strings.Resources.S_CANCEL,
                         icon: DialogService.DialogIcon.Exclamation);
 
                     if (result.Item1 is ContentDialogResult.None)
@@ -256,7 +269,7 @@ internal static class FileActionLogic
         }
         catch (Exception e)
         {
-            DialogService.ShowMessage(e.Message, Strings.S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+            DialogService.ShowMessage(e.Message, Strings.Resources.S_CREATE_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
             Data.DirList.FileList.Remove(file);
             throw;
         }
@@ -572,10 +585,12 @@ internal static class FileActionLogic
         }
 
         var result = await DialogService.ShowConfirmation(
-            Strings.S_DELETE_CONF(Data.FileActions.IsRecycleBin, deletedString),
-            Strings.S_DEL_CONF_TITLE,
-            Strings.S_DELETE_ACTION,
-            checkBoxText: Data.Settings.EnableRecycle && !Data.FileActions.IsRecycleBin ? Strings.S_PERM_DEL : "",
+            string.Format(Data.FileActions.IsRecycleBin
+                ? Strings.Resources.S_DELETE_PERMANENT
+                : Strings.Resources.S_DELETE_CONFIRMATION, deletedString),
+            Strings.Resources.S_DEL_CONF_TITLE,
+            Strings.Resources.S_DELETE_ACTION,
+            checkBoxText: Data.Settings.EnableRecycle && !Data.FileActions.IsRecycleBin ? Strings.Resources.S_PERM_DEL : "",
             icon: DialogService.DialogIcon.Delete);
 
         if (result.Item1 is not ContentDialogResult.Primary)
@@ -799,9 +814,9 @@ internal static class FileActionLogic
             Data.FileActions.RestoreEnabled = false;
         }
 
-        Data.FileActions.PullDescription.Value = Data.FileActions.IsFollowLinkEnabled ? Strings.S_PULL_ACTION_LINK : Strings.S_PULL_ACTION;
-        Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_EMPTY_TRASH : Strings.S_DELETE_ACTION;
-        Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.S_RESTORE_ALL : Strings.S_RESTORE_ACTION;
+        Data.FileActions.PullDescription.Value = Data.FileActions.IsFollowLinkEnabled ? Strings.Resources.S_PULL_ACTION_LINK : Strings.Resources.S_PULL_ACTION;
+        Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_EMPTY_TRASH : Strings.Resources.S_DELETE_ACTION;
+        Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_RESTORE_ALL : Strings.Resources.S_RESTORE_ACTION;
 
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
         Data.FileActions.IsSelectionIllegalOnFuse = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.FUSE);
@@ -886,22 +901,31 @@ internal static class FileActionLogic
         Data.RuntimeSettings.IsPathBoxFocused = false;
 
         string targetPath, targetName = "";
+        string title = "";
         if (isContextMenu && Data.SelectedFiles.Count() == 1)
         {
             targetPath = Data.SelectedFiles.First().FullPath;
             targetName = Data.SelectedFiles.First().FullName;
+
+            title = isFolderPicker
+                ? Strings.Resources.S_SELECT_FOLDER_PUSH_DESTINATION
+                : Strings.Resources.S_SELECT_FILE_PUSH_DESTINATION;
         }
         else
         {
             targetPath = Data.CurrentPath;
-        }
 
+            title = isFolderPicker
+                ? Strings.Resources.S_SELECT_FOLDER_PUSH
+                : Strings.Resources.S_SELECT_FILE_PUSH;
+        }
+        
         var dialog = new CommonOpenFileDialog()
         {
             IsFolderPicker = isFolderPicker,
             Multiselect = true,
             DefaultDirectory = Data.Settings.DefaultFolder,
-            Title = Strings.S_PUSH_BROWSE_TITLE(isFolderPicker, targetName),
+            Title = title,
         };
 
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -992,7 +1016,9 @@ internal static class FileActionLogic
                 IsFolderPicker = true,
                 Multiselect = false,
                 DefaultDirectory = Data.Settings.DefaultFolder,
-                Title = Strings.S_ITEMS_DESTINATION(pullItems.Count() > 1, pullItems.First()),
+                Title = pullItems.Count() > 1
+                    ? Strings.Resources.S_ITEM_DESTINATION_PLURAL
+                    : string.Format(Strings.Resources.S_ITEM_DESTINATION, pullItems.First()),
             };
 
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
@@ -1014,9 +1040,9 @@ internal static class FileActionLogic
 
         if (match.Success && invalidFiles.Any())
         {
-            var result = await DialogService.ShowConfirmation(Strings.S_WIN_ROOT_ILLEGAL(invalidFiles),
-                                                 Strings.S_WIN_ROOT_ILLEGAL_TITLE,
-                                                 primaryText: "Skip",
+            var result = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_WIN_ROOT_ILLEGAL, invalidFiles.Count()),
+                                                 Strings.Resources.S_WIN_ROOT_ILLEGAL_TITLE,
+                                                 primaryText: Strings.Resources.S_SKIP,
                                                  icon: DialogService.DialogIcon.Exclamation);
 
             if (result.Item1 is not ContentDialogResult.Primary)
@@ -1033,7 +1059,7 @@ internal static class FileActionLogic
             }
             catch (Exception e)
             {
-                DialogService.ShowMessage(e.Message, Strings.S_DEST_ERR, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(e.Message, Strings.Resources.S_DEST_ERR, DialogService.DialogIcon.Critical, copyToClipboard: true);
                 return;
             }
         }
@@ -1114,10 +1140,10 @@ internal static class FileActionLogic
     public static async void ResetAppSettings()
     {
         var result = await DialogService.ShowConfirmation(
-                        Strings.S_RESET_SETTINGS,
-                        Strings.S_RESET_SETTINGS_TITLE,
-                        primaryText: "Confirm",
-                        cancelText: "Cancel",
+                        Strings.Resources.S_RESET_SETTINGS,
+                        Strings.Resources.S_RESET_SETTINGS_TITLE,
+                        primaryText: Strings.Resources.S_CONFIRM,
+                        cancelText: Strings.Resources.S_CANCEL,
                         icon: DialogService.DialogIcon.Exclamation);
 
         if (result.Item1 == ContentDialogResult.None)

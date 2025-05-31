@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -17,7 +16,7 @@ public class WsaPkgDeviceViewModel : DeviceViewModel
 
     public DeviceAction LaunchWsaCommand { get; }
 
-    public override string Tooltip => Strings.S_WSA_PKG_TIP;
+    public override string Tooltip => Strings.Resources.S_WSA_PKG_TIP;
 
     public override bool DeviceExists => false;
 

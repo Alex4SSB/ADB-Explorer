@@ -806,12 +806,16 @@ public class CopyPasteService : ViewModelBase
         if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
             destination = drive;
 
+        var message = count == 1
+            ? string.Format(Strings.Resources.S_CONFLICT_ITEMS_DESTINATION, destination)
+            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL_DESTINATION, count, destination);
+
         var result = await DialogService.ShowConfirmation(
-            $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
-            "Paste Conflicts",
-            primaryText: "Merge or Replace",
-            secondaryText: count == filePaths.Count() ? "" : "Skip",
-            cancelText: "Cancel",
+            message,
+            Strings.Resources.S_PASTE_CONFLICTS_TITLE,
+            primaryText: Strings.Resources.S_MERGE_OR_REPLACE,
+            secondaryText: count == filePaths.Count() ? "" : Strings.Resources.S_SKIP,
+            cancelText: Strings.Resources.S_CANCEL,
             icon: DialogService.DialogIcon.Exclamation);
 
         if (result.Item1 is ContentDialogResult.None) // Cancel
@@ -884,12 +888,16 @@ public class CopyPasteService : ViewModelBase
         if (Data.CurrentDisplayNames.TryGetValue(targetPath, out var drive))
             destination = drive;
 
+        var message = count == 1
+            ? string.Format(Strings.Resources.S_CONFLICT_ITEMS_DESTINATION, destination)
+            : string.Format(Strings.Resources.S_CONFLICT_ITEMS_PLURAL_DESTINATION, count, destination);
+
         var result = await DialogService.ShowConfirmation(
-            $"{Strings.S_CONFLICT_ITEMS(count)} in {destination}",
-            "Paste Conflicts",
-            primaryText: "Merge or Replace",
-            secondaryText: count == filePaths.Count() ? "" : "Skip",
-            cancelText: "Cancel",
+            message,
+            Strings.Resources.S_PASTE_CONFLICTS_TITLE,
+            primaryText: Strings.Resources.S_MERGE_OR_REPLACE,
+            secondaryText: count == filePaths.Count() ? "" : Strings.Resources.S_SKIP,
+            cancelText: Strings.Resources.S_CANCEL,
             icon: DialogService.DialogIcon.Exclamation);
 
         if (result.Item1 is ContentDialogResult.None) // Cancel
@@ -918,9 +926,9 @@ public class CopyPasteService : ViewModelBase
             return pasteItems;
 
         var result = await DialogService.ShowConfirmation(
-            Strings.S_PASTE_ANCESTOR(ancestor),
+            string.Format(Strings.Resources.S_PASTE_ANCESTOR, ancestor.FullName),
             $"{(IsDrag ? "Drop" : "Paste")} Conflict",
-            "Skip",
+            Strings.Resources.S_SKIP,
             cancelText: "Abort",
             icon: DialogService.DialogIcon.Exclamation);
 

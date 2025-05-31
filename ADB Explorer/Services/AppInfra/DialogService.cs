@@ -99,12 +99,15 @@ public static class DialogService
                                         string title = "",
                                         string primaryText = "Yes",
                                         string secondaryText = "",
-                                        string cancelText = "Cancel",
+                                        string cancelText = null,
                                         string checkBoxText = "",
                                         DialogIcon icon = DialogIcon.None,
                                         bool censorContent = true,
                                         bool hidePanes = true)
     {
+        if (cancelText is null)
+            cancelText = Strings.Resources.S_CANCEL;
+
         if (windowDialog.IsVisible)
         {
             return (ContentDialogResult.None, false);

@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Services.FileAction;
@@ -352,13 +351,13 @@ internal static class AppActions
         new(FileActionType.PushPackages,
             () => Data.FileActions.PushPackageEnabled,
             FileActionLogic.PushPackages,
-            Strings.S_PUSH_PKG,
+            Strings.Resources.S_PUSH_PKG,
             Gestures[FileActionType.PushPackages],
             true),
         new(FileActionType.ContextPushPackages,
             () => Data.FileActions.ContextPushPackagesEnabled,
             FileActionLogic.PushPackages,
-            Strings.S_PUSH_PKG,
+            Strings.Resources.S_PUSH_PKG,
             Gestures[FileActionType.PushPackages]),
         new(FileActionType.None,
             new(),
@@ -379,7 +378,7 @@ internal static class AppActions
         new(FileActionType.OpenFileOps,
             () => !Data.RuntimeSettings.IsSplashScreenVisible,
             () => Data.RuntimeSettings.IsOperationsViewOpen ^= true,
-            Strings.S_FILE_OP_TOOLTIP,
+            Strings.Resources.S_FILE_OP_TOOLTIP,
             new(Key.D9, ModifierKeys.Alt),
             true),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.FileOpStop).FileAction,

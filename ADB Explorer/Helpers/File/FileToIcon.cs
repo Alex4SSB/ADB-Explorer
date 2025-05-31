@@ -292,7 +292,7 @@ public class FileToIconConverter
         
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
         {
-            Icon apkIcon = new(Properties.Resources.APK_icon, IconToSize(size));
+            Icon apkIcon = new(Properties.AppGlobal.APK_icon, IconToSize(size));
 
             yield return AddToDic<BitmapSource>(apkIcon, size, AbstractFile.SpecialFileType.Apk);
         }
@@ -314,7 +314,7 @@ public class FileToIconConverter
         var specialType = file.SpecialType;
         if (specialType.HasFlag(AbstractFile.SpecialFileType.Apk))
         {
-            Icon apkIcon = new(Properties.Resources.APK_icon, IconToSize(IconSize.Jumbo));
+            Icon apkIcon = new(Properties.AppGlobal.APK_icon, IconToSize(IconSize.Jumbo));
 
             return AddToDic<T>(apkIcon, IconSize.Jumbo, AbstractFile.SpecialFileType.Apk);
         }

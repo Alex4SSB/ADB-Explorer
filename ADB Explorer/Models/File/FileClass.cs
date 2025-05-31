@@ -6,7 +6,7 @@ using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
 
-public class FileClass : FilePath, IFileStat
+public class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 

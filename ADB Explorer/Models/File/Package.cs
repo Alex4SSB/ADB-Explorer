@@ -2,7 +2,7 @@
 
 namespace ADB_Explorer.Models;
 
-public class Package : ViewModelBase
+public class Package : ViewModelBase, IBrowserItem
 {
     public enum PackageType
     {
@@ -16,6 +16,8 @@ public class Package : ViewModelBase
         get => name;
         set => Set(ref name, value);
     }
+
+    public string DisplayName => Name;
 
     private PackageType type;
     public PackageType Type

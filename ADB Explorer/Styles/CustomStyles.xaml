@@ -110,6 +110,16 @@
             <Style BasedOn="{StaticResource TrimmedTextTooltipStyle}" TargetType="ToolTip" />
         </Style.Resources>
     </Style>
+    <Style
+        x:Key="TooltipTextBoxFluentStyle"
+        BasedOn="{StaticResource TextBoxFluentStyle}"
+        TargetType="TextBox">
+        <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}" />
+        <Style.Resources>
+            <Style BasedOn="{StaticResource TrimmedTextTooltipStyle}" TargetType="ToolTip" />
+        </Style.Resources>
+    </Style>
     <Style x:Key="TooltipTextBlockStyle" TargetType="TextBlock">
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
@@ -778,7 +788,7 @@
         x:Key="WindowStyle"
         BasedOn="{StaticResource DefaultWindowStyle}"
         TargetType="Window">
-        <Setter Property="Title" Value="{x:Static app_prop:Resources.AppDisplayName}" />
+        <Setter Property="Title" Value="{x:Static app_prop:AppGlobal.AppDisplayName}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRootActive}" Value="True">
                 <Setter Property="ui:TitleBar.Background" Value="OrangeRed" />

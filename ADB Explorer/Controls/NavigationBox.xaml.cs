@@ -394,7 +394,7 @@ public partial class NavigationBox
                 Glyph = "\uF0EF",
                 FontSize = 20,
             },
-            ToolTip = Strings.S_FUSE_DRIVE_TOOLTIP,
+            ToolTip = Strings.Resources.S_FUSE_DRIVE_TOOLTIP,
         };
 
         MenuHelper.SetIsMouseSelectionVisible(menuItem, false);

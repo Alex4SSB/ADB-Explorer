@@ -189,7 +189,15 @@ public partial class ADBService
             }
             catch (Exception e)
             {
-                dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_LS_ERROR(e), Strings.S_LS_ERROR_TITLE, DialogService.DialogIcon.Critical, true, copyToClipboard: true));
+                var message = e.Message;
+                if (!string.IsNullOrEmpty(message))
+                    message += "\n\n";
+                
+                dispatcher.Invoke(() => DialogService.ShowMessage(message + Strings.Resources.S_LS_ERROR,
+                                                                  Strings.Resources.S_LS_ERROR_TITLE,
+                                                                  DialogService.DialogIcon.Critical,
+                                                                  true,
+                                                                  copyToClipboard: true));
                 return;
             }
         }

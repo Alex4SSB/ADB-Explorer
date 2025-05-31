@@ -8,8 +8,8 @@ public static class DebugLog
     {
         mutex.WaitOne();
         
-        if (!string.IsNullOrEmpty(Properties.Resources.DragDropLogPath))
-            File.AppendAllText(Properties.Resources.DragDropLogPath, $"{DateTime.Now:HH:mm:ss:fff} | {message}\n");
+        if (!string.IsNullOrEmpty(Properties.AppGlobal.DragDropLogPath))
+            File.AppendAllText(Properties.AppGlobal.DragDropLogPath, $"{DateTime.Now:HH:mm:ss:fff} | {message}\n");
 
         mutex.ReleaseMutex();
     }

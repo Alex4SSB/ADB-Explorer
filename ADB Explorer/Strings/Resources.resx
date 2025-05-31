@@ -1,0 +1,515 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>The Android Robot Icon(s)</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>App Animations</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>The APK icon is licensed under the Apache License, Version 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Could not get ADB version from provided path.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>ADB version from provided path is too low.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Fail to override ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Select ADB Executable</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Reset App Settings</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>New App Version</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Navigation Error</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copy Package Name</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copy Item Path</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Restore All Items</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Empty Recycle Bin</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Destination Path Error</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>failed to connect to</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Connection Error</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Disconnection Error</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Pairing Error</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Root access cannot be enabled on selected device.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root Access</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Permanently Delete</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Create Error</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Restore Conflicts</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Confirm Uninstall</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Select packages to install</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Kill Emulator</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Remove Device</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Disconnect Device</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>File Operations</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Install Packages</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Pair and/or connect a WiFi device (without using mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Restart app for changes to take effect</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Error Reading File</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Could not pull file in order to read it.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Error Writing File</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Could not push file back to device.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB server needs to be restarted in order to disable mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Disable mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Launch WSA in background</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Pull</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Pull (Link Target)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>File Explorer Monitoring</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>Deploy AdbProgressRedirection.exe</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>Disk Usage Only</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>Progress Method</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Progress Redirection</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>List Directory Error</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Pull To Windows Drive Root</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Conflicting Apps</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>File Explorer monitoring is not available due to the following apps running:</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>Push/pull progress is displayed in total bytes transferred.
+Percentage is available only when total size is known.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
+    <value>Unable to deploy executable.
+Disk usage progress method will be used instead.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>Monitoring File Explorer enables the app to perform Drag / Clipboard Pull operations directly to the destination folder.
+
+Otherwise, Pull is performed to the app temp folder, from which File Explorer receives the file as a stream, which has to use a small buffer.
+These two added steps slow down the process significantly.
+
+The feature is auto-disabled for other selected file managers.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>Enable only if you intend to use the app with File Explorer.
+You can always change this in the settings.</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Welcome to a new ADB Explorer version!
+The release notes are available on GitHub.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE drive.
+• Symbolic links are not supported
+• File names cannot contain " * / : &lt; &gt; ? \ |
+• File names are case insensitive
+• Installation of APKs is not supported</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>The app has many animations that are enabled as part of the fluent design.
+The side views animation is always disabled when the app window is maximized on a secondary display.
+
+• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>All app settings will be reset upon closing the app.
+This cannot be undone. Are you sure?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Select Launch if ADB is already authorized in WSA.
+To approve ADB, open WSA advanced settings.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} of the selected files cannot be created under a Windows drive root.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Learn More About ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Download ADB</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>A helper program for reading push/pull progress from ADB.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
+    <value>Might falsely trigger some anti-virus programs.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>Copied to %LocalAppData%\AdbExplorer</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>Select an option to display explanation</value>
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value>Select Progress Method:</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Locate ADB (v{0} at least):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Change</value>
+    <comment>The content of a button used to change a path</comment>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Select ADB Path</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continue</value>
+    <comment>The tooltip of a button used to continue to the next step</comment>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>More Info</value>
+    <comment>The tooltip of a button used to display an info message</comment>
+  </data>
+  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
+    <value>File Explorer Monitoring:</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>A new {0}, version {1}, is available</value>
+    <comment>0 = App display name. 1 = new version number</comment>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Go To Version Page</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Close</value>
+    <comment>The content of a button to dismiss a message dialog</comment>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Go To Release Notes</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB Executable</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>This app is a UI for ADB - Android Debug Bridge.
+To use the app, you need to have ADB on your PC.
+ADB is available as part of the Android SDK Platform Tools.
+You can use the provided link to download the SDK Platform Tools.
+Unfortunately, we cannot provide ADB with the app due to licensing restrictions.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Help On ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Restart ADB Now</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Restart Later</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Select destination for {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Select destination for multiple items</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>The following will be deleted:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>The following will be permanently deleted:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>New File</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>New Folder</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>An error occurred while trying to list the contents of this folder.
+Visible content may be incomplete.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} is an ancestor of the destination folder.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Are you sure you want to kill this emulator?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Are you sure you want to remove this device?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Remove {0}</value>
+    <comment>0 = Device name to remove</comment>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Kill {0}</value>
+    <comment>0 = Emulator name to kill</comment>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>The following will be removed:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>The following will be removed:
+{0} packages</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>The content of a button used to cancel an operation</comment>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Confirm</value>
+    <comment>The content of a button used to confirm an operation</comment>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Skip</value>
+    <comment>The content of a button used to skip files in a merge dialog</comment>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Replace</value>
+    <comment>The content of a button used to replace files in a merge dialog</comment>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Merge or Replace</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>There is 1 conflicting item</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>There is 1 conflicting item {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>There are {0} conflicting items</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>There are {0} conflicting items in {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Paste Conflicts</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Select folders to push</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Select folders to push into {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Select files to push</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Select files to push into {0}</value>
+  </data>
+</root>

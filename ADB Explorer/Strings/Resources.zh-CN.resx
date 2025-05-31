@@ -1,0 +1,449 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Android 机器人 图标</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>Android 机器人是在 Google 原创及共享成果的基础上再创作或修改而成，须遵照知识共享署名 3.0 许可所述条款付诸应用。</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>应用动画</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>APK 图标根据 Apache License，版本 2.0 获得许可。</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>无法从指定路径获取 ADB 版本。</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>指定路径的 ADB 版本过低。</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>选择 ADB 可执行文件</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>重置应用设置</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>新的版本</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>路径导航错误</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>复制包名</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>复制文件路径</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>还原所有项目</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>清空回收站</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>目标路径错误</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>无法连接到</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>连接错误</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>断开连接错误</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>配对错误</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>无法在所选设备上启用 Root 权限。</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root 权限</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>确认删除</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>永久删除</value>
+  </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="S_CREATE_ERR_TITLE" type="System.Resources.ResXNullRef, System.Windows.Forms">
+    <value />
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>确认卸载</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>选择要安装的包</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>终止模拟器</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>删除设备</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>断开设备连接</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>文件操作</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>配对并连接 WiFi 设备（不使用 mDNS）</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>重启应用以使更改生效</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>文件读取错误</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>无法拉取文件以读取内容。</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>文件写入错误</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>无法将文件推送回设备。</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>需要重启 ADB 服务以禁用 mDNS。</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>禁用 mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>在后台启动 WSA</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>拉取文件</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>拉取文件 (Link Target)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>恢复</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>部署 AdbProgressRedirection.exe</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>进度显示方式</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>冲突的应用程序</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>推送/拉取进度以传输的总字节数显示。
+只有在知道总大小时才会显示百分比进度。</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
+    <value>无法部署可执行文件。
+将改用磁盘使用量进度显示方式。</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>欢迎来到 ADB Explorer 的新版本！
+发行说明已在 Github 上发布。</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>应用启用了流畅设计中的许多动画。
+当应用窗口在副显示器上最大化时，侧边视图动画始终禁用。
+
+• 勾选此设置将禁用所有动画（进度条、进度环和驱动器使用条除外）。</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>关闭应用后，所有设置将被重置。
+此操作不可逆。你确定吗？</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>若 ADB 已在 WSA 中授权，请直接点击启动。
+如需授权 ADB，请打开 WSA 高级设置。</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>{0} 有新版本 {1} 可用</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB 可执行文件</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>为 {0} 选择目标文件夹</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>为多个项目选择目标文件夹</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>以下内容将删除:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>以下内容将被永久删除：
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>新建文件</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>新建文件夹</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>知识共享</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value />
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value />
+  </data>
+</root>

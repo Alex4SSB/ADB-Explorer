@@ -7,10 +7,10 @@ namespace ADB_Explorer.Helpers;
 internal static class SettingsHelper
 {
     public static void DisableAnimationTipAction() =>
-        DialogService.ShowMessage(Strings.S_DISABLE_ANIMATION, Strings.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
+        DialogService.ShowMessage(Strings.Resources.S_DISABLE_ANIMATION, Strings.Resources.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
 
     public static void AdvancedDragTipAction() =>
-        DialogService.ShowMessage(Strings.S_ADVANCED_DRAG, Strings.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Tip);
+        DialogService.ShowMessage(Strings.Resources.S_ADVANCED_DRAG, Strings.Resources.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Tip);
 
     public static void ResetAppAction()
     {
@@ -39,8 +39,8 @@ internal static class SettingsHelper
         var dialog = new OpenFileDialog()
         {
             Multiselect = false,
-            Title = Strings.S_OVERRIDE_ADB_BROWSE,
-            Filter = "ADB Executable|adb.exe",
+            Title = Strings.Resources.S_OVERRIDE_ADB_BROWSE,
+            Filter = $"{Strings.Resources.S_ADB_EXECUTABLE}|adb.exe",
         };
 
         if (!string.IsNullOrEmpty(Data.Settings.ManualAdbPath))
@@ -58,16 +58,16 @@ internal static class SettingsHelper
             ADBService.VerifyAdbVersion(dialog.FileName);
             if (Data.RuntimeSettings.AdbVersion is null)
             {
-                message = Strings.S_MISSING_ADB_OVERRIDE;
+                message = Strings.Resources.S_MISSING_ADB_OVERRIDE;
             }
             else if (Data.RuntimeSettings.AdbVersion < AdbExplorerConst.MIN_ADB_VERSION)
             {
-                message = Strings.S_ADB_VERSION_LOW_OVERRIDE;
+                message = Strings.Resources.S_ADB_VERSION_LOW_OVERRIDE;
             }
 
             if (message != "")
             {
-                DialogService.ShowMessage(message, Strings.S_FAIL_OVERRIDE_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+                DialogService.ShowMessage(message, Strings.Resources.S_FAIL_OVERRIDE_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
                 return;
             }
 
@@ -96,22 +96,21 @@ internal static class SettingsHelper
 
     public static async void CheckAppVersions()
     {
-        Version currentVersion = new(Properties.Resources.AppVersion);
-        if (currentVersion > new Version(Data.Settings.LastVersion))
+        if (new Version(Properties.AppGlobal.AppVersion) > new Version(Data.Settings.LastVersion))
         {
             await App.Current.Dispatcher.Invoke(async () =>
             {
                 var res = await DialogService.ShowConfirmation(
-                    Strings.S_NEW_VERSION_MSG,
-                    "New Version",
-                    "Go To Release Notes",
-                    cancelText: "Close");
+                    Strings.Resources.S_NEW_VERSION_MSG,
+                    Strings.Resources.S_NEW_VERSION_TITLE,
+                    Strings.Resources.S_GO_TO_RELEASE_NOTES,
+                    cancelText: Strings.Resources.S_BUTTON_CLOSE);
 
                 if (res.Item1 is ContentDialogResult.Primary)
-                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.Resources.AppVersion}\"");
+                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.AppGlobal.AppVersion}\"");
             });
 
-            Data.Settings.LastVersion = Properties.Resources.AppVersion;
+            Data.Settings.LastVersion = Properties.AppGlobal.AppVersion;
         }
 
         if (Data.RuntimeSettings.IsAppDeployed || !Data.Settings.CheckForUpdates)
@@ -123,10 +122,10 @@ internal static class SettingsHelper
 
         await App.Current.Dispatcher.Invoke(async () =>
         {
-            var res = await DialogService.ShowConfirmation(Strings.S_NEW_VERSION(latestVersion),
-                Strings.S_NEW_VERSION_TITLE,
-                "Go To Version Page",
-                cancelText: "Close",
+            var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
+                Strings.Resources.S_NEW_VERSION_TITLE,
+                Strings.Resources.S_GO_TO_VERSION_PAGE,
+                cancelText: Strings.Resources.S_BUTTON_CLOSE,
                 icon: DialogService.DialogIcon.Informational);
 
             if (res.Item1 is ContentDialogResult.Primary)
@@ -138,14 +137,14 @@ internal static class SettingsHelper
     {
         HyperlinkButton ccLink = new()
         {
-            Content = Strings.S_CC_NAME,
+            Content = Strings.Resources.S_CC_NAME,
             ToolTip = Links.L_CC_LIC,
             NavigateUri = Links.L_CC_LIC,
             HorizontalAlignment = HorizontalAlignment.Center,
         };
         HyperlinkButton apacheLink = new()
         {
-            Content = Strings.S_APACHE_NAME,
+            Content = "Apache",
             ToolTip = Links.L_APACHE_LIC,
             NavigateUri = Links.L_APACHE_LIC,
             HorizontalAlignment = HorizontalAlignment.Center,
@@ -160,12 +159,12 @@ internal static class SettingsHelper
                 new TextBlock()
                 {
                     TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.S_ANDROID_ROBOT_LIC,
+                    Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
                 },
                 new TextBlock()
                 {
                     TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.S_APK_ICON_LIC,
+                    Text = Strings.Resources.S_APK_ICON_LIC,
                 },
                 new Grid()
                 {
@@ -177,10 +176,25 @@ internal static class SettingsHelper
 
         App.Current.Dispatcher.Invoke(() =>
         {
-            DialogService.ShowDialog(stack, Strings.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
+            DialogService.ShowDialog(stack, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
         });
     }
 
-    public static void ProgressMethodTipAction() =>
-        DialogService.ShowMessage(Strings.S_PROGRESS_METHOD_INFO(), Strings.S_PROGRESS_METHOD_TITLE, DialogService.DialogIcon.Tip);
+    public static void ProgressMethodTipAction()
+    {
+        //var rtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
+        // TODO: use RTL support in the future, for now just use LTR
+
+        var text = 
+        $"""
+        • {Strings.Resources.S_DEPLOY_REDIRECTION_TITLE}
+            {Strings.Resources.S_DEPLOY_REDIRECTION}
+            {(Data.RuntimeSettings.IsArm ? Strings.Resources.S_DEPLOY_REDIRECTION_ARM : Strings.Resources.S_DEPLOY_REDIRECTION_x64)}
+        
+        • {Strings.Resources.S_DISK_USAGE_PROGRESS_TITLE}
+            {Strings.Resources.S_DISK_USAGE_PROGRESS.Replace("\n", "\n    ")}
+        """;
+
+        DialogService.ShowMessage(text, Strings.Resources.S_PROGRESS_METHOD_TITLE, DialogService.DialogIcon.Tip);
+    }
 }

@@ -26,7 +26,7 @@ public partial class App : Application
             Data.AppDataPath = e.Args[0];
         }
         else
-            Data.AppDataPath = FileHelper.ConcatPaths(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), AdbExplorerConst.APP_DATA_FOLDER, '\\');
+            Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
 
         SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
         
@@ -51,9 +51,9 @@ public partial class App : Application
             }
 
 #if !DEPLOY
-            if (!File.Exists(ADB_Explorer.Properties.Resources.DragDropLogPath))
+            if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
             {
-                File.WriteAllText(ADB_Explorer.Properties.Resources.DragDropLogPath, "");
+                File.WriteAllText(ADB_Explorer.Properties.AppGlobal.DragDropLogPath, "");
             }
 #endif
 

@@ -53,4 +53,25 @@ internal class ThemeService : ViewModelBase
         AppSettings.AppTheme.windowsDefault => AppThemeToActual(WindowsTheme),
         _ => throw new NotSupportedException(),
     };
+
+    public void SetTheme(AppSettings.AppTheme theme) => SetTheme(AppThemeToActual(theme));
+
+    public static void SetTheme(ApplicationTheme theme) => App.Current.Dispatcher.Invoke(() =>
+    {
+        ThemeManager.Current.ApplicationTheme = theme;
+
+        Task.Run(() =>
+        {
+            var keys = ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys;
+            string[] brushes = new string[keys.Count];
+            keys.CopyTo(brushes, 0);
+
+            Parallel.ForEach(brushes, (brush) => SetResourceColor(theme, brush));
+        });
+    });
+
+    public static void SetResourceColor(ApplicationTheme theme, string resource)
+    {
+        App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
+    }
 }

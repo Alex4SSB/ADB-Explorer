@@ -3,15 +3,20 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:app_prop="clr-namespace:ADB_Explorer.Properties"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:resources="clr-namespace:ADB_Explorer.Resources"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="splashScreen"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <converters:StringFormatConverter x:Key="StringFormatConverter" />
+    </UserControl.Resources>
     <UserControl.Style>
         <Style TargetType="UserControl">
             <Setter Property="Margin" Value="0,-50,0,0" />
@@ -61,7 +66,7 @@
                         HorizontalAlignment="Center"
                         FontFamily="{StaticResource Nunito}"
                         FontSize="40"
-                        Text="{x:Static app_prop:Resources.AppDisplayName}" />
+                        Text="{x:Static app_prop:AppGlobal.AppDisplayName}" />
                 </StackPanel>
                 <ui:SimpleStackPanel
                     x:Name="MissingAdbGrid"
@@ -70,11 +75,13 @@
                     d:Visibility="Hidden"
                     Spacing="14"
                     Visibility="Collapsed">
-                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                        <TextBlock FontSize="20" Text="Locate ADB (v" />
-                        <TextBlock FontSize="20" Text="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_ADB_VERSION}}" />
-                        <TextBlock FontSize="20" Text=" at least):" />
-                    </StackPanel>
+                    <TextBlock HorizontalAlignment="Center" FontSize="20">
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_LOCATE_ADB_TITLE}">
+                                <Binding Source="{x:Static Member=models:AdbExplorerConst.MIN_ADB_VERSION}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                     <ui:SimpleStackPanel
                         HorizontalAlignment="Center"
                         Orientation="Horizontal"
@@ -84,32 +91,31 @@
                         </Button>
                         <ui:HyperlinkButton
                             HorizontalAlignment="Center"
-                            Content="{Binding Source={x:Static Member=resources:Strings.S_ADB_LEARN_MORE}}"
                             NavigateUri="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}"
-                            ToolTip="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}" />
+                            ToolTip="{Binding Source={x:Static Member=resources:Links.L_ADB_PAGE}}">
+                            <ui:HyperlinkButton.Style>
+                                <Style TargetType="ui:HyperlinkButton">
+                                    <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_DOWNLOAD}}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsAppDeployed}">
+                                            <Setter Property="Content" Value="{Binding Source={x:Static Member=strings:Resources.S_ADB_LEARN_MORE}}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:HyperlinkButton.Style>
+                        </ui:HyperlinkButton>
                     </ui:SimpleStackPanel>
                     <ui:SimpleStackPanel
                         HorizontalAlignment="Center"
                         Orientation="Horizontal"
                         Spacing="10">
-                        <Button Click="EditButton_Click" Content="Change" />
+                        <Button Click="EditButton_Click" Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CHANGE}}" />
                         <TextBox
                             Width="200"
-                            ui:ControlHelper.PlaceholderText="Select ADB Path"
+                            ui:ControlHelper.PlaceholderText="{Binding Source={x:Static Member=strings:Resources.S_SELECT_ADB_PATH}}"
                             IsReadOnly="True"
-                            Style="{StaticResource TextBoxFluentStyle}"
-                            Text="{Binding Source={x:Static Member=models:Data.Settings}, Path=ManualAdbPath}"
-                            ToolTip="{Binding RelativeSource={RelativeSource Mode=Self}, Path=Text}">
-                            <TextBox.Resources>
-                                <Style BasedOn="{StaticResource FluentTooltipStyle}" TargetType="ToolTip">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TextBox}, Path=Text.Length}" Value="0">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBox.Resources>
-                        </TextBox>
+                            Style="{StaticResource TooltipTextBoxFluentStyle}"
+                            Text="{Binding Source={x:Static Member=models:Data.Settings}, Path=ManualAdbPath}" />
                     </ui:SimpleStackPanel>
                     <Button
                         x:Name="CloseAdbScreenButton"
@@ -117,7 +123,7 @@
                         Click="CloseAdbScreenButton_Click"
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
-                        ToolTip="Continue">
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CONTINUE_TOOLTIP}}">
                         <ui:FontIcon Glyph="&#xe73e;" />
                     </Button>
                 </ui:SimpleStackPanel>
@@ -131,16 +137,16 @@
                     <TextBlock
                         HorizontalAlignment="Center"
                         FontSize="20"
-                        Text="Select Progress Method:" />
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_SELECT_PROGRESS_METHOD}}" />
                     <ui:SimpleStackPanel Spacing="2">
                         <ui:SimpleStackPanel.Resources>
                             <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
                                 <EventSetter Event="Click" Handler="RadioButton_Checked" />
-                                <Setter Property="ToolTip" Value="Select an option to display explanation" />
+                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_PROGRESS_METHOD_TOOLTIP}}" />
                             </Style>
                         </ui:SimpleStackPanel.Resources>
-                        <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION_TITLE}}" />
-                        <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS_TITLE}}" />
+                        <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION_TITLE}}" />
+                        <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_DISK_USAGE_PROGRESS_TITLE}}" />
                     </ui:SimpleStackPanel>
                     <StackPanel
                         x:Name="ExplanationPanel"
@@ -149,11 +155,25 @@
                         Visibility="Hidden">
                         <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
                         <Grid>
-                            <TextBlock x:Name="DeployTextBlock" Text="{Binding Source={x:Static Member=resources:Strings.S_DEPLOY_REDIRECTION}}" />
+                            <StackPanel x:Name="DeployTextBlock" d:Visibility="Hidden">
+                                <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION}}" />
+                                <TextBlock>
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION_x64}}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsArm}">
+                                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION_ARM}}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
                             <TextBlock
                                 x:Name="DiskUsageTextBlock"
-                                d:Visibility="Hidden"
-                                Text="{Binding Source={x:Static Member=resources:Strings.S_DISK_USAGE_PROGRESS}}" />
+                                d:Visibility="Visible"
+                                Text="{Binding Source={x:Static Member=strings:Resources.S_DISK_USAGE_PROGRESS}}" />
                         </Grid>
                     </StackPanel>
                     <Button
@@ -162,7 +182,7 @@
                         Click="ConfirmButton_Click"
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
-                        ToolTip="Continue">
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CONTINUE_TOOLTIP}}">
                         <ui:FontIcon Glyph="&#xe73e;" />
                     </Button>
                 </ui:SimpleStackPanel>
@@ -179,13 +199,13 @@
                             Margin="-270,0,0,0"
                             HorizontalAlignment="Center"
                             Click="AdvancedDragInfo_Click"
-                            ToolTip="More Info">
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_MORE_INFO_TOOLTIP}}">
                             <ui:FontIcon FontSize="14" Glyph="&#xE897;" />
                         </Button>
                         <TextBlock
                             HorizontalAlignment="Center"
                             FontSize="20"
-                            Text="File Explorer Monitoring:" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_SPLASH_MONITORING_TITLE}}" />
                     </Grid>
                     <ui:SimpleStackPanel Spacing="2">
                         <ui:SimpleStackPanel.Resources>
@@ -193,12 +213,12 @@
                                 <EventSetter Event="Click" Handler="RadioButton_Click" />
                             </Style>
                         </ui:SimpleStackPanel.Resources>
-                        <RadioButton x:Name="AdvancedDragEnabledRadioButton" Content="Enabled" />
-                        <RadioButton x:Name="AdvancedDragDisabledRadioButton" Content="Disabled" />
+                        <RadioButton x:Name="AdvancedDragEnabledRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_ENABLED}}" />
+                        <RadioButton x:Name="AdvancedDragDisabledRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_DISABLED}}" />
                     </ui:SimpleStackPanel>
                     <StackPanel Orientation="Horizontal">
                         <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
-                        <TextBlock Text="{Binding Source={x:Static Member=resources:Strings.S_ADVANCED_DRAG_SPLASH}}" />
+                        <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADVANCED_DRAG_SPLASH}}" />
                     </StackPanel>
                     <Button
                         x:Name="ConfirmAdvancedDrag"
@@ -206,7 +226,7 @@
                         Click="ConfirmAdvancedDrag_Click"
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
-                        ToolTip="Continue">
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CONTINUE_TOOLTIP}}">
                         <ui:FontIcon Glyph="&#xe73e;" />
                     </Button>
                 </ui:SimpleStackPanel>
@@ -217,7 +237,7 @@
                 VerticalAlignment="Bottom"
                 FontFamily="{StaticResource ConsoleFont}"
                 FontSize="14"
-                Text="{x:Static app_prop:Resources.AppVersion}" />
+                Text="{x:Static app_prop:AppGlobal.AppVersion}" />
         </Grid>
     </Border>
 </UserControl>

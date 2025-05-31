@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:app_prop="clr-namespace:ADB_Explorer.Properties"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -38,6 +39,7 @@
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
         <CollectionViewSource x:Key="FileListView" Source="{Binding Source={x:Static Member=models:Data.DirList}, Path=FileList}" />
         <ContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
+        <converters:StringFormatConverter x:Key="StringFormatConverter" />
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
@@ -789,7 +791,7 @@
                                                 Text="ADB Explorer" />
                                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Bottom" Text="v" />
-                                                <TextBlock VerticalAlignment="Bottom" Text="{x:Static app_prop:Resources.AppVersion}" />
+                                                <TextBlock VerticalAlignment="Bottom" Text="{x:Static app_prop:AppGlobal.AppVersion}" />
                                             </StackPanel>
                                             <Button
                                                 Margin="0,10,0,0"

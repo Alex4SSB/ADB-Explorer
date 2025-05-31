@@ -10,9 +10,7 @@ using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.Data;
-using static ADB_Explorer.Resources.Strings;
 using static ADB_Explorer.Services.FileAction;
-using static Vanara.PInvoke.Authz;
 
 namespace ADB_Explorer;
 
@@ -715,29 +713,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void SetTheme() => SetTheme(Settings.Theme);
 
-    private void SetTheme(AppSettings.AppTheme theme) => SetTheme(ThemeService.AppThemeToActual(theme));
-
-    private void SetTheme(ApplicationTheme theme) => Dispatcher.Invoke(() =>
-    {
-        ThemeManager.Current.ApplicationTheme = theme;
-
-        Task.Run(() =>
-        {
-            var keys = ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys;
-            string[] brushes = new string[keys.Count];
-            keys.CopyTo(brushes, 0);
-
-            Parallel.ForEach(brushes, (brush) =>
-            {
-                SetResourceColor(theme, brush);
-            });
-        });
-    });
-
-    private static void SetResourceColor(ApplicationTheme theme, string resource)
-    {
-        App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
-    }
+    private void SetTheme(AppSettings.AppTheme theme) => ThemeService.SetTheme(theme);
 
     private void IsPathBoxFocused(bool isFocused)
     {
@@ -1147,14 +1123,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         TypeColumn.Visibility =
         SizeColumn.Visibility = Visible(!FileActions.IsAppDrive);
 
-        FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? S_COPY_APK_NAME : S_COPY_PATH;
+        FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
         
         if (FileActions.IsRecycleBin)
         {
             TrashHelper.ParseIndexersAsync().ContinueWith(_ => DirList.Navigate(realPath));
 
-            FileActions.DeleteDescription.Value = S_EMPTY_TRASH;
-            FileActions.RestoreDescription.Value = S_RESTORE_ALL;
+            FileActions.DeleteDescription.Value = Strings.Resources.S_EMPTY_TRASH;
+            FileActions.RestoreDescription.Value = Strings.Resources.S_RESTORE_ALL;
         }
         else
         {
@@ -1167,7 +1143,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
             DirList.Navigate(realPath);
 
-            FileActions.DeleteDescription.Value = S_DELETE_ACTION;
+            FileActions.DeleteDescription.Value = Strings.Resources.S_DELETE_ACTION;
         }
 
         RuntimeSettings.ExplorerSource = DirList.FileList;
@@ -1808,7 +1784,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void NewItem(bool isFolder)
     {
-        var fileName = FileHelper.DuplicateFile(DirList.FileList, S_NEW_ITEM(isFolder));
+        var fileName = FileHelper.DuplicateFile(DirList.FileList, isFolder
+            ? Strings.Resources.S_NEW_FOLDER
+            : Strings.Resources.S_NEW_ITEM);
+
         FileClass newItem = new(fileName, FileHelper.ConcatPaths(CurrentPath, fileName), isFolder ? FileType.Folder : FileType.File, isTemp: true);
         DirList.FileList.Insert(0, newItem);
 
@@ -2259,5 +2238,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void SponsorButton_Click(object sender, RoutedEventArgs e)
     {
         Process.Start(RuntimeSettings.DefaultBrowserPath, $"\"{Links.SPONSOR}\"");
+    }
+
+    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        Thread.CurrentThread.CurrentUICulture = new CultureInfo((string)((ComboBoxItem)((ComboBox)sender).SelectedValue).Content);
+        DialogService.ShowMessage(Strings.Resources.S_ANDROID_ROBOT_LIC);
     }
 }

@@ -102,7 +102,23 @@ public static class DeviceHelper
 
     private static async void RemoveDeviceAction(DeviceViewModel device)
     {
-        var dialogTask = await DialogService.ShowConfirmation(Strings.S_REM_DEVICE(device), Strings.S_REM_DEVICE_TITLE(device));
+        var message = device.Type is DeviceType.Emulator
+            ? Strings.Resources.S_KILL_EMULATOR
+            : Strings.Resources.S_REM_DEVICE;
+
+        var name = device switch
+        {
+            HistoryDeviceViewModel dev when string.IsNullOrEmpty(dev.DeviceName) => dev.IpAddress,
+            HistoryDeviceViewModel dev => dev.DeviceName,
+            LogicalDeviceViewModel dev => dev.Name,
+            _ => throw new NotImplementedException(),
+        };
+
+        var title = device.Type is DeviceType.Emulator
+            ? Strings.Resources.S_KILL_EMULATOR_TITLE
+            : Strings.Resources.S_REM_DEVICE_TITLE;
+
+        var dialogTask = await DialogService.ShowConfirmation(message, string.Format(title, name));
         if (dialogTask.Item1 is not ContentDialogResult.Primary)
             return;
 
@@ -114,7 +130,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(ex.Message, Strings.Resources.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
                 return;
             }
         }
@@ -126,7 +142,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                DialogService.ShowMessage(ex.Message, Strings.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(ex.Message, Strings.Resources.S_DISCONN_FAILED_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
                 return;
             }
         }
@@ -147,9 +163,9 @@ public static class DeviceHelper
             () => RemoveDeviceAction(device),
             device.Type switch
             {
-                DeviceType.Remote => Strings.S_REM_DEV,
-                DeviceType.Emulator => Strings.S_REM_EMU,
-                DeviceType.History => Strings.S_REM_HIST_DEV,
+                DeviceType.Remote => Strings.Resources.S_REM_DEV,
+                DeviceType.Emulator => Strings.Resources.S_REM_EMU,
+                DeviceType.History => Strings.Resources.S_REM_HIST_DEV,
                 _ => "",
             });
 
@@ -167,7 +183,7 @@ public static class DeviceHelper
 
         if (device.Root is RootStatus.Forbidden)
         {
-            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.S_ROOT_FORBID, Strings.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+            App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(Strings.Resources.S_ROOT_FORBID, Strings.Resources.S_ROOT_FORBID_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
         }
     }
 
@@ -190,7 +206,7 @@ public static class DeviceHelper
         {
             if (Data.Settings.ShowLaunchWsaMessage)
             {
-                var result = await DialogService.ShowConfirmation(Strings.S_WSA_LAUNCH,
+                var result = await DialogService.ShowConfirmation(Strings.Resources.S_WSA_LAUNCH,
                                                                   "WSA Launch",
                                                                   "Launch",
                                                                   checkBoxText: "Do Not Show This Again.",
@@ -354,7 +370,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
 
@@ -399,7 +415,7 @@ public static class DeviceHelper
             }
             catch (Exception ex)
             {
-                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_PAIR_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
                 return false;
             }
         }).ContinueWith(t =>
@@ -433,13 +449,13 @@ public static class DeviceHelper
                 if (AdbExplorerConst.LOOPBACK_ADDRESSES.Contains(dev.IpAddress))
                     return true;
 
-                if (ex.Message.Contains(Strings.S_FAILED_CONN + dev.ConnectAddress)
+                if (ex.Message.Contains(Strings.Resources.S_FAILED_CONN + dev.ConnectAddress)
                     && !((NewDeviceViewModel)Data.RuntimeSettings.ConnectNewDevice).IsPairingEnabled)
                 {
                     Data.DevicesObject.CurrentNewDevice.EnablePairing();
                 }
                 else
-                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
+                    App.Current.Dispatcher.Invoke(() => DialogService.ShowMessage(ex.Message, Strings.Resources.S_FAILED_CONN_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true));
 
                 return false;
             }

@@ -59,7 +59,7 @@ public class NewDeviceViewModel : PairingDeviceViewModel
                                       && ushort.TryParse(ConnectPort, out ushort res)
                                       && res > 0;
 
-    public override string Tooltip => Strings.S_NEW_DEVICE_TIP;
+    public override string Tooltip => Strings.Resources.S_NEW_DEVICE_TIP;
 
     public override bool DeviceExists => false;
 

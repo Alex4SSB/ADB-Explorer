@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Helpers;
@@ -28,9 +27,9 @@ internal static class AdbHelper
         bool hashValid;
 
         if (Data.RuntimeSettings.IsArm)
-            hashValid = Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash_ARM;
+            hashValid = Security.CalculateWindowsFileHash(path) == Properties.AppGlobal.ProgressRedirectionHash_ARM;
         else
-            hashValid = Security.CalculateWindowsFileHash(path) == Properties.Resources.ProgressRedirectionHash_x64;
+            hashValid = Security.CalculateWindowsFileHash(path) == Properties.AppGlobal.ProgressRedirectionHash_x64;
 
         if (!hashValid)
         {
@@ -38,17 +37,17 @@ internal static class AdbHelper
             try
             {
                 if (Data.RuntimeSettings.IsArm)
-                    File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection_ARM);
+                    File.WriteAllBytes(path, Properties.AppGlobal.AdbProgressRedirection_ARM);
                 else
-                    File.WriteAllBytes(path, Properties.Resources.AdbProgressRedirection_x86);
+                    File.WriteAllBytes(path, Properties.AppGlobal.AdbProgressRedirection_x86);
             }
             catch (Exception e)
             {
                 Data.Settings.UseProgressRedirection = false;
 
                 App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage(Strings.S_DEPLOY_REDIRECTION_ERROR + e.Message,
-                                              Strings.S_DEPLOY_REDIRECTION_TITLE,
+                    DialogService.ShowMessage($"{Strings.Resources.S_DEPLOY_REDIRECTION_ERROR}\n\n{e.Message}",
+                                              Strings.Resources.S_DEPLOY_REDIRECTION_TITLE,
                                               DialogService.DialogIcon.Exclamation,
                                               copyToClipboard: true));
 
@@ -84,10 +83,10 @@ internal static class AdbHelper
         {
             if (Data.MdnsService.State is MDNS.MdnsState.Running)
             {
-                var result = await DialogService.ShowConfirmation(Strings.S_DISABLE_MDNS,
-                                                                  Strings.S_DISABLE_MDNS_TITLE,
-                                                                  "Restart ADB Now",
-                                                                  cancelText: "Restart Later",
+                var result = await DialogService.ShowConfirmation(Strings.Resources.S_DISABLE_MDNS,
+                                                                  Strings.Resources.S_DISABLE_MDNS_TITLE,
+                                                                  Strings.Resources.S_RESTART_ADB_NOW,
+                                                                  cancelText: Strings.Resources.S_RESTART_LATER,
                                                                   icon: DialogService.DialogIcon.Informational);
 
                 if (result.Item1 is ContentDialogResult.Primary)
@@ -103,20 +102,20 @@ internal static class AdbHelper
         => 0 == ADBService.ExecuteAdbCommand("pull",
                                              out _,
                                              out _,
-                                             new(), new[]
-                                             {
+                                             new(),
+                                             [
                                                  "-a",
                                                  ADBService.EscapeAdbString(file.FullPath),
                                                  ADBService.EscapeAdbString(windowsPath)
-                                             });
+                                             ]);
 
     public static bool SilentPush(Device device, string windowsPath, string androidPath)
         => 0 == ADBService.ExecuteAdbCommand("push",
             out _,
             out _,
-            new(), new[]
-            {
+            new(),
+            [
                 ADBService.EscapeAdbString(windowsPath),
                 ADBService.EscapeAdbString(androidPath)
-            });
+            ]);
 }

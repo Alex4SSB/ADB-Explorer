@@ -350,7 +350,10 @@ public class ExplorerHelper
                     Data.RuntimeSettings.IsAdvancedDragEnabled = false;
 
                     if (showMessage)
-                        DialogService.ShowMessage(Strings.S_CONFLICTING_APPS(apps), Strings.S_CONFLICTING_APPS_TITLE, DialogService.DialogIcon.Exclamation, copyToClipboard: true);
+                        DialogService.ShowMessage($"{Strings.Resources.S_CONFLICTING_APPS}\n\n{string.Join('\n', apps)}",
+                                                  Strings.Resources.S_CONFLICTING_APPS_TITLE,
+                                                  DialogService.DialogIcon.Exclamation,
+                                                  copyToClipboard: true);
                 });
             }
             else

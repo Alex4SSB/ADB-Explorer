@@ -36,7 +36,7 @@ public static class FileOpStatusConverter
     {
         if (!string.IsNullOrEmpty(message))
         {
-            return message.StartsWith(Strings.S_REDIRECTION)
+            return message.StartsWith(Strings.Resources.S_REDIRECTION)
                 ? message
                 : $"Error: {message}";
         }

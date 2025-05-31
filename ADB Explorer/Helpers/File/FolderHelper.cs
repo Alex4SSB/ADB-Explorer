@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 
@@ -56,7 +55,7 @@ public class FolderHelper
         catch (Exception e)
         {
             if (path != AdbExplorerConst.RECYCLE_PATH)
-                DialogService.ShowMessage(e.Message, Strings.S_NAV_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
+                DialogService.ShowMessage(e.Message, Strings.Resources.S_NAV_ERR_TITLE, DialogService.DialogIcon.Critical, copyToClipboard: true);
 
             return null;
         }
