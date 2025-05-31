@@ -4,7 +4,7 @@
 </p>
 
 <a href="https://hosted.weblate.org/engage/adb-explorer/">
-	<img src="https://hosted.weblate.org/widget/adb-explorer/strings/svg-badge.svg" alt="Translation status" />
+	<img src="https://hosted.weblate.org/widget/adb-explorer/resources/svg-badge.svg" alt="Translation status" />
 </a>
 <br></br>
 <p >
