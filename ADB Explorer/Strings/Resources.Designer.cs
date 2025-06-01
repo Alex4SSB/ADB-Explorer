@@ -61,6 +61,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Hide.
+        /// </summary>
+        public static string S_ACTION_HIDE {
+            get {
+                return ResourceManager.GetString("S_ACTION_HIDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Download ADB.
         /// </summary>
         public static string S_ADB_DOWNLOAD {
@@ -166,11 +175,38 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to App Data Folder.
+        /// </summary>
+        public static string S_APP_DATA_FOLDER {
+            get {
+                return ResourceManager.GetString("S_APP_DATA_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Attributions &amp; Third Party Licenses.
+        /// </summary>
+        public static string S_ATTRIBUTIONS {
+            get {
+                return ResourceManager.GetString("S_ATTRIBUTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change.
         /// </summary>
         public static string S_BUTTON_CHANGE {
             get {
                 return ResourceManager.GetString("S_BUTTON_CHANGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear.
+        /// </summary>
+        public static string S_BUTTON_CLEAR {
+            get {
+                return ResourceManager.GetString("S_BUTTON_CLEAR", resourceCulture);
             }
         }
         
@@ -220,6 +256,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Collapse All.
+        /// </summary>
+        public static string S_COLLAPSE_ALL {
+            get {
+                return ResourceManager.GetString("S_COLLAPSE_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm Uninstall.
         /// </summary>
         public static string S_CONF_UNI_TITLE {
@@ -247,7 +292,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to There is 1 conflicting item {0}.
+        ///   Looks up a localized string similar to There is 1 conflicting item in {0}.
         /// </summary>
         public static string S_CONFLICT_ITEMS_DESTINATION {
             get {
@@ -479,6 +524,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Donate or Sponsor.
+        /// </summary>
+        public static string S_DONATE {
+            get {
+                return ResourceManager.GetString("S_DONATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Empty Recycle Bin.
         /// </summary>
         public static string S_EMPTY_TRASH {
@@ -493,6 +547,24 @@ namespace ADB_Explorer.Strings {
         public static string S_ENABLED {
             get {
                 return ResourceManager.GetString("S_ENABLED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exit Search.
+        /// </summary>
+        public static string S_EXIT_SEARCH {
+            get {
+                return ResourceManager.GetString("S_EXIT_SEARCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expand All.
+        /// </summary>
+        public static string S_EXPAND_ALL {
+            get {
+                return ResourceManager.GetString("S_EXPAND_ALL", resourceCulture);
             }
         }
         
@@ -542,6 +614,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FUSE_DRIVE_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_FUSE_DRIVE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GitHub repository.
+        /// </summary>
+        public static string S_GITHUB_REPO {
+            get {
+                return ResourceManager.GetString("S_GITHUB_REPO", resourceCulture);
             }
         }
         
@@ -786,6 +867,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [not set].
+        /// </summary>
+        public static string S_PLACEHOLDER_NOT_SET {
+            get {
+                return ResourceManager.GetString("S_PLACEHOLDER_NOT_SET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Privacy Policy.
+        /// </summary>
+        public static string S_PRIVACY_POLICY {
+            get {
+                return ResourceManager.GetString("S_PRIVACY_POLICY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Progress Method.
         /// </summary>
         public static string S_PROGRESS_METHOD_TITLE {
@@ -1023,6 +1122,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Search Settings.
+        /// </summary>
+        public static string S_SEARCH_SETTINGS {
+            get {
+                return ResourceManager.GetString("S_SEARCH_SETTINGS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search View.
+        /// </summary>
+        public static string S_SEARCH_VIEW {
+            get {
+                return ResourceManager.GetString("S_SEARCH_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to See terms.
+        /// </summary>
+        public static string S_SEE_TERMS {
+            get {
+                return ResourceManager.GetString("S_SEE_TERMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ADB Path.
         /// </summary>
         public static string S_SELECT_ADB_PATH {
@@ -1073,6 +1199,357 @@ namespace ADB_Explorer.Strings {
         public static string S_SELECT_PROGRESS_METHOD {
             get {
                 return ResourceManager.GetString("S_SELECT_PROGRESS_METHOD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable Animations.
+        /// </summary>
+        public static string S_SETTINGS_ANIMATION {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ANIMATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable APK Handling.
+        /// </summary>
+        public static string S_SETTINGS_APK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_APK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically Open For Browsing.
+        /// </summary>
+        public static string S_SETTINGS_AUTO_OPEN {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_AUTO_OPEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically Enable Root.
+        /// </summary>
+        public static string S_SETTINGS_AUTO_ROOT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_AUTO_ROOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Compact View.
+        /// </summary>
+        public static string S_SETTINGS_COMPACT_VIEW {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_COMPACT_VIEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Default Folder.
+        /// </summary>
+        public static string S_SETTINGS_DEFAULT_FOLDER {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_DEFAULT_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Disable Hardware Acceleration.
+        /// </summary>
+        public static string S_SETTINGS_DISABLE_HW {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_DISABLE_HW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string S_SETTINGS_DOUBLE_CLICK_NONE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_NONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open In Editor.
+        /// </summary>
+        public static string S_SETTINGS_DOUBLE_CLICK_OPEN {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_OPEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull To Default Folder.
+        /// </summary>
+        public static string S_SETTINGS_DOUBLE_CLICK_PULL {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_DOUBLE_CLICK_PULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Command Log.
+        /// </summary>
+        public static string S_SETTINGS_ENABLE_LOG {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ENABLE_LOG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable mDNS.
+        /// </summary>
+        public static string S_SETTINGS_ENABLE_MDNS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ENABLE_MDNS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable Recycle Bin.
+        /// </summary>
+        public static string S_SETTINGS_ENABLE_TRASH {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ENABLE_TRASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable File Explorer Monitoring.
+        /// </summary>
+        public static string S_SETTINGS_EXPLORER_MONITORING {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_EXPLORER_MONITORING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force Fluent Styles.
+        /// </summary>
+        public static string S_SETTINGS_FLUENT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_FLUENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Device.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_DEVICE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_DEVICE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Double Click.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_DOUBLE_CLICK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_DOUBLE_CLICK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drives &amp; Features.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_DRIVES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_DRIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Explorer.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_EXPLORER {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_EXPLORER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graphics.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_GRAPHICS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_GRAPHICS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Theme.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_THEME {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_THEME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Working Directories.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_WORK_DIRS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_WORK_DIRS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Hidden Items.
+        /// </summary>
+        public static string S_SETTINGS_HIDDEN_ITEMS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_HIDDEN_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Force Media Rescan On Push.
+        /// </summary>
+        public static string S_SETTINGS_MEDIA_RESCAN {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_MEDIA_RESCAN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Override ADB Path.
+        /// </summary>
+        public static string S_SETTINGS_OVERRIDE_ADB {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_OVERRIDE_ADB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow Simultaneous Operations.
+        /// </summary>
+        public static string S_SETTINGS_PARALLEL_OPERATIONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_PARALLEL_OPERATIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Poll For Battery Status.
+        /// </summary>
+        public static string S_SETTINGS_POLL_BATTERY {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_POLL_BATTERY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Poll For Devices.
+        /// </summary>
+        public static string S_SETTINGS_POLL_DEVICES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_POLL_DEVICES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Poll For Drives.
+        /// </summary>
+        public static string S_SETTINGS_POLL_DRIVES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_POLL_DRIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save Manually Connected Devices.
+        /// </summary>
+        public static string S_SETTINGS_SAVE_DEVICES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SAVE_DEVICES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show File Name Extensions.
+        /// </summary>
+        public static string S_SETTINGS_SHOW_EXTENSIONS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SHOW_EXTENSIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Display Splash Screen.
+        /// </summary>
+        public static string S_SETTINGS_SPLASH {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SPLASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stop Polling On Push/Pull.
+        /// </summary>
+        public static string S_SETTINGS_STOP_ON_SYNC {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_STOP_ON_SYNC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show System Apps.
+        /// </summary>
+        public static string S_SETTINGS_SYSTEM_APPS {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_SYSTEM_APPS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dark.
+        /// </summary>
+        public static string S_SETTINGS_THEME_DARK {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THEME_DARK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows Default.
+        /// </summary>
+        public static string S_SETTINGS_THEME_DEFAULT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THEME_DEFAULT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Light.
+        /// </summary>
+        public static string S_SETTINGS_THEME_LIGHT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_THEME_LIGHT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string S_SETTINGS_TITLE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check For Updates.
+        /// </summary>
+        public static string S_SETTINGS_UPDATES {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_UPDATES", resourceCulture);
             }
         }
         

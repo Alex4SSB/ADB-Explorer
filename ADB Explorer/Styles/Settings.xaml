@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <Style
         x:Key="SettingsToggleStyle"
@@ -130,7 +131,7 @@
                 <TextBox
                     HorizontalAlignment="Stretch"
                     VerticalContentAlignment="Center"
-                    ui:ControlHelper.PlaceholderText="[not set]"
+                    ui:ControlHelper.PlaceholderText="{x:Static strings:Resources.S_PLACEHOLDER_NOT_SET}"
                     IsReadOnly="True"
                     Style="{StaticResource TooltipTextBoxStyle}"
                     Text="{Binding Value}" />

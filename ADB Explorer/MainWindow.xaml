@@ -10,6 +10,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:resources="clr-namespace:ADB_Explorer.Resources"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:views="clr-namespace:ADB_Explorer.Views"
@@ -715,7 +716,7 @@
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontSize="24"
-                            Text="Settings" />
+                            Text="{x:Static strings:Resources.S_SETTINGS_TITLE}" />
                         <Menu Grid.Column="2" Style="{StaticResource SettingsPaneMenuStyle}" />
                         <Grid
                             Grid.Row="1"
@@ -750,7 +751,7 @@
                                         Height="31"
                                         MinHeight="31"
                                         Padding="30,5,6,6"
-                                        ui:ControlHelper.PlaceholderText="Search Settings"
+                                        ui:ControlHelper.PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
                                         GotFocus="SettingsSearchBox_FocusChanged"
                                         LostFocus="SettingsSearchBox_FocusChanged"
                                         Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -788,7 +789,7 @@
                                                 HorizontalAlignment="Center"
                                                 FontFamily="{StaticResource Nunito}"
                                                 FontSize="18"
-                                                Text="ADB Explorer" />
+                                                Text="{x:Static app_prop:AppGlobal.AppDisplayName}" />
                                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Bottom" Text="v" />
                                                 <TextBlock VerticalAlignment="Bottom" Text="{x:Static app_prop:AppGlobal.AppVersion}" />
@@ -800,20 +801,20 @@
                                                 ToolTip="{Binding Source={x:Static Member=resources:Links.SPONSOR}}">
                                                 <ui:SimpleStackPanel Orientation="Horizontal" Spacing="6">
                                                     <ui:FontIcon Foreground="{DynamicResource SponsorIconBrush}" Glyph="&#xEB51;" />
-                                                    <TextBlock Text="Donate or Sponsor" />
+                                                    <TextBlock Text="{x:Static strings:Resources.S_DONATE}" />
                                                 </ui:SimpleStackPanel>
                                             </Button>
                                             <ui:SimpleStackPanel Margin="0,6" Spacing="-3">
                                                 <ui:HyperlinkButton
                                                     Click="AppDataHyperlink_Click"
-                                                    Content="App Data Folder"
+                                                    Content="{x:Static strings:Resources.S_APP_DATA_FOLDER}"
                                                     ToolTip="{Binding Source={x:Static Member=models:Data.AppDataPath}}" />
                                                 <ui:HyperlinkButton
-                                                    Content="GitHub repository"
+                                                    Content="{x:Static strings:Resources.S_GITHUB_REPO}"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}" />
                                                 <ui:HyperlinkButton
-                                                    Content="Privacy Policy"
+                                                    Content="{x:Static strings:Resources.S_PRIVACY_POLICY}"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}" />
                                             </ui:SimpleStackPanel>
@@ -822,7 +823,7 @@
                                                 Margin="0,20,0,0"
                                                 HorizontalAlignment="Center"
                                                 FontWeight="Bold"
-                                                Text="Attributions &amp; Third Party Licenses" />
+                                                Text="{x:Static strings:Resources.S_ATTRIBUTIONS}" />
                                             <ui:SimpleStackPanel Spacing="-3">
                                                 <ui:HyperlinkButton
                                                     Content="ModernWPF"
@@ -838,8 +839,8 @@
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.LGPL3}}" />
                                                 <ui:HyperlinkButton
                                                     Click="AndroidRobotLicense_Click"
-                                                    Content="The Android Robot Icon(s)"
-                                                    ToolTip="See terms" />
+                                                    Content="{x:Static strings:Resources.S_ANDROID_ICONS_TITLE}"
+                                                    ToolTip="{x:Static strings:Resources.S_SEE_TERMS}" />
                                             </ui:SimpleStackPanel>
                                         </StackPanel>
                                     </Expander>
