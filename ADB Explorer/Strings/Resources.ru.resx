@@ -117,25 +117,79 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>סמל(י) רובוט ה-אנדרואיד</value>
-  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>רובוט האנדרואיד משוחזר או שונה מיצירה שנוצרה ושותפה על ידי גוגל ומשמש בהתאם לתנאים המתוארים ברישיון ייחוס Creative Commons 3.0.</value>
+    <value>Робот Android воспроизводится или модифицируется на основе работы, созданной и распространяемой Google, и используется в соответствии с условиями, описанными в лицензии Creative Commons 3.0 с указанием авторства.</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>הנפשות היישום</value>
+    <value>Анимации</value>
   </data>
-  <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>השימוש בסמל ה-APK נעשה תחת רישיון Apache, גירסה 2.0.</value>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Не удалось получить версию ADB с заданного пути.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>Версия ADB с предоставленного пути слишком низкая.</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>גרסת תוכנה חדשה</value>
+    <value>Новая версия программы</value>
   </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>קריאייטיב קומונס</value>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Ошибка навигации</value>
   </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value />
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>не удалось подключиться к</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Ошибка подключения</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Убить эмулятор</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Удалить устройство</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Отключить устройство</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB-сервер необходимо перезапустить, чтобы отключить mDNS.</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Конфликтующие приложения</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Скачать ADB</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Больше информации</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Перезапустить ADB Сейчас</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Перезапустить позже</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Новый файл</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Новая папка</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить это устройство?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Удалить {0}</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Заменить</value>
   </data>
 </root>

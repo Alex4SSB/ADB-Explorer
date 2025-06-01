@@ -238,6 +238,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ok.
+        /// </summary>
+        public static string S_BUTTON_OK {
+            get {
+                return ResourceManager.GetString("S_BUTTON_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string S_CANCEL {
@@ -1406,6 +1415,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_HIDDEN_ITEMS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_HIDDEN_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string S_SETTINGS_LANGUAGE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_LANGUAGE", resourceCulture);
             }
         }
         

@@ -197,4 +197,38 @@ internal static class SettingsHelper
 
         DialogService.ShowMessage(text, Strings.Resources.S_PROGRESS_METHOD_TITLE, DialogService.DialogIcon.Tip);
     }
+
+    public static IEnumerable<CultureInfo> GetAvailableLanguages()
+    {
+        string assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;
+        yield return CultureInfo.InvariantCulture;
+        yield return new CultureInfo("en-US");
+
+        foreach (var dir in Directory.GetDirectories(AppDomain.CurrentDomain.BaseDirectory))
+        {
+            string folderName = Path.GetFileName(dir);
+            CultureInfo culture = null;
+            string resourceAssembly = "";
+
+            try
+            {
+                // Attempt to create a CultureInfo from folder name
+                culture = new(folderName);
+
+                // Check if satellite assembly exists for this culture
+                resourceAssembly = Path.Combine(dir, $"{assemblyName}.resources.dll");
+                
+            }
+            catch (CultureNotFoundException)
+            {
+                // Folder name is not a valid culture
+                continue;
+            }
+
+            if (File.Exists(resourceAssembly))
+            {
+                yield return culture;
+            }
+        }
+    }
 }

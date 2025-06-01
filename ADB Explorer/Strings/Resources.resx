@@ -723,4 +723,12 @@ Visible content may be incomplete.</value>
     <value>Hide</value>
     <comment>The tooltip of a button used to hide a view</comment>
   </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Language</value>
+    <comment>The setting used to set the UI language to a language different than Windows</comment>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+    <comment>The content of an OK button on a message dialog</comment>
+  </data>
 </root>

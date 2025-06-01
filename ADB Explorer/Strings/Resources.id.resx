@@ -117,25 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>סמל(י) רובוט ה-אנדרואיד</value>
-  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>רובוט האנדרואיד משוחזר או שונה מיצירה שנוצרה ושותפה על ידי גוגל ומשמש בהתאם לתנאים המתוארים ברישיון ייחוס Creative Commons 3.0.</value>
-  </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>הנפשות היישום</value>
-  </data>
-  <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>השימוש בסמל ה-APK נעשה תחת רישיון Apache, גירסה 2.0.</value>
-  </data>
-  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>גרסת תוכנה חדשה</value>
-  </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>קריאייטיב קומונס</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value />
+    <value>Robot Android diproduksi ulang atau dimodifikasi dari karya yang dibuat dan dibagikan oleh Google dan digunakan sesuai persyaratan yang dijelaskan dalam Lisensi Atribusi Creative Commons 3.0.</value>
   </data>
 </root>

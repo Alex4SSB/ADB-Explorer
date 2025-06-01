@@ -47,8 +47,11 @@ public static class DialogService
         Data.RuntimeSettings.IsDevicesPaneOpen = false;
     }
 
-    public static ContentDialog ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true, string buttonText = "Ok")
+    public static ContentDialog ShowDialog(object content, string title, DialogIcon icon = DialogIcon.None, bool hidePanes = true, string buttonText = null)
     {
+        if (buttonText is null)
+            buttonText = Strings.Resources.S_BUTTON_OK;
+
         windowDialog.Content = content;
         windowDialog.Title = title;
         windowDialog.PrimaryButtonText = null;

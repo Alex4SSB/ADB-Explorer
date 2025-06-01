@@ -101,4 +101,8 @@
     </None>
   </ItemGroup>
 	
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="&quot;$(SolutionDir)\ResXCleaner\bin\Debug\net9.0\ResxCleaner.exe&quot;" />
+  </Target>
+	
 </Project>

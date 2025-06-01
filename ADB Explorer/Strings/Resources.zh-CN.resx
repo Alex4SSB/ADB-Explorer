@@ -192,10 +192,6 @@
   <data name="S_PERM_DEL" xml:space="preserve">
     <value>永久删除</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="S_CREATE_ERR_TITLE" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>创建错误</value>
   </data>
@@ -318,33 +314,6 @@
     <value>若 ADB 已在 WSA 中授权，请直接点击启动。
 如需授权 ADB，请打开 WSA 高级设置。</value>
   </data>
-  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_BUTTON_CHANGE" xml:space="preserve">
-    <value />
-  </data>
   <data name="S_SELECT_ADB_PATH" xml:space="preserve">
     <value>选择 ADB 路径</value>
   </data>
@@ -356,12 +325,6 @@
   </data>
   <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
     <value>文件资源管理器监控：</value>
-  </data>
-  <data name="S_ENABLED" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_DISABLED" xml:space="preserve">
-    <value />
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
     <value>{0} 有新版本 {1} 可用</value>
@@ -474,9 +437,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
     <value>在 {1} 中有 {0} 个冲突项</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value />
-  </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
     <value>选择要推送的文件夹</value>
   </data>
@@ -489,163 +449,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
     <value>选择要推送至 {0} 的文件</value>
   </data>
-  <data name="S_BUTTON_CLEAR" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_DONATE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_PRIVACY_POLICY" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_SETTINGS_TITLE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_ACTION_HIDE" xml:space="preserve">
+  <data name="S_BUTTON_OK" xml:space="preserve">
     <value />
   </data>
 </root>

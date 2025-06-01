@@ -429,10 +429,9 @@ internal static class AppActions
     ];
 
     public static List<KeyBinding> Bindings =>
-        List.Where(a => a.UseForGesture)
+        [.. List.Where(a => a.UseForGesture)
             .Select(action => action.KeyBinding)
-            .Where(binding => binding is not null)
-            .ToList();
+            .Where(binding => binding is not null)];
 
     private static void ToggleSettingsPane()
     {

@@ -102,6 +102,94 @@
                 Style="{StaticResource RightHorizontalItemsControlStyle}" />
         </Grid>
     </DataTemplate>
+    <DataTemplate x:Key="ComboSettingTemplate" DataType="services:ComboSetting">
+        <Grid Margin="0,6,0,10" HorizontalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid Grid.Column="1" Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="28" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid Width="20" HorizontalAlignment="Left">
+                    <TextBlock
+                        Margin="0,-5,0,-10"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource BlueDotTextBlockStyle}" />
+                </Grid>
+                <TextBlock Grid.Column="1" Text="{Binding Description}" />
+                <ItemsControl
+                    Grid.Column="2"
+                    ItemTemplate="{StaticResource SettingsActionTemplate}"
+                    ItemsSource="{Binding Commands}"
+                    Style="{StaticResource RightHorizontalItemsControlStyle}" />
+            </Grid>
+            <Grid Grid.Row="1">
+                <ComboBox
+                    HorizontalAlignment="Stretch"
+                    VerticalContentAlignment="Center"
+                    ItemsSource="{Binding Options}"
+                    SelectedValue="{Binding Value, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel.Style>
+                                        <Style TargetType="StackPanel">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ThreeLetterISOLanguageName}" Value="ivl">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
+                                    <TextBlock Text="{Binding NativeName}" />
+                                    <TextBlock Text=" (" />
+                                    <TextBlock Text="{Binding Name}" />
+                                    <TextBlock Text=")" />
+                                </StackPanel>
+                                <TextBlock Text="{x:Static strings:Resources.S_SETTINGS_THEME_DEFAULT}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ThreeLetterISOLanguageName}" Value="ivl">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <StackPanel
+                    Margin="28,0,0,-12"
+                    VerticalAlignment="Bottom"
+                    Opacity="0.7"
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}, Path=IsMouseOver}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock FontSize="10" Text="→ " />
+                    <TextBlock FontSize="10" Text="{Binding GroupName}" />
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </DataTemplate>
     <DataTemplate x:Key="StringSettingTemplate" DataType="services:StringSetting">
         <Grid Margin="0,6,0,10" HorizontalAlignment="Stretch">
             <Grid.RowDefinitions>
@@ -205,11 +293,13 @@
     <helpers:SettingsTemplateSelector
         x:Key="GroupedSettingsTemplateSelector"
         BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+        ComboSettingTemplate="{StaticResource ComboSettingTemplate}"
         EnumSettingTemplate="{StaticResource GropuedEnumSettingTemplate}"
         StringSettingTemplate="{StaticResource StringSettingTemplate}" />
     <helpers:SettingsTemplateSelector
         x:Key="SortedSettingsTemplateSelector"
         BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
+        ComboSettingTemplate="{StaticResource ComboSettingTemplate}"
         EnumSettingTemplate="{StaticResource SortedEnumSettingTemplate}"
         StringSettingTemplate="{StaticResource StringSettingTemplate}" />
     <Style

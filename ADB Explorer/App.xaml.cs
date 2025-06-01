@@ -50,6 +50,8 @@ public partial class App : Application
                 ReadSettingsFile(reader);
             }
 
+            Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
+
 #if !DEPLOY
             if (!File.Exists(ADB_Explorer.Properties.AppGlobal.DragDropLogPath))
             {

@@ -120,6 +120,10 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_GRAPHICS,
             [
+                new ComboSetting(appSettings.GetProperty(nameof(Settings.UICulture)),
+                                 Strings.Resources.S_SETTINGS_LANGUAGE,
+                                 SettingsHelper.GetAvailableLanguages(),
+                                 commands: SettingsActions.Find(a => a.Name is ActionType.ResetApp)),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), Strings.Resources.S_SETTINGS_FLUENT, visibleProp: RuntimeSettings.GetType().GetProperty(nameof(AppRuntimeSettings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), Strings.Resources.S_SETTINGS_DISABLE_HW),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
@@ -255,6 +259,34 @@ public class StringSetting : AbstractSetting
     public StringSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
         : base(valueProp, description, visibleProp, commands)
     { }
+
+    protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == valueProp.Name)
+        {
+            OnPropertyChanged(nameof(Value));
+        }
+        else if (e.PropertyName == visibleProp?.Name)
+        {
+            OnPropertyChanged(nameof(Visibility));
+        }
+    }
+}
+
+public class ComboSetting : AbstractSetting
+{
+    public object Value
+    {
+        get => valueProp.GetValue(Settings);
+        set => valueProp.SetValue(Settings, value);
+    }
+    public IEnumerable<object> Options { get; } = [];
+
+    public ComboSetting(PropertyInfo valueProp, string description, IEnumerable<object> options, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(valueProp, description, visibleProp, commands)
+    {
+        Options = options;
+    }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {

@@ -415,6 +415,37 @@ public class AppSettings : ViewModelBase
         set => Set(ref lastDevice, value);
     }
 
+    private CultureInfo uiCulture;
+    public CultureInfo UICulture
+    {
+        get
+        {
+            if (uiCulture is null)
+            {
+                var uiLanguage = UILanguage;
+                uiCulture = string.IsNullOrEmpty(uiLanguage)
+                    ? CultureInfo.InvariantCulture
+                    : new(uiLanguage);
+            }
+
+            return uiCulture;
+        }
+        set
+        {
+            if (base.Set(ref uiCulture, value))
+            {
+                UILanguage = value.Name;
+            }
+        }
+    }
+
+    private string uiLanguage;
+    public string UILanguage
+    {
+        get => Get(ref uiLanguage, "");
+        set => Set(ref uiLanguage, value);
+    }
+
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))
