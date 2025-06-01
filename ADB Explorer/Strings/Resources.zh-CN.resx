@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -190,7 +190,7 @@
     <value>永久删除</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="S_CREATE_ERR_TITLE" type="System.Resources.ResXNullRef, System.Windows.Forms">
+  <data name="S_CREATE_ERR_TITLE" type="System.Resources.ResXNullRef, System.Windows.Forms" xml:space="preserve">
     <value />
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
@@ -310,16 +310,16 @@
     <value />
   </data>
   <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value />
+    <value>选择 ADB 路径</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
-    <value />
+    <value>继续</value>
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
-    <value />
+    <value>更多信息</value>
   </data>
   <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value />
+    <value>文件资源管理器监控：</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value />
@@ -331,28 +331,32 @@
     <value>{0} 有新版本 {1} 可用</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
-    <value />
+    <value>转到版本页面</value>
   </data>
   <data name="S_BUTTON_CLOSE" xml:space="preserve">
-    <value />
+    <value>关闭</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value />
+    <value>转到发行说明</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB 可执行文件</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value />
+    <value>本应用是 ADB - Android Debug Bridge （安卓调试桥） 的图形界面工具。
+使用前，请确保您的电脑已安装 ADB。
+ADB 包含在 Android SDK Platform Tools 中。
+您可通过下方链接下载 SDK Platform Tools。
+由于许可限制，我们无法随应用直接提供 ADB。</value>
   </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value />
+    <value>ADB 帮助</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value />
+    <value>立即重启 ADB</value>
   </data>
   <data name="S_RESTART_LATER" xml:space="preserve">
-    <value />
+    <value>稍后重启</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>为 {0} 选择目标文件夹</value>
@@ -378,72 +382,111 @@
     <value>知识共享</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
-    <value />
+    <value>尝试列出此文件夹内容时发生错误。
+当前显示的内容可能不完整。</value>
   </data>
   <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value />
+    <value>{0} 是目标文件夹的上级目录。</value>
   </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value />
+    <value>确定要终止此模拟器吗？</value>
   </data>
   <data name="S_REM_DEVICE" xml:space="preserve">
-    <value />
+    <value>确定要删除这个设备吗？</value>
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value />
+    <value>删除 {0}</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value />
+    <value>终止 {0}</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
-    <value />
+    <value>以下内容将被删除：
+{0}</value>
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value />
+    <value>以下内容将被卸载：
+{0} 软件包</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
-    <value />
+    <value>卸载</value>
   </data>
   <data name="S_CANCEL" xml:space="preserve">
-    <value />
+    <value>取消</value>
   </data>
   <data name="S_CONFIRM" xml:space="preserve">
-    <value />
+    <value>确认</value>
   </data>
   <data name="S_SKIP" xml:space="preserve">
-    <value />
+    <value>跳过</value>
   </data>
   <data name="S_REPLACE" xml:space="preserve">
-    <value />
+    <value>替换</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
-    <value />
+    <value>合并或替换</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value />
+    <value>有 1 个冲突项</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value />
+    <value>有 1 个冲突项 {0}</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value />
+    <value>有 {0} 个冲突项</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value />
+    <value>在 {1} 中有 {0} 个冲突项</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value />
   </data>
   <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
-    <value />
+    <value>选择要推送的文件夹</value>
   </data>
   <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
-    <value />
+    <value>选择要推送至 {0} 的文件夹</value>
   </data>
   <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
-    <value />
+    <value>选择要推送的文件</value>
   </data>
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
-    <value />
+    <value>选择要推送至 {0} 的文件</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>仅磁盘使用量</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>拉取到 Windows 驱动器根目录</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>仅在配合文件资源管理器使用时启用此功能。
+您随时可在设置中修改此选项。</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>文件资源管理器监听器</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>目录列表错误</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>无法覆盖 ADB</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>创建错误</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>由于以下应用程序正在运行，因此无法运行文件资源管理器监听器：</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>安装软件包</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>启用文件资源管理器监听器后，应用可直接将拖放/剪贴板拉取操作执行到目标文件夹。
+
+否则文件将先拉取至应用临时目录，再通过小缓冲区流式传输至文件资源管理器。
+这两个额外步骤会显著降低操作速度。
+
+该功能对其他文件管理器会自动禁用。</value>
   </data>
 </root>
