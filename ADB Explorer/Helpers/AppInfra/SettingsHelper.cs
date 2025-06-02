@@ -4,7 +4,7 @@ using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Helpers;
 
-internal static class SettingsHelper
+public static class SettingsHelper
 {
     public static void DisableAnimationTipAction() =>
         DialogService.ShowMessage(Strings.Resources.S_DISABLE_ANIMATION, Strings.Resources.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
@@ -230,5 +230,22 @@ internal static class SettingsHelper
                 yield return culture;
             }
         }
+    }
+
+    public static double GetCurrentPercentageTranslated(CultureInfo currentCulture)
+    {
+        var neutralCulture = CultureInfo.InvariantCulture;
+
+        var resourceManager = Strings.Resources.ResourceManager;
+        var resourceType = typeof(Strings.Resources);
+        var propertyInfos = resourceType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
+
+        var stringProps = propertyInfos.Where(p => p.PropertyType == typeof(string));
+        var neutralValues = stringProps.Select(p => resourceManager.GetString(p.Name, neutralCulture));
+        var currentValues = stringProps.Select(p => resourceManager.GetString(p.Name, currentCulture));
+        double translated = neutralValues.Except(currentValues).Count();
+        double total = neutralValues.Count();
+
+        return translated / total;
     }
 }

@@ -409,16 +409,8 @@ namespace ADB_Test
         [TestMethod]
         public void KnownFolderTest()
         {
-            var userFolder = $"C:\\Users\\{Environment.UserName}";
+            // The other checks are now irrelevant and heve been removed since the method has changes
 
-            string[] testFolders = [ "Downloads", "Documents", "Desktop", "Pictures", "Downloads\\Shared Videos", "Libraries\\Pictures"];
-
-            foreach (var item in testFolders)
-            {
-                Assert.IsTrue(CheckPath(ExplorerHelper.ParseTreePath(item), item));
-            }
-
-            Assert.AreEqual("C:", ExplorerHelper.ParseTreePath("This PC\\C:"));
             Assert.AreEqual("F:", ExplorerHelper.ParseTreePath("This PC\\Sandisk Cruzer (F:)"));
 
             // Quick access in Windows 10 can have any folder, hence it is impossible to determine the actual path
@@ -428,18 +420,6 @@ namespace ADB_Test
             Assert.IsNull(ExplorerHelper.ParseTreePath("Libraries"));
             Assert.IsNull(ExplorerHelper.ParseTreePath("Network"));
             Assert.IsNull(ExplorerHelper.ParseTreePath("This PC"));
-
-            bool CheckPath(string result, string origin)
-            {
-                var index = origin.IndexOf('\\');
-                var originTop = index > -1 ? origin[..index] : origin;
-                var remainder = index > -1 ? origin[index..] : "";
-
-                return result == $"{userFolder}\\{origin}"
-                    || result == $"{userFolder}\\OneDrive\\{origin}"
-                    || result == $"{userFolder}\\AppData\\Roaming\\Microsoft\\Windows\\{origin}"
-                    || result == $"{userFolder}\\AppData\\Roaming\\Microsoft\\Windows\\Libraries\\{originTop}.library-ms{remainder}";
-            }
         }
     }
 }

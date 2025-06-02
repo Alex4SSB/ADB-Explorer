@@ -768,7 +768,7 @@
                                     Margin="0,8,0,4"
                                     Style="{x:Null}" />
                             </Grid>
-                            <ScrollViewer Grid.Row="1" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
+                            <ScrollViewer Grid.Row="1">
                                 <ui:SimpleStackPanel
                                     Margin="6,0,24,10"
                                     HorizontalAlignment="Left"

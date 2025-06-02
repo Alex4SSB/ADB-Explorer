@@ -132,48 +132,56 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static ScrollViewer GetChildScrollViewer(DataGrid control)
-    {
-        var sv = control.GetValue(ChildScrollViewerProperty) as ScrollViewer;
+    private static readonly Dictionary<string, DependencyProperty> ChildrenProperties = [];
 
-        if (sv is null
-            && VisualTreeHelper.GetChild(control, 0) is Border border
-            && border.Child is ScrollViewer scroller)
+    public static T FindDescendant<T>(DependencyObject control, bool includeSelf = false) where T : DependencyObject
+    {
+        if (control is null)
+            return null;
+
+        if (includeSelf && control is T tControl)
+            return tControl;
+
+        var key = $"Child{typeof(T).Name}";
+        if (!ChildrenProperties.TryGetValue(key, out var requestedChild))
         {
-            control.SetValue(ChildScrollViewerProperty, scroller);
-            return scroller;
+            requestedChild = DependencyProperty.RegisterAttached(
+                key,
+                typeof(T),
+                typeof(StyleHelper),
+                null);
+
+            ChildrenProperties.Add(key, requestedChild);
         }
 
-        return sv;
+        var saved = control.GetValue(requestedChild) as T;
+        if (saved is not null)
+            return saved;
+
+        var descendant = _findDescendant<T>(control);
+        control.SetValue(requestedChild, descendant);
+
+        return descendant;
     }
 
-    public static readonly DependencyProperty ChildScrollViewerProperty =
-        DependencyProperty.RegisterAttached(
-            "ChildScrollViewer",
-            typeof(ScrollViewer),
-            typeof(StyleHelper),
-            null);
-
-    public static ItemsPresenter GetChildItemsPresenter(DataGrid control)
+    private static T _findDescendant<T>(DependencyObject control) where T : DependencyObject
     {
-        var cp = control.GetValue(ChildItemsPresenterProperty) as ItemsPresenter;
-        if (cp is null
-            && GetChildScrollViewer(control) is ScrollViewer sv
-            && sv.Content is ItemsPresenter presenter)
+        if (control is null)
+            return null;
+
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(control); i++)
         {
-            control.SetValue(ChildItemsPresenterProperty, presenter);
-            return presenter;
+            var child = VisualTreeHelper.GetChild(control, i);
+            if (child is T tChild)
+                return tChild;
+
+            var descendant = _findDescendant<T>(child);
+            if (descendant is not null)
+                return descendant;
         }
 
-        return cp;
+        return null;
     }
-
-    public static readonly DependencyProperty ChildItemsPresenterProperty =
-        DependencyProperty.RegisterAttached(
-            "ChildItemsPresenter",
-            typeof(ItemsPresenter),
-            typeof(StyleHelper),
-            null);
 
     public static void VerifyIcon(string icon, [CallerMemberName] string propertyName = null)
     {

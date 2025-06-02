@@ -123,6 +123,7 @@ public static class UISettings
                 new ComboSetting(appSettings.GetProperty(nameof(Settings.UICulture)),
                                  Strings.Resources.S_SETTINGS_LANGUAGE,
                                  SettingsHelper.GetAvailableLanguages(),
+                                 Settings.CultureTranslationProgress,
                                  commands: SettingsActions.Find(a => a.Name is ActionType.ResetApp)),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), Strings.Resources.S_SETTINGS_FLUENT, visibleProp: RuntimeSettings.GetType().GetProperty(nameof(AppRuntimeSettings.HideForceFluent))),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), Strings.Resources.S_SETTINGS_DISABLE_HW),
@@ -280,13 +281,32 @@ public class ComboSetting : AbstractSetting
         get => valueProp.GetValue(Settings);
         set => valueProp.SetValue(Settings, value);
     }
+
     public IEnumerable<object> Options { get; } = [];
 
-    public ComboSetting(PropertyInfo valueProp, string description, IEnumerable<object> options, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, commands)
+    public ObservableProperty<string> ObservableAltLabel { get; } = new();
+
+    public string AltLabel { get; private set; } = null;
+
+    public ComboSetting(PropertyInfo valueProp, string description, IEnumerable<object> options, ObservableProperty<string> altLabel = null, params BaseAction[] commands)
+        : base(valueProp, description, null, commands)
     {
         Options = options;
+        ObservableAltLabel = altLabel;
+
+
+        if (ObservableAltLabel is not null)
+        {
+            ObservableAltLabel.PropertyChanged += (sender, e) =>
+            {
+                AltLabel = e.NewValue;
+                OnPropertyChanged(nameof(AltLabel));
+            };
+
+            AltLabel = ObservableAltLabel.Value;
+        }
     }
+
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {

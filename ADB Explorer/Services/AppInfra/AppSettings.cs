@@ -426,6 +426,8 @@ public class AppSettings : ViewModelBase
                 uiCulture = string.IsNullOrEmpty(uiLanguage)
                     ? CultureInfo.InvariantCulture
                     : new(uiLanguage);
+
+                UpdateTranslation();
             }
 
             return uiCulture;
@@ -435,9 +437,21 @@ public class AppSettings : ViewModelBase
             if (base.Set(ref uiCulture, value))
             {
                 UILanguage = value.Name;
+                UpdateTranslation();
             }
         }
     }
+
+    private void UpdateTranslation()
+    {
+        string precent = UICulture.Equals(CultureInfo.InvariantCulture) || UICulture.Equals(CultureInfo.GetCultureInfo("en-US"))
+                            ? null
+                            : $"{SettingsHelper.GetCurrentPercentageTranslated(UICulture) * 100:f0}%";
+
+        CultureTranslationProgress.Value = precent;
+    }
+
+    public ObservableProperty<string> CultureTranslationProgress { get; private set; } = new() { Value = null };
 
     private string uiLanguage;
     public string UILanguage

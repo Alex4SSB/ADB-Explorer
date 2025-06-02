@@ -120,7 +120,22 @@
                         HorizontalAlignment="Center"
                         Style="{StaticResource BlueDotTextBlockStyle}" />
                 </Grid>
-                <TextBlock Grid.Column="1" Text="{Binding Description}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBlock Text="{Binding Description}" />
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding AltLabel}" Value="{x:Null}">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
+                        <TextBlock Text=" - " />
+                        <TextBlock Text="{Binding AltLabel}" />
+                    </StackPanel>
+                </StackPanel>
                 <ItemsControl
                     Grid.Column="2"
                     ItemTemplate="{StaticResource SettingsActionTemplate}"
@@ -132,6 +147,7 @@
                     HorizontalAlignment="Stretch"
                     VerticalContentAlignment="Center"
                     ItemsSource="{Binding Options}"
+                    MaxDropDownHeight="200"
                     SelectedValue="{Binding Value, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>

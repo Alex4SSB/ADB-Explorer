@@ -34,7 +34,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
     private double ScrollContentPresenterMargin => RuntimeSettings.UseFluentStyles ? ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top : 0;
     private double DataGridContentWidth
-        => StyleHelper.GetChildItemsPresenter(ExplorerGrid) is ItemsPresenter presenter ? presenter.ActualWidth : 0;
+        => StyleHelper.FindDescendant<ItemsPresenter>(ExplorerGrid) is ItemsPresenter presenter ? presenter.ActualWidth : 0;
 
     public string SelectedFilesTotalSize => (SelectedFiles is not null && FileHelper.TotalSize(SelectedFiles) is ulong size and > 0) ? size.ToSize() : "";
     public string SelectedFilesCount => $"{ExplorerGrid.SelectedItems.Count}";
@@ -1378,7 +1378,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             .Sum(item => item.ActualWidth);
 
         if (point.Y > (ExplorerGrid.Items.Count * RowHeight + ColumnHeaderHeight)
-            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.GetChildItemsPresenter(ExplorerGrid).ActualHeight % RowHeight)
+            || point.Y > (ExplorerGrid.ActualHeight - StyleHelper.FindDescendant<ItemsPresenter>(ExplorerGrid)?.ActualHeight % RowHeight)
             || point.Y < ColumnHeaderHeight + ScrollContentPresenterMargin
             || point.X > actualRowWidth
             || point.X > DataGridContentWidth)
@@ -1488,12 +1488,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ScrollViewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        ScrollViewer scroller = sender switch
-        {
-            ScrollViewer sv => sv,
-            DataGrid dg => StyleHelper.GetChildScrollViewer(dg),
-            _ => throw new NotSupportedException(),
-        };
+        ScrollViewer scroller = StyleHelper.FindDescendant<ScrollViewer>((DependencyObject)sender, true);
+        if (scroller is null)
+            return;
 
         scroller.ScrollToVerticalOffset(scroller.VerticalOffset - e.Delta);
         e.Handled = true;
@@ -1859,6 +1856,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void SortedSettings_MouseMove(object sender, MouseEventArgs e)
     {
+        // Prevent focus from being set on the ComboBox when it is open
+        // this only works for the first combobox
+        // when we'll have more, this will need to be adjusted
+        var combobox = StyleHelper.FindDescendant<ComboBox>(SortedSettings);
+        if (combobox is not null && 
+            (combobox.IsDropDownOpen || e.LeftButton is MouseButtonState.Pressed && combobox.IsMouseOver))
+            return;
+
         SortedSettings.Focus();
     }
 
@@ -1923,9 +1928,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             SelectionRect.Visibility = Visibility.Collapsed;
             return;
         }
-
-        var horizontal = StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
-        var vertical = StyleHelper.GetChildScrollViewer(ExplorerGrid).ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
+        var scroller = StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid);
+        var horizontal = scroller.ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
+        var vertical = scroller.ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
 
         if (!SelectionRect.IsVisible
             && ((point.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
