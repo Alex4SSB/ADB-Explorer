@@ -2245,9 +2245,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Process.Start(RuntimeSettings.DefaultBrowserPath, $"\"{Links.SPONSOR}\"");
     }
 
-    private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void ComboBox_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
     {
-        Thread.CurrentThread.CurrentUICulture = new CultureInfo((string)((ComboBoxItem)((ComboBox)sender).SelectedValue).Content);
-        DialogService.ShowMessage(Strings.Resources.S_ANDROID_ROBOT_LIC);
+        if (sender is ComboBox comboBox && !comboBox.IsDropDownOpen)
+        {
+            e.Handled = true;
+
+            // Re-raise the event to scroll the parent ScrollViewer
+            var eventArg = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                RoutedEvent = MouseWheelEvent,
+                Source = sender
+            };
+
+            var parent = VisualTreeHelper.GetParent(comboBox) as UIElement;
+            parent?.RaiseEvent(eventArg);
+        }
     }
 }

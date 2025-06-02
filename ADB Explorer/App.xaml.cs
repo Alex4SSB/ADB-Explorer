@@ -181,5 +181,9 @@ public partial class App : Application
         // Handle error 0x800401D0 (CLIPBRD_E_CANT_OPEN) - global WPF issue
         if (e.Exception is COMException comException && comException.ErrorCode == -2147221040)
             e.Handled = true;
+
+        // If application shutdown has started, do not throw exceptions
+        if (App.Current is null || App.Current.Dispatcher is null)
+            e.Handled = true;
     }
 }

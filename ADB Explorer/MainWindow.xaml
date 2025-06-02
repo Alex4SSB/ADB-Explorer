@@ -61,6 +61,12 @@
             <EventSetter Event="MouseUp" Handler="DataGridCell_MouseUp" />
             <EventSetter Event="DragOver" Handler="ExplorerGrid_DragOver" />
         </Style>
+        <Style
+            x:Key="SettingsComboboxStyle"
+            BasedOn="{StaticResource ComboBoxStyle}"
+            TargetType="ComboBox">
+            <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel" />
+        </Style>
     </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
@@ -693,6 +699,7 @@
                 <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
                     <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CCW" />
                 </Style>
+                <Style BasedOn="{StaticResource SettingsComboboxStyle}" TargetType="ComboBox" />
             </ui:SplitView.Resources>
             <ui:SplitView.Pane>
                 <Border

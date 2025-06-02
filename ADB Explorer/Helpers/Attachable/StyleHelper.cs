@@ -132,6 +132,33 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
+    public static DependencyObject GetPopupPlacementTarget(DependencyObject control) =>
+        (DependencyObject)control.GetValue(PopupPlacementTargetProperty);
+
+    public static void SetPopupPlacementTarget(DependencyObject control, DependencyObject value) =>
+        control.SetValue(PopupPlacementTargetProperty, value);
+
+    public static readonly DependencyProperty PopupPlacementTargetProperty =
+        DependencyProperty.RegisterAttached(
+            "PopupPlacementTarget",
+            typeof(DependencyObject),
+            typeof(StyleHelper),
+            null);
+
+    public static PlacementMode GetPopupPlacement(DependencyObject control) =>
+        (PlacementMode)control.GetValue(PopupPlacementProperty);
+
+    public static void SetPopupPlacement(DependencyObject control, PlacementMode value) =>
+        control.SetValue(PopupPlacementProperty, value);
+
+    public static readonly DependencyProperty PopupPlacementProperty =
+        DependencyProperty.RegisterAttached(
+            "PopupPlacement",
+            typeof(PlacementMode),
+            typeof(StyleHelper),
+            null);
+
+
     private static readonly Dictionary<string, DependencyProperty> ChildrenProperties = [];
 
     public static T FindDescendant<T>(DependencyObject control, bool includeSelf = false) where T : DependencyObject
