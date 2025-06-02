@@ -449,7 +449,4 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
     <value>选择要推送至 {0} 的文件</value>
   </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value />
-  </data>
 </root>

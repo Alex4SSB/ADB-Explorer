@@ -731,4 +731,149 @@ Visible content may be incomplete.</value>
     <value>Ok</value>
     <comment>The content of an OK button on a message dialog</comment>
   </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Filter File Operations</value>
+    <comment>The content of a button used to toggle file operations filtering</comment>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Enable Auto Play</value>
+    <comment>The content of a button used to toggle automatic processing of the file operations</comment>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Disable Auto Play
+Cancel All Running</value>
+    <comment>The tooltip of the file operations auto play button in its alt state</comment>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Log Updates Are Paused</value>
+    <comment>The tooltip of a button used to pause updates to the command log, in its off state</comment>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Pause Log Updates</value>
+    <comment>The tooltip of a button used to pause updates to the command log, in its on state</comment>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Command Log</value>
+    <comment>The tooltip of a button used to show / hide the command log</comment>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Device Drives</value>
+    <comment>The tooltip of a button used to switch to the drive view</comment>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Back</value>
+    <comment>The tooltip of a button used to navigate backwards in the file browser</comment>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Forward</value>
+    <comment>The tooltip of a button used to navigate forward in the file browser</comment>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Up</value>
+    <comment>The tooltip of a button used to navigate to the parent location in the file browser</comment>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filter</value>
+    <comment>The tooltip of a button used to hide the file browser filter box</comment>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Devices</value>
+    <comment>The tooltip of a button used to open the devices view</comment>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Push</value>
+    <comment>The tooltip of the button used to initiate a push operation</comment>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Folders</value>
+    <comment>The submenu for selecting folders to push</comment>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Files</value>
+    <comment>The submenu to select files to push</comment>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Refresh</value>
+    <comment>The menu item used to refresh the current location in the file browser</comment>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copy</value>
+    <comment>The menu used to select files for copy</comment>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>More</value>
+    <comment>The menu item hiding more options under it</comment>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Edit</value>
+    <comment>The menu item to edit the current path</comment>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>New</value>
+    <comment>The menu to create new files and folders</comment>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Folder</value>
+    <comment>The menu used to create a new folder</comment>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>File</value>
+    <comment>The menu used to create a new file</comment>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Select All</value>
+    <comment>The menu used to select all items currently visible in the file browser</comment>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Cut</value>
+    <comment>The menu used to cut files</comment>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Paste Link</value>
+    <comment>The menu used to paste a link of the copied item</comment>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Rename</value>
+    <comment>The menu used to rename a file or folder</comment>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Package</value>
+    <comment>The menu item containing package actions</comment>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Update Time Modified</value>
+    <comment>The menu used to update the time modified of files using their names</comment>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Close Editor</value>
+    <comment>The tooltip of a button used to close the text editor</comment>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Save Changes</value>
+    <comment>The tooltip of a button to save the changes made in the text editor</comment>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Install</value>
+    <comment>The menu to install app packages</comment>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Copy To Temp</value>
+    <comment>The menu used to copy selected APK files to the temp drive</comment>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Clear Command Log</value>
+    <comment>The button used to clear the command log</comment>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Open Item Location</value>
+    <comment>The menu used to open the (source) location to a symbolic link</comment>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Search In Browser</value>
+    <comment>The menu used to open the default web browser and search for a package name from the installed apps view</comment>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copy to clipboard</value>
+    <comment>The tooltip of the button in the message dialog used to copy the message to the clipboard</comment>
+  </data>
 </root>

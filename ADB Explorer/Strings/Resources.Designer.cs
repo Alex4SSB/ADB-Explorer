@@ -193,6 +193,25 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable Auto Play
+        ///Cancel All Running.
+        /// </summary>
+        public static string S_AUTO_PLAY_DISABLE {
+            get {
+                return ResourceManager.GetString("S_AUTO_PLAY_DISABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Back.
+        /// </summary>
+        public static string S_BUTTON_BACK {
+            get {
+                return ResourceManager.GetString("S_BUTTON_BACK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change.
         /// </summary>
         public static string S_BUTTON_CHANGE {
@@ -229,6 +248,60 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy to clipboard.
+        /// </summary>
+        public static string S_BUTTON_COPY_TO_CLIP {
+            get {
+                return ResourceManager.GetString("S_BUTTON_COPY_TO_CLIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Devices.
+        /// </summary>
+        public static string S_BUTTON_DEVICES {
+            get {
+                return ResourceManager.GetString("S_BUTTON_DEVICES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Device Drives.
+        /// </summary>
+        public static string S_BUTTON_DRIVES {
+            get {
+                return ResourceManager.GetString("S_BUTTON_DRIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter.
+        /// </summary>
+        public static string S_BUTTON_FILTER {
+            get {
+                return ResourceManager.GetString("S_BUTTON_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forward.
+        /// </summary>
+        public static string S_BUTTON_FORWARD {
+            get {
+                return ResourceManager.GetString("S_BUTTON_FORWARD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Command Log.
+        /// </summary>
+        public static string S_BUTTON_LOG {
+            get {
+                return ResourceManager.GetString("S_BUTTON_LOG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to More Info.
         /// </summary>
         public static string S_BUTTON_MORE_INFO_TOOLTIP {
@@ -243,6 +316,24 @@ namespace ADB_Explorer.Strings {
         public static string S_BUTTON_OK {
             get {
                 return ResourceManager.GetString("S_BUTTON_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Push.
+        /// </summary>
+        public static string S_BUTTON_PUSH {
+            get {
+                return ResourceManager.GetString("S_BUTTON_PUSH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Up.
+        /// </summary>
+        public static string S_BUTTON_UP {
+            get {
+                return ResourceManager.GetString("S_BUTTON_UP", resourceCulture);
             }
         }
         
@@ -551,6 +642,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Enable Auto Play.
+        /// </summary>
+        public static string S_ENABLE_AUTO_PLAY {
+            get {
+                return ResourceManager.GetString("S_ENABLE_AUTO_PLAY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         public static string S_ENABLED {
@@ -610,6 +710,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_OP_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_FILE_OP_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Filter File Operations.
+        /// </summary>
+        public static string S_FILTER_FILE_OPS {
+            get {
+                return ResourceManager.GetString("S_FILTER_FILE_OPS", resourceCulture);
             }
         }
         
@@ -730,6 +839,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pause Log Updates.
+        /// </summary>
+        public static string S_LOG_UPDATES_ALT {
+            get {
+                return ResourceManager.GetString("S_LOG_UPDATES_ALT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Log Updates Are Paused.
+        /// </summary>
+        public static string S_LOG_UPDATES_PAUSE {
+            get {
+                return ResourceManager.GetString("S_LOG_UPDATES_PAUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred while trying to list the contents of this folder.
         ///Visible content may be incomplete..
         /// </summary>
@@ -745,6 +872,204 @@ namespace ADB_Explorer.Strings {
         public static string S_LS_ERROR_TITLE {
             get {
                 return ResourceManager.GetString("S_LS_ERROR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear Command Log.
+        /// </summary>
+        public static string S_MENU_CLEAR_LOG {
+            get {
+                return ResourceManager.GetString("S_MENU_CLEAR_LOG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Close Editor.
+        /// </summary>
+        public static string S_MENU_CLOSE_EDITOR {
+            get {
+                return ResourceManager.GetString("S_MENU_CLOSE_EDITOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy.
+        /// </summary>
+        public static string S_MENU_COPY {
+            get {
+                return ResourceManager.GetString("S_MENU_COPY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy To Temp.
+        /// </summary>
+        public static string S_MENU_COPY_TEMP {
+            get {
+                return ResourceManager.GetString("S_MENU_COPY_TEMP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cut.
+        /// </summary>
+        public static string S_MENU_CUT {
+            get {
+                return ResourceManager.GetString("S_MENU_CUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Edit.
+        /// </summary>
+        public static string S_MENU_EDIT {
+            get {
+                return ResourceManager.GetString("S_MENU_EDIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File.
+        /// </summary>
+        public static string S_MENU_FILE {
+            get {
+                return ResourceManager.GetString("S_MENU_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Files.
+        /// </summary>
+        public static string S_MENU_FILES {
+            get {
+                return ResourceManager.GetString("S_MENU_FILES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folder.
+        /// </summary>
+        public static string S_MENU_FOLDER {
+            get {
+                return ResourceManager.GetString("S_MENU_FOLDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Folders.
+        /// </summary>
+        public static string S_MENU_FOLDERS {
+            get {
+                return ResourceManager.GetString("S_MENU_FOLDERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install.
+        /// </summary>
+        public static string S_MENU_INSTALL {
+            get {
+                return ResourceManager.GetString("S_MENU_INSTALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More.
+        /// </summary>
+        public static string S_MENU_MORE {
+            get {
+                return ResourceManager.GetString("S_MENU_MORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to New.
+        /// </summary>
+        public static string S_MENU_NEW {
+            get {
+                return ResourceManager.GetString("S_MENU_NEW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open Item Location.
+        /// </summary>
+        public static string S_MENU_OPEN_LOCATION {
+            get {
+                return ResourceManager.GetString("S_MENU_OPEN_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Package.
+        /// </summary>
+        public static string S_MENU_PACKAGE {
+            get {
+                return ResourceManager.GetString("S_MENU_PACKAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste Link.
+        /// </summary>
+        public static string S_MENU_PASTE_LINK {
+            get {
+                return ResourceManager.GetString("S_MENU_PASTE_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string S_MENU_REFRESH {
+            get {
+                return ResourceManager.GetString("S_MENU_REFRESH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rename.
+        /// </summary>
+        public static string S_MENU_RENAME {
+            get {
+                return ResourceManager.GetString("S_MENU_RENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save Changes.
+        /// </summary>
+        public static string S_MENU_SAVE_CHANGES {
+            get {
+                return ResourceManager.GetString("S_MENU_SAVE_CHANGES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Search In Browser.
+        /// </summary>
+        public static string S_MENU_SEARCH_WEB {
+            get {
+                return ResourceManager.GetString("S_MENU_SEARCH_WEB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select All.
+        /// </summary>
+        public static string S_MENU_SELECT_ALL {
+            get {
+                return ResourceManager.GetString("S_MENU_SELECT_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update Time Modified.
+        /// </summary>
+        public static string S_MENU_UPDATE_MODIFIED {
+            get {
+                return ResourceManager.GetString("S_MENU_UPDATE_MODIFIED", resourceCulture);
             }
         }
         

@@ -123,56 +123,14 @@
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
     <value>Animations de l'application</value>
   </data>
-  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
-    <value>Impossible d'obtenir la version d'ADB à partir du chemin spécifié.</value>
-  </data>
-  <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Récupérer</value>
-  </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>L'icône de l'APK est sous licence Apache version 2.0.</value>
   </data>
-  <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>Vider la corbeille</value>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Impossible d'obtenir la version d'ADB à partir du chemin spécifié.</value>
   </data>
-  <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Erreur de chemin de destination</value>
-  </data>
-  <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Restaurer tous les éléments</value>
-  </data>
-  <data name="S_PUSH_PKG" xml:space="preserve">
-    <value>Installer des paquets</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>Erreur d'écriture du fichier</value>
-  </data>
-  <data name="S_COPY_APK_NAME" xml:space="preserve">
-    <value>Copier le nom du paquet</value>
-  </data>
-  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Confirmer la suppression</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>Déployer AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>Utilisation du disque uniquement</value>
-  </data>
-  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>Erreur de lecture du fichier</value>
-  </data>
-  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
-    <value>Opérations de fichier</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>Méthode de progression</value>
-  </data>
-  <data name="S_REM_HIST_DEV" xml:space="preserve">
-    <value>Supprimer l'appareil</value>
-  </data>
-  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Récupérer (Lien cible)</value>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>La version d'ADB obtenue à partir du chemin fourni est trop basse.</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Sélectionner l'exécutable ADB</value>
@@ -183,29 +141,47 @@
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
     <value>Nouvelle version de l'application</value>
   </data>
-  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
-    <value>La version d'ADB obtenue à partir du chemin fourni est trop basse.</value>
-  </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
     <value>Erreur de navigation</value>
   </data>
-  <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>Exécuter WSA en arrière-plan</value>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copier le nom du paquet</value>
   </data>
-  <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>Restaurer</value>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copier le chemin de l'élément</value>
   </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Désactiver mDNS</value>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Restaurer tous les éléments</value>
   </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Applications en conflit</value>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Vider la corbeille</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Erreur de chemin de destination</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>échec de la connexion à</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Erreur de connexion</value>
   </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Erreur de déconnexion</value>
+  </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>Erreur d'appairage</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>L'accès root ne peut pas être activé sur le périphérique sélectionné.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Accès root</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Confirmer la suppression</value>
   </data>
   <data name="S_PERM_DEL" xml:space="preserve">
     <value>Supprimer définitivement</value>
@@ -216,17 +192,41 @@
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
     <value>Restaurer les conflits</value>
   </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Confirmer la désinstallation</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Sélectionner les paquets à installer</value>
+  </data>
   <data name="S_REM_EMU" xml:space="preserve">
     <value>Tuer l'émulateur</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Supprimer l'appareil</value>
   </data>
   <data name="S_REM_DEV" xml:space="preserve">
     <value>Déconnecter l'appareil</value>
   </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Opérations de fichier</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Installer des paquets</value>
+  </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
     <value>Appairer et/ou connecter un appareil en WiFi (sans utiliser mDNS)</value>
   </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Relancez l'application pour que les modifications soient prises en compte</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Erreur de lecture du fichier</value>
+  </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
     <value>Impossible de récupérer le fichier pour le lire.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Erreur d'écriture du fichier</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
     <value>Impossible de renvoyer le fichier sur l'appareil.</value>
@@ -234,31 +234,31 @@
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>Le serveur ADB doit être redémarré pour désactiver mDNS.</value>
   </data>
-  <data name="S_DELETE_ACTION" xml:space="preserve">
-    <value>Supprimer</value>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Désactiver mDNS</value>
   </data>
-  <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>L'accès root ne peut pas être activé sur le périphérique sélectionné.</value>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Exécuter WSA en arrière-plan</value>
   </data>
-  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Accès root</value>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Récupérer</value>
   </data>
-  <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Relancez l'application pour que les modifications soient prises en compte</value>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Récupérer (Lien cible)</value>
   </data>
-  <data name="S_INSTALL_APK" xml:space="preserve">
-    <value>Sélectionner les paquets à installer</value>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restaurer</value>
   </data>
-  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Erreur de déconnexion</value>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>Déployer AdbProgressRedirection.exe</value>
   </data>
-  <data name="S_COPY_PATH" xml:space="preserve">
-    <value>Copier le chemin de l'élément</value>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>Utilisation du disque uniquement</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>échec de la connexion à</value>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>Méthode de progression</value>
   </data>
-  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
-    <value>Confirmer la désinstallation</value>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Applications en conflit</value>
   </data>
 </root>
