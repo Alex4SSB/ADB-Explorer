@@ -149,7 +149,7 @@
                     helpers:StyleHelper.PopupPlacement="Center"
                     helpers:StyleHelper.PopupPlacementTarget="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:SplitView}, Path=Pane}"
                     ItemsSource="{Binding Options}"
-                    MaxDropDownHeight="300"
+                    MaxDropDownHeight="287"
                     SelectedValue="{Binding Value, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>

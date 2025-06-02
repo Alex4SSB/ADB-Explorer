@@ -132,16 +132,16 @@ public static class StyleHelper
             typeof(StyleHelper),
             null);
 
-    public static DependencyObject GetPopupPlacementTarget(DependencyObject control) =>
-        (DependencyObject)control.GetValue(PopupPlacementTargetProperty);
+    public static UIElement GetPopupPlacementTarget(DependencyObject control) =>
+        (UIElement)control.GetValue(PopupPlacementTargetProperty);
 
-    public static void SetPopupPlacementTarget(DependencyObject control, DependencyObject value) =>
+    public static void SetPopupPlacementTarget(DependencyObject control, UIElement value) =>
         control.SetValue(PopupPlacementTargetProperty, value);
 
     public static readonly DependencyProperty PopupPlacementTargetProperty =
         DependencyProperty.RegisterAttached(
             "PopupPlacementTarget",
-            typeof(DependencyObject),
+            typeof(UIElement),
             typeof(StyleHelper),
             null);
 
