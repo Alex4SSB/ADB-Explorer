@@ -72,16 +72,31 @@ class Program
                 return;
 
             int before = dataElements.Count;
+            int removedCount = 0;
 
             foreach (var element in dataElements.ToList())
             {
                 if (string.IsNullOrWhiteSpace(element.Element("value")?.Value))
                 {
                     element.Remove();
+                    removedCount++;
                 }
             }
 
+            if (removedCount == 0)
+            {
+                Console.WriteLine($"✅ No empty entries found in {Path.GetFileName(path)}");
+                return;
+            }
+
             doc.Save(path);
+
+            var bytes = File.ReadAllBytes(path);
+            if (bytes.Length > 0 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF)
+            {
+                // Remove BOM if present
+                File.WriteAllBytes(path, bytes[3..]);
+            }
 
             int after = doc.Root?.Elements("data").Count() ?? 0;
             Console.WriteLine($"🧹 Cleaned {Path.GetFileName(path)}: removed {before - after} empty entries");
