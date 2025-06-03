@@ -160,7 +160,7 @@
     <value>הַתקן חבילות</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>הפעל את היישום מחדש להכלת השינויים</value>
+    <value>הפעל את היישום מחדש להחלת השינויים</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>שגיאה בכתיבת קובץ</value>
@@ -184,10 +184,10 @@
     <value>שגיאת ניווט</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
-    <value>העתק נתיב קובץ</value>
+    <value>העתק נתיב פריט</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>שחזר את כל הקבצים</value>
+    <value>שחזר את כל הפריטים</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>בחירת קובץ הרצה של ADB</value>
