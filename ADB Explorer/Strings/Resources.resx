@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!-- 
     Microsoft ResX Schema 
@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -922,7 +922,7 @@ Cancel All Running</value>
     <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;... to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
     <comment>The sentence which is being translated here: This folder looks empty ... to the naked eye</comment>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
