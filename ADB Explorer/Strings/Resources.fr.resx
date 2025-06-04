@@ -261,4 +261,85 @@
   <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
     <value>Applications en conflit</value>
   </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>The Android Robot Icon(s)</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Suivant</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Dossier parent</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Appareils</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copier</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Plus</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Dossier</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Couper</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Paquet</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copier dans le presse-papier</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Fichiers</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Dossiers</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Coller le lien</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Historique de commandes</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Renommer</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Actualiser</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Sélectionner tous</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Fermer Editeur</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Enregistrer les modifications</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Vider l'historique de commandes</value>
+  </data>
 </root>
