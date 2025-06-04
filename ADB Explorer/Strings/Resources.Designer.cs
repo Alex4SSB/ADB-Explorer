@@ -70,6 +70,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ADB Disk Usage.
+        /// </summary>
+        public static string S_ADB_DISK_USAGE {
+            get {
+                return ResourceManager.GetString("S_ADB_DISK_USAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Download ADB.
         /// </summary>
         public static string S_ADB_DOWNLOAD {
@@ -199,6 +208,24 @@ namespace ADB_Explorer.Strings {
         public static string S_AUTO_PLAY_DISABLE {
             get {
                 return ResourceManager.GetString("S_AUTO_PLAY_DISABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to item.
+        /// </summary>
+        public static string S_BROWSER_ITEMS {
+            get {
+                return ResourceManager.GetString("S_BROWSER_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to items.
+        /// </summary>
+        public static string S_BROWSER_ITEMS_PLURAL {
+            get {
+                return ResourceManager.GetString("S_BROWSER_ITEMS_PLURAL", resourceCulture);
             }
         }
         
@@ -605,6 +632,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Other: {0}.
+        /// </summary>
+        public static string S_DISK_USAGE_OTHER {
+            get {
+                return ResourceManager.GetString("S_DISK_USAGE_OTHER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Push/pull progress is displayed in total bytes transferred.
         ///Percentage is available only when total size is known..
         /// </summary>
@@ -624,11 +660,47 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Read: {0}.
+        /// </summary>
+        public static string S_DISK_USAGE_READ {
+            get {
+                return ResourceManager.GetString("S_DISK_USAGE_READ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write: {0}.
+        /// </summary>
+        public static string S_DISK_USAGE_WRITE {
+            get {
+                return ResourceManager.GetString("S_DISK_USAGE_WRITE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Donate or Sponsor.
         /// </summary>
         public static string S_DONATE {
             get {
                 return ResourceManager.GetString("S_DONATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to get list..
+        /// </summary>
+        public static string S_EMPTY_APP_DRIVE {
+            get {
+                return ResourceManager.GetString("S_EMPTY_APP_DRIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No items match current filter..
+        /// </summary>
+        public static string S_EMPTY_FILTER {
+            get {
+                return ResourceManager.GetString("S_EMPTY_FILTER", resourceCulture);
             }
         }
         
@@ -723,6 +795,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This folder is empty..
+        /// </summary>
+        public static string S_FOLDER_EMPTY {
+            get {
+                return ResourceManager.GetString("S_FOLDER_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to FUSE drive.
         ///• Symbolic links are not supported
         ///• File names cannot contain &quot; * / : &lt; &gt; ? \ |
@@ -808,6 +889,24 @@ namespace ADB_Explorer.Strings {
         public static string S_ITEM_DESTINATION_PLURAL {
             get {
                 return ResourceManager.GetString("S_ITEM_DESTINATION_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to item selected.
+        /// </summary>
+        public static string S_ITEMS_SELECTED {
+            get {
+                return ResourceManager.GetString("S_ITEMS_SELECTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to items selected.
+        /// </summary>
+        public static string S_ITEMS_SELECTED_PLURAL {
+            get {
+                return ResourceManager.GetString("S_ITEMS_SELECTED_PLURAL", resourceCulture);
             }
         }
         
@@ -1152,6 +1251,15 @@ namespace ADB_Explorer.Strings {
         public static string S_NEW_VERSION_TITLE {
             get {
                 return ResourceManager.GetString("S_NEW_VERSION_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize=&quot;10&quot;&gt;... to the naked eye&lt;/Span&gt;&lt;/Span&gt;.
+        /// </summary>
+        public static string S_NON_ROOT_EMPTY_FOLDER {
+            get {
+                return ResourceManager.GetString("S_NON_ROOT_EMPTY_FOLDER", resourceCulture);
             }
         }
         
@@ -1672,6 +1780,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to About.
+        /// </summary>
+        public static string S_SETTINGS_GROUP_ABOUT {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_GROUP_ABOUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device.
         /// </summary>
         public static string S_SETTINGS_GROUP_DEVICE {
@@ -1911,6 +2028,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SPLASH_MONITORING_TITLE {
             get {
                 return ResourceManager.GetString("S_SPLASH_MONITORING_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Checks for updates on each launch.
+        /// </summary>
+        public static string S_TOOLTIP_UPDATES {
+            get {
+                return ResourceManager.GetString("S_TOOLTIP_UPDATES", resourceCulture);
             }
         }
         

@@ -6,6 +6,9 @@ using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using System.Windows.Documents;
+using System.Windows.Markup;
+using System.Xml;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -2261,5 +2264,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             var parent = VisualTreeHelper.GetParent(comboBox) as UIElement;
             parent?.RaiseEvent(eventArg);
         }
+    }
+
+    private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e)
+    {
+        string xamlString = $"<Span xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xml:space=\"preserve\"{Strings.Resources.S_NON_ROOT_EMPTY_FOLDER[5..]}";
+
+        Span parsedSpan;
+        using (StringReader stringReader = new(xamlString))
+        using (XmlReader xmlReader = XmlReader.Create(stringReader))
+        {
+            parsedSpan = (Span)XamlReader.Load(xmlReader);
+        }
+
+        EmptyNonRootTextBlock.TextAlignment = TextAlignment.Center;
+        EmptyNonRootTextBlock.Inlines.Clear();
+        EmptyNonRootTextBlock.Inlines.Add(parsedSpan);
     }
 }

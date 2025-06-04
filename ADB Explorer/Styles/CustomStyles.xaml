@@ -6,11 +6,13 @@
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
     <converters:DoubleEquals x:Key="DoubleEquals" />
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
     <converters:FileOpProgressConverter x:Key="FileOpProgressConverter" />
+    <converters:StringFormatConverter x:Key="StringFormatConverter" />
     <Style
         x:Key="StretchCheckBoxStyle"
         BasedOn="{StaticResource CheckBoxStyle}"
@@ -328,10 +330,10 @@
         x:Key="SelectedItemsSuffixStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value=" items" />
+        <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_ITEMS_SELECTED_PLURAL}}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="1">
-                <Setter Property="Text" Value=" item" />
+                <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_ITEMS_SELECTED}}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -753,13 +755,13 @@
     <Style x:Key="EmptyFolderAltPromptStyle" TargetType="TextBlock">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                <Setter Property="Text" Value="This folder is empty." />
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_FOLDER_EMPTY}}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                <Setter Property="Text" Value="Unable to get list." />
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_APP_DRIVE}}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
-                <Setter Property="Text" Value="No items match current filter." />
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_FILTER}}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -863,11 +865,11 @@
         x:Key="ItemsCountSuffixStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value=" items" />
+        <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_BROWSER_ITEMS_PLURAL}}" />
         <Setter Property="Margin" Value="0,4" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
-                <Setter Property="Text" Value=" item" />
+                <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_BROWSER_ITEMS}}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -877,19 +879,28 @@
         <Setter Property="ToolTip">
             <Setter.Value>
                 <StackPanel>
-                    <TextBlock Text="ADB Disk Usage" />
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Read: " />
-                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbReadRate}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Write: " />
-                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbWriteRate}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Other: " />
-                        <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbOtherRate}" />
-                    </StackPanel>
+                    <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADB_DISK_USAGE}}" />
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_READ}">
+                                <Binding Path="AdbReadRate" Source="{x:Static Member=models:Data.RuntimeSettings}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_WRITE}">
+                                <Binding Path="AdbWriteRate" Source="{x:Static Member=models:Data.RuntimeSettings}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock>
+                        <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DISK_USAGE_OTHER}">
+                                <Binding Path="AdbOtherRate" Source="{x:Static Member=models:Data.RuntimeSettings}" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
                 </StackPanel>
             </Setter.Value>
         </Setter>
@@ -898,9 +909,9 @@
         x:Key="UpdatesCheckBoxStyle"
         BasedOn="{StaticResource StretchCheckBoxStyle}"
         TargetType="CheckBox">
-        <Setter Property="ToolTip" Value="Checks for updates on each launch" />
+        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_UPDATES}}" />
         <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" />
-        <Setter Property="Content" Value="Check For Updates" />
+        <Setter Property="Content" Value="{Binding Source={x:Static strings:Resources.S_SETTINGS_UPDATES}}" />
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsAppDeployed}" Value="True">
@@ -912,7 +923,7 @@
         x:Key="SettingsAboutExpanderStyle"
         BasedOn="{StaticResource FluentExpanderStyle}"
         TargetType="Expander">
-        <Setter Property="Header" Value="About" />
+        <Setter Property="Header" Value="{Binding Source={x:Static strings:Resources.S_SETTINGS_GROUP_ABOUT}}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
                 <Setter Property="Visibility" Value="Collapsed" />

@@ -395,15 +395,7 @@
                     </Grid>
                     <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                         <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="This folder " />
-                                <TextBlock FontStyle="Italic" Text="looks" />
-                                <TextBlock Text=" empty" />
-                            </StackPanel>
-                            <TextBlock
-                                HorizontalAlignment="Center"
-                                FontSize="10"
-                                Text="... to the naked eye" />
+                            <TextBlock x:Name="EmptyNonRootTextBlock" Loaded="EmptyNonRootTextBlock_Loaded" />
                         </StackPanel>
                         <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
                     </Grid>
@@ -471,6 +463,7 @@
                 <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountContainerStyle}">
                     <StackPanel Orientation="Horizontal" Style="{StaticResource ItemsCountStackPanelStyle}">
                         <TextBlock x:Name="ItemsCountBlock" Style="{StaticResource ItemsCountStyle}" />
+                        <TextBlock Text=" " />
                         <TextBlock Style="{StaticResource ItemsCountSuffixStyle}" />
                         <TextBlock
                             x:Name="UnfinishedBlock"
@@ -489,8 +482,8 @@
                         </StackPanel.Style>
                         <Separator />
                         <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
+                        <TextBlock Text=" " />
                         <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
-                        <TextBlock Text=" selected" />
                         <TextBlock
                             x:Name="TotalSizeBlock"
                             Margin="6,4"
