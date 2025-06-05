@@ -270,7 +270,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     InitNavigation(RuntimeSettings.BrowseDrive.Path);
                     break;
 
-
                 case nameof(AppRuntimeSettings.PathBoxNavigation):
                     if (RuntimeSettings.PathBoxNavigation == "-")
                     {
@@ -2268,7 +2267,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e)
     {
-        string xamlString = $"<Span xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xml:space=\"preserve\"{Strings.Resources.S_NON_ROOT_EMPTY_FOLDER[5..]}";
+        var textBlock = sender as TextBlock;
+        var altText = TextHelper.GetAltText(textBlock);
+
+        string xamlString = $"<Span xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" xml:space=\"preserve\"{altText[5..]}";
 
         Span parsedSpan;
         using (StringReader stringReader = new(xamlString))
@@ -2277,8 +2279,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             parsedSpan = (Span)XamlReader.Load(xmlReader);
         }
 
-        EmptyNonRootTextBlock.TextAlignment = TextAlignment.Center;
-        EmptyNonRootTextBlock.Inlines.Clear();
-        EmptyNonRootTextBlock.Inlines.Add(parsedSpan);
+        textBlock.Inlines.Clear();
+        textBlock.Inlines.Add(parsedSpan);
     }
 }

@@ -36,33 +36,33 @@
                         if (useMilli && span.Seconds == 0)
                         {
                             value = $"{Math.Round(span.TotalMilliseconds, span.TotalMilliseconds < 100 ? digits : 1)}";
-                            resolution = "ms";
+                            resolution = Strings.Resources.S_MILLISECONDS_SHORT;
                         }
                         else
                         {
                             value = $"{Math.Round(span.TotalSeconds, digits)}";
-                            resolution = "s";
+                            resolution = Strings.Resources.S_SECONDS_SHORT;
                         }
                     }
                     else
                     {
                         value = $"{span.Minutes}:{span.Seconds:00}";
-                        resolution = "m";
+                        resolution = Strings.Resources.S_MINUTES_SHORT;
                     }
                 }
                 else
                 {
                     value = $"{span.Hours}:{span.Minutes:00}:{span.Seconds:00}";
-                    resolution = "h";
+                    resolution = Strings.Resources.S_HOURS_SHORT;
                 }
             }
             else
             {
                 value = $"{Math.Round(span.TotalHours)}";
-                resolution = "h";
+                resolution = Strings.Resources.S_HOURS_SHORT;
             }
 
-            return $"{value}{(scaleSpace ? " " : "")}{resolution}";
+            return string.Format(resolution, $"{value}{(scaleSpace ? " " : "")}");
         }
     }
 }

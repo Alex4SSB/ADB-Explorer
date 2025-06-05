@@ -184,14 +184,14 @@
                                 IsReadOnly="True">
                                 <DataGridTemplateColumn.HeaderStyle>
                                     <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
-                                        <Setter Property="ToolTip" Value="Icon" />
+                                        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_ICON}}" />
                                     </Style>
                                 </DataGridTemplateColumn.HeaderStyle>
                             </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 x:Name="NameColumn"
                                 Width="300"
-                                Header="Name"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                                 IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
                                 SortMemberPath="FullName">
                                 <DataGridTextColumn.EditingElementStyle>
@@ -214,13 +214,13 @@
                                 Binding="{Binding TrashIndex.ParentPath}"
                                 ElementStyle="{StaticResource DirectoryGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Original Location"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_ORIGINAL_LOCATION}}"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 x:Name="DateColumn"
                                 Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Date Modified"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_DATE_MODIFIED}}"
                                 IsReadOnly="True"
                                 SortMemberPath="ModifiedTime">
                                 <DataGridTextColumn.ElementStyle>
@@ -242,7 +242,7 @@
                                 x:Name="TypeColumn"
                                 Width="150"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Type"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                                 IsReadOnly="True"
                                 SortMemberPath="TypeName">
                                 <DataGridTextColumn.ElementStyle>
@@ -260,7 +260,7 @@
                                 x:Name="SizeColumn"
                                 Width="Auto"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Size"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_SIZE}}"
                                 IsReadOnly="True"
                                 SortMemberPath="Size">
                                 <DataGridTextColumn.ElementStyle>
@@ -285,7 +285,7 @@
                                 Binding="{Binding TrashIndex.ModifiedTimeString}"
                                 ElementStyle="{StaticResource DirectoryGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Date Deleted"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_DATE_DELETED}}"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 x:Name="PackageName"
@@ -293,7 +293,7 @@
                                 Binding="{Binding Name}"
                                 ElementStyle="{StaticResource ExplorerGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Name"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 x:Name="PackageType"
@@ -301,7 +301,7 @@
                                 Binding="{Binding Type}"
                                 ElementStyle="{StaticResource ExplorerGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Type"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 x:Name="PackageUid"
@@ -309,7 +309,7 @@
                                 Binding="{Binding Uid}"
                                 ElementStyle="{StaticResource ExplorerGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="User ID"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_USER_ID}}"
                                 IsReadOnly="True" />
                             <DataGridTextColumn
                                 x:Name="PackageVersion"
@@ -317,7 +317,7 @@
                                 Binding="{Binding Version}"
                                 ElementStyle="{StaticResource ExplorerGridCellStyle}"
                                 FontSize="{Binding Source={StaticResource FontSize}}"
-                                Header="Version"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_VERSION}}"
                                 IsReadOnly="True" />
                         </DataGrid.Columns>
                     </DataGrid>
@@ -395,7 +395,10 @@
                     </Grid>
                     <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
                         <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
-                            <TextBlock x:Name="EmptyNonRootTextBlock" Loaded="EmptyNonRootTextBlock_Loaded" />
+                            <TextBlock
+                                helpers:TextHelper.AltText="{Binding Source={x:Static Member=strings:Resources.S_NON_ROOT_EMPTY_FOLDER}}"
+                                Loaded="EmptyNonRootTextBlock_Loaded"
+                                TextAlignment="Center" />
                         </StackPanel>
                         <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
                     </Grid>
@@ -552,12 +555,7 @@
                                             Margin="4"
                                             Spacing="6"
                                             Style="{StaticResource MdnsOffPanelStyle}">
-                                            <TextBlock Text="• Polling for services is OFF" />
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="• Server " />
-                                                <TextBlock FontStyle="Italic" Text="might" />
-                                                <TextBlock Text=" be ON" />
-                                            </StackPanel>
+                                            <TextBlock helpers:TextHelper.AltText="{Binding Source={x:Static Member=strings:Resources.S_MDNS_OFF}}" Loaded="EmptyNonRootTextBlock_Loaded" />
                                         </ui:SimpleStackPanel>
                                         <Border Style="{StaticResource QrBackgroundStyle}">
                                             <Image
@@ -571,8 +569,13 @@
                                             Orientation="Horizontal"
                                             Style="{StaticResource MdnsInProgressPanelStyle}">
                                             <ui:FontIcon Margin="0,0,6,0" Glyph="&#xE823;" />
-                                            <TextBlock Text="Awaiting response: " />
-                                            <TextBlock Text="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=TimePassedString}" />
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_AWAITING_RESPONSE}">
+                                                        <Binding Path="TimePassedString" Source="{x:Static Member=models:Data.MdnsService}" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
                                         </StackPanel>
                                         <ui:SimpleStackPanel
                                             Margin="0,4"
@@ -583,12 +586,12 @@
                                                 Orientation="Horizontal"
                                                 Spacing="6">
                                                 <ui:FontIcon Glyph="&#xE783;" />
-                                                <TextBlock Text="Server is down" />
+                                                <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_SERVER_DOWN}}" />
                                             </ui:SimpleStackPanel>
                                             <Button
                                                 HorizontalAlignment="Center"
                                                 Click="RestartAdbButton_Click"
-                                                Content="Restart ADB" />
+                                                Content="{Binding Source={x:Static Member=strings:Resources.S_RESTART_ADB}}" />
                                         </ui:SimpleStackPanel>
                                     </Grid>
                                 </Expander>
@@ -598,7 +601,7 @@
                                         <Button
                                             Click="RefreshDevicesButton_Click"
                                             Style="{StaticResource DevicesManualPollingButtonStyle}"
-                                            ToolTip="Refresh Devices">
+                                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REFRESH_DEVICES}}">
                                             <ui:FontIcon FontSize="15" Glyph="&#xE72C;" />
                                         </Button>
                                     </Grid>
@@ -612,14 +615,19 @@
                                         <ui:SimpleStackPanel Orientation="Horizontal" Spacing="8">
                                             <ui:FontIcon FontSize="24" Glyph="&#xEBE8;" />
                                             <StackPanel>
-                                                <TextBlock Text="ADB Server Unresponsive" />
+                                                <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_SERVER_UNRESPONSIVE}}" />
                                                 <StackPanel
                                                     Margin="0,4"
                                                     Orientation="Horizontal"
-                                                    ToolTip="Time from last server response">
+                                                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_UNRESPONSIVE}}">
                                                     <ui:FontIcon Margin="0,0,4,0" Glyph="&#xE823;" />
-                                                    <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=TimeFromLastResponse}" />
-                                                    <TextBlock Text="s" />
+                                                    <TextBlock>
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_SECONDS_SHORT}">
+                                                                <Binding Path="TimeFromLastResponse" Source="{x:Static Member=models:Data.RuntimeSettings}" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
                                                 </StackPanel>
                                             </StackPanel>
                                         </ui:SimpleStackPanel>
@@ -630,7 +638,7 @@
                                             Spacing="10">
                                             <Button
                                                 Click="RestartAdbButton_Click"
-                                                Content="Kill Server"
+                                                Content="{Binding Source={x:Static Member=strings:Resources.S_KILL_SERVER}}"
                                                 Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="adb kill-server" />
@@ -638,7 +646,7 @@
                                             </Button>
                                             <Button
                                                 Click="KillAdbButton_Click"
-                                                Content="Kill Process"
+                                                Content="{Binding Source={x:Static Member=strings:Resources.S_KILL_PROCESS}}"
                                                 Style="{StaticResource AccentButtonStyle}">
                                                 <Button.ToolTip>
                                                     <TextBlock FontFamily="{StaticResource ConsoleFont}" Text="taskkill /f /im &quot;adb.exe&quot;" />

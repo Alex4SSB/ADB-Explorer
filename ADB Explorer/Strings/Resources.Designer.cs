@@ -212,6 +212,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Awaiting response: {0}.
+        /// </summary>
+        public static string S_AWAITING_RESPONSE {
+            get {
+                return ResourceManager.GetString("S_AWAITING_RESPONSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to item.
         /// </summary>
         public static string S_BROWSER_ITEMS {
@@ -388,6 +397,141 @@ namespace ADB_Explorer.Strings {
         public static string S_COLLAPSE_ALL {
             get {
                 return ResourceManager.GetString("S_COLLAPSE_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Added.
+        /// </summary>
+        public static string S_COLUMN_ADDED {
+            get {
+                return ResourceManager.GetString("S_COLUMN_ADDED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date Deleted.
+        /// </summary>
+        public static string S_COLUMN_DATE_DELETED {
+            get {
+                return ResourceManager.GetString("S_COLUMN_DATE_DELETED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Date Modified.
+        /// </summary>
+        public static string S_COLUMN_DATE_MODIFIED {
+            get {
+                return ResourceManager.GetString("S_COLUMN_DATE_MODIFIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination.
+        /// </summary>
+        public static string S_COLUMN_DESTINATION {
+            get {
+                return ResourceManager.GetString("S_COLUMN_DESTINATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Name.
+        /// </summary>
+        public static string S_COLUMN_FILE_NAME {
+            get {
+                return ResourceManager.GetString("S_COLUMN_FILE_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Icon.
+        /// </summary>
+        public static string S_COLUMN_ICON {
+            get {
+                return ResourceManager.GetString("S_COLUMN_ICON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Name.
+        /// </summary>
+        public static string S_COLUMN_NAME {
+            get {
+                return ResourceManager.GetString("S_COLUMN_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operation Type.
+        /// </summary>
+        public static string S_COLUMN_OP_TYPE {
+            get {
+                return ResourceManager.GetString("S_COLUMN_OP_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Original Location.
+        /// </summary>
+        public static string S_COLUMN_ORIGINAL_LOCATION {
+            get {
+                return ResourceManager.GetString("S_COLUMN_ORIGINAL_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Progress.
+        /// </summary>
+        public static string S_COLUMN_PROGRESS {
+            get {
+                return ResourceManager.GetString("S_COLUMN_PROGRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        public static string S_COLUMN_SIZE {
+            get {
+                return ResourceManager.GetString("S_COLUMN_SIZE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source.
+        /// </summary>
+        public static string S_COLUMN_SOURCE {
+            get {
+                return ResourceManager.GetString("S_COLUMN_SOURCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string S_COLUMN_TYPE {
+            get {
+                return ResourceManager.GetString("S_COLUMN_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User ID.
+        /// </summary>
+        public static string S_COLUMN_USER_ID {
+            get {
+                return ResourceManager.GetString("S_COLUMN_USER_ID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        public static string S_COLUMN_VERSION {
+            get {
+                return ResourceManager.GetString("S_COLUMN_VERSION", resourceCulture);
             }
         }
         
@@ -723,6 +867,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Click to enable server and polling.
+        /// </summary>
+        public static string S_ENABLE_MDNS {
+            get {
+                return ResourceManager.GetString("S_ENABLE_MDNS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         public static string S_ENABLED {
@@ -866,6 +1019,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}h.
+        /// </summary>
+        public static string S_HOURS_SHORT {
+            get {
+                return ResourceManager.GetString("S_HOURS_SHORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select packages to install.
         /// </summary>
         public static string S_INSTALL_APK {
@@ -929,6 +1091,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Kill Process.
+        /// </summary>
+        public static string S_KILL_PROCESS {
+            get {
+                return ResourceManager.GetString("S_KILL_PROCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Kill Server.
+        /// </summary>
+        public static string S_KILL_SERVER {
+            get {
+                return ResourceManager.GetString("S_KILL_SERVER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Locate ADB (v{0} at least):.
         /// </summary>
         public static string S_LOCATE_ADB_TITLE {
@@ -971,6 +1151,24 @@ namespace ADB_Explorer.Strings {
         public static string S_LS_ERROR_TITLE {
             get {
                 return ResourceManager.GetString("S_LS_ERROR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;.
+        /// </summary>
+        public static string S_MDNS_OFF {
+            get {
+                return ResourceManager.GetString("S_MDNS_OFF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server is up and running.
+        /// </summary>
+        public static string S_MDNS_ON {
+            get {
+                return ResourceManager.GetString("S_MDNS_ON", resourceCulture);
             }
         }
         
@@ -1178,6 +1376,24 @@ namespace ADB_Explorer.Strings {
         public static string S_MERGE_OR_REPLACE {
             get {
                 return ResourceManager.GetString("S_MERGE_OR_REPLACE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}ms.
+        /// </summary>
+        public static string S_MILLISECONDS_SHORT {
+            get {
+                return ResourceManager.GetString("S_MILLISECONDS_SHORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}m.
+        /// </summary>
+        public static string S_MINUTES_SHORT {
+            get {
+                return ResourceManager.GetString("S_MINUTES_SHORT", resourceCulture);
             }
         }
         
@@ -1399,6 +1615,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Refresh Devices.
+        /// </summary>
+        public static string S_REFRESH_DEVICES {
+            get {
+                return ResourceManager.GetString("S_REFRESH_DEVICES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The following will be removed:
         ///{0}.
         /// </summary>
@@ -1488,6 +1713,15 @@ namespace ADB_Explorer.Strings {
         public static string S_RESET_SETTINGS_TITLE {
             get {
                 return ResourceManager.GetString("S_RESET_SETTINGS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restart ADB.
+        /// </summary>
+        public static string S_RESTART_ADB {
+            get {
+                return ResourceManager.GetString("S_RESTART_ADB", resourceCulture);
             }
         }
         
@@ -1582,6 +1816,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}s.
+        /// </summary>
+        public static string S_SECONDS_SHORT {
+            get {
+                return ResourceManager.GetString("S_SECONDS_SHORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to See terms.
         /// </summary>
         public static string S_SEE_TERMS {
@@ -1641,6 +1884,24 @@ namespace ADB_Explorer.Strings {
         public static string S_SELECT_PROGRESS_METHOD {
             get {
                 return ResourceManager.GetString("S_SELECT_PROGRESS_METHOD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Server is down.
+        /// </summary>
+        public static string S_SERVER_DOWN {
+            get {
+                return ResourceManager.GetString("S_SERVER_DOWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ADB Server Unresponsive.
+        /// </summary>
+        public static string S_SERVER_UNRESPONSIVE {
+            get {
+                return ResourceManager.GetString("S_SERVER_UNRESPONSIVE", resourceCulture);
             }
         }
         
@@ -2028,6 +2289,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SPLASH_MONITORING_TITLE {
             get {
                 return ResourceManager.GetString("S_SPLASH_MONITORING_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Time from last server response.
+        /// </summary>
+        public static string S_TOOLTIP_UNRESPONSIVE {
+            get {
+                return ResourceManager.GetString("S_TOOLTIP_UNRESPONSIVE", resourceCulture);
             }
         }
         

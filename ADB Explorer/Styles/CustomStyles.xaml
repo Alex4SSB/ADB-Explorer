@@ -475,7 +475,7 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
-        <Setter Property="ui:ControlHelper.PlaceholderText" Value="Filter" />
+        <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_FILTER}}" />
         <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
         <Setter Property="Icon" Value="&#xE71C;" />
         <Setter Property="IsActive" Value="{Binding ElementName=MainWin, Path=IsActive, Mode=OneWay}" />
@@ -619,7 +619,7 @@
         </Setter>
         <Setter Property="Margin" Value="0,-5" />
         <Setter Property="MinWidth" Value="50" />
-        <Setter Property="ToolTip" Value="Click to enable server and polling" />
+        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ENABLE_MDNS}}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="IsEnabled" Value="False" />
@@ -629,11 +629,11 @@
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
                 <Setter Property="IsChecked" Value="{x:Null}" />
                 <Setter Property="helpers:StyleHelper.ThreeStateGlyph" Value="&#xE711;" />
-                <Setter Property="ToolTip" Value="Server is down" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVER_DOWN}}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
                 <Setter Property="IsChecked" Value="True" />
-                <Setter Property="ToolTip" Value="Server is up and running" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_MDNS_ON}}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>

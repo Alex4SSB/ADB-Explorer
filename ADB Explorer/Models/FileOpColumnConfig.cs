@@ -8,8 +8,8 @@ public static class FileOpColumns
 {
     public static void Init()
     {
-        List<FileOpColumnConfig> tempList = new()
-        {
+        List<FileOpColumnConfig> tempList =
+        [
             new(FileOpColumnConfig.ColumnType.OpType,
                 (DataTemplate)App.Current.FindResource("OperationIconTemplate"),
                 0,
@@ -47,9 +47,9 @@ public static class FileOpColumns
                 100,
                 visibleByDefault: false,
                 sortPath: $"{nameof(FileOperation.Device)}.{nameof(FileOperation.Device.Device)}.{nameof(FileOperation.Device.Device.Name)}"),
-        };
+        ];
 
-        List = tempList.OrderBy(c => c.Index).ToList();
+        List = [.. tempList.OrderBy(c => c.Index)];
 
         UpdateCheckedColumns();
     }
@@ -60,7 +60,7 @@ public static class FileOpColumns
     public static void UpdateColumnIndexes() =>
         List.ForEach(c => c.Index = c.Column.DisplayIndex);
 
-    public static List<FileOpColumnConfig> List { get; private set; } = new();
+    public static List<FileOpColumnConfig> List { get; private set; } = [];
 
     public static ObservableProperty<int> CheckedColumnsCount { get; set; } = new();
 }
@@ -243,18 +243,18 @@ public class FileOpColumnConfig : ViewModelBase
         Index = index;
         ColumnWidth = width;
 
-        FileOpColumns.CheckedColumnsCount.PropertyChanged += (object sender, PropertyChangedEventArgs<int> e) => OnPropertyChanged(nameof(IsEnabled));
+        FileOpColumns.CheckedColumnsCount.PropertyChanged += (sender, e) => OnPropertyChanged(nameof(IsEnabled));
     }
 
     public static string TypeString(ColumnType columnType) => columnType switch
     {
-        ColumnType.OpType => "Operation Type",
-        ColumnType.FileName => "File Name",
-        ColumnType.Progress => "Progress",
-        ColumnType.Source => "Source",
-        ColumnType.Dest => "Destination",
-        ColumnType.TimeStamp => "Added",
-        ColumnType.Device => "Device",
+        ColumnType.OpType => Strings.Resources.S_COLUMN_OP_TYPE,
+        ColumnType.FileName => Strings.Resources.S_COLUMN_FILE_NAME,
+        ColumnType.Progress => Strings.Resources.S_COLUMN_PROGRESS,
+        ColumnType.Source => Strings.Resources.S_COLUMN_SOURCE,
+        ColumnType.Dest => Strings.Resources.S_COLUMN_DESTINATION,
+        ColumnType.TimeStamp => Strings.Resources.S_COLUMN_ADDED,
+        ColumnType.Device => Strings.Resources.S_SETTINGS_GROUP_DEVICE,
         _ => throw new NotSupportedException(),
     };
 

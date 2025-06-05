@@ -923,7 +923,7 @@ Cancel All Running</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
     <value>&lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;... to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
-    <comment>The sentence which is being translated here: This folder looks empty ... to the naked eye</comment>
+    <comment>The sentence which is being translated here: This folder looks empty … to the naked eye</comment>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
     <value>item selected</value>
@@ -932,5 +932,125 @@ Cancel All Running</value>
   <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
     <value>items selected</value>
     <comment>The toolbar folder items selected count, plural form</comment>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Operation Type</value>
+    <comment>File operations detailed data grid column name for the type of the operation icon</comment>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>File Name</value>
+    <comment>File operations detailed data grid column name for the file name of the operation</comment>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Progress</value>
+    <comment>File operations detailed data grid column name for the progress / status of the operation</comment>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Source</value>
+    <comment>File operations detailed data grid column name for the source path of the operation</comment>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destination</value>
+    <comment>File operations detailed data grid column name for the destination path of the operation</comment>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Added</value>
+    <comment>File operations detailed data grid column name for the time the operation was added</comment>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Icon</value>
+    <comment>File browser data grid column tooltip for the file icon</comment>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Name</value>
+    <comment>File browser data grid column name for the file name</comment>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Original Location</value>
+    <comment>File browser data grid column name for the original location of an item in the recycle bin</comment>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Date Modified</value>
+    <comment>File browser data grid column name for the file date modified</comment>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Type</value>
+    <comment>File browser data grid column name for the type of the item</comment>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Size</value>
+    <comment>File browser data grid column name for the size of the file</comment>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Date Deleted</value>
+    <comment>File browser data grid column name for the date a file in the recycle bin was deleted</comment>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>User ID</value>
+    <comment>App view data grid column name for the package owner user ID</comment>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Version</value>
+    <comment>App view data grid column name for the installed package version</comment>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB Server Unresponsive</value>
+    <comment>The notification displayed when the server is unresponsive</comment>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Time from last server response</value>
+    <comment>The tooltip displayed when ADB server is unresponsive</comment>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+    <comment>Seconds display (eg. 6s)</comment>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Kill Server</value>
+    <comment>The content of a button to kill ADB server</comment>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Kill Process</value>
+    <comment>The content of a button to kill the process of ADB</comment>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Refresh Devices</value>
+    <comment>The tooltip of a button to manually refresh the device list</comment>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Restart ADB</value>
+    <comment>The content of a button to restart ADB server</comment>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>Server is down</value>
+    <comment>A notification indicating that ADB server is down</comment>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Awaiting response: {0}</value>
+    <comment>The notification displayed when the app is waiting too long for a response (0 - in seconds) from the server</comment>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+    <comment>Milliseconds display (eg. 300ms)</comment>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+    <comment>Minutes display (eg. 2m)</comment>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
+    <comment>Hours display (eg. 8h)</comment>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;</value>
+    <comment>The notification displayed when mDNS server has been turned off</comment>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Click to enable server and polling</value>
+    <comment>The tooltip of the checkbox to enable the mDNS server</comment>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>Server is up and running</value>
+    <comment>The tooltip of the mDNS checkbox when the server is on</comment>
   </data>
 </root>
