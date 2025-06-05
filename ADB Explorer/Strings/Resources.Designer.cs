@@ -1687,7 +1687,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize=&quot;10&quot;&gt;... to the naked eye&lt;/Span&gt;&lt;/Span&gt;.
+        ///   Looks up a localized string similar to &lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize=&quot;10&quot;&gt;… to the naked eye&lt;/Span&gt;&lt;/Span&gt;.
         /// </summary>
         public static string S_NON_ROOT_EMPTY_FOLDER {
             get {
