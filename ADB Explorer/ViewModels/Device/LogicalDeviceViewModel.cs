@@ -77,29 +77,27 @@ public class LogicalDeviceViewModel : DeviceViewModel
     {
         get
         {
-            string result = "";
-
-            result += Device.Type switch
+            var type = Device.Type switch
             {
-                DeviceType.Local => "USB",
-                DeviceType.Remote => "WiFi",
-                DeviceType.Emulator => "Emulator",
-                DeviceType.WSA => "WSA",
-                DeviceType.Service => "mDNS Service",
-                DeviceType.Recovery => "USB (Recovery)",
-                DeviceType.Sideload => "USB (Sideload)",
+                DeviceType.Local => Strings.Resources.S_TYPE_USB,
+                DeviceType.Remote => Strings.Resources.S_TYPE_WIFI,
+                DeviceType.Emulator => Strings.Resources.S_TYPE_EMULATOR,
+                DeviceType.WSA => Strings.Resources.S_TYPE_WSA,
+                DeviceType.Service => Strings.Resources.S_TYPE_SERVICE,
+                DeviceType.Recovery => $"{Strings.Resources.S_TYPE_USB} ({Strings.Resources.S_RECOVERY_MODE})",
+                DeviceType.Sideload => $"{Strings.Resources.S_TYPE_USB} ({Strings.Resources.S_REBOOT_SIDELOAD})",
                 _ => throw new NotSupportedException(),
             };
 
-            result += Device.Status switch
+            var status = Device.Status switch
             {
-                DeviceStatus.Ok => "",
-                DeviceStatus.Offline => " - Offline",
-                DeviceStatus.Unauthorized => " - Unauthorized",
+                DeviceStatus.Ok => "{0}",
+                DeviceStatus.Offline => Strings.Resources.S_STATUS_OFFLINE,
+                DeviceStatus.Unauthorized => Strings.Resources.S_STATUS_UNAUTH,
                 _ => throw new NotSupportedException(),
             };
 
-            return result;
+            return string.Format(status, type);
         }
     }
 
@@ -116,7 +114,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction BrowseCommand { get; }
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
-    public List<object> RebootCommands { get; } = new();
+    public List<object> RebootCommands { get; } = [];
 
     #endregion
 
@@ -135,7 +133,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
-        foreach (RebootCommand.RebootType item in Enum.GetValues(typeof(RebootCommand.RebootType)))
+        foreach (RebootCommand.RebootType item in Enum.GetValues<RebootCommand.RebootType>())
         {
             RebootCommands.Add(new RebootCommand(this, item));
 

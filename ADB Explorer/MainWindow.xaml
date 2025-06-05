@@ -510,7 +510,11 @@
                         <ui:FontIcon Style="{DynamicResource UnsupportedIconStyle}" />
                         <TextBlock Text="Android " />
                         <TextBlock Text="{Binding AndroidVersion}" />
-                        <TextBlock Style="{StaticResource AndroidVersionRecoveryTextblockStyle}" Text=" (Recovery)" />
+                        <TextBlock Style="{StaticResource AndroidVersionRecoveryTextblockStyle}">
+                            <Run Text=" (" />
+                            <Run Text="{Binding Source={x:Static Member=strings:Resources.S_RECOVERY_MODE}}" />
+                            <Run Text=")" />
+                        </TextBlock>
                     </StackPanel>
                     <Menu Margin="6,0,-3,0" Style="{StaticResource LogToggleStyle}" />
                 </StackPanel>

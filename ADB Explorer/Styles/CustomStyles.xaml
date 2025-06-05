@@ -235,7 +235,7 @@
         </Style.Resources>
         <Setter Property="Padding" Value="2" />
         <Setter Property="Margin" Value="0,0,4,0" />
-        <Setter Property="ToolTip" Value="Restart app for changes to take effect" />
+        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
     <Style x:Key="QrBackgroundStyle" TargetType="Border">
         <Style.Triggers>
@@ -259,11 +259,11 @@
             <DataTrigger Binding="{Binding Root}" Value="Disabled">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                <Setter Property="ToolTip" Value="Root Can Be Enabled" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_POSSIBLE}}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Root}" Value="Enabled">
                 <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="ToolTip" Value="Root Access Enabled" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
             </DataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
@@ -283,7 +283,7 @@
             <DataTrigger Binding="{Binding AnyFailedOperations}" Value="True">
                 <Setter Property="Visibility" Value="Visible" />
                 <Setter Property="Foreground" Value="#FFFF99A4" />
-                <Setter Property="ToolTip" Value="Some operations have failed" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_FAILED_OPERATIONS}}" />
             </DataTrigger>
             <Trigger Property="Value" Value="0">
                 <Setter Property="IsIndeterminate" Value="True" />
@@ -352,7 +352,7 @@
         BasedOn="{StaticResource GlyphFont}"
         TargetType="ui:FontIcon">
         <Setter Property="Glyph" Value="&#xE7BA;" />
-        <Setter Property="ToolTip" Value="Limited Support" />
+        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_LIMITED_SUPPORT}}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding AndroidVersionIncompatible}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />

@@ -61,7 +61,7 @@ public class LogicalDevice : Device
             : RootStatus.Unchecked;
 
         if (deviceType is DeviceType.WSA && name.ToLower().Contains("subsystem"))
-            name = "WSA";
+            name = Strings.Resources.S_TYPE_WSA;
 
         return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus, Root = rootStatus, IpAddress = ip };
     }

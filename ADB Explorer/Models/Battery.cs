@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
@@ -143,23 +142,39 @@ public class Battery : ViewModelBase
     {
         get
         {
-            if (BatteryState == 0)
+            if (BatteryState is 0)
                 return "";
-            else if (byte.TryParse(BatteryState.ToString(), out _))
-                return $"Status: {(ChargeSource == Source.None ? "Discharging" : $"Charging ({ChargeSource})")}";
-            else
-                return $"Status: {BatteryState.ToString().Replace('_', ' ')}{(ChargeSource == Source.None ? "" : $" ({ChargeSource})")}";
+
+            var status = byte.TryParse(BatteryState.ToString(), out _)
+                ? $"{(ChargeSource is Source.None ? Strings.Resources.S_BAT_STATE_DISCHARGING : $"{Strings.Resources.S_BAT_STATE_CHARGING} ({SourceString(ChargeSource)})")}"
+                : $"{StateString(BatteryState)}{(ChargeSource is Source.None ? "" : $" ({SourceString(ChargeSource)})")}";
+
+            return string.Format(Strings.Resources.S_BAT_STATUS, status);
         }
     }
 
-    public string CompactStateString => ChargeState is ChargingState.Unknown
-                ? "Battery Status Unknown"
-                : $"{Level}%{(ChargeState is ChargingState.Charging ? ", Plugged In" : "")}";
+    public string CompactStateString
+    {
+        get
+        {
+            if (ChargeState is ChargingState.Unknown)
+            {
+                return Strings.Resources.S_BAT_STATUS_UNKNOWN;
+            }
+            else
+            {
+                if (ChargeState is not ChargingState.Charging)
+                    return $"{Level}%";
+
+                return string.Format(Strings.Resources.S_BAT_STATUS_PLUGGED, Level);
+            }
+        }
+    }
 
     public string VoltageString => Voltage switch
     {
         null => "",
-        _ => $"Voltage: {Voltage}v"
+        _ => string.Format(Strings.Resources.S_BAT_VOLT, Voltage)
     };
 
     public string CurrentConsumption
@@ -174,21 +189,38 @@ public class Battery : ViewModelBase
             var perHourConsumption = currentDiff / timeDiff.TotalHours;
             var positive = perHourConsumption > 0;
 
-            return $"Power Balance: {(positive ? "+" : "")}{(perHourConsumption / 1000000).ToSize()}Ah";
+            return string.Format(Strings.Resources.S_BAT_BALANCE, $"{(positive ? "+" : "")}{(perHourConsumption / 1000000).ToSize()}");
         }
     }
 
     public string TemperatureString => Temperature switch
     {
         null => "",
-        _ => $"Temperature: {Temperature}°C"
+        _ => string.Format(Strings.Resources.S_BAT_TEMP, Temperature)
     };
 
-    public string BatteryHealthString => BatteryHealth switch
+    public string BatteryHealthString
     {
-        0 => "",
-        _ => $"Health: {BatteryHealth.ToString().Replace('_', ' ')}"
-    };
+        get
+        {
+            if (BatteryHealth is 0)
+                return "";
+            
+            string healthString = BatteryHealth switch
+            {
+                Health.Unknown => Strings.Resources.S_BAT_STATE_UNKNOWN,
+                Health.Good => Strings.Resources.S_BAT_HEALTH_GOOD,
+                Health.Overheat => Strings.Resources.S_BAT_HEALTH_OVERHEAT,
+                Health.Dead => Strings.Resources.S_BAT_HEALTH_DEAD,
+                Health.Over_Voltage => Strings.Resources.S_BAT_HEALTH_OVER_VOLTAGE,
+                Health.Unspecified_failure => Strings.Resources.S_BAT_HEALTH_UNSPECIFIED_FAILURE,
+                Health.Cold => Strings.Resources.S_BAT_HEALTH_COLD,
+                _ => null,
+            };
+
+            return string.Format(Strings.Resources.S_BAT_HEALTH, healthString);
+        }
+    }
 
     public string BatteryIcon
     {
@@ -218,13 +250,13 @@ public class Battery : ViewModelBase
         if (batteryInfo is null)
             return;
 
-        if (batteryInfo.ContainsKey("AC powered") && batteryInfo["AC powered"] == "true")
+        if (batteryInfo.TryGetValue("AC powered", out string ac) && ac == "true")
             ChargeSource = Source.AC;
 
-        if (batteryInfo.ContainsKey("USB powered") && batteryInfo["USB powered"] == "true")
+        if (batteryInfo.TryGetValue("USB powered", out string usb) && usb == "true")
             ChargeSource = Source.USB;
 
-        if (batteryInfo.ContainsKey("Wireless powered") && batteryInfo["Wireless powered"] == "true")
+        if (batteryInfo.TryGetValue("Wireless powered", out string wl) && wl == "true")
             ChargeSource = Source.Wireless;
 
         if (batteryInfo.ContainsKey("status"))
@@ -271,8 +303,8 @@ public class Battery : ViewModelBase
                 : (Health)health;
         }
 
-        if (batteryInfo.ContainsKey("Charge counter")
-            && long.TryParse(batteryInfo["Charge counter"], out long charge))
+        if (batteryInfo.TryGetValue("Charge counter", out string value)
+            && long.TryParse(value, out long charge))
         {
             if (chargeCounter != charge || prevChargeUpdate is null)
             {
@@ -285,4 +317,23 @@ public class Battery : ViewModelBase
 
         OnPropertyChanged(nameof(CurrentConsumption));
     }
+
+    public static string SourceString(Source source) => source switch
+    {
+        Source.None => Strings.Resources.S_BAT_SOURCE_NONE,
+        Source.AC => Strings.Resources.S_BAT_SOURCE_AC,
+        Source.USB => Strings.Resources.S_TYPE_USB,
+        Source.Wireless => Strings.Resources.S_BAT_SOURCE_WIRELESS,
+        _ => null,
+    };
+
+    public static string StateString(State state) => state switch
+    {
+        State.Unknown => Strings.Resources.S_BAT_STATE_UNKNOWN,
+        State.Charging => Strings.Resources.S_BAT_STATE_CHARGING,
+        State.Discharging => Strings.Resources.S_BAT_STATE_DISCHARGING,
+        State.Not_Charging => Strings.Resources.S_BAT_STATE_NOT_CHARGING,
+        State.Full => Strings.Resources.S_BAT_STATE_FULL,
+        _ => null,
+    };
 }

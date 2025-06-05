@@ -49,12 +49,12 @@ public class RebootCommand : DeviceAction
 
     private static string RebootString(RebootType type) => type switch
     {
-        RebootType.Title => "Reboot Into",
-        RebootType.Regular => "System Image",
-        RebootType.Bootloader => "Bootloader",
-        RebootType.Recovery => "Recovery",
-        RebootType.Sideload => "Sideload",
-        RebootType.SideloadAuto => "Sideload (Auto Reboot)",
+        RebootType.Title => Strings.Resources.S_DEVICE_REBOOT_TITLE,
+        RebootType.Regular => Strings.Resources.S_REBOOT_SYSTEM,
+        RebootType.Bootloader => Strings.Resources.S_REBOOT_BOOTLOADER,
+        RebootType.Recovery => Strings.Resources.S_RECOVERY_MODE,
+        RebootType.Sideload => Strings.Resources.S_REBOOT_SIDELOAD,
+        RebootType.SideloadAuto => Strings.Resources.S_REBOOT_SIDELOAD_AUTO,
         _ => throw new NotSupportedException(),
     };
 }

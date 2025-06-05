@@ -221,6 +221,195 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Power Balance: {0}Ah.
+        /// </summary>
+        public static string S_BAT_BALANCE {
+            get {
+                return ResourceManager.GetString("S_BAT_BALANCE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Health: {0}.
+        /// </summary>
+        public static string S_BAT_HEALTH {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cold.
+        /// </summary>
+        public static string S_BAT_HEALTH_COLD {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH_COLD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dead.
+        /// </summary>
+        public static string S_BAT_HEALTH_DEAD {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH_DEAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Good.
+        /// </summary>
+        public static string S_BAT_HEALTH_GOOD {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH_GOOD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Over Voltage.
+        /// </summary>
+        public static string S_BAT_HEALTH_OVER_VOLTAGE {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH_OVER_VOLTAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Overheat.
+        /// </summary>
+        public static string S_BAT_HEALTH_OVERHEAT {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH_OVERHEAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unspecified failure.
+        /// </summary>
+        public static string S_BAT_HEALTH_UNSPECIFIED_FAILURE {
+            get {
+                return ResourceManager.GetString("S_BAT_HEALTH_UNSPECIFIED_FAILURE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AC.
+        /// </summary>
+        public static string S_BAT_SOURCE_AC {
+            get {
+                return ResourceManager.GetString("S_BAT_SOURCE_AC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string S_BAT_SOURCE_NONE {
+            get {
+                return ResourceManager.GetString("S_BAT_SOURCE_NONE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wireless.
+        /// </summary>
+        public static string S_BAT_SOURCE_WIRELESS {
+            get {
+                return ResourceManager.GetString("S_BAT_SOURCE_WIRELESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Charging.
+        /// </summary>
+        public static string S_BAT_STATE_CHARGING {
+            get {
+                return ResourceManager.GetString("S_BAT_STATE_CHARGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Discharging.
+        /// </summary>
+        public static string S_BAT_STATE_DISCHARGING {
+            get {
+                return ResourceManager.GetString("S_BAT_STATE_DISCHARGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Full.
+        /// </summary>
+        public static string S_BAT_STATE_FULL {
+            get {
+                return ResourceManager.GetString("S_BAT_STATE_FULL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not Charging.
+        /// </summary>
+        public static string S_BAT_STATE_NOT_CHARGING {
+            get {
+                return ResourceManager.GetString("S_BAT_STATE_NOT_CHARGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string S_BAT_STATE_UNKNOWN {
+            get {
+                return ResourceManager.GetString("S_BAT_STATE_UNKNOWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status: {0}.
+        /// </summary>
+        public static string S_BAT_STATUS {
+            get {
+                return ResourceManager.GetString("S_BAT_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0}%, Plugged In.
+        /// </summary>
+        public static string S_BAT_STATUS_PLUGGED {
+            get {
+                return ResourceManager.GetString("S_BAT_STATUS_PLUGGED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Battery Status Unknown.
+        /// </summary>
+        public static string S_BAT_STATUS_UNKNOWN {
+            get {
+                return ResourceManager.GetString("S_BAT_STATUS_UNKNOWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Temperature: {0}°C.
+        /// </summary>
+        public static string S_BAT_TEMP {
+            get {
+                return ResourceManager.GetString("S_BAT_TEMP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Voltage: {0}v.
+        /// </summary>
+        public static string S_BAT_VOLT {
+            get {
+                return ResourceManager.GetString("S_BAT_VOLT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to item.
         /// </summary>
         public static string S_BROWSER_ITEMS {
@@ -728,6 +917,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reboot Into.
+        /// </summary>
+        public static string S_DEVICE_REBOOT_TITLE {
+            get {
+                return ResourceManager.GetString("S_DEVICE_REBOOT_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The app has many animations that are enabled as part of the fluent design.
         ///The side views animation is always disabled when the app window is maximized on a secondary display.
         ///
@@ -930,6 +1128,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Some operations have failed.
+        /// </summary>
+        public static string S_FAILED_OPERATIONS {
+            get {
+                return ResourceManager.GetString("S_FAILED_OPERATIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Operations.
         /// </summary>
         public static string S_FILE_OP_TOOLTIP {
@@ -1105,6 +1312,15 @@ namespace ADB_Explorer.Strings {
         public static string S_KILL_SERVER {
             get {
                 return ResourceManager.GetString("S_KILL_SERVER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limited Support.
+        /// </summary>
+        public static string S_LIMITED_SUPPORT {
+            get {
+                return ResourceManager.GetString("S_LIMITED_SUPPORT", resourceCulture);
             }
         }
         
@@ -1606,6 +1822,51 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bootloader.
+        /// </summary>
+        public static string S_REBOOT_BOOTLOADER {
+            get {
+                return ResourceManager.GetString("S_REBOOT_BOOTLOADER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sideload.
+        /// </summary>
+        public static string S_REBOOT_SIDELOAD {
+            get {
+                return ResourceManager.GetString("S_REBOOT_SIDELOAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sideload (Auto Reboot).
+        /// </summary>
+        public static string S_REBOOT_SIDELOAD_AUTO {
+            get {
+                return ResourceManager.GetString("S_REBOOT_SIDELOAD_AUTO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Image.
+        /// </summary>
+        public static string S_REBOOT_SYSTEM {
+            get {
+                return ResourceManager.GetString("S_REBOOT_SYSTEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recovery.
+        /// </summary>
+        public static string S_RECOVERY_MODE {
+            get {
+                return ResourceManager.GetString("S_RECOVERY_MODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Progress Redirection.
         /// </summary>
         public static string S_REDIRECTION {
@@ -1780,6 +2041,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Root Access Enabled.
+        /// </summary>
+        public static string S_ROOT_ENABLED {
+            get {
+                return ResourceManager.GetString("S_ROOT_ENABLED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Root access cannot be enabled on selected device..
         /// </summary>
         public static string S_ROOT_FORBID {
@@ -1794,6 +2064,15 @@ namespace ADB_Explorer.Strings {
         public static string S_ROOT_FORBID_TITLE {
             get {
                 return ResourceManager.GetString("S_ROOT_FORBID_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Root Can Be Enabled.
+        /// </summary>
+        public static string S_ROOT_POSSIBLE {
+            get {
+                return ResourceManager.GetString("S_ROOT_POSSIBLE", resourceCulture);
             }
         }
         
@@ -2293,6 +2572,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} - Offline.
+        /// </summary>
+        public static string S_STATUS_OFFLINE {
+            get {
+                return ResourceManager.GetString("S_STATUS_OFFLINE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} - Unauthorized.
+        /// </summary>
+        public static string S_STATUS_UNAUTH {
+            get {
+                return ResourceManager.GetString("S_STATUS_UNAUTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Time from last server response.
         /// </summary>
         public static string S_TOOLTIP_UNRESPONSIVE {
@@ -2307,6 +2604,51 @@ namespace ADB_Explorer.Strings {
         public static string S_TOOLTIP_UPDATES {
             get {
                 return ResourceManager.GetString("S_TOOLTIP_UPDATES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Emulator.
+        /// </summary>
+        public static string S_TYPE_EMULATOR {
+            get {
+                return ResourceManager.GetString("S_TYPE_EMULATOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to mDNS Service.
+        /// </summary>
+        public static string S_TYPE_SERVICE {
+            get {
+                return ResourceManager.GetString("S_TYPE_SERVICE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to USB.
+        /// </summary>
+        public static string S_TYPE_USB {
+            get {
+                return ResourceManager.GetString("S_TYPE_USB", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WiFi.
+        /// </summary>
+        public static string S_TYPE_WIFI {
+            get {
+                return ResourceManager.GetString("S_TYPE_WIFI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WSA.
+        /// </summary>
+        public static string S_TYPE_WSA {
+            get {
+                return ResourceManager.GetString("S_TYPE_WSA", resourceCulture);
             }
         }
         

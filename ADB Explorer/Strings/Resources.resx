@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1052,5 +1052,157 @@ Cancel All Running</value>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>Server is up and running</value>
     <comment>The tooltip of the mDNS checkbox when the server is on</comment>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Limited Support</value>
+    <comment>The tooltip displayed for too low Android versions</comment>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Some operations have failed</value>
+    <comment>The tooltip displayed when some file operations have failed</comment>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root Access Enabled</value>
+    <comment>The tooltip displayed when root access on the Android device is currently enabled</comment>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root Can Be Enabled</value>
+    <comment>The tooltip displayed when an Android device supports root access</comment>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Recovery</value>
+    <comment>The Android recovery mode</comment>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Voltage: {0}v</value>
+    <comment>The battery voltage indicator</comment>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperature: {0}°C</value>
+    <comment>The battery temperature indicator</comment>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Power Balance: {0}Ah</value>
+    <comment>The battery power balance indicator, in Ampere per hour</comment>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Reboot Into</value>
+    <comment>The title of the menu to select a device reboot option</comment>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>System Image</value>
+    <comment>The menu option to reboot the device into the Android system</comment>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+    <comment>The menu option to reboot the device into the bootloader</comment>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+    <comment>The menu option to reboot the device into side-load mode</comment>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (Auto Reboot)</value>
+    <comment>The menu option to reboot the device into side-load mode, with auto reboot</comment>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+    <comment>A device that is no longer online</comment>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Unauthorized</value>
+    <comment>A device that hasn't authorized ADB yet</comment>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulator</value>
+    <comment>An emulated Android device (other than WSA)</comment>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS Service</value>
+    <comment>An mDNS service of a device in the network - this is just the discovery mechanism, and the device isn't connected yet</comment>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+    <comment>A device that is connected to the PC by USB</comment>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+    <comment>A device that was manually connected over WiFi, without using mDNS</comment>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+    <comment>Windows Subsystem for Android - an Android emulator by Microsoft, now discontinued</comment>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Battery Status Unknown</value>
+    <comment>The battery status indicator when the status is unknown</comment>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, Plugged In</value>
+    <comment>Battery percentage when device is charging</comment>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Wireless</value>
+    <comment>Battery charging source indicator - wireless charging</comment>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+    <comment>Battery charging source indicator - AC charging</comment>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>None</value>
+    <comment>Battery charging source indicator - no source of charging</comment>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+    <comment>Battery state is unknown</comment>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Charging</value>
+    <comment>Battery state is charging</comment>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Discharging</value>
+    <comment>Battery state is discharging</comment>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Not Charging</value>
+    <comment>Battery state is not charging (but plugged in)</comment>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Full</value>
+    <comment>Battery state is full - done charging</comment>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+    <comment>Battery status indicator title</comment>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Health: {0}</value>
+    <comment>Battery health indicator title</comment>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Good</value>
+    <comment>Battery health indicator - good</comment>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Overheat</value>
+    <comment>Battery health indicator - overheat</comment>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Dead</value>
+    <comment>Battery health indicator - dead</comment>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Over Voltage</value>
+    <comment>Battery health indicator - over voltage</comment>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Unspecified failure</value>
+    <comment>Battery health indicator - unspecified failure</comment>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Cold</value>
+    <comment>Battery health indicator - cold</comment>
   </data>
 </root>
