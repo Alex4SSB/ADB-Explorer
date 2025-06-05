@@ -27,7 +27,7 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 
 <br></br>
 <h2 align="left"/>Translation</h2>
-Translation has started on https://hosted.weblate.org/engage/adb-explorer/
+Help with translation is most welcome - please visit our translation project on Weblate: https://hosted.weblate.org/engage/adb-explorer/
 <br></br>
 A Microsoft Store review:
 
