@@ -449,4 +449,53 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
     <value>选择要推送至 {0} 的文件</value>
   </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>筛选文件操作</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>启用自动处理</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>停用自动处理
+取消所有正在运行</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>日志更新操作已暂停</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>暂停日志更新</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>指令记录</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>设备驱动</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>后退</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>前进</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>上一级</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>筛选</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>设备</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>推送</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>选择文件夹</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>选择文件</value>
+  </data>
 </root>
