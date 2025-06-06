@@ -1205,4 +1205,40 @@ Cancel All Running</value>
     <value>Cold</value>
     <comment>Battery health indicator - cold</comment>
   </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Launch</value>
+    <comment>The content of the button to launch WSA</comment>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA Launch</value>
+    <comment>The title of the dialog message to launch WSA</comment>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Do Not Show This Again.</value>
+    <comment>The content of a checkbox used to silence the WSA launch dialog</comment>
+  </data>
+  <data name="S_EXTRACT_TITLE" xml:space="preserve">
+    <value>Extracting Files</value>
+    <comment>The title of the dialog showing progress of extraction from an archive</comment>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Abort</value>
+    <comment>The content of the button used to abort the extraction process</comment>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Sending To Shell</value>
+    <comment>The title of a dialog displayed when data of files is being sent to the shell</comment>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} Conflict</value>
+    <comment>The title of the dialog reporting a merge conflict. 0 = Paste / Drop</comment>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Paste</value>
+    <comment>The file paste operation</comment>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Drop</value>
+    <comment>The file drop operation</comment>
+  </data>
 </root>

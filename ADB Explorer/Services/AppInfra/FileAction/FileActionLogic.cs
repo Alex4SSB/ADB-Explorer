@@ -577,11 +577,11 @@ internal static class FileActionLogic
         {
             deletedString = $"{itemsToDelete.Count()} ";
             if (itemsToDelete.All(item => item.IsDirectory))
-                deletedString += "folders";
+                deletedString += Strings.Resources.S_MENU_FOLDERS;
             else if (itemsToDelete.All(item => !item.IsDirectory))
-                deletedString += "files";
+                deletedString += Strings.Resources.S_MENU_FILES;
             else
-                deletedString += "items";
+                deletedString += Strings.Resources.S_BROWSER_ITEMS_PLURAL;
         }
 
         var result = await DialogService.ShowConfirmation(

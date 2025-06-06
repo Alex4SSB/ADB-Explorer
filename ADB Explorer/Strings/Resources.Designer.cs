@@ -428,6 +428,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Abort.
+        /// </summary>
+        public static string S_BUTTON_ABORT {
+            get {
+                return ResourceManager.GetString("S_BUTTON_ABORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Back.
         /// </summary>
         public static string S_BUTTON_BACK {
@@ -514,6 +523,15 @@ namespace ADB_Explorer.Strings {
         public static string S_BUTTON_FORWARD {
             get {
                 return ResourceManager.GetString("S_BUTTON_FORWARD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Launch.
+        /// </summary>
+        public static string S_BUTTON_LAUNCH {
+            get {
+                return ResourceManager.GetString("S_BUTTON_LAUNCH", resourceCulture);
             }
         }
         
@@ -1029,6 +1047,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Do Not Show This Again..
+        /// </summary>
+        public static string S_DONT_SHOW_AGAIN {
+            get {
+                return ResourceManager.GetString("S_DONT_SHOW_AGAIN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drop.
+        /// </summary>
+        public static string S_DROP {
+            get {
+                return ResourceManager.GetString("S_DROP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unable to get list..
         /// </summary>
         public static string S_EMPTY_APP_DRIVE {
@@ -1097,6 +1133,15 @@ namespace ADB_Explorer.Strings {
         public static string S_EXPAND_ALL {
             get {
                 return ResourceManager.GetString("S_EXPAND_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Extracting Files.
+        /// </summary>
+        public static string S_EXTRACT_TITLE {
+            get {
+                return ResourceManager.GetString("S_EXTRACT_TITLE", resourceCulture);
             }
         }
         
@@ -1714,11 +1759,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paste.
+        /// </summary>
+        public static string S_PASTE {
+            get {
+                return ResourceManager.GetString("S_PASTE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is an ancestor of the destination folder..
         /// </summary>
         public static string S_PASTE_ANCESTOR {
             get {
                 return ResourceManager.GetString("S_PASTE_ANCESTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Conflict.
+        /// </summary>
+        public static string S_PASTE_CONFLICT {
+            get {
+                return ResourceManager.GetString("S_PASTE_CONFLICT", resourceCulture);
             }
         }
         
@@ -2163,6 +2226,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SELECT_PROGRESS_METHOD {
             get {
                 return ResourceManager.GetString("S_SELECT_PROGRESS_METHOD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sending To Shell.
+        /// </summary>
+        public static string S_SEND_TO_SHELL_TITLE {
+            get {
+                return ResourceManager.GetString("S_SEND_TO_SHELL_TITLE", resourceCulture);
             }
         }
         
@@ -2694,6 +2766,15 @@ namespace ADB_Explorer.Strings {
         public static string S_WRITE_FILE_ERROR_TITLE {
             get {
                 return ResourceManager.GetString("S_WRITE_FILE_ERROR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WSA Launch.
+        /// </summary>
+        public static string S_WSA_DIALOG_TITLE {
+            get {
+                return ResourceManager.GetString("S_WSA_DIALOG_TITLE", resourceCulture);
             }
         }
         

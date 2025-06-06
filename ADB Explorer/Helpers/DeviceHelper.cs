@@ -206,9 +206,9 @@ public static class DeviceHelper
             if (Data.Settings.ShowLaunchWsaMessage)
             {
                 var result = await DialogService.ShowConfirmation(Strings.Resources.S_WSA_LAUNCH,
-                                                                  "WSA Launch",
-                                                                  "Launch",
-                                                                  checkBoxText: "Do Not Show This Again.",
+                                                                  Strings.Resources.S_WSA_DIALOG_TITLE,
+                                                                  primaryText: Strings.Resources.S_BUTTON_LAUNCH,
+                                                                  checkBoxText: Strings.Resources.S_DONT_SHOW_AGAIN,
                                                                   icon: DialogService.DialogIcon.Exclamation,
                                                                   censorContent: false);
 

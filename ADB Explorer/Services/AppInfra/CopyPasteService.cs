@@ -1,12 +1,9 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
-using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
-using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Services;
 
@@ -538,7 +535,7 @@ public class CopyPasteService : ViewModelBase
                 // From archives, UNC paths, & DLNA servers
                 else if (dataObject.GetDataPresent(AdbDataFormats.ShellidList))
                 {
-                    Vanara.Windows.Shell.ShellFolder tempDrag = new(Data.RuntimeSettings.TempDragPath);
+                    ShellFolder tempDrag = new(Data.RuntimeSettings.TempDragPath);
                     var shItems = ShellItemArray.FromDataObject((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject);
 
                     ShellFileOperations shFileOp = new(NativeMethods.InterceptClipboard.MainWindowHandle);
@@ -576,7 +573,7 @@ public class CopyPasteService : ViewModelBase
                 else if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 {
                     var abort = false;
-                    var dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), "Extracting Files", buttonText: "Abort");
+                    var dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), Strings.Resources.S_EXTRACT_TITLE, buttonText: Strings.Resources.S_BUTTON_ABORT);
                     dialog.Closed += (s, e) =>
                     {
                         abort = true;
@@ -927,9 +924,9 @@ public class CopyPasteService : ViewModelBase
 
         var result = await DialogService.ShowConfirmation(
             string.Format(Strings.Resources.S_PASTE_ANCESTOR, ancestor.FullName),
-            $"{(IsDrag ? "Drop" : "Paste")} Conflict",
+            string.Format(Strings.Resources.S_PASTE_CONFLICT, IsDrag ? Strings.Resources.S_DROP : Strings.Resources.S_PASTE),
             Strings.Resources.S_SKIP,
-            cancelText: "Abort",
+            cancelText: Strings.Resources.S_BUTTON_ABORT,
             icon: DialogService.DialogIcon.Exclamation);
 
         return result.Item1 is ContentDialogResult.Primary

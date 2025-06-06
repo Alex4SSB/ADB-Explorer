@@ -400,7 +400,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                         if (!App.Current.MainWindow.IsActive)
                             return;
 
-                        dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), "Sending To Shell", buttonText: "Abort");
+                        dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), Strings.Resources.S_SEND_TO_SHELL_TITLE, buttonText: Strings.Resources.S_BUTTON_ABORT);
                         dialog.Closed += (s, e) =>
                         {
                             abort = true;
