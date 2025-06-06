@@ -228,4 +228,103 @@
   <data name="S_FAILED_CONN" xml:space="preserve">
     <value>שגיאה בהתחברות אל</value>
   </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>מיקום מקורי</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>השרת פועל</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}שע'</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}מילי'</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>מתח: v{0}</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>טמפרטורה: °C{0}</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>תמיכה חלקית</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>טובה</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>חמה מדי</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>מתח גבוה מדי</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>תקלה לא ידועה</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>מצב: {0}</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>לא בטעינה</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>לא ידוע</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>סוללה מלאה</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>בטעינה</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>בפריקה</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>מצב הסוללה לא ידוע</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>אין מקור טעינה</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>טעינה מרשת החשמל</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, בטעינה</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}דק'</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}שנ'</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>תאריך שינוי</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>מתה</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>קרה</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>בריאות: {0}</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>גרסה</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>טעינה אלחוטית</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>מאזן זרם: {0}Ah</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>גודל</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>תאריך מחיקה</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>סוג</value>
+  </data>
 </root>
