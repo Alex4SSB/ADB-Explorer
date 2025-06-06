@@ -327,4 +327,22 @@
   <data name="S_COLUMN_TYPE" xml:space="preserve">
     <value>סוג</value>
   </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>מקור</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>שם קובץ</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>שם</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>אייקון</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>התווסף</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>יעד</value>
+  </data>
 </root>
