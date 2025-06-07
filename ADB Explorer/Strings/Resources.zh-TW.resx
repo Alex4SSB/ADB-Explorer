@@ -255,7 +255,7 @@
     <value>無法 pull 文件以讀取内容。</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>無法將文件推送回設備</value>
+    <value>無法將文件推送回設備。</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
     <value>需要重啓 ADB 服務以禁用 mDNS。</value>
@@ -321,5 +321,863 @@
   </data>
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>文件資源管理器監聽器</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>啓動 WSA</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA 啓動器</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>不再顯示此消息。</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>粘貼</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>本應用程式是 ADB - Android Debug Bridge（Android 偵錯橋接器）的圖形化介面工具。
+使用前，請確保您的電腦已安裝 ADB。
+ADB 包含在 Android SDK Platform Tools 中。
+您可透過下方連結下載 SDK Platform Tools。
+由於授權限制，我們無法隨應用程式直接提供 ADB。</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>{0} 有新版本 {1} 可用</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>以下内容將被刪除：
+{0}</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>上一級</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>後退</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}時</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>替換</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>操作類型</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>菜單爲空</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} 衝突</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>虛擬驅動器</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>臨時目錄</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>複製對象 - {0}</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>遵循 Windows 命名規則</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>關閉應用程式後，所有設定將被重設。
+此操作無法復原，您確定嗎？</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>一些複製的文件在 FUSE 上有衝突的名稱</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>若 ADB 已在 WSA 中授權，請直接點擊啟動。
+如需授權 ADB，請開啟 WSA 進階設定。</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>合并或替換</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>知識共享</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>以下内容將被刪除：
+{0}</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>選擇一個選項以顯示解釋</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>卸載</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>在 {0} 中有 1 個衝突項</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>以下内容將被卸載：
+{0} 軟件包</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>下載 ADB</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>更改</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>無法在 Windows 驅動器根目錄下創建所選文件 {0}。</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>瞭解更多有關 ADB 的資訊</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>轉到版本頁面</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>稍後重啓</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>為 {0} 選擇目標文件夾</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>覆蓋 ADB 路徑</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>圖形</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>用於從 ADB 讀取推/拉進度的幫助程序。</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
+    <value>可能會錯誤地觸發某些殺毒程序。</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>複製到 %LocalAppData%\AdbExplorer</value>
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value>選擇進度方法：</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>指定 ADB（至少 v{0}）：</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>選擇 ADB 路徑</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>更多資訊</value>
+  </data>
+  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
+    <value>文件資源管理器監控：</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>啓用</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>禁止</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>轉到發行説明</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB 可執行文件</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>ADB 幫助</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>立即重啓 ADB</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>為多個對象選擇目標文件夾</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>以下内容將被永久刪除：
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>新建文件</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>新建文件夾</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>嘗試列出此資料夾內容時發生錯誤。
+目前顯示的內容可能不完整。</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} 是目標文件夾的上級目錄。</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>確定要終止此模擬器嗎？</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>確定要刪除此設備嗎？</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>刪除 {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>終止 {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>有 1 個衝突項</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>有 {0} 個衝突項</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>在 {1} 中有 {0} 個衝突項</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>粘貼衝突</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>選擇要推送的文件夾</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>選擇要推送至 {0} 的文件夾</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>選擇要推送的文件夾</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>選擇要推送至 {0} 的文件</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>清空</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>啓用 mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>輪詢設備</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>電池狀態查詢</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
+    <value>啓用命令日志</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>自動啓用 Root 權限</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>保存手動連接的設備</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>自動打開以進行瀏覽</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>啓用緊凑視圖</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>停止 Push / Pull 輪詢</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>允許同時操作</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>在 Push 時强制媒體重新掃描</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>輪詢設備</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
+    <value>啓用回收站</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>啓用 APK 處理</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>顯示文件擴展名</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>顯示隱藏的對象</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>顯示系統應用</value>
+  </data>
+  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
+    <value>啓用文件資源管理器監聽器</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>雙擊文件</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Pull 到默認文件夾</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>在編輯器中打開</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>無</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>默認文件夾</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>淺色</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>跟隨 Windows 默認主題</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>主題</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>强制 Fluent 風格</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>禁用硬件加速</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>禁用動畫</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>檢查更新</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>顯示啓動畫面</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>工作目錄</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>文件資源管理器</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>驅動程序和功能</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>設備</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>捐贈或資助</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>應用數據文件夾</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>查看條款</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>GitHub 倉庫</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>隱私政策</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>歸屬及第三方許可</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[未設置]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>搜索設置</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>退出搜索</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>搜索視圖</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>全部摺叠</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>展開所有</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>設置</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>隱藏</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>語言</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>篩選文件操作</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>應用自動處理</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>禁用自動處理
+取消所有正在運行的任務</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>日志更新操作已暫停</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>暫停日志更新</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>命令日志</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>篩選</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>設備</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>推送</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>選擇文件夾</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>選擇文件</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>更多</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>編輯</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>文件夾</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>全選</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>剪切</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>粘貼鏈接</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>軟件包</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>修改日期</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>關閉編輯器</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>保存更改</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>安裝</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>複製到臨時目錄</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>清除命令日志</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>打開文件所在位置</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>在瀏覽器中搜索</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>複製到剪切板</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>前進</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>無法獲取列表。</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>設備驅動</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>文件名</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>點擊以啓用服務器和輪詢</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>内容不匹配</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>服務器正常運行</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows 可執行文件</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>拖拽</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>複製的文件違反了 FUSE 命名規則</value>
+  </data>
+  <data name="S_EXTRACT_TITLE" xml:space="preserve">
+    <value>提取文件</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>内部存儲</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>發送到 Shell</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>遵循 Unix 命名規則（通過 ADB）</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>已安裝應用</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>直到下次應用啓動</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB 磁盤使用情況</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>讀取速度：{0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>寫入速度：{0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>其它速度：{0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>每次啓動時檢查更新</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>關於</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>對象</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>對象</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>此文件夾爲空。</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>沒有對象符合當前篩選條件。</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>選中的對象</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>選中的對象</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;此文件夾&lt;Italic&gt;似乎&lt;/Italic&gt;爲空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...對肉眼來説&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>修改日期</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>進度</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>源路徑</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>目標路徑</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>創建時間</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>圖標</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>名稱</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>原始位置</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>類型</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>大小</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>刪除日期</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>用戶 ID</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB 服務器無響應</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>服務器最近響應時間</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}秒</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>關閉服務器</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>關閉進程</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>刷新設備</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>重啓 ADB</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>服務器停止運行</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>等待回復：{0}</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• 服務輪詢功能已關閉&lt;LineBreak /&gt;• 服務器&lt;Italic&gt;可能&lt;/Italic&gt;處於運行狀態&lt;/Span&gt;</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>有限的支持</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>某些操作失敗了</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>啓用 Root 權限</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root 權限可以被啓用</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>恢復模式</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>電壓：{0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>溫度：{0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>剩餘電量：{0}Ah</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>重啓到特定模式</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>系統鏡像</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>側載</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>側載（自動重啓）</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - 離綫</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - 未授權</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>虛擬設備</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS 服務</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>電池狀態未知</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%，充電中</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>無綫</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>無</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>正在充電</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>使用電池</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>未充電</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>充電完成</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>狀態：{0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>健康：{0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>優秀</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>過熱</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>報廢</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>過高電壓</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>未明確歸類的電池錯誤</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>溫度過低</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>驗證 {0}</value>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
+    <value>粘貼{0}個{1}項</value>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS" xml:space="preserve">
+    <value>粘貼1個{0}項</value>
+  </data>
+  <data name="S_COPIED" xml:space="preserve">
+    <value>複製</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>鏈接</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0}（鏈接）</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>安卓應用程序包</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>回收站</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>根目錄</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>MicroSD卡</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG 存儲設備</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>{0} 文件名在目標文件系統上無效</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>缺失目標位置</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>永久刪除</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>提供的路徑不存在。</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>自定義應用數據路徑</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>遵循 FUSE 命名規則</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>遵循 Windows 驅動器根目錄命名規則</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>當前文件夾内已有同名文件或當前路徑下唯一</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>選中的文件違反了 Windows 命名規則</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>選中的文件違反了 Windows 驅動器命名規則</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>某些選中的文件在 FUSE / Windows 上具有衝突的名稱</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>所選文件違反了 FUSE 命名規則</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>選中的對象不是文件/文件夾</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>可以通過重置應用設置來撤銷，或者手動在設置文件中進行</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>不再顯示</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>取消</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>跳過</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>關閉</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>確認</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}毫秒</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}分</value>
   </data>
 </root>
