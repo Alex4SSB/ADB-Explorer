@@ -821,7 +821,7 @@ public class CopyPasteService : ViewModelBase
         }
         if (result.Item1 is ContentDialogResult.Secondary) // Skip
         {
-            filePaths = filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item))).ToList();
+            filePaths = [.. filePaths.Where(item => !existingItems.Contains(FileHelper.GetFullName(item)))];
         }
 
         return filePaths;
@@ -903,7 +903,7 @@ public class CopyPasteService : ViewModelBase
         }
         if (result.Item1 is ContentDialogResult.Secondary) // Skip
         {
-            filePaths = filePaths.Where(item => !existingItems.Contains(item.FullName)).ToList();
+            filePaths = [.. filePaths.Where(item => !existingItems.Contains(item.FullName))];
         }
 
         return filePaths;

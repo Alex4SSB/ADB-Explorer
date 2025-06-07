@@ -57,7 +57,7 @@ public class TrashIndexer : ViewModelBase
     { }
 
     public TrashIndexer(string recycleName, string originalPath, string dateModified)
-        : this(recycleName, originalPath, DateTime.TryParseExact(dateModified, AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT, null, System.Globalization.DateTimeStyles.None, out var res) ? res : null)
+        : this(recycleName, originalPath, DateTime.TryParseExact(dateModified, AdbExplorerConst.ADB_EXPLORER_DATE_FORMAT, null, DateTimeStyles.None, out var res) ? res : null)
     { }
 
     public TrashIndexer(string recycleName, string originalPath, DateTime? dateModified)

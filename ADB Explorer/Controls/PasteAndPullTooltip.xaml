@@ -7,6 +7,7 @@
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="pasteTooltip"
     d:Visibility="Visible"
@@ -90,7 +91,7 @@
                     <TextBlock
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Text="Warnings" />
+                        Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_WARNING}}" />
                 </Grid>
                 <Separator Grid.Row="1" Margin="-4,0,-6,0" />
                 <ui:SimpleStackPanel
@@ -118,7 +119,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="A selected file violates Windows naming rules" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_WINDOWS_NAMING}}" />
                     </Grid>
                     <Grid d:Visibility="Visible">
                         <Grid.Style>
@@ -144,7 +145,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="A selected file violates Windows drive root naming rules" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_DRIVE_ROOT}}" />
                     </Grid>
                     <Grid d:Visibility="Visible">
                         <Grid.Style>
@@ -170,7 +171,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="Some selected files have conflicting names on FUSE / Windows" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_UNIQUE}}" />
                     </Grid>
                     <Grid d:Visibility="Visible">
                         <Grid.Style>
@@ -193,7 +194,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="A selected file violates FUSE naming rules" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_SELECTED_FUSE}}" />
                     </Grid>
                     <Grid d:Visibility="Visible">
                         <Grid.Style>
@@ -216,7 +217,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="Some copied files have conflicting names on FUSE" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_UNIQUE}}" />
                     </Grid>
                     <Grid d:Visibility="Visible">
                         <Grid.Style>
@@ -236,7 +237,7 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="A copied file violates FUSE naming rules" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_COPIED_FUSE_NAMING}}" />
                     </Grid>
                     <Grid d:Visibility="Visible">
                         <Grid.Style>
@@ -259,19 +260,19 @@
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            Text="A selected item is not a file / folder" />
+                            Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_NON_FILE}}" />
                     </Grid>
                 </ui:SimpleStackPanel>
                 <Grid Grid.Row="4" Margin="2">
                     <CheckBox
                         x:Name="PermanentHideCheckBox"
-                        Content="Never Show Again"
-                        ToolTip="Can be undone by reset app settings, or manually in settings file" />
+                        Content="{Binding Source={x:Static Member=strings:Resources.S_POPUP_CHECKBOX}}"
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_POPUP_CHECKBOX_TOOLTIP}}" />
                     <Button
                         HorizontalAlignment="Right"
                         Click="Button_Click"
-                        Content="Hide"
-                        ToolTip="Until next app launch" />
+                        Content="{Binding Source={x:Static Member=strings:Resources.S_ACTION_HIDE}}"
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_POPUP_HIDE_TOOLTIP}}" />
                 </Grid>
             </Grid>
         </Border>

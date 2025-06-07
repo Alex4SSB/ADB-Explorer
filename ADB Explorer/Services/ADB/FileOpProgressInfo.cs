@@ -36,7 +36,7 @@ public abstract class FileOpErrorInfo : FileOpProgressInfo
 public class HashFailInfo : FileOpErrorInfo
 {
     public HashFailInfo(string androidPath, bool fileExists = true)
-        : base(fileExists ? "Content mismatch" : "Missing from target location")
+        : base(fileExists ? Strings.Resources.S_VALIDATE_MISMATCH : Strings.Resources.S_VALIDATE_MISSING)
     {
         AndroidPath = androidPath;
     }
@@ -100,7 +100,7 @@ public class SyncErrorInfo : FileOpErrorInfo
 
         if (path.Any(c => AdbExplorerConst.INVALID_NTFS_CHARS.Any(chr => chr == c)))
         {
-            result.Message = $"File name illegal on target file system: {FileHelper.GetFullName(path)}";
+            result.Message = string.Format(Strings.Resources.S_NAME_ILLEGAL_FS, FileHelper.GetFullName(path));
         }
         else if (result.Message.Contains(':'))
             result.Message = result.Message.Split(':').Last().Trim();
@@ -123,13 +123,13 @@ public class AdbSyncProgressInfo : FileOpProgressInfo
         if (match.Groups["TotalPercentage"].Success)
         {
             string totalPercentageRaw = match.Groups["TotalPercentage"].Value;
-            TotalPercentage = totalPercentageRaw.EndsWith("%") ? int.Parse(totalPercentageRaw.TrimEnd('%')) : null;
+            TotalPercentage = totalPercentageRaw.EndsWith('%') ? int.Parse(totalPercentageRaw.TrimEnd('%')) : null;
         }
 
         if (match.Groups["CurrentPercentage"].Success)
         {
             string currPercentageRaw = match.Groups["CurrentPercentage"].Value;
-            CurrentFilePercentage = currPercentageRaw.EndsWith("%") ? int.Parse(currPercentageRaw.TrimEnd('%')) : null;
+            CurrentFilePercentage = currPercentageRaw.EndsWith('%') ? int.Parse(currPercentageRaw.TrimEnd('%')) : null;
         }
 
         CurrentFileBytesTransferred = match.Groups["CurrentBytes"].Success ? UInt64.Parse(match.Groups["CurrentBytes"].Value) : null;

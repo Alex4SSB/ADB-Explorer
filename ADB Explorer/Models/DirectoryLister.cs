@@ -192,7 +192,7 @@ public class DirectoryLister(Dispatcher dispatcher, ADBService.AdbDevice adbDevi
         List<(string, FileType)> result = null;
         try
         {
-            result = Device.GetLinkType(items.Select(f => f.FullPath), LinkListCancellation.Token).ToList();
+            result = [.. Device.GetLinkType(items.Select(f => f.FullPath), LinkListCancellation.Token)];
         }
         catch (AggregateException e) when (e.InnerException is TaskCanceledException)
         { }

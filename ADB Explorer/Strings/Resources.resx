@@ -1241,4 +1241,179 @@ Cancel All Running</value>
     <value>Drop</value>
     <comment>The file drop operation</comment>
   </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Operation</value>
+    <comment>Used for file operation actions</comment>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operations</value>
+    <comment>Used for file operation actions, plural</comment>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Validate {0}</value>
+    <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Paste {0} {1} Items</value>
+    <comment>0 = number of items. 1 = Cut / Copied</comment>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS" xml:space="preserve">
+    <value>Paste 1 {0} Item</value>
+    <comment>0 = Cut / Copied</comment>
+  </data>
+  <data name="S_COPIED" xml:space="preserve">
+    <value>Copied</value>
+    <comment>In the context of "Paste 3 copied items"</comment>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Link</value>
+    <comment>A link to an unknown file type</comment>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Link)</value>
+    <comment>A link to a {0} file type</comment>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Android Application Package</value>
+    <comment>The type name for APK files</comment>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows Executable</value>
+    <comment>For executable file type</comment>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Recycle Bin</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Yes</value>
+    <comment>A dialog button</comment>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+    <comment>The root drive - /</comment>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Internal Storage</value>
+    <comment>The home / main user space drive</comment>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Installed Apps</value>
+    <comment>The drive displaying the installed applications</comment>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>µSD Card</value>
+    <comment>A micro SD card drive</comment>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG Drive</value>
+    <comment>A flash drive connected by USB to the device</comment>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Emulated Drive</value>
+    <comment>A drive on an emulator device</comment>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temp</value>
+    <comment>The user space temp drive - /data/local/tmp</comment>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>File name illegal on target file system: {0}</value>
+    <comment>0 = file name</comment>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Content mismatch</value>
+    <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Missing from target location</value>
+    <comment>The error displayed when during validation of a file operation the file was not found in the target location</comment>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Permanent Deletion</value>
+    <comment>The location displayed in the target column of a permanent delete file operation</comment>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+    <comment>Displayed in the source / target of a file operation when those are unknown</comment>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Provided path does not exist.</value>
+    <comment>Displayed when an invalid path argument is provided for app launch</comment>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Custom App Data Path</value>
+    <comment>The title of the error message when an invalid path argument is provided</comment>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Menu Is Empty</value>
+    <comment>Displayed when the context menu is empty</comment>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Copy</value>
+    <comment>A copy of an item. 0 = item name</comment>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Adheres to Unix naming rules (via ADB)</value>
+    <comment>Will be shown if a file name doesn't meet Unix naming rules</comment>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Adheres to FUSE naming rules</value>
+    <comment>Will show if a file name doesn't meet FUSE naming rules</comment>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Adheres to Windows naming rules</value>
+    <comment>Will show if a file name doesn't meet Windows naming rules</comment>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Adheres to Windows drive root naming rules</value>
+    <comment>Will show if a file name doesn't meet Windows drive root naming rules</comment>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Unique in current location</value>
+    <comment>Will show if a file name isn't unique in the current location, according to the file system naming rules</comment>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Warnings</value>
+    <comment>The title of the paste and pull warnings popup</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>A selected file violates Windows naming rules</value>
+    <comment>Will show if a selected file doesn't meet Windows naming rules</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>A selected file violates Windows drive root naming rules</value>
+    <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Some selected files have conflicting names on FUSE / Windows</value>
+    <comment>Will show when selecting files on a non-FUSE drive whose names differ only by upper / lower case</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>A selected file violates FUSE naming rules</value>
+    <comment>Will show if a selected file doesn't meet FUSE naming rules</comment>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Some copied files have conflicting names on FUSE</value>
+    <comment>Will show when copied files' names differ only by upper / lower case</comment>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>A copied file violates FUSE naming rules</value>
+    <comment>Will show if a copied file doesn't meet FUSE naming rules</comment>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>A selected item is not a file / folder</value>
+    <comment>Will show when selecting an item that can't be copied</comment>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Can be undone using Reset App Settings, or manually in settings file</value>
+    <comment>The tooltip displayed on the "Never show again" checkbox in the paste warnings popup</comment>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>Until next app launch</value>
+    <comment>The tooltip of the button used to hide the paste warnings popup</comment>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Never Show Again</value>
+    <comment>The paste popup permanent hide checkbox content</comment>
+  </data>
 </root>

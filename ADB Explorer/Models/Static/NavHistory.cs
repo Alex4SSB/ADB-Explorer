@@ -23,9 +23,9 @@ namespace ADB_Explorer.Models
             SpecialLocation.RecycleBin => AdbExplorerConst.DRIVE_DISPLAY_NAMES[AbstractDrive.DriveType.Trash],
             SpecialLocation.PackageDrive => AdbExplorerConst.DRIVE_DISPLAY_NAMES[AbstractDrive.DriveType.Package],
             SpecialLocation.Back or SpecialLocation.Forward or SpecialLocation.Up => location.ToString(),
-            SpecialLocation.DriveView => "Device Drives",
-            SpecialLocation.devNull => "Permanent Deletion",
-            SpecialLocation.Unknown => "N/A",
+            SpecialLocation.DriveView => Strings.Resources.S_BUTTON_DRIVES,
+            SpecialLocation.devNull => Strings.Resources.S_LOCATION_PERM_DEL,
+            SpecialLocation.Unknown => Strings.Resources.S_LOCATION_NA,
             _ => "",
         };
 
@@ -48,7 +48,7 @@ namespace ADB_Explorer.Models
             return location.IsNavigable();
         }
 
-        public static string StringFromLocation(SpecialLocation location) => $"[{Enum.GetName(typeof(SpecialLocation), location)}]";
+        public static string StringFromLocation(SpecialLocation location) => $"[{Enum.GetName(location)}]";
 
         public static SpecialLocation LocationFromString(object location)
         {
@@ -62,7 +62,7 @@ namespace ADB_Explorer.Models
                 return SpecialLocation.None;
         }
 
-        public static List<object> PathHistory { get; set; } = new();
+        public static List<object> PathHistory { get; set; } = [];
 
         private static int historyIndex = -1;
 

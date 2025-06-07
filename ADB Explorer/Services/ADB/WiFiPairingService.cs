@@ -38,7 +38,7 @@ public class WiFiPairingService
     {
         ADBService.ExecuteAdbCommand("mdns", out string services, out _, new(), "services");
 
-        List<ServiceDevice> mdnsServices = new();
+        List<ServiceDevice> mdnsServices = [];
         var matches = AdbRegEx.RE_MDNS_SERVICE().Matches(services);
         foreach (Match item in matches)
         {

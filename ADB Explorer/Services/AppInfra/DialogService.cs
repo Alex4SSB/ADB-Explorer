@@ -32,7 +32,7 @@ public static class DialogService
     {
         if (censorContent)
         {
-            content = content.Replace(AdbExplorerConst.RECYCLE_PATH, "Recycle Bin");
+            content = content.Replace(AdbExplorerConst.RECYCLE_PATH, Strings.Resources.S_DRIVE_TRASH);
         }
 
         if (copyToClipboard)
@@ -100,7 +100,7 @@ public static class DialogService
 
     public static async Task<(ContentDialogResult, bool)> ShowConfirmation(string content,
                                         string title = "",
-                                        string primaryText = "Yes",
+                                        string primaryText = null,
                                         string secondaryText = "",
                                         string cancelText = null,
                                         string checkBoxText = "",
@@ -108,6 +108,9 @@ public static class DialogService
                                         bool censorContent = true,
                                         bool hidePanes = true)
     {
+        if (primaryText is null)
+            primaryText = Strings.Resources.S_BUTTON_YES;
+
         if (cancelText is null)
             cancelText = Strings.Resources.S_CANCEL;
 
@@ -118,7 +121,7 @@ public static class DialogService
 
         if (censorContent)
         {
-            content = content.Replace(AdbExplorerConst.RECYCLE_PATH, "Recycle Bin");
+            content = content.Replace(AdbExplorerConst.RECYCLE_PATH, Strings.Resources.S_DRIVE_TRASH);
         }
 
         InitContent(content, checkBoxText);

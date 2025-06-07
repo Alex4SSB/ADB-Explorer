@@ -249,8 +249,8 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public static string CutTypeString(DragDropEffects cutType) => cutType switch
     {
-        DragDropEffects.Move => "Cut",
-        DragDropEffects.Copy => "Copied",
+        DragDropEffects.Move => Strings.Resources.S_MENU_CUT,
+        DragDropEffects.Copy => Strings.Resources.S_COPIED,
         _ => "",
     };
 
@@ -284,13 +284,15 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         var type = Type switch
         {
             FileType.File => GetTypeName(FullName),
-            FileType.Folder => "Folder",
+            FileType.Folder => Strings.Resources.S_MENU_FOLDER,
             FileType.Unknown => "",
             _ => GetFileTypeName(Type),
         };
 
         if (IsLink && Type is not FileType.BrokenLink)
-            type = string.IsNullOrEmpty(type) ? "Link" : $"{type} (Link)";
+            type = string.IsNullOrEmpty(type)
+                ? Strings.Resources.S_FILE_TYPE_LINK
+                : string.Format(Strings.Resources.S_KNOWN_TYPE_LINK, type);
 
         return type;
     }
@@ -298,13 +300,13 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
     public string GetTypeName(string fileName)
     {
         if (IsApk)
-            return "Android Application Package";
+            return Strings.Resources.S_FILE_TYPE_APK;
 
         if (string.IsNullOrEmpty(fileName) || (IsHidden && FullName.Count(c => c == '.') == 1))
-            return "File";
+            return Strings.Resources.S_MENU_FILE;
 
         if (Extension.Equals(".exe", StringComparison.CurrentCultureIgnoreCase))
-            return "Windows Executable";
+            return Strings.Resources.S_FILE_TYPE_EXE;
 
         if (!Ascii.IsValid(Extension))
         {
@@ -317,10 +319,10 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 ExtensionIsGlyph =
                 ExtensionIsFontIcon = false;
 
-                return $"{Extension[1..]} File";
+                return $"{Extension[1..]} {Strings.Resources.S_MENU_FILE}";
             }
 
-            return $"{ShortExtension} File";
+            return $"{ShortExtension} {Strings.Resources.S_MENU_FILE}";
         }
         else
         {

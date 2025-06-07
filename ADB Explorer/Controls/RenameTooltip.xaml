@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DesignHeight="100"
     d:DesignWidth="300"
@@ -107,27 +108,27 @@
             <TextBlock
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Adheres to Unix naming rules (via ADB)" />
+                Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_UNIX_NAMING}}" />
             <TextBlock
                 Grid.Row="1"
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Adheres to FUSE naming rules" />
+                Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_FUSE_NAMING}}" />
             <TextBlock
                 Grid.Row="2"
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Adheres to Windows naming rules" />
+                Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_WINDOWS_NAMING}}" />
             <TextBlock
                 Grid.Row="3"
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Adheres to Windows drive root naming rules" />
+                Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_DRIVE_ROOT_NAMING}}" />
             <TextBlock
                 Grid.Row="4"
                 Grid.Column="2"
                 VerticalAlignment="Center"
-                Text="Unique in current location" />
+                Text="{Binding Source={x:Static Member=strings:Resources.S_POPUP_UNIQUE_NAME}}" />
         </Grid>
     </Border>
 </UserControl>

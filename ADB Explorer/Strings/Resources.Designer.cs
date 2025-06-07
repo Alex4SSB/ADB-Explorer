@@ -70,6 +70,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operation.
+        /// </summary>
+        public static string S_ACTION_OPERATION {
+            get {
+                return ResourceManager.GetString("S_ACTION_OPERATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Operations.
+        /// </summary>
+        public static string S_ACTION_OPERATION_PLURAL {
+            get {
+                return ResourceManager.GetString("S_ACTION_OPERATION_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validate {0}.
+        /// </summary>
+        public static string S_ACTION_VALIDATE {
+            get {
+                return ResourceManager.GetString("S_ACTION_VALIDATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ADB Disk Usage.
         /// </summary>
         public static string S_ADB_DISK_USAGE {
@@ -581,6 +608,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string S_BUTTON_YES {
+            get {
+                return ResourceManager.GetString("S_BUTTON_YES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string S_CANCEL {
@@ -815,6 +851,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copied.
+        /// </summary>
+        public static string S_COPIED {
+            get {
+                return ResourceManager.GetString("S_COPIED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy Package Name.
         /// </summary>
         public static string S_COPY_APK_NAME {
@@ -838,6 +883,15 @@ namespace ADB_Explorer.Strings {
         public static string S_CREATE_ERR_TITLE {
             get {
                 return ResourceManager.GetString("S_CREATE_ERR_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Custom App Data Path.
+        /// </summary>
+        public static string S_CUSTOM_DATA_PATH {
+            get {
+                return ResourceManager.GetString("S_CUSTOM_DATA_PATH", resourceCulture);
             }
         }
         
@@ -1056,6 +1110,78 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Installed Apps.
+        /// </summary>
+        public static string S_DRIVE_APPS {
+            get {
+                return ResourceManager.GetString("S_DRIVE_APPS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Emulated Drive.
+        /// </summary>
+        public static string S_DRIVE_EMULATED {
+            get {
+                return ResourceManager.GetString("S_DRIVE_EMULATED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Internal Storage.
+        /// </summary>
+        public static string S_DRIVE_INTERNAL_STORAGE {
+            get {
+                return ResourceManager.GetString("S_DRIVE_INTERNAL_STORAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OTG Drive.
+        /// </summary>
+        public static string S_DRIVE_OTG {
+            get {
+                return ResourceManager.GetString("S_DRIVE_OTG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Root.
+        /// </summary>
+        public static string S_DRIVE_ROOT {
+            get {
+                return ResourceManager.GetString("S_DRIVE_ROOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to µSD Card.
+        /// </summary>
+        public static string S_DRIVE_SD {
+            get {
+                return ResourceManager.GetString("S_DRIVE_SD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Temp.
+        /// </summary>
+        public static string S_DRIVE_TEMP {
+            get {
+                return ResourceManager.GetString("S_DRIVE_TEMP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recycle Bin.
+        /// </summary>
+        public static string S_DRIVE_TRASH {
+            get {
+                return ResourceManager.GetString("S_DRIVE_TRASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Drop.
         /// </summary>
         public static string S_DROP {
@@ -1191,6 +1317,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Android Application Package.
+        /// </summary>
+        public static string S_FILE_TYPE_APK {
+            get {
+                return ResourceManager.GetString("S_FILE_TYPE_APK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows Executable.
+        /// </summary>
+        public static string S_FILE_TYPE_EXE {
+            get {
+                return ResourceManager.GetString("S_FILE_TYPE_EXE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Link.
+        /// </summary>
+        public static string S_FILE_TYPE_LINK {
+            get {
+                return ResourceManager.GetString("S_FILE_TYPE_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filter File Operations.
         /// </summary>
         public static string S_FILTER_FILE_OPS {
@@ -1289,6 +1442,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} - Copy.
+        /// </summary>
+        public static string S_ITEM_COPY {
+            get {
+                return ResourceManager.GetString("S_ITEM_COPY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select destination for {0}.
         /// </summary>
         public static string S_ITEM_DESTINATION {
@@ -1361,6 +1523,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} (Link).
+        /// </summary>
+        public static string S_KNOWN_TYPE_LINK {
+            get {
+                return ResourceManager.GetString("S_KNOWN_TYPE_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Limited Support.
         /// </summary>
         public static string S_LIMITED_SUPPORT {
@@ -1375,6 +1546,24 @@ namespace ADB_Explorer.Strings {
         public static string S_LOCATE_ADB_TITLE {
             get {
                 return ResourceManager.GetString("S_LOCATE_ADB_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to N/A.
+        /// </summary>
+        public static string S_LOCATION_NA {
+            get {
+                return ResourceManager.GetString("S_LOCATION_NA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Permanent Deletion.
+        /// </summary>
+        public static string S_LOCATION_PERM_DEL {
+            get {
+                return ResourceManager.GetString("S_LOCATION_PERM_DEL", resourceCulture);
             }
         }
         
@@ -1484,6 +1673,15 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_EDIT {
             get {
                 return ResourceManager.GetString("S_MENU_EDIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Menu Is Empty.
+        /// </summary>
+        public static string S_MENU_EMPTY {
+            get {
+                return ResourceManager.GetString("S_MENU_EMPTY", resourceCulture);
             }
         }
         
@@ -1668,6 +1866,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File name illegal on target file system: {0}.
+        /// </summary>
+        public static string S_NAME_ILLEGAL_FS {
+            get {
+                return ResourceManager.GetString("S_NAME_ILLEGAL_FS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Navigation Error.
         /// </summary>
         public static string S_NAV_ERR_TITLE {
@@ -1795,6 +2002,33 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paste 1 {0} Item.
+        /// </summary>
+        public static string S_PASTE_CUT_ITEMS {
+            get {
+                return ResourceManager.GetString("S_PASTE_CUT_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste {0} {1} Items.
+        /// </summary>
+        public static string S_PASTE_CUT_ITEMS_PLURAL {
+            get {
+                return ResourceManager.GetString("S_PASTE_CUT_ITEMS_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provided path does not exist..
+        /// </summary>
+        public static string S_PATH_INVALID {
+            get {
+                return ResourceManager.GetString("S_PATH_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Permanently Delete.
         /// </summary>
         public static string S_PERM_DEL {
@@ -1809,6 +2043,150 @@ namespace ADB_Explorer.Strings {
         public static string S_PLACEHOLDER_NOT_SET {
             get {
                 return ResourceManager.GetString("S_PLACEHOLDER_NOT_SET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Never Show Again.
+        /// </summary>
+        public static string S_POPUP_CHECKBOX {
+            get {
+                return ResourceManager.GetString("S_POPUP_CHECKBOX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can be undone using Reset App Settings, or manually in settings file.
+        /// </summary>
+        public static string S_POPUP_CHECKBOX_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_POPUP_CHECKBOX_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A copied file violates FUSE naming rules.
+        /// </summary>
+        public static string S_POPUP_COPIED_FUSE_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_COPIED_FUSE_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some copied files have conflicting names on FUSE.
+        /// </summary>
+        public static string S_POPUP_COPIED_UNIQUE {
+            get {
+                return ResourceManager.GetString("S_POPUP_COPIED_UNIQUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adheres to Windows drive root naming rules.
+        /// </summary>
+        public static string S_POPUP_DRIVE_ROOT_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_DRIVE_ROOT_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adheres to FUSE naming rules.
+        /// </summary>
+        public static string S_POPUP_FUSE_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_FUSE_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Until next app launch.
+        /// </summary>
+        public static string S_POPUP_HIDE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_POPUP_HIDE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A selected item is not a file / folder.
+        /// </summary>
+        public static string S_POPUP_NON_FILE {
+            get {
+                return ResourceManager.GetString("S_POPUP_NON_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A selected file violates Windows drive root naming rules.
+        /// </summary>
+        public static string S_POPUP_SELECTED_DRIVE_ROOT {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_DRIVE_ROOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A selected file violates FUSE naming rules.
+        /// </summary>
+        public static string S_POPUP_SELECTED_FUSE {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_FUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Some selected files have conflicting names on FUSE / Windows.
+        /// </summary>
+        public static string S_POPUP_SELECTED_UNIQUE {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_UNIQUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A selected file violates Windows naming rules.
+        /// </summary>
+        public static string S_POPUP_SELECTED_WINDOWS_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_SELECTED_WINDOWS_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unique in current location.
+        /// </summary>
+        public static string S_POPUP_UNIQUE_NAME {
+            get {
+                return ResourceManager.GetString("S_POPUP_UNIQUE_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adheres to Unix naming rules (via ADB).
+        /// </summary>
+        public static string S_POPUP_UNIX_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_UNIX_NAMING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warnings.
+        /// </summary>
+        public static string S_POPUP_WARNING {
+            get {
+                return ResourceManager.GetString("S_POPUP_WARNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adheres to Windows naming rules.
+        /// </summary>
+        public static string S_POPUP_WINDOWS_NAMING {
+            get {
+                return ResourceManager.GetString("S_POPUP_WINDOWS_NAMING", resourceCulture);
             }
         }
         
@@ -2730,6 +3108,24 @@ namespace ADB_Explorer.Strings {
         public static string S_UNINSTALL {
             get {
                 return ResourceManager.GetString("S_UNINSTALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Content mismatch.
+        /// </summary>
+        public static string S_VALIDATE_MISMATCH {
+            get {
+                return ResourceManager.GetString("S_VALIDATE_MISMATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing from target location.
+        /// </summary>
+        public static string S_VALIDATE_MISSING {
+            get {
+                return ResourceManager.GetString("S_VALIDATE_MISSING", resourceCulture);
             }
         }
         

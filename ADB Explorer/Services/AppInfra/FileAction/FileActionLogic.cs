@@ -308,7 +308,16 @@ internal static class FileActionLogic
             return;
         }
 
-        Data.FileActions.PasteDescription.Value = $"Paste {Data.CopyPaste.Files.Length} {FileClass.CutTypeString(Data.CopyPaste.PasteState)} {PluralityConverter.Convert(Data.CopyPaste.Files, "Item")}";
+        var cutType = FileClass.CutTypeString(Data.CopyPaste.PasteState);
+        var plural = Data.CopyPaste.Files.Length > 1;
+        object[] formatParams = plural 
+            ? [Data.CopyPaste.Files.Length, cutType]
+            : [cutType];
+        var stringFormat = plural
+            ? Strings.Resources.S_PASTE_CUT_ITEMS_PLURAL
+            : Strings.Resources.S_PASTE_CUT_ITEMS;
+
+        Data.FileActions.PasteDescription.Value = string.Format(stringFormat, formatParams);
 
         Data.FileActions.PasteEnabled = EnableUiPaste();
         Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
@@ -321,7 +330,7 @@ internal static class FileActionLogic
             && Data.CopyPaste.IsVirtual
             && Data.CopyPaste.Descriptors.Length == files.Length)
         {
-            files = Data.CopyPaste.Descriptors.Select(d => d.Name).ToArray();
+            files = [.. Data.CopyPaste.Descriptors.Select(d => d.Name)];
         }
 
         Data.FileActions.IsPastingInDescendant = files.Length == 1
@@ -1115,15 +1124,19 @@ internal static class FileActionLogic
             FileOpControlsMutex.WaitOne(0);
 
             var changed = false;
+            var plural = Data.FileActions.SelectedFileOps.Value.Count() > 1;
+            var opString = plural
+                ? Strings.Resources.S_ACTION_OPERATION_PLURAL
+                : Strings.Resources.S_ACTION_OPERATION;
 
-            var removeAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Remove Operation");
+            var removeAction = string.Format(Strings.Resources.S_REM_DEVICE_TITLE, opString);
             if (Data.FileActions.RemoveFileOpDescription.Value != removeAction)
             {
                 Data.FileActions.RemoveFileOpDescription.Value = removeAction;
                 changed = true;
             }
 
-            var validateAction = PluralityConverter.Convert(Data.FileActions.SelectedFileOps, "Validate Operation");
+            var validateAction = string.Format(Strings.Resources.S_ACTION_VALIDATE, opString);
             if (Data.FileActions.ValidateDescription.Value != validateAction)
             {
                 Data.FileActions.ValidateDescription.Value = validateAction;

@@ -18,8 +18,9 @@ public partial class App : Application
         {
             if (!Directory.Exists(e.Args[0]))
             {
-                DialogService.ShowMessage("Provided path does not exist.", "Custom App Data Path", DialogService.DialogIcon.Critical);
-                Current.Shutdown();
+                MessageBox.Show($"{Strings.Resources.S_PATH_INVALID}\n\n{e.Args[0]}", Strings.Resources.S_CUSTOM_DATA_PATH, MessageBoxButton.OK, MessageBoxImage.Error);
+                
+                Current.Shutdown(1);
                 return;
             }
 

@@ -15,15 +15,15 @@ public static class AdbExplorerConst
 
     public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
     {
-        { "/sdcard", "Internal Storage" },
-        { "/storage/emulated/0", "Internal Storage" },
-        { "/storage/self/primary", "Internal Storage" },
-        { "/mnt/sdcard", "Internal Storage" },
-        { "/", "Root" }
+        { "/sdcard", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
+        { "/storage/emulated/0", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
+        { "/storage/self/primary", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
+        { "/mnt/sdcard", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
+        { "/", Strings.Resources.S_DRIVE_ROOT }
     };
 
     public static List<string> POSSIBLE_RECYCLE_PATHS =>
-        SPECIAL_FOLDERS_DISPLAY_NAMES.Where(kv => kv.Value == "Internal Storage").Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}").ToList();
+        [.. SPECIAL_FOLDERS_DISPLAY_NAMES.Where(kv => kv.Value == Strings.Resources.S_DRIVE_INTERNAL_STORAGE).Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}")];
 
     public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
     {
@@ -41,15 +41,15 @@ public static class AdbExplorerConst
 
     public static readonly Dictionary<AbstractDrive.DriveType, string> DRIVE_DISPLAY_NAMES = new()
     {
-        { AbstractDrive.DriveType.Root, "Root" },
-        { AbstractDrive.DriveType.Internal, "Internal Storage" },
-        { AbstractDrive.DriveType.Expansion, "µSD Card" },
-        { AbstractDrive.DriveType.External, "OTG Drive" },
+        { AbstractDrive.DriveType.Root, Strings.Resources.S_DRIVE_ROOT },
+        { AbstractDrive.DriveType.Internal, Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
+        { AbstractDrive.DriveType.Expansion, Strings.Resources.S_DRIVE_SD },
+        { AbstractDrive.DriveType.External, Strings.Resources.S_DRIVE_OTG },
         { AbstractDrive.DriveType.Unknown, "" }, // "Other Drive"
-        { AbstractDrive.DriveType.Emulated, "Emulated Drive" },
-        { AbstractDrive.DriveType.Trash, "Recycle Bin" },
-        { AbstractDrive.DriveType.Temp, "Temp" },
-        { AbstractDrive.DriveType.Package, "Installed Apps" },
+        { AbstractDrive.DriveType.Emulated, Strings.Resources.S_DRIVE_EMULATED },
+        { AbstractDrive.DriveType.Trash, Strings.Resources.S_DRIVE_TRASH },
+        { AbstractDrive.DriveType.Temp, Strings.Resources.S_DRIVE_TEMP },
+        { AbstractDrive.DriveType.Package, Strings.Resources.S_DRIVE_APPS },
     };
 
     public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
@@ -76,7 +76,6 @@ public static class AdbExplorerConst
     public static readonly TimeSpan MDNS_FORCE_CONNECT_TIME = TimeSpan.FromMilliseconds(2500);
     public static readonly TimeSpan DISK_USAGE_INTERVAL_ACTIVE = TimeSpan.FromMilliseconds(200);
     public static readonly TimeSpan DISK_USAGE_INTERVAL_IDLE = TimeSpan.FromMilliseconds(1000);
-    //public static readonly TimeSpan DRAG_EXIT_INTERVAL = TimeSpan.FromMilliseconds(200);
 
     public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
     public static readonly sbyte MIN_PKG_UID_ANDROID_VER = 9;

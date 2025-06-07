@@ -304,6 +304,8 @@ internal class CompoundIconSubMenu : SubMenu
 
 internal class DummySubMenu : SubMenu
 {
+    // This is an easter egg.
+    // Do not translate it.
     private static readonly Action dummyAction = () =>
         DialogService.ShowMessage("An SSL error has occurred and a secure connection to\nthe server cannot be made.",
                                   "SHAKESPEARE QUOTE OF THE DAY",
@@ -317,7 +319,7 @@ internal class DummySubMenu : SubMenu
     }
 
     public DummySubMenu()
-        : base(new(FileAction.FileActionType.None, () => true, dummyAction, "Menu Is Empty"), "\uF141")
+        : base(new(FileAction.FileActionType.None, () => true, dummyAction, Strings.Resources.S_MENU_EMPTY), "\uF141")
     { }
 }
 

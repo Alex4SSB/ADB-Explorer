@@ -203,7 +203,7 @@ public static class FileHelper
     public static string DuplicateFile(IEnumerable<string> fileList, string fullName, DragDropEffects cutType = DragDropEffects.None)
     {
         // None - new file
-        var copySuffix = cutType is DragDropEffects.None ? "" : " - Copy";
+        var copySuffix = cutType is DragDropEffects.None ? "" : Strings.Resources.S_ITEM_COPY.Replace("{0}", "");
         var extension = GetExtension(fullName);
         var noExtName = fullName[..^extension.Length];
 
