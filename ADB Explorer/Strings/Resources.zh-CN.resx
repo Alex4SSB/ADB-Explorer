@@ -575,7 +575,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>保存更改</value>
   </data>
   <data name="S_MENU_INSTALL" xml:space="preserve">
-    <value></value>
+    <value>安装</value>
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>清除命令日志</value>
@@ -624,5 +624,188 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>每次启动时检查更新</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>内部存储</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>验证 {0}</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows 可执行文件</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}分钟</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}小时</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>永久删除</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>打开文件所在位置</value>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS" xml:space="preserve">
+    <value>粘贴1个{0}项</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>安卓应用程序包</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>已选择的对象</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>已选择的对象</value>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
+    <value>粘贴{0}个{1}项</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>源路径</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>目标路径</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>名称</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>原始位置</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>修改日期</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>类型</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>删除日期</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>用户 ID</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>关闭进程</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>刷新设备</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>重启 ADB</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>点击以启用服务器和轮询</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• 服务轮询功能已关闭&lt;LineBreak /&gt;• 服务器&lt;Italic&gt;可能&lt;/Italic&gt;处于运行状态&lt;/Span&gt;</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>服务器正常运行</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>有限的支持</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>某些操作失败了</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root 权限可以被启用</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>恢复模式</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>电压：{0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>温度：{0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>剩余电量：{0}Ah</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>重启到特定模式</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>系统镜像</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+  </data>
+  <data name="S_COPIED" xml:space="preserve">
+    <value>复制</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>链接</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} （链接）</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>是</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>已安装应用</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>MicroSD 卡</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>虚拟驱动器</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>{0} 文件名在目标文件系统上无效</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>内容不匹配</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>缺失目标位置</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>关闭服务器</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>复制到临时目录</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB 服务器无响应</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>大小</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG 存储设备</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>等待回复: {0}</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>回收站</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}秒</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>服务器最近响应时间</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>服务器停止运行</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>临时目录</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}毫秒</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>根目录</value>
   </data>
 </root>
