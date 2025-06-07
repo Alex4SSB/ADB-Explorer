@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,207 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android 機器人是由 Google 建立和共用的作品重製或修改而成，並遵循《創用 CC 3.0 姓名標示授權》中的條款使用。</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>啓用文件資源管理器監聽器后，應用可直接拖放/剪貼板拉取操作執行到目標文件夾。
+
+否則文件將先拉取至應用臨時目錄，再通過小緩衝區流式傳輸至文件資源管理器。
+這兩個額外步驟會顯著降低操作速度。
+
+該功能對其他文件管理器會自動禁用。</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>恢復</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>無法連接到</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>創建錯誤</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>刪除設備</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>文件操作</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>配對並連接 WiFi 設備（不使用 mDNS）</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>永久刪除</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>應用程式啟用了流暢設計中的多種動畫效果。
+當應用程式視窗在副螢幕上最大化時，側邊檢視動畫將始終停用。
+
+• 勾選此設定將停用所有動畫效果（進度條、進度環和磁碟機使用狀態列除外）。</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>禁用 mDNS</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>創建錯誤</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>斷開連接錯誤</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>路徑導航錯誤</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>文件寫入錯誤</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>APK 圖標根據 Apache License，版本 2.0 獲得許可。</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>配對錯誤</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>安裝軟件包</value>
+  </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Android 機器人圖標</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>應用動畫</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>無法從指定路徑獲取 ADB 版本。</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>指定路徑的 ADB 版本過低。</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>無法覆蓋 ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>選擇 ADB 可執行文件</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>重置應用設置</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>新版本</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>複製包名</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>複製文件路徑</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>還原所有項目</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>清空回收站</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>刪除</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>目標路徑錯誤</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>連接錯誤</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>無法在所選設備上啓用 Root 權限。</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root 權限</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>選擇要安裝的包</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>確認刪除</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>確認卸載</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>終止模擬器</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>斷開設備連接</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>重啓應用以使更改生效</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>文件讀取錯誤</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>無法 pull 文件以讀取内容。</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>無法將文件推送回設備</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>需要重啓 ADB 服務以禁用 mDNS。</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>在後臺啓動 WSA</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>拉取文件</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>拉取文件（Link Target）</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>部署 AdbProgressRedirection.exe</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>僅磁盤使用量</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>進度顯示方式</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>進度重置</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>目錄列表錯誤</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>拉取到 Windows 驅動器根目錄</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>衝突的應用程序</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>由於以下應用程序正在運行，因此無法運行文件資源管理器監聽器：</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>推送 / 拉取 進度以傳輸的縂字節數顯示。
+只有在知道總大小時才會顯示百分比進度。</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
+    <value>無法部署可執行文件。
+將改用磁盤使用量進度顯示方式。</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>僅在配合文件資源管理器使用時啓用此功能。
+您隨時可在設置中修改此選項。</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>歡迎來到 ADB Explorer 的新版本！
+發行説明已在 Github 上發佈。</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE 驅動器。
+• 不支援符號連結
+• 檔名不能包含 " * / : &lt; &gt; ? \ |
+• 檔名不區分大小寫
+• 不支援安裝 APK</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>繼續</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>文件資源管理器監聽器</value>
   </data>
 </root>
