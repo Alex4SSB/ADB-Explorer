@@ -498,4 +498,17 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_FILES" xml:space="preserve">
     <value>选择文件</value>
   </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>创建错误</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>进度重置</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE 驱动器。
+• 不支持符号链接
+• 文件名不能包含 " * / : &lt;&gt; ? \ |
+• 文件名不区分大小写
+• 不支持安装 APK</value>
+  </data>
 </root>
