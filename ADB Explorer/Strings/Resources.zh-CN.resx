@@ -532,4 +532,97 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>修改日期</value>
   </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>复制</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>更多</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>文件夹</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>文件</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>全选</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>剪切</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>重命名</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>粘贴链接</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>软件包</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>关闭编辑器</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>保存更改</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>清除命令日志</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>在浏览器中搜索</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>复制到剪切板</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>读取速度: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>写入速度: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>其他速度: {0}</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>项目</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>此文件夹为空。</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;此文件夹 &lt;Italic&gt;似乎&lt;/Italic&gt; 为空&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… 对肉眼来说&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>操作类型</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>文件名</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>进度</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>图标</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>不再显示</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>每次启动时检查更新</value>
+  </data>
 </root>
