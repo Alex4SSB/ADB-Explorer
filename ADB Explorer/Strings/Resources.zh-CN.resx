@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Android 机器人 图标</value>
+    <value>Android 机器人图标</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android 机器人是在 Google 原创及共享成果的基础上再创作或修改而成，须遵照知识共享署名 3.0 许可所述条款付诸应用。</value>
@@ -145,7 +145,7 @@
     <value>重置应用设置</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>新的版本</value>
+    <value>新版本</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
     <value>路径导航错误</value>
@@ -226,7 +226,7 @@
     <value>文件读取错误</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>无法拉取文件以读取内容。</value>
+    <value>无法 pull 文件以读取内容。</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>文件写入错误</value>
@@ -277,7 +277,7 @@
     <value>由于以下应用程序正在运行，因此无法运行文件资源管理器监听器：</value>
   </data>
   <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>推送/拉取进度以传输的总字节数显示。
+    <value>推送 / 拉取 进度以传输的总字节数显示。
 只有在知道总大小时才会显示百分比进度。</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
@@ -342,9 +342,9 @@
     <value>ADB 可执行文件</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>本应用是 ADB - Android Debug Bridge （安卓调试桥） 的图形界面工具。
-使用前，请确保您的电脑已安装 ADB。
-ADB 包含在 Android SDK Platform Tools 中。
+    <value>本应用是 ADB - Android Debug Bridge （安卓调试桥） 的图形界面工具。
+使用前，请确保您的电脑已安装 ADB。
+ADB 包含在 Android SDK Platform Tools 中。
 您可通过下方链接下载 SDK Platform Tools。
 由于许可限制，我们无法随应用直接提供 ADB。</value>
   </data>
@@ -459,8 +459,8 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>启用自动处理</value>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>停用自动处理
-取消所有正在运行</value>
+    <value>禁用自动处理
+取消所有正在运行的任务</value>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
     <value>日志更新操作已暂停</value>
@@ -734,7 +734,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>Bootloader</value>
   </data>
   <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
-    <value>Sideload</value>
+    <value>侧载</value>
   </data>
   <data name="S_COPIED" xml:space="preserve">
     <value>复制</value>
@@ -807,5 +807,377 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DRIVE_ROOT" xml:space="preserve">
     <value>根目录</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>不再显示此消息。</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} 冲突</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>拖拽</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>指定 ADB（至少 v{0}）：</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
+    <value>启用回收站</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>驱动程序和功能</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>启用 APK 处理</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>显示启动画面</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>在编辑器中打开</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>覆盖 ADB 路径</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>禁用动画</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>启用紧凑视图</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>跟随 Windows 默认主题</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>显示文件扩展名</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>隐藏</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>更改</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>停止 Push / Pull 轮询</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>轮询设备</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Pull 到默认文件夹</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>粘贴</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="S_EXTRACT_TITLE" xml:space="preserve">
+    <value>提取文件</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>发送到 Shell</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>菜单为空</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>直到下次应用启动</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>启动 WSA</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>关于</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>所选文件违反了 FUSE 命名规则</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>允许同时操作</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>退出搜索</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>浅色</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>文件资源管理器</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>轮询设备</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>禁用硬件加速</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>检查更新</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>强制 Fluent 风格</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>设备</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>应用数据文件夹</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>清空</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>启用 mDNS</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>显示隐藏的对象</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>显示系统应用</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>语言</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>禁用</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>选择一个选项以显示解释</value>
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value>选择进度方法：</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
+    <value>启用命令日志</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>粘贴冲突</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>电池状态查询</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>自动启用 Root 权限</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>保存手动连接的设备</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>自动打开以进行浏览</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>在 Push 时强制媒体重新扫描</value>
+  </data>
+  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
+    <value>启用文件资源管理器监听器</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>双击文件</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>默认文件夹</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>主题</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>图形</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>工作目录</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>捐赠或赞助</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>GitHub 仓库</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>隐私政策</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>归属及第三方许可</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>查看条款</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>搜索设置</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>搜索视图</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[未设置]</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>全部折叠</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>展开所有</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>设置</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB 磁盘使用情况</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>对象</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>无法获取列表。</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>没有对象符合当前筛选条件。</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>提供的路径不存在。</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>创建时间</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>启用 Root 权限</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>侧载（自动重启）</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - 离线</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - 未授权</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>虚拟设备</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS 服务</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>电池状态未知</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%，充电中</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>无线</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>无</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>正在充电</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>使用电池</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>未充电</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>充电完成</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>状态：{0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>健康：{0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>优秀</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>过热</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>报废</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>过高电压</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>未明确归类的电池故障</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>温度过低</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>复制对象 - {0}</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>遵循 Unix 命名规则（通过 ADB）</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>遵循 FUSE 命名规则</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>遵循 Windows 命名规则</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>遵循 Windows 驱动器根目录命名规则</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>当前文件夹内已有同名文件或当前路径下唯一</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>选中的文件违反了 Windows 命名规则</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>选中的文件违反了 Windows 驱动器命名规则</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>某些选中的文件在 FUSE / Windows 上具有冲突的名称</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>一些复制的文件在 FUSE 上有冲突的名称</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>选中的对象不是文件/文件夹</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>可以通过重置应用设置来撤消，或者手动在设置文件中进行</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>复制的文件违反了 FUSE 命名规则</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>自定义应用数据路径</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA 启动器</value>
   </data>
 </root>
