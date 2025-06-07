@@ -70,6 +70,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Move.
+        /// </summary>
+        public static string S_ACTION_MOVE {
+            get {
+                return ResourceManager.GetString("S_ACTION_MOVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Operation.
         /// </summary>
         public static string S_ACTION_OPERATION {
@@ -84,6 +93,24 @@ namespace ADB_Explorer.Strings {
         public static string S_ACTION_OPERATION_PLURAL {
             get {
                 return ResourceManager.GetString("S_ACTION_OPERATION_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recycle.
+        /// </summary>
+        public static string S_ACTION_RECYCLE {
+            get {
+                return ResourceManager.GetString("S_ACTION_RECYCLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Update.
+        /// </summary>
+        public static string S_ACTION_UPDATE {
+            get {
+                return ResourceManager.GetString("S_ACTION_UPDATE", resourceCulture);
             }
         }
         
@@ -138,6 +165,15 @@ namespace ADB_Explorer.Strings {
         public static string S_ADB_VERSION_LOW_OVERRIDE {
             get {
                 return ResourceManager.GetString("S_ADB_VERSION_LOW_OVERRIDE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add New Device.
+        /// </summary>
+        public static string S_ADD_NEW_DEVICE {
+            get {
+                return ResourceManager.GetString("S_ADD_NEW_DEVICE", resourceCulture);
             }
         }
         
@@ -473,6 +509,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Browse.
+        /// </summary>
+        public static string S_BUTTON_BROWSE {
+            get {
+                return ResourceManager.GetString("S_BUTTON_BROWSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Change.
         /// </summary>
         public static string S_BUTTON_CHANGE {
@@ -496,6 +541,15 @@ namespace ADB_Explorer.Strings {
         public static string S_BUTTON_CLOSE {
             get {
                 return ResourceManager.GetString("S_BUTTON_CLOSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connect.
+        /// </summary>
+        public static string S_BUTTON_CONNECT {
+            get {
+                return ResourceManager.GetString("S_BUTTON_CONNECT", resourceCulture);
             }
         }
         
@@ -527,11 +581,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable.
+        /// </summary>
+        public static string S_BUTTON_DISABLE {
+            get {
+                return ResourceManager.GetString("S_BUTTON_DISABLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device Drives.
         /// </summary>
         public static string S_BUTTON_DRIVES {
             get {
                 return ResourceManager.GetString("S_BUTTON_DRIVES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable.
+        /// </summary>
+        public static string S_BUTTON_ENABLE {
+            get {
+                return ResourceManager.GetString("S_BUTTON_ENABLE", resourceCulture);
             }
         }
         
@@ -590,6 +662,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pair &amp; Connect.
+        /// </summary>
+        public static string S_BUTTON_PAIR_CONNECT {
+            get {
+                return ResourceManager.GetString("S_BUTTON_PAIR_CONNECT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Push.
         /// </summary>
         public static string S_BUTTON_PUSH {
@@ -631,6 +712,15 @@ namespace ADB_Explorer.Strings {
         public static string S_CC_NAME {
             get {
                 return ResourceManager.GetString("S_CC_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Clear All.
+        /// </summary>
+        public static string S_CLEAR_ALL {
+            get {
+                return ResourceManager.GetString("S_CLEAR_ALL", resourceCulture);
             }
         }
         
@@ -989,11 +1079,56 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to QR Pairing.
+        /// </summary>
+        public static string S_DEVICE_QR {
+            get {
+                return ResourceManager.GetString("S_DEVICE_QR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ready To Pair.
+        /// </summary>
+        public static string S_DEVICE_READY_PAIR {
+            get {
+                return ResourceManager.GetString("S_DEVICE_READY_PAIR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reboot Into.
         /// </summary>
         public static string S_DEVICE_REBOOT_TITLE {
             get {
                 return ResourceManager.GetString("S_DEVICE_REBOOT_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved Device.
+        /// </summary>
+        public static string S_DEVICE_SAVED {
+            get {
+                return ResourceManager.GetString("S_DEVICE_SAVED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Unauthorized].
+        /// </summary>
+        public static string S_DEVICE_UNAUTH_NONAME {
+            get {
+                return ResourceManager.GetString("S_DEVICE_UNAUTH_NONAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WSA App.
+        /// </summary>
+        public static string S_DEVICE_WSA_APP {
+            get {
+                return ResourceManager.GetString("S_DEVICE_WSA_APP", resourceCulture);
             }
         }
         
@@ -1110,6 +1245,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to APK Installer.
+        /// </summary>
+        public static string S_DRIVE_APK_ITEMS {
+            get {
+                return ResourceManager.GetString("S_DRIVE_APK_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to APK Installers.
+        /// </summary>
+        public static string S_DRIVE_APK_ITEMS_PLURAL {
+            get {
+                return ResourceManager.GetString("S_DRIVE_APK_ITEMS_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Installed Apps.
         /// </summary>
         public static string S_DRIVE_APPS {
@@ -1119,11 +1272,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Empty.
+        /// </summary>
+        public static string S_DRIVE_EMPTY_TRASH {
+            get {
+                return ResourceManager.GetString("S_DRIVE_EMPTY_TRASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Emulated Drive.
         /// </summary>
         public static string S_DRIVE_EMULATED {
             get {
                 return ResourceManager.GetString("S_DRIVE_EMULATED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} free of {1}.
+        /// </summary>
+        public static string S_DRIVE_FREE_SPACE {
+            get {
+                return ResourceManager.GetString("S_DRIVE_FREE_SPACE", resourceCulture);
             }
         }
         
@@ -1142,6 +1313,15 @@ namespace ADB_Explorer.Strings {
         public static string S_DRIVE_OTG {
             get {
                 return ResourceManager.GetString("S_DRIVE_OTG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Packages.
+        /// </summary>
+        public static string S_DRIVE_PACKAGE_PLURAL {
+            get {
+                return ResourceManager.GetString("S_DRIVE_PACKAGE_PLURAL", resourceCulture);
             }
         }
         
@@ -1340,6 +1520,105 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_TYPE_LINK {
             get {
                 return ResourceManager.GetString("S_FILE_TYPE_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Canceled.
+        /// </summary>
+        public static string S_FILEOP_CANCELED {
+            get {
+                return ResourceManager.GetString("S_FILEOP_CANCELED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Completed.
+        /// </summary>
+        public static string S_FILEOP_COMPLETED {
+            get {
+                return ResourceManager.GetString("S_FILEOP_COMPLETED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error: {0}.
+        /// </summary>
+        public static string S_FILEOP_ERROR {
+            get {
+                return ResourceManager.GetString("S_FILEOP_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed.
+        /// </summary>
+        public static string S_FILEOP_FAILED {
+            get {
+                return ResourceManager.GetString("S_FILEOP_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous Operation.
+        /// </summary>
+        public static string S_FILEOP_PREV {
+            get {
+                return ResourceManager.GetString("S_FILEOP_PREV", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Previous.
+        /// </summary>
+        public static string S_FILEOP_PREVIOUS {
+            get {
+                return ResourceManager.GetString("S_FILEOP_PREVIOUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Running.
+        /// </summary>
+        public static string S_FILEOP_RUNNING {
+            get {
+                return ResourceManager.GetString("S_FILEOP_RUNNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} Failed.
+        /// </summary>
+        public static string S_FILEOP_SUBITEM_FAILED {
+            get {
+                return ResourceManager.GetString("S_FILEOP_SUBITEM_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Total:.
+        /// </summary>
+        public static string S_FILEOP_TOTAL {
+            get {
+                return ResourceManager.GetString("S_FILEOP_TOTAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validated.
+        /// </summary>
+        public static string S_FILEOP_VALIDATED {
+            get {
+                return ResourceManager.GetString("S_FILEOP_VALIDATED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Queued.
+        /// </summary>
+        public static string S_FILEOP_WAITING {
+            get {
+                return ResourceManager.GetString("S_FILEOP_WAITING", resourceCulture);
             }
         }
         
@@ -2038,11 +2317,47 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IP Address / Host Name.
+        /// </summary>
+        public static string S_PLACEHOLDER_HOST {
+            get {
+                return ResourceManager.GetString("S_PLACEHOLDER_HOST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [not set].
         /// </summary>
         public static string S_PLACEHOLDER_NOT_SET {
             get {
                 return ResourceManager.GetString("S_PLACEHOLDER_NOT_SET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pairing Code.
+        /// </summary>
+        public static string S_PLACEHOLDER_PAIRING_CODE {
+            get {
+                return ResourceManager.GetString("S_PLACEHOLDER_PAIRING_CODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pairing Port.
+        /// </summary>
+        public static string S_PLACEHOLDER_PAIRING_PORT {
+            get {
+                return ResourceManager.GetString("S_PLACEHOLDER_PAIRING_PORT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Port.
+        /// </summary>
+        public static string S_PLACEHOLDER_PORT {
+            get {
+                return ResourceManager.GetString("S_PLACEHOLDER_PORT", resourceCulture);
             }
         }
         
@@ -2518,6 +2833,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Root Status: {0}.
+        /// </summary>
+        public static string S_ROOT_STATUS_TITLE {
+            get {
+                return ResourceManager.GetString("S_ROOT_STATUS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Search Settings.
         /// </summary>
         public static string S_SEARCH_SETTINGS {
@@ -2631,6 +2955,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SERVER_UNRESPONSIVE {
             get {
                 return ResourceManager.GetString("S_SERVER_UNRESPONSIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [Service].
+        /// </summary>
+        public static string S_SERVICE_NONAME {
+            get {
+                return ResourceManager.GetString("S_SERVICE_NONAME", resourceCulture);
             }
         }
         
@@ -3022,6 +3355,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forbidden.
+        /// </summary>
+        public static string S_STAT_ROOT_FORBIDDEN {
+            get {
+                return ResourceManager.GetString("S_STAT_ROOT_FORBIDDEN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unchecked.
+        /// </summary>
+        public static string S_STAT_ROOT_UNCHECKED {
+            get {
+                return ResourceManager.GetString("S_STAT_ROOT_UNCHECKED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} - Offline.
         /// </summary>
         public static string S_STATUS_OFFLINE {
@@ -3036,6 +3387,15 @@ namespace ADB_Explorer.Strings {
         public static string S_STATUS_UNAUTH {
             get {
                 return ResourceManager.GetString("S_STATUS_UNAUTH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Currently Browsing.
+        /// </summary>
+        public static string S_TOOLTIP_BROWSING {
+            get {
+                return ResourceManager.GetString("S_TOOLTIP_BROWSING", resourceCulture);
             }
         }
         

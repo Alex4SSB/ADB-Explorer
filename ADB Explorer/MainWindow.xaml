@@ -512,7 +512,7 @@
                         <TextBlock Text="{Binding AndroidVersion}" />
                         <TextBlock Style="{StaticResource AndroidVersionRecoveryTextblockStyle}">
                             <Run Text=" (" />
-                            <Run Text="{Binding Source={x:Static Member=strings:Resources.S_RECOVERY_MODE}}" />
+                            <Run Text="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_RECOVERY_MODE}}" />
                             <Run Text=")" />
                         </TextBlock>
                     </StackPanel>

@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:WsaPkgDeviceViewModel}"
@@ -43,14 +44,14 @@
                     Grid.Column="1"
                     Margin="4"
                     Style="{StaticResource DeviceNameTextBlockStyle}"
-                    Text="WSA App" />
+                    Text="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_WSA_APP}}" />
             </Grid>
         </Expander.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
             <Button
                 HorizontalAlignment="Right"
                 Command="{Binding LaunchWsaCommand.Command}"
-                Content="Launch"
+                Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_LAUNCH}}"
                 Style="{StaticResource DeviceTextButtonStyle}" />
         </Grid>
     </Expander>

@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:HistoryDeviceViewModel}"
@@ -71,7 +72,7 @@
                         Command="{Binding RemoveCommand.Command}"
                         Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                         Style="{StaticResource RestartAppButtonStyle}"
-                        ToolTip="Remove Device">
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
                         <ui:FontIcon Glyph="&#xE74D;" />
                     </Button>
                 </Grid>
@@ -84,7 +85,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE774;" ToolTip="IP Address / Host Name" />
+                    <ui:FontIcon Glyph="&#xE774;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
                     <TextBox
                         Grid.Column="1"
                         Padding="4,5,0,6"
@@ -107,7 +108,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE177;" ToolTip="Port" />
+                    <ui:FontIcon Glyph="&#xE177;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
                 </Grid>
                 <Grid>
@@ -137,7 +138,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="Pairing Code" />
+                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
                 </Grid>
                 <Grid Style="{StaticResource NewDevicePairingGrid}">
@@ -149,11 +150,11 @@
                         <ui:FontIcon
                             Margin="0"
                             Glyph="&#xE177;"
-                            ToolTip="Pairing Port" />
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                         <ui:FontIcon
                             Glyph="&#xEA21;"
                             Style="{StaticResource NewDevicePairingPortAsteriskStyle}"
-                            ToolTip="Pairing Port" />
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                     </Grid>
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
                 </Grid>

@@ -31,7 +31,17 @@ public abstract class ServiceDeviceViewModel : PairingDeviceViewModel
 
     public ServiceDevice.ServiceType MdnsType => Device.MdnsType;
 
-    public override string Tooltip => $"mDNS Service - {(MdnsType is ServiceDevice.ServiceType.QrCode ? "QR Pairing" : "Ready To Pair")}";
+    public override string Tooltip
+    {
+        get
+        {
+            var type = MdnsType is ServiceDevice.ServiceType.QrCode
+                ? Strings.Resources.S_DEVICE_QR
+                : Strings.Resources.S_DEVICE_READY_PAIR;
+
+            return $"{Strings.Resources.S_TYPE_SERVICE} - {type}";
+        }
+    }
 
     #endregion
 

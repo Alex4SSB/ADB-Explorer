@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     xmlns:views="clr-namespace:ADB_Explorer.Views"
@@ -36,7 +37,7 @@
                                     <Setter Property="FontWeight" Value="Bold" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Status}" Value="Unauthorized">
-                                    <Setter Property="Text" Value="[Unauthorized]" />
+                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding Type}" Value="Emulator">
                                     <Setter Property="Text" Value="{Binding ID}" />
@@ -46,7 +47,7 @@
                                         <Condition Binding="{Binding Type}" Value="Service" />
                                         <Condition Binding="{Binding Name}" Value="" />
                                     </MultiDataTrigger.Conditions>
-                                    <Setter Property="Text" Value="[Service]" />
+                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVICE_NONAME}}" />
                                 </MultiDataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -67,7 +68,7 @@
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
-                                <Setter Property="ToolTip" Value="Currently Browsing" />
+                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_BROWSING}}" />
                             </Style>
                         </ui:FontIcon.Style>
                     </ui:FontIcon>
@@ -101,7 +102,7 @@
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{Binding BrowseCommand.Command}"
-                Content="Browse"
+                Content="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_BROWSE}}"
                 Style="{StaticResource DeviceTextButtonStyle}" />
         </Grid>
     </Expander>

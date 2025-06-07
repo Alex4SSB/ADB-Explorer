@@ -192,7 +192,20 @@ public abstract class FileOperation : ViewModelBase
 
     public abstract SyncFile AndroidPath { get; }
 
-    public virtual string Tooltip => $"{OperationName}";
+    public virtual string Tooltip => OperationName switch
+    {
+        OperationType.Pull => Strings.Resources.S_PULL_ACTION,
+        OperationType.Push => Strings.Resources.S_BUTTON_PUSH,
+        OperationType.Move => Strings.Resources.S_ACTION_MOVE,
+        OperationType.Delete => Strings.Resources.S_DELETE_ACTION,
+        OperationType.Recycle => Strings.Resources.S_ACTION_RECYCLE,
+        OperationType.Copy => Strings.Resources.S_MENU_COPY,
+        OperationType.Restore => Strings.Resources.S_RESTORE_ACTION,
+        OperationType.Install => Strings.Resources.S_MENU_INSTALL,
+        OperationType.Update => Strings.Resources.S_ACTION_UPDATE,
+        OperationType.Rename => Strings.Resources.S_MENU_RENAME,
+        _ => throw new NotSupportedException(),
+    };
 
     public virtual FrameworkElement OpIcon => OperationName switch
     {

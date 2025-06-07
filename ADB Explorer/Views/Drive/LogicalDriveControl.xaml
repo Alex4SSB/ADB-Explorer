@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:LogicalDriveViewModel}"
@@ -80,9 +81,14 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock Text="{Binding Available, Mode=OneWay}" />
-                <TextBlock Text=" free of " />
-                <TextBlock Text="{Binding Size, Mode=OneWay}" />
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
+                            <Binding Source="{Binding Available}" />
+                            <Binding Source="{Binding Size}" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
             </StackPanel>
         </Grid>
     </Button>

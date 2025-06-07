@@ -16,7 +16,7 @@ public class HistoryDeviceViewModel : NewDeviceViewModel
 
     public string DeviceName => Device.DeviceName;
 
-    public override string Tooltip => "Saved Device";
+    public override string Tooltip => Strings.Resources.S_DEVICE_SAVED;
 
     public override bool DeviceExists => false;
 

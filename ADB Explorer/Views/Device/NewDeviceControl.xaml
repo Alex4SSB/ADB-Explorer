@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:NewDeviceViewModel}"
@@ -45,13 +46,13 @@
                     Grid.Column="1"
                     Margin="4"
                     Style="{StaticResource DeviceNameTextBlockStyle}"
-                    Text="Add New Device" />
+                    Text="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_ADD_NEW_DEVICE}}" />
                 <Button
                     Grid.Column="2"
                     Command="{Binding ClearCommand.Command}"
                     Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                     Style="{StaticResource RestartAppButtonStyle}"
-                    ToolTip="Clear All">
+                    ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_CLEAR_ALL}}">
                     <ui:FontIcon Glyph="&#xE711;" />
                 </Button>
             </Grid>
@@ -63,7 +64,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE774;" ToolTip="IP Address / Host Name" />
+                    <ui:FontIcon Glyph="&#xE774;" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDeviceIpBoxStyle}" />
                 </Grid>
                 <Grid>
@@ -71,7 +72,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE177;" ToolTip="Port" />
+                    <ui:FontIcon Glyph="&#xE177;" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
                 </Grid>
                 <Grid>
@@ -101,7 +102,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="Pairing Code" />
+                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
                 </Grid>
                 <Grid Style="{StaticResource NewDevicePairingGrid}">
@@ -113,11 +114,11 @@
                         <ui:FontIcon
                             Margin="0"
                             Glyph="&#xE177;"
-                            ToolTip="Pairing Port" />
+                            ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                         <ui:FontIcon
                             Glyph="&#xEA21;"
                             Style="{StaticResource NewDevicePairingPortAsteriskStyle}"
-                            ToolTip="Pairing Port" />
+                            ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
                     </Grid>
                     <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
                 </Grid>

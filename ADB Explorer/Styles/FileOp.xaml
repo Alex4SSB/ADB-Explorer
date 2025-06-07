@@ -5,6 +5,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019">
     <converters:TreeViewIndentConverter x:Key="TreeViewIndentConverter" />
     <converters:FileOpTreeStatusConverter x:Key="FileOpTreeStatusConverter" />
@@ -535,7 +536,7 @@
                 Foreground="{DynamicResource HistoryDeviceBottomBorderBrush}"
                 Glyph="&#xE81C;"
                 Style="{StaticResource PrevOpIconStyle}"
-                ToolTip="Previous Operation" />
+                ToolTip="{Binding Source={x:Static Member=strings:Resources.S_FILEOP_PREV}}" />
             <ContentControl
                 Grid.Column="1"
                 Content="{Binding StatusInfo}"
@@ -670,7 +671,7 @@
         <Setter Property="Text" Value="{Binding Device.Device.Name}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Device.Device.Status}" Value="Unauthorized">
-                <Setter Property="Text" Value="[Unauthorized]" />
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEVICE_UNAUTH_NONAME}}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Device.Device.Type}" Value="Emulator">
                 <Setter Property="Text" Value="{Binding Device.Device.ID}" />
@@ -680,7 +681,7 @@
                     <Condition Binding="{Binding Device.Device.Type}" Value="Service" />
                     <Condition Binding="{Binding Device.Device.Name}" Value="" />
                 </MultiDataTrigger.Conditions>
-                <Setter Property="Text" Value="[Service]" />
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVICE_NONAME}}" />
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>

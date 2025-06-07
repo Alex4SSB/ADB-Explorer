@@ -6,6 +6,7 @@
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:VirtualDriveViewModel}"
@@ -81,19 +82,41 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
+                        <TextBlock Text=" " />
                         <TextBlock>
                             <TextBlock.Style>
                                 <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Type}" Value="Trash">
-                                            <Setter Property="Text" Value=" Item" />
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_BROWSER_ITEMS_PLURAL}}" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="Temp">
-                                            <Setter Property="Text" Value=" APK Installer" />
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_APK_ITEMS_PLURAL}}" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Type}" Value="Package">
-                                            <Setter Property="Text" Value=" Package" />
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_PACKAGE_PLURAL}}" />
                                         </DataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Type}" Value="Trash" />
+                                                <Condition Binding="{Binding ItemsCount}" Value="1" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_BROWSER_ITEMS}}" />
+                                        </MultiDataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Type}" Value="Temp" />
+                                                <Condition Binding="{Binding ItemsCount}" Value="1" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_APK_ITEMS}}" />
+                                        </MultiDataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding Type}" Value="Package" />
+                                                <Condition Binding="{Binding ItemsCount}" Value="1" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_MENU_PACKAGE}}" />
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </TextBlock.Style>
@@ -114,7 +137,7 @@
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />
-                                <Setter Property="Text" Value="Empty" />
+                                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DRIVE_EMPTY_TRASH}}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ItemsCount}" Value="0">
                                         <Setter Property="Visibility" Value="Visible" />

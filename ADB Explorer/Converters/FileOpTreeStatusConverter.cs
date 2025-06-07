@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 using static ADB_Explorer.Converters.FileOpStatusConverter;
 
@@ -38,21 +37,22 @@ public static class FileOpStatusConverter
         {
             return message.StartsWith(Strings.Resources.S_REDIRECTION)
                 ? message
-                : $"Error: {message}";
+                : string.Format(Strings.Resources.S_FILEOP_ERROR, message);
         }
 
         var completedString = (type == typeof(HashFailInfo) || type == typeof(HashSuccessInfo))
-            ? "Validated" : "Completed";
+            ? Strings.Resources.S_FILEOP_VALIDATED
+            : Strings.Resources.S_FILEOP_COMPLETED;
 
         if (failed == -1)
             return completedString;
 
         if (type == typeof(ShellErrorInfo))
-            return $"({failed} Failed)";
+            return $"({string.Format(Strings.Resources.S_FILEOP_SUBITEM_FAILED, failed)})";
 
-        var failedString = failed > 0 ? $"{failed} Failed, " : "";
+        var failedString = failed > 0 ? $"{string.Format(Strings.Resources.S_FILEOP_SUBITEM_FAILED, failed)}, " : "";
 
-        return $"({(total ? "Total: " : "")}{failedString}{completed} {completedString})";
+        return $"({(total ? $"{Strings.Resources.S_FILEOP_TOTAL} " : "")}{failedString}{completed} {completedString})";
     }
 
     public static (int, Type) CountFails(ObservableList<SyncFile> children)

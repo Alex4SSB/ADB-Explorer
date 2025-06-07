@@ -71,6 +71,15 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
     public RootStatus Root => Device.Root;
 
+    public string RootString => Root switch
+    {
+        RootStatus.Unchecked => Strings.Resources.S_STAT_ROOT_UNCHECKED,
+        RootStatus.Forbidden => Strings.Resources.S_STAT_ROOT_FORBIDDEN,
+        RootStatus.Disabled => Strings.Resources.S_DISABLED,
+        RootStatus.Enabled => Strings.Resources.S_ENABLED,
+        _ => throw new NotSupportedException(),
+    };
+
     public bool AndroidVersionIncompatible => AndroidVersion is not null && AndroidVersion < AdbExplorerConst.MIN_SUPPORTED_ANDROID_VER;
 
     public override string Tooltip

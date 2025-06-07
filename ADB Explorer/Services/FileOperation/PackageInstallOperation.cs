@@ -12,7 +12,9 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
     public bool IsUninstall => !string.IsNullOrEmpty(PackageName);
 
-    public override string Tooltip => IsUninstall ? "Uninstall" : "Install";
+    public override string Tooltip => IsUninstall
+        ? Strings.Resources.S_UNINSTALL
+        : Strings.Resources.S_MENU_INSTALL;
 
     public override FrameworkElement OpIcon => IsUninstall ? new UninstallIcon() : new InstallIcon();
 

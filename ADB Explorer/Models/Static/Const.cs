@@ -135,13 +135,13 @@ public static class AdbExplorerConst
 
     public static readonly Dictionary<FileOpFilter.FilterType, string> FILE_OP_NAMES = new()
     {
-        { FileOpFilter.FilterType.Running, "Running" },
-        { FileOpFilter.FilterType.Pending, "Queued" },
-        { FileOpFilter.FilterType.Completed, "Completed" },
-        { FileOpFilter.FilterType.Validated, "Validated" },
-        { FileOpFilter.FilterType.Failed, "Failed" },
-        { FileOpFilter.FilterType.Canceled, "Canceled" },
-        { FileOpFilter.FilterType.Previous, "Previous" },
+        { FileOpFilter.FilterType.Running, Strings.Resources.S_FILEOP_RUNNING },
+        { FileOpFilter.FilterType.Pending, Strings.Resources.S_FILEOP_WAITING },
+        { FileOpFilter.FilterType.Completed, Strings.Resources.S_FILEOP_COMPLETED },
+        { FileOpFilter.FilterType.Validated, Strings.Resources.S_FILEOP_VALIDATED },
+        { FileOpFilter.FilterType.Failed, Strings.Resources.S_FILEOP_FAILED },
+        { FileOpFilter.FilterType.Canceled, Strings.Resources.S_FILEOP_CANCELED },
+        { FileOpFilter.FilterType.Previous, Strings.Resources.S_FILEOP_PREVIOUS },
     };
 
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);

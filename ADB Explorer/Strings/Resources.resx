@@ -1416,4 +1416,164 @@ Cancel All Running</value>
     <value>Never Show Again</value>
     <comment>The paste popup permanent hide checkbox content</comment>
   </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA App</value>
+    <comment>Represents the WSA app, not the device itself</comment>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root Status: {0}</value>
+    <comment>0 = the status (enabled, forbidden, etc.)</comment>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Unchecked</value>
+    <comment>Root status - it is yet unknown whether the device supports root access</comment>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Forbidden</value>
+    <comment>Root access - the device does not support root access</comment>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Enable</value>
+    <comment>Toggle button - enable</comment>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Disable</value>
+    <comment>Toggle button - disable</comment>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Pairing Code</value>
+    <comment>The placeholder text for the pairing code textbox</comment>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP Address / Host Name</value>
+    <comment>The placeholder text for the IP address textbox</comment>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+    <comment>The placeholder text for the connect port textbox</comment>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Pairing Port</value>
+    <comment>The placeholder text for the pairing port textbox</comment>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Pair &amp; Connect</value>
+    <comment>The content of a button to pair and connect a new manually connected device</comment>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Saved Device</value>
+    <comment>A saved device that has been manually connected</comment>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR Pairing</value>
+    <comment>An mDNS service device that is in the process of pairing using the QR code</comment>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Ready To Pair</value>
+    <comment>An mDNS service device that is ready to pair</comment>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Clear All</value>
+    <comment>The tooltip of a button used to clear all textboxes in the connect new device</comment>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Add New Device</value>
+    <comment>The tooltip of the new device icon</comment>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Unauthorized]</value>
+    <comment>The name displayed for a device that hasn't authorized ADB yet, and we don't know its name</comment>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Service]</value>
+    <comment>The name displayed for a service device for which we don't have a name yet</comment>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Currently Browsing</value>
+    <comment>The tooltip displayed for the device that is currently open for browsing</comment>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Browse</value>
+    <comment>The content of the button to open a device for browsing</comment>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Connect</value>
+    <comment>The button to try to connect an old / new device manually</comment>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} free of {1}</value>
+    <comment>0 = free space on drive (in B/KB/MB/GB). 1 = total drive capacity (in B/KB/MB/GB)</comment>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Empty</value>
+    <comment>The notification displayed on the recycle bin drive when it is empty</comment>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK Installer</value>
+    <comment>The item count on the temp drive, singular</comment>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK Installers</value>
+    <comment>The item count on the temp drive, plural</comment>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Packages</value>
+    <comment>The installed apps drive items count display, plural</comment>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Error: {0}</value>
+    <comment>0 = an internal error message</comment>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validated</value>
+    <comment>A file operation status - validated</comment>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Completed</value>
+    <comment>A file operation status - completed</comment>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Failed</value>
+    <comment>File operation sub items failed status. 0 = failed items count</comment>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Total:</value>
+    <comment>File operation total sub items count</comment>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Previous Operation</value>
+    <comment>A file operation from a previous batch</comment>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>Running</value>
+    <comment>File operation status - running (in progress)</comment>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>Queued</value>
+    <comment>File operation status - queued (waiting)</comment>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Failed</value>
+    <comment>File operation status - failed</comment>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Canceled</value>
+    <comment>File operation status - canceled</comment>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Previous</value>
+    <comment>File operation status - previous</comment>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Move</value>
+    <comment>The action to move a file (cut-paste)</comment>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Recycle</value>
+    <comment>The action to recycle an item - send it to the trash</comment>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Update</value>
+    <comment>The action to update the date modified of a file according to its name</comment>
+  </data>
 </root>

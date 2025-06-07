@@ -13,7 +13,7 @@ public static class FileOpFilters
         {
             if (list is null)
             {
-                list = new(Enum.GetValues<FileOpFilter.FilterType>().Select(f => new FileOpFilter(f)));
+                list = [.. Enum.GetValues<FileOpFilter.FilterType>().Select(f => new FileOpFilter(f))];
 
                 UpdateCheckedColumns();
             }
