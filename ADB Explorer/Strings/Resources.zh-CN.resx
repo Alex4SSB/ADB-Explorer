@@ -511,4 +511,25 @@ ADB 包含在 Android SDK Platform Tools 中。
 • 文件名不区分大小写
 • 不支持安装 APK</value>
   </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>了解有关 ADB 的更多信息</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>无法在 Windows 驱动器根目录下创建所选文件 {0}。</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>下载 ADB</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>复制到 %LocalAppData%\AdbExplorer</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>用于从 ADB 读取推/拉进度的帮助程序。</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
+    <value>可能会错误地触发某些杀毒程序。</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>修改日期</value>
+  </data>
 </root>
