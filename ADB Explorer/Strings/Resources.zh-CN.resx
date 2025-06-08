@@ -1180,4 +1180,121 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
     <value>WSA 启动器</value>
   </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>未检查</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>启用</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP 地址 / 主机名</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>配对端口</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>配对与连接</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>二维码配对</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>准备配对</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>清空</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>添加新设备</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[未授权]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[服务]</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>连接</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK 安装程序</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} 可用，共 {1}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>已验证</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>完成</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} 失败</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>总计：</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>运行中</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>排队中</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>失败</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>移动</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root 权限状态：{0}</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>端口</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>配对代码</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>错误：{0}</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>保存的设备</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK 安装程序</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>软件包</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>上一个操作</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>取消中</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>当前浏览</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>不支持</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>浏览</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>空</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA 应用</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>禁用</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>回收</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>更新</value>
+  </data>
 </root>
