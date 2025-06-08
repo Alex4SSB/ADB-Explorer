@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Android 机器人图标</value>
+    <value>Android 机器人 图标</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android 机器人是在 Google 原创及共享成果的基础上再创作或修改而成，须遵照知识共享署名 3.0 许可所述条款付诸应用。</value>
