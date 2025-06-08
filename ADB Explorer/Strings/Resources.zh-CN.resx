@@ -127,7 +127,7 @@
     <value>应用动画</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>APK 图标根据 Apache License，版本 2.0 获得许可。</value>
+    <value>APK 图标是根据 Apache License 2.0 版本授权的。</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>无法从指定路径获取 ADB 版本。</value>
@@ -1296,5 +1296,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>更新</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>先前的</value>
   </data>
 </root>
