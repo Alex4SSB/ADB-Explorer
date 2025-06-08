@@ -71,7 +71,7 @@ internal static class FileActionLogic
             DefaultDirectory = Data.Settings.DefaultFolder,
             Title = Strings.Resources.S_INSTALL_APK,
         };
-        dialog.Filters.Add(new("Android Package", string.Join(';', AdbExplorerConst.INSTALL_APK.Select(name => name[1..]))));
+        dialog.Filters.Add(new(Strings.Resources.S_FILE_TYPE_APK, string.Join(';', AdbExplorerConst.INSTALL_APK.Select(name => name[1..]))));
 
         if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
             return;

@@ -84,8 +84,8 @@
                 <TextBlock>
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
-                            <Binding Source="{Binding Available}" />
-                            <Binding Source="{Binding Size}" />
+                            <Binding Path="Available" />
+                            <Binding Path="Size" />
                         </MultiBinding>
                     </TextBlock.Text>
                 </TextBlock>

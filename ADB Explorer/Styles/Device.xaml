@@ -364,7 +364,7 @@
                         <TextBlock FontWeight="Bold">
                             <TextBlock.Text>
                                 <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_ROOT_STATUS_TITLE}">
-                                    <Binding Source="{Binding RootString}" />
+                                    <Binding Path="RootString" />
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
@@ -422,7 +422,7 @@
         <MenuItem
             ItemsSource="{Binding RebootCommands}"
             Style="{StaticResource DeviceActionsMenuItemStyle}"
-            ToolTip="Reboot Into">
+            ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_DEVICE_REBOOT_TITLE}}">
             <MenuItem.ItemContainerStyle>
                 <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
                     <Setter Property="Command" Value="{Binding Command}" />
