@@ -361,7 +361,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>为 {0} 选择目标文件夹</value>
   </data>
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
-    <value>为多个对象选择目标文件夹</value>
+    <value>为多个项目选择目标文件夹</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
     <value>以下内容将被删除:
@@ -599,7 +599,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>关于</value>
   </data>
   <data name="S_BROWSER_ITEMS" xml:space="preserve">
-    <value>对象</value>
+    <value>项目</value>
   </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
     <value>此文件夹为空。</value>
@@ -653,10 +653,10 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>安卓应用程序包</value>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
-    <value>选中的对象</value>
+    <value>选中的项目</value>
   </data>
   <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
-    <value>选中的对象</value>
+    <value>选中的项目</value>
   </data>
   <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
     <value>粘贴{0}个{1}项</value>
@@ -932,7 +932,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>启用 mDNS</value>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>显示隐藏的对象</value>
+    <value>显示隐藏的项目</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>显示系统应用</value>
@@ -1031,13 +1031,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>ADB 磁盘使用情况</value>
   </data>
   <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
-    <value>对象</value>
+    <value>项目</value>
   </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
     <value>无法获取列表。</value>
   </data>
   <data name="S_EMPTY_FILTER" xml:space="preserve">
-    <value>没有对象符合当前筛选条件。</value>
+    <value>没有项目符合当前筛选条件。</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
     <value>提供的路径不存在。</value>
@@ -1133,7 +1133,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>N/A</value>
   </data>
   <data name="S_ITEM_COPY" xml:space="preserve">
-    <value>复制对象 - {0}</value>
+    <value>{0} - 复制</value>
   </data>
   <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
     <value>遵循 Unix 命名规则（通过 ADB）</value>
@@ -1166,7 +1166,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>一些复制的文件在 FUSE 上有冲突的名称</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>选中的对象不是文件/文件夹</value>
+    <value>选中的项目不是文件/文件夹</value>
   </data>
   <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
     <value>可以通过重置应用设置来撤消，或者手动在设置文件中进行</value>
