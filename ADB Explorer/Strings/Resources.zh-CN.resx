@@ -226,7 +226,7 @@
     <value>文件读取错误</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>无法 pull 文件以读取内容。</value>
+    <value>无法拉取文件以读取内容。</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>文件写入错误</value>
@@ -857,13 +857,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>更改</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>停止 Push / Pull 轮询</value>
+    <value>停止 推送 / 拉取 轮询</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>轮询设备</value>
   </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Pull 到默认文件夹</value>
+    <value>拉取到默认文件夹</value>
   </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>粘贴</value>
