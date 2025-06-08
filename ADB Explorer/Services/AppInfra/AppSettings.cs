@@ -444,9 +444,13 @@ public class AppSettings : ViewModelBase
 
     private void UpdateTranslation()
     {
-        string precent = UICulture.Equals(CultureInfo.InvariantCulture) || UICulture.Equals(CultureInfo.GetCultureInfo("en-US"))
-                            ? null
-                            : $"{SettingsHelper.GetCurrentPercentageTranslated(UICulture) * 100:f0}%";
+        var actual = UICulture.Equals(CultureInfo.InvariantCulture)
+            ? OriginalCulture
+            : UICulture;
+
+        string precent = actual.Parent.Name == "en"
+                         ? null
+                         : $"{SettingsHelper.GetCurrentPercentageTranslated(actual) * 100:f0}%";
 
         CultureTranslationProgress.Value = precent;
     }
@@ -459,6 +463,8 @@ public class AppSettings : ViewModelBase
         get => Get(ref uiLanguage, "");
         set => Set(ref uiLanguage, value);
     }
+
+    public CultureInfo OriginalCulture { get; set; }
 
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {

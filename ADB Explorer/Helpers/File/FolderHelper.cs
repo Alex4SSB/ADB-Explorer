@@ -22,19 +22,20 @@ public class FolderHelper
                 ? drive.ID : drive.DisplayName);
         }
 
-        foreach (var item in AdbExplorerConst.SPECIAL_FOLDERS_DISPLAY_NAMES)
+        foreach (var item in AdbExplorerConst.DRIVE_TYPES.Where(d => d.Value is AbstractDrive.DriveType.Root or AbstractDrive.DriveType.Internal))
         {
-            Data.CurrentDisplayNames.TryAdd(item.Key, item.Value);
+            Data.CurrentDisplayNames.TryAdd(item.Key, AbstractDrive.GetDriveDisplayName(item.Value));
         }
 
         foreach (var item in AdbExplorerConst.DRIVE_TYPES)
         {
-            var names = AdbExplorerConst.DRIVE_DISPLAY_NAMES.Where(n => n.Key == item.Value && item.Value
+            var names = Enum.GetValues<AbstractDrive.DriveType>().Where(n => n == item.Value && item.Value
                 is not AbstractDrive.DriveType.Root
-                and not AbstractDrive.DriveType.Internal);
+                and not AbstractDrive.DriveType.Internal)
+                .Select(AbstractDrive.GetDriveDisplayName);
 
             if (names.Any())
-                Data.CurrentDisplayNames.TryAdd(item.Key, names.First().Value);
+                Data.CurrentDisplayNames.TryAdd(item.Key, names.First());
         }
 
         Data.RuntimeSettings.RefreshBreadcrumbs = true;

@@ -1562,7 +1562,7 @@ Cancel All Running</value>
   </data>
   <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
     <value>Previous</value>
-    <comment>File operation status - previous</comment>
+    <comment>File operation status - A file operation from a previous batch</comment>
   </data>
   <data name="S_ACTION_MOVE" xml:space="preserve">
     <value>Move</value>
@@ -1575,5 +1575,9 @@ Cancel All Running</value>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>Update</value>
     <comment>The action to update the date modified of a file according to its name</comment>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% Used</value>
+    <comment>The tooltip for the drive usage percentage progress bar</comment>
   </data>
 </root>

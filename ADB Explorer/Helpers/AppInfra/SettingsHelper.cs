@@ -241,7 +241,7 @@ public static class SettingsHelper
         var propertyInfos = resourceType.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static);
 
         var stringProps = propertyInfos.Where(p => p.PropertyType == typeof(string));
-        var neutralValues = stringProps.Select(p => resourceManager.GetString(p.Name, neutralCulture));
+        var neutralValues = stringProps.Select(p => resourceManager.GetString(p.Name, neutralCulture)).Where(s => !s.All(c => char.IsAsciiLetterUpper(c)));
         var currentValues = stringProps.Select(p => resourceManager.GetString(p.Name, currentCulture));
         double translated = neutralValues.Except(currentValues).Count();
         double total = neutralValues.Count();

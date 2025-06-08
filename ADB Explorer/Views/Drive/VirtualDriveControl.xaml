@@ -121,17 +121,6 @@
                                 </Style>
                             </TextBlock.Style>
                         </TextBlock>
-                        <TextBlock Text="s">
-                            <TextBlock.Style>
-                                <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding ItemsCount}" Value="1">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
                     </StackPanel>
                     <TextBlock>
                         <TextBlock.Style>

@@ -13,17 +13,8 @@ public static class AdbExplorerConst
     public const string RECYCLE_PATH = $"/sdcard/{RECYCLE_FOLDER}";
     public const string RECYCLE_INDEX_SUFFIX = ".index";
 
-    public static readonly Dictionary<string, string> SPECIAL_FOLDERS_DISPLAY_NAMES = new()
-    {
-        { "/sdcard", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
-        { "/storage/emulated/0", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
-        { "/storage/self/primary", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
-        { "/mnt/sdcard", Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
-        { "/", Strings.Resources.S_DRIVE_ROOT }
-    };
-
     public static List<string> POSSIBLE_RECYCLE_PATHS =>
-        [.. SPECIAL_FOLDERS_DISPLAY_NAMES.Where(kv => kv.Value == Strings.Resources.S_DRIVE_INTERNAL_STORAGE).Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}")];
+        [.. DRIVE_TYPES.Where(kv => kv.Value is AbstractDrive.DriveType.Internal).Select(kv => $"{kv.Key}/{RECYCLE_FOLDER}")];
 
     public static readonly Dictionary<string, AbstractDrive.DriveType> DRIVE_TYPES = new()
     {
@@ -37,19 +28,6 @@ public static class AdbExplorerConst
         { TEMP_PATH, AbstractDrive.DriveType.Temp },
         { NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
         { "/", AbstractDrive.DriveType.Root },
-    };
-
-    public static readonly Dictionary<AbstractDrive.DriveType, string> DRIVE_DISPLAY_NAMES = new()
-    {
-        { AbstractDrive.DriveType.Root, Strings.Resources.S_DRIVE_ROOT },
-        { AbstractDrive.DriveType.Internal, Strings.Resources.S_DRIVE_INTERNAL_STORAGE },
-        { AbstractDrive.DriveType.Expansion, Strings.Resources.S_DRIVE_SD },
-        { AbstractDrive.DriveType.External, Strings.Resources.S_DRIVE_OTG },
-        { AbstractDrive.DriveType.Unknown, "" }, // "Other Drive"
-        { AbstractDrive.DriveType.Emulated, Strings.Resources.S_DRIVE_EMULATED },
-        { AbstractDrive.DriveType.Trash, Strings.Resources.S_DRIVE_TRASH },
-        { AbstractDrive.DriveType.Temp, Strings.Resources.S_DRIVE_TEMP },
-        { AbstractDrive.DriveType.Package, Strings.Resources.S_DRIVE_APPS },
     };
 
     public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);

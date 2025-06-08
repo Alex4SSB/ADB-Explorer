@@ -58,16 +58,6 @@ public partial class NavigationBox
         DependencyProperty.Register(nameof(DisplayPath), typeof(string),
           typeof(NavigationBox), new PropertyMetadata(null));
 
-    public Dictionary<string, string> DisplayNames
-    {
-        get => (Dictionary<string, string>)GetValue(DisplayNamesProperty);
-        set => SetValue(DisplayNamesProperty, value);
-    }
-
-    public static readonly DependencyProperty DisplayNamesProperty =
-        DependencyProperty.Register(nameof(DisplayNames), typeof(Dictionary<string, string>),
-          typeof(NavigationBox), new PropertyMetadata(null));
-
     public List<MenuItem> Breadcrumbs
     {
         get => (List<MenuItem>)GetValue(BreadcrumbsProperty);
@@ -158,13 +148,13 @@ public partial class NavigationBox
             AddSpecialButton(ref path,
                              ref expectedLength,
                              ref tempButtons,
-                             DisplayNames.FirstOrDefault(kv => path.StartsWith(kv.Key)),
+                             Data.CurrentDisplayNames.FirstOrDefault(kv => path.StartsWith(kv.Key)),
                              false);
         }
         
         isFuse = DriveHelper.GetCurrentDrive(path)?.IsFUSE is true;
 
-        var pairs = DisplayNames.Where(kv => path.StartsWith(kv.Key));
+        var pairs = Data.CurrentDisplayNames.Where(kv => path.StartsWith(kv.Key));
         var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.FirstOrDefault();
         
         AddSpecialButton(ref path, ref expectedLength, ref tempButtons, specialPair);

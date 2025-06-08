@@ -20,8 +20,8 @@ namespace ADB_Explorer.Models
 
         public static string DisplayName(this SpecialLocation location) => location switch
         {
-            SpecialLocation.RecycleBin => AdbExplorerConst.DRIVE_DISPLAY_NAMES[AbstractDrive.DriveType.Trash],
-            SpecialLocation.PackageDrive => AdbExplorerConst.DRIVE_DISPLAY_NAMES[AbstractDrive.DriveType.Package],
+            SpecialLocation.RecycleBin => AbstractDrive.GetDriveDisplayName(AbstractDrive.DriveType.Trash),
+            SpecialLocation.PackageDrive => AbstractDrive.GetDriveDisplayName(AbstractDrive.DriveType.Package),
             SpecialLocation.Back or SpecialLocation.Forward or SpecialLocation.Up => location.ToString(),
             SpecialLocation.DriveView => Strings.Resources.S_BUTTON_DRIVES,
             SpecialLocation.devNull => Strings.Resources.S_LOCATION_PERM_DEL,

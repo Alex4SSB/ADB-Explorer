@@ -699,7 +699,6 @@
     <Style TargetType="controls:NavigationBox">
         <Setter Property="MenuPadding" Value="4" />
         <Setter Property="Height" Value="32" />
-        <Setter Property="DisplayNames" Value="{Binding Source={x:Static Member=models:Data.CurrentDisplayNames}}" />
     </Style>
     <Style
         x:Key="LogTextBoxStyle"

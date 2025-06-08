@@ -30,6 +30,25 @@ public abstract class AbstractDrive : ViewModelBase
     {
         return obj is not null;
     }
+
+    public string DisplayName
+    {
+        get => GetDriveDisplayName(Type);
+    }
+
+    public static string GetDriveDisplayName(DriveType type) => type switch
+    {
+        DriveType.Root => Strings.Resources.S_DRIVE_ROOT,
+        DriveType.Internal => Strings.Resources.S_DRIVE_INTERNAL_STORAGE,
+        DriveType.Expansion => Strings.Resources.S_DRIVE_SD,
+        DriveType.External => Strings.Resources.S_DRIVE_OTG,
+        DriveType.Unknown => "",
+        DriveType.Emulated => Strings.Resources.S_DRIVE_EMULATED,
+        DriveType.Trash => Strings.Resources.S_DRIVE_TRASH,
+        DriveType.Temp => Strings.Resources.S_DRIVE_TEMP,
+        DriveType.Package => Strings.Resources.S_DRIVE_APPS,
+        _ => null,
+    };
 }
 
 public class Drive : AbstractDrive

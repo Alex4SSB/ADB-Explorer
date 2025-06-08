@@ -1362,6 +1362,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0}% Used.
+        /// </summary>
+        public static string S_DRIVE_USAGE_TOOLTIP {
+            get {
+                return ResourceManager.GetString("S_DRIVE_USAGE_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Drop.
         /// </summary>
         public static string S_DROP {

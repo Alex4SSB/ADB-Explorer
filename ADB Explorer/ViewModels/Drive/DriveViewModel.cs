@@ -36,7 +36,8 @@ public class DriveViewModel : AbstractDrive
     public string Path => Drive.Path;
     public new DriveType Type => Drive.Type;
     public bool IsFUSE => Drive.IsFUSE;
-    public string DisplayName => AdbExplorerConst.DRIVE_DISPLAY_NAMES[Type];
+
+    public new string DisplayName => Drive.DisplayName;
 
     public string DriveIcon => Type switch
     {

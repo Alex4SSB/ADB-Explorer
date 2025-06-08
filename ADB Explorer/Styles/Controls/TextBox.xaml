@@ -98,20 +98,23 @@
                                             CornerRadius="{TemplateBinding ui:ControlHelper.CornerRadius}" />
                                     </Grid>
                                 </Border>
-                                <TextBlock
-                                    x:Name="PlaceholderTextContentPresenter"
+                                <Border
                                     Grid.Row="1"
                                     Grid.Column="0"
                                     Grid.ColumnSpan="2"
-                                    Margin="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}"
-                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                    Foreground="{TemplateBinding ui:ControlHelper.PlaceholderForeground}"
-                                    IsHitTestVisible="False"
-                                    Text="{TemplateBinding ui:ControlHelper.PlaceholderText}"
-                                    TextAlignment="{TemplateBinding TextAlignment}"
-                                    TextWrapping="{TemplateBinding TextWrapping}" />
+                                    Margin="2,0,0,0">
+                                    <TextBlock
+                                        x:Name="PlaceholderTextContentPresenter"
+                                        Margin="{TemplateBinding BorderThickness}"
+                                        Padding="{TemplateBinding Padding}"
+                                        HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                        Foreground="{TemplateBinding ui:ControlHelper.PlaceholderForeground}"
+                                        IsHitTestVisible="False"
+                                        Text="{TemplateBinding ui:ControlHelper.PlaceholderText}"
+                                        TextAlignment="{TemplateBinding TextAlignment}"
+                                        TextWrapping="{TemplateBinding TextWrapping}" />
+                                </Border>
                                 <Button
                                     x:Name="DeleteButton"
                                     Grid.Row="1"

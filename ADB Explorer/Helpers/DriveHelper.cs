@@ -21,6 +21,11 @@ internal class DriveHelper
     {
         if (string.IsNullOrEmpty(path)) return null;
 
-        return Data.DevicesObject.Current?.Drives.FirstOrDefault(d => path.StartsWith(d.Path));
+        // First search for a non-root drive that matches the path
+        var nonRoot = Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Type is not AbstractDrive.DriveType.Root && path.StartsWith(d.Path));
+        if (nonRoot is null)
+            return Data.DevicesObject.Current?.Drives.FirstOrDefault(d => d.Type is AbstractDrive.DriveType.Root);
+
+        return nonRoot;
     }
 }

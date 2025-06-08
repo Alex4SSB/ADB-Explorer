@@ -198,9 +198,7 @@
     <Style
         x:Key="DeviceTextButtonStyle"
         BasedOn="{StaticResource ButtonStyle}"
-        TargetType="Button">
-        <Setter Property="Width" Value="74" />
-    </Style>
+        TargetType="Button" />
     <Style
         x:Key="ConnectNewDeviceButtonStyle"
         BasedOn="{StaticResource DeviceTextButtonStyle}"
