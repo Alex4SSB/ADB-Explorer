@@ -21,9 +21,9 @@
                 <ResourceDictionary Source="Styles\Controls\RadioButton.xaml" />
                 <ResourceDictionary Source="Styles\Controls\Button.xaml" />
                 <ResourceDictionary Source="Styles\Controls\ToggleButton.xaml" />
-                <ResourceDictionary Source="Styles\Controls\TextBox.xaml" />
                 <ResourceDictionary Source="Styles\Controls\ComboBox.xaml" />
                 <ResourceDictionary Source="Styles\Controls\MenuItem.xaml" />
+                <ResourceDictionary Source="Styles\Controls\TextBox.xaml" />
                 <ResourceDictionary Source="Styles\Controls\Expander.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
                 <ResourceDictionary Source="Styles\Controls\DataGrid.xaml" />

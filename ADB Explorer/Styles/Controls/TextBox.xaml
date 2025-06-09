@@ -230,6 +230,7 @@
         <Setter Property="ui:TextBoxHelper.IsDeleteButtonVisible" Value="True" />
         <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{x:Null}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
     </Style>
 
     <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox" />

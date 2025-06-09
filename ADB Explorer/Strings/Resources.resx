@@ -1580,4 +1580,64 @@ Cancel All Running</value>
     <value>{0}% Used</value>
     <comment>The tooltip for the drive usage percentage progress bar</comment>
   </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Scroll Here</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Top</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Bottom</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Page Up</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Page Down</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Scroll Up</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Scroll Down</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Left Edge</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Right Edge</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Page Left</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Page Right</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Scroll Left</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Scroll Right</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Undo</value>
+    <comment>TextBox ContextMenu</comment>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Redo</value>
+    <comment>TextBox ContextMenu</comment>
+  </data>
 </root>

@@ -2064,6 +2064,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Redo.
+        /// </summary>
+        public static string S_MENU_REDO {
+            get {
+                return ResourceManager.GetString("S_MENU_REDO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Refresh.
         /// </summary>
         public static string S_MENU_REFRESH {
@@ -2105,6 +2114,15 @@ namespace ADB_Explorer.Strings {
         public static string S_MENU_SELECT_ALL {
             get {
                 return ResourceManager.GetString("S_MENU_SELECT_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Undo.
+        /// </summary>
+        public static string S_MENU_UNDO {
+            get {
+                return ResourceManager.GetString("S_MENU_UNDO", resourceCulture);
             }
         }
         
@@ -3559,6 +3577,123 @@ namespace ADB_Explorer.Strings {
         public static string S_WSA_PKG_TIP {
             get {
                 return ResourceManager.GetString("S_WSA_PKG_TIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Down.
+        /// </summary>
+        public static string ScrollBar_LineDownCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_LineDownCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Left.
+        /// </summary>
+        public static string ScrollBar_LineLeftCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_LineLeftCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Right.
+        /// </summary>
+        public static string ScrollBar_LineRightCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_LineRightCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Up.
+        /// </summary>
+        public static string ScrollBar_LineUpCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_LineUpCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page Down.
+        /// </summary>
+        public static string ScrollBar_PageDownCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_PageDownCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page Left.
+        /// </summary>
+        public static string ScrollBar_PageLeftCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_PageLeftCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page Right.
+        /// </summary>
+        public static string ScrollBar_PageRightCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_PageRightCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Page Up.
+        /// </summary>
+        public static string ScrollBar_PageUpCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_PageUpCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Scroll Here.
+        /// </summary>
+        public static string ScrollBar_ScrollHereCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_ScrollHereCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Bottom.
+        /// </summary>
+        public static string ScrollBar_ScrollToBottomCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_ScrollToBottomCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Left Edge.
+        /// </summary>
+        public static string ScrollBar_ScrollToLeftEndCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_ScrollToLeftEndCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Right Edge.
+        /// </summary>
+        public static string ScrollBar_ScrollToRightEndCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_ScrollToRightEndCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Top.
+        /// </summary>
+        public static string ScrollBar_ScrollToTopCommand {
+            get {
+                return ResourceManager.GetString("ScrollBar_ScrollToTopCommand", resourceCulture);
             }
         }
     }
