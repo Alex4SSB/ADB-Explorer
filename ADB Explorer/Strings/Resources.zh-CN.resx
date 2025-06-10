@@ -1289,7 +1289,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>取消中</value>
   </data>
   <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
-    <value>先前的</value>
+    <value>上一批次</value>
   </data>
   <data name="S_ACTION_MOVE" xml:space="preserve">
     <value>移动</value>
