@@ -1345,4 +1345,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MENU_UNDO" xml:space="preserve">
     <value>撤消</value>
   </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>已使用 {0}%</value>
+  </data>
 </root>
