@@ -231,6 +231,7 @@
         <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{x:Null}" />
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="ContextMenu" Value="{StaticResource TextBoxContextMenu}" />
+        <Setter Property="helpers:ContextMenuHelper.EnableAutoClose" Value="True" />
     </Style>
 
     <Style BasedOn="{StaticResource TextBoxFluentStyle}" TargetType="TextBox" />

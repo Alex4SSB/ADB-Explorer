@@ -448,7 +448,7 @@ public class AppSettings : ViewModelBase
             ? OriginalCulture
             : UICulture;
 
-        string precent = actual.Parent.Name == "en"
+        string precent = actual.Name == "en" || actual.Parent.Name == "en"
                          ? null
                          : $"{SettingsHelper.GetCurrentPercentageTranslated(actual) * 100:f0}%";
 
