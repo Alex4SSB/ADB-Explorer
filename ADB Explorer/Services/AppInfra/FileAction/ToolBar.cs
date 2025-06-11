@@ -247,9 +247,8 @@ internal static class SettingsMenu
 {
     public static ObservableList<IMenuItem> List { get; } =
     [
-        new IconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
-            "\uE713",
-            iconSize: 18),
+        new CompoundIconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
+            new SettingsIcon()),
     ];
 }
 

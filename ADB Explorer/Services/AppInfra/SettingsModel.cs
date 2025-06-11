@@ -137,7 +137,8 @@ public static class UISettings
             ]),
             new Ungrouped(
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), Strings.Resources.S_SETTINGS_UPDATES),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), Strings.Resources.S_SETTINGS_UPDATES)
+                { GroupName = Strings.Resources.S_SETTINGS_GROUP_ABOUT },
             ]),
         ];
     }

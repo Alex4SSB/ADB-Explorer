@@ -430,6 +430,13 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref isAdvancedDragEnabled, value);
     }
 
+    private List<string> settingsContifications = [];
+    public List<string> SettingsNotifications
+    {
+        get => settingsContifications;
+        set => Set(ref settingsContifications, value);
+    }
+
     public bool IsArm => RuntimeInformation.ProcessArchitecture switch
     {
         Architecture.Arm64 or Architecture.Arm or Architecture.Armv6 => true,
