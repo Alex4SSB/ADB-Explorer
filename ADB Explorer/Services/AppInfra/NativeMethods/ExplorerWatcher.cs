@@ -120,28 +120,34 @@ public static partial class NativeMethods
             if (hwnd == InterceptClipboard.MainWindowHandle)
                 return;
 
-            ExplorerWindow window;
-            if (hwnd == DesktopWindow.Hwnd)
+            App.Current.Dispatcher.Invoke(() =>
             {
-                CurrentExplorerWindow = DesktopWindow;
-                FocusedPath = DesktopWindow.Path;
-            }
-            else
-            {
-                window = new(hwnd);
-
-                if (window.Process.ProcessName is not "explorer")
+                ExplorerWindow window;
+                if (hwnd == DesktopWindow.Hwnd)
                 {
-                    if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
-                        ExplorerHelper.CheckConflictingApps();
-
-                    return;
+                    CurrentExplorerWindow = DesktopWindow;
+                    FocusedPath = DesktopWindow.Path;
                 }
+                else
+                {
+                    window = new(hwnd);
 
-                UpdateExplorerWindows();
-                CurrentExplorerWindow = ExplorerWindows.FirstOrDefault(w => w.Hwnd == hwnd);
-                FocusedPath = CurrentExplorerWindow?.Path;
-            }
+                    if (window.Process is null)
+                        return;
+
+                    if (window.Process.ProcessName is not "explorer")
+                    {
+                        if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
+                            ExplorerHelper.CheckConflictingApps();
+
+                        return;
+                    }
+
+                    UpdateExplorerWindows();
+                    CurrentExplorerWindow = ExplorerWindows.FirstOrDefault(w => w.Hwnd == hwnd);
+                    FocusedPath = CurrentExplorerWindow?.Path;
+                }
+            });
         }
 
         private void SubscribeToTitleEvents()

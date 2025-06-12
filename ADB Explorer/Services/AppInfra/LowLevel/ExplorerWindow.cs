@@ -42,12 +42,21 @@ public class ExplorerWindow : IComparable
         {
             if (_process is null)
             {
-                // Don't use automation just to get pid if it isn't ready yet
-                int processId = _fileList is null
-                    ? ProcessHandling.GetProcessIdFromWindowHandle(Hwnd)
-                    : RootElement.Current.ProcessId;
+                try
+                {
+                    // Don't use automation just to get pid if it isn't ready yet
+                    int processId = _fileList is null
+                        ? ProcessHandling.GetProcessIdFromWindowHandle(Hwnd)
+                        : RootElement.Current.ProcessId;
 
-                _process = Process.GetProcessById(processId);
+                    _process = Process.GetProcessById(processId);
+                }
+                catch (Exception e)
+                {
+#if !DEPLOY
+                    DebugLog.PrintLine($"Process.get: {e}");
+#endif
+                }
             }
 
             return _process;
@@ -73,7 +82,7 @@ public class ExplorerWindow : IComparable
             {
                 var pathDict = Paths.ToDictionary(FileHelper.GetFullName, path => path);
 
-                var query = pathDict.Where(item => RootElement.Current.Name.StartsWith(item.Key));
+                var query = pathDict.Where(item => RootElement.Current.Name.Contains(item.Key));
 
                 return query.Any() ? query.First().Value : null;
             }

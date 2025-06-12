@@ -309,8 +309,12 @@ public class ExplorerHelper
             SHChangeNotify(SHCNE.SHCNE_DELETE, SHCNF.SHCNF_PATHW, hPath);
             result = true;
         }
-        catch
-        { }
+        catch (Exception ex)
+        {
+#if !DEPLOY
+            DebugLog.PrintLine($"Exception while deleting {path}: {ex.Message}");
+#endif
+        }
         finally
         {
             Marshal.FreeHGlobal((nint)hPath);

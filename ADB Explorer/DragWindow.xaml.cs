@@ -89,9 +89,9 @@ public partial class DragWindow : INotifyPropertyChanged
                     var path = ExplorerHelper.GetPathFromElement(ElementUnderMouse, WindowUnderMouse);
 
 #if !DEPLOY
-                    DebugLog.PrintLine($"Path under mouse: {path}");
+                        DebugLog.PrintLine($"Path under mouse: {path}");
 #endif
-
+                    
                     if (string.IsNullOrEmpty(path))
                     {
                         explorerTarget = "";
@@ -102,7 +102,11 @@ public partial class DragWindow : INotifyPropertyChanged
                         Data.RuntimeSettings.PathUnderMouse = new(path);
                         IsDropAllowed = Data.RuntimeSettings.PathUnderMouse.IsFolder;
 
-                        explorerTarget = " to " + FileHelper.GetShortFileName(Data.RuntimeSettings.PathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay), 30);
+                        string displayName = Data.RuntimeSettings.PathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay);
+                        if (displayName.Count(c => c == '\\') > 1)
+                            displayName = Data.RuntimeSettings.PathUnderMouse.ParsingName;
+
+                        explorerTarget = " to " + FileHelper.GetShortFileName(displayName, 30);
                     }
                 }
                 catch
