@@ -10,7 +10,12 @@ public class ProcessHandling
 
         foreach (var item in procs)
         {
-            item.Kill();
+            try
+            {
+                item.Kill();
+            }
+            catch
+            { }
         }
     }
 
