@@ -98,7 +98,7 @@ public static class SettingsHelper
     {
         if (new Version(Properties.AppGlobal.AppVersion) > new Version(Data.Settings.LastVersion))
         {
-            await App.Current.Dispatcher.Invoke(async () =>
+            UISettings.Notifications.Add(new(async () =>
             {
                 var res = await DialogService.ShowConfirmation(
                     Strings.Resources.S_NEW_VERSION_MSG,
@@ -108,9 +108,9 @@ public static class SettingsHelper
 
                 if (res.Item1 is ContentDialogResult.Primary)
                     Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{Properties.AppGlobal.AppVersion}\"");
-            });
 
-            Data.Settings.LastVersion = Properties.AppGlobal.AppVersion;
+                Data.Settings.LastVersion = Properties.AppGlobal.AppVersion;
+            }, Strings.Resources.S_NEW_VERSION_TITLE));
         }
 
         if (Data.RuntimeSettings.IsAppDeployed || !Data.Settings.CheckForUpdates)
@@ -120,7 +120,7 @@ public static class SettingsHelper
         if (latestVersion is null || latestVersion <= Data.AppVersion)
             return;
 
-        await App.Current.Dispatcher.Invoke(async () =>
+        UISettings.Notifications.Add(new(async () =>
         {
             var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
                 Strings.Resources.S_NEW_VERSION_TITLE,
@@ -130,7 +130,7 @@ public static class SettingsHelper
 
             if (res.Item1 is ContentDialogResult.Primary)
                 Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
-        });
+        }, Strings.Resources.S_NEW_VERSION_TITLE));
     }
 
     public static void ShowAndroidRobotLicense()

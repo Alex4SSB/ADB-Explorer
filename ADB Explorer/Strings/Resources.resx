@@ -1640,4 +1640,8 @@ Cancel All Running</value>
     <value>Redo</value>
     <comment>TextBox ContextMenu</comment>
   </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notifications</value>
+    <comment>The title of the notifications area in the settings pane</comment>
+  </data>
 </root>

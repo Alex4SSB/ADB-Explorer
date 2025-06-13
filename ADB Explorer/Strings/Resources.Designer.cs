@@ -2254,6 +2254,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Notifications.
+        /// </summary>
+        public static string S_NOTIFICATIONS_TITLE {
+            get {
+                return ResourceManager.GetString("S_NOTIFICATIONS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select ADB Executable.
         /// </summary>
         public static string S_OVERRIDE_ADB_BROWSE {

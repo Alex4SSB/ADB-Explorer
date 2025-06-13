@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     mc:Ignorable="d">
     <Grid>
@@ -16,6 +17,7 @@
             Margin="0,-7,-8,0"
             HorizontalAlignment="Right"
             VerticalAlignment="Top"
+            d:Visibility="Visible"
             Fill="{StaticResource EditorTextChangedBrush}"
             StrokeThickness="1">
             <Ellipse.Style>
@@ -25,7 +27,7 @@
                         <Trigger Property="ui:ThemeManager.ActualTheme" Value="Dark">
                             <Setter Property="Stroke" Value="Transparent" />
                         </Trigger>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SettingsNotifications.Count}" Value="0">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>

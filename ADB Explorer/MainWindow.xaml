@@ -716,20 +716,14 @@
                             <RowDefinition Height="52" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
                         <Menu Margin="10" Style="{StaticResource ResetAppSettingsMenuStyle}" />
                         <TextBlock
-                            Grid.Column="1"
                             Margin="0,0,0,2"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             FontSize="24"
                             Text="{x:Static strings:Resources.S_SETTINGS_TITLE}" />
-                        <Menu Grid.Column="2" Style="{StaticResource SettingsPaneMenuStyle}" />
+                        <Menu HorizontalAlignment="Right" Style="{StaticResource SettingsPaneMenuStyle}" />
                         <Grid
                             Grid.Row="1"
                             Grid.ColumnSpan="3"
@@ -774,17 +768,41 @@
                                         IsHitTestVisible="False"
                                         Opacity="0.7" />
                                 </Grid>
-                                <Separator
+                                <Grid
                                     Grid.Row="1"
                                     Grid.ColumnSpan="2"
                                     Margin="0,8,0,4"
-                                    Style="{x:Null}" />
+                                    Style="{StaticResource SettingsTitleSeparatorStyle}">
+                                    <Separator Style="{x:Null}" />
+                                </Grid>
                             </Grid>
                             <ScrollViewer Grid.Row="1">
                                 <ui:SimpleStackPanel
                                     Margin="6,0,24,10"
                                     HorizontalAlignment="Left"
                                     Spacing="6">
+                                    <Border
+                                        Margin="0,6,0,0"
+                                        BorderBrush="Gray"
+                                        BorderThickness="1"
+                                        Style="{StaticResource NotificationsBorderStyle}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <TextBlock
+                                                Margin="4"
+                                                HorizontalAlignment="Center"
+                                                FontSize="16"
+                                                Text="{x:Static strings:Resources.S_NOTIFICATIONS_TITLE}" />
+                                            <ListView
+                                                x:Name="NotificationsList"
+                                                Grid.Row="1"
+                                                Margin="24,0,24,6"
+                                                Style="{StaticResource NotificationsListView}" />
+                                        </Grid>
+                                    </Border>
                                     <ListView
                                         x:Name="SettingsList"
                                         Margin="0,0,0,-3"

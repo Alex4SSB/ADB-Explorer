@@ -405,4 +405,20 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <DataTemplate x:Key="NotificationTemplate" DataType="services:Notification">
+        <Button
+            HorizontalAlignment="Stretch"
+            Background="{StaticResource EditorTextChangedBrush}"
+            Command="{Binding Command}"
+            Content="{Binding Title}"
+            Foreground="Black"
+            Style="{StaticResource AccentButtonStyle}" />
+    </DataTemplate>
+    <Style
+        x:Key="NotificationsListView"
+        BasedOn="{StaticResource DefaultListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="ItemTemplate" Value="{StaticResource NotificationTemplate}" />
+        <Setter Property="ItemContainerStyle" Value="{StaticResource SettingsGroupContainer}" />
+    </Style>
 </ResourceDictionary>

@@ -9,6 +9,8 @@ public static class UISettings
 {
     public static ObservableList<AbstractGroup> SettingsList { get; set; }
 
+    public static ObservableList<Notification> Notifications { get; set; } = [];
+
     public static IEnumerable<AbstractGroup> GroupedSettings => SettingsList.Where(group => group is not Ungrouped);
 
     public static IEnumerable<AbstractSetting> SortSettings => SettingsList.Where(group => group is not SettingsSeparator)
@@ -144,6 +146,21 @@ public static class UISettings
     }
 }
 
+public class Notification : BaseAction
+{
+    public string Title { get; }
+
+    public Notification(Action action, string title) : base(() => true, action)
+    {
+        Title = title;
+
+        ((CommandHandler)Command).OnExecute.PropertyChanged += (sender, e) =>
+        {
+            UISettings.Notifications.Remove(this);
+        };
+    }
+}
+
 public abstract class SettingsBase : ViewModelBase
 {
     public BaseAction[] Commands { get; protected set; }
@@ -170,7 +187,7 @@ public class SettingsGroup : AbstractGroup
         Name = name;
         Children = children;
         Commands = commands;
-
+        
         Children.ForEach(c => c.GroupName = Name);
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;

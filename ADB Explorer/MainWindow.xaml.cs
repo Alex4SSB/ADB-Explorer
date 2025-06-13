@@ -884,6 +884,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             SettingsList.ItemsSource = UISettings.GroupedSettings;
             SortedSettings.ItemsSource = UISettings.SortSettings;
+            NotificationsList.ItemsSource = UISettings.Notifications;
 
             NavigationToolBar.ItemsSource = Services.NavigationToolBar.List;
             MainToolBar.ItemsSource = Services.MainToolBar.List;
