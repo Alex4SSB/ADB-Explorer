@@ -264,12 +264,14 @@ public class CopyPasteService : ViewModelBase
 
     public void ClearDrag()
     {
+        Data.RuntimeSettings.DragBitmap = null;
+        if (IsClipboard)
+            return;
+
         DropEffect = DragDropEffects.None;
         DragPasteSource = DataSource.None;
         DragFiles = [];
         DragParent = "";
-
-        Data.RuntimeSettings.DragBitmap = null;
     }
 
     public void GetClipboardPasteItems()
