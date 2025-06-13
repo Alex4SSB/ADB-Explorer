@@ -111,7 +111,7 @@ public class FilePath : AbstractFile, IBaseFile
         PathType = FilePathType.Windows;
 
         FullPath = windowsPath.ParsingName;
-        FullName = windowsPath.Name;
+        FullName = windowsPath.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
 
         SpecialType = windowsPath.IsFolder
             ? SpecialFileType.Folder

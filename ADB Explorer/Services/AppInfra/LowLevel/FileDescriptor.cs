@@ -66,7 +66,7 @@ public class FileDescriptor
             }
             catch
             {
-                Name = shellItem.Name;
+                Name = shellItem.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
             }
         }
         else

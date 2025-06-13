@@ -209,7 +209,7 @@ public class ExplorerHelper
                         continue;
 
                     path = item.FileSystemPath;
-                    name = item.Name;
+                    name = item.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
                 }
             }
             catch
