@@ -43,10 +43,17 @@ public abstract class AbstractFile : ViewModelBase
         LinkOverlay = 32,
     }
 
-    private static readonly string[] names =
-        { "Socket", "File", "Block Device", "Folder", "Char Device", "FIFO", "Unknown", "Broken Link" };
-
-    public static string GetFileTypeName(FileType type) => names[(int)type];
+    public static string GetFileTypeName(FileType type) => type switch
+    {
+        FileType.Socket => Strings.Resources.S_FILE_SOCKET,
+        FileType.File => Strings.Resources.S_MENU_FILE,
+        FileType.BlockDevice => Strings.Resources.S_FILE_BLOCK,
+        FileType.Folder => Strings.Resources.S_MENU_FOLDER,
+        FileType.CharDevice => Strings.Resources.S_FILE_CHAR,
+        FileType.FIFO => Strings.Resources.S_FILE_FIFO,
+        FileType.BrokenLink => Strings.Resources.S_FILE_BROKEN_LINK,
+        _ => Strings.Resources.S_FILE_UNKNOWN,
+    };
 }
 
 public class FilePath : AbstractFile, IBaseFile

@@ -1662,4 +1662,28 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Go to Weblate</value>
     <comment>The content of the button used to open the link to our project on Weblate</comment>
   </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+    <comment>The socket Unix file type</comment>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Block Device</value>
+    <comment>The block device Unix file type</comment>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Char Device</value>
+    <comment>The char device Unix file type</comment>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+    <comment>The FIFO (First-In First-Out) Unix file type</comment>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+    <comment>An unknown file type</comment>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Broken Link</value>
+    <comment>A symbolic link that points to a file that doesn't exist</comment>
+  </data>
 </root>

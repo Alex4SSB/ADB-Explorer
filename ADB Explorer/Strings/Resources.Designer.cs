@@ -1497,11 +1497,56 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Block Device.
+        /// </summary>
+        public static string S_FILE_BLOCK {
+            get {
+                return ResourceManager.GetString("S_FILE_BLOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Broken Link.
+        /// </summary>
+        public static string S_FILE_BROKEN_LINK {
+            get {
+                return ResourceManager.GetString("S_FILE_BROKEN_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Char Device.
+        /// </summary>
+        public static string S_FILE_CHAR {
+            get {
+                return ResourceManager.GetString("S_FILE_CHAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FIFO.
+        /// </summary>
+        public static string S_FILE_FIFO {
+            get {
+                return ResourceManager.GetString("S_FILE_FIFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to File Operations.
         /// </summary>
         public static string S_FILE_OP_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_FILE_OP_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Socket.
+        /// </summary>
+        public static string S_FILE_SOCKET {
+            get {
+                return ResourceManager.GetString("S_FILE_SOCKET", resourceCulture);
             }
         }
         
@@ -1529,6 +1574,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_TYPE_LINK {
             get {
                 return ResourceManager.GetString("S_FILE_TYPE_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown.
+        /// </summary>
+        public static string S_FILE_UNKNOWN {
+            get {
+                return ResourceManager.GetString("S_FILE_UNKNOWN", resourceCulture);
             }
         }
         

@@ -612,7 +612,7 @@
                                     <TextBlock
                                         HorizontalAlignment="Center"
                                         FontSize="24"
-                                        Text="Devices" />
+                                        Text="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_DEVICES}}" />
                                 </Grid>
                                 <Border Padding="4" Style="{StaticResource UnresponsiveServerBorderStyle}">
                                     <StackPanel Margin="2,0">
