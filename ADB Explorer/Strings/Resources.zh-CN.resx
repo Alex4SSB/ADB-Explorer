@@ -1348,4 +1348,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
     <value>已使用 {0}%</value>
   </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>块设备</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>字符设备</value>
+  </data>
 </root>
