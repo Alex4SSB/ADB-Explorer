@@ -466,6 +466,13 @@ public class AppSettings : ViewModelBase
 
     public CultureInfo OriginalCulture { get; set; }
 
+    private bool showLanguageNotification;
+    public bool ShowLanguageNotification
+    {
+        get => Get(ref showLanguageNotification, true);
+        set => Set(ref showLanguageNotification, value);
+    }
+
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))

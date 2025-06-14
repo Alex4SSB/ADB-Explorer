@@ -844,6 +844,10 @@
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_GITHUB}}" />
                                                 <ui:HyperlinkButton
+                                                    Content="Weblate"
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.WEBLATE}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.WEBLATE}}" />
+                                                <ui:HyperlinkButton
                                                     Content="{x:Static strings:Resources.S_PRIVACY_POLICY}"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}" />

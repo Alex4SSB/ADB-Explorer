@@ -412,7 +412,8 @@
             Command="{Binding Command}"
             Content="{Binding Title}"
             Foreground="Black"
-            Style="{StaticResource AccentButtonStyle}" />
+            Style="{StaticResource AccentButtonStyle}"
+            ToolTip="{Binding Tooltip}" />
     </DataTemplate>
     <Style
         x:Key="NotificationsListView"

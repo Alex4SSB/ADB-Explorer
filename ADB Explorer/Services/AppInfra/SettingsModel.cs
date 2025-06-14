@@ -150,6 +150,8 @@ public class Notification : BaseAction
 {
     public string Title { get; }
 
+    public static string Tooltip => Strings.Resources.S_TOOLTIP_MORE_INFO;
+
     public Notification(Action action, string title) : base(() => true, action)
     {
         Title = title;

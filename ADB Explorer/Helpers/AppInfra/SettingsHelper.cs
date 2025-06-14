@@ -94,8 +94,25 @@ public static class SettingsHelper
         Data.RuntimeSettings.FinalizeSplash = true;
     }
 
-    public static async void CheckAppVersions()
+    public static async void InitNotifications()
     {
+        if (Data.Settings.OriginalCulture.Name != "en-US")
+        {
+            UISettings.Notifications.Add(new(async () =>
+            {
+                var res = await DialogService.ShowConfirmation(Strings.Resources.S_LANG_NOTIFICATION,
+                    Strings.Resources.S_LANG_NOTIFICATION_TITLE,
+                    Strings.Resources.S_GOTO_WEBLATE,
+                    cancelText: Strings.Resources.S_BUTTON_CLOSE,
+                    icon: DialogService.DialogIcon.Informational);
+
+                if (res.Item1 is ContentDialogResult.Primary)
+                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.WEBLATE}\"");
+
+                Data.Settings.ShowLanguageNotification = false;
+            }, Strings.Resources.S_LANG_NOTIFICATION_TITLE));
+        }
+
         if (new Version(Properties.AppGlobal.AppVersion) > new Version(Data.Settings.LastVersion))
         {
             UISettings.Notifications.Add(new(async () =>
@@ -113,24 +130,24 @@ public static class SettingsHelper
             }, Strings.Resources.S_NEW_VERSION_TITLE));
         }
 
-        if (Data.RuntimeSettings.IsAppDeployed || !Data.Settings.CheckForUpdates)
-            return;
-
-        var latestVersion = await Network.LatestAppReleaseAsync();
-        if (latestVersion is null || latestVersion <= Data.AppVersion)
-            return;
-
-        UISettings.Notifications.Add(new(async () =>
+        if (!Data.RuntimeSettings.IsAppDeployed && Data.Settings.CheckForUpdates)
         {
-            var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
-                Strings.Resources.S_NEW_VERSION_TITLE,
-                Strings.Resources.S_GO_TO_VERSION_PAGE,
-                cancelText: Strings.Resources.S_BUTTON_CLOSE,
-                icon: DialogService.DialogIcon.Informational);
+            var latestVersion = await Network.LatestAppReleaseAsync();
+            if (latestVersion is null || latestVersion <= Data.AppVersion)
+                return;
 
-            if (res.Item1 is ContentDialogResult.Primary)
-                Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
-        }, Strings.Resources.S_NEW_VERSION_TITLE));
+            UISettings.Notifications.Add(new(async () =>
+            {
+                var res = await DialogService.ShowConfirmation(string.Format(Strings.Resources.S_NEW_VERSION, Properties.AppGlobal.AppDisplayName, latestVersion),
+                    Strings.Resources.S_NEW_VERSION_TITLE,
+                    Strings.Resources.S_GO_TO_VERSION_PAGE,
+                    cancelText: Strings.Resources.S_BUTTON_CLOSE,
+                    icon: DialogService.DialogIcon.Informational);
+
+                if (res.Item1 is ContentDialogResult.Primary)
+                    Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"https://github.com/Alex4SSB/ADB-Explorer/releases/tag/v{latestVersion}\"");
+            }, Strings.Resources.S_NEW_VERSION_TITLE));
+        }
     }
 
     public static void ShowAndroidRobotLicense()

@@ -161,7 +161,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ServerWatchdogTimer.Start();
         DiskUsageTimer.Start();
 
-        SettingsHelper.CheckAppVersions();
+        SettingsHelper.InitNotifications();
     }
 
     private void DiskUsageTimer_Tick(object sender, EventArgs e)

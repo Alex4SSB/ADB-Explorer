@@ -1690,6 +1690,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Go to Weblate.
+        /// </summary>
+        public static string S_GOTO_WEBLATE {
+            get {
+                return ResourceManager.GetString("S_GOTO_WEBLATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This app is a UI for ADB - Android Debug Bridge.
         ///To use the app, you need to have ADB on your PC.
         ///ADB is available as part of the Android SDK Platform Tools.
@@ -1816,6 +1825,26 @@ namespace ADB_Explorer.Strings {
         public static string S_KNOWN_TYPE_LINK {
             get {
                 return ResourceManager.GetString("S_KNOWN_TYPE_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select your app language of choice in the settings.
+        ///Translation progress is displayed for the selected language.
+        ///Please help us localize the app to your language on Weblate..
+        /// </summary>
+        public static string S_LANG_NOTIFICATION {
+            get {
+                return ResourceManager.GetString("S_LANG_NOTIFICATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to App Language.
+        /// </summary>
+        public static string S_LANG_NOTIFICATION_TITLE {
+            get {
+                return ResourceManager.GetString("S_LANG_NOTIFICATION_TITLE", resourceCulture);
             }
         }
         
@@ -3432,6 +3461,15 @@ namespace ADB_Explorer.Strings {
         public static string S_TOOLTIP_BROWSING {
             get {
                 return ResourceManager.GetString("S_TOOLTIP_BROWSING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Click to display more info.
+        /// </summary>
+        public static string S_TOOLTIP_MORE_INFO {
+            get {
+                return ResourceManager.GetString("S_TOOLTIP_MORE_INFO", resourceCulture);
             }
         }
         

@@ -1644,4 +1644,22 @@ Cancel All Running</value>
     <value>Notifications</value>
     <comment>The title of the notifications area in the settings pane</comment>
   </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Click to display more info</value>
+    <comment>The tooltip of a button used to display a notification message</comment>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>App Language</value>
+    <comment>The title of the notification message about the app language</comment>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Select your app language of choice in the settings.
+Translation progress is displayed for the selected language.
+Please help us localize the app to your language on Weblate.</value>
+    <comment>The content of the app language notification message </comment>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Go to Weblate</value>
+    <comment>The content of the button used to open the link to our project on Weblate</comment>
+  </data>
 </root>
