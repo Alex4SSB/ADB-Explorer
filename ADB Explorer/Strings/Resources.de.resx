@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,50 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Das Android-Roboter-Logo wurde aus einer von Google erstellten und geteilten Arbeit reproduziert oder geändert und wird gemäß den Bedingungen der Creative Commons 3.0-Attributionslizenz verwendet.</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Gerät entfernen</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Verbindungsfehler</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>App-Animationen</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Pakete installieren</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Alle Elemente wiederherstellen</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>App-Einstellungen zurücksetzen</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Neue App-Version</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Navigationsfehler</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Paketname kopieren</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Kopplungsfehler</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Löschen bestätigen</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Endgültig löschen</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Gerät trennen</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Papierkorb leeren</value>
   </data>
 </root>
