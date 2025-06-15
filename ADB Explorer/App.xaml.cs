@@ -14,6 +14,9 @@ public partial class App : Application
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
+        // Read to force it to be set to Windows' culture
+        _ = Data.Settings.OriginalCulture;
+
         if (e.Args.Length > 0)
         {
             if (!Directory.Exists(e.Args[0]))
@@ -51,7 +54,6 @@ public partial class App : Application
                 ReadSettingsFile(reader);
             }
 
-            Data.Settings.OriginalCulture = Thread.CurrentThread.CurrentUICulture;
             if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
             {
                 Thread.CurrentThread.CurrentUICulture =

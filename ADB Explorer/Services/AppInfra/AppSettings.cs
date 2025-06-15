@@ -464,7 +464,23 @@ public class AppSettings : ViewModelBase
         set => Set(ref uiLanguage, value);
     }
 
-    public CultureInfo OriginalCulture { get; set; }
+    private CultureInfo originalCulture = null;
+    public CultureInfo OriginalCulture
+    {
+        get
+        {
+            if (originalCulture is null)
+            {
+                try
+                {
+                    originalCulture = Thread.CurrentThread.CurrentUICulture;
+                }
+                catch
+                { }
+            }
+            return originalCulture;
+        }
+    }
 
     private bool showLanguageNotification;
     public bool ShowLanguageNotification
