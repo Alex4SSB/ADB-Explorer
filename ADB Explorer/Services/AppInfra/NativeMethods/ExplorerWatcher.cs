@@ -230,7 +230,10 @@ public static partial class NativeMethods
             Data.RuntimeSettings.Watchers = [];
         }
 
-        private void UpdateExplorerWindows() => ExplorerWindows = ExplorerHelper.GetExplorerPaths();
+        private void UpdateExplorerWindows()
+        {
+            App.Current.Dispatcher.Invoke(() => ExplorerWindows = ExplorerHelper.GetExplorerPaths());
+        }
 
         /// <summary>
         /// Returns a collection of unique file system paths after resolving special placeholders and verifying their

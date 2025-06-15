@@ -36,6 +36,7 @@
                 <ResourceDictionary Source="Styles\FileOpColumn.xaml" />
                 <ResourceDictionary Source="Styles\Controls\ContentDialog.xaml" />
                 <!--  Other merged dictionaries here  -->
+                <!--<ResourceDictionary Source="pack://application:,,,/PresentationFramework.Fluent;component/Themes/Fluent.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
             <!--  Other app resources here  -->
 

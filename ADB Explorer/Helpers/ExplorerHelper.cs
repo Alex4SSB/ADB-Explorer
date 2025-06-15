@@ -186,6 +186,10 @@ public class ExplorerHelper
     /// excluded.</returns>
     public static IEnumerable<KeyValuePair<string, string>> GetFolderItems(ShellFolder parent)
     {
+        var nameMode = parent == ThisPc 
+            ? ShellItemDisplayString.NormalDisplay
+            : ShellItemDisplayString.ParentRelativeParsing;
+
         foreach (var item in parent)
         {
             string name, path;
@@ -209,7 +213,7 @@ public class ExplorerHelper
                         continue;
 
                     path = item.FileSystemPath;
-                    name = item.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
+                    name = item.GetDisplayName(nameMode);
                 }
             }
             catch
@@ -274,7 +278,12 @@ public class ExplorerHelper
                 if (window.Path == ThisPcTitle)
                 {
                     if (ThisPcItems.TryGetValue(elementName, out string actualPath))
-                        return actualPath;
+                    {
+                        // Ensure the drive is not empty
+                        return Directory.Exists(actualPath)
+                            ? actualPath
+                            : null;
+                    }
                 }
                 else if (window.Path == LibrariesTitle)
                 {

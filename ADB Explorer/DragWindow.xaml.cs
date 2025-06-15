@@ -241,19 +241,21 @@ public partial class DragWindow : INotifyPropertyChanged
         }
 
         var hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
+
+        // Shouldn't happen. But if it does, we don't want to do anything.
+        if (hwndUnderMouse == dragWindowHandle)
+            return;
+
         MouseWithinApp = hwndUnderMouse == InterceptClipboard.MainWindowHandle;
+
+        if (!MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
+            Data.RuntimeSettings.DragBitmap = null;
 
         if (WindowUnderMouse?.Hwnd == hwndUnderMouse)
             return;
 
         if (!MouseWithinApp)
         {
-            if (hwndUnderMouse == dragWindowHandle)
-                return;
-
-            if (Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
-                Data.RuntimeSettings.DragBitmap = null;
-
             var explorerWin = InterceptClipboard.ExplorerWatcher?.AllWindows.FirstOrDefault(win => win.Hwnd == hwndUnderMouse);
             if (explorerWin is null)
                 return;
