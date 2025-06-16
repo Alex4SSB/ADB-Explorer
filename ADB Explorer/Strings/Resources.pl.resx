@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,104 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Robot Androida jest powielany lub modyfikowany na podstawie prac stworzonych i udostępnianych przez Google i używany zgodnie z warunkami opisanymi na stronie Creative Commons 3.0 uznania autorstwa.</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Błąd parowania</value>
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value>Wybierz metodę postępu:</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Nowa wersja aplikacji</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Ikona aplikacji jest dostępna na licencji Apache License, wersja 2.0.</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Opróżnij Kosz</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Resetuj ustawienia aplikacji</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>Wybierz opcję, aby wyświetlić wyjaśnienie</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Błąd nawigacji</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>Tylko użycie dysku</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Przywróć wszystkie elementy</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Nie można uzyskać wersji ADB z podanej ścieżki.</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Błąd rozłączenia</value>
+  </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Ikony robotów Android</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Animacje aplikacji</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>Wersja ADB z podanej ścieżki jest zbyt niska.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Nie udało się zastąpić ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Wybierz plik wykonywalny ADB</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Kopiuj nazwę pakietu</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Kopiuj ścieżkę elementu</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Usuń</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Błąd ścieżki docelowej</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>nie udało się połączyć z</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Błąd połączenia</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>Wdróż AdbProgressRedirection.exe</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>Metoda postępu</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Nowy folder</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Nowy plik</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Pokaż rozszerzenia plików</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Urządzenia</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nowy</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Dodaj nowe urządzenie</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Nazwa pliku</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Odśwież urządzenia</value>
   </data>
 </root>
