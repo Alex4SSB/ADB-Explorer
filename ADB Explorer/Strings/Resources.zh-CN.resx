@@ -1354,4 +1354,10 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_FILE_CHAR" xml:space="preserve">
     <value>字符设备</value>
   </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>单击以显示更多信息</value>
+  </data>
 </root>
