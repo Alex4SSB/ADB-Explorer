@@ -349,7 +349,7 @@
     <value>选择一个选项以显示解释</value>
   </data>
   <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>选择进度方法：</value>
+    <value>选择文件传输进度显示方法:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>指定 ADB（至少 v{0}）：</value>
@@ -559,7 +559,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>启用文件资源管理器监听器</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>双击文件</value>
+    <value>双击文件时</value>
   </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
     <value>无</value>
@@ -583,7 +583,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>深色</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>跟随 Windows 默认主题</value>
+    <value>跟随 Windows 默认</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>主题</value>
@@ -1359,5 +1359,22 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
     <value>单击以显示更多信息</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>损坏的符号链接</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>在设置中选择应用的语言。
+同时将显示所选语言的翻译进度。
+请帮助我们在 Weblate 上将应用程序本地化为你的语言。</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>转到 Weblate</value>
   </data>
 </root>
