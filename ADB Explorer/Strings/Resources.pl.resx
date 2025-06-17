@@ -288,4 +288,34 @@
   <data name="S_SERVICE_NONAME" xml:space="preserve">
     <value>[Usługa]</value>
   </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Rozłącz urządzenie</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Instaluj pakiety</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Nie można ściągnąć pliku w celu jego odczytania.</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Potwierdź odinstalowanie</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Zabij emulator</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Usuń urządzenie</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Operacje na plikach</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Sparuj i/lub podłącz urządzenie WiFi (bez użycia mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Zrestartuj aplikację, aby zastosować zmiany</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Błąd odczytu pliku</value>
+  </data>
 </root>
