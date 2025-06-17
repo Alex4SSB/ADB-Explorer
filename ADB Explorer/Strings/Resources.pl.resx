@@ -219,4 +219,73 @@
   <data name="S_REFRESH_DEVICES" xml:space="preserve">
     <value>Odśwież urządzenia</value>
   </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Nieznany</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Nie można włączyć dostępu do roota na wybranym urządzeniu.</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Potwierdź usunięcie</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Błąd utworzenia</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Usuń trwale</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Dostęp do roota</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Wybierz pakiety do zainstalowania</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Przeglądaj</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Połącz</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>Dostępne {0} z {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Pusty</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Wyłącz</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Kod parowania</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>Adres IP / Nazwa hosta</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Port parowania</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Paruj i połącz</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Zapisane urządzenie</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>Parowanie kodem QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Gotowe do parowania</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Wyczyść wszystko</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Nieautoryzowane]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Usługa]</value>
+  </data>
 </root>
