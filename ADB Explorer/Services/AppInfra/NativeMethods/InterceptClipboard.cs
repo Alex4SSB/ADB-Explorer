@@ -19,9 +19,21 @@ public static partial class NativeMethods
         {
             _externalClipAction = clipboardAction;
             _externalIpcAction = ipcAction;
-            RoutedEventHandler handler = null;
+            RoutedEventHandler windowLoadedHandler = null;
+            PropertyChangedEventHandler driveViewHandler = null;
 
-            handler = (object sender, RoutedEventArgs e) =>
+            driveViewHandler = (sender, e) =>
+            {
+                if (e.PropertyName == nameof(Data.RuntimeSettings.DriveViewNav) && Data.RuntimeSettings.DriveViewNav)
+                {
+                    InitWatcher();
+                    Data.RuntimeSettings.PropertyChanged -= driveViewHandler;
+                }
+            };
+
+            Data.RuntimeSettings.PropertyChanged += driveViewHandler;
+
+            windowLoadedHandler = (sender, e) =>
             {
                 MainWindowHandle = new WindowInteropHelper(window).Handle;
 
@@ -30,14 +42,6 @@ public static partial class NativeMethods
 
                 AddClipboardFormatListener(MainWindowHandle);
 
-                Data.CopyPaste.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(Data.CopyPaste.PasteSource))
-                    {
-                        InitWatcher();
-                    }
-                };
-
                 Data.RuntimeSettings.PropertyChanged += (s, e) =>
                 {
                     if (e.PropertyName == nameof(Data.RuntimeSettings.IsAdvancedDragEnabled))
@@ -45,18 +49,20 @@ public static partial class NativeMethods
                         // The DataObject will have to be recreated if the setting changes
                         if (Data.CopyPaste.IsSelfClipboard)
                             Data.CopyPaste.Clear();
+
+                        InitWatcher();
                     }
                 };
 
-                window.Loaded -= handler;
+                window.Loaded -= windowLoadedHandler;
             };
 
-            window.Loaded += handler;
+            window.Loaded += windowLoadedHandler;
         }
 
         private static void InitWatcher()
         {
-            if (Data.CopyPaste.IsSelf && Data.RuntimeSettings.IsAdvancedDragEnabled)
+            if (Data.RuntimeSettings.IsAdvancedDragEnabled)
                 ExplorerWatcher = new();
             else
             {
@@ -67,6 +73,7 @@ public static partial class NativeMethods
 
         public static void Close()
         {
+            ExplorerWatcher?.Dispose();
             RemoveClipboardFormatListener(MainWindowHandle);
             _hwndSource?.RemoveHook(WndProc);
             _hwndSource?.Dispose();

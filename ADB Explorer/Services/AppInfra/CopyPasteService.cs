@@ -264,6 +264,9 @@ public class CopyPasteService : ViewModelBase
 
     public void ClearDrag()
     {
+        if (!IsDrag)
+            return;
+
         Data.RuntimeSettings.DragBitmap = null;
         if (IsClipboard)
             return;
@@ -307,15 +310,19 @@ public class CopyPasteService : ViewModelBase
         UpdateUI();
     }
 
-    public void UpdateSelfVFDO()
+    public void UpdateSelfVFDO(bool isDrag)
     {
         if (VirtualFileDataObject.SelfFiles is null || !VirtualFileDataObject.SelfFiles.Any())
             return;
 
-        PasteSource &= ~DataSource.None;
-        DragPasteSource = DataSource.None;
-        CurrentSource |= DataSource.Android;
-        CurrentSource |= DataSource.Self;
+        if (isDrag)
+        {
+            DragPasteSource |= DataSource.Android | DataSource.Self;
+        }
+        else
+        {
+            PasteSource |= DataSource.Android | DataSource.Self;
+        }
 
         SourceDevice = Data.CurrentADBDevice.Device;
         MasterPid = Environment.ProcessId;
@@ -335,7 +342,7 @@ public class CopyPasteService : ViewModelBase
         }
         else
             DragPasteSource &= ~DataSource.None;
-        
+
         PreviewDataObject(dataObject);
         if (DragFiles.Length < 1)
             return DragDropEffects.None;

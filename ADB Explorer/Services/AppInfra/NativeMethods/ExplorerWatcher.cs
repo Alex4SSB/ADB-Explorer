@@ -159,6 +159,9 @@ public static partial class NativeMethods
 
             _titleChangeHandler = (sender, e) =>
             {
+                if (CurrentExplorerWindow is null)
+                    return;
+
                 // e.NewValue does provide us the new window title, but we need to refresh the full path anyway
                 UpdateExplorerWindows();
                 FocusedPath = ExplorerWindows.FirstOrDefault(w => w.Hwnd == CurrentExplorerWindow.Hwnd)?.Path;
