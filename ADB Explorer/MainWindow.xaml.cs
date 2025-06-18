@@ -1354,8 +1354,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
         var point = Mouse.GetPosition(ExplorerGrid);
-        if (point.Y < ColumnHeaderHeight)
+        if (point.Y < ColumnHeaderHeight || WasDragging)
+        {
+            WasDragging = false;
+
+            SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
             e.Handled = true;
+            return;
+        }
 
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, true);
         FileActionLogic.UpdateFileActions();
@@ -1363,6 +1369,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
+        if (e.ChangedButton != MouseButton.Left)
+            return;
+
         if (RowHeight is null && ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(0) is DataGridRow row)
             RowHeight = row.ActualHeight;
 
@@ -1717,7 +1726,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ClickCount = -1;
             return;
         }
-
+        
+        WasDragging = false;
+        
         var cell = sender as DataGridCell;
         WasEditing = cell.IsEditing;
 

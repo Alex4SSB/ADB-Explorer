@@ -394,7 +394,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
 
     public void SetAdbDrag(IEnumerable<FileClass> files, ADBService.AdbDevice device)
     {
-        SelfFiles = files;
+        SelfFiles = [.. files];
         NativeMethods.ADBDRAGLIST adbDrag = new(device, files);
         SetData(AdbDataFormats.AdbDrop, adbDrag.Bytes);
     }
@@ -809,6 +809,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             var res = escapePressed switch
             {
                 true => NativeMethods.HResult.DRAGDROP_S_CANCEL,
+                false when Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.RightMouseButton) => NativeMethods.HResult.DRAGDROP_S_CANCEL,
                 false when !Data.RuntimeSettings.DragModifiers.HasFlag(DragDropKeyStates.LeftMouseButton) => NativeMethods.HResult.DRAGDROP_S_DROP,
                 _ => NativeMethods.HResult.Ok,
             };

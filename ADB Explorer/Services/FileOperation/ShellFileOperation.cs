@@ -141,20 +141,6 @@ public static class ShellFileOperation
     }
 
     public static void MoveItems(ADBService.AdbDevice device,
-                                 IEnumerable<string> items,
-                                 string targetPath,
-                                 string currentPath,
-                                 Dispatcher dispatcher,
-                                 DragDropEffects cutType = DragDropEffects.None)
-        => MoveItems(device,
-                     items.Select(f => new FileClass(new FilePath(f))),
-                     targetPath,
-                     currentPath,
-                     Array.Empty<string>(),
-                     dispatcher,
-                     cutType);
-
-    public static void MoveItems(ADBService.AdbDevice device,
                                  IEnumerable<FileClass> items,
                                  string targetPath,
                                  string currentPath,
@@ -165,7 +151,7 @@ public static class ShellFileOperation
                      items,
                      targetPath,
                      currentPath,
-                     fileList.Select(f => f.FullPath),
+                     fileList.Select(f => f.FullName),
                      dispatcher,
                      cutType);
 

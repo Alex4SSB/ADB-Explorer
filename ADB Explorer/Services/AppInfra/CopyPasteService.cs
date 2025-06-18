@@ -748,7 +748,7 @@ public class CopyPasteService : ViewModelBase
                   items: pasteItems,
                   targetPath: targetPath,
                   currentPath: currentPath,
-                  existingItems: [],
+                  existingItems: Data.DirList.FileList.Select(f => f.FullName),
                   dispatcher: dispatcher,
                   cutType: cutType,
                   masterPid: masterPid);
