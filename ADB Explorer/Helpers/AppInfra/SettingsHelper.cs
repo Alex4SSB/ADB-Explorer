@@ -47,7 +47,10 @@ public static class SettingsHelper
         {
             try
             {
-                dialog.InitialDirectory = Directory.GetParent(Data.Settings.ManualAdbPath).FullName;
+                var dir = Directory.GetParent(Data.Settings.ManualAdbPath);
+
+                if (dir.Exists)
+                    dialog.InitialDirectory = dir.FullName;
             }
             catch (Exception) { }
         }
