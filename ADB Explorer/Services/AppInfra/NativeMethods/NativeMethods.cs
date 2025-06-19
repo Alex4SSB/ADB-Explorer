@@ -491,6 +491,19 @@ public static partial class NativeMethods
         GA_ROOTOWNER = 3 // Retrieves the owned root window.
     }
 
+    private enum SIGDN : uint
+    {
+        NORMALDISPLAY = 0x00000000,
+        PARENTRELATIVEPARSING = 0x80018001,
+        DESKTOPABSOLUTEPARSING = 0x80028000,
+        PARENTRELATIVEEDITING = 0x80031001,
+        FILESYSPATH = 0x80058000,
+        URL = 0x80068000,
+        PARENTRELATIVEFORADDRESSBAR = 0x8007c001,
+        PARENTRELATIVE = 0x80080001,
+        PARENTRELATIVEFORUI = 0x80094001,
+    }
+
     #endregion
 
     #region General Use Structs
@@ -686,6 +699,38 @@ public static partial class NativeMethods
             return "File";
 
         return shInfo.szTypeName;
+    }
+
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+    private static extern void SHCreateItemFromParsingName(
+        [MarshalAs(UnmanagedType.LPWStr)] string pszPath,
+        IntPtr pbc,
+        [MarshalAs(UnmanagedType.LPStruct)] Guid riid,
+        out IShellItem ppv
+    );
+
+    [ComImport]
+    [Guid("43826D1E-E718-42EE-BC55-A1E261C37BFE")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    private interface IShellItem
+    {
+        void BindToHandler(IntPtr pbc, ref Guid bhid, ref Guid riid, out IntPtr ppv);
+        void GetParent(out IShellItem ppsi);
+        void GetDisplayName(SIGDN sigdnName, out IntPtr ppszName);
+        void GetAttributes(uint sfgaoMask, out uint psfgaoAttribs);
+        void Compare(IShellItem psi, uint hint, out int piOrder);
+    }
+
+    public static string GetSpecialFolderName(string guid)
+    {
+        SHCreateItemFromParsingName($"shell:{guid}", IntPtr.Zero, typeof(IShellItem).GUID, out IShellItem shellItem);
+
+        shellItem.GetDisplayName(SIGDN.NORMALDISPLAY, out IntPtr pszName);
+
+        string name = Marshal.PtrToStringUni(pszName);
+        Marshal.FreeCoTaskMem(pszName);
+
+        return name;
     }
 
     #endregion

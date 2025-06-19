@@ -262,6 +262,8 @@ public partial class DragWindow : INotifyPropertyChanged
 
             WindowUnderMouse = explorerWin;
 
+            WindowUnderMouse.UpdateWin10Path();
+
             var procName = WindowUnderMouse.Process?.ProcessName;
 
             Data.RuntimeSettings.DragWithinSlave = procName == Properties.AppGlobal.AppDisplayName;
