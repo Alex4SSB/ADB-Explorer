@@ -419,6 +419,13 @@ public static partial class NativeMethods
         ///      idChild    is INDEXID_OBJECT <br />
         /// </summary>
         EVENT_SYSTEM_FOREGROUND = 0x0003,
+        /// <summary>
+        /// An object's Name property has changed.
+        /// The system sends this event for the following user interface elements:
+        /// check box, cursor, list-view control, push button, radio button, status bar control, tree view control, and window object.
+        /// Server applications send this event for their accessible objects.
+        /// </summary>
+        EVENT_OBJECT_NAMECHANGE = 0x800C,
     }
 
     /// <summary>

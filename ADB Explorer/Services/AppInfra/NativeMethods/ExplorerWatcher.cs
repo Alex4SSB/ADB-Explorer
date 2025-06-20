@@ -11,7 +11,8 @@ public static partial class NativeMethods
 {
     public sealed class ExplorerWatcher : IDisposable
     {
-        private readonly HANDLE _hookId = IntPtr.Zero;
+        private readonly HANDLE _foregroundHookId = IntPtr.Zero;
+        private readonly HANDLE _nameChangeHookId = IntPtr.Zero;
         private readonly WinEventDelegate _delegate;
         
         private AutomationPropertyChangedEventHandler _titleChangeHandler;
@@ -70,11 +71,18 @@ public static partial class NativeMethods
 
         public ExplorerWatcher()
         {
+            UpdateExplorerWindows();
             UpdateWatchers();
 
             _delegate = new WinEventDelegate(WinEventProc);
-            _hookId = SetWinEventHook(WindowsEvents.EVENT_SYSTEM_FOREGROUND, WindowsEvents.EVENT_SYSTEM_FOREGROUND, 
+            _foregroundHookId = SetWinEventHook(WindowsEvents.EVENT_SYSTEM_FOREGROUND, WindowsEvents.EVENT_SYSTEM_FOREGROUND, 
                 IntPtr.Zero, _delegate, 0, 0, WinEventHookFlags.WINEVENT_OUTOFCONTEXT);
+
+            if (!Data.RuntimeSettings.Is22H2)
+            {
+                _nameChangeHookId = SetWinEventHook(WindowsEvents.EVENT_OBJECT_NAMECHANGE, WindowsEvents.EVENT_OBJECT_NAMECHANGE,
+                    IntPtr.Zero, _delegate, 0, 0, WinEventHookFlags.WINEVENT_OUTOFCONTEXT);
+            }
 
             // WMI query for removable drives (DriveType=2)
             var query = new WqlEventQuery(
@@ -113,11 +121,18 @@ public static partial class NativeMethods
             int idChild, uint dwEventThread,
             uint dwmsEventTime)
         {
-            if (eventType != WindowsEvents.EVENT_SYSTEM_FOREGROUND
-                || hwnd == IntPtr.Zero)
+            if (hwnd == IntPtr.Zero)
                 return;
 
-            if (hwnd == InterceptClipboard.MainWindowHandle)
+            if (eventType is WindowsEvents.EVENT_OBJECT_NAMECHANGE)
+            {
+                if (CurrentExplorerWindow is null || hwnd != CurrentExplorerWindow.Hwnd)
+                    return;
+            }
+            else if (eventType is not WindowsEvents.EVENT_SYSTEM_FOREGROUND)
+                return;
+
+            if (hwnd == InterceptClipboard.MainWindowHandle && Data.RuntimeSettings.Is22H2)
                 return;
 
             App.Current.Dispatcher.Invoke(() =>
@@ -130,17 +145,20 @@ public static partial class NativeMethods
                 }
                 else
                 {
-                    window = new(hwnd);
-
-                    if (window.Process is null)
-                        return;
-
-                    if (window.Process.ProcessName is not "explorer")
+                    if (eventType is WindowsEvents.EVENT_SYSTEM_FOREGROUND)
                     {
-                        if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
-                            ExplorerHelper.CheckConflictingApps();
+                        window = new(hwnd);
 
-                        return;
+                        if (window.Process is null)
+                            return;
+
+                        if (window.Process.ProcessName is not "explorer")
+                        {
+                            if (AdbExplorerConst.INCOMPATIBLE_APPS.Contains(window.Process.ProcessName))
+                                ExplorerHelper.CheckConflictingApps();
+
+                            return;
+                        }
                     }
 
                     UpdateExplorerWindows();
@@ -154,7 +172,7 @@ public static partial class NativeMethods
         {
             // Hierarchy: Window -> Pane -> Tab -> List -> TabItem
 
-            if (CurrentExplorerWindow?.RootElement is null)
+            if (!Data.RuntimeSettings.Is22H2 || CurrentExplorerWindow?.RootElement is null)
                 return;
 
             _titleChangeHandler = (sender, e) =>
@@ -185,7 +203,7 @@ public static partial class NativeMethods
 
         private static void UnsubscribeFromTitleEvents(AutomationPropertyChangedEventHandler handler, ExplorerWindow window)
         {
-            if (handler is null || window?.RootElement is null)
+            if (handler is null || !Data.RuntimeSettings.Is22H2 || window?.RootElement is null)
                 return;
 
             try
@@ -208,8 +226,6 @@ public static partial class NativeMethods
         /// watchers  and creates new ones for the updated paths.</remarks>
         public void UpdateWatchers()
         {
-            UpdateExplorerWindows();
-
             var oldPaths = Data.RuntimeSettings.Watchers.Select(w => w.Path);
             var newPaths = GetUniquePaths([FocusedPath, .. ExplorerWindows.Select(w => w.Path)]);
             
@@ -345,8 +361,11 @@ public static partial class NativeMethods
             _driveWatcher?.Stop();
             _driveWatcher?.Dispose();
 
-            if (_hookId != IntPtr.Zero)
-                UnhookWinEvent(_hookId);
+            if (_foregroundHookId != IntPtr.Zero)
+                UnhookWinEvent(_foregroundHookId);
+
+            if (_nameChangeHookId != IntPtr.Zero)
+                UnhookWinEvent(_nameChangeHookId);
         }
     }
 }

@@ -249,7 +249,7 @@ public partial class DragWindow : INotifyPropertyChanged
         {
             try
             {
-                ElementUnderMouse = AutomationElement.FromPoint(actualPoint);
+                ElementUnderMouse = AutomationElement.FromPoint(point);
             }
             catch
             {
@@ -282,8 +282,6 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
 
             WindowUnderMouse = explorerWin;
-
-            WindowUnderMouse.UpdateWin10Path();
 
             var procName = WindowUnderMouse.Process?.ProcessName;
 

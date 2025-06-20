@@ -72,35 +72,6 @@ public class ExplorerHelper
         return null;
     }
 
-    private static int win10ToolbarIndex = 0;
-
-    /// <summary>
-    /// Get the full path of a Windows Explorer window
-    /// </summary>
-    /// <param name="rootElement"></param>
-    /// <returns></returns>
-    public static string GetPathFromWindow(AutomationElement rootElement)
-    {
-        var toolbars = rootElement.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ToolBar));
-
-        for (int i = -1; i < toolbars.Count; i++)
-        {
-            if (i == win10ToolbarIndex)
-                continue;
-
-            var toolbar = i < 0 ? toolbars[win10ToolbarIndex] : toolbars[i];
-
-            var splitName = toolbar.Current.Name.Split(':', 2);
-            if (splitName.Length > 1 && splitName[1].Length > 0)
-            {
-                win10ToolbarIndex = i;
-                return splitName[1].Trim();
-            }
-        }
-
-        return null;
-    }
-
     /// <summary>
     /// Retrieves a collection of active Windows Explorer windows and their associated paths.
     /// </summary>

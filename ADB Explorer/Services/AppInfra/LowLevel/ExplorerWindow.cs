@@ -89,14 +89,6 @@ public class ExplorerWindow : IComparable
         }
     }
 
-    public void UpdateWin10Path()
-    {
-        if (Data.RuntimeSettings.Is22H2 || Hwnd == NativeMethods.InterceptClipboard.ExplorerWatcher.DesktopWindow.Hwnd)
-            return;
-
-        Paths = [ExplorerHelper.GetPathFromWindow(RootElement)];
-    }
-
     public ExplorerWindow(IGrouping<HANDLE, string> paths)
     {
         Hwnd = paths.Key;
