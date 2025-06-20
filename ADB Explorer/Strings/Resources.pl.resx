@@ -318,4 +318,7 @@
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Błąd odczytu pliku</value>
   </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Uszkodzony link</value>
+  </data>
 </root>
