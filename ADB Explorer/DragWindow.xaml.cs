@@ -100,7 +100,8 @@ public partial class DragWindow : INotifyPropertyChanged
                     else
                     {
                         Data.RuntimeSettings.PathUnderMouse = new(path);
-                        IsDropAllowed = Data.RuntimeSettings.PathUnderMouse.IsFolder;
+                        IsDropAllowed = Data.RuntimeSettings.PathUnderMouse.IsFolder
+                            && Data.RuntimeSettings.PathUnderMouse.FileInfo.Attributes is not FileAttributes.Archive;
 
                         string displayName = Data.RuntimeSettings.PathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay);
                         if (displayName.Count(c => c == '\\') > 1)
@@ -123,9 +124,23 @@ public partial class DragWindow : INotifyPropertyChanged
                     IsDropAllowed = true;
             }
 
-            var target = MouseWithinApp
-                ? " to " + FileHelper.GetFullName(Data.CopyPaste.DropTarget)
-                : explorerTarget;
+            string target = "";
+            if (MouseWithinApp)
+            {
+                if (Data.CopyPaste.IsSelf
+                    && Data.CopyPaste.DropTarget == Data.CopyPaste.DragParent
+                    && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                {
+                    DragTooltip.Text = "";
+                    return;
+                }
+
+                target = " to " + FileHelper.GetFullName(Data.CopyPaste.DropTarget);
+            }
+            else
+            {
+                target = explorerTarget;
+            }
 
             DragTooltip.Text = $" {Data.CopyPaste.DragFiles.Length} item(s){target}";
         });
@@ -208,11 +223,13 @@ public partial class DragWindow : INotifyPropertyChanged
 #if DEBUG
         MouseWithinApp = true;
 #else
-        InterceptMouse.Init(MouseMessages.WM_MOUSEMOVE, UpdateMouse);
+        InterceptMouse.Init(UpdateMouse, CancelDrag);
 #endif
 
         DragTimer.Start();
     }
+
+    private void CancelDrag() => Data.RuntimeSettings.DragBitmap = null;
 
     private void UpdateMouse(POINT point)
     {
@@ -246,6 +263,7 @@ public partial class DragWindow : INotifyPropertyChanged
         if (hwndUnderMouse == dragWindowHandle)
             return;
 
+        var wasWithinApp = MouseWithinApp;
         MouseWithinApp = hwndUnderMouse == InterceptClipboard.MainWindowHandle;
 
         if (!MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
@@ -256,6 +274,9 @@ public partial class DragWindow : INotifyPropertyChanged
 
         if (!MouseWithinApp)
         {
+            if (wasWithinApp)
+                Data.CopyPaste.PasteState = DragDropEffects.None;
+
             var explorerWin = InterceptClipboard.ExplorerWatcher?.AllWindows.FirstOrDefault(win => win.Hwnd == hwndUnderMouse);
             if (explorerWin is null)
                 return;

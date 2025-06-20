@@ -20,18 +20,18 @@ public static partial class NativeMethods
 
         private static LowLevelMouseProc _mouseProc = HookCallback;
         private static HANDLE _mouseHookID = IntPtr.Zero;
-        private static Action<POINT> _externalMouseAction;
-        private static MouseMessages _requestedMouseEvent;
+        private static Action<POINT> _mouseMoveAction;
+        private static Action _rButtonAction;
         public static POINT MousePosition { get; private set; }
         
         public static HANDLE WindowUnderMouse { get; private set; }
 
         private delegate HANDLE LowLevelMouseProc(int nCode, MouseMessages wParam, HANDLE lParam);
 
-        public static void Init(MouseMessages mouseEvent, Action<POINT> action)
+        public static void Init(Action<POINT> mouseMoveAction, Action rButtonAction)
         {
-            _requestedMouseEvent = mouseEvent;
-            _externalMouseAction = action;
+            _mouseMoveAction = mouseMoveAction;
+            _rButtonAction = rButtonAction;
 
             _mouseHookID = SetHook(_mouseProc);
         }
@@ -53,17 +53,26 @@ public static partial class NativeMethods
 
         private static HANDLE HookCallback(int nCode, MouseMessages wParam, HANDLE lParam)
         {
-            if (nCode < 0 || wParam != _requestedMouseEvent)
+            if (nCode < 0 || wParam is not MouseMessages.WM_MOUSEMOVE and not MouseMessages.WM_RBUTTONDOWN)
+            {
                 return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
+            }
 
             var hookStruct = Marshal.PtrToStructure<MSLLHOOKSTRUCT>(lParam);
 
-            POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
-            if (newPoint != MousePosition)
-                _externalMouseAction?.Invoke(MousePosition);
+            if (wParam is MouseMessages.WM_RBUTTONDOWN)
+            {
+                _rButtonAction?.Invoke();
+            }
+            else
+            {
+                POINT newPoint = new(hookStruct.pt.X, hookStruct.pt.Y);
+                if (newPoint != MousePosition)
+                    _mouseMoveAction?.Invoke(MousePosition);
 
-            MousePosition = newPoint;
-
+                MousePosition = newPoint;
+            }
+            
             return CallNextHookEx(_mouseHookID, nCode, wParam, lParam);
         }
 

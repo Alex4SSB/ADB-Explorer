@@ -902,7 +902,8 @@ internal static class FileActionLogic
         Data.FileActions.InstallPackageEnabled = Data.DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery
             && Data.CurrentDrive?.IsFUSE is not true;
 
-        Data.RuntimeSettings.FilterActions = true;
+        if (!Data.CopyPaste.IsDrag)
+            Data.RuntimeSettings.FilterActions = true;
     }
 
     public static void PushItems(bool isFolderPicker, bool isContextMenu)

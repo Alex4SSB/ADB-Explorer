@@ -2050,7 +2050,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
-        CopyPaste.AcceptDataObject(e.Data, (FrameworkElement)sender);
+        CopyPaste.AcceptDataObject(e, (FrameworkElement)sender);
         e.Handled = true;
     }
 
@@ -2199,7 +2199,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
         e.Effects = allowed;
 
-        if (allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
+        if (allowed.HasFlag(DragDropEffects.Move) && CopyPaste.IsSelf)
+        {
+            e.Effects = DragDropEffects.Move;
+            CopyPaste.DropEffect = DragDropEffects.Move;
+        }
+        else if (allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
         {
             e.Effects = DragDropEffects.Move;
             CopyPaste.DropEffect = DragDropEffects.Move;

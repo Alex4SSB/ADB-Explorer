@@ -467,14 +467,19 @@ public class CopyPasteService : ViewModelBase
         }
     }
 
-    public void AcceptDataObject(IDataObject dataObject, FrameworkElement sender, bool isLink = false)
+    public void AcceptDataObject(System.Windows.DragEventArgs e, FrameworkElement sender, bool isLink = false)
     {
         var dataContext = sender.DataContext;
 
         string targetFolder = dataContext is FileClass { IsDirectory: true } file
             ? file.FullPath
             : Data.CurrentPath;
-        AcceptDataObject(dataObject, targetFolder, isLink);
+        
+        // Do not perform implicit duplicate by drag (only with Ctrl)
+        if (IsSelf && targetFolder == DragParent && e.KeyStates is DragDropKeyStates.None)
+            return;
+
+        AcceptDataObject(e.Data, targetFolder, isLink);
     }
 
     public void AcceptDataObject(IDataObject dataObject, IEnumerable<FileClass> selectedFiles, bool isLink = false)
