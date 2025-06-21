@@ -1180,4 +1180,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_MINUTES_SHORT" xml:space="preserve">
     <value>{0}分</value>
   </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root 狀態：{0}</value>
+  </data>
 </root>
