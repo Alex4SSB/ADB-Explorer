@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,104 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>El robot de Android se reproduce o modifica a partir del trabajo generado y compartido por Google, y se usa conforme a lo descrito en la Licencia de Atribución de Creative Commons 3.0.</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Animaciones de la Aplicación</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Borrar</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Error de desconexión</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Eliminar permanentemente</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copiar nombre del paquete</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Restaurar conflictos</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Desconectar el dispositivo</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>El ícono de la aplicación está licenciado bajo la Licencia de Apache, Versión 2.0.</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Quitar dispositivo</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>No se puede obtener la versión de ADB de la ruta especificada.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Acceso Raíz</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Detener Emulador</value>
+  </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Ícono(s) de Android</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>La versión de ADB de la ruta especificada es demasiado baja.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>No se pudo anular ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Selecciona el ejecutable ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Restablecer la configuración de la aplicación</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Nueva versión de la aplicación</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Error de navegación</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Restaurar todos los elementos</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Error de ruta de destino</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>No se pudo conectar a</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Error de conexión</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Error de emparejamiento</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>No se puede habilitar el acceso root en el dispositivo seleccionado.</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Confirmar eliminación</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Error al crear</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Confirmar desinstalación</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Seleccionar paquetes para instalar</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Operaciones con archivos</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Instalar paquetes</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copiar ruta del elemento</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Papelera de reciclaje vacía</value>
   </data>
 </root>
