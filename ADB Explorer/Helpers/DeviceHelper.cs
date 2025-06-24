@@ -223,6 +223,85 @@ public static class DeviceHelper
             Process.Start($"{AdbExplorerConst.WSA_PROCESS_NAME}.exe");
         });
 
+    public static readonly Predicate<DeviceViewModel> DevicePredicate = device =>
+    {
+        // current device cannot be hidden
+        if (device is LogicalDeviceViewModel { IsOpen: true })
+            return true;
+
+        if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service)
+        {
+            if (device.Status is DeviceStatus.Offline)
+            {
+                // if a logical service is offline, and we have one of its services - hide the logical service
+                return Data.DevicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
+            }
+
+            // if there's a logical service and a remote device with the same IP - hide the logical service
+            return !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
+                                                    && l.Type is DeviceType.Remote or DeviceType.Local
+                                                    && l.Status is DeviceStatus.Ok);
+        }
+
+        if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
+        {
+            // if a remote device is also connected by USB and both are authorized - hide the remote device
+            return !Data.DevicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is DeviceType.Local
+                && usb.Status is DeviceStatus.Ok
+                && (device.ID.Contains(usb.ID)
+                    || usb.IpAddress == device.IpAddress));
+        }
+
+        if (device is HistoryDeviceViewModel hist)
+        {
+            // if there's any device with the IP of a history device - hide the history device
+            return Data.Settings.SaveDevices && !Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == hist.IpAddress || logical.IpAddress == hist.HostName)
+                    && !Data.DevicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == hist.IpAddress || service.IpAddress == hist.HostName);
+        }
+
+        if (device is ServiceDeviceViewModel service)
+        {
+            // connect services are always hidden
+            if (service is ConnectServiceViewModel)
+                return false;
+
+            // if there's any online logical device with the IP of a pairing service - hide the pairing service
+            if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
+                return false;
+
+            // if there's any QR service with the IP of a code pairing service - hide the code pairing service
+            if (service.MdnsType is ServiceDevice.ServiceType.PairingCode
+                && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
+                                                          && qr.IpAddress == service.IpAddress))
+                return false;
+        }
+
+        if (device is WsaPkgDeviceViewModel wsaPkg)
+        {
+            // if WSA is not installed - hide it
+            if (wsaPkg.Status is DeviceStatus.Offline)
+                return false;
+
+            // if an online logical WSA device exists, the WSA package is hidden
+            if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Type is DeviceType.WSA && logical.Status is not DeviceStatus.Offline))
+                return false;
+        }
+
+        // if there's an offline WSA device - hide it
+        if (device is LogicalDeviceViewModel { Type: DeviceType.WSA, Status: DeviceStatus.Offline })
+            return false;
+
+        if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
+        {
+            // if there are multiple logical devices of the same model, display their ID instead
+            logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name)) > 1;
+        }
+
+        return true;
+    };
+
+    public static readonly Predicate<object> devicePredicate = d => DevicePredicate((DeviceViewModel)d);
+
     public static void FilterDevices(ICollectionView collectionView)
     {
         if (collectionView is null)
@@ -234,85 +313,7 @@ public static class DeviceHelper
             return;
         }
 
-        Predicate<object> predicate = d =>
-        {
-            var device = (DeviceViewModel)d;
-
-            // current device cannot be hidden
-            if (device is LogicalDeviceViewModel { IsOpen: true })
-                return true;
-
-            if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service)
-            {
-                if (device.Status is DeviceStatus.Offline)
-                {
-                    // if a logical service is offline, and we have one of its services - hide the logical service
-                    return Data.DevicesObject.ServiceDeviceViewModels.All(s => s.IpAddress != device.IpAddress);
-                }
-
-                // if there's a logical service and a remote device with the same IP - hide the logical service
-                return !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
-                                                        && l.Type is DeviceType.Remote or DeviceType.Local
-                                                        && l.Status is DeviceStatus.Ok);
-            }
-
-            if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
-            {
-                // if a remote device is also connected by USB and both are authorized - hide the remote device
-                return !Data.DevicesObject.LogicalDeviceViewModels.Any(usb => usb.Type is DeviceType.Local
-                    && usb.Status is DeviceStatus.Ok
-                    && usb.IpAddress == device.IpAddress);
-            }
-
-            if (device is HistoryDeviceViewModel hist)
-            {
-                // if there's any device with the IP of a history device - hide the history device
-                return Data.Settings.SaveDevices && !Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.IpAddress == hist.IpAddress || logical.IpAddress == hist.HostName)
-                        && !Data.DevicesObject.ServiceDeviceViewModels.Any(service => service.IpAddress == hist.IpAddress || service.IpAddress == hist.HostName);
-            }
-
-            if (device is ServiceDeviceViewModel service)
-            {
-                // connect services are always hidden
-                if (service is ConnectServiceViewModel)
-                    return false;
-
-                // if there's any online logical device with the IP of a pairing service - hide the pairing service
-                if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Status is not DeviceStatus.Offline && logical.IpAddress == service.IpAddress))
-                    return false;
-
-                // if there's any QR service with the IP of a code pairing service - hide the code pairing service
-                if (service.MdnsType is ServiceDevice.ServiceType.PairingCode
-                    && Data.DevicesObject.ServiceDeviceViewModels.Any(qr => qr.MdnsType is ServiceDevice.ServiceType.QrCode
-                                                              && qr.IpAddress == service.IpAddress))
-                    return false;
-            }
-
-            if (device is WsaPkgDeviceViewModel wsaPkg)
-            {
-                // if WSA is not installed - hide it
-                if (wsaPkg.Status is DeviceStatus.Offline)
-                    return false;
-
-                // if an online logical WSA device exists, the WSA package is hidden
-                if (Data.DevicesObject.LogicalDeviceViewModels.Any(logical => logical.Type is DeviceType.WSA && logical.Status is not DeviceStatus.Offline))
-                    return false;
-            }
-
-            // if there's an offline WSA device - hide it
-            if (device is LogicalDeviceViewModel { Type: DeviceType.WSA, Status: DeviceStatus.Offline })
-                return false;
-
-            if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
-            {
-                // if there are multiple logical devices of the same model, display their ID instead
-                logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name)) > 1;
-            }
-
-            return true;
-        };
-
-        collectionView.Filter = new(predicate);
+        collectionView.Filter = new(devicePredicate);
         collectionView.SortDescriptions.Clear();
         collectionView.SortDescriptions.Add(new SortDescription(nameof(DeviceViewModel.Type), ListSortDirection.Ascending));
     }

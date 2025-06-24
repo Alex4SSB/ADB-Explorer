@@ -39,7 +39,7 @@ public class Devices : AbstractDevice
     public LogicalDeviceViewModel Current => LogicalDeviceViewModels?.FirstOrDefault(device => device.IsOpen)
         ?? Data.RuntimeSettings.DeviceToOpen;
 
-    public int Count => UIList.Count(d => d.DeviceExists);
+    public int Count => UIList.Count(d => DeviceHelper.DevicePredicate(d) && d is not HistoryDeviceViewModel and not NewDeviceViewModel);
 
     public ObservableProperty<string> ObservableCount = new();
 
