@@ -112,10 +112,7 @@
                             x:Name="NavigationToolBar"
                             Margin="0,0,6,0"
                             Style="{StaticResource MainToolBarStyle}" />
-                        <controls:NavigationBox
-                            x:Name="NavigationBox"
-                            Grid.Column="1"
-                            SizeChanged="NavigationBox_SizeChanged" />
+                        <controls:NavigationBox x:Name="NavigationBox" Grid.Column="1" />
                         <controls:SearchBox
                             x:Name="SearchBox"
                             Grid.Column="2"

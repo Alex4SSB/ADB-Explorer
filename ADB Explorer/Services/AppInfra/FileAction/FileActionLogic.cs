@@ -522,7 +522,9 @@ internal static class FileActionLogic
 
     public static void Rename(TextBox textBox)
     {
-        FileClass file = TextHelper.GetAltObject(textBox) as FileClass;
+        if (textBox.DataContext is not FileClass file)
+            return;
+        
         var name = FileHelper.DisplayName(textBox);
 
         if (!Data.FileActions.IsRenameUnixLegal
@@ -1190,7 +1192,7 @@ internal static class FileActionLogic
 
         if (FileHelper.GetParentPath(target) != Data.CurrentPath)
         {
-            Data.RuntimeSettings.LocationToNavigate = target + "/..";
+            Data.RuntimeSettings.LocationToNavigate = new(target + "/..");
         }
 
         await AsyncHelper.WaitUntil(() => !Data.DirList.InProgress, TimeSpan.FromMilliseconds(500), TimeSpan.FromMilliseconds(20), new());

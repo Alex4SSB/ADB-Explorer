@@ -279,7 +279,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     else
                     {
                         if (FileActions.IsExplorerVisible)
-                            NavigateToLocation(RuntimeSettings.PathBoxNavigation);
+                            NavigateToLocation(new(RuntimeSettings.PathBoxNavigation));
                         else
                         {
                             if (!InitNavigation(RuntimeSettings.PathBoxNavigation))
@@ -291,23 +291,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     break;
 
                 case nameof(AppRuntimeSettings.LocationToNavigate):
-                    switch (RuntimeSettings.LocationToNavigate)
+                    if (RuntimeSettings.LocationToNavigate is null)
+                        return;
+
+                    switch (RuntimeSettings.LocationToNavigate.Location)
                     {
-                        case NavHistory.SpecialLocation.Back:
+                        case Navigation.SpecialLocation.Back:
                             bfNavigation = true;
                             NavigateToLocation(NavHistory.GoBack());
                             break;
-                        case NavHistory.SpecialLocation.Forward:
+                        case Navigation.SpecialLocation.Forward:
                             bfNavigation = true;
                             NavigateToLocation(NavHistory.GoForward());
                             break;
-                        case NavHistory.SpecialLocation.Up:
+                        case Navigation.SpecialLocation.Up:
                             bfNavigation = false;
                             NavigateToPath(ParentPath);
                             break;
-                        case not null:
+                        default:
                             bfNavigation = false;
-                            if (FileActions.IsDriveViewVisible && NavHistory.LocationFromString(RuntimeSettings.LocationToNavigate) is NavHistory.SpecialLocation.DriveView)
+                            if (FileActions.IsDriveViewVisible && RuntimeSettings.LocationToNavigate.Location is Navigation.SpecialLocation.DriveView)
                                 FileActionLogic.RefreshDrives(true);
                             else
                                 NavigateToLocation(RuntimeSettings.LocationToNavigate);
@@ -622,7 +625,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
                 FileActionLogic.UpdateFileActions();
 
-                if (NavHistory.Current is NavHistory.SpecialLocation.DriveView)
+                if (NavHistory.Current.Location is Navigation.SpecialLocation.DriveView)
                     FileActionLogic.RefreshDrives(true);
 
                 FilterDrives();
@@ -932,8 +935,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         UpdateFileOp();
 
         NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
-        NavigationBox.Path = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
-        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+        NavigationBox.Path = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
+        NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         DriveList.ItemsSource = DevicesObject.Current.Drives;
         CurrentDrive = null;
@@ -1090,12 +1093,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ExplorerGrid.Focus();
         CurrentPath = realPath;
 
-        NavigationBox.Path = realPath == RECYCLE_PATH ? NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin) : realPath;
+        NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
         ParentPath = FileHelper.GetParentPath(CurrentPath);
         CurrentDrive = DriveHelper.GetCurrentDrive(CurrentPath);
 
         FileActions.IsRecycleBin = CurrentPath == RECYCLE_PATH;
-        FileActions.IsAppDrive = CurrentPath == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive);
+        FileActions.IsAppDrive = CurrentPath == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive);
         FileActions.IsTemp = CurrentPath == TEMP_PATH;
         FileActions.ParentEnabled = CurrentPath != ParentPath && !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
 
@@ -1154,11 +1157,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return true;
     }
 
-    private void NavigateToLocation(object location)
+    private void NavigateToLocation(AdbLocation location)
     {
         SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
 
-        if (NavHistory.LocationFromString(location) is NavHistory.SpecialLocation.DriveView)
+        if (location.Location is Navigation.SpecialLocation.DriveView)
         {
             FileActions.IsRecycleBin = false;
             RuntimeSettings.IsPathBoxFocused = false;
@@ -1169,25 +1172,17 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else
         {
-            string path;
-            if (location is NavHistory.SpecialLocation special)
-                path = NavHistory.StringFromLocation(special);
-            else if (location is string str)
-                path = str;
-            else
-                return;
-
             if (!FileActions.IsExplorerVisible)
-                InitNavigation(path);
+                InitNavigation(location.DisplayName);
             else
-                NavigateToPath(path);
+                NavigateToPath(location.DisplayName);
         }
     }
 
     private void Window_MouseUp(object sender, MouseButtonEventArgs e) => e.Handled = e.ChangedButton switch
         {
-            MouseButton.XButton1 => NavHistory.NavigateBF(NavHistory.SpecialLocation.Back),
-            MouseButton.XButton2 => NavHistory.NavigateBF(NavHistory.SpecialLocation.Forward),
+            MouseButton.XButton1 => NavHistory.NavigateBF(Navigation.SpecialLocation.Back),
+            MouseButton.XButton2 => NavHistory.NavigateBF(Navigation.SpecialLocation.Forward),
             _ => false,
         };
 
@@ -1205,7 +1200,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 break;
             }
             case Key.Back:
-                NavHistory.NavigateBF(NavHistory.SpecialLocation.Back);
+                NavHistory.NavigateBF(Navigation.SpecialLocation.Back);
                 break;
 
             case Key.Delete when FileActions.DeleteEnabled:
@@ -1416,7 +1411,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        NavigationBox.Refresh();
         ResizeDetailedView();
         EnableSplitViewAnimation();
         SearchBoxMaxWidth();
@@ -1670,7 +1664,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
     {
         var textBox = sender as TextBox;
-        TextHelper.SetAltObject(textBox, FileHelper.GetFromCell(ExplorerGrid.SelectedCells[1]));
         textBox.Focus();
         
         var editPoint = textBox.TranslatePoint(new(), ExplorerCanvas);
@@ -1884,11 +1877,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void MdnsCheckBox_Click(object sender, RoutedEventArgs e)
     {
         UpdateMdns();
-    }
-
-    private void NavigationBox_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        NavigationBox.Refresh();
     }
 
     private void ExplorerGrid_MouseMove(object sender, MouseEventArgs e)
@@ -2298,5 +2286,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         textBlock.Inlines.Clear();
         textBlock.Inlines.Add(parsedSpan);
+    }
+
+    private void MenuItem_MouseEnter(object sender, MouseEventArgs e)
+    {
+        var menuitem = sender as MenuItem;
+
+        FlyoutBase.ShowAttachedFlyout(menuitem);
     }
 }

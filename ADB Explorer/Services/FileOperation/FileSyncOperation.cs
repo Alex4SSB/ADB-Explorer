@@ -33,7 +33,7 @@ public class FileSyncOperation : FileOperation
 
         StatusInfo = status;
         Status = OperationStatus.Failed;
-        AltSource = NavHistory.SpecialLocation.Unknown;
+        AltSource = new(Navigation.SpecialLocation.Unknown);
     }
 
     public FileSyncOperation(

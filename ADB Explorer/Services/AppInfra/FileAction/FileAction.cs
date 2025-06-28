@@ -6,7 +6,7 @@ using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Services;
 
-internal static class AppActions
+public static class AppActions
 {
     private static readonly Dictionary<FileActionType, KeyGesture> Gestures = new()
     {
@@ -48,6 +48,7 @@ internal static class AppActions
         { FileActionType.PasteLink, "\uE1A5" },
         { FileActionType.HideSettings, "\uE761" },
         { FileActionType.SearchApkOnWeb, "\uF6FA" },
+        { FileActionType.Home, "\uE80F" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } =
@@ -99,30 +100,30 @@ internal static class AppActions
     [
         new(FileActionType.Home,
             () => Data.FileActions.HomeEnabled,
-            () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.DriveView,
+            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.DriveView),
             Strings.Resources.S_BUTTON_DRIVES,
             Gestures[FileActionType.Home]),
         new(FileActionType.KeyboardHome,
             () => Data.FileActions.HomeEnabled && !Data.FileActions.IsExplorerEditing,
-            () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.DriveView,
+            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.DriveView),
             Strings.Resources.S_BUTTON_DRIVES,
             Gestures[FileActionType.Home],
             true),
         new(FileActionType.Back,
             () => NavHistory.BackAvailable,
-            () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.Back,
+            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.Back),
             Strings.Resources.S_BUTTON_BACK,
             new(Key.Back),
             true),
         new(FileActionType.Forward,
             () => NavHistory.ForwardAvailable,
-            () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.Forward,
+            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.Forward),
             Strings.Resources.S_BUTTON_FORWARD,
             new(Key.Right, ModifierKeys.Alt),
             true),
         new(FileActionType.Up,
             () => Data.FileActions.ParentEnabled,
-            () => Data.RuntimeSettings.LocationToNavigate = NavHistory.SpecialLocation.Up,
+            () => Data.RuntimeSettings.LocationToNavigate = new(Navigation.SpecialLocation.Up),
             Strings.Resources.S_BUTTON_UP,
             new(Key.Up, ModifierKeys.Alt),
             true),
@@ -425,7 +426,11 @@ internal static class AppActions
                 Clipboard.SetText(Data.FileActions.MessageToCopy);
                 Data.FileActions.MessageToCopy = "";
             },
-            Strings.Resources.S_BUTTON_COPY_TO_CLIP)
+            Strings.Resources.S_BUTTON_COPY_TO_CLIP),
+        new(FileActionType.NavHistory,
+            () => NavHistory.MenuHistory.Value.Any(),
+            () => { },
+            Strings.Resources.S_NAV_HISTORY),
     ];
 
     public static List<KeyBinding> Bindings =>
@@ -450,9 +455,9 @@ internal static class AppActions
     }
 }
 
-internal class FileAction : ViewModelBase
+public class FileAction : ViewModelBase
 {
-    internal enum FileActionType
+    public enum FileActionType
     {
         None,
         Home,
@@ -518,6 +523,7 @@ internal class FileAction : ViewModelBase
         PasteLink,
         SearchApkOnWeb,
         CopyMessageToClipboard,
+        NavHistory,
     }
 
     public FileActionType Name { get; }

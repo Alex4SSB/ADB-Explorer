@@ -9,7 +9,7 @@ internal static class NavigationToolBar
     public static ObservableList<IMenuItem> List { get; } = [
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Home),
-            "\uE80F",
+            AppActions.Icons[FileAction.FileActionType.Home],
             StyleHelper.ContentAnimation.Bounce,
             16,
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardHome)),
@@ -17,6 +17,12 @@ internal static class NavigationToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Back),
             "\uE72B",
             StyleHelper.ContentAnimation.LeftMarquee),
+        new IconMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavHistory),
+            "\uE70D",
+            iconSize: 12,
+            children:
+            NavHistory.MenuHistory),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Forward),
             "\uE72A",

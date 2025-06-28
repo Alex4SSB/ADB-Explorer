@@ -4,12 +4,12 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-internal interface IMenuItem : INotifyPropertyChanged
+public interface IMenuItem : INotifyPropertyChanged
 {
 
 }
 
-internal abstract class ActionBase : ViewModelBase, IMenuItem
+public abstract class ActionBase : ViewModelBase, IMenuItem
 {
     public enum AnimationSource
     {
@@ -100,9 +100,9 @@ internal abstract class ActionBase : ViewModelBase, IMenuItem
     }
 }
 
-internal abstract class ActionMenu : ActionBase
+public abstract class ActionMenu : ActionBase
 {
-    public IEnumerable<SubMenu> Children { get; }
+    public IEnumerable<SubMenu> Children { get; set; }
 
     protected ActionMenu(FileAction fileAction,
                          string icon,
@@ -121,10 +121,10 @@ internal abstract class ActionMenu : ActionBase
     { }
 }
 
-internal class MenuSeparator : ViewModelBase, IMenuItem
+public class MenuSeparator : ViewModelBase, IMenuItem
 { }
 
-internal class AltTextMenu : ActionMenu
+public class AltTextMenu : ActionMenu
 {
     protected string altText = "";
     public string AltText
@@ -162,7 +162,7 @@ internal class AltTextMenu : ActionMenu
     }
 }
 
-internal class DynamicAltTextMenu : AltTextMenu
+public class DynamicAltTextMenu : AltTextMenu
 {
     public DynamicAltTextMenu(FileAction fileAction,
                               ObservableProperty<string> altText,
@@ -177,7 +177,7 @@ internal class DynamicAltTextMenu : AltTextMenu
     }
 }
 
-internal class AltObjectMenu : ActionMenu
+public class AltObjectMenu : ActionMenu
 {
     public bool IsContentDropDown { get; }
     public AltObjectMenu(FileAction fileAction, string icon, FileAction altAction = null, IEnumerable<SubMenu> children = null, bool isContentDropDown = false)
@@ -187,13 +187,33 @@ internal class AltObjectMenu : ActionMenu
     }
 }
 
-internal class IconMenu : ActionMenu
+public class IconMenu : ActionMenu
 {
     private bool isSelectionBarVisible = false;
     public bool IsSelectionBarVisible
     {
         get => isSelectionBarVisible;
         set => Set(ref isSelectionBarVisible, value);
+    }
+
+    //public new ObservableList<SubMenu> Children { get; }
+
+    public IconMenu(FileAction fileAction,
+                    string icon,
+                    ObservableProperty<IEnumerable<SubMenu>> children,
+                    StyleHelper.ContentAnimation animation = StyleHelper.ContentAnimation.None,
+                    int iconSize = 16)
+        : base(fileAction, icon, animation: animation, iconSize: iconSize)
+    {
+        if (children is not null)
+        {
+            children.PropertyChanged += (sender, e) =>
+            {
+                Children = children.Value;
+
+                OnPropertyChanged(nameof(Children));
+            };
+        }
     }
 
     public IconMenu(FileAction fileAction,
@@ -228,7 +248,7 @@ internal class IconMenu : ActionMenu
     { }
 }
 
-internal class AnimatedNotifyMenu : DynamicAltTextMenu
+public class AnimatedNotifyMenu : DynamicAltTextMenu
 {
     public AnimatedNotifyMenu(FileAction fileAction,
                               ObservableProperty<string> altText,
@@ -241,7 +261,7 @@ internal class AnimatedNotifyMenu : DynamicAltTextMenu
     { }
 }
 
-internal class CompoundIconMenu : ActionMenu
+public class CompoundIconMenu : ActionMenu
 {
     public UserControl CompoundIcon { get; }
 
@@ -257,9 +277,18 @@ internal class CompoundIconMenu : ActionMenu
     }
 }
 
-internal class SubMenu : ActionMenu
+public class TextMenu : ActionMenu
 {
-    protected SubMenu()
+    public bool IsLast { get; set; } = false;
+
+    public TextMenu(FileAction fileAction)
+        : base(fileAction, null)
+    { }
+}
+
+public class SubMenu : ActionMenu
+{
+    public SubMenu()
     { }
 
     public SubMenu(FileAction fileAction, string icon, IEnumerable<SubMenu> children = null, int iconSize = 16, FileAction altAction = null, ObservableProperty<bool> isVisible = null)
@@ -267,7 +296,7 @@ internal class SubMenu : ActionMenu
     { }
 }
 
-internal class GeneralSubMenu : SubMenu
+public class GeneralSubMenu : SubMenu
 {
     public object Content { get; }
 
@@ -288,7 +317,7 @@ internal class GeneralSubMenu : SubMenu
     }
 }
 
-internal class CompoundIconSubMenu : SubMenu
+public class CompoundIconSubMenu : SubMenu
 {
     public UserControl CompoundIcon { get; }
 
@@ -302,7 +331,7 @@ internal class CompoundIconSubMenu : SubMenu
     }
 }
 
-internal class DummySubMenu : SubMenu
+public class DummySubMenu : SubMenu
 {
     // This is an easter egg.
     // Do not translate it.
@@ -323,7 +352,7 @@ internal class DummySubMenu : SubMenu
     { }
 }
 
-internal class SubMenuSeparator : SubMenu
+public class SubMenuSeparator : SubMenu
 {
     private readonly bool externalVisibility;
 
@@ -351,7 +380,7 @@ internal class SubMenuSeparator : SubMenu
     { }
 }
 
-internal class DualActionButton : IconMenu
+public class DualActionButton : IconMenu
 {
     private bool isChecked = false;
     public bool IsChecked
@@ -416,7 +445,7 @@ internal class DualActionButton : IconMenu
     }
 }
 
-internal class CompoundDualAction : DualActionButton
+public class CompoundDualAction : DualActionButton
 {
     public UserControl CompoundIcon { get; }
 

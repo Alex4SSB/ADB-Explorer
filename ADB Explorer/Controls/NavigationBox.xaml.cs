@@ -1,7 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
+using ADB_Explorer.Services;
 
 namespace ADB_Explorer.Controls;
 
@@ -24,9 +24,9 @@ public partial class NavigationBox
         Breadcrumbs = [];
 
         Mode = ViewMode.None;
-    }
 
-    private bool isFuse;
+        SizeChanged += (sender, args) => ArrangeBreadcrumbs();
+    }
 
     #region Dependency Properties
 
@@ -38,6 +38,8 @@ public partial class NavigationBox
             if (Path != value)
             {
                 AddDevice(value);
+
+                IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
             }
 
             SetValue(PathProperty, value);
@@ -67,6 +69,16 @@ public partial class NavigationBox
     public static readonly DependencyProperty BreadcrumbsProperty =
         DependencyProperty.Register(nameof(Breadcrumbs), typeof(List<MenuItem>),
           typeof(NavigationBox), new PropertyMetadata(null));
+
+    public bool IsFUSE
+    {
+        get => (bool)GetValue(IsFUSEProperty);
+        set => SetValue(IsFUSEProperty, value);
+    }
+
+    public static readonly DependencyProperty IsFUSEProperty =
+        DependencyProperty.Register(nameof(IsFUSE), typeof(bool),
+          typeof(NavigationBox), new PropertyMetadata(false));
 
     public bool IsLoadingProgressVisible
     {
@@ -98,6 +110,16 @@ public partial class NavigationBox
         DependencyProperty.Register(nameof(MenuPadding), typeof(Thickness),
           typeof(NavigationBox), new PropertyMetadata(null));
 
+    public ObservableList<IMenuItem> Items
+    {
+        get => (ObservableList<IMenuItem>)GetValue(ItemsProperty);
+        set => SetValue(ItemsProperty, value);
+    }
+
+    public static readonly DependencyProperty ItemsProperty =
+        DependencyProperty.Register(nameof(Items), typeof(ObservableList<IMenuItem>),
+          typeof(NavigationBox), new PropertyMetadata(null));
+
     #endregion
 
     public ViewMode Mode
@@ -125,7 +147,7 @@ public partial class NavigationBox
         if (string.IsNullOrEmpty(path))
             return;
 
-        var driveView = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
+        var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         if (path == driveView)
             PopulateButtons(path);
         else
@@ -134,282 +156,109 @@ public partial class NavigationBox
 
     public void Refresh() => AddDevice(Path);
 
+    public static IEnumerable<AdbLocation> SeparatePath(string path)
+    {
+        string current = path;
+
+        var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
+        if (path.StartsWith(driveView))
+        {
+            yield return new(Navigation.SpecialLocation.DriveView);
+            current = current[driveView.Length..];
+        }
+
+        if (current.Length == 0)
+            yield break;
+
+        var pairs = Data.CurrentDisplayNames.Where(kv => current.StartsWith(kv.Key));
+        var drive = pairs.Count() > 1
+            ? pairs.OrderBy(kv => kv.Key.Length).Last()
+            : pairs.FirstOrDefault();
+
+        yield return new(drive.Key);
+
+        if (current.Length == 0)
+            yield break;
+
+        var index = drive.Key.Length;
+
+        if (current.Length == index)
+            yield break;
+
+        while (index >= 0)
+        {
+            if (current.Length <= index)
+                break;
+
+            var next = current.IndexOf('/', index + 1);
+
+            yield return new(current[..(next < 0 ? ^0 : next)]);
+
+            index = next;
+        }
+    }
+
+    IEnumerable<AdbLocation> locations = [];
+    List<TextMenu> breadcrumbs = [];
+    List<double> itemWidths = [];
+
     private void PopulateButtons(string path)
     {
         if (string.IsNullOrEmpty(path))
             return;
 
-        var expectedLength = 0.0;
-        List<MenuItem> tempButtons = [];
-        List<string> pathItems = [];
+        locations = SeparatePath(path);
+        breadcrumbs = locations.Select(item => item.NameSubMenu).ToList();
+        breadcrumbs[^1].IsLast = true;
 
-        if (path.StartsWith(NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView)))
-        {
-            AddSpecialButton(ref path,
-                             ref expectedLength,
-                             ref tempButtons,
-                             Data.CurrentDisplayNames.FirstOrDefault(kv => path.StartsWith(kv.Key)),
-                             false);
-        }
-        
-        isFuse = DriveHelper.GetCurrentDrive(path)?.IsFUSE is true;
+        var template = (DataTemplate)Resources["BreadcrumbTemplate"];
+        itemWidths = breadcrumbs.Select(item => GetTextWidth(item) + ControlSize.GetWidth(template, item)).ToList();
 
-        var pairs = Data.CurrentDisplayNames.Where(kv => path.StartsWith(kv.Key));
-        var specialPair = pairs.Count() > 1 ? pairs.OrderBy(kv => kv.Key.Length).Last() : pairs.FirstOrDefault();
-        
-        AddSpecialButton(ref path, ref expectedLength, ref tempButtons, specialPair);
-        pathItems.Add(specialPair.Key);
-
-        var dirs = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        foreach (var dir in dirs)
-        {
-            pathItems.Add(dir);
-            var dirPath = string.Join('/', pathItems).Replace("//", "/");
-            MenuItem button = CreatePathButton(dirPath, dir);
-            tempButtons.Add(button);
-            expectedLength += ControlSize.GetWidth(button);
-        }
-
-        expectedLength += (tempButtons.Count - 1) * ControlSize.GetWidth(CreatePathArrow());
-
-        // Refresh optimization - do not overwrite breadcrumbs unnecessarily
-        int i = 0;
-        for (; i < Breadcrumbs.Count && i < tempButtons.Count; i++)
-        {
-            var oldB = Breadcrumbs[i];
-            var newB = tempButtons[i];
-            if (((TextBlock)oldB.Header).Text != ((TextBlock)newB.Header).Text ||
-                TextHelper.GetAltObject(oldB).ToString() != TextHelper.GetAltObject(newB).ToString())
-            {
-                break;
-            }
-        }
-        Breadcrumbs.RemoveRange(i, Breadcrumbs.Count - i);
-        Breadcrumbs.AddRange(tempButtons.GetRange(i, tempButtons.Count - i));
-
-        ConsolidateButtons(expectedLength);
+        ArrangeBreadcrumbs();
     }
 
-    private void AddSpecialButton(ref string path,
-        ref double expectedLength,
-        ref List<MenuItem> tempButtons,
-        KeyValuePair<string, string> specialPair,
-        bool trimStart = true)
+    private void ArrangeBreadcrumbs()
     {
-        if (specialPair.Key is null)
+        if (breadcrumbs.Count == 0)
             return;
 
-        MenuItem button = CreatePathButton(specialPair);
-        tempButtons.Add(button);
-
-        path = path[specialPair.Key.Length..];
-        if (trimStart)
-            path = path.TrimStart();
-
-        expectedLength += ControlSize.GetWidth(button);
-    }
-
-    private void ConsolidateButtons(double expectedLength)
-    {
-        if (isFuse)
+        int lastHiddenIndex = -1;
+        for (var i = 1; i < breadcrumbs.Count; i++)
         {
-            expectedLength += ControlSize.GetWidth(CreateFuseIcon());
-        }
-
-        if (expectedLength > PathBox.ActualWidth)
-            expectedLength += ControlSize.GetWidth(CreateExcessButton());
-
-        double excessLength = expectedLength - PathBox.ActualWidth;
-        List<MenuItem> excessButtons = [];
-        BreadcrumbMenu.Items.Clear();
-
-        if (excessLength > 0)
-        {
-            int i = 1;
-            while (excessLength >= 0 && Breadcrumbs.Count - excessButtons.Count > 0)
+            if (80 + itemWidths[0] + itemWidths[i..].Sum() > PathBox.ActualWidth)
             {
-                var path = TextHelper.GetAltObject(Breadcrumbs[i]).ToString();
-                var drives = Data.DevicesObject.Current.Drives.Where(drive => drive.Path == path);
-                var icon = "\uE8B7";
-                if (drives.Any())
-                    icon = drives.First().DriveIcon;
-
-                excessButtons.Add(Breadcrumbs[i]);
-                Breadcrumbs[i].ContextMenu = null;
-                Breadcrumbs[i].Height = double.NaN;
-                Breadcrumbs[i].Padding = new(10, 4, 10, 4);
-                Breadcrumbs[i].Icon = new FontIcon() { Glyph = icon };
-
-                Breadcrumbs[i].Margin = Data.RuntimeSettings.UseFluentStyles ? new(5, 1, 5, 1) : new(0);
-                ControlHelper.SetCornerRadius(Breadcrumbs[i], new(Data.RuntimeSettings.UseFluentStyles ? 4 : 0));
-
-                excessLength -= ControlSize.GetWidth(Breadcrumbs[i]);
-
-                i++;
+                lastHiddenIndex = i;
             }
-
-            AddExcessButton(excessButtons);
         }
 
-        foreach (var item in Breadcrumbs.Except(excessButtons))
-        {
-            if (BreadcrumbMenu.Items.Count == 1 && ((MenuItem)BreadcrumbMenu.Items[0]).HasItems)
-            {
-                AddPathButton(item, 0);
-                AddPathArrow(1);
-                continue;
-            }
-
-            if (BreadcrumbMenu.Items.Count > 0)
-                AddPathArrow();
-
-            AddPathButton(item);
-        }
-
-        if (isFuse)
-        {
-            AddFuseIcon();
-        }
-
-        if (excessLength > 0)
-        {
-            var width = Breadcrumbs[^1].ActualWidth - (ControlSize.GetWidth(BreadcrumbMenu) - PathBox.ActualWidth) - 4;
-            if (width < 0)
-                width = 0;
-
-            Breadcrumbs[^1].Width = width;
-        }
+        if (lastHiddenIndex == -1)
+            Items = [.. breadcrumbs];
         else
-            Breadcrumbs[^1].Width = double.NaN;
-    }
-
-    private static MenuItem CreateExcessButton()
-    {
-        var menuItem = new MenuItem()
         {
-            VerticalAlignment = VerticalAlignment.Center,
-            Height = 24,
-            Padding = new(10, 4, 10, 4),
-            Margin = new(0),
-            Header = new FontIcon()
+            var excessButton = new TextMenu(
+                new FileAction(FileAction.FileActionType.None, () => true, () => { }, "\uE712"))
             {
-                Glyph = "\uE712",
-                FontSize = 18,
-            },
-        };
+                Children = locations.ToList()[1..(lastHiddenIndex + 1)].Select(item => item.ExcessSubMenu)
+            };
 
-        return menuItem;
-    }
+            var itemsControl = (ItemsControl)Resources["OverflowItemsControl"];
+            itemsControl.ItemsSource = excessButton.Children;
 
-    private void AddExcessButton(List<MenuItem> excessButtons = null)
-    {
-        if (excessButtons is not null && excessButtons.Count == 0)
-            return;
-
-        var button = CreateExcessButton();
-        button.ItemsSource = excessButtons;
-
-        BreadcrumbMenu.Items.Add(button);
-    }
-
-    private MenuItem CreatePathButton(KeyValuePair<string, string> kv) => CreatePathButton(kv.Key, kv.Value);
-    private MenuItem CreatePathButton(object path, string name)
-    {
-        MenuItem button = new()
-        {
-            Header = new TextBlock { Text = name, Margin = new(0, 0, 0, 1), TextTrimming = TextTrimming.CharacterEllipsis },
-            VerticalAlignment = VerticalAlignment.Center,
-            Margin = new(0),
-            Padding = new(8, 0, 8, 0),
-            Height = 24,
-        };
-        button.Click += PathButton_Click;
-        TextHelper.SetAltObject(button, path);
-
-        return button;
-    }
-
-    private void AddPathButton(MenuItem button, int index = -1)
-    {
-        if (TextHelper.GetAltObject(button) is string str && str == AdbExplorerConst.RECYCLE_PATH)
-            button.ContextMenu = null;
-
-        button.Height = 24;
-        button.Padding = new(8, 0, 8, 0);
-        button.Margin = new(0);
-
-        ControlHelper.SetCornerRadius(button, new(Data.RuntimeSettings.UseFluentStyles ? 3 : 0));
-
-        if (index < 0)
-            BreadcrumbMenu.Items.Add(button);
-        else
-            BreadcrumbMenu.Items.Insert(index, button);
-    }
-
-    private static MenuItem CreatePathArrow() => new()
-    {
-        VerticalAlignment = VerticalAlignment.Center,
-        Height = 24,
-        Margin = new(0),
-        Padding = new(3, 0, 3, 0),
-        IsEnabled = false,
-        Header = new FontIcon()
-        {
-            Glyph = "\uE970",
-            FontSize = 8,
-        },
-    };
-
-    private void AddPathArrow(int index = -1)
-    {
-        var arrow = CreatePathArrow();
-
-        if (index < 0)
-            BreadcrumbMenu.Items.Add(arrow);
-        else
-            BreadcrumbMenu.Items.Insert(index, arrow);
-    }
-
-    private static MenuItem CreateFuseIcon()
-    {
-        MenuItem menuItem = new()
-        {
-            VerticalAlignment = VerticalAlignment.Center,
-            Height = 24,
-            Margin = new(0, 0, 4, 0),
-            Padding = new(3, 0, 3, 0),
-            IsChecked = true,
-            Header = new FontIcon()
-            {
-                Glyph = "\uF0EF",
-                FontSize = 20,
-            },
-            ToolTip = Strings.Resources.S_FUSE_DRIVE_TOOLTIP,
-        };
-
-        MenuHelper.SetIsMouseSelectionVisible(menuItem, false);
-
-        return menuItem;
-    }
-
-    private void AddFuseIcon()
-    {
-        BreadcrumbMenu.Items.Insert(0, CreateFuseIcon());
-    }
-
-    private void PathButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is MenuItem item)
-        {
-            Data.RuntimeSettings.LocationToNavigate = TextHelper.GetAltObject(item);
+            Items = [breadcrumbs[0], excessButton, .. breadcrumbs[(lastHiddenIndex + 1)..]];
         }
+    }
+
+    private static double GetTextWidth(TextMenu textMenu)
+    {
+        TextBlock textBlock = new() { Text = textMenu.Action.Description };
+        return ControlSize.GetWidth(textBlock);
     }
 
     private void PathBox_GotFocus(object sender, RoutedEventArgs e)
     {
         Mode = ViewMode.Path;
 
-        DisplayPath = NavHistory.LocationFromString(Path) is NavHistory.SpecialLocation.None ? Path : "";
+        DisplayPath = AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None ? Path : "";
 
         PathBox.SelectAll();
     }
@@ -423,7 +272,7 @@ public partial class NavigationBox
         }
         else if (e.Key == Key.Enter)
         {
-            Data.RuntimeSettings.PathBoxNavigation = AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(path => DisplayPath.StartsWith(path))
+            Data.RuntimeSettings.PathBoxNavigation = AdbExplorerConst.POSSIBLE_RECYCLE_PATHS.Any(DisplayPath.StartsWith)
                 ? AdbExplorerConst.RECYCLE_PATH
                 : DisplayPath;
 
@@ -435,5 +284,15 @@ public partial class NavigationBox
     private void PathBox_LostFocus(object sender, RoutedEventArgs e)
     {
         Mode = ViewMode.Breadcrumbs;
+    }
+
+    private void FuseIcon_Click(object sender, RoutedEventArgs e)
+    {
+        ((ToolTip)FuseIcon.ToolTip).IsOpen = true;
+    }
+
+    private void FuseIcon_MouseLeave(object sender, MouseEventArgs e)
+    {
+        ((ToolTip)FuseIcon.ToolTip).IsOpen = false;
     }
 }

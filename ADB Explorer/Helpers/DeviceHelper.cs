@@ -601,7 +601,7 @@ public static class DeviceHelper
 
         FolderHelper.CombineDisplayNames();
         Data.RuntimeSettings.DriveViewNav = true;
-        NavHistory.Navigate(NavHistory.SpecialLocation.DriveView);
+        NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         Data.CopyPaste.GetClipboardPasteItems();
         Data.RuntimeSettings.FilterDrives = true;

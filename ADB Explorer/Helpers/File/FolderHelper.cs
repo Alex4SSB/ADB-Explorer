@@ -8,7 +8,7 @@ public class FolderHelper
 {
     public static void CombineDisplayNames()
     {
-        var driveView = NavHistory.StringFromLocation(NavHistory.SpecialLocation.DriveView);
+        var driveView = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         if (Data.CurrentDisplayNames.ContainsKey(driveView))
             Data.CurrentDisplayNames[driveView] = Data.DevicesObject.Current.Name;
         else
@@ -43,10 +43,10 @@ public class FolderHelper
 
     public static string FolderExists(string path)
     {
-        if (path == NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive))
+        if (path == AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive))
             return path;
 
-        if (path == NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin))
+        if (path == AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin))
             return AdbExplorerConst.RECYCLE_PATH;
 
         try

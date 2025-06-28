@@ -30,11 +30,11 @@ public class PackageInstallOperation : AbstractShellFileOperation
 
         if (IsUninstall)
         {
-            AltSource = NavHistory.SpecialLocation.PackageDrive;
-            AltTarget = NavHistory.SpecialLocation.devNull;
+            AltSource = new(Navigation.SpecialLocation.PackageDrive);
+            AltTarget = new(Navigation.SpecialLocation.devNull);
         }
         else
-            AltTarget = NavHistory.SpecialLocation.PackageDrive;
+            AltTarget = new(Navigation.SpecialLocation.PackageDrive);
     }
 
     public override void Start()

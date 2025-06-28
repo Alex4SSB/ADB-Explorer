@@ -103,9 +103,9 @@ public abstract class FileOperation : ViewModelBase
 
     public virtual SyncFile TargetPath { get; protected set; }
 
-    public NavHistory.SpecialLocation AltSource { get; protected set; } = NavHistory.SpecialLocation.None;
+    public AdbLocation AltSource { get; protected set; } = new(Navigation.SpecialLocation.None);
 
-    public NavHistory.SpecialLocation AltTarget { get; protected set; } = NavHistory.SpecialLocation.None;
+    public AdbLocation AltTarget { get; protected set; } = new(Navigation.SpecialLocation.None);
 
     public double LastProgress = 0.0;
 
@@ -149,8 +149,8 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
-            if (AltSource is not NavHistory.SpecialLocation.None)
-                return AltSource.DisplayName();
+            if (AltSource.Location is not Navigation.SpecialLocation.None)
+                return AltSource.DisplayName;
 
             if (FilePath is null)
                 return "";
@@ -180,8 +180,8 @@ public abstract class FileOperation : ViewModelBase
     {
         get
         {
-            if (AltTarget is not NavHistory.SpecialLocation.None)
-                return AltTarget.DisplayName();
+            if (AltTarget.Location is not Navigation.SpecialLocation.None)
+                return AltTarget.DisplayName;
 
             if (TargetPath is null)
                 return "";
@@ -239,10 +239,10 @@ public abstract class FileOperation : ViewModelBase
     }
 
     public bool IsSourceNavigable => FilePath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltSource.IsNoneOrNavigable());
+                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltSource.IsNoneOrNavigable);
 
     public bool IsTargetNavigable => TargetPath?.PathType is AbstractFile.FilePathType.Windows
-                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltTarget.IsNoneOrNavigable());
+                || (Device.Status is AbstractDevice.DeviceStatus.Ok && AltTarget.IsNoneOrNavigable);
 
     #endregion
 
@@ -280,9 +280,9 @@ public abstract class FileOperation : ViewModelBase
     {
         object location;
         if (target)
-            location = AltTarget.IsNavigable() ? AltTarget : TargetPath;
+            location = AltTarget.IsNavigable ? AltTarget : TargetPath;
         else
-            location = AltSource.IsNavigable() ? AltSource : FilePath;
+            location = AltSource.IsNavigable ? AltSource : FilePath;
 
         if (location is FilePath file)
         {
@@ -298,15 +298,15 @@ public abstract class FileOperation : ViewModelBase
                 if (!Device.Device.IsOpen)
                     Data.RuntimeSettings.DeviceToOpen = Device.Device;
 
-                Data.RuntimeSettings.LocationToNavigate = file.ParentPath;
+                Data.RuntimeSettings.LocationToNavigate = new(file.ParentPath);
             }
         }
-        else if (location is NavHistory.SpecialLocation)
+        else if (location is AdbLocation loc)
         {
             if (!Device.Device.IsOpen)
                 Data.RuntimeSettings.DeviceToOpen = Device.Device;
 
-            Data.RuntimeSettings.LocationToNavigate = location;
+            Data.RuntimeSettings.LocationToNavigate = loc;
         }
         else
             throw new NotSupportedException();

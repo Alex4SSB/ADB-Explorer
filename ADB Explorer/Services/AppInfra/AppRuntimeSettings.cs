@@ -175,8 +175,8 @@ public class AppRuntimeSettings : ViewModelBase
 
     public bool ServerUnresponsive => Data.Settings.PollDevices && DateTime.Now.Subtract(LastServerResponse) > AdbExplorerConst.SERVER_RESPONSE_TIMEOUT;
 
-    private object locationToNavigate = NavHistory.SpecialLocation.None;
-    public object LocationToNavigate
+    private AdbLocation locationToNavigate = new(Navigation.SpecialLocation.None);
+    public AdbLocation LocationToNavigate
     {
         get => locationToNavigate;
         set

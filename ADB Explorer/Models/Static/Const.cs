@@ -24,9 +24,9 @@ public static class AdbExplorerConst
         { "/mnt/sdcard", AbstractDrive.DriveType.Internal },
         { "/storage/emulated", AbstractDrive.DriveType.Internal },
         { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
-        { NavHistory.StringFromLocation(NavHistory.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
+        { AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
         { TEMP_PATH, AbstractDrive.DriveType.Temp },
-        { NavHistory.StringFromLocation(NavHistory.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
+        { AdbLocation.StringFromLocation(Navigation.SpecialLocation.PackageDrive), AbstractDrive.DriveType.Package },
         { "/", AbstractDrive.DriveType.Root },
     };
 

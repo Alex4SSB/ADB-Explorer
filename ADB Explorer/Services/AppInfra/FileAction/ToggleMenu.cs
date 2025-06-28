@@ -3,7 +3,7 @@ using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Services;
 
-internal class ToggleMenu : ViewModelBase
+public class ToggleMenu : ViewModelBase
 {
     public ObservableProperty<bool> IsChecked { get; set; } = new();
 

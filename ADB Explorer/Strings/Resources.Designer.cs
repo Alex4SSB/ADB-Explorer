@@ -2273,6 +2273,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Navigation History.
+        /// </summary>
+        public static string S_NAV_HISTORY {
+            get {
+                return ResourceManager.GetString("S_NAV_HISTORY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pair and/or connect a WiFi device (without using mDNS).
         /// </summary>
         public static string S_NEW_DEVICE_TIP {

@@ -39,7 +39,9 @@ public class DriveViewModel : AbstractDrive
 
     public new string DisplayName => Drive.DisplayName;
 
-    public string DriveIcon => Type switch
+    public string DriveIcon => GetDriveIcon(Type);
+
+    public static string GetDriveIcon(DriveType type) => type switch
     {
         DriveType.Root => "\uF259",
         DriveType.Internal => "\uEDA2",

@@ -28,19 +28,6 @@ public static class TextHelper
             typeof(TextHelper),
             null);
 
-    public static object GetAltObject(UIElement control) =>
-        control.GetValue(AltObjectProperty);
-
-    public static void SetAltObject(UIElement control, object value) =>
-        control.SetValue(AltObjectProperty, value);
-
-    public static readonly DependencyProperty AltObjectProperty =
-        DependencyProperty.RegisterAttached(
-            "AltObject",
-            typeof(object),
-            typeof(TextHelper),
-            null);
-
     public enum ValidationType
     {
         None,

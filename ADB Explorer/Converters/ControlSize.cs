@@ -12,4 +12,11 @@ public static class ControlSize
         item.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         return item.DesiredSize.Width;
     }
+
+    public static double GetWidth(DataTemplate template, object dataContext)
+    {
+        var content = (FrameworkElement)template.LoadContent();
+        content.DataContext = dataContext;
+        return GetWidth(content);
+    }
 }

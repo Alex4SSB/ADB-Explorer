@@ -112,6 +112,9 @@
     <DataTemplate x:Key="DualActionButtonTemplate">
         <ui:FontIcon Style="{StaticResource MenuIconStyle}" />
     </DataTemplate>
+    <DataTemplate x:Key="SubMenuTemplate">
+        <TextBlock Text="{Binding}" TextOptions.TextFormattingMode="Display" />
+    </DataTemplate>
     <helpers:MenuTemplateSelector
         x:Key="MenuTemplateSelector"
         AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
@@ -125,7 +128,7 @@
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
         SubMenuSeparatorTemplate="{x:Null}"
-        SubMenuTemplate="{x:Null}" />
+        SubMenuTemplate="{StaticResource SubMenuTemplate}" />
     <Style
         x:Key="ActionMenuItemStyle"
         BasedOn="{StaticResource AdbMenuItemStyle}"
