@@ -165,4 +165,16 @@
   <data name="S_EMPTY_TRASH" xml:space="preserve">
     <value>Papierkorb leeren</value>
   </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Navigationsverlauf</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Blockgerät</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Defekte Verknüpfung</value>
+  </data>
 </root>
