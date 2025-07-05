@@ -898,8 +898,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             FileActions.IsLogToggleVisible.Value = Settings.EnableLog;
         });
 
-        Settings.RootArgs ??= ["root"];
-        Settings.UnrootArgs ??= ["unroot"];
         Settings.UnrootOnDisconnect ??= false;
 
         RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();

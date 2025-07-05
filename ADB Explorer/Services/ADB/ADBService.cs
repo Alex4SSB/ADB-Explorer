@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using static ADB_Explorer.Models.AdbExplorerConst;
 using static ADB_Explorer.Models.AdbRegEx;
 using static ADB_Explorer.Models.Data;
@@ -332,15 +331,37 @@ public partial class ADBService
         return ExecuteCommand("taskkill", "/f", out _, out _, Encoding.UTF8, CancellationToken.None, "/im", "\"adb.exe\"") == 0;
     }
 
+    const string magiskRootArgs = """
+                magiskpolicy --live 'allow adbd adbd process setcurrent'
+                magiskpolicy --live 'allow adbd su process dyntransition'
+                magiskpolicy --live 'permissive { su }'
+                resetprop ro.secure 0
+                resetprop ro.adb.secure 0
+                resetprop ro.force.debuggable 1
+                resetprop ro.debuggable 1
+                resetprop service.adb.root 1
+                resetprop ctl.restart adbd
+                """;
+
+    static string[] RootArgs => ["shell", "su", "-c", string.Join(" ; ", magiskRootArgs.Split("\r\n", StringSplitOptions.RemoveEmptyEntries))];
+
+    static string[] UnrootArgs => ["shell", "su", "-c", "'resetprop ro.debuggable 0 ; resetprop service.adb.root 0 ; setprop ctl.restart adbd'"];
+
     public static bool Root(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, Settings.RootArgs);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, RootArgs);
+        if (stdout.Contains("su: inaccessible or not found"))
+            ExecuteDeviceAdbCommand(device.ID, "", out stdout, out _, CancellationToken.None, "root");
+
         return !stdout.Contains("cannot run as root");
     }
 
     public static bool Unroot(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, Settings.UnrootArgs);
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, UnrootArgs);
+        if (stdout.Contains("su: inaccessible or not found"))
+            ExecuteDeviceAdbCommand(device.ID, "", out stdout, out _, CancellationToken.None, "unroot");
+
         var result = stdout.Contains("restarting adbd as non root");
         DevicesObject.UpdateDeviceRoot(device.ID, result);
 

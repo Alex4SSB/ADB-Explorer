@@ -71,6 +71,9 @@ public class LogicalDevice : Device
         Root = enable
             ? ADBService.Root(this) ? RootStatus.Enabled : RootStatus.Forbidden
             : ADBService.Unroot(this) ? RootStatus.Disabled : RootStatus.Unchecked;
+
+        if (Data.CurrentADBDevice.ID == ID)
+            Data.RuntimeSettings.IsRootActive = Root is RootStatus.Enabled;
     }
 
     public void UpdateBattery()

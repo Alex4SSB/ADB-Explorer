@@ -394,7 +394,7 @@ public static class DeviceHelper
         {
             bool root = ADBService.WhoAmI(device.ID);
             bool rootDisabled = Data.DevicesObject.RootDevices.Contains(device.ID);
-            App.Current.Dispatcher.Invoke(() =>
+            App.Current?.Dispatcher?.Invoke(() =>
             {
                 return device.SetRootStatus(root ? RootStatus.Enabled
                     : rootDisabled ? RootStatus.Disabled
