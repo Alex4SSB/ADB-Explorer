@@ -28,7 +28,6 @@ public class SavedLocation : ViewModelBase
             () =>
             {
                 Data.RuntimeSettings.SavedLocations = [.. Data.RuntimeSettings.SavedLocations.Except([Path])];
-                //Data.RuntimeSettings.SavedLocations.Remove(Path);
                 Storage.StoreValue(nameof(Data.RuntimeSettings.SavedLocations), Data.RuntimeSettings.SavedLocations.ToArray());
             });
 
@@ -37,7 +36,6 @@ public class SavedLocation : ViewModelBase
             () =>
             {
                 Data.RuntimeSettings.SavedLocations = [.. Data.RuntimeSettings.SavedLocations, Data.CurrentPath];
-                //Data.RuntimeSettings.SavedLocations.Add(Data.CurrentPath);
                 Storage.StoreValue(nameof(Data.RuntimeSettings.SavedLocations), Data.RuntimeSettings.SavedLocations.ToArray());
             });
 
