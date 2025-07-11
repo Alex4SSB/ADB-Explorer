@@ -387,6 +387,24 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <Style
+        x:Key="BlueFontIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style x:Key="BlueDotTextBlockStyle" TargetType="TextBlock">
         <Setter Property="Text" Value="•" />
         <Setter Property="FontSize" Value="20" />

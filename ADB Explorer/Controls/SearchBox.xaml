@@ -31,8 +31,7 @@
             helpers:ExpanderHelper.ExpanderArrow="None"
             helpers:ExpanderHelper.IsHeaderToggleExternal="True"
             ExpandDirection="Right"
-            IsExpanded="{Binding IsExpanded}"
-            MouseEnter="Expander_MouseEnter">
+            IsExpanded="{Binding IsExpanded}">
             <Expander.Style>
                 <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="Expander">
 

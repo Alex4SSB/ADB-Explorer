@@ -1690,4 +1690,16 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Navigation History</value>
     <comment>The tooltip of the menu that displays the navigation history</comment>
   </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Add Current Location</value>
+    <comment>The button used to add the current location (path) to the saved locations list</comment>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Remove</value>
+    <comment>The tooltip of the button used to remove a saved location from the list</comment>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Saved Locations</value>
+    <comment>The tooltip of the button used to open the saved locations menu</comment>
+  </data>
 </root>

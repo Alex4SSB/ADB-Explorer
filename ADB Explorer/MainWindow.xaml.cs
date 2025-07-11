@@ -961,15 +961,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         Task.Delay(EXPLORER_NAV_DELAY).ContinueWith(_ => Dispatcher.Invoke(() => RuntimeSettings.IsExplorerLoaded = true));
 
-        Task.Delay(INIT_NAV_HIDE_FILTER_DELAY).ContinueWith(_ => Dispatcher.Invoke(() =>
-        {
-            if (!SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu))
-                RuntimeSettings.IsSearchBoxFocused = false;
-        }));
-
-        if (Width > MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE)
-            RuntimeSettings.IsSearchBoxFocused = true;
-
         return _navigateToPath(realPath);
     }
 

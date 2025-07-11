@@ -169,6 +169,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add Current Location.
+        /// </summary>
+        public static string S_ADD_CURRENT_LOC {
+            get {
+                return ResourceManager.GetString("S_ADD_CURRENT_LOC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add New Device.
         /// </summary>
         public static string S_ADD_NEW_DEVICE {
@@ -2834,6 +2843,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove.
+        /// </summary>
+        public static string S_REMOVE {
+            get {
+                return ResourceManager.GetString("S_REMOVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Replace.
         /// </summary>
         public static string S_REPLACE {
@@ -2966,6 +2984,15 @@ namespace ADB_Explorer.Strings {
         public static string S_ROOT_STATUS_TITLE {
             get {
                 return ResourceManager.GetString("S_ROOT_STATUS_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Saved Locations.
+        /// </summary>
+        public static string S_SAVED_LOCATIONS {
+            get {
+                return ResourceManager.GetString("S_SAVED_LOCATIONS", resourceCulture);
             }
         }
         

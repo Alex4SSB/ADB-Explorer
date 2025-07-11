@@ -437,6 +437,25 @@ public class AppRuntimeSettings : ViewModelBase
         _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
     };
 
+    private List<string> savedLocations = null;
+    public List<string> SavedLocations
+    {
+        get
+        {
+            if (savedLocations is null)
+            {
+                var storage = Storage.RetrieveValue(nameof(SavedLocations));
+                if (storage is not null && storage is string[] locations)
+                {
+                    savedLocations = [.. locations];
+                }
+            }
+            return savedLocations;
+        }
+
+        set => Set(ref savedLocations, value);
+    }
+
     public string DefaultBrowserPath { get; set; }
 
     public string AdbPath { get; set; }

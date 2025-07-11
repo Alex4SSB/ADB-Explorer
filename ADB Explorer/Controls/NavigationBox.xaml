@@ -24,10 +24,70 @@
                 </MenuItem.Header>
             </MenuItem>
         </DataTemplate>
+        <DataTemplate x:Key="SavedItemTemplate">
+            <MenuItem>
+                <MenuItem.Style>
+                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding AddAction.IsEnabled}" Value="True">
+                                <Setter Property="Header">
+                                    <Setter.Value>
+                                        <Grid Width="240" Margin="0,3">
+                                            <ui:SimpleStackPanel
+                                                HorizontalAlignment="Center"
+                                                Orientation="Horizontal"
+                                                Spacing="4">
+                                                <ui:FontIcon Glyph="&#xE710;" />
+                                                <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADD_CURRENT_LOC}}" />
+                                            </ui:SimpleStackPanel>
+                                        </Grid>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Command" Value="{Binding AddAction.Command}" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="Command" Value="{Binding NavigateAction.Command}" />
+                        <Setter Property="Header">
+                            <Setter.Value>
+                                <Grid Width="240" Margin="0,3">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock
+                                        Margin="0,0,6,0"
+                                        Style="{StaticResource TooltipTextBlockStyle}"
+                                        Text="{Binding Path}" />
+                                    <Button
+                                        Grid.Column="1"
+                                        Command="{Binding DeleteAction.Command}"
+                                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REMOVE}}">
+                                        <Button.Style>
+                                            <Style BasedOn="{StaticResource RestartAppButtonStyle}" TargetType="Button">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=IsMouseOver}" Value="False">
+                                                        <Setter Property="Visibility" Value="Hidden" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                        <ui:FontIcon Glyph="&#xE711;" />
+                                    </Button>
+                                </Grid>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </MenuItem.Style>
+            </MenuItem>
+        </DataTemplate>
         <ItemsControl
             x:Key="OverflowItemsControl"
             x:Name="OverflowItemsControl"
             ItemTemplate="{StaticResource BreadcrumbFlyoutItemTemplate}" />
+        <ItemsControl
+            x:Key="SavedItemsControl"
+            x:Name="SavedItemsControl"
+            ItemTemplate="{StaticResource SavedItemTemplate}" />
         <DataTemplate x:Key="BreadcrumbTemplate">
             <StackPanel Orientation="Horizontal">
                 <Button
@@ -173,6 +233,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button
                 x:Name="FuseIcon"
@@ -216,6 +277,44 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ItemsControl>
+            <Button
+                x:Name="SavedItemsButton"
+                Grid.Column="2"
+                Margin="0,0,2,0"
+                Padding="3"
+                VerticalAlignment="Center"
+                ToolTip="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}">
+                <Button.Style>
+                    <Style BasedOn="{StaticResource ButtonStyle}" TargetType="Button">
+                        <Setter Property="ui:FlyoutService.Flyout">
+                            <Setter.Value>
+                                <ui:Flyout Content="{StaticResource SavedItemsControl}" Placement="Bottom" />
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Content">
+                            <Setter.Value>
+                                <ui:FontIcon Glyph="&#xE734;" Style="{StaticResource GlyphFont}" />
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="False">
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="Background" Value="Transparent" />
+                            </Trigger>
+                            <DataTrigger Binding="{Binding ElementName=NavBox, Path=SavedItems.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ElementName=NavBox, Path=IsCurrentSaved}" Value="True">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <ui:FontIcon Glyph="&#xE735;" Style="{StaticResource BlueFontIconStyle}" />
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

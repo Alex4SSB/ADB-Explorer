@@ -9,7 +9,7 @@ public partial class SearchBox : UserControl
     {
         InitializeComponent();
 
-        IsEnabledChanged += (object sender, DependencyPropertyChangedEventArgs e) =>
+        IsEnabledChanged += (sender, e) =>
         {
             if (!IsEnabled)
                 Expander.IsExpanded = false;
@@ -115,12 +115,6 @@ public partial class SearchBox : UserControl
         {
             Models.Data.RuntimeSettings.AutoHideSearchBox = true;
         }
-    }
-
-    private void Expander_MouseEnter(object sender, MouseEventArgs e)
-    {
-        if (IsActive)
-            IsExpanded = true;
     }
 
     private void GridSplitter_DragDelta(object sender, DragDeltaEventArgs e)

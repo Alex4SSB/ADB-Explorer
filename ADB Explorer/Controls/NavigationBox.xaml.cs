@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Controls;
 
@@ -26,6 +27,18 @@ public partial class NavigationBox
         Mode = ViewMode.None;
 
         SizeChanged += (sender, args) => ArrangeBreadcrumbs();
+
+        Data.RuntimeSettings.PropertyChanged += (sender, args) =>
+        {
+            if (args.PropertyName == nameof(AppRuntimeSettings.LocationToNavigate))
+            {
+                FlyoutService.GetFlyout(SavedItemsButton).Hide();
+            }
+            else if (args.PropertyName == nameof(AppRuntimeSettings.SavedLocations))
+            {
+                UpdateSavedItems();
+            }
+        };
     }
 
     #region Dependency Properties
@@ -35,14 +48,15 @@ public partial class NavigationBox
         get => (string)GetValue(PathProperty);
         set
         {
-            if (Path != value)
-            {
-                AddDevice(value);
-
-                IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
-            }
+            bool update = Path != value;
 
             SetValue(PathProperty, value);
+            
+            if (update)
+            {
+                IsFUSE = DriveHelper.GetCurrentDrive(value)?.IsFUSE is true;
+                AddDevice(value);
+            }
         }
     }
 
@@ -120,6 +134,26 @@ public partial class NavigationBox
         DependencyProperty.Register(nameof(Items), typeof(ObservableList<IMenuItem>),
           typeof(NavigationBox), new PropertyMetadata(null));
 
+    public ObservableList<SavedLocation> SavedItems
+    {
+        get => (ObservableList<SavedLocation>)GetValue(SavedItemsProperty);
+        set => SetValue(SavedItemsProperty, value);
+    }
+
+    public static readonly DependencyProperty SavedItemsProperty =
+        DependencyProperty.Register(nameof(SavedItems), typeof(ObservableList<SavedLocation>),
+          typeof(NavigationBox), new PropertyMetadata(null));
+
+    public bool IsCurrentSaved
+    {
+        get => (bool)GetValue(IsCurrentSavedProperty);
+        set => SetValue(IsCurrentSavedProperty, value);
+    }
+
+    public static readonly DependencyProperty IsCurrentSavedProperty =
+        DependencyProperty.Register(nameof(IsCurrentSaved), typeof(bool),
+          typeof(NavigationBox), new PropertyMetadata(false));
+
     #endregion
 
     public ViewMode Mode
@@ -152,6 +186,22 @@ public partial class NavigationBox
             PopulateButtons(path);
         else
             PopulateButtons(driveView + path);
+
+        UpdateSavedItems();
+    }
+
+    private void UpdateSavedItems()
+    {
+        SavedItems = Data.RuntimeSettings.SavedLocations is null
+            ? []
+            : [.. Data.RuntimeSettings.SavedLocations.Select(p => new SavedLocation(p))];
+
+        IsCurrentSaved = SavedItems.Any(i => i.Path == Path);
+
+        if (AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None && !IsCurrentSaved)
+            SavedItems.Insert(0, new SavedLocation());
+
+        ((ItemsControl)Resources["SavedItemsControl"]).ItemsSource = SavedItems;
     }
 
     public void Refresh() => AddDevice(Path);
@@ -212,7 +262,7 @@ public partial class NavigationBox
         breadcrumbs[^1].IsLast = true;
 
         var template = (DataTemplate)Resources["BreadcrumbTemplate"];
-        itemWidths = breadcrumbs.Select(item => GetTextWidth(item) + ControlSize.GetWidth(template, item)).ToList();
+        itemWidths = [.. breadcrumbs.Select(item => GetTextWidth(item) + ControlSize.GetWidth(template, item))];
 
         ArrangeBreadcrumbs();
     }
@@ -225,7 +275,7 @@ public partial class NavigationBox
         int lastHiddenIndex = -1;
         for (var i = 1; i < breadcrumbs.Count; i++)
         {
-            if (80 + itemWidths[0] + itemWidths[i..].Sum() > PathBox.ActualWidth)
+            if (125 + itemWidths[0] + itemWidths[i..].Sum() > PathBox.ActualWidth)
             {
                 lastHiddenIndex = i;
             }
