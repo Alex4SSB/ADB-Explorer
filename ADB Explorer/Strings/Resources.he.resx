@@ -429,6 +429,11 @@
   <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
     <value>כונן FUSE.
 • אין תמיכה בקיצורי דרך
-• שמות קבצים לא יכולים להכיל</value>
+• שמות קבצים לא יכולים להכיל " * / : &lt; &gt; ? \ |
+• אין משמעות לאותיות גדולות/קטנות בשמות קבצים
+• אין תמיכה בהרצת קבצי התקנה של APK</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>בתוכנה קיימות הרבה אנימציות אשר מאופשרות כחלק מ</value>
   </data>
 </root>
