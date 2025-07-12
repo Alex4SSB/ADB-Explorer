@@ -358,6 +358,9 @@
     <value>כבה שרת mDNS</value>
   </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>התחל WSA ברקע</value>
+    <value>התחל את WSA ברקע</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>משוך</value>
   </data>
 </root>
