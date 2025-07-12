@@ -345,4 +345,19 @@
   <data name="S_COLUMN_DESTINATION" xml:space="preserve">
     <value>יעד</value>
   </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>כשל בהחלפת ADB</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>שגיאות בשיחזור</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>הרוג את האימולטור</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>כבה שרת mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>התחל WSA ברקע</value>
+  </data>
 </root>
