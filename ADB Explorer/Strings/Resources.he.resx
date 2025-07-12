@@ -391,6 +391,9 @@
     <value>ניתוב ההתקדמות</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>שגיאה ב</value>
+    <value>שגיאה בקבלת תוכן התיקיה</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>הורדה לראשית כונן וינדוס</value>
   </data>
 </root>
