@@ -427,6 +427,8 @@
 ניתן למצוא את השינויים בגרסה ב GitHub.</value>
   </data>
   <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>כונן FUSE.</value>
+    <value>כונן FUSE.
+• אין תמיכה בקיצורי דרך
+• שמות קבצים לא יכולים להכיל</value>
   </data>
 </root>
