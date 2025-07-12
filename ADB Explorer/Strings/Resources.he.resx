@@ -407,6 +407,10 @@
 תצוגה באחוזים תתאפשר רק כאשר המשקל הכולל ידוע.</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>לא ניתן לפרוס את</value>
+    <value>לא ניתן לפרוס את תוכנת העזר.
+הצגת ההתקדמות תבוצע ע"י חישוב השימוש בדיסק.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>ניטור סייר הקבצים מאפשר לתוכנה לבצע הורדה ע"י גרירה /</value>
   </data>
 </root>
