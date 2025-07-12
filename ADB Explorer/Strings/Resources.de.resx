@@ -177,4 +177,31 @@
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
     <value>Defekte Verknüpfung</value>
   </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Das Android-Roboter-Symbol</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>"ADB" auführbare Datei auswählen</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Dateipfad kopieren</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Zielpfadfehler</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>Verbindung fehlgeschlagen an</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Fehler bei Trennung</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Auf dem ausgewählten Gerät könnte Root-Zugriff nicht aktiviert werden.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root-Zugriff</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Die Anwendung neu starten, damit die Änderungen wirksam werden.</value>
+  </data>
 </root>
