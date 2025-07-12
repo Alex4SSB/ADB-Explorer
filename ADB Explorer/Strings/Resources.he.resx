@@ -400,6 +400,13 @@
     <value>תוכנות היוצרות התנגשות</value>
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>ניתור</value>
+    <value>התוכנות הבאות מונעות כרגע את ניטור סייר הקבצים:</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>התקדמות הורדה/העלאה תוצג בסך הבתים שהועברו
+תצוגה באחוזים תתאפשר רק כאשר המשקל הכולל ידוע.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
+    <value>לא ניתן לפרוס את</value>
   </data>
 </root>
