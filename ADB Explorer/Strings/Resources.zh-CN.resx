@@ -1380,4 +1380,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
     <value>应用语言</value>
   </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
 </root>
