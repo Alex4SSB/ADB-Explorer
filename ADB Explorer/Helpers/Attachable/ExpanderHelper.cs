@@ -151,4 +151,17 @@ public static class ExpanderHelper
             typeof(bool),
             typeof(ExpanderHelper),
             null);
+
+    public static bool GetIsTransparent(Control control) =>
+        (bool)control.GetValue(IsTransparentProperty);
+
+    public static void SetIsTransparent(Control control, bool value) =>
+        control.SetValue(IsTransparentProperty, value);
+
+    public static readonly DependencyProperty IsTransparentProperty =
+        DependencyProperty.RegisterAttached(
+            "IsTransparent",
+            typeof(bool),
+            typeof(ExpanderHelper),
+            null);
 }

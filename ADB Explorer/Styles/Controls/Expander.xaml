@@ -115,6 +115,16 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="CornerRadius" Value="5,0,0,5" />
             </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="CornerRadius" Value="5" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
     </Style>
@@ -135,6 +145,16 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="CornerRadius" Value="5,0,0,5" />
             </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="CornerRadius" Value="5" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
         </Style.Triggers>
         <Setter Property="Visibility" Value="Collapsed" />
     </Style>
@@ -165,6 +185,10 @@
             </MultiDataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsExpandEnabled)}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="True">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -415,6 +439,7 @@
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsExpanded" Value="True" />
                                 <Condition Property="helpers:ExpanderHelper.IsHeaderToggleExternal" Value="False" />
+                                <Condition Property="helpers:ExpanderHelper.IsTransparent" Value="False" />
                             </MultiTrigger.Conditions>
                             <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource ExpanderBorderExpanded}" />
                         </MultiTrigger>
@@ -497,6 +522,7 @@
                             <MultiDataTrigger.Conditions>
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsContentCollapsed)}" Value="True" />
                                 <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=ExpandDirection}" Value="Down" />
+                                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(helpers:ExpanderHelper.IsTransparent)}" Value="False" />
                             </MultiDataTrigger.Conditions>
                             <Setter TargetName="BottomExtraBorder" Property="Visibility" Value="Visible" />
                         </MultiDataTrigger>
@@ -539,6 +565,10 @@
                 <Setter Property="ui:ControlHelper.CornerRadius" Value="5" />
                 <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             </DataTrigger>
+            <Trigger Property="helpers:ExpanderHelper.IsTransparent" Value="True">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="Transparent" />
+            </Trigger>
         </Style.Triggers>
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="CW" />

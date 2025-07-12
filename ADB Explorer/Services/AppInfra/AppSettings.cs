@@ -475,6 +475,13 @@ public class AppSettings : ViewModelBase
         set => Set(ref showLanguageNotification, value);
     }
 
+    private bool homeLocationsExpanded;
+    public bool HomeLocationsExpanded
+    {
+        get => Get(ref homeLocationsExpanded, false);
+        set => Set(ref homeLocationsExpanded, value);
+    }
+
     protected override bool Set<T>(ref T storage, T value, [CallerMemberName] string propertyName = null)
     {
         if (Equals(storage, value))

@@ -941,6 +941,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
+
+        HomeSavedLocationsList.ItemsSource = NavigationBox.SavedItems;
+        if (NavigationBox.SavedItems.Count == 0)
+            Settings.HomeLocationsExpanded = false;
     }
 
     private bool InitNavigation(string path = "")

@@ -137,11 +137,24 @@
                 Style="{StaticResource ExplorerViewBackgroundStyle}">
                 <Grid>
                     <ScrollViewer Style="{StaticResource DriveViewScrollViewerStyle}">
-                        <ListView
-                            x:Name="DriveList"
-                            DataContext="{Binding Source={x:Static Member=models:Data.DevicesObject}, Path=Current}"
-                            ItemsSource="{Binding Drives}"
-                            Style="{StaticResource DriveListViewStyle}" />
+                        <StackPanel>
+                            <Expander
+                                Margin="4"
+                                helpers:ExpanderHelper.IsTransparent="True"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_SAVED_LOCATIONS}}"
+                                IsExpanded="{Binding Source={x:Static Member=models:Data.Settings}, Path=HomeLocationsExpanded, Mode=TwoWay}">
+                                <ListView x:Name="HomeSavedLocationsList" Style="{StaticResource HomeSavedLocationsListStyle}" />
+                            </Expander>
+                            <Expander
+                                Margin="4"
+                                helpers:ExpanderHelper.IsTransparent="True"
+                                Header="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_DRIVES}}"
+                                IsExpanded="True">
+                                <ListView
+                                    x:Name="DriveList"
+                                    Style="{StaticResource DriveListViewStyle}" />
+                            </Expander>
+                        </StackPanel>
                     </ScrollViewer>
                     <DataGrid
                         x:Name="ExplorerGrid"

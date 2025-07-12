@@ -320,7 +320,7 @@
         <Setter Property="Text" Value="{Binding ElementName=MainWin, Path=SelectedFilesCount}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=SelectedItems.Count}" />
+                <Setter Property="Text" Value="0" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
                 <Setter Property="Text" Value="0" />
@@ -875,7 +875,7 @@
         <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Text" Value="{Binding ElementName=DriveList, Path=ItemsSource.Count}" />
+                <Setter Property="Text" Value="" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -1022,5 +1022,42 @@
                 <Setter Property="Visibility" Value="Visible" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="HomeViewItemStyle"
+        BasedOn="{StaticResource BaseButtonStyle}"
+        TargetType="Button">
+        <Setter Property="Width" Value="280" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Padding" Value="8,1,8,2" />
+        <Setter Property="helpers:StyleHelper.PressedForeground" Value="{DynamicResource DriveForegroundPressed}" />
+    </Style>
+    <Style
+        x:Key="HomeSavedLocationsListStyle"
+        BasedOn="{StaticResource ListViewStyle}"
+        TargetType="ListView">
+        <Setter Property="SelectionMode" Value="Single" />
+        <Setter Property="ItemsPanel" Value="{StaticResource HorizontalListViewPanelTemplate}" />
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style BasedOn="{StaticResource ListViewItemContainerStyle}" TargetType="ListViewItem">
+                    <Setter Property="Margin" Value="5" />
+                </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <Button
+                        Height="32"
+                        Background="Transparent"
+                        Command="{Binding NavigateAction.Command}"
+                        Style="{StaticResource HomeViewItemStyle}">
+                        <TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
+                    </Button>
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 </ResourceDictionary>
