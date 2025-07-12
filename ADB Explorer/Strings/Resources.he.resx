@@ -441,6 +441,22 @@
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>כל ההגדרות יאופסו בסגירת התוכנה.
-הפעולה לא ניתנת לשיחזור. להמשיך?</value>
+הפעולה לא ניתנת לשיחזור. האם אתם בטוחים?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>בחרו 'הרץ' אם ADB כבר מאושר ב-WSA.
+ניתן לאשר את ADB בהגדרות מתקדמות ב-WSA.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>לא ניתן ליצור {0} מהקבצים שנבחרו ישירות תחת כונן המחשב.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>גלו עוד על ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>הורד את ADB</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>תוכנת עזר עבור קריאת ההתקדמות של הורדות והעלאות מ-ADB.</value>
   </data>
 </root>
