@@ -202,6 +202,117 @@
     <value>Root-Zugriff</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Die Anwendung neu starten, damit die Änderungen wirksam werden.</value>
+    <value>Die Anwendung neu starten, damit die Änderungen wirksam werden</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Wiederherstellen</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>Nur aktivieren, wenn Sie die App gemeinsam mit dem Dateiexplorer verwenden wollen.
+Sie können diese Einstellung jederzeit ändern.</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Ändern</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Später neustarten</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Deinstallieren</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Neue Datei</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Fortsetzen</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>ADB herunterladen</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Mehr Informationen</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Jetzt ADB neu starten</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB ausführbare Datei</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Neuen Ordner</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Hilfe über ADB</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>{0} entfernen</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>{0} beenden</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Die folgende App wird entfernt:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>Die folgenden Apps wird entfernt:
+{0} insgesamt</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Ersetzen</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Abbrechen</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Überspringen</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Bestätigen</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Zusammenführen oder ersetzen</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Es gibt ein Konflikt</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Es gibt ein Konflikt im {0}</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Symbol</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Fehlgeschlagen</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Leeren</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Papierkorb</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Interner Speicher</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Installierte Apps</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>SD-Card</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG-Gerät</value>
   </data>
 </root>
