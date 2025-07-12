@@ -361,6 +361,9 @@
     <value>התחל את WSA ברקע</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>משוך</value>
+    <value>הורד</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>לא ניתן להעלות את הקובץ חזרה למכשיר</value>
   </data>
 </root>
