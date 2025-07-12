@@ -394,6 +394,12 @@
     <value>שגיאה בקבלת תוכן התיקיה</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>הורדה לראשית כונן וינדוס</value>
+    <value>הורדה לראשית כונן במחשב</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>תוכנות היוצרות התנגשות</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>ניתור</value>
   </data>
 </root>
