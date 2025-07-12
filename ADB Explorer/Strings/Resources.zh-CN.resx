@@ -1377,4 +1377,7 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
     <value>转到 Weblate</value>
   </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>应用语言</value>
+  </data>
 </root>
