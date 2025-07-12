@@ -376,6 +376,21 @@
     <value>שחזר</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>פרוס AdbProgressRedirection.exe</value>
+    <value>פרוס את AdbProgressRedirection.exe</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>מעקב אחר סייר הקבצים</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>שימוש בדיסק בלבד</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>שיטת התקדמות</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>ניתוב ההתקדמות</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>שגיאה ב</value>
   </data>
 </root>
