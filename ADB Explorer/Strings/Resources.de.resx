@@ -315,4 +315,7 @@ Sie können diese Einstellung jederzeit ändern.</value>
   <data name="S_DRIVE_OTG" xml:space="preserve">
     <value>OTG-Gerät</value>
   </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value></value>
+  </data>
 </root>
