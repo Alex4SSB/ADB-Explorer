@@ -35,11 +35,7 @@ public class SavedLocation : ViewModelBase
             () => string.IsNullOrEmpty(Path),
             () =>
             {
-                if (Data.RuntimeSettings.SavedLocations is null)
-                    Data.RuntimeSettings.SavedLocations = [Data.CurrentPath];
-                else
-                    Data.RuntimeSettings.SavedLocations = [.. Data.RuntimeSettings.SavedLocations, Data.CurrentPath];
-
+                Data.RuntimeSettings.SavedLocations = [.. Data.RuntimeSettings.SavedLocations, Data.CurrentPath];
                 Storage.StoreValue(nameof(Data.RuntimeSettings.SavedLocations), Data.RuntimeSettings.SavedLocations.ToArray());
             });
 

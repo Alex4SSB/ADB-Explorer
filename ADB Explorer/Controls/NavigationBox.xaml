@@ -174,7 +174,6 @@
             Height="{Binding Height}"
             VerticalAlignment="Center"
             d:Background="LightGray"
-            ui:TextBoxHelper.IsDeleteButtonVisible="False"
             GotFocus="PathBox_GotFocus"
             KeyDown="PathBox_KeyDown"
             LostFocus="PathBox_LostFocus">
