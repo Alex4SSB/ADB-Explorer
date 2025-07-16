@@ -214,6 +214,6 @@
     <value>Ошибки при восстановлении</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Перезапустить программу</value>
+    <value>Перезапустить программу, чтобы изменения вступили в силу</value>
   </data>
 </root>
