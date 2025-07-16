@@ -192,4 +192,28 @@
   <data name="S_REPLACE" xml:space="preserve">
     <value>Заменить</value>
   </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Символ(ы) Робота Андроид</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Обнулить Настройки Программы</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Очистить Карзину</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Ошибка при отключении</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Подтвердите Удаление</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Ошибка при создании</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Ошибки при восстановлении</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Перезапустить программу д</value>
+  </data>
 </root>
