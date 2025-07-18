@@ -2181,28 +2181,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
     {
         var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
-        e.Effects = allowed;
 
         if (allowed.HasFlag(DragDropEffects.Move) && CopyPaste.IsSelf && !e.KeyStates.HasFlag(DragDropKeyStates.ControlKey) && !e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
         {
             e.Effects = DragDropEffects.Move;
-            CopyPaste.DropEffect = DragDropEffects.Move;
         }
         else if (allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
         {
             e.Effects = DragDropEffects.Move;
-            CopyPaste.DropEffect = DragDropEffects.Move;
         }
         else if (allowed.HasFlag(DragDropEffects.Link) && e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
         {
             e.Effects = DragDropEffects.Link;
-            CopyPaste.DropEffect = DragDropEffects.Link;
         }
         else if (allowed.HasFlag(DragDropEffects.Copy)) // copy is the default and does not require Ctrl to be activated
         {
             e.Effects = DragDropEffects.Copy;
-            CopyPaste.DropEffect = DragDropEffects.Copy;
         }
+        else
+            e.Effects = allowed;
 
         if ((!allowed.HasFlag(DragDropEffects.Copy) && e.KeyStates.HasFlag(DragDropKeyStates.ControlKey))
             || (!allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
@@ -2211,6 +2208,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             e.Effects = DragDropEffects.None;
         }
 
+        CopyPaste.DropEffect =
         CopyPaste.CurrentDropEffect = e.Effects;
 
         if (CopyPaste.CurrentFiles.Any())
@@ -2239,7 +2237,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void MainWindow_OnPreviewKeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.LeftAlt or Key.RightAlt or Key.System && CopyPaste.IsDrag)
+        if (e.Key is Key.System && CopyPaste.IsDrag)
             e.Handled = true;
     }
 
