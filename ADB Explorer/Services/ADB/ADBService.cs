@@ -345,12 +345,12 @@ public partial class ADBService
 
     static string[] RootArgs => ["shell", "su", "-c", EscapeAdbShellString(string.Join(" && ", magiskRootArgs.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)))];
 
-    static string[] UnrootArgs => ["shell", "su", "-c", EscapeAdbShellString("'resetprop ro.debuggable 0 && resetprop service.adb.root 0 && setprop ctl.restart adbd'")];
+    static string[] UnrootArgs => ["shell", "su", "-c", EscapeAdbShellString("resetprop ro.debuggable 0 && resetprop service.adb.root 0 && setprop ctl.restart adbd")];
 
     public static bool Root(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, RootArgs);
-        if (stdout.Contains("su: inaccessible or not found"))
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out string stderr, CancellationToken.None, RootArgs);
+        if (stdout != "" || stderr != "")
             ExecuteDeviceAdbCommand(device.ID, "", out stdout, out _, CancellationToken.None, "root");
 
         return !stdout.Contains("cannot run as root");
@@ -358,8 +358,8 @@ public partial class ADBService
 
     public static bool Unroot(Device device)
     {
-        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out _, CancellationToken.None, UnrootArgs);
-        if (stdout.Contains("su: inaccessible or not found"))
+        ExecuteDeviceAdbCommand(device.ID, "", out string stdout, out string stderr, CancellationToken.None, UnrootArgs);
+        if (stdout != "" || stderr != "")
             ExecuteDeviceAdbCommand(device.ID, "", out stdout, out _, CancellationToken.None, "unroot");
 
         var result = stdout.Contains("restarting adbd as non root");
