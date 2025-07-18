@@ -134,6 +134,9 @@
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Move">
                                         <Setter Property="Glyph" Value="&#xE72A;" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Link">
+                                        <Setter Property="Glyph" Value="&#xE8AD;" />
+                                    </DataTrigger>
                                     <DataTrigger Binding="{Binding IsObstructed}" Value="True">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>

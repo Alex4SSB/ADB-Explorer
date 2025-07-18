@@ -1097,6 +1097,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileActionLogic.IsPasteEnabled();
 
+        if (!RuntimeSettings.IsRootActive && DevicesObject.Current.Root is AbstractDevice.RootStatus.Enabled)
+            RuntimeSettings.IsRootActive = true;
+
         FileActions.PushPackageEnabled = Settings.EnableApk && DevicesObject?.Current?.Type is not AbstractDevice.DeviceType.Recovery;
         FileActions.UninstallPackageEnabled = false;
 
@@ -1904,14 +1907,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 WasDragging = true;
 
                 var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
-                var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move);
+                var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
 
                 if (vfdo is not null)
                 {
                     CopyPaste.UpdateSelfVFDO(true);
                     RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
 
-                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move);
+                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
                 }
             }
             else
@@ -2180,7 +2183,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
         e.Effects = allowed;
 
-        if (allowed.HasFlag(DragDropEffects.Move) && CopyPaste.IsSelf)
+        if (allowed.HasFlag(DragDropEffects.Move) && CopyPaste.IsSelf && !e.KeyStates.HasFlag(DragDropKeyStates.ControlKey) && !e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
         {
             e.Effects = DragDropEffects.Move;
             CopyPaste.DropEffect = DragDropEffects.Move;

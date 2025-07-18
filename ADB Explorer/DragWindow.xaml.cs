@@ -101,6 +101,7 @@ public partial class DragWindow : INotifyPropertyChanged
                     {
                         Data.RuntimeSettings.PathUnderMouse = new(path);
                         IsDropAllowed = Data.RuntimeSettings.PathUnderMouse.IsFolder
+                            && Data.CopyPaste.CurrentDropEffect is not DragDropEffects.Link
                             && Data.RuntimeSettings.PathUnderMouse.FileInfo.Attributes is not FileAttributes.Archive;
 
                         string displayName = Data.RuntimeSettings.PathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay);
@@ -129,7 +130,8 @@ public partial class DragWindow : INotifyPropertyChanged
             {
                 if (Data.CopyPaste.IsSelf
                     && Data.CopyPaste.DropTarget == Data.CopyPaste.DragParent
-                    && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                    && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
+                    && !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
                 {
                     DragTooltip.Text = "";
                     return;

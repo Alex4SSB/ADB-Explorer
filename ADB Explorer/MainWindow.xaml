@@ -150,9 +150,7 @@
                                 helpers:ExpanderHelper.IsTransparent="True"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_DRIVES}}"
                                 IsExpanded="True">
-                                <ListView
-                                    x:Name="DriveList"
-                                    Style="{StaticResource DriveListViewStyle}" />
+                                <ListView x:Name="DriveList" Style="{StaticResource DriveListViewStyle}" />
                             </Expander>
                         </StackPanel>
                     </ScrollViewer>

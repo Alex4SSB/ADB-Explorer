@@ -462,7 +462,14 @@ internal static class FileActionLogic
             _ => target.FullPath,
         };
 
-        PastingOnFuse(targetPath, Data.CopyPaste.CurrentFiles.Select(f => f.FullPath).ToArray());
+        PastingOnFuse(targetPath, [.. Data.CopyPaste.CurrentFiles.Select(f => f.FullPath)]);
+
+        var result = DragDropEffects.Copy;
+        if (Data.RuntimeSettings.IsRootActive 
+            && Data.CopyPaste.IsSelf
+            && DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is false
+            && Data.CopyPaste.CurrentFiles.Count() == 1)
+            result |= DragDropEffects.Link;
 
         if (Data.FileActions.IsPastingIllegalOnFuse || Data.FileActions.IsPastingConflictingOnFuse)
             return DragDropEffects.None;
@@ -470,7 +477,7 @@ internal static class FileActionLogic
         if (target is null)
         {
             if (Data.CopyPaste.DragParent == Data.CurrentPath)
-                return DragDropEffects.Copy;
+                return result;
         }
         else
         {
@@ -483,7 +490,7 @@ internal static class FileActionLogic
 
         return pastingInDescendant
             ? DragDropEffects.None
-            : DragDropEffects.Copy | DragDropEffects.Move;
+            : result | DragDropEffects.Move;
     }
 
     private static void PastingOnFuse(string targetPath, string[] files)
