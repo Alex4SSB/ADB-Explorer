@@ -343,9 +343,9 @@ public partial class ADBService
                 resetprop ctl.restart adbd
                 """;
 
-    static string[] RootArgs => ["shell", "su", "-c", string.Join(" ; ", magiskRootArgs.Split("\r\n", StringSplitOptions.RemoveEmptyEntries))];
+    static string[] RootArgs => ["shell", "su", "-c", EscapeAdbShellString(string.Join(" && ", magiskRootArgs.Split("\r\n", StringSplitOptions.RemoveEmptyEntries)))];
 
-    static string[] UnrootArgs => ["shell", "su", "-c", "'resetprop ro.debuggable 0 ; resetprop service.adb.root 0 ; setprop ctl.restart adbd'"];
+    static string[] UnrootArgs => ["shell", "su", "-c", EscapeAdbShellString("'resetprop ro.debuggable 0 && resetprop service.adb.root 0 && setprop ctl.restart adbd'")];
 
     public static bool Root(Device device)
     {
