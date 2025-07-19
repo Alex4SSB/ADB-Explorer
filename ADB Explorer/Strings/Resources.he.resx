@@ -379,7 +379,7 @@
     <value>פרוס את AdbProgressRedirection.exe</value>
   </data>
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>מעקב אחר סייר הקבצים</value>
+    <value>ניטור סייר הקבצים</value>
   </data>
   <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
     <value>שימוש בדיסק בלבד</value>
@@ -434,10 +434,10 @@
 • אין תמיכה בהרצת קבצי התקנה של APK</value>
   </data>
   <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>בתוכנה קיימות הרבה אנימציות אשר מאופשרות כחלק מעיצוב fluent.
-אנימציית התצוגות הצדדיות תמיד אינה מאופשרת כאשר התוכנה פועלת בחלון מלא על מסך משני.
+    <value>התוכנה כוללת מספר אנימציות אשר מאופשרות כחלק מעיצוב fluent.
+אנימציית התצוגות הצדדיות תמיד מבוטלת כאשר התוכנה פועלת בחלון מלא על מסך משני.
 
-• איפשור הגדרה זו מבטל את כל האנימציות חוץ מפקדים המציגים התקדמות / ניצול.</value>
+• איפשור הגדרה זו מבטל את כל האנימציות חוץ מפקדים המציגים התקדמות או ניצול נפח.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>כל ההגדרות יאופסו בסגירת התוכנה.
