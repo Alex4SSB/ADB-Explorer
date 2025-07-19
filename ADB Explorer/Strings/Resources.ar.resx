@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,164 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>تتم إعادة إنتاج روبوت Android أو تعديله من عمل أنشأته Google وشاركته، ويتم استخدامه وفقًا للبنود الموضّحة في ترخيص Creative Commons 3.0 Attribution.</value>
+  </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>علامه الاندرويد روبوت</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>انيميشنات التطبيق</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>علامه الحزمه مرخصه تحت رخصه apache الإصدار الثاني</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>لم اتمكن من معرفه اصدار ADB من هذا الطريق</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>اصدار ADB من هذا الطريق منخفض جداً</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>خطأ في الكتابه علي ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>اختر مخرجات ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>اعاده اعدادات التطبيق</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>اصدار تطبيق جديد</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>خطأ في محدد الإتجاه</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>نسخ اسم الحزمه</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>نسخ طريق العنصر</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>اعاده كل الاغراض</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>تفريخ سله المهملات</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>مسح</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>خطأ في مسار الوجهه</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>خطأ في الاتصال مع</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>فشل في الاتصال</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>خطأ قطع الاتصال</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>خطأ في الاتصال</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>صلاحيه root لا يمكن تفعيلها من هذا الجهاز</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>صلاحيه root</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>تأكيد المسح</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>مسح كلي</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>صنع خطأ</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>اعاده الاشتباك</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>تأكيد إلغاء التثبيت</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>اختر الحزمه للتثبيث</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>انهاء المحاكي</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>مسح الجهاز</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>قطع اتصال الجهاز</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>مهام الملف</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>تثبيث الحزم</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>اتصال و/او اتصل بجهاز WiFi (بدون استخدام mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>اعاده تشغيل الطبيق لحفظ التغيرات</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>خطأ في قراءة الملف</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>لا يمكن سحب الملف لطلب قرائته</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>خطأ في كتابه الملف</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>لا يمكن ارجاع الملف للجهاز</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>خادم ADB يحتاج لاعاده التشغيل لتعطيل mDNS</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>تعطيل mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>بدء WSA في الخلفية</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>سحب</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>سحب (هدف الرابط)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>اعاده</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>مراقبه متصفح الملفات</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>استخدام دسك فقط</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>طريقه التحميل</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>اعاده توجيه التحميل</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>خطأ في تصنيف المكتبه</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>­سحب الي جزور مساحه windows</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>تداخل التطبيقات</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>مراقبه متصفح الملفات غير موجود نظراً لوجود تطبيقات مفعله</value>
   </data>
 </root>
