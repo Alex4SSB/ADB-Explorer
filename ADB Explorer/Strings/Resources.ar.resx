@@ -229,7 +229,7 @@
     <value>خطأ في قراءة الملف</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>لا يمكن سحب الملف لطلب قرائته</value>
+    <value>لا يمكن سحب الملف لطلب قرأته</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>خطأ في كتابه الملف</value>
@@ -278,5 +278,9 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>مراقبه متصفح الملفات غير موجود نظراً لوجود تطبيقات مفعله</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>دفع/سحب التحميل معروض بصيغه bytes الكليه المحوله.
+النسبه موضحه فقط حين معرفه الحجم الكلي</value>
   </data>
 </root>
