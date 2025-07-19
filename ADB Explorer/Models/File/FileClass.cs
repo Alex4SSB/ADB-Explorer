@@ -165,7 +165,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+    public string ModifiedTimeString => ModifiedTime?.ToString(CultureInfo.CurrentCulture.DateTimeFormat).Replace("\u200F", "");
 
     public string SizeString => Size?.ToSize();
 

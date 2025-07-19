@@ -117,7 +117,7 @@ public abstract class FileOperation : ViewModelBase
 
     #region Read-only Properties
 
-    public string Time => TimeStamp.ToLongTimeString();
+    public string Time => TimeStamp.ToLongTimeString().Replace("\u200F", "");
 
     public FileOpFilter.FilterType Filter
     {

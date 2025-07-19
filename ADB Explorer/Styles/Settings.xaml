@@ -396,8 +396,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <TextBlock Text="&#x200E; - v" />
-                            <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersion}" />
+                            <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersionString}" />
                         </StackPanel>
                     </StackPanel>
                     <ItemsControl

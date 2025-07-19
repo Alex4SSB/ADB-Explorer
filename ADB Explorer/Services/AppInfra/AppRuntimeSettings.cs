@@ -201,8 +201,14 @@ public class AppRuntimeSettings : ViewModelBase
     public Version AdbVersion
     {
         get => adbVersion;
-        set => Set(ref adbVersion, value);
+        set
+        {
+            if (Set(ref adbVersion, value))
+                OnPropertyChanged(nameof(AdbVersionString));
+        }
     }
+
+    public string AdbVersionString => $"\u200E - v{AdbVersion}";
 
     private bool isSplashScreenVisible = true;
     public bool IsSplashScreenVisible
