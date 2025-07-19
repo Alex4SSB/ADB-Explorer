@@ -202,9 +202,6 @@ public static class SettingsHelper
 
     public static void ProgressMethodTipAction()
     {
-        //var rtl = CultureInfo.CurrentUICulture.TextInfo.IsRightToLeft;
-        // TODO: use RTL support in the future, for now just use LTR
-
         var text = 
         $"""
         • {Strings.Resources.S_DEPLOY_REDIRECTION_TITLE}

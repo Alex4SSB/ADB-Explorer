@@ -180,7 +180,17 @@
                                         RecognizesAccessKey="True"
                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
                                         TextElement.Foreground="{TemplateBinding Foreground}"
-                                        TextWrapping="Wrap" />
+                                        TextWrapping="Wrap">
+                                        <ui:ContentPresenterEx.Style>
+                                            <Style TargetType="ui:ContentPresenterEx">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                                                        <Setter Property="FlowDirection" Value="RightToLeft" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ui:ContentPresenterEx.Style>
+                                    </ui:ContentPresenterEx>
                                 </Grid>
                                 <VisualStateManager.VisualStateGroups>
                                     <VisualStateGroup x:Name="CheckStates">

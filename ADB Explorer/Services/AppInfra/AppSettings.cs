@@ -436,7 +436,7 @@ public class AppSettings : ViewModelBase
 
         string precent = actual.Name == "en" || actual.Parent.Name == "en"
                          ? null
-                         : $"{SettingsHelper.GetCurrentPercentageTranslated(actual) * 100:f0}%";
+                         : $"\u200E{SettingsHelper.GetCurrentPercentageTranslated(actual) * 100:f0}%";
 
         CultureTranslationProgress.Value = precent;
     }

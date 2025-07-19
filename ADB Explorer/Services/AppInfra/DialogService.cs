@@ -52,6 +52,10 @@ public static class DialogService
         if (buttonText is null)
             buttonText = Strings.Resources.S_BUTTON_OK;
 
+        windowDialog.FlowDirection = Data.Settings.UICulture.TextInfo.IsRightToLeft
+            ? FlowDirection.RightToLeft
+            : FlowDirection.LeftToRight;
+
         windowDialog.Content = content;
         windowDialog.Title = title;
         windowDialog.PrimaryButtonText = null;
