@@ -748,7 +748,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הסכם פרטיות</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>ייחוסים ורשיונות צד ג'</value>
+    <value>ייחוסים ורשיונות צד ג'‏</value>
   </data>
   <data name="S_SEE_TERMS" xml:space="preserve">
     <value>ראה תנאים</value>
@@ -968,7 +968,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>ממתין לתשובה: {0}</value>
   </data>
   <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt;להיות פעיל&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt; להיות פעיל&lt;/Span&gt;</value>
   </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>לחצו כדי לאפשר את השרת והסריקה</value>
