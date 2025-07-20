@@ -370,7 +370,7 @@
     <value>לא ניתן להוריד את הקובץ לקריאה.</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>הורד (היעד של קיצור הדרך)</value>
+    <value>הורד (את יעד הקישור)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>שחזר</value>
@@ -428,10 +428,10 @@
   </data>
   <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
     <value>כונן FUSE.
-• אין תמיכה בקיצורי דרך
+• אין תמיכה בקישורים (קיצורי דרך)
 • שמות קבצים לא יכולים להכיל " * / : &lt; &gt; ? \ |
 • אין משמעות לאותיות גדולות/קטנות בשמות קבצים
-• אין תמיכה בהרצת קבצי התקנה של APK</value>
+• אין תמיכה בהרצת קבצי התקנה APK</value>
   </data>
   <data name="S_DISABLE_ANIMATION" xml:space="preserve">
     <value>התוכנה כוללת מספר אנימציות אשר מאופשרות כחלק מעיצוב fluent.
@@ -622,7 +622,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>נקה</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>אפשֵר mDNS</value>
+    <value>הפעל mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>סרוק אחר מכשירים</value>
@@ -631,10 +631,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>סרוק מצב סוללה</value>
   </data>
   <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>אפשֵר יומן פקודות</value>
+    <value>הפעל יומן פקודות</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>אפשֵר גישת Root אוטומטית</value>
+    <value>הפעל גישת Root אוטומטית</value>
   </data>
   <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
     <value>שמור מכשירים שחוברו ידנית</value>
@@ -643,13 +643,13 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>אוטומטית פתח לסיור</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>אפשֵר תצוגה קומפקטית</value>
+    <value>הפעל תצוגה קומפקטית</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>עצור סריקות בזמן הורדה/העלאה</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>אפשֵר פעולות מקביליות</value>
+    <value>הפעל פעולות מקביליות</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>דרוש סריקת מדיה לאחר העלאה</value>
@@ -658,10 +658,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>סרוק אחר כוננים</value>
   </data>
   <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>אפשֵר פח מיחזור</value>
+    <value>הפעל פח מיחזור</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>אפשֵר טיפול ב APK</value>
+    <value>הפעל טיפול ב APK</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>הצג סיומות בשמות קבצים</value>
@@ -673,7 +673,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הצג אפליקציות מערכת</value>
   </data>
   <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>אפשֵר ניטור סייר הקבצים</value>
+    <value>הפעל ניטור סייר הקבצים</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>לחיצה כפולה על קובץ</value>
@@ -700,7 +700,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>כהה</value>
   </data>
   <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>ברירת מחדל של המערכת</value>
+    <value>ברירת המחדל של המערכת</value>
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>צבע</value>
@@ -782,5 +782,285 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
     <value>אוקיי</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>סנן פעולות קבצים</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>הפעל ריצה אוטומטית</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>בטל ריצה אוטומטית
+בטל את כל הפעולות הרצות</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>עדכון היומן מופסק</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>הפסק עדכוני יומן</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>יומן פקודות</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>כונני המכשיר</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>אחורה</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>קדימה</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>מעלה</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>סינון</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>מכשירים</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>העלה</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>תיקיות</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>קבצים</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>רענן</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>העתק</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>עוד</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>ערוך</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>חדש</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>תיקיה</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>קובץ</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>בחר הכל</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>גזור</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>הדבק קישור</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>שנה שם</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>חבילה</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>עדכן זמן שינוי</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>סגור את העורך</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>שמור שינויים</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>התקן</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>העתק ל Temp</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>נקה את יומן הפקודות</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>פתח את מיקום הפריט</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>חפש ברשת</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>העתק ללוח</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>שימוש בדיסק ע"י ADB</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>קריאה: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>כתיבה: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>אחר: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>מאפשר חיפוש עדכונים בכל הפעלה</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>אודות</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>פריט</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>פריטים</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>התיקיה ריקה.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>לא ניתן לקבל את הרשימה.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>אין פריטים התואמים לסינון.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;התיקייה&lt;Italic&gt;נראית&lt;/Italic&gt;ריקה&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;...לעין בלתי מזוינת&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>פריט נבחר</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>פריטים נבחרו</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>סוג פעולה</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>התקדמות</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>משתמש</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>שרת ADB אינו מגיב</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>זמן מהתשובה האחרונה מהשרת</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>הרוג את השרת</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>הרוג את התהליך</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>רענן מכשירים</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>הפעל ADB מחדש</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>השרת אינו פועל</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>ממתין לתשובה: {0}</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt;להיות פעיל&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>לחצו כדי לאפשר את השרת והסריקה</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>פעולות מסויימות נכשלו</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>גישת Root מאופשרת</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>גישת Root מוכנה להפעלה</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>הפעל מחדש לתוך</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>מערכת</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>מצב Recovery</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>מצב Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>מצב Sideload</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>מצב Sideload (הפעלה מחדש אוט')</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - מנותק</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - לא מאושר</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>אימולטור</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>שירות mDNS</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>ויפי</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>הפעל</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>הפעל WSA</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>אל תציג יותר.</value>
+  </data>
+  <data name="S_EXTRACT_TITLE" xml:space="preserve">
+    <value>מחלץ קבצים</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>בטל</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>שולח למערכת</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>התנגשות ב{0}</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>הדבקה</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>גרירה</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>פעולה</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>פעולות</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>אימות {0}</value>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
+    <value>הדבק {0} פריטים ש{1}</value>
+  </data>
+  <data name="S_COPIED" xml:space="preserve">
+    <value>הועתקו</value>
   </data>
 </root>
