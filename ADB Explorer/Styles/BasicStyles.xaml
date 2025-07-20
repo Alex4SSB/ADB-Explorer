@@ -11,6 +11,7 @@
     <sys:Double x:Key="DataGridColumnHeaderHeight">30.0</sys:Double>
     <Thickness x:Key="DataGridScrollContentPresenterMargin">0,3,0,0</Thickness>
     <Style x:Key="TextBlockStyle" TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
                 <Setter Property="FlowDirection" Value="RightToLeft" />
@@ -247,6 +248,11 @@
     <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />
     <Style TargetType="ui:HyperlinkButton">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     <Style TargetType="GridSplitter">
         <Setter Property="IsTabStop" Value="False" />

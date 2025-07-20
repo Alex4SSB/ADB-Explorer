@@ -67,6 +67,7 @@
             TargetType="ComboBox">
             <EventSetter Event="PreviewMouseWheel" Handler="ComboBox_PreviewMouseWheel" />
         </Style>
+        <Style BasedOn="{StaticResource TextBlockStyle}" TargetType="TextBlock" />
     </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ProgressValue="{Binding ElementName=UpperProgressBar, Path=Value}" />
