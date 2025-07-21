@@ -1294,4 +1294,99 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
     <value>{0}% בשימוש</value>
   </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>גלול לכאן</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>קצה עליון</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>קצה תחתון</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>עמוד למעלה</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>עמוד למטה</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>גלול מעלה</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>גלול מטה</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>קצה שמאלי</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>קצה ימני</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>עמוד שמאלה</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>עמוד ימינה</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>גלול לשמאל</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>גלול לימין</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>בטל</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>בצע שוב</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>הודעות</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>לחץ להצגת מידע נוסף</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>שפת התוכנה</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>בחרו את שפת התצוגה הרצויה בהגדרות התוכנה.
+התקדמות התרגום מוצגת עבור השפה שנבחרה.
+עזרו לנו לתרגם את התוכנה לשפה שלכם ב Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>עבור לאתר Weblate</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>קובץ Socket</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>קובץ Block</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>קובץ Char</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>לא ידוע</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>קישור שבור</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>מיקומים אחרונים</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>הוסף מיקום נוכחי</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>הסר</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>מיקומים שמורים</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>קובץ הרצה של וינדוס</value>
+  </data>
 </root>
