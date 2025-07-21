@@ -652,7 +652,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הפעל פעולות מקביליות</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>דרוש סריקת מדיה לאחר העלאה</value>
+    <value>בצע סריקת מדיה לאחר העלאה</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>סרוק אחר כוננים</value>
