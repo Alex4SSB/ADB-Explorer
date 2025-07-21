@@ -223,7 +223,7 @@
     <value>לא ניתן לקרוא גרסת ADB מהנתיב שסופק.</value>
   </data>
   <data name="S_PERM_DEL" xml:space="preserve">
-    <value>מחיקה לצמיתות</value>
+    <value>מחק לצמיתות</value>
   </data>
   <data name="S_FAILED_CONN" xml:space="preserve">
     <value>שגיאה בהתחברות אל</value>
@@ -1062,5 +1062,236 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_COPIED" xml:space="preserve">
     <value>הועתקו</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>קישור</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (קישור)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>חבילת אפליקציה של אנדרואיד</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>פח מחזור</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>כן</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>כונן Root</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>אחסון פנימי</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>אפליקציות מותקנות</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>כרטיס SD</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>כונן חיצוני</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>כונן וירטואלי</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>כונן Temp</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>שם קובץ לא חוקי במערכת הקבצים ביעד: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>שוני בתוכן</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>לא קיים ביעד</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>מחיקה לצמיתות</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>לא ידוע</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>הנתיב שסופק אינו קיים.</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>התפריט ריק</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - עותק</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>חוקי בתור שם קובץ יוניקס (דרך ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>חוקי בתור שם קובץ על FUSE</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>חוקי בתור שם קובץ וינדוס</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>חוקי בתור שם קובץ בראשית כונן וינדוס</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>ייחודי במיקום הנוכחי</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>אזהרות</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>קובץ שנבחר אינו עומד בחוקי שם קובץ וינדוס</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>קובץ שנבחר אינו עומד בחוקי שם קובץ בראשית כונן וינדוס</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>נבחרו קבצים בעלי שמות מתנגשים בוינדוס / FUSE</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>קובץ שנבחר אינו עומד בחוקי שם קובץ FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>הועתקו קבצים בעלי שמות מתנגשים בוינדוס / FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>קובץ שהועתקו אינו עומד בחוקי שם קובץ FUSE</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>פריט שנבחר אינו קובץ / תיקיה</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>ניתן לשינוי ע"י איפוס הגדרות התוכנה, או ידנית בקובץ ההגדרות</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>עד ההדלקה הבאה של התוכנה</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>אל תציג זאת יותר</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>תוכנת WSA</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>מצב Root:‏ {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>טרם נבדק</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>לא מאושר</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>איפשור</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>ביטול</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>סיסמת צימוד</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>כתובת IP / שם התקן</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>פורט</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>פורט צימוד</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>צמד והתחבר</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>מכשיר שמור</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>צימוד QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>מוכן לצימוד</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>נקה הכל</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>הוסף מכשיר חדש</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[לא מאושר]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[שירות mDNS]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>פתוח בסייר</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>פתח בסייר</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>התחבר</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} פנוי מתוך {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>ריק</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>קובץ התקנת APK</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>קבצי התקנת APK</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>חבילות</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>שגיאה: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>התוכן מאומת</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>הושלם</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} נכשלו</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>סך הכל:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>פעולת עבר</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>בריצה</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>בהמתנה</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>נכשל</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>בוטל</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>פעולת עבר</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>הזזה</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>מיחזור</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>עדכון</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% בשימוש</value>
   </data>
 </root>
