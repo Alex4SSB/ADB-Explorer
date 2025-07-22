@@ -68,7 +68,7 @@ public class FileOpFilter : ViewModelBase
                 {
                     Style = (Style)App.Current.FindResource("FileOpFilterCheckBox"),
                     DataContext = this,
-                    Content = AdbExplorerConst.FILE_OP_NAMES[Type],
+                    Content = GetFilterName(Type),
                     Margin = new(0, -6, 0, -6),
                 };
             }
@@ -76,6 +76,19 @@ public class FileOpFilter : ViewModelBase
             return checkBox;
         }
     }
+
+    public static string GetFilterName(FilterType filterType)
+        => filterType switch
+    {
+        FilterType.Running => Strings.Resources.S_FILEOP_RUNNING,
+        FilterType.Pending => Strings.Resources.S_FILEOP_WAITING,
+        FilterType.Completed => Strings.Resources.S_FILEOP_COMPLETED,
+        FilterType.Validated => Strings.Resources.S_FILEOP_VALIDATED,
+        FilterType.Failed => Strings.Resources.S_FILEOP_FAILED,
+        FilterType.Canceled => Strings.Resources.S_FILEOP_CANCELED,
+        FilterType.Previous => Strings.Resources.S_FILEOP_PREVIOUS,
+        _ => throw new NotSupportedException()
+    };
 
     public FilterType Type { get; }
 

@@ -129,7 +129,19 @@
                         HorizontalAlignment="Center"
                         Style="{StaticResource BlueDotTextBlockStyle}" />
                 </Grid>
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <StackPanel
+                    Grid.Column="1"
+                    HorizontalAlignment="Left"
+                    Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                                    <Setter Property="FlowDirection" Value="RightToLeft" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
                     <TextBlock Text="{Binding Description}" />
                     <StackPanel Orientation="Horizontal">
                         <StackPanel.Style>
@@ -141,7 +153,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock Text="&#x200E; - " />
+                        <TextBlock Text=" - " />
                         <TextBlock Text="{Binding AltLabel}" />
                     </StackPanel>
                 </StackPanel>

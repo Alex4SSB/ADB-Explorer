@@ -111,17 +111,6 @@ public static class AdbExplorerConst
     public static readonly ulong DISK_WRITE_THRESHOLD = 500000;
     public static readonly ulong MAX_DISK_DISPLAY_RATE = 1000000000;
 
-    public static readonly Dictionary<FileOpFilter.FilterType, string> FILE_OP_NAMES = new()
-    {
-        { FileOpFilter.FilterType.Running, Strings.Resources.S_FILEOP_RUNNING },
-        { FileOpFilter.FilterType.Pending, Strings.Resources.S_FILEOP_WAITING },
-        { FileOpFilter.FilterType.Completed, Strings.Resources.S_FILEOP_COMPLETED },
-        { FileOpFilter.FilterType.Validated, Strings.Resources.S_FILEOP_VALIDATED },
-        { FileOpFilter.FilterType.Failed, Strings.Resources.S_FILEOP_FAILED },
-        { FileOpFilter.FilterType.Canceled, Strings.Resources.S_FILEOP_CANCELED },
-        { FileOpFilter.FilterType.Previous, Strings.Resources.S_FILEOP_PREVIOUS },
-    };
-
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 
     public static readonly string TEMP_DRAG_FOLDER = $"TempDrag_{Helpers.RandomString.GetUniqueKey(3, [.. WIFI_PAIRING_ALPHABET.Except(INVALID_NTFS_CHARS)])}";

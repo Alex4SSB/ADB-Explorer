@@ -110,7 +110,7 @@ internal static class MainToolBar
             StyleHelper.ContentAnimation.DownMarquee,
             18,
             isVisible: Data.FileActions.IsUninstallVisible),
-        new IconMenu(description: "More",
+        new IconMenu(description: Strings.Resources.S_MENU_MORE,
             icon: AppActions.Icons[FileAction.FileActionType.More],
             iconSize: 20,
             children:

@@ -16,7 +16,7 @@ public abstract class FileOpProgressViewModel : ViewModelBase
         _ => throw new NotSupportedException(),
     };
 
-    public string Name => AdbExplorerConst.FILE_OP_NAMES[FilterType];
+    public string Name => FileOpFilter.GetFilterName(FilterType);
 
     private bool isValidationInProgress = false;
     public bool IsValidationInProgress

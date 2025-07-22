@@ -31,12 +31,16 @@
         x:Key="DeviceNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
         TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
