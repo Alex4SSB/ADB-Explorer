@@ -237,6 +237,7 @@
                 VerticalAlignment="Bottom"
                 FontFamily="{StaticResource ConsoleFont}"
                 FontSize="14"
+                NumberSubstitution.Substitution="European"
                 Text="{x:Static app_prop:AppGlobal.AppVersion}" />
         </Grid>
     </Border>

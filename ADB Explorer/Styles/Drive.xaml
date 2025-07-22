@@ -54,12 +54,18 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="DriveNameTextBlockStyle" TargetType="TextBlock">
+    <Style
+        x:Key="DriveNameTextBlockStyle"
+        BasedOn="{StaticResource TextBlockStyle}"
+        TargetType="TextBlock">
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Text" Value="{Binding DisplayName}" />
     </Style>
-    <Style x:Key="DriveItemsCountTextBlockStyle" TargetType="TextBlock">
+    <Style
+        x:Key="DriveItemsCountTextBlockStyle"
+        BasedOn="{StaticResource TextBlockStyle}"
+        TargetType="TextBlock">
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style

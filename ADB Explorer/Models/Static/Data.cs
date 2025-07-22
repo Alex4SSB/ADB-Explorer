@@ -45,7 +45,7 @@ internal static class Data
 
     public static PairingQrClass QrClass { get; set; }
 
-    public static IEnumerable<FileClass> SelectedFiles { get; set; } = Enumerable.Empty<FileClass>();
+    public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];
 
-    public static IEnumerable<Package> SelectedPackages { get; set; } = Enumerable.Empty<Package>();
+    public static IEnumerable<Package> SelectedPackages { get; set; } = [];
 }

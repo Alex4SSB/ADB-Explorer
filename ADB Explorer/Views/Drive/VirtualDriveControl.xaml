@@ -45,12 +45,12 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-                <TextBlock Style="{StaticResource DriveNameTextBlockStyle}" />
+                <TextBlock HorizontalAlignment="Left" Style="{StaticResource DriveNameTextBlockStyle}" />
                 <Grid Grid.Row="1">
                     <Grid.Resources>
                         <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock" />
                     </Grid.Resources>
-                    <StackPanel Orientation="Horizontal">
+                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
                                 <Style.Triggers>
@@ -67,6 +67,9 @@
                                         </MultiDataTrigger.Conditions>
                                         <Setter Property="Visibility" Value="Visible" />
                                     </MultiDataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                                        <Setter Property="FlowDirection" Value="RightToLeft" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
@@ -122,7 +125,7 @@
                             </TextBlock.Style>
                         </TextBlock>
                     </StackPanel>
-                    <TextBlock>
+                    <TextBlock HorizontalAlignment="Left">
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DriveItemsCountTextBlockStyle}" TargetType="TextBlock">
                                 <Setter Property="Visibility" Value="Collapsed" />

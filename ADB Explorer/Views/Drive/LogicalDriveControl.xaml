@@ -81,7 +81,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock>
+                <TextBlock Style="{StaticResource TextBlockStyle}">
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
                             <Binding Path="Available" />

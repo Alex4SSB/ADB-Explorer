@@ -831,7 +831,10 @@
                                                 Text="{x:Static app_prop:AppGlobal.AppDisplayName}" />
                                             <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
                                                 <TextBlock VerticalAlignment="Bottom" Text="v" />
-                                                <TextBlock VerticalAlignment="Bottom" Text="{x:Static app_prop:AppGlobal.AppVersion}" />
+                                                <TextBlock
+                                                    VerticalAlignment="Bottom"
+                                                    NumberSubstitution.Substitution="European"
+                                                    Text="{x:Static app_prop:AppGlobal.AppVersion}" />
                                             </StackPanel>
                                             <Button
                                                 Margin="0,10,0,0"
