@@ -163,7 +163,7 @@
     <value>Erreur de chemin de destination</value>
   </data>
   <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>échec de la connexion à</value>
+    <value>Echec de la connexion à</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>Erreur de connexion</value>
@@ -341,5 +341,180 @@
   </data>
   <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
     <value>Vider l'historique de commandes</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Échoué</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Annulé</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Impossible de remplacer ADB</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>Surveillance de l’explorateur de fichiers</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Redirection de la progression</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Erreur lors de l'affichage du répertoire</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Transférer vers la racine du lecteur Windows</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>La surveillance de l’explorateur de fichiers n’est pas disponible car les applications suivantes sont en cours d’exécution :</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>La progression des push/pull est affichée en octets transférés.
+Le pourcentage n’est affiché que lorsque la taille totale est connue.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
+    <value>Impossible de déployer l’exécutable.
+La méthode de progression basée sur l’utilisation du disque sera utilisée à la place.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>La surveillance de l’explorateur de fichiers permet à l’application d’effectuer des opérations Pull via glisser-déposer ou presse-papiers directement vers le dossier de destination.
+
+Autrement, l’opération Pull s’effectue d’abord vers le dossier temporaire de l’application, depuis lequel l’explorateur de fichiers reçoit le fichier en tant que flux, ce qui nécessite l’utilisation d’un petit tampon.
+Ces deux étapes supplémentaires ralentissent considérablement le processus.
+
+Cette fonctionnalité est automatiquement désactivée pour les autres gestionnaires de fichiers sélectionnés.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>Activez cette option uniquement si vous comptez utiliser l’application avec l’explorateur de fichiers.
+Vous pouvez toujours modifier ce paramètre dans les options.</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Bienvenue dans cette nouvelle version d’ADB Explorer!
+Les notes de version sont disponibles sur GitHub.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Lecteur FUSE
+• Les liens symboliques ne sont pas pris en charge
+• Les noms de fichiers ne peuvent pas contenir " * / : &lt; &gt; ? \ |
+• Les noms de fichiers ne tiennent pas compte de la casse
+• L’installation de fichiers APK n’est pas prise en charge</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>L’application comporte de nombreuses animations activées dans le cadre du Fluent design.
+L’animation des volets latéraux est toujours désactivée lorsque la fenêtre de l’application est maximisée sur un écran secondaire.
+
+• Activer cette option désactive toutes les animations de l’application, à l’exception des barres de progression, anneaux de progression et indicateurs d’utilisation du lecteur.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Tous les paramètres de l’application seront réinitialisés à la fermeture.
+Cette action est irréversible. Voulez-vous continuer ?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Sélectionnez Lancer si ADB est déjà autorisé dans WSA.
+Pour autoriser ADB, ouvrez les paramètres avancés de WSA.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} des fichiers sélectionnés ne peuvent pas être créés à la racine d’un lecteur Windows.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>En savoir plus sur ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Télécharger ADB</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>Un utilitaire permettant de lire la progression des transferts push/pull depuis ADB.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
+    <value>Peut être détecté à tort (faux positif) par certains antivirus.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>Copié dans %LocalAppData%\AdbExplorer</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>Sélectionnez une option pour afficher l'explication</value>
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value>Sélectionner la méthode de progression :</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Localiser ADB (v{0} minimum) :</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Changer</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Sélectionner le chemin d'accès à ADB</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continuer</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Plus d'informations</value>
+  </data>
+  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
+    <value>Surveillance de l’explorateur de fichiers :</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Activé</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Désactivé</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Un(e) nouveau(elle) {0}, version {1}, est disponible</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Aller à la page Version</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Fermer</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Accéder aux notes de mise à jour</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>Exécutable ADB</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Cette application est une interface graphique pour ADB (Android Debug Bridge).
+Pour utiliser l’application, vous devez disposer d’ADB sur votre ordinateur.
+ADB est disponible avec les outils de développement Android, SDK Platform Tools.
+Vous pouvez utiliser le lien fourni pour télécharger les outils SDK Platform Tools.
+Malheureusement, nous ne pouvons pas inclure ADB dans l’application en raison de restrictions de licence.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Aide sur ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Redémarrer ADB maintenant</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Redémarrer plus tard</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Sélectionnez la destination pour {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Sélectionnez la destination pour plusieurs éléments</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Les éléments suivants seront supprimés :
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Les éléments suivants seront supprimés :
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Nouveau fichier</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Nouveau dossier</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Une erreur est survenue lors de la tentative d'affichage du contenu de ce dossier.
+Le contenu visible peut être incomplet.</value>
   </data>
 </root>
