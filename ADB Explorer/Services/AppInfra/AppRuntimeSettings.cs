@@ -484,6 +484,8 @@ public class AppRuntimeSettings : ViewModelBase
 
     public bool UseFluentStyles => IsWin11 || Data.Settings.ForceFluentStyles;
 
+    public static bool IsRTL => Thread.CurrentThread.CurrentCulture.TextInfo.IsRightToLeft;
+
     #region Event-only properties
 
     public bool NewFolder { get => false; set => OnPropertyChanged(); }

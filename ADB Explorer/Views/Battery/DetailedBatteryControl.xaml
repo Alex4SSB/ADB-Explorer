@@ -53,7 +53,7 @@
                                 <ui:SimpleStackPanel.Style>
                                     <Style TargetType="ui:SimpleStackPanel">
                                         <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
                                                 <Setter Property="FlowDirection" Value="RightToLeft" />
                                             </DataTrigger>
                                         </Style.Triggers>

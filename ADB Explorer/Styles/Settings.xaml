@@ -136,7 +136,7 @@
                     <StackPanel.Style>
                         <Style TargetType="StackPanel">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
                                     <Setter Property="FlowDirection" Value="RightToLeft" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -175,12 +175,15 @@
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <Grid>
-                                <StackPanel Orientation="Horizontal">
+                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
                                     <StackPanel.Style>
                                         <Style TargetType="StackPanel">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding ThreeLetterISOLanguageName}" Value="ivl">
                                                     <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding TextInfo.IsRightToLeft}" Value="True">
+                                                    <Setter Property="FlowDirection" Value="RightToLeft" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

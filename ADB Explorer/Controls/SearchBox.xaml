@@ -124,7 +124,10 @@
                 </Style>
             </Expander.Style>
             <Expander.Header>
-                <ui:FontIcon Margin="4,-1" Glyph="{Binding Icon}">
+                <ui:FontIcon
+                    Margin="4,-1"
+                    Glyph="{Binding Icon}"
+                    ToolTip="{Binding (ui:ControlHelper.PlaceholderText)}">
                     <ui:FontIcon.Style>
                         <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
 
