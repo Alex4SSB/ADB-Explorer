@@ -118,6 +118,9 @@
     <Color x:Key="DarkTrashDriveAltBorder">#FFFF4500</Color>
     <Color x:Key="LightTrashDriveAltBorder">#FFEB3324</Color>
 
+    <Color x:Key="DarkRootTitleBrush">#FFA82E00</Color>
+    <Color x:Key="LightRootTitleBrush">#FFC23400</Color>
+
     <SolidColorBrush x:Key="SelectionRectangleFill" Color="#6B2E86D8" />
     <SolidColorBrush x:Key="SelectionRectangleBorderBrush" Color="#FF3399FF" />
 
@@ -148,13 +151,13 @@
         <SolidColorBrush x:Key="ExpanderLowerBorderMouseOver" Color="{DynamicResource LightExpanderLowerBorderMouseOver}" />
         <SolidColorBrush x:Key="ExpanderSideBorderMouseOver" Color="{DynamicResource LightExpanderSideBorderMouseOver}" />
 
-        <SolidColorBrush x:Key="AdbTextBoxUpperBorder" Color="{DynamicResource LightTextBoxUpperBorder}" />
-        <SolidColorBrush x:Key="AdbTextBoxLowerBorder" Color="{DynamicResource LightTextBoxLowerBorder}" />
-        <SolidColorBrush x:Key="AdbTextBoxBorderDisabled" Color="{DynamicResource LightTextBoxBorderDisabled}" />
-        <SolidColorBrush x:Key="AdbTextBoxBackgroundFocused" Color="{DynamicResource LightTextBoxBackgroundFocused}" />
-        <SolidColorBrush x:Key="AdbTextBoxBackgroundUnfocused" Color="{DynamicResource LightTextBoxBackgroundUnfocused}" />
-        <SolidColorBrush x:Key="AdbTextBoxBackgroundMouseOver" Color="{DynamicResource LightTextBoxBackgroundMouseOver}" />
-        <SolidColorBrush x:Key="AdbTextBoxBackgroundDisabled" Color="{DynamicResource LightTextBoxBackgroundDisabled}" />
+        <SolidColorBrush x:Key="AdbTextBoxUpperBorder" Color="{DynamicResource LightAdbTextBoxUpperBorder}" />
+        <SolidColorBrush x:Key="AdbTextBoxLowerBorder" Color="{DynamicResource LightAdbTextBoxLowerBorder}" />
+        <SolidColorBrush x:Key="AdbTextBoxBorderDisabled" Color="{DynamicResource LightAdbTextBoxBorderDisabled}" />
+        <SolidColorBrush x:Key="AdbTextBoxBackgroundFocused" Color="{DynamicResource LightAdbTextBoxBackgroundFocused}" />
+        <SolidColorBrush x:Key="AdbTextBoxBackgroundUnfocused" Color="{DynamicResource LightAdbTextBoxBackgroundUnfocused}" />
+        <SolidColorBrush x:Key="AdbTextBoxBackgroundMouseOver" Color="{DynamicResource LightAdbTextBoxBackgroundMouseOver}" />
+        <SolidColorBrush x:Key="AdbTextBoxBackgroundDisabled" Color="{DynamicResource LightAdbTextBoxBackgroundDisabled}" />
 
         <SolidColorBrush x:Key="AdbButtonBackgroundNormal" Color="{DynamicResource LightAdbButtonBackgroundNormal}" />
         <SolidColorBrush x:Key="AdbButtonBackgroundMouseOver" Color="{DynamicResource LightAdbButtonBackgroundMouseOver}" />
@@ -187,8 +190,10 @@
 
         <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="{DynamicResource LightHistoryDeviceBottomBorderBrush}" />
 
-        <SolidColorBrush x:Key="FileOpHyperLinkBrush" Color="{DynamicResource LightHyperLinkBrush}" />
+        <SolidColorBrush x:Key="FileOpHyperLinkBrush" Color="{DynamicResource LightFileOpHyperLinkBrush}" />
 
-        <SolidColorBrush x:Key="SponsorIconBrush" Color="{DynamicResource LightSponsorBrush}" />
+        <SolidColorBrush x:Key="SponsorIconBrush" Color="{DynamicResource LightSponsorIconBrush}" />
+
+        <SolidColorBrush x:Key="RootTitleBrush" Color="{DynamicResource LightRootTitleBrush}" />
     </ResourceDictionary>
 </ResourceDictionary>

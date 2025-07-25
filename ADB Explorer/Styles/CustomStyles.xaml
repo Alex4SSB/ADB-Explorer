@@ -811,7 +811,7 @@
         <Setter Property="Title" Value="{x:Static app_prop:AppGlobal.AppDisplayName}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRootActive}" Value="True">
-                <Setter Property="ui:TitleBar.Background" Value="OrangeRed" />
+                <Setter Property="ui:TitleBar.Background" Value="{DynamicResource RootTitleBrush}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
