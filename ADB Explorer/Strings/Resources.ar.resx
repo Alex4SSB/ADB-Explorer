@@ -127,13 +127,13 @@
     <value>انيميشنات التطبيق</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>علامه الحزمه مرخصه تحت رخصه apache الإصدار الثاني</value>
+    <value>علامه الحزمه مرخصه تحت رخصه apache الإصدار الثاني.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
-    <value>لم اتمكن من معرفه اصدار ADB من هذا الطريق</value>
+    <value>لم اتمكن من معرفه اصدار ADB من هذا الطريق.</value>
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
-    <value>اصدار ADB من هذا الطريق منخفض جداً</value>
+    <value>اصدار ADB من هذا الطريق منخفض جداً.</value>
   </data>
   <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
     <value>خطأ في الكتابه علي ADB</value>
@@ -181,7 +181,7 @@
     <value>خطأ في الاتصال</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>صلاحيه root لا يمكن تفعيلها من هذا الجهاز</value>
+    <value>صلاحيه root لا يمكن تفعيلها من هذا الجهاز.</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>صلاحيه root</value>
@@ -229,16 +229,16 @@
     <value>خطأ في قراءة الملف</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>لا يمكن سحب الملف لطلب قرأته</value>
+    <value>لا يمكن سحب الملف لطلب قرأته.</value>
   </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>خطأ في كتابه الملف</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>لا يمكن ارجاع الملف للجهاز</value>
+    <value>لا يمكن ارجاع الملف للجهاز.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>خادم ADB يحتاج لاعاده التشغيل لتعطيل mDNS</value>
+    <value>خادم ADB يحتاج لاعاده التشغيل لتعطيل mDNS.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>تعطيل mDNS</value>
@@ -277,10 +277,10 @@
     <value>تداخل التطبيقات</value>
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>مراقبه متصفح الملفات غير موجود نظراً لوجود تطبيقات مفعله</value>
+    <value>مراقبه متصفح الملفات غير موجود نظراً لوجود تطبيقات مفعله:</value>
   </data>
   <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
     <value>دفع/سحب التحميل معروض بصيغه bytes الكليه المحوله.
-النسبه موضحه فقط حين معرفه الحجم الكلي</value>
+النسبه موضحه فقط حين معرفه الحجم الكلي.</value>
   </data>
 </root>
