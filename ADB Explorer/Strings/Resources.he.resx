@@ -1389,4 +1389,37 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_FILE_TYPE_EXE" xml:space="preserve">
     <value>קובץ הרצה של וינדוס</value>
   </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>‎{0} GB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>‎{0} MB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>‎{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>‎{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>‎{0} EB</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>‎{0} KB</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>‎{0} B</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>נתיב נתוני אפליקציה מותאם אישית</value>
+  </data>
 </root>
