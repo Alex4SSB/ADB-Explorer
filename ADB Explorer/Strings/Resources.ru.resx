@@ -1290,7 +1290,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Добавить текущее местоположение</value>
   </data>
   <data name="S_REMOVE" xml:space="preserve">
-    <value>Удалить</value>
+    <value>Стереть</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Сохранённые местоположения</value>
@@ -1303,5 +1303,126 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Ошибка пути</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>Monitoring File Explorer позволяет приложению выполнять операции Drag / Clipboard Pull напрямую в целевую папку.
+
+В противном случае Pull выполняется во временную папку приложения, откуда File Explorer получает файл в виде потока, что требует использования небольшого буфера.
+Эти два дополнительных шага значительно замедляют процесс.
+
+Функция автоматически отключается для других выбранных файловых менеджеров.</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>В приложении используется множество анимаций, включённых как часть Fluent Design.
+Анимация боковых панелей всегда отключается, когда окно приложения развёрнуто на втором мониторе.
+
+• Если включить эту настройку, отключатся все анимации приложения, кроме индикаторов загрузки (progress bars, progress rings) и шкал использования диска.</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Выберите Запустить, если ADB уже авторизован в WSA.
+Чтобы разрешить ADB, откройте расширенные настройки WSA.</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Лицензия Creative Commons (CC)</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} является родительской папкой для целевой директории.</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Прекращать опрос при передаче файлов</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Автообновление медиатеки после копирования</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Принудительные стили</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Включить авто воспроизведение</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Отключить авто воспроизведение
+Отмена всех запусков</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Режим опроса служб: ВЫКЛ&lt;LineBreak /&gt;• Сервер &lt;Italic&gt;возможно&lt;/Italic&gt; активен&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Нажмите, чтобы включить сервер и опрос</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Сброс</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Соблюдение правил именования Unix (через ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования Windows</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования корневых дисков Windows</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Уникальность в текущем местоположении</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования корня диска Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Некоторые выбранные файлы имеют противоречивые имена в FUSE / Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Некоторые скопированные файлы имеют противоречивые имена в FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Скопированный файл нарушает правила именования FUSE</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Устройство Char</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} КБ</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} МБ</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} ГБ</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>ТБ</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} ПБ</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} ЕБ</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>м</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>микро</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>нано</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} БАЙТ</value>
   </data>
 </root>
