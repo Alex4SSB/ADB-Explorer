@@ -391,7 +391,7 @@
     <value>ניתוב ההתקדמות</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>שגיאה בקבלת תוכן התיקיה</value>
+    <value>שגיאה בקבלת תוכן התיקייה</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>הורדה לראשית כונן במחשב</value>
@@ -544,10 +544,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>קובץ חדש</value>
   </data>
   <data name="S_NEW_FOLDER" xml:space="preserve">
-    <value>תיקיה חדשה</value>
+    <value>תיקייה חדשה</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
-    <value>אירעה שגיאה בניסיון לקבל את תוכן התיקיה.
+    <value>אירעה שגיאה בניסיון לקבל את תוכן התיקייה.
 התוכן המוצג עלול להיות חלקי.</value>
   </data>
   <data name="S_PASTE_ANCESTOR" xml:space="preserve">
@@ -845,7 +845,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>חדש</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
-    <value>תיקיה</value>
+    <value>תיקייה</value>
   </data>
   <data name="S_MENU_FILE" xml:space="preserve">
     <value>קובץ</value>
@@ -917,7 +917,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>פריטים</value>
   </data>
   <data name="S_FOLDER_EMPTY" xml:space="preserve">
-    <value>התיקיה ריקה.</value>
+    <value>התיקייה ריקה.</value>
   </data>
   <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
     <value>לא ניתן לקבל את הרשימה.</value>
@@ -1160,7 +1160,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>קובץ שהועתקו אינו עומד בחוקי שם קובץ FUSE</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
-    <value>פריט שנבחר אינו קובץ / תיקיה</value>
+    <value>פריט שנבחר אינו קובץ / תיקייה</value>
   </data>
   <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
     <value>ניתן לשינוי ע"י איפוס הגדרות התוכנה, או ידנית בקובץ ההגדרות</value>
