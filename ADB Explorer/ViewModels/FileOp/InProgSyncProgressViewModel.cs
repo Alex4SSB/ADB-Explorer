@@ -21,7 +21,7 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
 
     public ulong? TotalBytesTransferred => adbInfo?.TotalBytesTransferred;
 
-    public string TotalBytes => TotalBytesTransferred?.ToSize();
+    public string TotalBytes => TotalBytesTransferred?.BytesToSize();
 
     public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
 

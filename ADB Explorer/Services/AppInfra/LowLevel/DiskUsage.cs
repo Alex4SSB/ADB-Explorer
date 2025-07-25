@@ -40,7 +40,7 @@ public class DiskUsage : ViewModelBase
     }
 
     public bool IsReadActive => ReadRate > AdbExplorerConst.DISK_READ_THRESHOLD && ReadRate < AdbExplorerConst.MAX_DISK_DISPLAY_RATE;
-    public string ReadString => (ReadRate is null || ReadRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : ReadRate.Value).ToSize(true) + "/s";
+    public string ReadString => (ReadRate is null || ReadRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : ReadRate.Value).BytesToSize(true) + "/s";
 
     private ulong? writeRate;
     public ulong? WriteRate
@@ -57,7 +57,7 @@ public class DiskUsage : ViewModelBase
     }
 
     public bool IsWriteActive => WriteRate > AdbExplorerConst.DISK_READ_THRESHOLD && WriteRate < AdbExplorerConst.MAX_DISK_DISPLAY_RATE;
-    public string WriteString => (WriteRate is null || WriteRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : WriteRate.Value).ToSize(true) + "/s";
+    public string WriteString => (WriteRate is null || WriteRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : WriteRate.Value).BytesToSize(true) + "/s";
 
     private ulong? otherRate;
     public ulong? OtherRate
@@ -72,7 +72,7 @@ public class DiskUsage : ViewModelBase
         }
     }
 
-    public string OtherString => (OtherRate is null || OtherRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : OtherRate.Value).ToSize(true) + "/s";
+    public string OtherString => (OtherRate is null || OtherRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : OtherRate.Value).BytesToSize(true) + "/s";
 
     public DiskUsage(Process process, ulong? readRate = null, ulong? writeRate = null, ulong? otherRate = null, DateTime? time = null)
     {

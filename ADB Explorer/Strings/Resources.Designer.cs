@@ -61,6 +61,87 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} B.
+        /// </summary>
+        public static string BYTES {
+            get {
+                return ResourceManager.GetString("BYTES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} EB.
+        /// </summary>
+        public static string EXA {
+            get {
+                return ResourceManager.GetString("EXA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} GB.
+        /// </summary>
+        public static string GIGA {
+            get {
+                return ResourceManager.GetString("GIGA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} KB.
+        /// </summary>
+        public static string KILO {
+            get {
+                return ResourceManager.GetString("KILO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} MB.
+        /// </summary>
+        public static string MEGA {
+            get {
+                return ResourceManager.GetString("MEGA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to u.
+        /// </summary>
+        public static string MICRO {
+            get {
+                return ResourceManager.GetString("MICRO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to m.
+        /// </summary>
+        public static string MILLI {
+            get {
+                return ResourceManager.GetString("MILLI", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to n.
+        /// </summary>
+        public static string NANO {
+            get {
+                return ResourceManager.GetString("NANO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} PB.
+        /// </summary>
+        public static string PETA {
+            get {
+                return ResourceManager.GetString("PETA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Hide.
         /// </summary>
         public static string S_ACTION_HIDE {
@@ -3831,6 +3912,15 @@ namespace ADB_Explorer.Strings {
         public static string ScrollBar_ScrollToTopCommand {
             get {
                 return ResourceManager.GetString("ScrollBar_ScrollToTopCommand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TB.
+        /// </summary>
+        public static string TERA {
+            get {
+                return ResourceManager.GetString("TERA", resourceCulture);
             }
         }
     }

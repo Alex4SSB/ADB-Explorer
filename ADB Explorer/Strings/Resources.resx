@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1701,5 +1701,45 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Saved Locations</value>
     <comment>The tooltip of the button used to open the saved locations menu</comment>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+    <comment>The notation for KiloBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+    <comment>The notation for MegaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+    <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>TB</value>
+    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+    <comment>The notation for PetaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+    <comment>The notation for ExaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+    <comment>The notation for milli (Ampere) when displaying battery usage</comment>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+    <comment>The notation for micro (Ampere) when displaying battery usage</comment>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+    <comment>The notation for nano (Ampere) when displaying battery usage</comment>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+    <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
 </root>

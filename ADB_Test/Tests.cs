@@ -32,7 +32,7 @@ namespace ADB_Test
 
             foreach (var item in testVals)
             {
-                Assert.IsTrue(item.Key.ToSize() == item.Value);
+                Assert.IsTrue(item.Key.BytesToSize() == item.Value);
             }
 
         }

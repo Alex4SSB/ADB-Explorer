@@ -81,7 +81,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock Style="{StaticResource TextBlockStyle}">
+                <TextBlock NumberSubstitution.Substitution="European" Style="{StaticResource TextBlockStyle}" TextTrimming="CharacterEllipsis">
                     <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
                             <Binding Path="Available" />

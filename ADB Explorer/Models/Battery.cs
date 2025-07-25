@@ -189,7 +189,7 @@ public class Battery : ViewModelBase
             var perHourConsumption = currentDiff / timeDiff.TotalHours;
             var positive = perHourConsumption > 0;
 
-            return string.Format(Strings.Resources.S_BAT_BALANCE, $"{(positive ? "+" : "")}{(perHourConsumption / 1000000).ToSize()}");
+            return string.Format(Strings.Resources.S_BAT_BALANCE, $"{(positive ? "+" : "")}{(perHourConsumption / 1000000).AmpsToSize()}");
         }
     }
 
