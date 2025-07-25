@@ -50,6 +50,15 @@
                     <Setter Property="ToolTip">
                         <Setter.Value>
                             <ui:SimpleStackPanel Spacing="4">
+                                <ui:SimpleStackPanel.Style>
+                                    <Style TargetType="ui:SimpleStackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=UICulture.TextInfo.IsRightToLeft, Mode=OneTime}" Value="True">
+                                                <Setter Property="FlowDirection" Value="RightToLeft" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ui:SimpleStackPanel.Style>
                                 <TextBlock Text="{Binding BatteryStateString}" />
                                 <TextBlock Text="{Binding BatteryHealthString}" />
                                 <TextBlock Text="{Binding VoltageString}" />
