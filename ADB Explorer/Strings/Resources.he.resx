@@ -235,16 +235,16 @@
     <value>השרת פועל</value>
   </data>
   <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>{0}שע'</value>
+    <value>­{0}שע'</value>
   </data>
   <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
     <value>{0}מילי'</value>
   </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
-    <value>מתח: v{0}</value>
+    <value>מתח: ‏‎{0}v</value>
   </data>
   <data name="S_BAT_TEMP" xml:space="preserve">
-    <value>טמפרטורה: °C{0}</value>
+    <value>טמפרטורה: ‎{0}°C</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>תמיכה חלקית</value>
@@ -289,7 +289,7 @@
     <value>טעינה מרשת החשמל</value>
   </data>
   <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
-    <value>{0}%, בטעינה</value>
+    <value>%{0}, בטעינה</value>
   </data>
   <data name="S_MINUTES_SHORT" xml:space="preserve">
     <value>{0}דק'</value>
@@ -316,7 +316,7 @@
     <value>טעינה אלחוטית</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>מאזן זרם: {0}Ah</value>
+    <value>מאזן זרם: ‎{0}Ah</value>
   </data>
   <data name="S_COLUMN_SIZE" xml:space="preserve">
     <value>גודל</value>
@@ -1292,7 +1292,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>עדכון</value>
   </data>
   <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
-    <value>{0}% בשימוש</value>
+    <value>%{0} בשימוש</value>
   </data>
   <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
     <value>גלול לכאן</value>
