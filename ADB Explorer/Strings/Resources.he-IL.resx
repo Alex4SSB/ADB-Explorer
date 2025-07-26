@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -129,59 +129,29 @@
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>השימוש בסמל ה-APK נעשה תחת רישיון Apache, גירסה 2.0.</value>
   </data>
-  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>גרסת תוכנה חדשה</value>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>לא ניתן לקרוא גרסת ADB מהנתיב שסופק.</value>
   </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>קריאייטיב קומונס</value>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>גרסת ADB מהנתיב שסופק נמוכה מדי.</value>
   </data>
-  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>צַמד או חבּר מכשיר WiFi (ללא mDNS)</value>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>כשל בהחלפת ADB</value>
   </data>
-  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>גישת root</value>
-  </data>
-  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>שגיאת יצירה</value>
-  </data>
-  <data name="S_INSTALL_APK" xml:space="preserve">
-    <value>בחירת חבילות להתקנה</value>
-  </data>
-  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
-    <value>אישור הסרה</value>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>בחירת קובץ הרצה של ADB</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
     <value>איפוס הגדרות היישום</value>
   </data>
-  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
-    <value>פעולות קבצים</value>
-  </data>
-  <data name="S_PUSH_PKG" xml:space="preserve">
-    <value>הַתקן חבילות</value>
-  </data>
-  <data name="S_RESTART_APP" xml:space="preserve">
-    <value>הפעל את היישום מחדש להחלת השינויים</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>שגיאה בכתיבת קובץ</value>
-  </data>
-  <data name="S_COPY_APK_NAME" xml:space="preserve">
-    <value>העתק שם חבילה</value>
-  </data>
-  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>שגיאה בקריאת קובץ</value>
-  </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>כיבוי ה-mDNS דורש הפעלה מחדש של שרת ה-ADB.</value>
-  </data>
-  <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>רוקן סל מיחזור</value>
-  </data>
-  <data name="S_DEST_ERR" xml:space="preserve">
-    <value>שגיאה בנתיב היעד</value>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>גרסת תוכנה חדשה</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
     <value>שגיאת ניווט</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>העתק שם חבילה</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
     <value>העתק נתיב פריט</value>
@@ -189,11 +159,17 @@
   <data name="S_RESTORE_ALL" xml:space="preserve">
     <value>שחזר את כל הפריטים</value>
   </data>
-  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
-    <value>בחירת קובץ הרצה של ADB</value>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>רוקן סל מיחזור</value>
   </data>
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>מחק</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>שגיאה בנתיב היעד</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>שגיאה בהתחברות אל</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>שגיאת התחברות</value>
@@ -204,8 +180,32 @@
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>שגיאת צימוד</value>
   </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>לא ניתן לאפשר גישת root במכשיר שנבחר.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>גישת root</value>
+  </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>אישור מחיקה</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>מחק לצמיתות</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>שגיאת יצירה</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>שגיאות בשיחזור</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>אישור הסרה</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>בחירת חבילות להתקנה</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>הרוג את האימולטור</value>
   </data>
   <data name="S_REM_HIST_DEV" xml:space="preserve">
     <value>הסר מכשיר</value>
@@ -213,146 +213,32 @@
   <data name="S_REM_DEV" xml:space="preserve">
     <value>נַתק מכשיר</value>
   </data>
-  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
-    <value>גרסת ADB מהנתיב שסופק נמוכה מדי.</value>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>פעולות קבצים</value>
   </data>
-  <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>לא ניתן לאפשר גישת root במכשיר שנבחר.</value>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>הַתקן חבילות</value>
   </data>
-  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
-    <value>לא ניתן לקרוא גרסת ADB מהנתיב שסופק.</value>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>צַמד או חבּר מכשיר WiFi (ללא mDNS)</value>
   </data>
-  <data name="S_PERM_DEL" xml:space="preserve">
-    <value>מחק לצמיתות</value>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>הפעל את היישום מחדש להחלת השינויים</value>
   </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>שגיאה בהתחברות אל</value>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>שגיאה בקריאת קובץ</value>
   </data>
-  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
-    <value>מיקום מקורי</value>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>לא ניתן להוריד את הקובץ לקריאה.</value>
   </data>
-  <data name="S_MDNS_ON" xml:space="preserve">
-    <value>השרת פועל</value>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>שגיאה בכתיבת קובץ</value>
   </data>
-  <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>­{0}שע'</value>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>לא ניתן להעלות את הקובץ חזרה למכשיר.</value>
   </data>
-  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0}מילי'</value>
-  </data>
-  <data name="S_BAT_VOLT" xml:space="preserve">
-    <value>מתח: ‏‎{0}v</value>
-  </data>
-  <data name="S_BAT_TEMP" xml:space="preserve">
-    <value>טמפרטורה: ‎{0}°C</value>
-  </data>
-  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
-    <value>תמיכה חלקית</value>
-  </data>
-  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
-    <value>טובה</value>
-  </data>
-  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
-    <value>חמה מדי</value>
-  </data>
-  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
-    <value>מתח גבוה מדי</value>
-  </data>
-  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
-    <value>תקלה לא ידועה</value>
-  </data>
-  <data name="S_BAT_STATUS" xml:space="preserve">
-    <value>מצב: {0}</value>
-  </data>
-  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
-    <value>לא בטעינה</value>
-  </data>
-  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
-    <value>לא ידוע</value>
-  </data>
-  <data name="S_BAT_STATE_FULL" xml:space="preserve">
-    <value>סוללה מלאה</value>
-  </data>
-  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
-    <value>בטעינה</value>
-  </data>
-  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
-    <value>בפריקה</value>
-  </data>
-  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
-    <value>מצב הסוללה לא ידוע</value>
-  </data>
-  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
-    <value>אין מקור טעינה</value>
-  </data>
-  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
-    <value>טעינה מרשת החשמל</value>
-  </data>
-  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
-    <value>%{0}, בטעינה</value>
-  </data>
-  <data name="S_MINUTES_SHORT" xml:space="preserve">
-    <value>{0}דק'</value>
-  </data>
-  <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0}שנ'</value>
-  </data>
-  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
-    <value>תאריך שינוי</value>
-  </data>
-  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
-    <value>מתה</value>
-  </data>
-  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
-    <value>קרה</value>
-  </data>
-  <data name="S_BAT_HEALTH" xml:space="preserve">
-    <value>בריאות: {0}</value>
-  </data>
-  <data name="S_COLUMN_VERSION" xml:space="preserve">
-    <value>גרסה</value>
-  </data>
-  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
-    <value>טעינה אלחוטית</value>
-  </data>
-  <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>מאזן זרם: ‎{0}Ah</value>
-  </data>
-  <data name="S_COLUMN_SIZE" xml:space="preserve">
-    <value>גודל</value>
-  </data>
-  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
-    <value>תאריך מחיקה</value>
-  </data>
-  <data name="S_COLUMN_TYPE" xml:space="preserve">
-    <value>סוג</value>
-  </data>
-  <data name="S_COLUMN_SOURCE" xml:space="preserve">
-    <value>מקור</value>
-  </data>
-  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
-    <value>שם קובץ</value>
-  </data>
-  <data name="S_COLUMN_NAME" xml:space="preserve">
-    <value>שם</value>
-  </data>
-  <data name="S_COLUMN_ICON" xml:space="preserve">
-    <value>אייקון</value>
-  </data>
-  <data name="S_COLUMN_ADDED" xml:space="preserve">
-    <value>התווסף</value>
-  </data>
-  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
-    <value>יעד</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>כשל בהחלפת ADB</value>
-  </data>
-  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>שגיאות בשיחזור</value>
-  </data>
-  <data name="S_REM_EMU" xml:space="preserve">
-    <value>הרוג את האימולטור</value>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>כיבוי ה-mDNS דורש הפעלה מחדש של שרת ה-ADB.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>כבה שרת mDNS</value>
@@ -363,23 +249,17 @@
   <data name="S_PULL_ACTION" xml:space="preserve">
     <value>הורד</value>
   </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>לא ניתן להעלות את הקובץ חזרה למכשיר.</value>
-  </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>לא ניתן להוריד את הקובץ לקריאה.</value>
-  </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
     <value>הורד (את יעד הקישור)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>שחזר</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>פרוס את AdbProgressRedirection.exe</value>
-  </data>
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>ניטור סייר הקבצים</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>פרוס את AdbProgressRedirection.exe</value>
   </data>
   <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
     <value>שימוש בדיסק בלבד</value>
@@ -459,11 +339,11 @@
   <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
     <value>תוכנת עזר עבור קריאת ההתקדמות של הורדות והעלאות מ-ADB.</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>מועתק ל ‎%LocalAppData%\AdbExplorer</value>
-  </data>
   <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
     <value>עלול להיות מזוהה כאיום בשגגה ע"י תוכנות אנטי-וירוס מסויימות.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>מועתק ל ‎%LocalAppData%\AdbExplorer</value>
   </data>
   <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
     <value>בחר אופציה כדי להציג הסבר</value>
@@ -545,6 +425,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_NEW_FOLDER" xml:space="preserve">
     <value>תיקייה חדשה</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>קריאייטיב קומונס</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>אירעה שגיאה בניסיון לקבל את תוכן התיקייה.
@@ -937,17 +820,56 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>סוג פעולה</value>
   </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>שם קובץ</value>
+  </data>
   <data name="S_COLUMN_PROGRESS" xml:space="preserve">
     <value>התקדמות</value>
   </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>מקור</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>יעד</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>התווסף</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>אייקון</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>שם</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>מיקום מקורי</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>תאריך שינוי</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>סוג</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>גודל</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>תאריך מחיקה</value>
+  </data>
   <data name="S_COLUMN_USER_ID" xml:space="preserve">
     <value>משתמש</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>גרסה</value>
   </data>
   <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
     <value>שרת ADB אינו מגיב</value>
   </data>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
     <value>זמן מהתשובה האחרונה מהשרת</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}שנ'</value>
   </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
     <value>הרוג את השרת</value>
@@ -967,11 +889,26 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>ממתין לתשובה: {0}</value>
   </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}מילי'</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}דק'</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>­{0}שע'</value>
+  </data>
   <data name="S_MDNS_OFF" xml:space="preserve">
     <value>&lt;Span&gt;• הסריקה אחר שירותי mDNS מבוטלת&lt;LineBreak /&gt;• השרת &lt;Italic&gt;עלול&lt;/Italic&gt; להיות פעיל&lt;/Span&gt;</value>
   </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>לחצו כדי לאפשר את השרת והסריקה</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>השרת פועל</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>תמיכה חלקית</value>
   </data>
   <data name="S_FAILED_OPERATIONS" xml:space="preserve">
     <value>פעולות מסויימות נכשלו</value>
@@ -982,14 +919,23 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
     <value>גישת Root מוכנה להפעלה</value>
   </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>מצב Recovery</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>מתח: ‏‎{0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>טמפרטורה: ‎{0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>מאזן זרם: ‎{0}Ah</value>
+  </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>הפעל מחדש לתוך</value>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
     <value>מערכת</value>
-  </data>
-  <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>מצב Recovery</value>
   </data>
   <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
     <value>מצב Bootloader</value>
@@ -1020,6 +966,60 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_TYPE_WSA" xml:space="preserve">
     <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>מצב הסוללה לא ידוע</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>%{0}, בטעינה</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>טעינה אלחוטית</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>טעינה מרשת החשמל</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>אין מקור טעינה</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>לא ידוע</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>בטעינה</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>בפריקה</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>לא בטעינה</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>סוללה מלאה</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>מצב: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>בריאות: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>טובה</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>חמה מדי</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>מתה</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>מתח גבוה מדי</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>תקלה לא ידועה</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>קרה</value>
   </data>
   <data name="S_BUTTON_LAUNCH" xml:space="preserve">
     <value>הפעל</value>
@@ -1072,6 +1072,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>חבילת אפליקציה של אנדרואיד</value>
   </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>קובץ הרצה של וינדוס</value>
+  </data>
   <data name="S_DRIVE_TRASH" xml:space="preserve">
     <value>פח מחזור</value>
   </data>
@@ -1116,6 +1119,9 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
     <value>הנתיב שסופק אינו קיים.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>נתיב נתוני אפליקציה מותאם אישית</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>התפריט ריק</value>
@@ -1386,14 +1392,14 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>מיקומים שמורים</value>
   </data>
-  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
-    <value>קובץ הרצה של וינדוס</value>
-  </data>
-  <data name="GIGA" xml:space="preserve">
-    <value>‎{0} GB</value>
+  <data name="KILO" xml:space="preserve">
+    <value>‎{0} KB</value>
   </data>
   <data name="MEGA" xml:space="preserve">
     <value>‎{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>‎{0} GB</value>
   </data>
   <data name="TERA" xml:space="preserve">
     <value>‎{0} TB</value>
@@ -1404,22 +1410,34 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="EXA" xml:space="preserve">
     <value>‎{0} EB</value>
   </data>
-  <data name="KILO" xml:space="preserve">
-    <value>‎{0} KB</value>
-  </data>
-  <data name="BYTES" xml:space="preserve">
-    <value>‎{0} B</value>
-  </data>
-  <data name="NANO" xml:space="preserve">
-    <value>n</value>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
   </data>
   <data name="MICRO" xml:space="preserve">
     <value>u</value>
   </data>
-  <data name="MILLI" xml:space="preserve">
-    <value>m</value>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
   </data>
-  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>נתיב נתוני אפליקציה מותאם אישית</value>
+  <data name="BYTES" xml:space="preserve">
+    <value>‎{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>העתק {0} פריט(ים)</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>העתק {0} פריט(ים) ל {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>העבר {0} פריט(ים) ל {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>צור קישור ב {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>העבר {0} פריט(ים)</value>
+  </data>
+  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
+    <value>האזור מוסתר - יש לפתוח את חלון הסייר מחדש.</value>
   </data>
 </root>
