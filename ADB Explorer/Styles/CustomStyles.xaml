@@ -300,6 +300,9 @@
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
                 <Setter Property="Visibility" Value="Hidden" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="ItemsCountContainerStyle" TargetType="StackPanel">
@@ -311,6 +314,16 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Visibility" Value="Hidden" />
             </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="SelectedItemsCountContainerStyle" TargetType="StackPanel">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
+                <Setter Property="Visibility" Value="Hidden" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style

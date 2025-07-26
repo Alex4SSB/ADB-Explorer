@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using System.Windows.Automation;
+using System.Windows.Documents;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Services.NativeMethods;
 
@@ -45,6 +46,7 @@ public partial class DragWindow : INotifyPropertyChanged
     private DateTime lastUpdate;
     private bool waitingForUpdate = false;
     private bool imageEmpty = false;
+    private readonly SolidColorBrush blueBrush = new(Colors.DodgerBlue);
 
     private void GetPathUnderMouse()
     {
@@ -61,9 +63,9 @@ public partial class DragWindow : INotifyPropertyChanged
 
         App.Current.Dispatcher.Invoke(() =>
         {
+            DragTooltip.Inlines.Clear();
             if (Data.CopyPaste.DragFiles.Length == 0 || Data.CopyPaste.CurrentDropEffect is DragDropEffects.None)
             {
-                DragTooltip.Text = "";
                 return;
             }
 
@@ -81,7 +83,7 @@ public partial class DragWindow : INotifyPropertyChanged
                     {
                         IsDropAllowed = true;
                         IsObstructed = true;
-                        DragTooltip.Text = "Area obstructed - reopen Explorer window.";
+                        DragTooltip.Inlines.Add(Strings.Resources.S_DRAGDROP_OBSTRUCTED);
                         return;
                     }
                     IsObstructed = false;
@@ -108,7 +110,7 @@ public partial class DragWindow : INotifyPropertyChanged
                         if (displayName.Count(c => c == '\\') > 1)
                             displayName = Data.RuntimeSettings.PathUnderMouse.ParsingName;
 
-                        explorerTarget = " to " + FileHelper.GetShortFileName(displayName, 30);
+                        explorerTarget = FileHelper.GetShortFileName(displayName, 30);
                     }
                 }
                 catch
@@ -133,18 +135,41 @@ public partial class DragWindow : INotifyPropertyChanged
                     && !Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
                     && !Keyboard.Modifiers.HasFlag(ModifierKeys.Alt))
                 {
-                    DragTooltip.Text = "";
                     return;
                 }
 
-                target = " to " + FileHelper.GetFullName(Data.CopyPaste.DropTarget);
+                target = FileHelper.GetFullName(Data.CopyPaste.DropTarget);
             }
             else
             {
                 target = explorerTarget;
             }
 
-            DragTooltip.Text = $" {Data.CopyPaste.DragFiles.Length} item(s){target}";
+            var format = "";
+            if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Link)
+                format = Strings.Resources.S_DRAGDROP_LINK;
+            else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
+            {
+                format = string.IsNullOrEmpty(target)
+                    ? Strings.Resources.S_DRAGDROP_MOVE
+                    : Strings.Resources.S_DRAGDROP_MOVE_TARGET;
+            }
+            else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Copy)
+            {
+                format = string.IsNullOrEmpty(target)
+                    ? Strings.Resources.S_DRAGDROP_COPY
+                    : Strings.Resources.S_DRAGDROP_COPY_TARGET;
+            }
+            
+            var result = string.Format(format, string.IsNullOrEmpty(target)
+                ? [Data.CopyPaste.DragFiles.Length]
+                : [Data.CopyPaste.DragFiles.Length, target]);
+
+            var split = result.Split(target);
+
+            DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+            if (split.Length > 1)
+                DragTooltip.Inlines.Add(target);
         });
     }
 

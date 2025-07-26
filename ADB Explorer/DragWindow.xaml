@@ -117,8 +117,7 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="30" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <ui:FontIcon
                         Width="16"
@@ -174,27 +173,8 @@
                         </ui:FontIcon.Style>
                     </ui:FontIcon>
                     <TextBlock
-                        x:Name="DropEffect"
-                        Grid.Column="1"
-                        HorizontalAlignment="Center"
-                        Foreground="DodgerBlue"
-                        Text="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsObstructed}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
-                    <TextBlock
                         x:Name="DragTooltip"
-                        Grid.Column="2"
+                        Grid.Column="1"
                         Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}"
                         TextWrapping="Wrap">
                         <TextBlock.Style>

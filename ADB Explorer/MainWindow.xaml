@@ -483,23 +483,17 @@
                             Style="{StaticResource UnfinishedTextblockStyle}"
                             Text=" *" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel.Style>
-                            <Style TargetType="StackPanel">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
-                                        <Setter Property="Visibility" Value="Hidden" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </StackPanel.Style>
-                        <Separator />
+                    <Separator Visibility="{Binding ElementName=SelectedItemsCountContainer, Path=Visibility}" />
+                    <StackPanel
+                        x:Name="SelectedItemsCountContainer"
+                        Orientation="Horizontal"
+                        Style="{StaticResource SelectedItemsCountContainerStyle}">
                         <TextBlock x:Name="SelectedItemsBlock" Style="{StaticResource SelectedItemsStyle}" />
                         <TextBlock Text=" " />
                         <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
                         <TextBlock
                             x:Name="TotalSizeBlock"
-                            Margin="6,4"
+                            Margin="6,4,0,4"
                             Style="{StaticResource TotalSizeStyle}"
                             Text="{Binding ElementName=MainWin, Path=SelectedFilesTotalSize}" />
                     </StackPanel>

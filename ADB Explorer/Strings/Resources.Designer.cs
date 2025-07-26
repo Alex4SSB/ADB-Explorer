@@ -1335,6 +1335,60 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy {0} item(s).
+        /// </summary>
+        public static string S_DRAGDROP_COPY {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy {0} item(s) to {1}.
+        /// </summary>
+        public static string S_DRAGDROP_COPY_TARGET {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Create link in {0}.
+        /// </summary>
+        public static string S_DRAGDROP_LINK {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_LINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move {0} item(s).
+        /// </summary>
+        public static string S_DRAGDROP_MOVE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move {0} item(s) to {1}.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE_TARGET {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Area obstructed - reopen Explorer window..
+        /// </summary>
+        public static string S_DRAGDROP_OBSTRUCTED {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_OBSTRUCTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to APK Installer.
         /// </summary>
         public static string S_DRIVE_APK_ITEMS {

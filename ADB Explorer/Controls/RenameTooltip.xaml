@@ -17,6 +17,15 @@
         BorderThickness="1"
         Style="{StaticResource BorderStyle}">
         <Grid Margin="4">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                            <Setter Property="FlowDirection" Value="RightToLeft" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="4" />
