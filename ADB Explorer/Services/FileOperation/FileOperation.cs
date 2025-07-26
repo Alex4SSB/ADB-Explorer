@@ -117,7 +117,7 @@ public abstract class FileOperation : ViewModelBase
 
     #region Read-only Properties
 
-    public string Time => TimeStamp.ToLongTimeString().Replace("\u200F", "");
+    public string Time => TabularDateFormatter.Format(TimeStamp, Thread.CurrentThread.CurrentCulture);
 
     public FileOpFilter.FilterType Filter
     {

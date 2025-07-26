@@ -275,6 +275,7 @@
                                 <DataGridTextColumn.ElementStyle>
                                     <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                         <Setter Property="Text" Value="{Binding SizeString}" />
+                                        <Setter Property="HorizontalAlignment" Value="Right" />
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
                                             <MultiDataTrigger>

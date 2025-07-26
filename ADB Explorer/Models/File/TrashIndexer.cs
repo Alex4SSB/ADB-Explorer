@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Services;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
 
 namespace ADB_Explorer.Models;
@@ -26,7 +27,7 @@ public class TrashIndexer : ViewModelBase
         set => Set(ref dateModified, value);
     }
 
-    public string ModifiedTimeString => DateModified?.ToString(CultureInfo.CurrentCulture.DateTimeFormat);
+    public string ModifiedTimeString => TabularDateFormatter.Format(DateModified, Thread.CurrentThread.CurrentCulture);
 
     public string IndexerPath => $"{AdbExplorerConst.RECYCLE_PATH}/.{RecycleName}{AdbExplorerConst.RECYCLE_INDEX_SUFFIX}";
 
