@@ -74,16 +74,30 @@ public partial class ADBService
     {
         using var cmdProcess = StartCommandProcess(file, cmd, encoding, args: args);
 
-        using var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync(cancellationToken);
-        using var stderrTask = cmdProcess.StandardError.ReadToEndAsync(cancellationToken);
+        var stdoutTask = cmdProcess.StandardOutput.ReadToEndAsync();
+        var stderrTask = cmdProcess.StandardError.ReadToEndAsync();
         
-        using var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
+        var processTask = cmdProcess.WaitForExitAsync(cancellationToken);
 
-        Task.WaitAll([stdoutTask, stderrTask, processTask], cancellationToken);
+        try
+        {
+            Task.WaitAll([stdoutTask, stderrTask, processTask], cancellationToken);
 
-        stdout = stdoutTask.Result;
-        stderr = stderrTask.Result;
-        return cmdProcess.ExitCode;
+            stdout = stdoutTask.Result;
+            stderr = stderrTask.Result;
+            return cmdProcess.ExitCode;
+        }
+        catch (OperationCanceledException)
+        {
+            processTask = null;
+            stdoutTask = null;
+            stderrTask = null;
+
+            stdout = "";
+            stderr = "";
+
+            return -1;
+        }
     }
 
     public static int ExecuteAdbCommand(string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
@@ -136,14 +150,14 @@ public partial class ADBService
         string stderr = "";
         cmdProcess.OutputDataReceived += (sender, e) =>
         {
-            if (e.Data is null)
-            {
-                outputQueue.CompleteAdding();
-            }
-            else
-            {
-                outputQueue.Add(e.Data, cancellationToken);
-            }
+                if (e.Data is null)
+                {
+                    outputQueue.CompleteAdding();
+                }
+                else
+                {
+                    outputQueue.Add(e.Data, cancellationToken);
+                }
 
             RuntimeSettings.LastServerResponse = DateTime.Now;
         };

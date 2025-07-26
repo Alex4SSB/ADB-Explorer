@@ -258,11 +258,11 @@ public abstract class FileOperation : ViewModelBase
         FilePath = filePath;
 
         SourceAction = new(
-            () => IsSourceNavigable,
+            () => IsSourceNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(false));
 
         TargetAction = new(
-            () => IsTargetNavigable,
+            () => IsTargetNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(true));
 
         Device.Device.PropertyChanged += Device_PropertyChanged;

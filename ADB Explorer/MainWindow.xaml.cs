@@ -464,10 +464,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     Dispatcher.Invoke(() => _navigateToPath(CurrentPath));
                     FileActions.RefreshPackages = false;
                 }
+
                 break;
 
             case nameof(FileActionsEnable.ExplorerFilter):
                 FilterExplorerItems();
+
                 break;
 
             case nameof(FileActionsEnable.ItemToSelect):
@@ -478,11 +480,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     ExplorerGrid.ScrollIntoView(FileActions.ItemToSelect);
                     ExplorerGrid.SelectedItem = FileActions.ItemToSelect;
                 }
+
                 break;
 
             case nameof(FileActionsEnable.PasteEnabled):
                 FilterFileActions();
                 FilterExplorerContextMenu();
+
                 break;
         }
     }
@@ -755,8 +759,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (file.Type is FileType.Folder)
         {
-            bfNavigation = false;
-            NavigateToPath(file);
+            if (!FileActions.ListingInProgress)
+            {
+                bfNavigation = false;
+                NavigateToPath(file);
+            }
 
             return;
         }
@@ -1175,12 +1182,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void Window_MouseUp(object sender, MouseButtonEventArgs e) => e.Handled = e.ChangedButton switch
+    private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (FileActions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        e.Handled = e.ChangedButton switch
         {
             MouseButton.XButton1 => NavHistory.NavigateBF(Navigation.SpecialLocation.Back),
             MouseButton.XButton2 => NavHistory.NavigateBF(Navigation.SpecialLocation.Forward),
             _ => false,
         };
+    }
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
     {

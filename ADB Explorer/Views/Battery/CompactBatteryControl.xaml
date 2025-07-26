@@ -20,9 +20,17 @@
             </Style.Triggers>
         </Style>
     </UserControl.Style>
-    <ui:FontIcon
-        Margin="0,1,0,0"
-        Glyph="{Binding BatteryIcon}"
-        Style="{StaticResource DeviceHeaderIcon}"
-        ToolTip="{Binding CompactStateString}" />
+    <ui:FontIcon Margin="0,1,0,0" Glyph="{Binding BatteryIcon}">
+        <ui:FontIcon.Style>
+            <Style BasedOn="{StaticResource DeviceHeaderIcon}" TargetType="ui:FontIcon">
+                <Setter Property="ToolTip">
+                    <Setter.Value>
+                        <ToolTip>
+                            <TextBlock FlowDirection="LeftToRight" NumberSubstitution.Substitution="NativeNational" Text="{Binding CompactStateString}" />
+                        </ToolTip>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ui:FontIcon.Style>
+    </ui:FontIcon>
 </UserControl>

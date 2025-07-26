@@ -772,6 +772,9 @@ public class CopyPasteService : ViewModelBase
     /// </returns>
     public static async Task<IEnumerable<string>> MergeFiles(IEnumerable<string> filePaths, string targetPath)
     {
+        if (filePaths is null || targetPath is null)
+            return [];
+
         // Figure out whether the target is Windows or Android
         var sep = FileHelper.GetSeparator(targetPath);
 
@@ -854,6 +857,9 @@ public class CopyPasteService : ViewModelBase
     /// </returns>
     public static async Task<IEnumerable<FileClass>> MergeFiles(string targetPath, params IEnumerable<FileClass> filePaths)
     {
+        if (filePaths is null || targetPath is null)
+            return [];
+
         // Figure out whether the target is Windows or Android
         var sep = FileHelper.GetSeparator(targetPath);
 
