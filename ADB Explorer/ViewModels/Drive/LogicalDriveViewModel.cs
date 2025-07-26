@@ -23,6 +23,26 @@ class LogicalDriveViewModel : DriveViewModel
     public LogicalDriveViewModel(LogicalDrive drive) : base(drive)
     {
         Drive = drive;
+
+        Drive.PropertyChanged += (s, e) =>
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(LogicalDrive.Size):
+                    OnPropertyChanged(nameof(Size));
+                    break;
+                case nameof(LogicalDrive.Used):
+                    OnPropertyChanged(nameof(Used));
+                    break;
+                case nameof(LogicalDrive.Available):
+                    OnPropertyChanged(nameof(Available));
+                    break;
+                case nameof(LogicalDrive.UsageP):
+                    OnPropertyChanged(nameof(UsageP));
+                    OnPropertyChanged(nameof(UsageWarning));
+                    break;
+            }
+        };
     }
 
     public void UpdateDrive(LogicalDrive other)
