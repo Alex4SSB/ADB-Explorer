@@ -28,10 +28,6 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 <br></br>
 <h2 align="left"/>Translation</h2>
 Help with translation is most welcome - please visit our translation project on Weblate: https://hosted.weblate.org/engage/adb-explorer/
-<br></br>
-A Microsoft Store review:
-
-> 超级赞！！！传输文件快、稳的一匹！！！找个方法替换一下支持中文！！！
 
 <br></br>
 <h2 align="left"/>App Files</h2>
