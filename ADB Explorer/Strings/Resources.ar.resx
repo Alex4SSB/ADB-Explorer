@@ -283,4 +283,13 @@
     <value>دفع/سحب التحميل معروض بصيغه bytes الكليه المحوله.
 النسبه موضحه فقط حين معرفه الحجم الكلي.</value>
   </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} مجانية من {1}</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} جيجابايت</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} ميجابايت</value>
+  </data>
 </root>
