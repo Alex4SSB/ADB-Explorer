@@ -3970,7 +3970,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to TB.
+        ///   Looks up a localized string similar to {0} TB.
         /// </summary>
         public static string TERA {
             get {

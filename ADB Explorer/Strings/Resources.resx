@@ -1715,7 +1715,7 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
   </data>
   <data name="TERA" xml:space="preserve">
-    <value>TB</value>
+    <value>{0} TB</value>
     <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
   </data>
   <data name="PETA" xml:space="preserve">
