@@ -1031,15 +1031,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copied.
-        /// </summary>
-        public static string S_COPIED {
-            get {
-                return ResourceManager.GetString("S_COPIED", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy Package Name.
         /// </summary>
         public static string S_COPY_APK_NAME {
@@ -2549,24 +2540,6 @@ namespace ADB_Explorer.Strings {
         public static string S_PASTE_CONFLICTS_TITLE {
             get {
                 return ResourceManager.GetString("S_PASTE_CONFLICTS_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Paste 1 {0} Item.
-        /// </summary>
-        public static string S_PASTE_CUT_ITEMS {
-            get {
-                return ResourceManager.GetString("S_PASTE_CUT_ITEMS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Paste {0} {1} Items.
-        /// </summary>
-        public static string S_PASTE_CUT_ITEMS_PLURAL {
-            get {
-                return ResourceManager.GetString("S_PASTE_CUT_ITEMS_PLURAL", resourceCulture);
             }
         }
         

@@ -247,13 +247,6 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         SortName = new(FullName);
     }
 
-    public static string CutTypeString(DragDropEffects cutType) => cutType switch
-    {
-        DragDropEffects.Move => Strings.Resources.S_MENU_CUT,
-        DragDropEffects.Copy => Strings.Resources.S_COPIED,
-        _ => "",
-    };
-
     public void UpdateType()
     {
         TypeName = GetTypeName();

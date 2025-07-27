@@ -1253,18 +1253,6 @@ Cancel All Running</value>
     <value>Validate {0}</value>
     <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
   </data>
-  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Paste {0} {1} Items</value>
-    <comment>0 = number of items. 1 = Cut / Copied</comment>
-  </data>
-  <data name="S_PASTE_CUT_ITEMS" xml:space="preserve">
-    <value>Paste 1 {0} Item</value>
-    <comment>0 = Cut / Copied</comment>
-  </data>
-  <data name="S_COPIED" xml:space="preserve">
-    <value>Copied</value>
-    <comment>In the context of "Paste 3 copied items"</comment>
-  </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Link</value>
     <comment>A link to an unknown file type</comment>
