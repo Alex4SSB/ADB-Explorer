@@ -1443,4 +1443,16 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
     <value>Область перекрыта — снова откройте окно проводника.</value>
   </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Вставить 1 вырезанный элемент</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Вставить 1 скопированный элемент</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Вставить {0} скопированных элементов</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Вставить {0} вырезанных элементов</value>
+  </data>
 </root>
