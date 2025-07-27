@@ -1425,4 +1425,22 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="BYTES" xml:space="preserve">
     <value>{0} БАЙТ</value>
   </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Скопировано {0} элемент(ов)</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Скопировано {0} элемент(ов) в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Отправить {0} элемент(ов) в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Создать ссылку в {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Отправить {0} элемент(ов)</value>
+  </data>
+  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
+    <value>Область перекрыта — снова откройте окно проводника.</value>
+  </data>
 </root>
