@@ -1115,7 +1115,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>מחיקה לצמיתות</value>
   </data>
   <data name="S_LOCATION_NA" xml:space="preserve">
-    <value>לא ידוע</value>
+    <value>אינו ידוע</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
     <value>הנתיב שסופק אינו קיים.</value>
@@ -1286,7 +1286,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>בוטל</value>
   </data>
   <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
-    <value>פעולת עבר</value>
+    <value>פעולה מקבוצה קודמת</value>
   </data>
   <data name="S_ACTION_MOVE" xml:space="preserve">
     <value>הזזה</value>
@@ -1387,7 +1387,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הוסף מיקום נוכחי</value>
   </data>
   <data name="S_REMOVE" xml:space="preserve">
-    <value>הסר</value>
+    <value>הסר מהרשימה</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>מיקומים שמורים</value>
@@ -1439,5 +1439,17 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
     <value>האזור מוסתר - יש לפתוח את חלון הסייר מחדש.</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>הדבק פריט 1 שנגזר</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>הדבק פריט אחד שהועתק</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>הדבק {0} פריטים שהועתקו</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>הדבק {0} פריטים שנגזרו</value>
   </data>
 </root>
