@@ -28,6 +28,30 @@ public static partial class TabularDateFormatter
     }
 
     /// <summary>
+    /// Formats a TimeOnly using the given culture's date/time format,
+    /// but ensures zero-padding for consistent column width.
+    /// </summary>
+    public static string Format(TimeOnly? dateTime, CultureInfo culture)
+    {
+        if (dateTime is null)
+            return string.Empty;
+
+        // Build combined pattern from ShortDate and LongTime patterns
+        string pattern = culture.DateTimeFormat.LongTimePattern;
+
+        // Normalize to tabular pattern
+        pattern = PadDateTimePattern(pattern);
+
+        // Format the DateTime
+        string result = dateTime?.ToString(pattern, culture);
+
+        // Remove RTL marks that might appear in RTL cultures
+        result = RemoveRtlMarks(result);
+
+        return result;
+    }
+
+    /// <summary>
     /// Replaces single-character date/time format tokens (d, M, H, h, m, s)
     /// with their padded versions (dd, MM, etc.), leaving multi-letter tokens intact.
     /// </summary>

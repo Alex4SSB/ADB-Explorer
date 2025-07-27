@@ -107,8 +107,11 @@
                             <DataTrigger Binding="{Binding ElementName=DragTooltip, Path=Text}" Value="">
                                 <Setter Property="Visibility" Value="Hidden" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding ElementName=DropEffect, Path=Text}" Value="None">
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="None">
                                 <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                                <Setter Property="FlowDirection" Value="RightToLeft" />
                             </DataTrigger>
                         </Style.Triggers>
                         <Setter Property="CornerRadius" Value="0" />
@@ -121,6 +124,7 @@
                     </Grid.ColumnDefinitions>
                     <ui:FontIcon
                         Width="16"
+                        Margin="0,0,2,0"
                         HorizontalAlignment="Left"
                         FontSize="12"
                         Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}">

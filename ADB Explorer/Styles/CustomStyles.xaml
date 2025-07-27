@@ -356,6 +356,9 @@
             <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>

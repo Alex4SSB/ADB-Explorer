@@ -208,7 +208,10 @@
             Command="{Binding SourceAction.Command}"
             FocusVisualStyle="{x:Null}">
             <ui:HyperlinkButton.Content>
-                <TextBlock Style="{StaticResource BoldInProgressHyperTextStyle}" Text="{Binding SourcePathString}" />
+                <TextBlock
+                    FlowDirection="LeftToRight"
+                    Style="{StaticResource BoldInProgressHyperTextStyle}"
+                    Text="{Binding SourcePathString}" />
             </ui:HyperlinkButton.Content>
         </ui:HyperlinkButton>
     </DataTemplate>
@@ -218,7 +221,10 @@
             Command="{Binding TargetAction.Command}"
             FocusVisualStyle="{x:Null}">
             <ui:HyperlinkButton.Content>
-                <TextBlock Style="{StaticResource BoldInProgressHyperTextStyle}" Text="{Binding TargetPathString}" />
+                <TextBlock
+                    FlowDirection="LeftToRight"
+                    Style="{StaticResource BoldInProgressHyperTextStyle}"
+                    Text="{Binding TargetPathString}" />
             </ui:HyperlinkButton.Content>
         </ui:HyperlinkButton>
     </DataTemplate>
