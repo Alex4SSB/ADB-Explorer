@@ -1275,13 +1275,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Сокет</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Блокировать устройство</value>
+    <value>Устройство Block</value>
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>Неизвестный</value>
   </data>
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Ссылка не действительна</value>
+    <value>Неработающая ссылка</value>
   </data>
   <data name="S_NAV_HISTORY" xml:space="preserve">
     <value>История навигации</value>
@@ -1293,7 +1293,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Стереть</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
-    <value>Сохранённые местоположения</value>
+    <value>Сохранённые пути</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>Иконка APK лицензирована Apache License, Version 2.0.</value>
@@ -1405,7 +1405,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} ГБ</value>
   </data>
   <data name="TERA" xml:space="preserve">
-    <value>ТБ</value>
+    <value>{0} ТБ</value>
   </data>
   <data name="PETA" xml:space="preserve">
     <value>{0} ПБ</value>
@@ -1414,7 +1414,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} ЕБ</value>
   </data>
   <data name="MILLI" xml:space="preserve">
-    <value>м</value>
+    <value>милли</value>
   </data>
   <data name="MICRO" xml:space="preserve">
     <value>микро</value>
@@ -1423,22 +1423,22 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>нано</value>
   </data>
   <data name="BYTES" xml:space="preserve">
-    <value>{0} БАЙТ</value>
+    <value>{0} Б</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Скопировано {0} элемент(ов)</value>
+    <value>Копировать {0} элемент(ов)</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Скопировано {0} элемент(ов) в {1}</value>
+    <value>Копировать {0} элемент(ов) в {1}</value>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Отправить {0} элемент(ов) в {1}</value>
+    <value>Переместить {0} элемент(ов) в {1}</value>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Создать ссылку в {0}</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Отправить {0} элемент(ов)</value>
+    <value>Переместить {0} элемент(ов)</value>
   </data>
   <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
     <value>Область перекрыта — снова откройте окно проводника.</value>
