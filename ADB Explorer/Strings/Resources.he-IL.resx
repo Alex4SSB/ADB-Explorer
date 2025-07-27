@@ -475,10 +475,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>מזג או החלף</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>קיים פריט אחד עם התנגשות</value>
+    <value>קיים פריט 1 עם התנגשות</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>קיים פריט אחד עם התנגשות ב {0}</value>
+    <value>קיים פריט 1 עם התנגשות ב {0}</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
     <value>קיימים {0} פריטים עם התנגשות</value>
@@ -1444,7 +1444,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הדבק פריט 1 שנגזר</value>
   </data>
   <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>הדבק פריט אחד שהועתק</value>
+    <value>הדבק פריט 1 שהועתק</value>
   </data>
   <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
     <value>הדבק {0} פריטים שהועתקו</value>
