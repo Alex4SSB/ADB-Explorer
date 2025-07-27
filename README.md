@@ -35,7 +35,7 @@ Help with translation is most welcome - please visit our translation project on 
 `%LocalAppData%\AdbExplorer`
 
 
-### ℹ️ For Store version: <br />To be able to see these files, create `%LocalAppData%\AdbExplorer\App.txt` <br /> *before installing*, otherwise the files are stored in an unknown location.
+### ℹ️ For Store version (previous versions): <br />To be able to see these files, create `%LocalAppData%\AdbExplorer\App.txt` <br /> *before installing*, otherwise the files are stored in an unknown location.
 
 
 * App.txt - persistent settings file.
