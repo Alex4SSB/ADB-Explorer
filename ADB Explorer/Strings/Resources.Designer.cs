@@ -2571,6 +2571,42 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Paste 1 Copied Item.
+        /// </summary>
+        public static string S_PASTE_ONE_COPIED_ITEM {
+            get {
+                return ResourceManager.GetString("S_PASTE_ONE_COPIED_ITEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste 1 Cut Item.
+        /// </summary>
+        public static string S_PASTE_ONE_CUT_ITEM {
+            get {
+                return ResourceManager.GetString("S_PASTE_ONE_CUT_ITEM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste {0} Copied Items.
+        /// </summary>
+        public static string S_PASTE_PLURAL_COPIED_ITEMS {
+            get {
+                return ResourceManager.GetString("S_PASTE_PLURAL_COPIED_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Paste {0} Cut Items.
+        /// </summary>
+        public static string S_PASTE_PLURAL_CUT_ITEMS {
+            get {
+                return ResourceManager.GetString("S_PASTE_PLURAL_CUT_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Provided path does not exist..
         /// </summary>
         public static string S_PATH_INVALID {

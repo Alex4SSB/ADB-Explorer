@@ -1766,4 +1766,16 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Area obstructed - reopen Explorer window.</value>
     <comment>The drag tooltip when hovering over an invisible Explorer element</comment>
   </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Paste 1 Cut Item</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Paste 1 Copied Item</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Paste {0} Copied Items</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Paste {0} Cut Items</value>
+  </data>
 </root>

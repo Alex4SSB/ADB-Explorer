@@ -308,16 +308,20 @@ internal static class FileActionLogic
             return;
         }
 
-        var cutType = FileClass.CutTypeString(Data.CopyPaste.PasteState);
-        var plural = Data.CopyPaste.Files.Length > 1;
-        object[] formatParams = plural 
-            ? [Data.CopyPaste.Files.Length, cutType]
-            : [cutType];
-        var stringFormat = plural
-            ? Strings.Resources.S_PASTE_CUT_ITEMS_PLURAL
-            : Strings.Resources.S_PASTE_CUT_ITEMS;
+        if (Data.CopyPaste.Files.Length > 1)
+        {
+            var stringFormat = Data.CopyPaste.PasteState is DragDropEffects.Move
+                ? Strings.Resources.S_PASTE_PLURAL_CUT_ITEMS
+                : Strings.Resources.S_PASTE_PLURAL_COPIED_ITEMS;
 
-        Data.FileActions.PasteDescription.Value = string.Format(stringFormat, formatParams);
+            Data.FileActions.PasteDescription.Value = string.Format(stringFormat, Data.CopyPaste.Files.Length);
+        }
+        else
+        {
+            Data.FileActions.PasteDescription.Value = Data.CopyPaste.PasteState is DragDropEffects.Move
+                ? Strings.Resources.S_PASTE_ONE_CUT_ITEM
+                : Strings.Resources.S_PASTE_ONE_COPIED_ITEM;
+        }
 
         Data.FileActions.PasteEnabled = EnableUiPaste();
         Data.FileActions.IsKeyboardPasteEnabled = EnableKeyboardPaste();
