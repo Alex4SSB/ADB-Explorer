@@ -24,9 +24,27 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
 
     public int FileCountCompletedRate => (int)((float)FilesTransferred / (FilesTransferred + FilesSkipped) * 100.0);
 
-    public string FileCountCompletedString => $"{FilesTransferred} of {FilesTransferred + FilesSkipped}";
+    public string FileCountCompletedString => string.Format(Strings.Resources.S_COMPLETED_FILES_NUM, FilesTransferred, FilesTransferred + FilesSkipped);
 
-    public string AverageRateString => AverageRateMBps.HasValue ? $"{UnitConverter.BytesToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/s" : string.Empty;
+    public string AverageRateString
+    {
+        get
+        {
+            if (AverageRateMBps.HasValue)
+            {
+                return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/");
+            }
+            else
+            {
+                if (TotalBytes.HasValue && TotalSeconds.HasValue && TotalSeconds.Value > 0)
+                {
+                    return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize(TotalBytes.Value / (UInt64)TotalSeconds.Value)}/");
+                }
+
+                return string.Empty;
+            }
+        }
+    }
 
     public string TotalSize => TotalBytes.HasValue ? UnitConverter.BytesToSize(TotalBytes.Value) : string.Empty;
 

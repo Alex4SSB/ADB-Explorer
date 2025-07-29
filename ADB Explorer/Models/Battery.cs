@@ -164,7 +164,9 @@ public class Battery : ViewModelBase
             else
             {
                 if (ChargeState is not ChargingState.Charging)
-                    return $"{Level}%";
+                    return Data.RuntimeSettings.IsRTL
+                        ? $"%{Level}"
+                        : $"{Level}%";
 
                 return string.Format(Strings.Resources.S_BAT_STATUS_PLUGGED, Level);
             }

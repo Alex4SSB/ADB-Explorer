@@ -959,6 +959,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} of {1}.
+        /// </summary>
+        public static string S_COMPLETED_FILES_NUM {
+            get {
+                return ResourceManager.GetString("S_COMPLETED_FILES_NUM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Confirm Uninstall.
         /// </summary>
         public static string S_CONF_UNI_TITLE {
@@ -1673,6 +1682,15 @@ namespace ADB_Explorer.Strings {
         public static string S_FILE_OP_TOOLTIP {
             get {
                 return ResourceManager.GetString("S_FILE_OP_TOOLTIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} in {1} ({2}).
+        /// </summary>
+        public static string S_FILE_PROGRESS_TRANSFER {
+            get {
+                return ResourceManager.GetString("S_FILE_PROGRESS_TRANSFER", resourceCulture);
             }
         }
         

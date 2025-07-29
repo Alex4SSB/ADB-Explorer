@@ -1766,4 +1766,12 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
     <value>Paste {0} Cut Items</value>
   </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+    <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} of {1}</value>
+    <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
+  </data>
 </root>

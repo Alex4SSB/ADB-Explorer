@@ -6,24 +6,18 @@ internal class CompletedStatsConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var result = "";
-        if (value is not CompletedSyncProgressViewModel info)
-            return result;
+        if (value is not CompletedSyncProgressViewModel info || string.IsNullOrEmpty(info.TotalSize))
+            return "";
 
-        if (string.IsNullOrEmpty(info.TotalSize))
-            return result;
+        string format = Strings.Resources.S_FILE_PROGRESS_TRANSFER;
 
-        result += info.TotalSize;
         if (string.IsNullOrEmpty(info.TotalTime))
-            return result;
-
-        result += $" in {info.TotalTime}";
+            return info.TotalSize;
 
         if (string.IsNullOrEmpty(info.AverageRateString))
-            return result;
+            return string.Format(format[..(format.IndexOf("{1}") + 3)].Trim(), info.TotalSize, info.TotalTime);
 
-        result += $" ({info.AverageRateString})";
-        return result;
+        return string.Format(format, info.TotalSize, info.TotalTime, info.AverageRateString);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

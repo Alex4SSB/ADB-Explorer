@@ -354,6 +354,15 @@
     </Style>
     <DataTemplate x:Key="CompletedSyncProgressInnerTemplate">
         <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                            <Setter Property="FlowDirection" Value="RightToLeft" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.Resources>
                 <Style BasedOn="{StaticResource DisabledTooltipTextBlockStyle}" TargetType="TextBlock" />
             </Grid.Resources>
@@ -383,6 +392,15 @@
     </DataTemplate>
     <DataTemplate x:Key="CompactCompletedSyncProgressInnerTemplate">
         <Grid Margin="4,0" DataContext="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ContentControl}, Path=DataContext}">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                            <Setter Property="FlowDirection" Value="RightToLeft" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />

@@ -26,7 +26,10 @@
                 <Setter Property="ToolTip">
                     <Setter.Value>
                         <ToolTip>
-                            <TextBlock FlowDirection="LeftToRight" NumberSubstitution.Substitution="NativeNational" Text="{Binding CompactStateString}" />
+                            <TextBlock
+                                NumberSubstitution.Substitution="NativeNational"
+                                Style="{StaticResource TextBlockStyle}"
+                                Text="{Binding CompactStateString}" />
                         </ToolTip>
                     </Setter.Value>
                 </Setter>
