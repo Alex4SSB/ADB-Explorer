@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1057,12 +1057,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>אימות {0}</value>
   </data>
-  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
-    <value>הדבק {0} פריטים ש{1}</value>
-  </data>
-  <data name="S_COPIED" xml:space="preserve">
-    <value>הועתקו</value>
-  </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>קישור</value>
   </data>
@@ -1451,5 +1445,17 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
     <value>הדבק {0} פריטים שנגזרו</value>
+  </data>
+  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
+    <value>הדבק {0} פריטים ש{1}</value>
+  </data>
+  <data name="S_COPIED" xml:space="preserve">
+    <value>הועתקו</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} תוך {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} מתוך {1}</value>
   </data>
 </root>
