@@ -1204,7 +1204,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>В корзину</value>
   </data>
   <data name="S_ACTION_UPDATE" xml:space="preserve">
-    <value>Обновить</value>
+    <value>Обновление</value>
   </data>
   <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
     <value>{0}% использовано</value>
@@ -1454,5 +1454,11 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
     <value>Вставить {0} вырезанных элементов</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} за {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} из {1}</value>
   </data>
 </root>
