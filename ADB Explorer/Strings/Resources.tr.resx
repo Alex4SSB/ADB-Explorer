@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,86 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android robotu, Google tarafından oluşturulan ve paylaşılan bir çalışmadan çoğaltılmış veya değiştirilmiş olup Creative Commons 3.0 Atıf Lisansı'nda açıklanan şartlara uygun şekilde kullanılmıştır.</value>
+  </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Android Robot İcon(lar)</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Uygulama Animasyonları</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Uygulama simgesi Apache Lisansı altında lisanslanmıştır, Versiyon 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Verilen yoldan ADB sürümü alınamadı.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>Sağlanan yoldan ADB versiyonu çok düşük.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>ADB Geçersiz kılma başarısız oldu</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>ADB Yürütülebilir Dosyasını Seçin</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Uygulama Ayarlarını Sıfırla</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Yeni Uygulama Sürümü</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Gezinme Hatası</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Paket Adını Kopyala</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Öğe Yolunu Kopyala</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Tüm Öğeleri Geri Yükle</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Geri Dönüşüm Kutusunu Boşaltın</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Sil</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Hedef Yol Hatası</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>Bağlanmada hata oluştu</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Bağlantı Hatası</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Bağlantı Kesilme Hatası</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Eşleştirme Hatası</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Seçilen cihazda Root erişimi etkinleştirilemiyor.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Yönetici erişimi</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Silmeyi Onayla</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Kalıcı olarak sil</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Oluşturma Hatası</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Çakışmaları Geri Yükle</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Kaldırmayı Onayla</value>
   </data>
 </root>
