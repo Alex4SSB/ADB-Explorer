@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1417,19 +1417,19 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>{0} Б</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Копировать {0} элемент(ов)</value>
+    <value>Копировать {0} элементов</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Копировать {0} элемент(ов) в {1}</value>
+    <value>Копировать {0} элементов в {1}</value>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Переместить {0} элемент(ов) в {1}</value>
+    <value>Переместить {0} элементов в {1}</value>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
     <value>Создать ссылку в {0}</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Переместить {0} элемент(ов)</value>
+    <value>Переместить {0} элементов</value>
   </data>
   <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
     <value>Область перекрыта — снова откройте окно проводника.</value>
@@ -1451,5 +1451,17 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} из {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Копировать {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Копировать {0} в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Переместить {0} в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Переместить {0}</value>
   </data>
 </root>
