@@ -1464,4 +1464,10 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
     <value>Переместить {0}</value>
   </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Файл не найден</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Завершено без подтверждения</value>
+  </data>
 </root>
