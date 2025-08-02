@@ -1464,4 +1464,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
     <value>העבר את {0} ל-{1}</value>
   </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>קובץ לא נמצא</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>הסתיים ללא אישור</value>
+  </data>
 </root>
