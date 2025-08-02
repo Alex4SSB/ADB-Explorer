@@ -86,7 +86,7 @@ public class FileSyncOperation : FileOperation
             (!File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath)))
         {
             Status = OperationStatus.Failed;
-            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: "File not found", total: true));
+            StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: Strings.Resources.S_SYNC_FILE_NOT_FOUND, total: true));
 
             return;
         }
@@ -146,7 +146,7 @@ public class FileSyncOperation : FileOperation
         {
             Status = OperationStatus.Completed;
             if (t.Result is null)
-                StatusInfo = new CompletedShellProgressViewModel("Finished with no confirmation");
+                StatusInfo = new CompletedShellProgressViewModel(Strings.Resources.S_SYNC_NO_CONFIRM);
             else if (t.Result.FilesTransferred + t.Result.FilesSkipped < 1)
                 StatusInfo = new CompletedShellProgressViewModel();
             else

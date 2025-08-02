@@ -3744,6 +3744,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File not found.
+        /// </summary>
+        public static string S_SYNC_FILE_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("S_SYNC_FILE_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Finished with no confirmation.
+        /// </summary>
+        public static string S_SYNC_NO_CONFIRM {
+            get {
+                return ResourceManager.GetString("S_SYNC_NO_CONFIRM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Currently Browsing.
         /// </summary>
         public static string S_TOOLTIP_BROWSING {

@@ -1790,4 +1790,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Move {0} to {1}</value>
     <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
   </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>File not found</value>
+    <comment>The error message displayed when a sync operation is about to start but the source file is missing</comment>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Finished with no confirmation</value>
+    <comment>The error message displayed when a sync operation has finished but ADB did not provide a confirmation</comment>
+  </data>
 </root>
