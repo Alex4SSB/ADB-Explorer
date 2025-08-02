@@ -146,30 +146,77 @@ public partial class DragWindow : INotifyPropertyChanged
             }
 
             var format = "";
-            if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Link)
-                format = Strings.Resources.S_DRAGDROP_LINK;
-            else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
-            {
-                format = string.IsNullOrEmpty(target)
-                    ? Strings.Resources.S_DRAGDROP_MOVE
-                    : Strings.Resources.S_DRAGDROP_MOVE_TARGET;
-            }
-            else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Copy)
-            {
-                format = string.IsNullOrEmpty(target)
-                    ? Strings.Resources.S_DRAGDROP_COPY
-                    : Strings.Resources.S_DRAGDROP_COPY_TARGET;
-            }
-            
-            var result = string.Format(format, string.IsNullOrEmpty(target)
-                ? [Data.CopyPaste.DragFiles.Length]
-                : [Data.CopyPaste.DragFiles.Length, target]);
+            string result = "";
+            var count = Data.CopyPaste.DragFiles.Length;
 
-            var split = result.Split(target);
+            if (count == 1)
+            {
+                int sourceLength = target is null ? 30 : 45 - target.Length;
+                var source = FileHelper.GetShortFileName(Data.CopyPaste.DragFiles[0], sourceLength);
 
-            DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
-            if (split.Length > 1)
-                DragTooltip.Inlines.Add(target);
+                if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Link)
+                {
+                    result = string.Format(Strings.Resources.S_DRAGDROP_LINK, target);
+                }
+                else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
+                {
+                    format = string.IsNullOrEmpty(target)
+                        ? Strings.Resources.S_DRAGDROP_MOVE_SINGLE
+                        : Strings.Resources.S_DRAGDROP_MOVE_TARGET_SINGLE;
+                }
+                else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Copy)
+                {
+                    format = string.IsNullOrEmpty(target)
+                        ? Strings.Resources.S_DRAGDROP_COPY_SINGLE
+                        : Strings.Resources.S_DRAGDROP_COPY_TARGET_SINGLE;
+                }
+
+                if (result == "")
+                {
+                    result = string.Format(format, string.IsNullOrEmpty(target)
+                        ? [source]
+                        : [source, target]);
+                }
+
+                var split = result.Split(source);
+
+                DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                DragTooltip.Inlines.Add(source);
+
+                split = split[1].Split(target);
+
+                DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                if (split.Length > 1)
+                    DragTooltip.Inlines.Add(target);
+            }
+            else
+            {
+                if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
+                {
+                    format = string.IsNullOrEmpty(target)
+                        ? Strings.Resources.S_DRAGDROP_MOVE
+                        : Strings.Resources.S_DRAGDROP_MOVE_TARGET;
+                }
+                else if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Copy)
+                {
+                    format = string.IsNullOrEmpty(target)
+                        ? Strings.Resources.S_DRAGDROP_COPY
+                        : Strings.Resources.S_DRAGDROP_COPY_TARGET;
+                }
+
+                if (result == "")
+                {
+                    result = string.Format(format, string.IsNullOrEmpty(target)
+                        ? [count]
+                        : [count, target]);
+                }
+
+                var split = result.Split(target);
+
+                DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
+                if (split.Length > 1)
+                    DragTooltip.Inlines.Add(target);
+            }
         });
     }
 

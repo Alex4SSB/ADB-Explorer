@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>The Android Robot Icon(s)</value>
+  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Le robot Android est reproduit ou modifié à partir d'une ressource créée et partagée par Google qui est utilisée selon les conditions décrites dans la licence d'attribution Creative Commons 3.0.</value>
   </data>
@@ -131,6 +134,9 @@
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>La version d'ADB obtenue à partir du chemin fourni est trop basse.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Impossible de remplacer ADB</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>Sélectionner l'exécutable ADB</value>
@@ -249,6 +255,9 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restaurer</value>
   </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>Surveillance de l’explorateur de fichiers</value>
+  </data>
   <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
     <value>Déployer AdbProgressRedirection.exe</value>
   </data>
@@ -258,102 +267,6 @@
   <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
     <value>Méthode de progression</value>
   </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Applications en conflit</value>
-  </data>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>The Android Robot Icon(s)</value>
-  </data>
-  <data name="S_BUTTON_BACK" xml:space="preserve">
-    <value>Retour</value>
-  </data>
-  <data name="S_BUTTON_FORWARD" xml:space="preserve">
-    <value>Suivant</value>
-  </data>
-  <data name="S_BUTTON_UP" xml:space="preserve">
-    <value>Dossier parent</value>
-  </data>
-  <data name="S_BUTTON_DEVICES" xml:space="preserve">
-    <value>Appareils</value>
-  </data>
-  <data name="S_MENU_COPY" xml:space="preserve">
-    <value>Copier</value>
-  </data>
-  <data name="S_MENU_MORE" xml:space="preserve">
-    <value>Plus</value>
-  </data>
-  <data name="S_MENU_EDIT" xml:space="preserve">
-    <value>Modifier</value>
-  </data>
-  <data name="S_MENU_NEW" xml:space="preserve">
-    <value>Nouveau</value>
-  </data>
-  <data name="S_MENU_FOLDER" xml:space="preserve">
-    <value>Dossier</value>
-  </data>
-  <data name="S_MENU_CUT" xml:space="preserve">
-    <value>Couper</value>
-  </data>
-  <data name="S_MENU_PACKAGE" xml:space="preserve">
-    <value>Paquet</value>
-  </data>
-  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
-    <value>Copier dans le presse-papier</value>
-  </data>
-  <data name="S_MENU_FILE" xml:space="preserve">
-    <value>Fichier</value>
-  </data>
-  <data name="S_BUTTON_FILTER" xml:space="preserve">
-    <value>Filtrer</value>
-  </data>
-  <data name="S_MENU_FILES" xml:space="preserve">
-    <value>Fichiers</value>
-  </data>
-  <data name="S_MENU_FOLDERS" xml:space="preserve">
-    <value>Dossiers</value>
-  </data>
-  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
-    <value>Coller le lien</value>
-  </data>
-  <data name="S_BUTTON_LOG" xml:space="preserve">
-    <value>Historique de commandes</value>
-  </data>
-  <data name="S_MENU_RENAME" xml:space="preserve">
-    <value>Renommer</value>
-  </data>
-  <data name="S_BUTTON_PUSH" xml:space="preserve">
-    <value>Push</value>
-  </data>
-  <data name="S_MENU_REFRESH" xml:space="preserve">
-    <value>Actualiser</value>
-  </data>
-  <data name="S_MENU_INSTALL" xml:space="preserve">
-    <value>Installer</value>
-  </data>
-  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
-    <value>Sélectionner tous</value>
-  </data>
-  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
-    <value>Fermer Editeur</value>
-  </data>
-  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
-    <value>Enregistrer les modifications</value>
-  </data>
-  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
-    <value>Vider l'historique de commandes</value>
-  </data>
-  <data name="S_FILEOP_FAILED" xml:space="preserve">
-    <value>Échoué</value>
-  </data>
-  <data name="S_FILEOP_CANCELED" xml:space="preserve">
-    <value>Annulé</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Impossible de remplacer ADB</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Surveillance de l’explorateur de fichiers</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Redirection de la progression</value>
   </data>
@@ -362,6 +275,9 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Transférer vers la racine du lecteur Windows</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Applications en conflit</value>
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>La surveillance de l’explorateur de fichiers n’est pas disponible car les applications suivantes sont en cours d’exécution :</value>
@@ -516,5 +432,89 @@ Malheureusement, nous ne pouvons pas inclure ADB dans l’application en raison 
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Une erreur est survenue lors de la tentative d'affichage du contenu de ce dossier.
 Le contenu visible peut être incomplet.</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Historique de commandes</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Retour</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Suivant</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Dossier parent</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Appareils</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Push</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Dossiers</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Fichiers</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Actualiser</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copier</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Plus</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Modifier</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nouveau</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Dossier</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Sélectionner tous</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Couper</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Coller le lien</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Renommer</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Paquet</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Fermer Editeur</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Enregistrer les modifications</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Installer</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Vider l'historique de commandes</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copier dans le presse-papier</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Échoué</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Annulé</value>
   </data>
 </root>

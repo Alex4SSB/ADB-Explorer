@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,23 +117,20 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Das Android-Roboter-Symbol</value>
+  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Das Android-Roboter-Logo wurde aus einer von Google erstellten und geteilten Arbeit reproduziert oder geändert und wird gemäß den Bedingungen der Creative Commons 3.0-Attributionslizenz verwendet.</value>
-  </data>
-  <data name="S_REM_HIST_DEV" xml:space="preserve">
-    <value>Gerät entfernen</value>
-  </data>
-  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
-    <value>Verbindungsfehler</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
     <value>App-Animationen</value>
   </data>
-  <data name="S_PUSH_PKG" xml:space="preserve">
-    <value>Pakete installieren</value>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value />
   </data>
-  <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Alle Elemente wiederherstellen</value>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>"ADB" auführbare Datei auswählen</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
     <value>App-Einstellungen zurücksetzen</value>
@@ -147,44 +144,17 @@
   <data name="S_COPY_APK_NAME" xml:space="preserve">
     <value>Paketname kopieren</value>
   </data>
-  <data name="S_DELETE_ACTION" xml:space="preserve">
-    <value>Löschen</value>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Dateipfad kopieren</value>
   </data>
-  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
-    <value>Kopplungsfehler</value>
-  </data>
-  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Löschen bestätigen</value>
-  </data>
-  <data name="S_PERM_DEL" xml:space="preserve">
-    <value>Endgültig löschen</value>
-  </data>
-  <data name="S_REM_DEV" xml:space="preserve">
-    <value>Gerät trennen</value>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Alle Elemente wiederherstellen</value>
   </data>
   <data name="S_EMPTY_TRASH" xml:space="preserve">
     <value>Papierkorb leeren</value>
   </data>
-  <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>Navigationsverlauf</value>
-  </data>
-  <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Blockgerät</value>
-  </data>
-  <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Unbekannt</value>
-  </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Defekte Verknüpfung</value>
-  </data>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Das Android-Roboter-Symbol</value>
-  </data>
-  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
-    <value>"ADB" auführbare Datei auswählen</value>
-  </data>
-  <data name="S_COPY_PATH" xml:space="preserve">
-    <value>Dateipfad kopieren</value>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Löschen</value>
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
     <value>Zielpfadfehler</value>
@@ -192,14 +162,35 @@
   <data name="S_FAILED_CONN" xml:space="preserve">
     <value>Verbindung fehlgeschlagen an</value>
   </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Verbindungsfehler</value>
+  </data>
   <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
     <value>Fehler bei Trennung</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Kopplungsfehler</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
     <value>Auf dem ausgewählten Gerät könnte Root-Zugriff nicht aktiviert werden.</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>Root-Zugriff</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Löschen bestätigen</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Endgültig löschen</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Gerät entfernen</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Gerät trennen</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Pakete installieren</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>Die Anwendung neu starten, damit die Änderungen wirksam werden</value>
@@ -211,41 +202,38 @@
     <value>Nur aktivieren, wenn Sie die App gemeinsam mit dem Dateiexplorer verwenden wollen.
 Sie können diese Einstellung jederzeit ändern.</value>
   </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>ADB herunterladen</value>
+  </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>Ändern</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Später neustarten</value>
-  </data>
-  <data name="S_UNINSTALL" xml:space="preserve">
-    <value>Deinstallieren</value>
-  </data>
-  <data name="S_NEW_ITEM" xml:space="preserve">
-    <value>Neue Datei</value>
-  </data>
-  <data name="S_BUTTON_CLOSE" xml:space="preserve">
-    <value>Schließen</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Fortsetzen</value>
   </data>
-  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
-    <value>ADB herunterladen</value>
-  </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>Mehr Informationen</value>
   </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Jetzt ADB neu starten</value>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Schließen</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
     <value>ADB ausführbare Datei</value>
   </data>
-  <data name="S_NEW_FOLDER" xml:space="preserve">
-    <value>Neuen Ordner</value>
-  </data>
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Hilfe über ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Jetzt ADB neu starten</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Später neustarten</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Neue Datei</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Neuen Ordner</value>
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
     <value>{0} entfernen</value>
@@ -261,17 +249,20 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value>Die folgenden Apps wird entfernt:
 {0} insgesamt</value>
   </data>
-  <data name="S_REPLACE" xml:space="preserve">
-    <value>Ersetzen</value>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Deinstallieren</value>
   </data>
   <data name="S_CANCEL" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Bestätigen</value>
+  </data>
   <data name="S_SKIP" xml:space="preserve">
     <value>Überspringen</value>
   </data>
-  <data name="S_CONFIRM" xml:space="preserve">
-    <value>Bestätigen</value>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Ersetzen</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Zusammenführen oder ersetzen</value>
@@ -282,56 +273,8 @@ Sie können diese Einstellung jederzeit ändern.</value>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
     <value>Es gibt ein Konflikt im {0}</value>
   </data>
-  <data name="S_COLUMN_ICON" xml:space="preserve">
-    <value>Symbol</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="S_FILEOP_FAILED" xml:space="preserve">
-    <value>Fehlgeschlagen</value>
-  </data>
-  <data name="S_DRIVE_ROOT" xml:space="preserve">
-    <value>Root</value>
-  </data>
-  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Leeren</value>
-  </data>
-  <data name="S_DRIVE_TRASH" xml:space="preserve">
-    <value>Papierkorb</value>
-  </data>
-  <data name="S_BUTTON_YES" xml:space="preserve">
-    <value>Ja</value>
-  </data>
-  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
-    <value>Interner Speicher</value>
-  </data>
-  <data name="S_DRIVE_APPS" xml:space="preserve">
-    <value>Installierte Apps</value>
-  </data>
-  <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>SD-Card</value>
-  </data>
-  <data name="S_DRIVE_OTG" xml:space="preserve">
-    <value>OTG-Gerät</value>
-  </data>
-  <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>{0} Element(e) verschieben</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>{0} Element(e) nach {1} verschieben</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>{0} Element(e) nach {1} kopieren</value>
-  </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>{0} Element(e) kopieren</value>
-  </data>
-  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
-    <value>Hardwarebeschleunigung deaktivieren</value>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>Kein</value>
   </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
     <value>Im Editor öffnen</value>
@@ -350,6 +293,9 @@ Sie können diese Einstellung jederzeit ändern.</value>
   </data>
   <data name="S_SETTINGS_FLUENT" xml:space="preserve">
     <value>Fluent-Stile erzwingen</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Hardwarebeschleunigung deaktivieren</value>
   </data>
   <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
     <value>Animationen deaktivieren</value>
@@ -404,6 +350,9 @@ Sie können diese Einstellung jederzeit ändern.</value>
   </data>
   <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Sprache</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>Zurück</value>
@@ -515,6 +464,9 @@ Sie können diese Einstellung jederzeit ändern.</value>
   </data>
   <data name="S_COLUMN_ADDED" xml:space="preserve">
     <value>Hinzugefügt</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Symbol</value>
   </data>
   <data name="S_COLUMN_NAME" xml:space="preserve">
     <value>Name</value>
@@ -666,13 +618,61 @@ Sie können diese Einstellung jederzeit ändern.</value>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>{0} validieren</value>
   </data>
-  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
-    <value>Ausführbare Windows-Datei</value>
-  </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>Android-Anwendungspaket</value>
   </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Kein</value>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Ausführbare Windows-Datei</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Papierkorb</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Interner Speicher</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Installierte Apps</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>SD-Card</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG-Gerät</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Leeren</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Fehlgeschlagen</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Blockgerät</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Unbekannt</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Defekte Verknüpfung</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Navigationsverlauf</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>{0} Element(e) kopieren</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>{0} Element(e) nach {1} kopieren</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>{0} Element(e) nach {1} verschieben</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>{0} Element(e) verschieben</value>
   </data>
 </root>

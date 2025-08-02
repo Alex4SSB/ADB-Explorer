@@ -1731,15 +1731,15 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The notation for Bytes when displaying file size or drive usage</comment>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copy {0} item(s)</value>
+    <value>Copy {0} items</value>
     <comment>The drag tooltip in copy mode. 0 - number of items being dragged</comment>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copy {0} item(s) to {1}</value>
+    <value>Copy {0} items to {1}</value>
     <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Move {0} item(s) to {1}</value>
+    <value>Move {0} items to {1}</value>
     <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
@@ -1747,7 +1747,7 @@ Please help us localize the app to your language on Weblate.</value>
     <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Move {0} item(s)</value>
+    <value>Move {0} items</value>
     <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
   </data>
   <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
@@ -1773,5 +1773,21 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} of {1}</value>
     <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copy {0}</value>
+    <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copy {0} to {1}</value>
+    <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Move {0}</value>
+    <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Move {0} to {1}</value>
+    <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
   </data>
 </root>

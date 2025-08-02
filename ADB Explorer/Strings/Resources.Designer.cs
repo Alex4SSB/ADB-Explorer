@@ -1335,7 +1335,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy {0} item(s).
+        ///   Looks up a localized string similar to Copy {0} items.
         /// </summary>
         public static string S_DRAGDROP_COPY {
             get {
@@ -1344,11 +1344,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Copy {0} item(s) to {1}.
+        ///   Looks up a localized string similar to Copy {0}.
+        /// </summary>
+        public static string S_DRAGDROP_COPY_SINGLE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY_SINGLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy {0} items to {1}.
         /// </summary>
         public static string S_DRAGDROP_COPY_TARGET {
             get {
                 return ResourceManager.GetString("S_DRAGDROP_COPY_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy {0} to {1}.
+        /// </summary>
+        public static string S_DRAGDROP_COPY_TARGET_SINGLE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_COPY_TARGET_SINGLE", resourceCulture);
             }
         }
         
@@ -1362,7 +1380,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move {0} item(s).
+        ///   Looks up a localized string similar to Move {0} items.
         /// </summary>
         public static string S_DRAGDROP_MOVE {
             get {
@@ -1371,11 +1389,29 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Move {0} item(s) to {1}.
+        ///   Looks up a localized string similar to Move {0}.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE_SINGLE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE_SINGLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move {0} items to {1}.
         /// </summary>
         public static string S_DRAGDROP_MOVE_TARGET {
             get {
                 return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Move {0} to {1}.
+        /// </summary>
+        public static string S_DRAGDROP_MOVE_TARGET_SINGLE {
+            get {
+                return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET_SINGLE", resourceCulture);
             }
         }
         

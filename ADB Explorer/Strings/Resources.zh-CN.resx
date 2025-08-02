@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1057,15 +1057,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>验证 {0}</value>
   </data>
-  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
-    <value>粘贴{0}个{1}项</value>
-  </data>
-  <data name="S_PASTE_CUT_ITEMS" xml:space="preserve">
-    <value>粘贴1个{0}项</value>
-  </data>
-  <data name="S_COPIED" xml:space="preserve">
-    <value>复制</value>
-  </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>链接</value>
   </data>
@@ -1300,6 +1291,9 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_ACTION_UPDATE" xml:space="preserve">
     <value>更新</value>
   </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>已使用 {0}%</value>
+  </data>
   <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
     <value>滚动至此</value>
   </data>
@@ -1339,20 +1333,11 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="ScrollBar_LineRightCommand" xml:space="preserve">
     <value>向右滚动</value>
   </data>
-  <data name="S_MENU_REDO" xml:space="preserve">
-    <value>重做</value>
-  </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
     <value>撤消</value>
   </data>
-  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
-    <value>已使用 {0}%</value>
-  </data>
-  <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>块设备</value>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>字符设备</value>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>重做</value>
   </data>
   <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
     <value>通知</value>
@@ -1360,14 +1345,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
     <value>单击以显示更多信息</value>
   </data>
-  <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>未知</value>
-  </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>损坏的符号链接</value>
-  </data>
-  <data name="S_FILE_SOCKET" xml:space="preserve">
-    <value>Socket</value>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>应用语言</value>
   </data>
   <data name="S_LANG_NOTIFICATION" xml:space="preserve">
     <value>在设置中选择应用的语言。
@@ -1377,10 +1356,22 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
     <value>转到 Weblate</value>
   </data>
-  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
-    <value>应用语言</value>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>块设备</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>字符设备</value>
   </data>
   <data name="S_FILE_FIFO" xml:space="preserve">
     <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>未知</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>损坏的符号链接</value>
   </data>
 </root>

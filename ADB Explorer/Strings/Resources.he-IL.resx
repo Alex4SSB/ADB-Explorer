@@ -1446,12 +1446,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
     <value>הדבק {0} פריטים שנגזרו</value>
   </data>
-  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
-    <value>הדבק {0} פריטים ש{1}</value>
-  </data>
-  <data name="S_COPIED" xml:space="preserve">
-    <value>הועתקו</value>
-  </data>
   <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
     <value>{0} תוך {1} ({2})</value>
   </data>

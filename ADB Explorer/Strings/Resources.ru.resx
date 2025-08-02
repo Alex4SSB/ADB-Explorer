@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Символ(ы) Робота Андроид</value>
+  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Робот Android воспроизводится или модифицируется на основе работы, созданной и распространяемой Google, и используется в соответствии с условиями, описанными в лицензии Creative Commons 3.0 с указанием авторства.</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
     <value>Анимации</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Иконка APK лицензирована Apache License, Version 2.0.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>Не удалось получить версию ADB с заданного пути.</value>
@@ -129,95 +135,20 @@
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>Версия ADB с предоставленного пути слишком низкая.</value>
   </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Не удалось предопределить ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Выберите исполняемый файл ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Обнулить Настройки Программы</value>
+  </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
     <value>Новая версия программы</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
     <value>Ошибка навигации</value>
-  </data>
-  <data name="S_DELETE_ACTION" xml:space="preserve">
-    <value>Удалить</value>
-  </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>не удалось подключиться к</value>
-  </data>
-  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
-    <value>Ошибка подключения</value>
-  </data>
-  <data name="S_REM_EMU" xml:space="preserve">
-    <value>Убить эмулятор</value>
-  </data>
-  <data name="S_REM_HIST_DEV" xml:space="preserve">
-    <value>Удалить устройство</value>
-  </data>
-  <data name="S_REM_DEV" xml:space="preserve">
-    <value>Отключить устройство</value>
-  </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>ADB-сервер необходимо перезапустить, чтобы отключить mDNS.</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Конфликтующие приложения</value>
-  </data>
-  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
-    <value>Скачать ADB</value>
-  </data>
-  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
-    <value>Продолжить</value>
-  </data>
-  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
-    <value>Больше информации</value>
-  </data>
-  <data name="S_BUTTON_CLOSE" xml:space="preserve">
-    <value>Закрыть</value>
-  </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Перезапустить ADB Сейчас</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Перезапустить позже</value>
-  </data>
-  <data name="S_NEW_ITEM" xml:space="preserve">
-    <value>Новый файл</value>
-  </data>
-  <data name="S_NEW_FOLDER" xml:space="preserve">
-    <value>Новая папка</value>
-  </data>
-  <data name="S_REM_DEVICE" xml:space="preserve">
-    <value>Вы уверены, что хотите удалить это устройство?</value>
-  </data>
-  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value>Удалить {0}</value>
-  </data>
-  <data name="S_REPLACE" xml:space="preserve">
-    <value>Заменить</value>
-  </data>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Символ(ы) Робота Андроид</value>
-  </data>
-  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
-    <value>Обнулить Настройки Программы</value>
-  </data>
-  <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>Очистить Карзину</value>
-  </data>
-  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Ошибка при отключении</value>
-  </data>
-  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Подтвердите Удаление</value>
-  </data>
-  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Ошибка при создании</value>
-  </data>
-  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Ошибки при восстановлении</value>
-  </data>
-  <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Перезапустить программу, чтобы изменения вступили в силу</value>
-  </data>
-  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
-    <value>Выберите исполняемый файл ADB</value>
   </data>
   <data name="S_COPY_APK_NAME" xml:space="preserve">
     <value>Скопировать имя Пакета</value>
@@ -228,6 +159,24 @@
   <data name="S_RESTORE_ALL" xml:space="preserve">
     <value>Восстановить все элементы</value>
   </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Очистить Карзину</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Ошибка пути</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>не удалось подключиться к</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Ошибка подключения</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Ошибка при отключении</value>
+  </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>Ошибка соединения</value>
   </data>
@@ -237,14 +186,32 @@
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>ROOT доступ</value>
   </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Подтвердите Удаление</value>
+  </data>
   <data name="S_PERM_DEL" xml:space="preserve">
     <value>Удалить навсегда</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Ошибка при создании</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Ошибки при восстановлении</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Подтвердите удаление</value>
   </data>
   <data name="S_INSTALL_APK" xml:space="preserve">
     <value>Выбрать пакеты для установки</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Убить эмулятор</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Удалить устройство</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Отключить устройство</value>
   </data>
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
     <value>Файловые операции</value>
@@ -254,6 +221,9 @@
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
     <value>Соединить и/или подключить Wi-Fi устройство (не используя mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Перезапустить программу, чтобы изменения вступили в силу</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Ошибка чтения файла</value>
@@ -266,6 +236,9 @@
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
     <value>Не удалось отправить файл обратно на устройство.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB-сервер необходимо перезапустить, чтобы отключить mDNS.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Отключить mDNS</value>
@@ -303,6 +276,9 @@
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Извлечь в корень диска Windows</value>
   </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Конфликтующие приложения</value>
+  </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>Мониторинг недоступен во время работы этих приложений:</value>
   </data>
@@ -310,13 +286,21 @@
     <value>Прогресс извлечения/отправки отображается в байтах.
 Процент доступен только когда известен общий размер.</value>
   </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Включайте только если вы будете использовать приложение вместе с Проводником.
-Этот параметр можно изменить в настройках.</value>
-  </data>
   <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
     <value>Невозможно выгрузить исполняемый файл.
 Будет использоваться метод прогресса использования диска.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>Monitoring File Explorer позволяет приложению выполнять операции Drag / Clipboard Pull напрямую в целевую папку.
+
+В противном случае Pull выполняется во временную папку приложения, откуда File Explorer получает файл в виде потока, что требует использования небольшого буфера.
+Эти два дополнительных шага значительно замедляют процесс.
+
+Функция автоматически отключается для других выбранных файловых менеджеров.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>Включайте только если вы будете использовать приложение вместе с Проводником.
+Этот параметр можно изменить в настройках.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Вас приветствует новая версия ADB Explorer!
@@ -329,15 +313,28 @@
 • Имена файлов нечувствительны к регистру
 • Установка APK не поддерживается</value>
   </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>В приложении используется множество анимаций, включённых как часть Fluent Design.
+Анимация боковых панелей всегда отключается, когда окно приложения развёрнуто на втором мониторе.
+
+• Если включить эту настройку, отключатся все анимации приложения, кроме индикаторов загрузки (progress bars, progress rings) и шкал использования диска.</value>
+  </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
     <value>Все настройки будут сброшены при закрытии приложения.
 Это действие нельзя отменить. Вы уверены?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Выберите Запустить, если ADB уже авторизован в WSA.
+Чтобы разрешить ADB, откройте расширенные настройки WSA.</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
     <value>{0} выбранных файлов не могут быть созданы в корне диска Windows.</value>
   </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Узнайте больше про ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Скачать ADB</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
     <value>Вспомогательная программа для прочтения прогресса отправки/извлечения из ADB.</value>
@@ -363,6 +360,12 @@
   <data name="S_SELECT_ADB_PATH" xml:space="preserve">
     <value>Выберите путь к ADB</value>
   </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Больше информации</value>
+  </data>
   <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
     <value>Мониторинг Проводника:</value>
   </data>
@@ -377,6 +380,9 @@
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>Перейти на страницу версии</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Закрыть</value>
   </data>
   <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
     <value>Перейти к списку изменений</value>
@@ -394,6 +400,12 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
     <value>Помощь с ADB</value>
   </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Перезапустить ADB Сейчас</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Перезапустить позже</value>
+  </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
     <value>Выберите назначение для {0}</value>
   </data>
@@ -408,12 +420,30 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Следующие элементы будут безвозвратно удалены:
 {0}</value>
   </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Новый файл</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Новая папка</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Лицензия Creative Commons (CC)</value>
+  </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Во время чтения этой папки произошла ошибка.
 Контент может отображаться неправильно.</value>
   </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} является родительской папкой для целевой директории.</value>
+  </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
     <value>Вы действительно хотите завершить эмулятор?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить это устройство?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Удалить {0}</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
     <value>Отключить {0}</value>
@@ -437,6 +467,9 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SKIP" xml:space="preserve">
     <value>Пропустить</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Заменить</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
     <value>Объединить или заменить</value>
@@ -495,8 +528,14 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
     <value>Включить компактный вид</value>
   </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Прекращать опрос при передаче файлов</value>
+  </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Разрешить одновременные операции</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Автообновление медиатеки после копирования</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Запрос по устройствам</value>
@@ -548,6 +587,9 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
     <value>Тема</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Принудительные стили</value>
   </data>
   <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
     <value>Отключить аппаратное ускорение</value>
@@ -626,6 +668,13 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>Фильтр операций</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Включить авто воспроизведение</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Отключить авто воспроизведение
+Отмена всех запусков</value>
   </data>
   <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
     <value>Логирование остановлено</value>
@@ -849,6 +898,12 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_HOURS_SHORT" xml:space="preserve">
     <value>{0}час</value>
   </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Режим опроса служб: ВЫКЛ&lt;LineBreak /&gt;• Сервер &lt;Italic&gt;возможно&lt;/Italic&gt; активен&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Нажмите, чтобы включить сервер и опрос</value>
+  </data>
   <data name="S_MDNS_ON" xml:space="preserve">
     <value>Сервер запущен</value>
   </data>
@@ -921,6 +976,12 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
     <value>Беспровод</value>
   </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Нет</value>
+  </data>
   <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
     <value>Неизвестен</value>
   </data>
@@ -984,6 +1045,9 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_PASTE" xml:space="preserve">
     <value>Вставить</value>
   </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Сброс</value>
+  </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
     <value>Операция</value>
   </data>
@@ -992,15 +1056,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>Сверить {0}</value>
-  </data>
-  <data name="S_PASTE_CUT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Вставить {0} {1} элементов</value>
-  </data>
-  <data name="S_PASTE_CUT_ITEMS" xml:space="preserve">
-    <value>Вставить 1 {0} элемент</value>
-  </data>
-  <data name="S_COPIED" xml:space="preserve">
-    <value>Скопированных</value>
   </data>
   <data name="S_FILE_TYPE_LINK" xml:space="preserve">
     <value>Ссылка</value>
@@ -1068,11 +1123,41 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_ITEM_COPY" xml:space="preserve">
     <value>{0} - Копировать</value>
   </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Соблюдение правил именования Unix (через ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования Windows</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования корневых дисков Windows</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Уникальность в текущем местоположении</value>
+  </data>
   <data name="S_POPUP_WARNING" xml:space="preserve">
     <value>Предупреждения</value>
   </data>
   <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
     <value>Имя файла нарушает правила Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования корня диска Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Некоторые выбранные файлы имеют противоречивые имена в FUSE / Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Некоторые скопированные файлы имеют противоречивые имена в FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Скопированный файл нарушает правила именования FUSE</value>
   </data>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Выбранный элемент не является файлом/папкой</value>
@@ -1277,6 +1362,12 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_FILE_BLOCK" xml:space="preserve">
     <value>Устройство Block</value>
   </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Устройство Char</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>Неизвестный</value>
   </data>
@@ -1294,106 +1385,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Сохранённые пути</value>
-  </data>
-  <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>Иконка APK лицензирована Apache License, Version 2.0.</value>
-  </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Не удалось предопределить ADB</value>
-  </data>
-  <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Ошибка пути</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Monitoring File Explorer позволяет приложению выполнять операции Drag / Clipboard Pull напрямую в целевую папку.
-
-В противном случае Pull выполняется во временную папку приложения, откуда File Explorer получает файл в виде потока, что требует использования небольшого буфера.
-Эти два дополнительных шага значительно замедляют процесс.
-
-Функция автоматически отключается для других выбранных файловых менеджеров.</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>В приложении используется множество анимаций, включённых как часть Fluent Design.
-Анимация боковых панелей всегда отключается, когда окно приложения развёрнуто на втором мониторе.
-
-• Если включить эту настройку, отключатся все анимации приложения, кроме индикаторов загрузки (progress bars, progress rings) и шкал использования диска.</value>
-  </data>
-  <data name="S_WSA_LAUNCH" xml:space="preserve">
-    <value>Выберите Запустить, если ADB уже авторизован в WSA.
-Чтобы разрешить ADB, откройте расширенные настройки WSA.</value>
-  </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>Лицензия Creative Commons (CC)</value>
-  </data>
-  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value>{0} является родительской папкой для целевой директории.</value>
-  </data>
-  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Прекращать опрос при передаче файлов</value>
-  </data>
-  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Автообновление медиатеки после копирования</value>
-  </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Принудительные стили</value>
-  </data>
-  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
-    <value>Включить авто воспроизведение</value>
-  </data>
-  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
-    <value>Отключить авто воспроизведение
-Отмена всех запусков</value>
-  </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Режим опроса служб: ВЫКЛ&lt;LineBreak /&gt;• Сервер &lt;Italic&gt;возможно&lt;/Italic&gt; активен&lt;/Span&gt;</value>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Нажмите, чтобы включить сервер и опрос</value>
-  </data>
-  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
-    <value>AC</value>
-  </data>
-  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
-    <value>Нет</value>
-  </data>
-  <data name="S_DROP" xml:space="preserve">
-    <value>Сброс</value>
-  </data>
-  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
-    <value>Соблюдение правил именования Unix (через ADB)</value>
-  </data>
-  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
-    <value>Соблюдайте правила именования FUSE</value>
-  </data>
-  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
-    <value>Соблюдайте правила именования Windows</value>
-  </data>
-  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Соблюдайте правила именования корневых дисков Windows</value>
-  </data>
-  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
-    <value>Уникальность в текущем местоположении</value>
-  </data>
-  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>Выбранный файл нарушает правила именования корня диска Windows</value>
-  </data>
-  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
-    <value>Некоторые выбранные файлы имеют противоречивые имена в FUSE / Windows</value>
-  </data>
-  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
-    <value>Выбранный файл нарушает правила именования FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
-    <value>Некоторые скопированные файлы имеют противоречивые имена в FUSE</value>
-  </data>
-  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
-    <value>Скопированный файл нарушает правила именования FUSE</value>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Устройство Char</value>
-  </data>
-  <data name="S_FILE_FIFO" xml:space="preserve">
-    <value>FIFO</value>
   </data>
   <data name="KILO" xml:space="preserve">
     <value>{0} КБ</value>
