@@ -1417,19 +1417,19 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>‎{0} B</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>העתק {0} פריט(ים)</value>
+    <value>העתק {0} פריטים</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>העתק {0} פריט(ים) ל {1}</value>
+    <value>העתק {0} פריטים ל-{1}</value>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>העבר {0} פריט(ים) ל {1}</value>
+    <value>העבר {0} פריטים ל-{1}</value>
   </data>
   <data name="S_DRAGDROP_LINK" xml:space="preserve">
-    <value>צור קישור ב {0}</value>
+    <value>צור קישור ב-{0}</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>העבר {0} פריט(ים)</value>
+    <value>העבר {0} פריטים</value>
   </data>
   <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
     <value>האזור מוסתר - יש לפתוח את חלון הסייר מחדש.</value>
@@ -1451,5 +1451,17 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
     <value>{0} מתוך {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>העתק את {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>העתק את {0} ל-{1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>העבר את {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>העבר את {0} ל-{1}</value>
   </data>
 </root>
