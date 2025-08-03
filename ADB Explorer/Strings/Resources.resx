@@ -1798,4 +1798,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Finished with no confirmation</value>
     <comment>The error message displayed when a sync operation has finished but ADB did not provide a confirmation</comment>
   </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Validation error: {0}</value>
+    <comment>The title of the error message displayed on a file operation validation error</comment>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validating…</value>
+    <comment>The info displayed in file operation progress during content validation</comment>
+  </data>
 </root>

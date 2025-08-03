@@ -83,7 +83,7 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
         if (isVisible is not null)
         {
             IsVisible = isVisible;
-            isVisible.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsVisible = e.NewValue;
+            isVisible.PropertyChanged += (sender, e) => IsVisible = e.NewValue;
         }
     }
 
@@ -173,7 +173,7 @@ public class DynamicAltTextMenu : AltTextMenu
                               FileAction altAction = null)
         : base(fileAction, icon, altText, animation: animation, iconSize: iconSize, animationSource: animationSource, altAction: altAction)
     {
-        altText.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => AltText = e.NewValue;
+        altText.PropertyChanged += (sender, e) => AltText = e.NewValue;
     }
 }
 
@@ -229,7 +229,7 @@ public class IconMenu : ActionMenu
         if (selectionBar is not null)
         {
             IsSelectionBarVisible = selectionBar.Value;
-            selectionBar.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsSelectionBarVisible = e.NewValue;
+            selectionBar.PropertyChanged += (sender, e) => IsSelectionBarVisible = e.NewValue;
         }
     }
 
@@ -312,7 +312,7 @@ public class GeneralSubMenu : SubMenu
         
         if (content is CheckBox cb)
         {
-            cb.IsEnabledChanged += (object sender, DependencyPropertyChangedEventArgs e) => IsEnabled = cb.IsEnabled;
+            cb.IsEnabledChanged += (sender, e) => IsEnabled = cb.IsEnabled;
         }
     }
 }
@@ -424,9 +424,9 @@ public class DualActionButton : IconMenu
         IsCheckable = isCheckable;
 
         IsChecked = isChecked;
-        observableIsChecked.PropertyChanged += (object sender, PropertyChangedEventArgs<bool> e) => IsChecked = e.NewValue;
+        observableIsChecked.PropertyChanged += (sender, e) => IsChecked = e.NewValue;
 
-        icon.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Icon = icon;
+        icon.PropertyChanged += (sender, e) => Icon = icon;
     }
 
     /// <summary>

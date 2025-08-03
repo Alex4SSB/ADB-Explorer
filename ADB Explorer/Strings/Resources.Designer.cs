@@ -1866,6 +1866,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Validating….
+        /// </summary>
+        public static string S_FILEOP_VALIDATING {
+            get {
+                return ResourceManager.GetString("S_FILEOP_VALIDATING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Queued.
         /// </summary>
         public static string S_FILEOP_WAITING {
@@ -3866,6 +3875,15 @@ namespace ADB_Explorer.Strings {
         public static string S_VALIDATE_MISSING {
             get {
                 return ResourceManager.GetString("S_VALIDATE_MISSING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validation error: {0}.
+        /// </summary>
+        public static string S_VALIDATION_ERROR {
+            get {
+                return ResourceManager.GetString("S_VALIDATION_ERROR", resourceCulture);
             }
         }
         

@@ -436,7 +436,7 @@
                         <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                         <Setter Property="Glyph" Value="&#xF13E;" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Message}" Value="Finished with no confirmation">
+                            <DataTrigger Binding="{Binding NoConfirmation}" Value="True">
                                 <Setter Property="Foreground" Value="{StaticResource EditorTextChangedBrush}" />
                                 <Setter Property="Glyph" Value="&#xF142;" />
                             </DataTrigger>
@@ -453,7 +453,7 @@
                 <RowDefinition />
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <TextBlock Margin="0,0,0,2" Text="Validating..." />
+            <TextBlock Margin="0,0,0,2" Text="{Binding Source={x:Static Member=strings:Resources.S_FILEOP_VALIDATING}}" />
             <ui:ProgressBar
                 Grid.Row="1"
                 IsIndeterminate="True"
@@ -651,11 +651,11 @@
                         <Setter Property="Glyph" Value="&#xF13D;" />
                         <Setter Property="Foreground" Value="{DynamicResource TrashDriveAltBorder}" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Completed">
+                            <DataTrigger Binding="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}, ConverterParameter=Completed}" Value="True">
                                 <Setter Property="Glyph" Value="&#xF13E;" />
                                 <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                             </DataTrigger>
-                            <DataTrigger Binding="{Binding ElementName=FileStatus, Path=Text}" Value="Validated">
+                            <DataTrigger Binding="{Binding ProgressUpdates, Converter={StaticResource FileOpTreeStatusConverter}, ConverterParameter=Validated}" Value="True">
                                 <Setter Property="Glyph" Value="&#xF13E;" />
                                 <Setter Property="Foreground" Value="{DynamicResource NewDeviceAltBorder}" />
                             </DataTrigger>

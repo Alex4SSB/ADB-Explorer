@@ -140,7 +140,9 @@ public static class Security
         var message = "";
         if (source.Count() == 1)
         {
-            message = update is HashFailInfo fail ? "Validation error: " + fail.Message : "Validated";
+            message = update is HashFailInfo fail
+                ? string.Format(Strings.Resources.S_VALIDATION_ERROR, fail.Message)
+                : Strings.Resources.S_FILEOP_VALIDATED;
         }
         else
         {
