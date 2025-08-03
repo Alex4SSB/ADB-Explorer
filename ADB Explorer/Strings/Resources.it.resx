@@ -559,4 +559,34 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
     <value>Rispetta le regole di Windows sul nome</value>
   </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Rispetta le regole di Windows sul nome della radice dell'unità</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Unico nella cartella corrente</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Avvisi</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>Un file selezionato non rispetta le regole di Windows sul nome</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Un file selezionato non rispetta le regole di Windows sul nome della radice dell'unità</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Alcuni file selezionati hanno nomi in conflitto tra FUSE e Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Un file selezionato non rispetta le regole di FUSE sul nome</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Alcuni file selezionati hanno nomi in conflitto su FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Un file copiato viola le regole di FUSE sul nome</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Un file selezionato non è un file / cartella</value>
+  </data>
 </root>
