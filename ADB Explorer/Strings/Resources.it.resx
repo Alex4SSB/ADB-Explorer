@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,444 @@
   </resheader>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Il robot Android viene riprodotto o modificato da un lavoro creato e condiviso da Google e utilizzato secondo i termini descritti nella licenza Creative Commons 3.0.</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Filtra in base all'operazione sui file</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Disabilita auto esecuzione delle operazioni
+Annulla tutte le operazioni in corso</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Abilita auto esecuzione delle operazioni</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Dischi del dispositivo</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Indietro</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Avanti</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Cartella padre</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filtra</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Dispositivi</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Metti sul dispositivo</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Cartelle</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Aggiorna</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copia</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Altro</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Modifica</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nuovo</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Cartella</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>File</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Seleziona tutti</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Taglia</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Incolla collegamento</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>RInomina</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Aggiorna l'ultima modifica</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Chiudi l'editor</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Salva le modifiche</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Installa</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Copia nella cartella temporanea</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Apri percorso originale</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Cerca nel browser</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copia negli appunti</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>Utilizzo del disco da parte di ADB</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Lettura: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Scrittura: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>Altro: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Cerca aggiornamenti all'apertura</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>Informazioni</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>elemento</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>elementi</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>Questa cartella è vuota.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Impossibile ottenere la lista.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Nessun elemento coincide con i criteri del filtro.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Questa cartella&lt;Italic&gt;sembra&lt;/Italic&gt; vuota&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… a occhio nudo&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>elemento selezionato</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>elementi selezionati</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Tipo di operazione</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Nome del file / cartella</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Stato</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Origine</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destinazione</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Aggiunto alle</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Icona</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Nome</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Percorso originale</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Ultima modifica</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Tipo</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>DImensione</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Data e ora eliminazione</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ID utente</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Versione</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>Il server ADB non risponde</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Tempo dall'ultima risposta del server</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Forza chiusura</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Forza chiusura del processo</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Aggiorna la lista</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Riavvia ADB</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>Il server è chiuso</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>In attesa di una risposta da {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Il rilevamento dei servizi è disattivato&lt;LineBreak /&gt;• Il server&lt;Italic&gt;potrebbe&lt;/Italic&gt; essere acceso&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Premi per attivare il server e il rilevamento</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>Il server è attivo e funzionante</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Supporto limitato</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Alcune operazioni sono fallite</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Accesso root abilitato</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>L'accesso root può essere attivato</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Recovery</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Voltaggio: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperatura: {0}°C</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Riavvia in</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Sistema operativo</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (con riavvio automatico)</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Non autorizzato</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulatore</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>Servizio mDNS</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Stato della batteria sconosciuto</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, in carica</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Wireless</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Nessuna</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Sconosciuto</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>In carica</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Si sta scaricando</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Non si sta caricando</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Piena</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Stato: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Salute: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Buona</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Surriscaldata</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Morta</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Voltaggio troppo alto</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Problema non specificato</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Fredda</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Avvia</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>Avvio WSA</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Non chiederlo più.</value>
+  </data>
+  <data name="S_EXTRACT_TITLE" xml:space="preserve">
+    <value>Estrazione file</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Invio alla shell</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Incolla</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Rilascio</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>Conflitto durante {0}</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>operazione</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>operazioni</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Valida {0}</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Collegamento</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (collegamento)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Pacchetto applicazione Android (APK)</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Eseguibile di Windows</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Cestino</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Sì</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Non connesso</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Memoria interna</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>App installate</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>Scheda microSD</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>Memoria USB esterna (OTG)</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Disco emulato</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Cartella temporanea</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>Il nome {0} non è consentito sul file system di destinazione</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Il contenuto non corrisponde</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Non esiste più sulla destinazione</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Eliminazione permanente</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/D</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Il percorso fornito non esiste.</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Il menù è vuoto</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Copia</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Rispetta le regole di Unix sul nome (tramite ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Rispetta le regole di FUSE sul nome</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Rispetta le regole di Windows sul nome</value>
   </data>
 </root>
