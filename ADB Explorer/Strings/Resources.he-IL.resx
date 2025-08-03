@@ -1470,4 +1470,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
     <value>הסתיים ללא אישור</value>
   </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>טעות באימות: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>מאמת…</value>
+  </data>
 </root>
