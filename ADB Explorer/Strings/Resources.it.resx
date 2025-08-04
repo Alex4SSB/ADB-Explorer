@@ -560,7 +560,7 @@ Annulla tutte le operazioni in corso</value>
     <value>Rispetta le regole di Windows sul nome</value>
   </data>
   <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
-    <value>Rispetta le regole di Windows sul nome della radice dell'unità</value>
+    <value>Rispetta le regole di Windows sul nome della radice dell'unità (/)</value>
   </data>
   <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
     <value>Unico nella cartella corrente</value>
@@ -572,7 +572,7 @@ Annulla tutte le operazioni in corso</value>
     <value>Un file selezionato non rispetta le regole di Windows sul nome</value>
   </data>
   <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
-    <value>Un file selezionato non rispetta le regole di Windows sul nome della radice dell'unità</value>
+    <value>Un file selezionato non rispetta le regole di Windows sul nome della root dell'unità (/)</value>
   </data>
   <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
     <value>Alcuni file selezionati hanno nomi in conflitto tra FUSE e Windows</value>
@@ -1048,7 +1048,7 @@ L'animazione delle viste laterali è sempre disabilitata quando la finestra dell
     <value>Mostra app di sistema</value>
   </data>
   <data name="S_DONATE" xml:space="preserve">
-    <value>Dona o sponsorizza</value>
+    <value>Dona o Abbonati</value>
   </data>
   <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
     <value>Dispositivo</value>
@@ -1253,5 +1253,227 @@ L'animazione delle viste laterali è sempre disabilitata quando la finestra dell
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Errore nell'elenco della cartella</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Posizione di ADB (versione minima: {0}):</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>Selezionare un'opzione per visualizzare la spiegazione</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>Un programma ausiliario per leggere i progressi del trasferimento da ADB.</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validazione in corso…</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Errore nella validazione: {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copia {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copia {0} in {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Sposta {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Sposta {0} in {1}</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} di {1}</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Incolla {0} elementi tagliati</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Incolla {0} elementi copiati</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Incolla 1 elemento copiati</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Incolla 1 elemento tagliato</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket (Unix)</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Dispositivo a blocchi (Unix)</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Dispositivo a caratteri (Unix)</value>
+  </data>
+  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
+    <value>Area ostruita - riaprire la finestra.</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Cestina</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Aggiorna</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% usato</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Scorri qui</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Inizio</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Fine</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Pagina sù</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Pagina giù</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Scorri su</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Scorri giù</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Bordo sinistro</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Bordo destro</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Pagina sinistra</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Pagina destra</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Scorri a sinistra</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Scorri a destra</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Rifai</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notifiche</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Premi per mostrare più informazioni</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>Lingua dell'app</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Seleziona la lingua dell'app nelle impostazioni.
+Il progresso della traduzione viene visualizzato per la lingua selezionata.
+Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Sposta</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Annullata</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Precedente</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Fallita</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>In coda</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>In corso</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Operazione precedente</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Totale:</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Bilancio energia: {0}Ah</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Crediti e Licenze di terze parti</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Cartella dei dati dell'app</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Dischi e funzioni</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Conflitti nell'incolla</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Sovrascrivi il percorso di ADB</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Cartelle per le operazioni</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Si è verificato un errore mentre cercavo di elencare il contenuto della cartella.
+Il contenuto che vedi potrebbe essere incompleto.</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Verranno eliminati i seguenti elementi:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Verranno eliminati definitivamente i seguenti elementi:
+{0}</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Impossibile sovrascrivere il percorso di ADB</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Prendi dal dispositivo (Pull) e metti nella root del disco di Windows (C:\)</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Prendi dal dispositivo (Pull) l'elemento all'origine del collegamento</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} dei file selezionati non può essere creato nella root del disco di Windows (C:\).</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root (/)</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>Cavo</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Questa applicazione è un'interfaccia utente per ADB - Android Debug Bridge.
+Per utilizzare l'applicazione, è necessario avere ADB sul PC.
+ADB è disponibile come parte degli Android SDK Platform Tools.
+Puoi usare il link fornito per scaricare gli SDK Platform Tools.
+Purtroppo, non possiamo fornire ADB con l'applicazione a delle restrizioni della licenza.</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Percorso</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Può essere annullato con Reimposta le impostazioni dell'app, o manualmente nel file delle impostazioni</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} è un antenato della cartella di destinazione.</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Reindirizzamento del progresso delle operazioni</value>
   </data>
 </root>
