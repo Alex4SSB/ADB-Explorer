@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Helpers;
 
@@ -60,5 +61,45 @@ public class FolderHelper
 
             return null;
         }
+    }
+
+    public static List<ShellItem> GetEmptySubfoldersRecursively(ShellFolder rootFolder)
+    {
+        var emptyFolders = new List<ShellItem>();
+        FindEmptySubfolders(rootFolder, emptyFolders);
+        return emptyFolders;
+    }
+
+    private static bool FindEmptySubfolders(ShellFolder folder, List<ShellItem> result)
+    {
+        if (!folder.IsFolder) return false;
+
+        bool hasNonFolder = false;
+        bool hasNonEmptyFolder = false;
+
+        foreach (var child in folder)
+        {
+            if (!child.IsFolder)
+            {
+                hasNonFolder = true;
+                continue;
+            }
+
+            // Recurse into subfolder
+            if (!FindEmptySubfolders((ShellFolder)child, result))
+            {
+                hasNonEmptyFolder = true;
+            }
+        }
+
+        bool isEmpty = !hasNonFolder && !hasNonEmptyFolder && !folder.Any();
+
+        if (isEmpty)
+        {
+            result.Add(folder);
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1001,6 +1001,16 @@ internal static class FileActionLogic
                     Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellItem)));
             }
 
+            if (op.FilePath.IsDirectory)
+            {
+                var empty = FolderHelper.GetEmptySubfoldersRecursively((ShellFolder)op.FilePath.ShellItem);
+                foreach (var folder in empty)
+                {
+                    string relative = FileHelper.ExtractRelativePath(folder.FileSystemPath, op.FilePath.FullPath).Replace('\\', '/');
+                    ShellFileOperation.MakeDir(op.Device, FileHelper.ConcatPaths(op.TargetPath.FullPath, relative));
+                }
+            }
+
             // In push we can delete the source once the operation has completed
             if (op.VFDO.CurrentEffect is DragDropEffects.Move)
             {
