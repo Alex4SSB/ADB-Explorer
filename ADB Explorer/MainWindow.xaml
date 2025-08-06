@@ -879,10 +879,6 @@
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.LGPL3}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.LGPL3}}" />
                                                 <ui:HyperlinkButton
-                                                    Content="Apache"
-                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.L_APACHE_LIC}}"
-                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.L_APACHE_LIC}}" />
-                                                <ui:HyperlinkButton
                                                     Click="AndroidRobotLicense_Click"
                                                     Content="{x:Static strings:Resources.S_ANDROID_ICONS_TITLE}"
                                                     ToolTip="{x:Static strings:Resources.S_SEE_TERMS}" />
