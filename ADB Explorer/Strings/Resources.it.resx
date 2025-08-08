@@ -1404,7 +1404,7 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
     <value>Totale:</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Bilancio energia: {0}Ah</value>
+    <value>Bilancio energia: {0}A</value>
   </data>
   <data name="S_ATTRIBUTIONS" xml:space="preserve">
     <value>Crediti e Licenze di terze parti</value>
