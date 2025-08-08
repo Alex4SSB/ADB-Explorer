@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels;
+using AdvancedSharpAdbClient.Models;
 
 namespace ADB_Explorer.Models;
 
@@ -41,6 +42,8 @@ public class LogicalDevice : Device
 
     #endregion
 
+    public DeviceData DeviceData { get; private set; }
+
     private LogicalDevice(string name, string id)
     {
         Name = name;
@@ -51,8 +54,12 @@ public class LogicalDevice : Device
         InitDeviceDrives();
     }
 
-    public static LogicalDevice New(string name, string id, string status)
+    public static LogicalDevice New(Match match)
     {
+        var name = DeviceHelper.ParseDeviceName(match.Groups["model"].Value, match.Groups["device"].Value);
+        var id = match.Groups["id"].Value;
+        var status = match.Groups["status"].Value;
+
         var deviceType = DeviceHelper.GetType(id, status);
         var deviceStatus = DeviceHelper.GetStatus(status);
         var ip = deviceType is DeviceType.Remote ? id.Split(':')[0] : "";
@@ -60,10 +67,17 @@ public class LogicalDevice : Device
             ? RootStatus.Enabled
             : RootStatus.Unchecked;
 
-        if (deviceType is DeviceType.WSA && name.ToLower().Contains("subsystem"))
+        if (deviceType is DeviceType.WSA && name.Contains("subsystem", StringComparison.InvariantCultureIgnoreCase))
             name = Strings.Resources.S_TYPE_WSA;
 
-        return new LogicalDevice(name, id) { Type = deviceType, Status = deviceStatus, Root = rootStatus, IpAddress = ip };
+        return new LogicalDevice(name, id)
+        {
+            Type = deviceType,
+            Status = deviceStatus,
+            Root = rootStatus,
+            IpAddress = ip,
+            DeviceData = new(match.Value)
+        };
     }
 
     public void EnableRoot(bool enable)
