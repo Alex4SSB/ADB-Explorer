@@ -599,7 +599,8 @@
                                             <Button
                                                 HorizontalAlignment="Center"
                                                 Click="RestartAdbButton_Click"
-                                                Content="{Binding Source={x:Static Member=strings:Resources.S_RESTART_ADB}}" />
+                                                Content="{Binding Source={x:Static Member=strings:Resources.S_RESTART_ADB}}"
+                                                Style="{StaticResource RtlButtonStyle}" />
                                         </ui:SimpleStackPanel>
                                     </Grid>
                                 </Expander>
