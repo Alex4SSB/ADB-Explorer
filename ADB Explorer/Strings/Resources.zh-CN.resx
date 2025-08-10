@@ -1374,4 +1374,16 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
     <value>损坏的符号链接</value>
   </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>显示导航历史记录的菜单的工具提示</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>显示导航历史记录的菜单的工具提示</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>用于从列表中删除已保存位置的按钮的工具提示</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>用于打开已保存位置菜单的按钮的工具提示</value>
+  </data>
 </root>
