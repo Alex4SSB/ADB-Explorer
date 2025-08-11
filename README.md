@@ -8,15 +8,15 @@
 </a>
 <br></br>
 <p >
-  <a title="Platform" target="_blank">
-	<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
-  </a>
-  <a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
-    <img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" />
-  </a>
-	<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total" />
-	
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit">
+	<a title="Platform" target="_blank">
+		<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
+	</a>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
+		<img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" style="display:block;"/></a>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/releases">
+		<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total" /></a>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/commits">
+  		<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit"></a>
 </p>
 
 An interface to ADB that allows browsing, transferring, and editing of files with ease, in a modern and fluent Windows app, built in WPF.
