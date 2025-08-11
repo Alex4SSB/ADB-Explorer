@@ -14,6 +14,8 @@
   <a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
     <img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" />
   </a>
+	<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total" />
+	
   <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit">
 </p>
 
