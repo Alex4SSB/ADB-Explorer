@@ -929,7 +929,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>טמפרטורה: ‎{0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>מאזן נוכחי: ‎{0}A</value>
+    <value>מאזן זרם: ‎{0}A</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>הפעל מחדש לתוך</value>
