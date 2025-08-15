@@ -222,4 +222,31 @@
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
     <value>Emparejar y/o conectar a dispositivo WiFi (sin usar mDNS)</value>
   </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Reiniciar app para que los cambios surtan efecto</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Error leyendo archivo</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>No se pudo recuperar archivo para leerlo.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Error al escribir archivo</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>No se pudo enviar archivo al dispositivo.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Servidor ADB debe reiniciarse para deshabilitar mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Deshabilitar mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Ejecutar WSA en segundo plano</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restablecer</value>
+  </data>
 </root>
