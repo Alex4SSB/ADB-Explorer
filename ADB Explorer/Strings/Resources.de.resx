@@ -684,4 +684,22 @@ Sie können diese Einstellung jederzeit ändern.</value>
   <data name="S_NEW_VERSION" xml:space="preserve">
     <value>­</value>
   </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value></value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Kopieren auf Temp</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Offener Stück Drehort</value>
+  </data>
 </root>
