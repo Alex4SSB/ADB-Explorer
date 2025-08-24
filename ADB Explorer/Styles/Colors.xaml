@@ -132,6 +132,9 @@
     <Color x:Key="DarkFileOpHyperLinkBrush">#FF66B3FF</Color>
     <Color x:Key="LightFileOpHyperLinkBrush">#FF246DB3</Color>
 
+    <Color x:Key="DarkHyperLinkBrush">#FF90C4F9</Color>
+    <Color x:Key="LightHyperLinkBrush">#FF1155CC</Color>
+
     <Color x:Key="DarkSponsorIconBrush">#FFDB61A2</Color>
     <Color x:Key="LightSponsorIconBrush">#FFBF3989</Color>
 
@@ -191,6 +194,8 @@
         <SolidColorBrush x:Key="HistoryDeviceBottomBorderBrush" Color="{DynamicResource LightHistoryDeviceBottomBorderBrush}" />
 
         <SolidColorBrush x:Key="FileOpHyperLinkBrush" Color="{DynamicResource LightFileOpHyperLinkBrush}" />
+
+        <SolidColorBrush x:Key="HyperLinkBrush" Color="{DynamicResource LightFileOpHyperLinkBrush}" />
 
         <SolidColorBrush x:Key="SponsorIconBrush" Color="{DynamicResource LightSponsorIconBrush}" />
 
