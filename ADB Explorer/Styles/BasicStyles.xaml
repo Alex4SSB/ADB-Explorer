@@ -248,6 +248,7 @@
     <Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />
     <Style TargetType="ui:HyperlinkButton">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
+        <Setter Property="Foreground" Value="{DynamicResource HyperLinkBrush}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
                 <Setter Property="FlowDirection" Value="RightToLeft" />
