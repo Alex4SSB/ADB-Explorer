@@ -127,10 +127,10 @@
     <value>App-Animationen</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value></value>
+    <value>Das APK-Symbol unterliegt der Apache-Lizenz, Version 2.0.</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
-    <value>"ADB" auführbare Datei auswählen</value>
+    <value>ADB-Programmdatei auswählen</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
     <value>App-Einstellungen zurücksetzen</value>
@@ -352,7 +352,7 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value>Sprache</value>
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
+    <value>OK</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>Zurück</value>
@@ -640,10 +640,10 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value>Installierte Apps</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>SD-Card</value>
+    <value>µSD-Karte</value>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
-    <value>OTG-Gerät</value>
+    <value>OTG-Laufwerk</value>
   </data>
   <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
     <value>Leeren</value>
@@ -664,16 +664,16 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value>Navigationsverlauf</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>{0} Element(e) kopieren</value>
+    <value>{0} Elemente kopieren</value>
   </data>
   <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>{0} Element(e) nach {1} kopieren</value>
+    <value>{0} Elemente nach {1} kopieren</value>
   </data>
   <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>{0} Element(e) nach {1} verschieben</value>
+    <value>{0} Elemente nach {1} verschieben</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>{0} Element(e) verschieben</value>
+    <value>{0} Elemente verschieben</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>Aktiviert</value>
@@ -685,10 +685,10 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value>­</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
-    <value></value>
+    <value>Die ADB-Version konnte nicht über den angegebenen Pfad abgerufen werden.</value>
   </data>
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
-    <value></value>
+    <value>Die ADB-Version aus dem angegebenen Pfad ist zu niedrig.</value>
   </data>
   <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
     <value></value>
@@ -697,9 +697,578 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value></value>
   </data>
   <data name="S_MENU_COPY_TEMP" xml:space="preserve">
-    <value>Kopieren auf Temp</value>
+    <value>Nach Temporär kopieren</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
     <value>Offener Stück Drehort</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Deinstallieren bestätigen</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Pakete zum Installieren auswählen</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Emulator abwürgen</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Dateioperationen</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Fehler beim Lesen der Datei</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Fehler beim Schreiben der Datei</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Der ADB-Server muss neu gestartet werden, um mDNS zu deaktivieren.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>mDNS deaktivieren</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>WSA im Hintergrund starten</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>AdbProgressRedirection.exe bereitstellen</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>Nur Festplattennutzung</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>Fortschrittsmethode</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Fortschrittsumleitung</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Konflikt zwischen Apps</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Willkommen zur neuen Version von ADB Explorer!
+Die Versionshinweise sind auf GitHub verfügbar.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Alle App-Einstellungen werden beim Schließen der App zurückgesetzt.
+Dieser Vorgang kann nicht rückgängig gemacht werden. Sind Sie sicher?</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Erfahren Sie mehr über ADB</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
+    <value>Könnte fälschlicherweise einige Antivirenprogramme auslösen.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>Nach %LocalAppData%\AdbExplorer kopiert</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
+    <value>Wählen Sie eine Option aus, um die Erklärung anzuzeigen</value>
+  </data>
+  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
+    <value>Fortschrittsmethode auswählen:</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>ADB-Pfad auswählen</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Zur Versionsseite gehen</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Zu den Versionshinweisen gehen</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Ziel für {0} auswählen</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Ziel für mehrere Elemente auswählen</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Folgendes wird gelöscht:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Folgendes wird endgültig gelöscht:
+{0}</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Beim Versuch, den Inhalt dieses Ordners aufzulisten, ist ein Fehler aufgetreten.
+Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} ist ein Vorgänger des Zielordners.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Sind Sie sicher, dass Sie diesen Emulator abwürgen möchten?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Sind Sie sicher, dass Sie dieses Gerät entfernen möchten?</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Es gibt {0} miteinander in Konflikt stehende Elemente</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Es gibt {0} miteinander in Konflikt stehende Elemente in {1}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS aktivieren</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
+    <value>Befehlsprotokoll aktivieren</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Root automatisch aktivieren</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Manuell verbundene Geräte speichern</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Kompaktansicht aktivieren</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Gleichzeitige Operationen zulassen</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
+    <value>Papierkorb aktivieren</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Dateinamenserweiterungen anzeigen</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Versteckte Elemente anzeigen</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>System-Apps anzeigen</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Datei-Doppelklick</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>ADB-Pfad überschreiben</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Standardordner</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>Startbildschirm anzeigen</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Quellenangaben und Lizenzen von Drittanbietern</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>Bedingungen ansehen</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Filter-Dateioperationen</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Automatische Ausführung aktivieren</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Protokollaktualisierungen sind pausiert</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Protokollaktualisierungen pausieren</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Befehlsprotokoll</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Gerätelaufwerke</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Hoch</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Mehr</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Befehlsprotokoll löschen</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Prüft bei jedem Start auf Aktualisierungen</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Es gibt keine Elemente, die dem aktuellen Filter entsprechen.</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Operationstyp</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB-Server reagiert nicht</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Zeit seit der letzten Serverantwort</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>Server ist ausgefallen</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Warten auf Antwort: {0}</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>Server ist hochgefahren und läuft</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Eingeschränkte Unterstützung</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Manche Operationen sind fehlgeschlagen</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root-Zugriff aktiviert</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root kann aktiviert werden</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Aktueller Ausgleich: {0} A</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Querladen (automatischer Neustart)</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA-Start</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Nicht mehr anzeigen.</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Ablegen</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operationen</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Verknüpfung</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Verknüpfung)</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Emuliertes Laufwerk</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temporär</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>Dateiname auf dem Zieldateisystem ungültig: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Inhalt stimmt nicht überein</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Fehlt am Zielort</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Endgültige Löschung</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/V</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Der angegebene Pfad existiert nicht.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Benutzerdefinierter App-Datenpfad</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Menü ist leer</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Kopie</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Hält sich an die Unix-Namenskonventionen (über ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Hält sich an die FUSE-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Hält sich an die Windows-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Einzigartig am aktuellen Ort</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Warnungen</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>Eine ausgewählte Datei verstößt gegen die Windows-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Manche ausgewählten Dateien haben auf FUSE / Windows miteinander in Konflikt stehende Namen</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Eine ausgewählte Datei verstößt gegen die FUSE-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Manche kopierten Dateien haben auf FUSE miteinander in Konflikt stehende Namen</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Eine kopierte Datei verstößt gegen die FUSE-Namenskonventionen</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Ein ausgewähltes Element ist keine Datei/kein Ordner</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>Bis zum nächsten App-Start</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Nie wieder anzeigen</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA-App</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root-Status: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Ungeprüft</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Verboten</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Aktivieren</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Deaktivieren</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Kopplungscode</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP-Adresse / Hostname</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Kopplungsport</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Koppeln und verbinden</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Gespeichertes Gerät</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR-Kopplung</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Bereit zum Koppeln</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Alles löschen</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Neues Gerät hinzufügen</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Nicht autorisiert]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Dienst]</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Durchsuchen</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Verbinden</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} frei von {1}</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK-Installationsprogramm</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK-Installationsprogramme</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Pakete</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Fehler: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validiert</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Abgeschlossen</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} fehlgeschlagen</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Gesamt:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Vorherige Operation</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>Läuft</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Abgebrochen</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Verschieben</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>In den Papierkorb verschieben</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Aktualisieren</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0} % belegt</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Oben</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Unten</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Bild auf</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Bild ab</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Linker Rand</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Rechter Rand</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Seite links</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Seite rechts</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Nach links scrollen</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Nach rechts scrollen</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Rückgängig</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Wiederherstellen</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Benachrichtigungen</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>App-Sprache</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Zu Weblate gehen</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Aktuellen Ort hinzufügen</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Entfernen</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Gespeicherte Orte</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Verknüpfung in {0} erstellen</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>1 ausgeschnittenes Element einfügen</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>1 kopiertes Element einfügen</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>{0} kopierte Elemente einfügen</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>{0} ausgeschnittene Elemente einfügen</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} von {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>{0} kopieren</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>{0} nach {1} kopieren</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>{0} verschieben</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>{0} nach {1} verschieben</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Datei nicht gefunden</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Ohne Bestätigung abgeschlossen</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Validierungsfehler: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Wird validiert…</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Zeichengerät</value>
   </data>
 </root>
