@@ -120,9 +120,16 @@ public class FileSyncOperation : FileOperation
         });
 
         string cmd = "", arg = "";
+
+        string sourcePath = FilePath.FullPath;
+        var targetPath = TargetPath.IsDirectory ? TargetPath.ParentPath : TargetPath.FullPath;
+
         if (OperationName is OperationType.Push)
         {
             cmd = "push";
+
+            if (FilePath.IsDirectory)
+                sourcePath += "\\\\\\\\";
         }
         else
         {
@@ -130,10 +137,10 @@ public class FileSyncOperation : FileOperation
             arg = "-a";
         }
 
-        var targetPath = TargetPath.IsDirectory ? TargetPath.ParentPath : TargetPath.FullPath;
-
         operationTask = Task.Run(() =>
-            Device.DoFileSync(cmd, arg, targetPath, FilePath.FullPath, AdbProcess.Process, ref progressUpdates, cancelTokenSource.Token),
+        {
+            return Device.DoFileSync(cmd, arg, targetPath, sourcePath, AdbProcess.Process, ref progressUpdates, cancelTokenSource.Token);
+        },
             cancelTokenSource.Token);
 
         operationTask.ContinueWith((t) =>
