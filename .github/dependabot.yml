@@ -1,0 +1,73 @@
+version: 2
+enable-beta-ecosystems: false
+
+updates:
+  # .NET / NuGet dependencies (csproj, props, packages.config, etc.)
+  - package-ecosystem: "nuget"
+    directory: "/"
+    schedule:
+      interval: "weekly"          # Options: daily, weekly, monthly
+      day: "sunday"               # Only used for weekly interval
+      time: "03:00"               # HH:MM (24h)
+      timezone: "UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "nuget"
+    reviewers:
+      - "Alex4SSB"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    # Group all minor & patch bumps into a single PR (reduce PR noise)
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"                  # applies to all NuGet packages
+        update-types:
+          - "minor"
+          - "patch"
+    # Example ignores (uncomment / edit as needed)
+    # ignore:
+    #   - dependency-name: "Some.Package"
+    #     versions: [ "1.x" ]
+    #   - dependency-name: "Other.Package"
+    #     update-types: [ "version-update:semver-major" ]
+
+  # GitHub Actions workflow dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+      time: "03:30"
+      timezone: "UTC"
+    labels:
+      - "dependencies"
+      - "actions"
+    reviewers:
+      - "Alex4SSB"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # (Optional) Security-only daily check for fast reaction (uncomment to enable)
+  # - package-ecosystem: "nuget"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "daily"
+  #     time: "04:00"
+  #     timezone: "UTC"
+  #   allow:
+  #     - dependency-type: "direct"
+  #   security-updates-only: true
+  #   labels:
+  #     - "dependencies"
+  #     - "security"
