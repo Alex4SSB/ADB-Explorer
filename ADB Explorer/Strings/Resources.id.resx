@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -122,5 +122,65 @@
   </data>
   <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
     <value>Aktifkan Putar Otomatis</value>
+  </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Ikon Robot Android</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Animasi Aplikasi</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Ikon APK dilisensikan di bawah Lisensi Apache, Versi 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Tidak dapat mendapatkan versi ADB dari lokasi yang disediakan.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>Versi ADB dari lokasi yang disediakan terlalu rendah.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Gagal mengganti ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Pilih Berkas Eksekusi ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Reset Pengaturan Aplikasi</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Versi Aplikasi Baru</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Navigasi Error</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Salin Nama Paket</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Salin lokasi Item</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Pulihkan Semua Item</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Kosongkan Tempat Sampah</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Hapus</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Lokasi Tujuan Error</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>Gagal terhubung ke</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Koneksi Error</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Pemutusan Koneksi Error</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Pemasangan Error</value>
   </data>
 </root>
