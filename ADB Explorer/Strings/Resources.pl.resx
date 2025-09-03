@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -320,5 +320,38 @@
   </data>
   <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
     <value>Uszkodzony link</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Błąd przy zapisywaniu pliku</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Serwer ADB musi zostać uruchomiony ponownie, żeby wyłączyć mDNS.</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Uruchom WSA w tle</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Przywróć</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Konfliktujące aplikacje</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Pobierz ADB</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
+    <value>Skopiowane do %LocalAppData%\AdbExplorer</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Więcej informacji</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Włączone</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Wyłączone</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Przywróć konflikty</value>
   </data>
 </root>
