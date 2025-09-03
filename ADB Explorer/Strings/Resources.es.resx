@@ -323,4 +323,16 @@ Para aprobar ADB, abra la configuración avanzada de WSA.</value>
   <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
     <value>Seleccionar método de progreso:</value>
   </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continuar</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Más información</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Cerrar</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Ayuda con ADB</value>
+  </data>
 </root>
