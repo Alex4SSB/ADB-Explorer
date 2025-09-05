@@ -391,8 +391,10 @@ Zamiast tego zostanie użyta metoda pomiaru postępu wykorzystania dysku.</value
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>Monitorowanie Eksploratora plików umożliwia aplikacji wykonywanie operacji przeciągania/wyciągania ze schowka bezpośrednio do folderu docelowego.
+
 W przeciwnym razie pobieranie jest wykonywane do folderu tymczasowego aplikacji, z którego Eksplorator plików odbiera plik w postaci strumienia, który musi korzystać z niewielkiego bufora.
 Te dwa dodatkowe kroki znacznie spowalniają proces.
+
 Funkcja jest automatycznie wyłączana dla innych wybranych menedżerów plików.</value>
   </data>
   <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
@@ -405,14 +407,15 @@ Informacje o wydaniu są dostępne na GitHubie.</value>
   </data>
   <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
     <value>Napęd FUSE.
-• Dowiązania symboliczne nie są obsługiwane.
+• Dowiązania symboliczne nie są obsługiwane
 • Nazwy plików nie mogą zawierać znaków " * / : &lt; &gt; ? \ |
-• Nazwy plików nie uwzględniają wielkości liter.
-• Instalacja plików APK nie jest obsługiwana.</value>
+• Nazwy plików nie uwzględniają wielkości liter
+• Instalacja plików APK nie jest obsługiwana</value>
   </data>
   <data name="S_DISABLE_ANIMATION" xml:space="preserve">
     <value>Aplikacja oferuje wiele animacji włączonych w ramach płynnego projektowania.
 Animacja widoku bocznego jest zawsze wyłączona, gdy okno aplikacji jest zmaksymalizowane na dodatkowym ekranie.
+
 • Zaznaczenie tego ustawienia wyłącza wszystkie animacje aplikacji z wyjątkiem pasków postępu, pierścieni postępu i pasków użycia dysku.</value>
   </data>
   <data name="S_RESET_SETTINGS" xml:space="preserve">
