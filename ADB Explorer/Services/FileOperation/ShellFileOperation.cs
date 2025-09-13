@@ -252,6 +252,9 @@ public static class ShellFileOperation
                 SilentDelete(op.Device, op.IndexerPath);
             }
 
+            // remove file from cut items
+            op.FilePath.CutState = DragDropEffects.None;
+
             if (op.Device.ID == Data.CurrentADBDevice.ID)
             {
                 // notify master process of completion
@@ -260,10 +263,9 @@ public static class ShellFileOperation
                     IpcService.NotifyFileMoved(op.MasterPid, op.Device, op.FilePath);
                 }
 
-                // remove file from cut items and clear its trash indexer if restore / recycle on current device
+                // clear file trash indexer if restore / recycle on current device
                 if (op.OperationName is FileOperation.OperationType.Recycle or FileOperation.OperationType.Restore)
                 {
-                    op.FilePath.CutState = DragDropEffects.None;
                     op.FilePath.TrashIndex = null;
                 }
 

@@ -305,10 +305,10 @@ public class FileOperationQueue : ViewModelBase
         OnPropertyChanged(nameof(TotalCount));
         UpdateProgress();
 
-        if (e.NewItems is null)
+        if (e.Action is not NotifyCollectionChangedAction.Reset && e.NewItems is null)
             return;
 
-        foreach (FileOperation item in e.NewItems)
+        foreach (FileOperation item in Operations.Where(op => op.Status is FileOperation.OperationStatus.None))
         {
             item.BeginWaiting();
         }
