@@ -10,6 +10,7 @@
     <Platforms>AnyCPU;x64;ARM64</Platforms>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
     <Configurations>Debug;Release;Deploy</Configurations>
+	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
 	<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
   </PropertyGroup>
 
@@ -54,9 +55,9 @@
     <PackageReference Include="ModernWpfUI" Version="0.9.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="QRCoder.Xaml" Version="1.6.0" />
-    <PackageReference Include="System.Management" Version="9.0.8" />
-    <PackageReference Include="Vanara.Windows.Shell" Version="4.2.0" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.2.0" />
+    <PackageReference Include="System.Management" Version="9.0.9" />
+    <PackageReference Include="Vanara.Windows.Shell" Version="4.2.1" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.2.1" />
   </ItemGroup>
 	
   <ItemGroup>

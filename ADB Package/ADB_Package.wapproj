@@ -77,7 +77,7 @@
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <EntryPointProjectUniqueName>..\ADB Explorer\ADB Explorer.csproj</EntryPointProjectUniqueName>
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
-    <PackageCertificateThumbprint>2AD17DB97ED84531F0B922231C8DAA7ED6AC686B</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>E3378940061A812DEA46B2DF96EB92D47317FFE4</PackageCertificateThumbprint>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
