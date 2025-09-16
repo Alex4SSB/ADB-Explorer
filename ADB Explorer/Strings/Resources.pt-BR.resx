@@ -121,6 +121,42 @@
     <value>O robô do Android é reproduzido ou modificado com base no trabalho criado e compartilhado pelo Google e é usado de acordo com os termos descritos na Licença de Atribuição 3.0 do Creative Commons.</value>
   </data>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value></value>
+    <value>O(s) ícone(s) do robô Android</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Animações de aplicativos</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>O ícone APK é licenciado sob a Licença Apache, Versão 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Não foi possível obter a versão do ADB no caminho fornecido.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>A versão do ADB do caminho fornecido é muito baixa.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Falha ao substituir ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Selecione o executável ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Redefinir as configurações do aplicativo</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Nova versão do aplicativo</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Erro de navegação</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copiar nome do pacote</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copiar caminho do item</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Restaurar todos os itens</value>
   </data>
 </root>
