@@ -124,10 +124,10 @@
     <value>O(s) ícone(s) do robô Android</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animações de aplicativos</value>
+    <value>Animações do aplicativos</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>O ícone APK é licenciado sob a Licença Apache, Versão 2.0.</value>
+    <value>O ícone APK está licenciado sob a Apache License, Versão 2.0.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>Não foi possível obter a versão do ADB no caminho fornecido.</value>
@@ -142,21 +142,87 @@
     <value>Selecione o executável ADB</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
-    <value>Redefinir as configurações do aplicativo</value>
+    <value>Redefinir as Configurações do Aplicativo</value>
   </data>
   <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>Nova versão do aplicativo</value>
+    <value>Nova Versão do Aplicativo</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
-    <value>Erro de navegação</value>
+    <value>Erro de Navegação</value>
   </data>
   <data name="S_COPY_APK_NAME" xml:space="preserve">
-    <value>Copiar nome do pacote</value>
+    <value>Copiar Nome do Pacote</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
     <value>Copiar caminho do item</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Restaurar todos os itens</value>
+    <value>Restaurar Todos os Itens</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Esvaziar Lixeira</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Excluir</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>falha ao se conectar com</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Erro de Conexão</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Erro de Disconexão</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Erro de Pareamento</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Confirmar Exclusão</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Excluir Permanentemente</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Erro ao criar a pasta/o arquivo</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Erro de Restauração de Arquivo</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Confirmar Desinstalação</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Selecione os pacotes a serem instalados</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Terminar Emulador</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Remover Dispositivo</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Desconectar Dispositivo</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Operações de Arquivo</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Instalar Pacotes</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Reinicie o aplicativo para aplicar as mudanças</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Erro ao ler o arquivo</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>O servidor do ADB precisa ser reinicializado para desativar o mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Desativar mDNS</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restaurar</value>
   </data>
 </root>
