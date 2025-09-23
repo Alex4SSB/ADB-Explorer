@@ -8,6 +8,7 @@ using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
 using System.Runtime.InteropServices.ComTypes;
 using Vanara.Extensions;
+using static ADB_Explorer.Services.FileDescriptor;
 using static Vanara.PInvoke.Shell32;
 
 namespace ADB_Explorer.Services;
@@ -334,7 +335,7 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         },
     });
 
-    public void UpdateData(AdbDataFormat dataFormat, IEnumerable<Action<Stream>> dataStreams)
+    public void UpdateData(AdbDataFormat dataFormat, IEnumerable<StreamContents> dataStreams)
     {
         // Remove all previous streams
         dataObjects.RemoveAll(d => d.FORMATETC.cfFormat == dataFormat);
@@ -358,25 +359,16 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     /// Uses Stream instead of IEnumerable(T) because Stream is more likely
     /// to be natural for the expected scenarios.
     /// </remarks>
-    public void SetData(AdbDataFormat dataFormat, int index, Action<Stream> streamData)
+    public void SetData(AdbDataFormat dataFormat, int index, StreamContents streamData)
         => dataObjects.Add(new()
     {
         FORMATETC = CreateFormat(dataFormat, index),
         GetData = () =>
         {
-            // Create IStream for data
-            var ptr = IntPtr.Zero;
-            var iStream = NativeMethods.MCreateStreamOnHGlobal(IntPtr.Zero, true);
-            if (streamData != null)
-            {
-                // Wrap in a .NET-friendly Stream and call provided code to fill it
-                using var stream = new IStreamWrapper(iStream);
-                streamData(stream);
-            }
-            
-            // Return an IntPtr for the IStream
-            ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
+            var iStream = streamData();
+            var ptr = Marshal.GetComInterfaceForObject(iStream, typeof(IStream));
             Marshal.ReleaseComObject(iStream);
+
             return (ptr, NativeMethods.HResult.Ok);
         },
     });
