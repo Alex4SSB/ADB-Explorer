@@ -14,7 +14,7 @@ public class FileGroup
 
     public IEnumerable<byte> GroupDescriptorBytes => GroupDescriptor.Bytes;
 
-    public IEnumerable<Action<Stream>> DataStreams => FileDescriptors.Select(f => f.StreamContents);
+    public IEnumerable<FileDescriptor.StreamContents> DataStreams => FileDescriptors.Select(f => f.Stream);
 
     public FileGroup(IEnumerable<FileDescriptor> fileDescriptors)
     {
@@ -38,13 +38,17 @@ public class FileDescriptor
     /// <summary>
     /// Gets or sets an Action that returns the contents of the file.
     /// </summary>
-    public Action<Stream> StreamContents { get; set; }
+    //public Action<System.Runtime.InteropServices.ComTypes.IStream> StreamContents { get; set; }
 
     public Func<bool> SaveToFile { get; set; }
 
     public bool IsDirectory { get; set; }
 
     public string SourcePath { get; set; }
+
+    public delegate System.Runtime.InteropServices.ComTypes.IStream StreamContents();
+
+    public StreamContents Stream { get; set; }
 
     public override string ToString() => Name;
 
