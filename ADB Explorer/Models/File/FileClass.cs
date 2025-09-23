@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
+using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Models;
@@ -352,7 +353,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             IsDirectory = item[^1] is '/',
             Length = size,
             ChangeTimeUtc = date,
-            StreamContents = stream =>
+            Stream = () =>
             {
                 var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
                 var operations = vfdo.Operations.Where(op => op.Status is FileOperation.OperationStatus.None);
@@ -362,7 +363,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 // When a legitimate request for data is made, the app can't be focused during the first file, but it can become focused again for the next files.
                 if ((Data.CopyPaste.IsClipboard && isActive && operations.Any())
                     || !includeContent)
-                    return;
+                    return null;
 
 #if !DEPLOY
                 DebugLog.PrintLine($"Total uninitiated operations: {operations.Count()}");
@@ -387,57 +388,18 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 // in case the file is still in use by ADB or hasn't appeared yet
                 for (int i = 0; i < 10; i++)
                 {
-                    var abort = false;
-                    ContentDialog dialog = null;
-
-                    App.Current.Dispatcher.Invoke(() =>
-                    {
-                        if (!App.Current.MainWindow.IsActive)
-                            return;
-
-                        dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), Strings.Resources.S_SEND_TO_SHELL_TITLE, buttonText: Strings.Resources.S_BUTTON_ABORT);
-                        dialog.Closed += (s, e) =>
-                        {
-                            abort = true;
-                        };
-                    });
-
                     try
                     {
-                        using (FileStream fs = new(file, FileMode.Open, FileAccess.Read))
-                        {
-                            // This uses a ~85K buffer, which is a pain for large files, but it gets cleared automatically
-                            byte[] buffer = new byte[81920];
-                            int totalRead = 0, read = 0;
-                            Data.RuntimeSettings.CurrentTransferFile = item;
-
-                            while (!abort && (read = fs.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                stream.Write(buffer, 0, read);
-                                totalRead += read;
-
-                                App.Current.Dispatcher.Invoke(() =>
-                                {
-                                    Data.RuntimeSettings.TransferProgress = 100 * (totalRead / (float)fs.Length);
-                                });
-                            }
-                        }
-                        if (dialog is not null)
-                            App.Current.Dispatcher.Invoke(dialog.Hide);
-
-                        break;
+                        return NativeMethods.CreateStreamOnFile(file);
                     }
                     catch (Exception)
                     {
                         Thread.Sleep(100);
                         continue;
                     }
-                    finally
-                    {
-                        if (dialog is not null)
-                            App.Current.Dispatcher.Invoke(dialog.Hide);
-                    }
                 }
+
+                return null;
             }
         });
 
