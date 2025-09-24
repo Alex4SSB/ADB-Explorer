@@ -580,24 +580,24 @@ internal static class FileActionLogic
 
     public static async void DeleteFiles()
     {
-        IEnumerable<FileClass> itemsToDelete;
+        List<FileClass> itemsToDelete;
         if (Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any())
         {
-            itemsToDelete = Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX);
+            itemsToDelete = [.. Data.DirList.FileList.Where(f => f.Extension != AdbExplorerConst.RECYCLE_INDEX_SUFFIX)];
         }
         else
         {
-            itemsToDelete = Data.DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
+            itemsToDelete = [.. Data.DevicesObject.Current.Root != AbstractDevice.RootStatus.Enabled
                 ? Data.SelectedFiles.Where(file => file.Type is FileType.File or FileType.Folder)
-                : Data.SelectedFiles;
+                : Data.SelectedFiles];
         }
 
         string deletedString;
-        if (itemsToDelete.Count() == 1)
+        if (itemsToDelete.Count == 1)
             deletedString = FileHelper.DisplayName(itemsToDelete.First());
         else
         {
-            deletedString = $"{itemsToDelete.Count()} ";
+            deletedString = $"{itemsToDelete.Count} ";
             if (itemsToDelete.All(item => item.IsDirectory))
                 deletedString += Strings.Resources.S_MENU_FOLDERS;
             else if (itemsToDelete.All(item => !item.IsDirectory))
