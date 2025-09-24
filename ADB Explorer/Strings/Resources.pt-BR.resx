@@ -234,4 +234,34 @@
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
     <value>Acesso Root</value>
   </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Parear e/ou conectar a um dispositivo WIFI (sem usar mDNS)</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Não foi possível puxar o arquivo para lê-lo.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Erro ao gravar o arquivo</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Iniciar WSA no segundo plano</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>Monitoramento do explorador de arquivos</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>Apenas Para Uso do Disco</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Redirecionamento do progresso</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Erro de Diretório de Lista</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Aplicativos em conflito</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>Monitoramento do explorador de arquivos não está disponível pois os seguintes apps estão ativos:</value>
+  </data>
 </root>
