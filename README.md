@@ -6,7 +6,7 @@
 
 <p align="center">
 	<a href="https://hosted.weblate.org/engage/adb-explorer/">
-		<img src="https://hosted.weblate.org/widget/adb-explorer/resources/svg-badge.svg" alt="Translation status" /></a>
+		<img src="https://hosted.weblate.org/widget/adb-explorer/resources/287x66-grey.png" alt="Translation status" /></a>
 	<br></br>
 	<a title="Platform" target="_blank">
 		<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" /></a>
