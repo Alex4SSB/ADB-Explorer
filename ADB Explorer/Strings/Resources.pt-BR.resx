@@ -264,4 +264,10 @@
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>Monitoramento do explorador de arquivos não está disponível pois os seguintes apps estão ativos:</value>
   </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Não foi possível implementar o arquivo de volta ao dispositivo.</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Puxar</value>
+  </data>
 </root>
