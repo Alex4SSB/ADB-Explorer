@@ -1165,4 +1165,11 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Langue</value>
   </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Etes vous bien sûr que vous voulez enlever appareil?</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Le suivant vas etre supprimer:
+{0}</value>
+  </data>
 </root>
