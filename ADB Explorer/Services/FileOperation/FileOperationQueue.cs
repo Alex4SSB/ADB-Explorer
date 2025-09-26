@@ -281,7 +281,8 @@ public class FileOperationQueue : ViewModelBase
                 if (IsAutoPlayOn)
                     MoveToNextOperation();
 
-                if (op.OperationName is FileOperation.OperationType.Push)
+                if (op.OperationName is FileOperation.OperationType.Push
+                    && Data.Settings.RescanOnPush)
                     Task.Run(() => CheckForRescan(op));
             }
         }
