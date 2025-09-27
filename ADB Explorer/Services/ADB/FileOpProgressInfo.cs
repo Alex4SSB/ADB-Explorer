@@ -155,8 +155,16 @@ public class AdbSyncStatsInfo
     public string SourcePath { get; }
     public UInt64 FilesTransferred { get; }
     public UInt64 FilesSkipped { get; }
+
+    /// <summary>
+    /// Rate of transfer in MB/s
+    /// </summary>
     public decimal? AverageRate { get; }
     public UInt64? TotalBytes { get; }
+
+    /// <summary>
+    /// Transfer time in seconds
+    /// </summary>
     public decimal? TotalTime { get; }
 
     public AdbSyncStatsInfo(Match match)
@@ -169,13 +177,18 @@ public class AdbSyncStatsInfo
         TotalTime = match.Groups["TotalTime"].Success ? decimal.Parse(match.Groups["TotalTime"].Value, CultureInfo.InvariantCulture) : null;
     }
 
-    public AdbSyncStatsInfo(string targetPath, ulong filesTransferred, ulong filesSkipped, decimal? averageRate, ulong? totalBytes, decimal? totalTime)
+    public AdbSyncStatsInfo(string sourcePath, ulong? totalBytes, decimal? totalTime, ulong filesTransferred = 1, ulong filesSkipped = 0, decimal? averageRate = -1)
     {
-        SourcePath = targetPath;
-        FilesTransferred = filesTransferred;
-        FilesSkipped = filesSkipped;
-        AverageRate = averageRate;
+        SourcePath = sourcePath;
         TotalBytes = totalBytes;
         TotalTime = totalTime;
+
+        FilesTransferred = filesTransferred;
+        FilesSkipped = filesSkipped;
+
+        if (averageRate == -1 && totalBytes.HasValue && totalTime.HasValue && totalTime > 0)
+            AverageRate = totalBytes.Value / 1000000 / totalTime.Value;
+        else
+            AverageRate = averageRate;
     }
 }

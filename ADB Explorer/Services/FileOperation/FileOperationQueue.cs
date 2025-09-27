@@ -281,7 +281,8 @@ public class FileOperationQueue : ViewModelBase
                 if (IsAutoPlayOn)
                     MoveToNextOperation();
 
-                if (op.OperationName is FileOperation.OperationType.Push)
+                if (op.OperationName is FileOperation.OperationType.Push
+                    && Data.Settings.RescanOnPush)
                     Task.Run(() => CheckForRescan(op));
             }
         }
@@ -305,10 +306,10 @@ public class FileOperationQueue : ViewModelBase
         OnPropertyChanged(nameof(TotalCount));
         UpdateProgress();
 
-        if (e.NewItems is null)
+        if (e.Action is not NotifyCollectionChangedAction.Reset && e.NewItems is null)
             return;
 
-        foreach (FileOperation item in e.NewItems)
+        foreach (FileOperation item in Operations.Where(op => op.Status is FileOperation.OperationStatus.None))
         {
             item.BeginWaiting();
         }

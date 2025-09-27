@@ -3,7 +3,6 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
-using Vanara.PInvoke;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
@@ -173,7 +172,7 @@ public static partial class NativeMethods
     [DllImport("Shlwapi.dll", CharSet = CharSet.Unicode)]
     private static extern HResult SHCreateStreamOnFileEx(
         [MarshalAs(UnmanagedType.LPWStr)] string pszFile,
-        STGM grfMode,
+        Vanara.PInvoke.STGM grfMode,
         FileFlagsAndAttributes dwAttributes,
         [MarshalAs(UnmanagedType.Bool)] bool fCreate,
         IStream pstmTemplate,
@@ -182,7 +181,7 @@ public static partial class NativeMethods
     public static IStream CreateStreamOnFile(string filePath)
     {
         var result = SHCreateStreamOnFileEx(filePath,
-            STGM.STGM_READ | STGM.STGM_SHARE_DENY_NONE | STGM.STGM_DELETEONRELEASE,
+            Vanara.PInvoke.STGM.STGM_READ | Vanara.PInvoke.STGM.STGM_SHARE_DENY_NONE | Vanara.PInvoke.STGM.STGM_DELETEONRELEASE,
             0,
             false,
             null,

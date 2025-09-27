@@ -18,20 +18,20 @@ public class CompletedTestOperation : FileOperation
     }
 
     public static CompletedTestOperation CreateFileCompleted(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
-        => new(dispatcher, adbDevice, new(filePath), new(filePath, 1, 0, 2.3m, 3141592653589, 123));
+        => new(dispatcher, adbDevice, new(filePath), new(filePath, 3141592653589, 123, 1, 0, 2.3m));
 
     public static CompletedTestOperation CreateFolderCompleted(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string folderPath)
         => new(
             dispatcher, 
             adbDevice, 
             new(folderPath, AbstractFile.FileType.Folder), 
-            new(folderPath, 10, 0, 2.3m, 3141592653589, 123));
+            new(folderPath, 3141592653589, 123, 10, 0, 2.3m));
 
     public static CompletedTestOperation CreateFileSkipped(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string filePath)
-        => new(dispatcher, adbDevice, new(filePath), new(filePath, 0, 1, 0m, 0, 0));
+        => new(dispatcher, adbDevice, new(filePath), new(filePath, 0, 0, 0, 1, 0m));
     
     public static CompletedTestOperation CreateFolderPartiallySkipped(Dispatcher dispatcher, ADBService.AdbDevice adbDevice, string folderPath)
-        => new(dispatcher, adbDevice, new(folderPath, AbstractFile.FileType.Folder), new(folderPath, 7, 3, 2.3m, 3141592653589, 123));
+        => new(dispatcher, adbDevice, new(folderPath, AbstractFile.FileType.Folder), new(folderPath, 3141592653589, 123, 7, 3, 2.3m));
 
     public override void Start()
     {

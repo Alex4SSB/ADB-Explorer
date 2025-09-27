@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using AdvancedSharpAdbClient.Models;
 
 namespace ADB_Explorer.ViewModels;
 
@@ -34,6 +35,8 @@ public class LogicalDeviceViewModel : DeviceViewModel
             }
         }
     }
+
+    public DeviceData DeviceData => Device.DeviceData;
 
     private byte? androidVersion;
     public byte? AndroidVersion

@@ -80,6 +80,15 @@ public class SyncFile : FilePath
 
     public string DirectChildPath(string fullPath)
         => FileHelper.DirectChildPath(FullPath, fullPath);
+
+    public static SyncFile MergeToWindowsPath(FileClass fileClass, ShellItem windowsPath)
+    {
+        SyncFile syncFile = new(fileClass);
+        syncFile.UpdatePath(FileHelper.ConcatPaths(windowsPath.ParsingName, fileClass.FullName, '\\'));
+        syncFile.PathType = FilePathType.Windows;
+
+        return syncFile;
+    }
 }
 
 public class SyncFileComparer : IEqualityComparer<SyncFile>

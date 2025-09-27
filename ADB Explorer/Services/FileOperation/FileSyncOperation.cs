@@ -2,13 +2,14 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using AdvancedSharpAdbClient;
+using AdvancedSharpAdbClient.Models;
 using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Services;
 
 public class FileSyncOperation : FileOperation
 {
-    private Task<AdbSyncStatsInfo> operationTask;
     private CancellationTokenSource cancelTokenSource;
     private ObservableList<FileOpProgressInfo> progressUpdates;
 
@@ -18,11 +19,14 @@ public class FileSyncOperation : FileOperation
         ? FilePath
         : TargetPath;
 
-    public DiskUsage AdbProcess { get; private set; } = new(new());
-
     public VirtualFileDataObject VFDO { get; set; }
 
     public ShellItem OriginalShellItem { get; set; }
+
+    public DateTime TransferStart { get; private set; }
+    public DateTime TransferEnd { get; private set; }
+
+    private bool isCanceled = false;
 
     public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FailedOpProgressViewModel status)
         : base(new FileClass(sourcePath), adbDevice, App.Current.Dispatcher)
@@ -48,26 +52,6 @@ public class FileSyncOperation : FileOperation
         TargetPath = targetPath;
     }
 
-    private void AdbProcess_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        var totalBytes = OperationName is OperationType.Push ? AdbProcess.ReadRate : AdbProcess.WriteRate;
-        int? DiskUsageProgress = null;
-
-        // for now we only have size of files, and folders are still 4096B
-        if (!FilePath.IsDirectory && totalBytes is not null)
-        {
-            DiskUsageProgress = (int)(100 * (double)totalBytes / FilePath.Size);
-            OnPropertyChanged(nameof(DiskUsageProgress));
-        }
-
-        if (StatusInfo is InProgSyncProgressViewModel prog
-            && prog.TotalPercentage is not null
-            && !string.IsNullOrEmpty(prog.CurrentFilePath))
-            return;
-
-        StatusInfo = new InProgSyncProgressViewModel(new(null, DiskUsageProgress, null, totalBytes));
-    }
-
     public override void Start()
     {
         if (Status == OperationStatus.InProgress)
@@ -83,7 +67,7 @@ public class FileSyncOperation : FileOperation
         progressUpdates.CollectionChanged += ProgressUpdates_CollectionChanged;
 
         if (OperationName is OperationType.Push &&
-            (!File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath)))
+            !File.Exists(FilePath.FullPath) && !Directory.Exists(FilePath.FullPath))
         {
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: Strings.Resources.S_SYNC_FILE_NOT_FOUND, total: true));
@@ -91,76 +75,64 @@ public class FileSyncOperation : FileOperation
             return;
         }
 
-        var procTask = AsyncHelper.WaitUntil(() => !string.IsNullOrEmpty(AdbProcess.Process.StartInfo.Arguments),
-                                             TimeSpan.FromSeconds(10),
-                                             TimeSpan.FromMilliseconds(100),
-                                             cancelTokenSource.Token);
-
-        procTask.ContinueWith((t) =>
+        void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs)
         {
-            if (AdbProcess.Process.StartInfo.FileName == Data.ProgressRedirectionPath)
-            {
-                try
-                {
-                    var id = AdbProcess.Process.Id;
-                    var children = ProcessHandling.GetChildProcesses(AdbProcess.Process, false);
-                    var adbProc = children.FirstOrDefault(proc => proc.ProcessName == AdbExplorerConst.ADB_PROCESS);
+            progressUpdates.Add(new AdbSyncProgressInfo(FilePath.FullPath, (int)eventArgs.ProgressPercentage, null, null));
 
-                    if (adbProc is not null)
-                        AdbProcess = new(adbProc);
-                }
-                catch
-                {
-                    // if we can't get the pid or process name without throwing an exception, the process is useless
-                    return;
-                }
-            }
-
-            AdbProcess.PropertyChanged += AdbProcess_PropertyChanged;
-        });
-
-        string cmd = "", arg = "";
-        if (OperationName is OperationType.Push)
-        {
-            cmd = "push";
-        }
-        else
-        {
-            cmd = "pull";
-            arg = "-a";
+            TransferEnd = DateTime.Now;
         }
 
         var targetPath = TargetPath.IsDirectory ? TargetPath.ParentPath : TargetPath.FullPath;
+        DateTime lastWriteTime = DateTime.MinValue;
+        UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
 
-        operationTask = Task.Run(() =>
-            Device.DoFileSync(cmd, arg, targetPath, FilePath.FullPath, AdbProcess.Process, ref progressUpdates, cancelTokenSource.Token),
-            cancelTokenSource.Token);
+        if (OperationName is OperationType.Push)
+            lastWriteTime = FilePath.ShellItem.FileInfo.LastWriteTime;
 
-        operationTask.ContinueWith((t) =>
+        var task = Task.Run(() =>
         {
-            progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged;
-            AdbProcess.PropertyChanged -= AdbProcess_PropertyChanged;
+            TransferStart = DateTime.Now;
+            using SyncService service = new(Device.Device.DeviceData);
+
+            // TODO: Directory push/pull
+
+            if (OperationName is OperationType.Push)
+            {
+                using var stream = new FileStream(FilePath.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, in isCanceled);
+            }
+            else
+            {
+                using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                service.Pull(FilePath.FullPath, stream, SyncProgressCallback, in isCanceled);
+            }
         });
 
-        operationTask.ContinueWith((t) => 
+        task.ContinueWith((t) =>
         {
+            progressUpdates.CollectionChanged -= ProgressUpdates_CollectionChanged;
+        });
+
+        task.ContinueWith((t) =>
+        {
+            //((AdbSyncProgressInfo)progressUpdates.LastOrDefault()).TotalPercentage;
+
+            // TODO: Check for errors, cancellations, and skipped files
+
             Status = OperationStatus.Completed;
-            if (t.Result is null)
-                StatusInfo = new CompletedShellProgressViewModel(Strings.Resources.S_SYNC_NO_CONFIRM);
-            else if (t.Result.FilesTransferred + t.Result.FilesSkipped < 1)
-                StatusInfo = new CompletedShellProgressViewModel();
-            else
-                StatusInfo = new CompletedSyncProgressViewModel(t.Result);
+
+            AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, FilePath.Size, (decimal)TransferEnd.Subtract(TransferStart).TotalSeconds);
+            StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
-        operationTask.ContinueWith((t) =>
+        task.ContinueWith((t) =>
         {
             Status = OperationStatus.Canceled;
             StatusInfo = new CanceledOpProgressViewModel();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
-        operationTask.ContinueWith((t) =>
+        task.ContinueWith((t) =>
         {
             string message = string.IsNullOrEmpty(t.Exception.InnerException.Message)
                 ? progressUpdates.OfType<SyncErrorInfo>().Last().Message
@@ -191,10 +163,8 @@ public class FileSyncOperation : FileOperation
             throw new Exception("Cannot cancel a deactivated operation!");
         }
 
+        isCanceled = true;
         cancelTokenSource.Cancel();
-
-        if (AdbProcess?.Process is Process proc)
-            ProcessHandling.KillProcess(proc);
     }
 
     public override void ClearChildren()

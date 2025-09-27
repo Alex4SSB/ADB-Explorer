@@ -36,7 +36,7 @@ internal class FileOpTest
             if (i == updates.Length)
             {
                 Data.FileOpQ.RemoveOperation(op);
-                Data.FileOpQ.AddOperation(new CompletedTestOperation(App.Current.Dispatcher, Data.CurrentADBDevice, op.FilePath, new(op.FilePath.FullPath, (ulong)updates.Count(u => u is AdbSyncProgressInfo), (ulong)updates.Count(u => u is SyncErrorInfo), 1000000, 200, 2)));
+                Data.FileOpQ.AddOperation(new CompletedTestOperation(App.Current.Dispatcher, Data.CurrentADBDevice, op.FilePath, new(op.FilePath.FullPath, 200, 2, (ulong)updates.Count(u => u is AdbSyncProgressInfo), (ulong)updates.Count(u => u is SyncErrorInfo), 1000000)));
                 return;
             }
             op.AddUpdates(updates[i]);

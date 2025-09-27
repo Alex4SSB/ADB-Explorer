@@ -390,10 +390,17 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 {
                     try
                     {
-                        return NativeMethods.CreateStreamOnFile(file);
+                        var stream = NativeMethods.CreateStreamOnFile(file);
+
+                        if (stream is not null)
+                            return stream;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+#if !DEPLOY
+                        DebugLog.PrintLine($"Failed to open stream on {file}: {e.Message}");
+#endif
+
                         Thread.Sleep(100);
                         continue;
                     }

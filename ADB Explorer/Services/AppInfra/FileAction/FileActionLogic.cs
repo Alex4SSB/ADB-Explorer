@@ -1105,9 +1105,8 @@ internal static class FileActionLogic
 
         foreach (var item in pullItems)
         {
-            SyncFile target = new(path);
-            target.UpdatePath(FileHelper.ConcatPaths(target, item.FullName));
-
+            var target = SyncFile.MergeToWindowsPath(item, path);
+            
             var fileOp = FileSyncOperation.PullFile(new(item), target, Data.CurrentADBDevice, App.Current.Dispatcher);
 
             if (notify)

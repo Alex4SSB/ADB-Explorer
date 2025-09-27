@@ -159,29 +159,6 @@ internal static class DiskUsageHelper
         if (!newUsages.Any())
             return;
 
-        var syncUsages = Data.FileOpQ.Operations
-            .OfType<FileSyncOperation>()
-            .Where(op => op.Status is FileOperation.OperationStatus.InProgress)
-            .Select(op => op.AdbProcess);
-
-        foreach (var usage in syncUsages)
-        {
-            if (usage is null || usage.Process is null)
-                continue;
-            try
-            {
-                var matchingProcess = newUsages.FirstOrDefault(proc => proc.PID == usage.PID);
-
-                if (matchingProcess != null)
-                {
-                    usage.Update(matchingProcess);
-                }
-            }
-            catch (InvalidOperationException)
-            {
-            }
-        }
-
         var newUsage = DiskUsage.Consolidate(newUsages);
 
         if (newUsage is null)
