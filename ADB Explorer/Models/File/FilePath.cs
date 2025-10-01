@@ -120,7 +120,11 @@ public class FilePath : AbstractFile, IBaseFile
         FullPath = windowsPath.ParsingName;
         FullName = windowsPath.GetDisplayName(ShellItemDisplayString.ParentRelativeParsing);
 
-        SpecialType = windowsPath.IsFolder
+        // A regular file has IsFolder = false, so we get a short-circuit here.
+        // But an archive file (e.g. .zip) has IsFolder = true as well, so we need to check the attributes too.
+        var isFolder = windowsPath.IsFolder && windowsPath.FileInfo?.Attributes.HasFlag(FileAttributes.Directory) is true;
+        
+        SpecialType = isFolder
             ? SpecialFileType.Folder
             : SpecialFileType.None;
     }
