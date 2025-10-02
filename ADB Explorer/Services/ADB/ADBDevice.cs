@@ -385,26 +385,18 @@ public partial class ADBService
             return true;
         }
 
-        public static bool ForceMediaScan(LogicalDeviceViewModel device, string path)
+        public static bool ForceMediaScan(LogicalDeviceViewModel device)
         {
-            var linkRetVal = ExecuteDeviceAdbShellCommand(device.ID,
-                "readlink", out var stdout, out _, CancellationToken.None, "-f", path);
-
-            var target = linkRetVal == 0
-                ? stdout.TrimEnd(LINE_SEPARATORS)
-                : path;
-
-            // am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE --receiver-include-background -d file:///storage/emulated/0/...
+            // content call --method scan_volume --uri content://media --arg external_primary
             var res = ExecuteDeviceAdbShellCommand(device.ID,
-                "am", 
-                out _, 
-                out _, 
+                "content",
+                out _,
+                out _,
                 CancellationToken.None,
-                "broadcast -a",
-                "android.intent.action.MEDIA_SCANNER_SCAN_FILE",
-                "--receiver-include-background -d",
-                EscapeAdbShellString($"file://{target}"));
-
+                "call --method scan_volume",
+                "--uri content://media",
+                "--arg external_primary");
+        
             return res == 0;
         }
     }
