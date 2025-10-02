@@ -121,10 +121,10 @@
     <value>The Android Robot Icon(s)</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>The Android robot is reproduced or modified from work created and shared by Google and used according to described in the Creative Commons 3.0 Attribution License.</value>
+    <value>The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>App Animations system</value>
+    <value>App Animations</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>The APK icon is licensed under the Apache License, Version 2.0.</value>
