@@ -6,6 +6,7 @@
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -197,26 +198,28 @@
                                     </Style>
                                 </DataGridTemplateColumn.HeaderStyle>
                             </DataGridTemplateColumn>
-                            <DataGridTextColumn
+                            <DataGridTemplateColumn
                                 x:Name="NameColumn"
                                 Width="300"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                                 IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
                                 SortMemberPath="FullName">
-                                <DataGridTextColumn.EditingElementStyle>
-                                    <Style BasedOn="{StaticResource FileNameEditingElementStyle}" TargetType="TextBox">
-                                        <EventSetter Event="Loaded" Handler="NameColumnEdit_Loaded" />
-                                        <EventSetter Event="LostFocus" Handler="NameColumnEdit_LostFocus" />
-                                        <EventSetter Event="KeyDown" Handler="NameColumnEdit_KeyDown" />
-                                        <EventSetter Event="TextChanged" Handler="NameColumnEdit_TextChanged" />
-                                    </Style>
-                                </DataGridTextColumn.EditingElementStyle>
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <TextBox
+                                            KeyDown="NameColumnEdit_KeyDown"
+                                            Loaded="NameColumnEdit_Loaded"
+                                            LostFocus="NameColumnEdit_LostFocus"
+                                            Style="{StaticResource FileNameEditingElementStyle}"
+                                            TextChanged="NameColumnEdit_TextChanged" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <emoji:TextBlock Style="{StaticResource DirectoryGridCellStyle}" Text="{Binding DisplayName}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 x:Name="OriginalPath"
                                 Width="180"
@@ -247,24 +250,21 @@
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTextColumn
+                            <DataGridTemplateColumn
                                 x:Name="TypeColumn"
                                 Width="150"
-                                FontSize="{Binding Source={StaticResource FontSize}}"
                                 Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                                 IsReadOnly="True"
                                 SortMemberPath="TypeName">
-                                <DataGridTextColumn.ElementStyle>
-                                    <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
-                                        <Setter Property="Text" Value="{Binding TypeName}" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ExtensionIsGlyph}" Value="True">
-                                                <Setter Property="FontFamily" Value="Segoe UI Symbol" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </DataGridTextColumn.ElementStyle>
-                            </DataGridTextColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <emoji:TextBlock
+                                            FontSize="{Binding Source={StaticResource FontSize}}"
+                                            Style="{StaticResource DirectoryGridCellStyle}"
+                                            Text="{Binding TypeName}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn
                                 x:Name="SizeColumn"
                                 Width="Auto"
