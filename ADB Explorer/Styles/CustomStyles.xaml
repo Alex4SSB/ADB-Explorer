@@ -4,6 +4,7 @@
     xmlns:app_prop="clr-namespace:ADB_Explorer.Properties"
     xmlns:controls="clr-namespace:ADB_Explorer.Controls"
     xmlns:converters="clr-namespace:ADB_Explorer.Converters"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:services="clr-namespace:ADB_Explorer.Services"
@@ -470,11 +471,11 @@
                     RenderOptions.BitmapScalingMode="HighQuality"
                     Source="{Binding IconOverlay}" />
             </Grid>
-            <TextBlock
+            <emoji:TextBlock
                 HorizontalAlignment="Center"
                 FontSize="16"
                 Text="{Binding ShortExtension}">
-                <TextBlock.Style>
+                <emoji:TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed" />
                         <Setter Property="Opacity" Value="1" />
@@ -485,15 +486,15 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding ExtensionIsFontIcon}" Value="True">
                                 <Setter Property="Visibility" Value="Visible" />
-                                <Setter Property="Margin" Value="-1,-6,0,0" />
+                                <Setter Property="Margin" Value="0,-2,0,0" />
                             </DataTrigger>
                             <DataTrigger Binding="{Binding CutState}" Value="Move">
                                 <Setter Property="Opacity" Value="0.5" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </TextBlock.Style>
-            </TextBlock>
+                </emoji:TextBlock.Style>
+            </emoji:TextBlock>
         </Grid>
     </DataTemplate>
     <Style

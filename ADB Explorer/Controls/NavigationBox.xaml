@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:emoji="clr-namespace:Emoji.Wpf;assembly=Emoji.Wpf"
     xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
@@ -97,8 +98,8 @@
                     Command="{Binding Action.Command.Command}">
                     <Button.Content>
                         <Grid>
-                            <TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display">
-                                <TextBlock.Style>
+                            <emoji:TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display">
+                                <emoji:TextBlock.Style>
                                     <Style TargetType="TextBlock">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                         <Style.Triggers>
@@ -107,8 +108,8 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                                </emoji:TextBlock.Style>
+                            </emoji:TextBlock>
                             <ui:FontIcon FontSize="18" Glyph="{Binding Action.Description}">
                                 <ui:FontIcon.Style>
                                     <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
