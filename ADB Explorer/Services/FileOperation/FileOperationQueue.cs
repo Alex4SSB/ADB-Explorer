@@ -260,7 +260,7 @@ public class FileOperationQueue : ViewModelBase
             return;
         }
 
-        ADBService.AdbDevice.ForceMediaScan(fileOp.Device.Device, target);
+        ADBService.AdbDevice.ForceMediaScan(fileOp.Device.Device);
     }
 
     private void CurrentOperation_PropertyChanged(object sender, PropertyChangedEventArgs e)
