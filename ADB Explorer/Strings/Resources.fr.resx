@@ -1326,4 +1326,19 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
     <value>Déplacer {0} vers {1}</value>
   </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Échec(s)</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>mA</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>uA</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>nA</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} O</value>
+  </data>
 </root>
