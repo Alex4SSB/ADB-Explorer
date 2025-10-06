@@ -118,7 +118,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public string[] Children
+    public (string, long?)[] Children
     {
         get
         {
@@ -128,13 +128,19 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             var findCmd = ShellCommands.TranslateCommand("find");
             var target = ADBService.EscapeAdbShellString(FullName);
 
-            // get relative (to ParentPath) paths of all files and empty directories
-            // directories are marked with a trailing slash
-            string[] args = [ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-mindepth 1 -type d -empty -printf '%p/\\n'"];
+            // get relative (to ParentPath) paths and sizes of all files, directries are marked with 'd'
+            string[] args = [ParentPath, "&&", findCmd, target, "-mindepth 1", "\\( -type d -printf '/// %p /// d ///\\n' \\) -o \\( -type f -printf '/// %p /// %s ///\\n' \\)"];
 
             ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, CancellationToken.None, args);
 
-            return stdout.Split(ADBService.LINE_SEPARATORS, StringSplitOptions.RemoveEmptyEntries);
+            var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
+
+            return [.. matches.Where(m => m.Success)
+                .Select(m =>
+                (
+                    m.Groups["Name"].Value,
+                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value)
+                ))];
         }
     }
 
@@ -323,20 +329,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
-    public SyncFile GetSyncFile(bool includeContent = true)
-    {
-        SyncFile file = new(this);
-        if (includeContent && Children is not null)
-        {
-            string[] children = Children;
-            var tree = children.Select(f => new AdbSyncProgressInfo(FileHelper.ConcatPaths(ParentPath, f), null, null, null));
-            file.AddUpdates(tree);
-        }
-        
-        return file;
-    }
-
-    public IEnumerable<string> GetEmptySubfolders() => Children?.Where(f => f[^1] == '/');
+    public SyncFile GetSyncFile() => new(this, Children);
 
     public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {
@@ -347,22 +340,20 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        string[] items = [FullName + (IsDirectory ? '/' : "")];
+        (string, long?)[] items = [(FullName, (long?)Size)];
         if (includeContent && Children is not null)
         {
             items = [..items, ..Children];
         }
 
-        // We only know the size of a single file beforehand
-        long? size = IsDirectory ? null : (long?)Size;
         DateTime? date = IsDirectory ? null : ModifiedTime;
 
         Descriptors = items.Select(item => new FileDescriptor
         {
-            Name = item.TrimEnd('/'),
+            Name = item.Item1,
             SourcePath = FullPath,
-            IsDirectory = item[^1] is '/',
-            Length = size,
+            IsDirectory = item.Item2 is null,
+            Length = item.Item2,
             ChangeTimeUtc = date,
             Stream = () =>
             {
@@ -393,7 +384,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                     Thread.Sleep(100);
                 }
                 
-                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item, '\\');
+                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item.Item1, '\\');
 
                 // Try 10 times to read from the file and write to the stream,
                 // in case the file is still in use by ADB or hasn't appeared yet

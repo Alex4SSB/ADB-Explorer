@@ -29,10 +29,13 @@ public class SyncFile : FilePath
         }
     }
 
-    public SyncFile(FileClass fileClass)
+    public SyncFile(FileClass fileClass, IEnumerable<(string, long?)> tree = null)
         : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
         Size = fileClass.Size;
+
+        if (tree is not null && IsDirectory)
+            Children = [.. GetFolderTree(tree, FullPath)];
     }
 
     public SyncFile(SyncFile other) : this(new FileClass(other))
@@ -51,10 +54,52 @@ public class SyncFile : FilePath
                 };
             }
             else
+            {
                 yield return new(child)
                 {
                     ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
                 };
+            }
+        }
+    }
+
+    static IEnumerable<SyncFile> GetFolderTree(IEnumerable<(string, long?)> tree, string parent)
+    {
+        // empty folder
+        if (!tree.Any())
+            yield break;
+
+        // parent path here is absolute, tree paths are relative to the original parent
+        var relativeParent = parent;
+        while (!tree.First().Item1.Contains(relativeParent))
+        {
+            relativeParent = relativeParent[(relativeParent.IndexOf('/') + 1)..];
+        }
+
+        var groups = tree.GroupBy(f => f.Item1.Split(relativeParent)[1].Trim('/').Split('/')[0]);
+
+        foreach (var group in groups.Where(g => g.Key is not null))
+        {
+            var fullPath = FileHelper.ConcatPaths(parent, group.Key);
+
+            if (group.First().Item2 is null)
+            {
+                var children = GetFolderTree(group.Skip(1), fullPath);
+
+                yield return new(fullPath, FileType.Folder)
+                {
+                    Children = [.. children],
+                    ProgressUpdates = [new AdbSyncProgressInfo(fullPath, null, null, null)]
+                };
+            }
+            else
+            {
+                yield return new(fullPath, FileType.File)
+                {
+                    Size = (ulong)group.First().Item2,
+                    ProgressUpdates = [new AdbSyncProgressInfo(fullPath, null, null, null)]
+                };
+            }
         }
     }
 

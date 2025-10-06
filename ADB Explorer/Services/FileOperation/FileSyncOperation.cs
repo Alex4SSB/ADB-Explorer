@@ -26,6 +26,9 @@ public class FileSyncOperation : FileOperation
     public DateTime TransferStart { get; private set; }
     public DateTime TransferEnd { get; private set; }
 
+    private ulong TotalBytes;
+    IEnumerable<SyncFile> Files = null;
+
     private bool isCanceled = false;
 
     public FileSyncOperation(OperationType operationName, FileDescriptor sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, FailedOpProgressViewModel status)
@@ -81,31 +84,32 @@ public class FileSyncOperation : FileOperation
         if (OperationName is OperationType.Push)
             lastWriteTime = FilePath.ShellItem.FileInfo.LastWriteTime;
 
-        IEnumerable<SyncFile> files = null;
         Mutex mutex = new();
 
         var task = Task.Run(() =>
         {
             TransferStart = DateTime.Now;
 
-            files = [FilePath, .. FilePath.AllChildren()];
+            Files = [FilePath, .. FilePath.AllChildren()];
+            TotalBytes = (ulong)Files.Sum(f => (decimal?)f.Size);
+
             if (OperationName is OperationType.Push)
             {
-                var paths = FolderHelper.GetBottomMostFolders(files)
+                var paths = FolderHelper.GetBottomMostFolders(Files)
                     .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false)));
 
                 ShellFileOperation.MakeDirs(Device, paths);
             }
             else
             {
-                foreach (var dir in FolderHelper.GetBottomMostFolders(files))
+                foreach (var dir in FolderHelper.GetBottomMostFolders(Files))
                 {
                     var targetDirPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(dir.FullPath, FilePath.FullPath, false));
                     Directory.CreateDirectory(targetDirPath);
                 }
             }
 
-            Parallel.ForEach(files.Where(f => !f.IsDirectory), (item) =>
+            Parallel.ForEach(Files.Where(f => !f.IsDirectory), (item) =>
             {
                 if (OperationName is OperationType.Push)
                 {
@@ -142,8 +146,8 @@ public class FileSyncOperation : FileOperation
         {
             Status = OperationStatus.Completed;
 
-            var totalBytes = (ulong)files.Where(f => !f.IsDirectory).Sum(f => (decimal)f.Size);
-            var completed = (ulong)files.Where(f => !f.IsDirectory).Count(f => f.ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo p && p.CurrentFilePercentage == 100);
+            var totalBytes = (ulong)Files.Where(f => !f.IsDirectory).Sum(f => (decimal)f.Size);
+            var completed = (ulong)Files.Where(f => !f.IsDirectory).Count(f => f.ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo p && p.CurrentFilePercentage == 100);
 
             AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, totalBytes, (decimal)TransferEnd.Subtract(TransferStart).TotalSeconds, completed);
             StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
@@ -187,10 +191,9 @@ public class FileSyncOperation : FileOperation
 
         if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
-            // TODO: this only counts completed files, not the size
             if (currProgress.TotalPercentage is null)
             {
-                var total = (float)FilePath.Children.Count(f => f.ProgressUpdates.Count > 1) / FilePath.Children.Count;
+                var total = (float)Files.Sum(f => (decimal?)((AdbSyncProgressInfo)f.ProgressUpdates.LastOrDefault())?.CurrentFileBytesTransferred) / TotalBytes;
                 currProgress.TotalPercentage = (int)(total * 100);
             }
 
