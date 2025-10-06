@@ -6,11 +6,11 @@ namespace ADB_Explorer.Models;
 
 public class SyncFile : FilePath
 {
-    public ObservableList<FileOpProgressInfo> ProgressUpdates { get; } = [];
+    public ObservableList<FileOpProgressInfo> ProgressUpdates { get; private set; } = [];
 
-    public ObservableList<SyncFile> Children { get; } = [];
+    public ObservableList<SyncFile> Children { get; private set; } = [];
 
-    public ulong? Size { get; }
+    public ulong? Size { get; set; }
 
     public SyncFile(string androidPath, FileType fileType = FileType.File)
         : base(androidPath, fileType: fileType)
@@ -18,10 +18,15 @@ public class SyncFile : FilePath
 
     }
 
-    public SyncFile(ShellItem windowsPath)
+    public SyncFile(ShellItem windowsPath, bool includeContent = false)
         : base(windowsPath)
     {
         Size = IsDirectory ? null : (ulong?)windowsPath.FileInfo.Length;
+
+        if (includeContent && IsDirectory)
+        {
+            Children = [.. GetFolderTree((ShellFolder)windowsPath)];
+        }
     }
 
     public SyncFile(FileClass fileClass)
@@ -30,10 +35,33 @@ public class SyncFile : FilePath
         Size = fileClass.Size;
     }
 
+    public SyncFile(SyncFile other) : this(new FileClass(other))
+    { }
+
+    static IEnumerable<SyncFile> GetFolderTree(ShellFolder rootFolder)
+    {
+        foreach (var child in rootFolder)
+        {
+            if (child.IsNonArchiveFolder())
+            {
+                yield return new(child)
+                {
+                    Children = [.. GetFolderTree((ShellFolder)child)],
+                    ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
+                };
+            }
+            else
+                yield return new(child)
+                {
+                    ProgressUpdates = [new AdbSyncProgressInfo(child.ParsingName, null, null, null)]
+                };
+        }
+    }
+
     public void AddUpdates(params FileOpProgressInfo[] newUpdates)
         => AddUpdates(newUpdates.Where(o => o is not null));
 
-    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation fileOp = null)
+    public void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates, FileOperation fileOp = null, bool executeInDispatcher = true)
     {
         if (!newUpdates.Any())
             return;
@@ -63,15 +91,18 @@ public class SyncFile : FilePath
             
             if (file is null)
             {
-                bool isDir = !group.Key.Equals(group.First().AndroidPath);
-                file = new(group.Key, isDir ? FileType.Folder : FileType.File);
+                bool isDir = !group.Key.Equals(group.First().AndroidPath) || group.Key[^1] is '/' or '\\';
+                file = new(group.Key, isDir ? FileType.Folder : FileType.File)
+                {
+                    PathType = PathType
+                };
 
                 ExecuteInDispatcher(() =>
                 {
                     Children.Add(file);
                     
                     OnPropertyChanged(nameof(Children));
-                });
+                }, executeInDispatcher);
             }
 
             file.AddUpdates(group);
@@ -81,13 +112,27 @@ public class SyncFile : FilePath
     public string DirectChildPath(string fullPath)
         => FileHelper.DirectChildPath(FullPath, fullPath);
 
-    public static SyncFile MergeToWindowsPath(FileClass fileClass, ShellItem windowsPath)
+    public IEnumerable<SyncFile> AllChildren()
     {
-        SyncFile syncFile = new(fileClass);
-        syncFile.UpdatePath(FileHelper.ConcatPaths(windowsPath.ParsingName, fileClass.FullName, '\\'));
-        syncFile.PathType = FilePathType.Windows;
+        foreach (var child in Children)
+        {
+            yield return child;
 
-        return syncFile;
+            foreach (var grandChild in child.AllChildren())
+            {
+                yield return grandChild;
+            }
+        }
+    }
+
+    public static SyncFile MergeToWindowsPath(SyncFile syncFile, ShellItem windowsPath)
+    {
+        SyncFile copy = new(syncFile);
+
+        copy.UpdatePath(FileHelper.ConcatPaths(windowsPath.ParsingName, syncFile.FullName, '\\'));
+        copy.PathType = FilePathType.Windows;
+
+        return copy;
     }
 }
 

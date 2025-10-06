@@ -125,15 +125,11 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             if (!IsDirectory)
                 return null;
 
-            var findCmd = "find";
-            if (Enum.TryParse<ShellCommands.ShellCmd>(findCmd, out var enumCmd)
-                && ShellCommands.DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
-                && dict.TryGetValue(enumCmd, out var deviceCmd))
-            {
-                findCmd = deviceCmd;
-            }
-
+            var findCmd = ShellCommands.TranslateCommand("find");
             var target = ADBService.EscapeAdbShellString(FullName);
+
+            // get relative (to ParentPath) paths of all files and empty directories
+            // directories are marked with a trailing slash
             string[] args = [ParentPath, "&&", findCmd, target, "-type f", "&&", findCmd, target, "-mindepth 1 -type d -empty -printf '%p/\\n'"];
 
             ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, CancellationToken.None, args);
@@ -326,6 +322,21 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             return NativeMethods.GetShellFileType(fileName);
         }
     }
+
+    public SyncFile GetSyncFile(bool includeContent = true)
+    {
+        SyncFile file = new(this);
+        if (includeContent && Children is not null)
+        {
+            string[] children = Children;
+            var tree = children.Select(f => new AdbSyncProgressInfo(FileHelper.ConcatPaths(ParentPath, f), null, null, null));
+            file.AddUpdates(tree);
+        }
+        
+        return file;
+    }
+
+    public IEnumerable<string> GetEmptySubfolders() => Children?.Where(f => f[^1] == '/');
 
     public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {

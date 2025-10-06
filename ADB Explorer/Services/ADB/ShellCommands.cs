@@ -30,11 +30,22 @@ public static class ShellCommands
         whoami,
     }
 
-    public static string[] Commands => Enum.GetNames(typeof(ShellCmd));
+    public static string[] Commands => Enum.GetNames<ShellCmd>();
 
     public static Dictionary<string, Dictionary<ShellCmd, string>> DeviceCommands { get; set; } = [];
 
     public static bool BusyBoxExists { get; private set; }
+
+    public static string TranslateCommand(string cmd)
+    {
+        if (Enum.TryParse<ShellCmd>(cmd, out var enumCmd)
+            && Data.CurrentADBDevice is not null
+            && DeviceCommands.TryGetValue(Data.CurrentADBDevice.ID, out var dict)
+            && dict.TryGetValue(enumCmd, out var deviceCmd))
+            return deviceCmd;
+
+        return cmd;
+    }
 
     public static void FindCommands(string deviceID)
     {

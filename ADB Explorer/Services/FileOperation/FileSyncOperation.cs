@@ -75,37 +75,62 @@ public class FileSyncOperation : FileOperation
             return;
         }
 
-        void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs)
-        {
-            progressUpdates.Add(new AdbSyncProgressInfo(FilePath.FullPath, (int)eventArgs.ProgressPercentage, null, null));
-
-            TransferEnd = DateTime.Now;
-        }
-
-        var targetPath = TargetPath.IsDirectory ? TargetPath.ParentPath : TargetPath.FullPath;
         DateTime lastWriteTime = DateTime.MinValue;
         UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
 
         if (OperationName is OperationType.Push)
             lastWriteTime = FilePath.ShellItem.FileInfo.LastWriteTime;
 
+        IEnumerable<SyncFile> files = null;
+        Mutex mutex = new();
+
         var task = Task.Run(() =>
         {
             TransferStart = DateTime.Now;
-            using SyncService service = new(Device.Device.DeviceData);
 
-            // TODO: Directory push/pull
-
+            files = [FilePath, .. FilePath.AllChildren()];
             if (OperationName is OperationType.Push)
             {
-                using var stream = new FileStream(FilePath.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, in isCanceled);
+                var paths = FolderHelper.GetBottomMostFolders(files)
+                    .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false)));
+
+                ShellFileOperation.MakeDirs(Device, paths);
             }
             else
             {
-                using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                service.Pull(FilePath.FullPath, stream, SyncProgressCallback, in isCanceled);
+                foreach (var dir in FolderHelper.GetBottomMostFolders(files))
+                {
+                    var targetDirPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(dir.FullPath, FilePath.FullPath, false));
+                    Directory.CreateDirectory(targetDirPath);
+                }
             }
+
+            Parallel.ForEach(files.Where(f => !f.IsDirectory), (item) =>
+            {
+                if (OperationName is OperationType.Push)
+                {
+                    // target = [Android parent folder]\[relative path from Windows parent folder to current item]
+                    var targetPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath));
+                    using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using SyncService service = new(Device.Device.DeviceData);
+
+                    service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, in isCanceled);
+
+                    void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
+                }
+                else
+                {
+                    // target = [Windows parent folder]\[relative path from Android parent folder to current item]
+                    var targetPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath));
+                    using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                    using SyncService service = new(Device.Device.DeviceData);
+
+                    service.Pull(item.FullPath, stream, SyncProgressCallback, in isCanceled);
+
+                    void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
+                }
+            });
+
         });
 
         task.ContinueWith((t) =>
@@ -115,13 +140,12 @@ public class FileSyncOperation : FileOperation
 
         task.ContinueWith((t) =>
         {
-            //((AdbSyncProgressInfo)progressUpdates.LastOrDefault()).TotalPercentage;
-
-            // TODO: Check for errors, cancellations, and skipped files
-
             Status = OperationStatus.Completed;
 
-            AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, FilePath.Size, (decimal)TransferEnd.Subtract(TransferStart).TotalSeconds);
+            var totalBytes = (ulong)files.Where(f => !f.IsDirectory).Sum(f => (decimal)f.Size);
+            var completed = (ulong)files.Where(f => !f.IsDirectory).Count(f => f.ProgressUpdates.LastOrDefault() is AdbSyncProgressInfo p && p.CurrentFilePercentage == 100);
+
+            AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, totalBytes, (decimal)TransferEnd.Subtract(TransferStart).TotalSeconds, completed);
             StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -143,6 +167,17 @@ public class FileSyncOperation : FileOperation
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
+    private void AddUpdates(SyncFile item, SyncProgressChangedEventArgs eventArgs, Mutex mutex)
+    {
+        item.Size ??= (ulong)eventArgs.TotalBytesToReceive;
+
+        mutex.WaitOne();
+        progressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, (int)eventArgs.ProgressPercentage, (ulong)eventArgs.ReceivedBytesSize));
+        mutex.ReleaseMutex();
+
+        TransferEnd = DateTime.Now;
+    }
+
     private void ProgressUpdates_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         if (Status is not OperationStatus.InProgress)
@@ -152,6 +187,13 @@ public class FileSyncOperation : FileOperation
 
         if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
+            // TODO: this only counts completed files, not the size
+            if (currProgress.TotalPercentage is null)
+            {
+                var total = (float)FilePath.Children.Count(f => f.ProgressUpdates.Count > 1) / FilePath.Children.Count;
+                currProgress.TotalPercentage = (int)(total * 100);
+            }
+
             StatusInfo = new InProgSyncProgressViewModel(currProgress);
         }
     }
@@ -169,15 +211,15 @@ public class FileSyncOperation : FileOperation
 
     public override void ClearChildren()
     {
-        AndroidPath.Children.Clear();
+        FilePath.Children.Clear();
         progressUpdates.Clear();
     }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
-        => AndroidPath.AddUpdates(newUpdates, this);
+        => FilePath.AddUpdates(newUpdates, this);
 
     public override void AddUpdates(params FileOpProgressInfo[] newUpdates)
-        => AndroidPath.AddUpdates(newUpdates, this);
+        => FilePath.AddUpdates(newUpdates, this);
 
     public static FileSyncOperation PullFile(SyncFile sourcePath, SyncFile targetPath, ADBService.AdbDevice adbDevice, Dispatcher dispatcher)
         => new(OperationType.Pull, sourcePath, targetPath, adbDevice, dispatcher);

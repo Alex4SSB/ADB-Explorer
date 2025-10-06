@@ -111,7 +111,7 @@ public class SyncErrorInfo : FileOpErrorInfo
 
 public class AdbSyncProgressInfo : FileOpProgressInfo
 {
-    public int? TotalPercentage { get; }
+    public int? TotalPercentage { get; set; }
     public int? CurrentFilePercentage { get; }
     public UInt64? CurrentFileBytesTransferred { get; }
     public ulong? TotalBytesTransferred { get; }
