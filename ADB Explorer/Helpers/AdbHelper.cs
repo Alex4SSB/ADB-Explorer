@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using AdvancedSharpAdbClient;
 
 namespace ADB_Explorer.Helpers;
 
@@ -14,48 +15,6 @@ internal static class AdbHelper
         ADBService.VerifyAdbVersion(adbPath);
 
         return Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
-    });
-
-    public static void VerifyProgressRedirection() => Task.Run(() =>
-    {
-        if (!Data.Settings.UseProgressRedirection
-            || Data.RuntimeSettings.AdbVersion is null
-            || string.IsNullOrEmpty(Data.RuntimeSettings.AdbPath))
-            return;
-        
-        string path = $"{Data.AppDataPath}\\{AdbExplorerConst.PROGRESS_REDIRECTION_PATH}";
-        bool hashValid;
-
-        if (Data.RuntimeSettings.IsArm)
-            hashValid = Security.CalculateWindowsFileHash(path) == Properties.AppGlobal.ProgressRedirectionHash_ARM;
-        else
-            hashValid = Security.CalculateWindowsFileHash(path) == Properties.AppGlobal.ProgressRedirectionHash_x64;
-
-        if (!hashValid)
-        {
-            // hash will be null if file does not exist, or is inaccessible
-            try
-            {
-                if (Data.RuntimeSettings.IsArm)
-                    File.WriteAllBytes(path, Properties.AppGlobal.AdbProgressRedirection_ARM);
-                else
-                    File.WriteAllBytes(path, Properties.AppGlobal.AdbProgressRedirection_x86);
-            }
-            catch (Exception e)
-            {
-                Data.Settings.UseProgressRedirection = false;
-
-                App.Current.Dispatcher.Invoke(() =>
-                    DialogService.ShowMessage($"{Strings.Resources.S_DEPLOY_REDIRECTION_ERROR}\n\n{e.Message}",
-                                              Strings.Resources.S_DEPLOY_REDIRECTION_TITLE,
-                                              DialogService.DialogIcon.Exclamation,
-                                              copyToClipboard: true));
-
-                return;
-            }
-        }
-
-        Data.ProgressRedirectionPath = path;
     });
 
     public static void MdnsCheck()
@@ -98,24 +57,27 @@ internal static class AdbHelper
         }
     });
 
-    public static bool SilentPull(Device device, FilePath file, string windowsPath) 
-        => 0 == ADBService.ExecuteAdbCommand("pull",
-                                             out _,
-                                             out _,
-                                             new(),
-                                             [
-                                                 "-a",
-                                                 ADBService.EscapeAdbString(file.FullPath),
-                                                 ADBService.EscapeAdbString(windowsPath)
-                                             ]);
+    public static string ReadFile(ADBService.AdbDevice device, string path)
+    {
+        using MemoryStream stream = new();
+        using SyncService service = new(device.Device.DeviceData);
 
-    public static bool SilentPush(Device device, string windowsPath, string androidPath)
-        => 0 == ADBService.ExecuteAdbCommand("push",
-            out _,
-            out _,
-            new(),
-            [
-                ADBService.EscapeAdbString(windowsPath),
-                ADBService.EscapeAdbString(androidPath)
-            ]);
+        service.Pull(path, stream);
+
+        stream.Position = 0;
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
+    public static void WriteFile(ADBService.AdbDevice device, string path, string content)
+    {
+        using MemoryStream stream = new();
+        using StreamWriter writer = new(stream);
+        writer.Write(content);
+        writer.Flush();
+        stream.Position = 0;
+
+        using SyncService service = new(device.Device.DeviceData);
+        service.Push(stream, path, (UnixFileMode)0x1ED, DateTime.Now); // 0x1ED = 0777 in octal
+    }
 }

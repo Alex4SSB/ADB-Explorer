@@ -129,7 +129,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             var target = ADBService.EscapeAdbShellString(FullName);
 
             // get relative (to ParentPath) paths and sizes of all files, directries are marked with 'd'
-            string[] args = [ParentPath, "&&", findCmd, target, "-mindepth 1", "\\( -type d -printf '/// %p /// d ///\\n' \\) -o \\( -type f -printf '/// %p /// %s ///\\n' \\)"];
+            string[] args = [ParentPath, "&&", findCmd, target, "-mindepth 1", "\\( -type d -printf '/// %p /// d ///\\n' \\) -o \\( -type f -printf '/// %p /// %s ///\\n' \\)", "2>&1"];
 
             ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, CancellationToken.None, args);
 

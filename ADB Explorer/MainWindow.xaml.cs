@@ -155,8 +155,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         RuntimeSettings.IsSplashScreenVisible = false;
         RuntimeSettings.IsDevicesPaneOpen = true;
 
-        AdbHelper.VerifyProgressRedirection();
-
         ConnectTimer.Start();
         ServerWatchdogTimer.Start();
         DiskUsageTimer.Start();
@@ -640,10 +638,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     DevicesObject.RetrieveHistoryDevices();
 
                 FilterDevices();
-                break;
-
-            case nameof(AppSettings.UseProgressRedirection):
-                AdbHelper.VerifyProgressRedirection();
                 break;
         }
     }

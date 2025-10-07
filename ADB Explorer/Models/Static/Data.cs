@@ -37,8 +37,6 @@ internal static class Data
 
     public static string AppDataPath { get; set; } = "";
 
-    public static string ProgressRedirectionPath { get; set; } = null;
-
     public static Devices DevicesObject { get; set; }
 
     public static MDNS MdnsService { get; set; } = new();

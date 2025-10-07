@@ -8,17 +8,8 @@
         [GeneratedRegex(@"^(?<id>[\w.:-]+?) +(?<status>unauthorized|device|offline|authorizing|recovery|sideload)(?: +.*(?:model:(?<model>\w+)))?(?: +.*(?:device:(?<device>\w+)))?[^\r\n]*", RegexOptions.Multiline)]
         public static partial Regex RE_DEVICE_NAME();
 
-        [GeneratedRegex(@"^\[ *(?<TotalPercentage>(?>\d+%|\?))\] (?<CurrentFile>.+?)(?>: (?<CurrentPercentage>\d+%)|(?<CurrentBytes>\d+)\/\?)? *$", RegexOptions.Multiline)]
-        public static partial Regex RE_FILE_SYNC_PROGRESS();
-
-        [GeneratedRegex(@"^(adb: error: )*(?<Message>(?:(?:'(?<WindowsPath>\w:(?:\\+[^\/']+)+)')|(?: (?<WindowsPath1>\w:(?:\\+[^\/:]+)+): )|(?:'(?<AndroidPath>(?:\/+[^']+)+)')|(?: (?<AndroidPath1>(?:\/+[^:]+)+): )|(?:.+?))*?) *$", RegexOptions.Multiline)]
-        public static partial Regex RE_FILE_SYNC_ERROR();
-
         [GeneratedRegex(@"^\w+: (?<Message>(?<AndroidPath>[^':]+):.*)$", RegexOptions.Multiline)]
         public static partial Regex RE_SHELL_ERROR();
-
-        [GeneratedRegex("^(?<SourcePath>.+?): (?<TotalTransferred>\\d+) files? (?>pulled|pushed), (?<TotalSkipped>\\d+) skipped\\.(?> (?<AverageRate>\\d+(?>\\.\\d+)?) MB\\/s \\((?<TotalBytes>\\d+) bytes in (?<TotalTime>\\d+(?>\\.\\d+)?)s\\))? *$", RegexOptions.Multiline)]
-        public static partial Regex RE_FILE_SYNC_STATS();
 
         [GeneratedRegex(@"(?<FileSystem>[\w\/]+)\s+(?<size_kB>\d+)\s+(?<used_kB>\d+)\s+(?<available_kB>\d+)\s+(?<usage_P>\d+)%\s+(?<path>.*?)[\r\n]")]
         public static partial Regex RE_EMULATED_STORAGE_SINGLE();

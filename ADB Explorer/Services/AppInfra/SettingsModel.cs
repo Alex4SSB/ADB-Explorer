@@ -34,7 +34,6 @@ public static class UISettings
         new(ActionType.ClearAdbPath, () => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", Icons[ActionType.ClearDefaultPath], Strings.Resources.S_BUTTON_CLEAR),
         new(ActionType.ResetApp, () => true, SettingsHelper.ResetAppAction, Icons[ActionType.ResetApp], Strings.Resources.S_RESTART_APP),
         new(ActionType.AnimationInfo, () => true, SettingsHelper.DisableAnimationTipAction, Icons[ActionType.AnimationInfo], Strings.Resources.S_BUTTON_MORE_INFO_TOOLTIP),
-        new(ActionType.ProgressMethodInfo, () => true, SettingsHelper.ProgressMethodTipAction, Icons[ActionType.AnimationInfo], Strings.Resources.S_BUTTON_MORE_INFO_TOOLTIP),
         new(ActionType.AdvancedDragInfo, () => true, SettingsHelper.AdvancedDragTipAction, Icons[ActionType.AnimationInfo], Strings.Resources.S_BUTTON_MORE_INFO_TOOLTIP),
     ];
 
@@ -50,9 +49,6 @@ public static class UISettings
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDevices)), Strings.Resources.S_SETTINGS_POLL_DEVICES),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), Strings.Resources.S_SETTINGS_POLL_BATTERY),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), Strings.Resources.S_SETTINGS_ENABLE_LOG),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.UseProgressRedirection)),
-                                Strings.Resources.S_DEPLOY_REDIRECTION_TITLE,
-                                commands: SettingsActions.Find(a => a.Name is ActionType.ProgressMethodInfo)),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
@@ -424,7 +420,6 @@ public class SettingsAction : BaseAction
         ClearAdbPath,
         ResetApp,
         AnimationInfo,
-        ProgressMethodInfo,
         AdvancedDragInfo,
     }
 

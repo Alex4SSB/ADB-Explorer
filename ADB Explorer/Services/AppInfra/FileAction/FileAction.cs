@@ -388,10 +388,6 @@ public static class AppActions
             () => Data.FileOpQ.Operations.RemoveAll(Data.FileActions.SelectedFileOps.Value),
             Data.FileActions.RemoveFileOpDescription),
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.LogToggle).FileAction,
-        new(FileActionType.FileOpTestNext,
-            () => true,
-            FileOpTest.TestCurrentOperation,
-            "Next Test"), // no need to translate this
         ToggleActions.Find(a => a.FileAction.Name is FileActionType.PauseLogs).FileAction,
         new(FileActionType.ClearLogs,
             () => Data.CommandLog.Count > 0,
@@ -510,7 +506,6 @@ public class FileAction : ViewModelBase
         SaveEditor,
         FileOpStop,
         FileOpRemove,
-        FileOpTestNext,
         PauseLogs,
         ClearLogs,
         ResetSettings,

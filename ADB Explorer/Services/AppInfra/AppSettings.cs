@@ -333,25 +333,11 @@ public class AppSettings : ViewModelBase
         set => Set(ref appTheme, value);
     }
 
-    private bool progressMethod;
-    public bool UseProgressRedirection
-    {
-        get => Get(ref progressMethod, false);
-        set => Set(ref progressMethod, value);
-    }
-
     private bool hidePasteNamingInfo;
     public bool HidePasteNamingInfo
     {
         get => Get(ref hidePasteNamingInfo, false);
         set => Set(ref hidePasteNamingInfo, value);
-    }
-
-    private bool showWelcomeScreen;
-    public bool ShowWelcomeScreen
-    {
-        get => Get(ref showWelcomeScreen, true);
-        set => Set(ref showWelcomeScreen, value);
     }
 
     private bool advancedDragSet;

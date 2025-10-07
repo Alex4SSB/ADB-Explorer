@@ -126,20 +126,6 @@ public partial class ADBService
             return string.IsNullOrEmpty(stderr) ? stdout : stderr;
     }
 
-    public static IEnumerable<string> RedirectCommandAsync(
-        string file, CancellationToken cancellationToken, Process process = null, string workingDir = null, params string[] args)
-    {
-        if (Settings.UseProgressRedirection)
-        {
-            if (file[0] != '"')
-                file = $"\"{file}\"";
-
-            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, workingDir, args: args);
-        }
-        else
-            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, true, process, workingDir, args: args);
-    }
-
     public static IEnumerable<string> ExecuteCommandAsync(
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {

@@ -100,11 +100,7 @@ internal static class FileActionLogic
         {
             try
             {
-                Data.FileActions.EditorWindowsPath = Path.GetTempFileName();
-                if (AdbHelper.SilentPull(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath, Data.FileActions.EditorWindowsPath))
-                    return File.ReadAllText(Data.FileActions.EditorWindowsPath);
-                else
-                    throw new Exception(Strings.Resources.S_READ_FILE_ERROR);
+                return AdbHelper.ReadFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath);
             }
             catch (Exception e)
             {
@@ -124,18 +120,12 @@ internal static class FileActionLogic
 
     public static void SaveEditorText()
     {
-        string text = Data.FileActions.EditorText;
-
         var writeTask = Task.Run(() =>
         {
             try
             {
-                File.WriteAllText(Data.FileActions.EditorWindowsPath, Data.FileActions.EditorText);
-
-                if (AdbHelper.SilentPush(Data.CurrentADBDevice, Data.FileActions.EditorWindowsPath, Data.FileActions.EditorAndroidPath.FullPath))
-                    return true;
-                else
-                    throw new Exception(Strings.Resources.S_WRITE_FILE_ERROR);
+                AdbHelper.WriteFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath, Data.FileActions.EditorText);
+                return true;
             }
             catch (Exception e)
             {
