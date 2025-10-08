@@ -1405,13 +1405,13 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
     <value>{0} EB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
-    <value>mA</value>
+    <value>m</value>
   </data>
   <data name="MICRO" xml:space="preserve">
-    <value>uA</value>
+    <value>u</value>
   </data>
   <data name="NANO" xml:space="preserve">
-    <value>nA</value>
+    <value>n</value>
   </data>
   <data name="BYTES" xml:space="preserve">
     <value>{0} B</value>
