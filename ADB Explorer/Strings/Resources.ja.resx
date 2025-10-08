@@ -220,7 +220,7 @@
     <value>パッケージのインストール</value>
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Wi-Fiデバイスをペアリングして接続する（mDNSを未使用）</value>
+    <value>Wi-Fiデバイスをペアリングして接続する(mDNSを未使用)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>変更を有効にするにはアプリを再起動してください</value>
@@ -250,7 +250,7 @@
     <value>デバイスから受信</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>デバイスから受信（リンク先）</value>
+    <value>デバイスから受信(リンク先)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>復元</value>
@@ -280,10 +280,10 @@
     <value>競合するアプリ</value>
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>次のアプリが実行されているため、ファイル エクスプローラーの監視は利用できません：</value>
+    <value>次のアプリが実行されているため、ファイル エクスプローラーの監視は利用できません:</value>
   </data>
   <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>送信／受信の進捗状況は、転送された合計バイト数で表示されます。
+    <value>送受信の進捗状況は、転送された合計バイト数で表示されます。
 パーセンテージは、合計サイズがわかっている場合にのみ表示されます。</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
@@ -337,7 +337,7 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
     <value>ADBをダウンロード</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>ADB から送信／受信の進捗状況を読み取るためのヘルパー プログラム。</value>
+    <value>ADB から送受信の進捗状況を読み取るためのヘルパー プログラム。</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
     <value>一部のウイルス対策プログラムによって誤検知される可能性があります。</value>
@@ -349,10 +349,10 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
     <value>説明を表示するにはオプションを選択してください</value>
   </data>
   <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>進捗方法を選択：</value>
+    <value>進捗状況を取得する方法を選択:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>ADB の場所（v{0} 以上）：</value>
+    <value>ADB の場所 (v{0} 以上):</value>
   </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>変更</value>
@@ -367,7 +367,7 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
     <value>詳細情報</value>
   </data>
   <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>ファイルエクスプローラーの監視：</value>
+    <value>ファイルエクスプローラーの監視:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>有効</value>
@@ -376,7 +376,7 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
     <value>無効</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>新しい{0}（バージョン{1}）が利用可能です</value>
+    <value>新しい {0} (バージョン {1}) が利用可能です</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>バージョンページへ移動</value>
@@ -391,7 +391,7 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
     <value>ADB実行ファイル</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>このアプリは、ADB（Android Debug Bridge）用のUIです。
+    <value>このアプリは、ADB(Android Debug Bridge)用のUIです。
 アプリを使用するには、PCにADBがインストールされている必要があります。
 ADBはAndroid SDK Platform Toolsの一部として提供されています。
 提供されているリンクからSDK Platform Toolsをダウンロードできます。
@@ -413,11 +413,11 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>複数アイテムの保存先を選択</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>以下が削除されます：
+    <value>以下が削除されます:
 {0}</value>
   </data>
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
-    <value>以下は完全に削除されます：
+    <value>以下は完全に削除されます:
 {0}</value>
   </data>
   <data name="S_NEW_ITEM" xml:space="preserve">
@@ -449,11 +449,11 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>{0} を強制終了</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
-    <value>以下は削除されます：
+    <value>以下は削除されます:
 {0}</value>
   </data>
   <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>以下のパッケージが削除されます：
+    <value>以下のパッケージが削除されます:
 {0} パッケージ</value>
   </data>
   <data name="S_UNINSTALL" xml:space="preserve">
@@ -529,7 +529,7 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>コンパクトビューを有効にする</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>送信／受信時にポーリングを停止する</value>
+    <value>送受信時にポーリングを停止する</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>複数のデバイスで同時操作を許可する</value>
@@ -1304,6 +1304,176 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>最下部</value>
   </data>
   <data name="ScrollBar_PageUpCommand" xml:space="preserve">
-    <value>前のページ</value>
+    <value>上のページ</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>下のページ</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>上にスクロール</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>下にスクロール</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>左端</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>右端</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>左のページ</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>右のページ</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>左にスクロール</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>右にスクロール</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>元に戻す</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>やり直す</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>通知</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>クリックすると詳細情報が表示されます</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>アプリの言語</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>設定でアプリの言語を選択してください。
+選択した言語の翻訳の進捗状況が表示されます。
+Weblate でアプリをあなたの言語にローカライズできるよう、ご協力をお願いいたします。</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Weblateへ移動</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>ソケット</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>ブロックデバイス</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>キャラクタデバイス</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>名前付きパイプ(FIFO)</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>不明</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>リンク切れ</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>ナビゲーション履歴</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>現在の場所を追加</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>保存した場所</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>mA</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>uA</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>nA</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>{0} 個の項目をコピー</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>{0} 個の項目を {1} にコピー</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>{0} 個の項目を {1} に移動</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>{0} にリンクを作成</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>{0} 個の項目を移動</value>
+  </data>
+  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
+    <value>領域が遮られています - エクスプローラー ウィンドウを再度開きます。</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>切り取った項目を1件貼り付ける</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>コピーした項目を1件貼り付ける</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>コピーした項目を{0}件貼り付ける</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>切り取りした項目を{0}件貼り付ける</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} を {1} で ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} / {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>{0} をコピー</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>{0} を {1} にコピー</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>{0} を移動</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>{0} を {1} に移動</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>ファイルが見つかりません</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>同期動作完了しましたが、ADBが未確認</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>検証エラー: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>検証中…</value>
   </data>
 </root>
