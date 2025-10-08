@@ -120,4 +120,174 @@
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android ロボットは、Google が作成および提供している作品から複製または変更したものであり、クリエイティブ・コモンズ表示 3.0 ライセンスに記載された条件に従って使用しています。</value>
   </data>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Android ロボットアイコン</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>APK アイコンは、Apache ライセンス バージョン 2.0 に基づいてライセンスされます。</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>指定されたパスから ADB バージョンを取得できませんでした。</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>指定されたパスの ADB バージョンが低すぎます。</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>ADBの上書きに失敗しました</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>ADB実行ファイルを選択</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>アプリアニメーション</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>アプリ設定をリセット</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>新アプリバージョン</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>ナビゲーションエラー</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>パッケージ名をコピー</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>ファイルパスをコピー</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>すべてのアイテムを復元</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>ごみ箱を空にする</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>削除</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>宛先パスエラー</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>接続に失敗しました</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>接続エラー</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>切断エラー</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>ペアリングエラー</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>選択したデバイスではroot権限を有効にできません。</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>root権限</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>削除確認</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>完全に削除</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>作成エラー</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>復元の競合</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>アンインストール確認</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>インストールするパッケージを選択</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>エミュレータを強制終了</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>デバイスを取り外す</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>デバイスを切断</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>ファイル操作</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>パッケージのインストール</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Wi-Fiデバイスをペアリングして接続する（mDNSを未使用）</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>変更を有効にするにはアプリを再起動してください</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>ファイルの読み取りエラー</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>ファイルを読み取るために取得できませんでした。</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>ファイルの書き込みエラー</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>ファイルをデバイスに送信できませんでした。</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>mDNS を無効にするには、ADB サーバーを再起動する必要があります。</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>mDNSを無効にする</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>WSAをバックグラウンドで起動</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>デバイスから受信</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>デバイスから受信（リンク先）</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>復元</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>ファイルエクスプローラーの監視</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
+    <value>デプロイ AdbProgressRedirection.exe</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
+    <value>ディスク使用量のみ</value>
+  </data>
+  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
+    <value>進捗表示方法</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>進捗状況のリダイレクト</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>ディレクトリの一覧表示エラー</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Windows ドライブ直下に受信</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>競合するアプリ</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>次のアプリが実行されているため、ファイル エクスプローラーの監視は利用できません：</value>
+  </data>
+  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
+    <value>送信／受信の進行状況は、転送された合計バイト数で表示されます。
+パーセンテージは、合計サイズがわかっている場合にのみ表示されます。</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
+    <value>実行ファイルを展開できません。
+代わりに、ディスク使用量を計算して進行状況が表示されます。</value>
+  </data>
 </root>
