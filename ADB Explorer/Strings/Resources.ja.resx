@@ -666,4 +666,644 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_BUTTON_OK" xml:space="preserve">
     <value>OK</value>
   </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>ファイル操作のフィルター</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>自動処理を有効にする</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>自動処理を無効にする
+実行中のすべての処理をキャンセル</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>ログの更新は一時停止中</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>ログ更新を一時停止</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>コマンドログ</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>デバイスドライブ</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>戻る</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>進む</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>親フォルダ</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>フィルター</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>デバイス</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>デバイスへ送信</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>フォルダー</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>コピー</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>その他のメニュー</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>編集</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>新規作成</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>フォルダー</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>ファイル</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>すべて選択</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>切り取り</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>リンクを貼り付け</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>名前の変更</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>パッケージ</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>更新時間の変更</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>エディターを閉じる</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>変更を保存</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>インストール</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>一時ドライブにコピー</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>コマンドログをクリアする</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>リンク先の場所を開く</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>ブラウザで検索</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>クリップボードにコピー</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB ディスク使用量</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>読み取り: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>書き込み: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>その他: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>起動ごとにアップデートをチェックします</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>このアプリについて</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>項目</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>項目</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>このフォルダは空です。</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>リストを取得できません。</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>現在のフィルターに一致する項目はありません。</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;このフォルダーは &lt;Italic&gt;空に見える&lt;/Italic&gt;&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;…ぱっと見では&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>個の項目を選択</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>個の項目を選択</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>操作タイプ</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>ファイル名</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>進捗</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>ソース</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>宛先</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>開始時間</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>アイコン</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>名前</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>元の場所</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>更新日時</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>種類</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>サイズ</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>削除日時</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ユーザー ID</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>バージョン</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB サーバーが応答しません</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>サーバーの最終応答時間</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}秒</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>サーバーを強制終了</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>プロセスを強制終了</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>デバイス一覧の更新</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>ADBを再起動</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>サーバーがダウンしています</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>応答を待っています: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ミリ秒</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}分</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}時</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;・サービスのポーリングはオフです&lt;LineBreak /&gt;・サーバーは &lt;Italic&gt;オンの可能性があります&lt;/Italic&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>クリックしてサーバーとポーリングを有効にします</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>サーバーは稼働中です</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>限定的なサポート</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>いくつかの操作が失敗しました</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>root権限が有効</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>root権限を有効にできます</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>リカバリーモード</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>電圧: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>温度: {0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>電流状態: {0}A</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>特定のモードで再起動</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>システムイメージ(GSI)</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>ブートローダー</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>サイドロード</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>サイドロード(自動再起動)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - オフライン</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - 未許可</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>エミュレーター</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNSサービス</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>Wi-Fi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>バッテリー状態不明</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, 接続済み</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>ワイヤレス</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>有線</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>未充電</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>不明</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>充電</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>放電中</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>充電しない</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>充電完了</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>状態: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>健康状態: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>良好</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>過熱</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>使用不可</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>過電圧</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>不明な障害</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>低温</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>起動</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSAを起動</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>次回から表示しない。</value>
+  </data>
+  <data name="S_EXTRACT_TITLE" xml:space="preserve">
+    <value>ファイルの抽出</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>中断</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>シェルに送信中</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} 競合</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>貼り付け</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>ドロップ</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>操作</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>{0} を検証</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>リンク</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (リンク)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Android アプリケーション パッケージ</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows 実行ファイル</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>ごみ箱</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>はい</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>ルート (/)</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>内部ストレージ</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>インストールされたアプリ</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>外部ストレージ</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG ドライブ</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>エミュレートされたドライブ</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>一時ディレクトリ</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>ファイル名はターゲット ファイル システムでは無効です: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>コンテンツの不一致</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>ターゲットの場所から見つかりません</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>永久削除</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>指定されたパスは存在しません。</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>カスタムアプリデータパス</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>メニューが空です</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - コピー</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Unix の命名規則に準拠 (ADB 経由)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>FUSE命名規則に準拠</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Windowsの命名規則に準拠</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Windows ドライブルート命名規則に準拠</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>現在の場所でユニーク</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>警告</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>選択したファイルは Windows の命名規則に違反しています</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>選択したファイルは Windows ドライブルート命名規則に違反しています</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>選択されたファイルの一部は、FUSE / Windows 上で名前が競合しています</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>選択されたファイルはFUSE命名規則に違反しています</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>コピーされたファイルの一部にFUSE上で競合する名前があります</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>コピーされたファイルはFUSEの命名規則に違反しています</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>選択された項目はファイル/フォルダではありません</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>「アプリ設定をリセット」を使用するか、設定ファイルで手動で元に戻すことができます</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>次のアプリのリリースまで</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>二度と表示しない</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSAアプリ</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>root状態: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>未チェック</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>拒否</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>有効</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>無効</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>ペアリングコード</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IPアドレス/ホスト名</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>ポート</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>ペアリングポート</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>ペアリング＆接続</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>保存済みデバイス</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QRペアリング</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>ペアリング準備完了</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>すべてクリア</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>新しいデバイスを追加</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[未許可]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[サービス]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>現在閲覧中</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>ブラウズ</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>接続</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>空き容量 {0} / 総容量 {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>空</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APKインストーラー</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APKインストーラー</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>パッケージ</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>エラー: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>検証済み</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>完了</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} 件失敗</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>合計:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>前回の操作</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>実行中</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>キュー</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>失敗</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>キャンセル済み</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>前回</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>移動</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>ごみ箱に送る</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% 使用済み</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>ここにスクロール</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>最上部</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>最下部</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>前のページ</value>
+  </data>
 </root>
