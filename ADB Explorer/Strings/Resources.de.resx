@@ -691,7 +691,7 @@ Sie können diese Einstellung jederzeit ändern.</value>
     <value>Die ADB-Version aus dem angegebenen Pfad ist zu niedrig.</value>
   </data>
   <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value />
+    <value>ADB konnte nicht überschrieben werden</value>
   </data>
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
     <value>Fehler beim Erstellen</value>
@@ -1367,5 +1367,113 @@ Alle laufenden Vorgänge abbrechen</value>
   </data>
   <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
     <value>Zum Anzeigen weiterer Informationen klicken</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Konnte die Datei nicht herunterladen, um sie zu lesen.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Konnte die Datei nicht zurück auf das Gerät schicken.</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Ziehen</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Ziehen (Linkziel)</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>Datei-Explorer-Überwachung</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Ziehen zu Windows-Drive-Wurzel</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>Datei-Explorer-Überwachung nicht verfügbar, da folgende Apps laufen :</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>Die Überwachung des Datei-Explorers ermöglicht der App, Drag / Clipboard-Pull-Operationen direkt im Zielverzeichnis.
+
+Andernfalls wird der Pull im temporären Ordner der App durchgeführt, von dem der Datei-Explorer die Datei als Stream erhält, den ein kleiner Puffer verwendet.
+Diese beiden zusätzlichen Schritte verlangsamen den Prozess erheblich.
+
+Diese Funktion wird für andere ausgewählte Dateimanager automatisch deaktiviert.</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Wählen Sie 'Starten' aus, wenn ADB bereits in WSA autorisiert ist.
+Um ADB zu genehmigen, öffnen Sie die erweiterten Einstellungen von WSA.</value>
+  </data>
+  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
+    <value>Ein Hilfsprogramm zum Lesen des Push/Pull-Progress von ADB.</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>ADB (v{0} mindestens) finden:</value>
+  </data>
+  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
+    <value>Datei-Explorer-Überwachung:</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Diese App ist eine Benutzeroberfläche für ADB - Android Debug Bridge.
+Um die App zu verwenden, müssen Sie ADB auf Ihrem PC installiert haben.
+ADB ist als Teil der Android SDK Platform Tools verfügbar.
+Sie können den bereitgestellten Link verwenden, um die SDK Platform Tools herunterzuladen.
+Leider können wir ADB mit der App aufgrund von Lizenzbeschränkungen nicht bereitstellen.</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Ordner auswählen, um zu pushen</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Push Zielordner auswählen</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Zu pushende Dateien auswählen</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Wählen Sie Dateien aus, um sie in {0} zu übertragen</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Stopen Sie das Polling bei Push/Pull</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Media-Rescan erzwingen bei Push</value>
+  </data>
+  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
+    <value>Datei-Explorer-Überwachung aktivieren</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>In Standard Ordner ziehen</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Datei Browser</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Upload auf das Gerät</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Dieser Ordner &lt;Italic&gt; sieht &lt;/Italic&gt; leer aus&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;…mit dem bloßen Auge&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Die Abfrage von Dienstleistungen ist AUS&lt;LineBreak /&gt;• Der Server &lt;Italic&gt;könnte&lt;/Italic&gt; EIN sein&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Server &amp; Polling an</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>Wechselspannung</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Befolgt die Windows-Regeln für die Benennung der Laufwerkswurzel</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Eine ausgewählte Datei verletzt die Namensregeln für das Windows-Volume-Root</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Wählen Sie Ihre bevorzugte Anwendungs Sprache in den Einstellungen aus.
+Die Übersetzungsfortschritte werden für die ausgewählte Sprache angezeigt.
+Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value>
+  </data>
+  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
+    <value>Bereich blockiert - Explorer-Fenster erneut öffnen.</value>
   </data>
 </root>
