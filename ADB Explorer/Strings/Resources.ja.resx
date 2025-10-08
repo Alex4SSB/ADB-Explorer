@@ -259,7 +259,7 @@
     <value>ファイルエクスプローラーの監視</value>
   </data>
   <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>展開 AdbProgressRedirection.exe</value>
+    <value>AdbProgressRedirection.exe を展開</value>
   </data>
   <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
     <value>ディスク使用量のみ</value>
