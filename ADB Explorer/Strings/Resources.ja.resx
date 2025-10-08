@@ -154,10 +154,10 @@
     <value>パッケージ名をコピー</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
-    <value>ファイルパスをコピー</value>
+    <value>パスのコピー</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>すべてのアイテムを復元</value>
+    <value>すべての項目を復元</value>
   </data>
   <data name="S_EMPTY_TRASH" xml:space="preserve">
     <value>ごみ箱を空にする</value>
@@ -410,7 +410,7 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>{0} の宛先を選択</value>
   </data>
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
-    <value>複数アイテムの保存先を選択</value>
+    <value>複数項目の保存先を選択</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
     <value>以下が削除されます:
@@ -475,16 +475,16 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>マージまたは置換</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>競合するアイテムが 1 件あります</value>
+    <value>競合する項目が 1 件あります</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>{0} には競合するアイテムが 1 件あります</value>
+    <value>{0} には競合する項目が 1 件あります</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>競合するアイテムが {0} 件あります</value>
+    <value>競合する項目が {0} 件あります</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>{1} には競合するアイテムが {0} 件あります</value>
+    <value>{1} には競合する項目が {0} 件あります</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>貼り付けの競合</value>
@@ -550,7 +550,7 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>ファイル名拡張子を表示</value>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>非表示のアイテムを表示</value>
+    <value>非表示の項目を表示</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>システムアプリを表示</value>
@@ -1085,7 +1085,7 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
     <value>インストールされたアプリ</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
-    <value>外部ストレージ</value>
+    <value>マイクロSDカード</value>
   </data>
   <data name="S_DRIVE_OTG" xml:space="preserve">
     <value>OTG ドライブ</value>
