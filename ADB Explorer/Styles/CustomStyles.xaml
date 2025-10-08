@@ -1080,7 +1080,7 @@
                         Background="Transparent"
                         Command="{Binding NavigateAction.Command}"
                         Style="{StaticResource HomeViewItemStyle}">
-                        <TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
+                        <emoji:TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
                     </Button>
                 </DataTemplate>
             </Setter.Value>

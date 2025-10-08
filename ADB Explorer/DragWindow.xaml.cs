@@ -187,7 +187,10 @@ public partial class DragWindow : INotifyPropertyChanged
 
                 DragTooltip.Inlines.Add(new Run(split[0]) { Foreground = blueBrush });
                 if (split.Length > 1)
+                {
                     DragTooltip.Inlines.Add(target);
+                    DragTooltip.Inlines.Add(new Run(split[1]) { Foreground = blueBrush });
+                }
             }
             else
             {
