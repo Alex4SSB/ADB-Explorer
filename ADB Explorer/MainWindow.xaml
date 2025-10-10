@@ -872,6 +872,10 @@
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.MODERN_WPF}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.MODERN_WPF}}" />
                                                 <ui:HyperlinkButton
+                                                    Content="AdvancedSharpAdbClient"
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.ADVANCED_SHARP_ADB}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.ADVANCED_SHARP_ADB}}" />
+                                                <ui:HyperlinkButton
                                                     Content="Icons8"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.ICONS8}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.ICONS8}}" />
@@ -879,6 +883,10 @@
                                                     Content="LGPL v3"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.LGPL3}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.LGPL3}}" />
+                                                <ui:HyperlinkButton
+                                                    Content="Apache"
+                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.L_APACHE_LIC}}"
+                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.L_APACHE_LIC}}" />
                                                 <ui:HyperlinkButton
                                                     Click="AndroidRobotLicense_Click"
                                                     Content="{x:Static strings:Resources.S_ANDROID_ICONS_TITLE}"

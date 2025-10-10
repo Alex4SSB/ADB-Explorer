@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Models.AbstractFile;
 
