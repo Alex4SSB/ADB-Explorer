@@ -10,6 +10,7 @@
     <Platforms>AnyCPU;x64;ARM64</Platforms>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
     <Configurations>Debug;Release;Deploy</Configurations>
+	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
 	<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
   </PropertyGroup>
 

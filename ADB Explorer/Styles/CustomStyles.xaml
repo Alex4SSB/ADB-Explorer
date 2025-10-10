@@ -1080,10 +1080,20 @@
                         Background="Transparent"
                         Command="{Binding NavigateAction.Command}"
                         Style="{StaticResource HomeViewItemStyle}">
-                        <TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
+                        <emoji:TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
                     </Button>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    <Style
+        x:Key="RtlButtonStyle"
+        BasedOn="{StaticResource ButtonStyle}"
+        TargetType="Button">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 </ResourceDictionary>

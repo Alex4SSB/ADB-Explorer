@@ -23,7 +23,7 @@ public static partial class NativeMethods
     private static extern HResult SHCreateStdEnumFmtEtc(uint cfmt, FORMATETC[] afmt, out IEnumFORMATETC ppenumFormatEtc);
 
     public static HResult SHCreateStdEnumFmtEtc(int cfmt, IEnumerable<FORMATETC> afmt, out IEnumFORMATETC ppenumFormatEtc)
-        => SHCreateStdEnumFmtEtc((uint)cfmt, afmt.ToArray(), out ppenumFormatEtc);
+        => SHCreateStdEnumFmtEtc((uint)cfmt, [.. afmt], out ppenumFormatEtc);
 
     [return: MarshalAs(UnmanagedType.Interface)]
     [DllImport("Ole32.dll", PreserveSig = false)]
@@ -80,9 +80,9 @@ public static partial class NativeMethods
             deviceId = device.ID;
             parentFolder = files.First().ParentPath;
             
-            items = (parentFolder == AdbExplorerConst.RECYCLE_PATH
+            items = [.. parentFolder == AdbExplorerConst.RECYCLE_PATH
                 ? files.Select(f => f.TrashIndex.RecycleName)
-                : files.Select(f => f.FullName)).ToArray();
+                : files.Select(f => f.FullName)];
         }
 
         public readonly IEnumerable<byte> Bytes
@@ -99,7 +99,7 @@ public static partial class NativeMethods
         public static ADBDRAGLIST FromStream(MemoryStream stream)
         {
             ADBDRAGLIST dragList = new();
-            var bytes = stream.ToArray();
+            var bytes = stream.ToArray().AsSpan();
 
             int i = 4;
             List<string> strings = [];
@@ -115,7 +115,7 @@ public static partial class NativeMethods
                     break;
 
                 string item = Encoding.Unicode.GetString(bytes[i..index]);
-                if (string.IsNullOrEmpty(item) || bytes[i..index].Sum(b => (decimal)b) == 0)
+                if (string.IsNullOrEmpty(item) || bytes[i..index].Sum() == 0)
                     break;
 
                 strings.Add(item);
@@ -125,7 +125,7 @@ public static partial class NativeMethods
 
             dragList.deviceId = strings[0];
             dragList.parentFolder = strings[1];
-            dragList.items = strings.Skip(2).ToArray();
+            dragList.items = [.. strings.Skip(2)];
 
             return dragList;
         }

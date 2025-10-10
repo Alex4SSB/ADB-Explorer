@@ -155,6 +155,22 @@ public static class SettingsHelper
 
     public static void ShowAndroidRobotLicense()
     {
+        HyperlinkButton ccLink = new()
+        {
+            Content = Strings.Resources.S_CC_NAME,
+            ToolTip = Links.L_CC_LIC,
+            NavigateUri = Links.L_CC_LIC,
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        HyperlinkButton apacheLink = new()
+        {
+            Content = "Apache",
+            ToolTip = Links.L_APACHE_LIC,
+            NavigateUri = Links.L_APACHE_LIC,
+            HorizontalAlignment = HorizontalAlignment.Center,
+        };
+        apacheLink.SetValue(Grid.ColumnProperty, 1);
+
         SimpleStackPanel stack = new()
         {
             Spacing = 8,
@@ -170,13 +186,11 @@ public static class SettingsHelper
                     TextWrapping = TextWrapping.Wrap,
                     Text = Strings.Resources.S_APK_ICON_LIC,
                 },
-                new HyperlinkButton()
+                new Grid()
                 {
-                    Content = Strings.Resources.S_CC_NAME,
-                    ToolTip = Links.L_CC_LIC,
-                    NavigateUri = Links.L_CC_LIC,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                }
+                    ColumnDefinitions = { new(), new() },
+                    Children = { ccLink, apacheLink },
+                },
             },
         };
 

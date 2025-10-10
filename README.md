@@ -3,18 +3,20 @@
   <h1 align="center">ADB Explorer</h1>
 </p>
 
-<a href="https://hosted.weblate.org/engage/adb-explorer/">
-	<img src="https://hosted.weblate.org/widget/adb-explorer/resources/svg-badge.svg" alt="Translation status" />
-</a>
-<br></br>
-<p >
-  <a title="Platform" target="_blank">
-	<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" />
-  </a>
-  <a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
-    <img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" />
-  </a>
-  <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit">
+
+<p align="center">
+	<a href="https://hosted.weblate.org/engage/adb-explorer/">
+		<img src="https://hosted.weblate.org/widget/adb-explorer/resources/287x66-grey.png" alt="Translation status" /></a>
+	<br></br>
+	<a title="Platform" target="_blank">
+		<img src="https://img.shields.io/badge/Platform-Windows-blue" alt="Platform" /></a>
+ 	<br></br>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/issues">
+		<img alt="Issues" src="https://img.shields.io/github/issues/Alex4SSB/ADB-Explorer?color=0088ff" style="display:block;"/></a>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/releases">
+		<img alt="Downloads" src="https://img.shields.io/github/downloads/Alex4SSB/ADB-Explorer/total" /></a>
+	<a href="https://github.com/Alex4SSB/ADB-Explorer/commits">
+  		<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/Alex4SSB/ADB-Explorer?label=Last%20commit"></a>
 </p>
 
 An interface to ADB that allows browsing, transferring, and editing of files with ease, in a modern and fluent Windows app, built in WPF.

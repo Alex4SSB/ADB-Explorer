@@ -374,7 +374,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Power Balance: {0}Ah.
+        ///   Looks up a localized string similar to Current Balance: {0}A.
         /// </summary>
         public static string S_BAT_BALANCE {
             get {

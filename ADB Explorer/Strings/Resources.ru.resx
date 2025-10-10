@@ -728,7 +728,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Создать</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
-    <value>Папку</value>
+    <value>Папка</value>
   </data>
   <data name="S_MENU_FILE" xml:space="preserve">
     <value>Файл</value>
@@ -809,7 +809,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Нет соответствующих элементов.</value>
   </data>
   <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
-    <value>&lt;Span&gt;Эта папка &lt;Italic&gt;lвыглядить&lt;/Italic&gt; пустой&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… по крайней мере невооруженным взглядом&lt;/Span&gt;&lt;/Span&gt;</value>
+    <value>&lt;Span&gt;Эта папка &lt;Italic&gt;выглядит&lt;/Italic&gt; пустой&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… по крайней мере невооруженным взглядом&lt;/Span&gt;&lt;/Span&gt;</value>
   </data>
   <data name="S_ITEMS_SELECTED" xml:space="preserve">
     <value>Выбранный элемент</value>
@@ -929,7 +929,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Температура: {0}°C</value>
   </data>
   <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Аккумулятор: {0}А/ч</value>
+    <value>Баланс тока: {0}А</value>
   </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Перезагрузить в</value>
@@ -1094,7 +1094,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Эмулируемое устройство</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
-    <value>Временно</value>
+    <value>Временная Папка</value>
   </data>
   <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
     <value>Имя файла недопустимо в конечной файловой системе: {0}</value>

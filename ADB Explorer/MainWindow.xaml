@@ -599,7 +599,8 @@
                                             <Button
                                                 HorizontalAlignment="Center"
                                                 Click="RestartAdbButton_Click"
-                                                Content="{Binding Source={x:Static Member=strings:Resources.S_RESTART_ADB}}" />
+                                                Content="{Binding Source={x:Static Member=strings:Resources.S_RESTART_ADB}}"
+                                                Style="{StaticResource RtlButtonStyle}" />
                                         </ui:SimpleStackPanel>
                                     </Grid>
                                 </Expander>
@@ -878,10 +879,6 @@
                                                     Content="LGPL v3"
                                                     NavigateUri="{Binding Source={x:Static Member=resources:Links.LGPL3}}"
                                                     ToolTip="{Binding Source={x:Static Member=resources:Links.LGPL3}}" />
-                                                <ui:HyperlinkButton
-                                                    Content="Apache"
-                                                    NavigateUri="{Binding Source={x:Static Member=resources:Links.L_APACHE_LIC}}"
-                                                    ToolTip="{Binding Source={x:Static Member=resources:Links.L_APACHE_LIC}}" />
                                                 <ui:HyperlinkButton
                                                     Click="AndroidRobotLicense_Click"
                                                     Content="{x:Static strings:Resources.S_ANDROID_ICONS_TITLE}"

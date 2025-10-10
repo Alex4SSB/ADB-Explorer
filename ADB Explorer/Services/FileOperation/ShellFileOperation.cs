@@ -216,13 +216,14 @@ public static class ShellFileOperation
         }
 
         List<FileMoveOperation> fileops = [];
+        items = [.. items];
 
         if (items.First().ParentPath == AdbExplorerConst.RECYCLE_PATH || currentPath == AdbExplorerConst.RECYCLE_PATH)
-            fileops = Restore().ToList();
+            fileops = [.. Restore()];
         else if (targetPath == AdbExplorerConst.RECYCLE_PATH)
-            fileops = Recycle().ToList();
+            fileops = [.. Recycle()];
         else
-            fileops = Move().ToList();
+            fileops = [.. Move()];
 
         fileops.ForEach(op => op.MasterPid = masterPid);
 
