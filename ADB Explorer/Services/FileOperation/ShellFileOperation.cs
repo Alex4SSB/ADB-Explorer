@@ -326,6 +326,18 @@ public static class ShellFileOperation
         }
     }
 
+    public static async void MakeDirs(ADBService.AdbDevice device, IEnumerable<string> paths)
+    {
+        var result = await ADBService.ExecuteVoidShellCommand(device.ID,
+                                                              CancellationToken.None,
+                                                              "mkdir",
+                                                              ["-p", .. paths.Select(path => ADBService.EscapeAdbShellString(path))]);
+        if (!string.IsNullOrEmpty(result))
+        {
+            throw new Exception(result);
+        }
+    }
+
     public static async void MakeFile(ADBService.AdbDevice device, string fullPath)
     {
         var result = await ADBService.ExecuteVoidShellCommand(device.ID,

@@ -126,20 +126,6 @@ public partial class ADBService
             return string.IsNullOrEmpty(stderr) ? stdout : stderr;
     }
 
-    public static IEnumerable<string> RedirectCommandAsync(
-        string file, CancellationToken cancellationToken, Process process = null, string workingDir = null, params string[] args)
-    {
-        if (Settings.UseProgressRedirection)
-        {
-            if (file[0] != '"')
-                file = $"\"{file}\"";
-
-            return ExecuteCommandAsync(ProgressRedirectionPath, file, Encoding.Unicode, cancellationToken, true, process, workingDir, args: args);
-        }
-        else
-            return ExecuteCommandAsync(file, "", Encoding.UTF8, cancellationToken, true, process, workingDir, args: args);
-    }
-
     public static IEnumerable<string> ExecuteCommandAsync(
         string file, string cmd, Encoding encoding, CancellationToken cancellationToken, bool redirect = true, Process process = null, string workingDir = null, params string[] args)
     {
@@ -217,14 +203,7 @@ public partial class ADBService
 
     public static int ExecuteDeviceAdbShellCommand(string deviceId, string cmd, out string stdout, out string stderr, CancellationToken cancellationToken, params string[] args)
     {
-        var actualCmd = cmd;
-
-        if (Enum.TryParse<ShellCommands.ShellCmd>(cmd, out var enumCmd)
-            && ShellCommands.DeviceCommands.TryGetValue(deviceId, out var dict)
-            && dict.TryGetValue(enumCmd, out var deviceCmd))
-        {
-            actualCmd = deviceCmd;
-        }
+        var actualCmd = ShellCommands.TranslateCommand(cmd);
 
         return ExecuteDeviceAdbCommand(deviceId, "shell", out stdout, out stderr, cancellationToken, [actualCmd, .. args]);
     }
@@ -264,12 +243,7 @@ public partial class ADBService
     {
         ExecuteAdbCommand(GET_DEVICES, out string stdout, out string stderr, CancellationToken.None, "-l");
 
-        return RE_DEVICE_NAME().Matches(stdout).Select(
-            m => LogicalDevice.New(
-                name: DeviceHelper.ParseDeviceName(m.Groups["model"].Value, m.Groups["device"].Value),
-                id: m.Groups["id"].Value,
-                status: m.Groups["status"].Value)
-            ).Where(d => d);
+        return RE_DEVICE_NAME().Matches(stdout).Select(LogicalDevice.New).Where(d => d);
     }
 
     public static void ConnectNetworkDevice(string host, UInt16 port) => NetworkDeviceOperation("connect", $"{host}:{port}");

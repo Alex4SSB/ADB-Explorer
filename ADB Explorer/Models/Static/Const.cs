@@ -3,7 +3,6 @@
 public static class AdbExplorerConst
 {
     public const string ADB_PROCESS = "adb";
-    public const string PROGRESS_REDIRECTION_PATH = "AdbProgressRedirection.exe";
     public const string APP_DATA_FOLDER = "AdbExplorer";
     public const string ADB_DRAG_FORMAT = "ADB Explorer Drag List";
 

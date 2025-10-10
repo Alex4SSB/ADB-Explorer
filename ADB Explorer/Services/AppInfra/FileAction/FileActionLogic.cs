@@ -100,11 +100,7 @@ internal static class FileActionLogic
         {
             try
             {
-                Data.FileActions.EditorWindowsPath = Path.GetTempFileName();
-                if (AdbHelper.SilentPull(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath, Data.FileActions.EditorWindowsPath))
-                    return File.ReadAllText(Data.FileActions.EditorWindowsPath);
-                else
-                    throw new Exception(Strings.Resources.S_READ_FILE_ERROR);
+                return AdbHelper.ReadFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath);
             }
             catch (Exception e)
             {
@@ -124,18 +120,12 @@ internal static class FileActionLogic
 
     public static void SaveEditorText()
     {
-        string text = Data.FileActions.EditorText;
-
         var writeTask = Task.Run(() =>
         {
             try
             {
-                File.WriteAllText(Data.FileActions.EditorWindowsPath, Data.FileActions.EditorText);
-
-                if (AdbHelper.SilentPush(Data.CurrentADBDevice, Data.FileActions.EditorWindowsPath, Data.FileActions.EditorAndroidPath.FullPath))
-                    return true;
-                else
-                    throw new Exception(Strings.Resources.S_WRITE_FILE_ERROR);
+                AdbHelper.WriteFile(Data.CurrentADBDevice, Data.FileActions.EditorAndroidPath.FullPath, Data.FileActions.EditorText);
+                return true;
             }
             catch (Exception e)
             {
@@ -962,11 +952,12 @@ internal static class FileActionLogic
     public static FileSyncOperation PushShellObject(ShellItem item, string targetPath, DragDropEffects dropEffects = DragDropEffects.Copy, ShellItem originalShellItem = null)
     {
         FileSyncOperation pushOperation = null;
+        var source = new SyncFile(item, true);
+        var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
+        
         App.Current.Dispatcher.Invoke(() =>
         {
-            var source = new SyncFile(item) { ShellItem = item };
-            var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
-
+            // TODO: stop using VFDO for direct push
             pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
             pushOperation.VFDO = new() { CurrentEffect = dropEffects };
             pushOperation.OriginalShellItem = originalShellItem;
@@ -1103,17 +1094,23 @@ internal static class FileActionLogic
             pullItems = pullItems.Where(f => files.Contains(f.FullPath));
         }
 
-        foreach (var item in pullItems)
+        await Task.Run(() =>
         {
-            SyncFile target = new(path);
-            target.UpdatePath(FileHelper.ConcatPaths(target, item.FullName));
+            App.Current.Dispatcher.Invoke(() => Data.FileOpQ.AddOperations(GeneratePullOps(path, pullItems, notify)));
+        });
+        
+        static IEnumerable<FileSyncOperation> GeneratePullOps(ShellItem path, IEnumerable<FileClass> pullItems, bool notify)
+        {
+            foreach (var item in pullItems.Select(f => f.GetSyncFile()))
+            {
+                var target = SyncFile.MergeToWindowsPath(item, path);
+                var fileOp = FileSyncOperation.PullFile(item, target, Data.CurrentADBDevice, App.Current.Dispatcher);
 
-            var fileOp = FileSyncOperation.PullFile(new(item), target, Data.CurrentADBDevice, App.Current.Dispatcher);
+                if (notify)
+                    fileOp.PropertyChanged += PullOperation_PropertyChanged;
 
-            if (notify)
-                fileOp.PropertyChanged += PullOperation_PropertyChanged;
-
-            Data.FileOpQ.AddOperation(fileOp);
+                yield return fileOp;
+            }
         }
     }
 

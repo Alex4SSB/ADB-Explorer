@@ -5,7 +5,7 @@ using Vanara.Windows.Shell;
 
 namespace ADB_Explorer.Helpers;
 
-public class FolderHelper
+public static class FolderHelper
 {
     public static void CombineDisplayNames()
     {
@@ -101,5 +101,28 @@ public class FolderHelper
         }
 
         return false;
+    }
+
+    public static bool IsNonArchiveFolder(this ShellItem self)
+    {
+        // A regular file has IsFolder = false, so we get a short-circuit here.
+        // But an archive file (e.g. .zip) has IsFolder = true as well, so we need to check the attributes too.
+        return self.IsFolder && self.FileInfo?.Attributes.HasFlag(FileAttributes.Directory) is true;
+    }
+
+    /// <summary>
+    /// Retrieves the bottom-most folders from a collection of files.
+    /// </summary>
+    /// <remarks>A "bottom-most folder" is defined as a directory that does not contain any other directory 
+    /// from the provided collection as a descendant. This method filters out parent directories to return only the
+    /// deepest-level directories in the hierarchy.</remarks>
+    /// <param name="files">A collection of <see cref="SyncFile"/> objects to evaluate. Each object represents a file or directory.</param>
+    /// <returns>An enumerable collection of <see cref="SyncFile"/> objects representing directories that are not ancestors of
+    /// any other directory in the collection.</returns>
+    public static IEnumerable<SyncFile> GetBottomMostFolders(IEnumerable<SyncFile> files)
+    {
+        var dirs = files.Where(f => f.IsDirectory);
+
+        return dirs.Where(dir => !dirs.Any(f => dir.RelationFrom(f) is AbstractFile.RelationType.Descendant));
     }
 }

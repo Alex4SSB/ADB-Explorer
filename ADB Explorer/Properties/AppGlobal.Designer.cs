@@ -61,26 +61,6 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] AdbProgressRedirection_ARM {
-            get {
-                object obj = ResourceManager.GetObject("AdbProgressRedirection_ARM", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        public static byte[] AdbProgressRedirection_x86 {
-            get {
-                object obj = ResourceManager.GetObject("AdbProgressRedirection_x86", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         public static System.Drawing.Icon APK_icon {
@@ -114,24 +94,6 @@ namespace ADB_Explorer.Properties {
         public static string DragDropLogPath {
             get {
                 return ResourceManager.GetString("DragDropLogPath", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to CB3D9C2E879572CEEA9601531FD532C6.
-        /// </summary>
-        public static string ProgressRedirectionHash_ARM {
-            get {
-                return ResourceManager.GetString("ProgressRedirectionHash_ARM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to A80EA21FAB8CD745642BCAEEB6A91EB2.
-        /// </summary>
-        public static string ProgressRedirectionHash_x64 {
-            get {
-                return ResourceManager.GetString("ProgressRedirectionHash_x64", resourceCulture);
             }
         }
     }

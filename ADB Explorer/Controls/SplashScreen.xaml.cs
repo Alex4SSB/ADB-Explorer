@@ -24,11 +24,7 @@ public partial class SplashScreen
             ? Visibility.Collapsed
             : Visibility.Visible;
 
-        FirstLaunchGrid.Visibility = Data.Settings.ShowWelcomeScreen && !MissingAdbGrid.Visible()
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-
-        AdvancedDragPanel.Visibility = !Data.Settings.AdvancedDragSet && !MissingAdbGrid.Visible() && !FirstLaunchGrid.Visible()
+        AdvancedDragPanel.Visibility = !Data.Settings.AdvancedDragSet && !MissingAdbGrid.Visible()
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -43,35 +39,8 @@ public partial class SplashScreen
         });
     }
 
-    private void RadioButton_Checked(object sender, RoutedEventArgs e)
-    {
-        ConfirmButton.IsEnabled = true;
-        ExplanationPanel.Visibility = Visibility.Visible;
-
-        DeployTextBlock.Visibility = DeployRadioButton.IsChecked is true ? Visibility.Visible : Visibility.Hidden;
-        DiskUsageTextBlock.Visibility = DiskUsageRadioButton.IsChecked is true ? Visibility.Visible : Visibility.Hidden;
-    }
-
-    private void ConfirmButton_Click(object sender, RoutedEventArgs e)
-    {
-        FirstLaunchGrid.Visibility = Visibility.Collapsed;
-
-        if (DeployRadioButton.IsChecked is true)
-            Data.Settings.UseProgressRedirection = true;
-        else if (DiskUsageRadioButton.IsChecked is true)
-            Data.Settings.UseProgressRedirection = false;
-        else
-            throw new NotSupportedException("Unsupported progress method");
-
-        if (Data.Settings.AdvancedDragSet)
-            CloseSplashScreen();
-        else
-            AdvancedDragPanel.Visibility = Visibility.Visible;
-    }
-
     private static void CloseSplashScreen()
     {
-        Data.Settings.ShowWelcomeScreen = false;
         Data.Settings.AdvancedDragSet = true;
         Data.RuntimeSettings.FinalizeSplash = true;
     }
@@ -88,10 +57,7 @@ public partial class SplashScreen
     {
         MissingAdbGrid.Visibility = Visibility.Collapsed;
 
-        if (Data.Settings.ShowWelcomeScreen)
-            FirstLaunchGrid.Visibility = Visibility.Visible;
-        else
-            CloseSplashScreen();
+        CloseSplashScreen();
     }
 
     private void HelpButton_OnClick(object sender, RoutedEventArgs e)

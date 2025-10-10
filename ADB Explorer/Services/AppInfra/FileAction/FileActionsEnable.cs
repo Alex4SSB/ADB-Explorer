@@ -350,8 +350,6 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref editorFilePath, value);
     }
 
-    public string EditorWindowsPath { get; set; }
-
     private string explorerFilter = "";
     public string ExplorerFilter
     {

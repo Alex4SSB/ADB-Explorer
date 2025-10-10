@@ -202,65 +202,6 @@ public partial class ADBService
             }
         }
 
-        public AdbSyncStatsInfo DoFileSync(
-            string cmd,
-            string arg,
-            string target,
-            string source,
-            Process cmdProcess,
-            ref ObservableList<FileOpProgressInfo> updates, CancellationToken cancellationToken)
-        {
-            string _target = target;
-
-            if (target[1] == ':' && target.Count(c => c == '\\') < 2)
-                _target = FileHelper.ConcatPaths(target, ".", '\\');
-
-            _target = EscapeAdbString(_target);
-
-            var stdout = RedirectCommandAsync(
-                Data.RuntimeSettings.AdbPath,
-                cancellationToken,
-                cmdProcess,
-                args: [
-                    "-s",
-                    ID,
-                    cmd,
-                    arg,
-                    EscapeAdbString(source),
-                    _target
-                ]);
-            
-            // Each line should be a progress update (but sometimes the output can be weird)
-            string lastStdoutLine = null;
-            foreach (string stdoutLine in stdout)
-            {
-                lastStdoutLine = stdoutLine;
-                if (string.IsNullOrWhiteSpace(lastStdoutLine))
-                    continue;
-
-                var progressMatch = AdbRegEx.RE_FILE_SYNC_PROGRESS().Match(stdoutLine);
-                if (progressMatch.Success)
-                    updates.Add(new AdbSyncProgressInfo(progressMatch));
-                else
-                {
-                    var errorMatch = AdbRegEx.RE_FILE_SYNC_ERROR().Match(stdoutLine);
-                    if (errorMatch.Success && SyncErrorInfo.New(errorMatch) is SyncErrorInfo error)
-                    {
-                        updates.Add(error);
-                    }
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(lastStdoutLine))
-                return null;
-
-            var match = AdbRegEx.RE_FILE_SYNC_STATS().Match(lastStdoutLine);
-            if (!match.Success)
-                return null;
-
-            return new AdbSyncStatsInfo(match);
-        }
-
         public string TranslateDevicePath(string path)
         {
             if (path.StartsWith('~'))
@@ -396,7 +337,7 @@ public partial class ADBService
                 "call --method scan_volume",
                 "--uri content://media",
                 "--arg external_primary");
-        
+
             return res == 0;
         }
     }

@@ -85,13 +85,19 @@ public static class FileHelper
 
     public static string ConcatPaths(string path1, string path2, char separator = '/')
     {
-        return $"{path1.TrimEnd(separator)}{separator}{path2.TrimStart(separator)}";
+        string result = $"{path1.TrimEnd('/', '\\')}{separator}{path2.TrimStart('/', '\\')}";
+
+        return result.Replace(separator is '/' ? '\\' : '/', separator);
     }
 
-    public static string ExtractRelativePath(string fullPath, string parent)
+    public static string ExtractRelativePath(string fullPath, string parent, bool includeSelf = true)
     {
         if (fullPath == parent)
-            return GetFullName(fullPath);
+        {
+            return includeSelf
+                ? GetFullName(fullPath)
+                : $"{GetSeparator(fullPath)}";
+        }
 
         var index = fullPath.IndexOf(parent);
         

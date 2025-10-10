@@ -37,13 +37,9 @@
                         <RowDefinition.Style>
                             <Style TargetType="RowDefinition">
                                 <Style.Triggers>
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Binding="{Binding ElementName=FirstLaunchGrid, Path=Visibility}" Value="Collapsed" />
-                                            <Condition Binding="{Binding ElementName=MissingAdbGrid, Path=Visibility}" Value="Collapsed" />
-                                        </MultiDataTrigger.Conditions>
+                                    <DataTrigger Binding="{Binding ElementName=MissingAdbGrid, Path=Visibility}" Value="Collapsed">
                                         <Setter Property="Height" Value="0" />
-                                    </MultiDataTrigger>
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </RowDefinition.Style>
@@ -121,65 +117,6 @@
                         x:Name="CloseAdbScreenButton"
                         HorizontalAlignment="Center"
                         Click="CloseAdbScreenButton_Click"
-                        IsEnabled="False"
-                        Style="{StaticResource AccentButtonStyle}"
-                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CONTINUE_TOOLTIP}}">
-                        <ui:FontIcon Glyph="&#xe73e;" />
-                    </Button>
-                </ui:SimpleStackPanel>
-                <ui:SimpleStackPanel
-                    x:Name="FirstLaunchGrid"
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    d:Visibility="Hidden"
-                    Spacing="10"
-                    Visibility="Collapsed">
-                    <TextBlock
-                        HorizontalAlignment="Center"
-                        FontSize="20"
-                        Text="{Binding Source={x:Static Member=strings:Resources.S_SELECT_PROGRESS_METHOD}}" />
-                    <ui:SimpleStackPanel Spacing="2">
-                        <ui:SimpleStackPanel.Resources>
-                            <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
-                                <EventSetter Event="Click" Handler="RadioButton_Checked" />
-                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_PROGRESS_METHOD_TOOLTIP}}" />
-                            </Style>
-                        </ui:SimpleStackPanel.Resources>
-                        <RadioButton x:Name="DeployRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION_TITLE}}" />
-                        <RadioButton x:Name="DiskUsageRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_DISK_USAGE_PROGRESS_TITLE}}" />
-                    </ui:SimpleStackPanel>
-                    <StackPanel
-                        x:Name="ExplanationPanel"
-                        d:Visibility="Visible"
-                        Orientation="Horizontal"
-                        Visibility="Hidden">
-                        <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
-                        <Grid>
-                            <StackPanel x:Name="DeployTextBlock" d:Visibility="Hidden">
-                                <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION}}" />
-                                <TextBlock>
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION_x64}}" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsArm}">
-                                                    <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_DEPLOY_REDIRECTION_ARM}}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
-                            </StackPanel>
-                            <TextBlock
-                                x:Name="DiskUsageTextBlock"
-                                d:Visibility="Visible"
-                                Text="{Binding Source={x:Static Member=strings:Resources.S_DISK_USAGE_PROGRESS}}" />
-                        </Grid>
-                    </StackPanel>
-                    <Button
-                        x:Name="ConfirmButton"
-                        HorizontalAlignment="Center"
-                        Click="ConfirmButton_Click"
                         IsEnabled="False"
                         Style="{StaticResource AccentButtonStyle}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CONTINUE_TOOLTIP}}">
