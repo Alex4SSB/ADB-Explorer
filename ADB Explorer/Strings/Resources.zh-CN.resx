@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -258,15 +258,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>文件资源管理器监听器</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>部署 AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>仅磁盘使用量</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>进度显示方式</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>进度重置</value>
   </data>
@@ -281,14 +272,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>由于以下应用程序正在运行，因此无法运行文件资源管理器监听器：</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>推送 / 拉取 进度以传输的总字节数显示。
-只有在知道总大小时才会显示百分比进度。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>无法部署可执行文件。
-将改用磁盘使用量进度显示方式。</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>启用文件资源管理器监听器后，应用可直接将拖放/剪贴板拉取操作执行到目标文件夹。
@@ -335,21 +318,6 @@
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>下载 ADB</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>用于从 ADB 读取推/拉进度的帮助程序。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>可能会错误地触发某些杀毒程序。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>复制到 %LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>选择一个选项以显示解释</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>选择文件传输进度显示方法:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>指定 ADB（至少 v{0}）：</value>

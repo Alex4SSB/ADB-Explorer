@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -258,12 +258,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>مراقبه متصفح الملفات</value>
   </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>استخدام دسك فقط</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>طريقه التحميل</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>اعاده توجيه التحميل</value>
   </data>
@@ -278,10 +272,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>مراقبه متصفح الملفات غير موجود نظراً لوجود تطبيقات مفعله:</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>دفع/سحب التحميل معروض بصيغه bytes الكليه المحوله.
-النسبه موضحه فقط حين معرفه الحجم الكلي.</value>
   </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
     <value>{0} مجانية من {1}</value>

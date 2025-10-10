@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -259,15 +259,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>File Explorer Monitoring</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>Deploy AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>Disk Usage Only</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>Progress Method</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Progress Redirection</value>
   </data>
@@ -282,14 +273,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>File Explorer monitoring is not available due to the following apps running:</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>Push/pull progress is displayed in total bytes transferred.
-Percentage is available only when total size is known.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>Unable to deploy executable.
-Disk usage progress method will be used instead.</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>Monitoring File Explorer enables the app to perform Drag / Clipboard Pull operations directly to the destination folder.
@@ -336,21 +319,6 @@ To approve ADB, open WSA advanced settings.</value>
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Download ADB</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>A helper program for reading push/pull progress from ADB.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>Might falsely trigger some anti-virus programs.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>Copied to %LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>Select an option to display explanation</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>Select Progress Method:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>Locate ADB (v{0} at least):</value>

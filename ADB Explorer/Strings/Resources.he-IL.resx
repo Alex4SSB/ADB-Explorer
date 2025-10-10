@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -258,15 +258,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>ניטור סייר הקבצים</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>פרוס את AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>שימוש בדיסק בלבד</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>שיטת התקדמות</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>ניתוב ההתקדמות</value>
   </data>
@@ -281,14 +272,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>התוכנות הבאות מונעות כרגע את ניטור סייר הקבצים:</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>התקדמות הורדה/העלאה תוצג בסך הבתים שהועברו
-תצוגה באחוזים תתאפשר רק כאשר המשקל הכולל ידוע.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>לא ניתן לפרוס את תוכנת העזר.
-הצגת ההתקדמות תבוצע ע"י חישוב השימוש בדיסק.</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>ניטור סייר הקבצים מאפשר לתוכנה לבצע פעולות הורדה ע"י גרירה / העתקה ללוח ישירות לתיקיית היעד.
@@ -335,21 +318,6 @@
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>הורד את ADB</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>תוכנת עזר עבור קריאת ההתקדמות של הורדות והעלאות מ-ADB.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>עלול להיות מזוהה כאיום בשגגה ע"י תוכנות אנטי-וירוס מסויימות.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>מועתק ל ‎%LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>בחר אופציה כדי להציג הסבר</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>בחר שיטת התקדמות:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>אתר את ADB (גרסה {0} לכל הפחות):</value>

@@ -200,21 +200,6 @@ public static class SettingsHelper
         });
     }
 
-    public static void ProgressMethodTipAction()
-    {
-        var text = 
-        $"""
-        • {Strings.Resources.S_DEPLOY_REDIRECTION_TITLE}
-            {Strings.Resources.S_DEPLOY_REDIRECTION}
-            {(Data.RuntimeSettings.IsArm ? Strings.Resources.S_DEPLOY_REDIRECTION_ARM : Strings.Resources.S_DEPLOY_REDIRECTION_x64)}
-        
-        • {Strings.Resources.S_DISK_USAGE_PROGRESS_TITLE}
-            {Strings.Resources.S_DISK_USAGE_PROGRESS.Replace("\n", "\n    ")}
-        """;
-
-        DialogService.ShowMessage(text, Strings.Resources.S_PROGRESS_METHOD_TITLE, DialogService.DialogIcon.Tip);
-    }
-
     public static IEnumerable<CultureInfo> GetAvailableLanguages()
     {
         string assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;

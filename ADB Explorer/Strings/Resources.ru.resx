@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -258,15 +258,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>Мониторинг Проводника</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>Выгрузить AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>Использовать только диск</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>Метод Прогресса</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Перенаправление Прогресса</value>
   </data>
@@ -281,14 +272,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>Мониторинг недоступен во время работы этих приложений:</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>Прогресс извлечения/отправки отображается в байтах.
-Процент доступен только когда известен общий размер.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>Невозможно выгрузить исполняемый файл.
-Будет использоваться метод прогресса использования диска.</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>Monitoring File Explorer позволяет приложению выполнять операции Drag / Clipboard Pull напрямую в целевую папку.
@@ -335,21 +318,6 @@
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>Скачать ADB</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>Вспомогательная программа для прочтения прогресса отправки/извлечения из ADB.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>Возможны ложные срабатывания антивирусов.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>Скопировано в %LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>Выберите опцию для отображения объяснения</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>Выберите метод прогресса:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>Обнаружить ADB (v{0} как минимум):</value>
@@ -1458,11 +1426,11 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
     <value>Копировать {0} в {1}</value>
   </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Переместить {0} в {1}</value>
-  </data>
   <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
     <value>Переместить {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Переместить {0} в {1}</value>
   </data>
   <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
     <value>Файл не найден</value>

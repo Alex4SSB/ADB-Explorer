@@ -1114,52 +1114,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A helper program for reading push/pull progress from ADB..
-        /// </summary>
-        public static string S_DEPLOY_REDIRECTION {
-            get {
-                return ResourceManager.GetString("S_DEPLOY_REDIRECTION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Might falsely trigger some anti-virus programs..
-        /// </summary>
-        public static string S_DEPLOY_REDIRECTION_ARM {
-            get {
-                return ResourceManager.GetString("S_DEPLOY_REDIRECTION_ARM", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Unable to deploy executable.
-        ///Disk usage progress method will be used instead..
-        /// </summary>
-        public static string S_DEPLOY_REDIRECTION_ERROR {
-            get {
-                return ResourceManager.GetString("S_DEPLOY_REDIRECTION_ERROR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Deploy AdbProgressRedirection.exe.
-        /// </summary>
-        public static string S_DEPLOY_REDIRECTION_TITLE {
-            get {
-                return ResourceManager.GetString("S_DEPLOY_REDIRECTION_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Copied to %LocalAppData%\AdbExplorer.
-        /// </summary>
-        public static string S_DEPLOY_REDIRECTION_x64 {
-            get {
-                return ResourceManager.GetString("S_DEPLOY_REDIRECTION_x64", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Destination Path Error.
         /// </summary>
         public static string S_DEST_ERR {
@@ -1276,25 +1230,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DISK_USAGE_OTHER {
             get {
                 return ResourceManager.GetString("S_DISK_USAGE_OTHER", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Push/pull progress is displayed in total bytes transferred.
-        ///Percentage is available only when total size is known..
-        /// </summary>
-        public static string S_DISK_USAGE_PROGRESS {
-            get {
-                return ResourceManager.GetString("S_DISK_USAGE_PROGRESS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Disk Usage Only.
-        /// </summary>
-        public static string S_DISK_USAGE_PROGRESS_TITLE {
-            get {
-                return ResourceManager.GetString("S_DISK_USAGE_PROGRESS_TITLE", resourceCulture);
             }
         }
         
@@ -2859,24 +2794,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Progress Method.
-        /// </summary>
-        public static string S_PROGRESS_METHOD_TITLE {
-            get {
-                return ResourceManager.GetString("S_PROGRESS_METHOD_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select an option to display explanation.
-        /// </summary>
-        public static string S_PROGRESS_METHOD_TOOLTIP {
-            get {
-                return ResourceManager.GetString("S_PROGRESS_METHOD_TOOLTIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Pull.
         /// </summary>
         public static string S_PULL_ACTION {
@@ -3281,15 +3198,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SELECT_FOLDER_PUSH_DESTINATION {
             get {
                 return ResourceManager.GetString("S_SELECT_FOLDER_PUSH_DESTINATION", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Select Progress Method:.
-        /// </summary>
-        public static string S_SELECT_PROGRESS_METHOD {
-            get {
-                return ResourceManager.GetString("S_SELECT_PROGRESS_METHOD", resourceCulture);
             }
         }
         

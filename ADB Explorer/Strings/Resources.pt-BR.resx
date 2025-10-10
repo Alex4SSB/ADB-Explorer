@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,11 +117,11 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>O robô do Android é reproduzido ou modificado com base no trabalho criado e compartilhado pelo Google e é usado de acordo com os termos descritos na Licença de Atribuição 3.0 do Creative Commons.</value>
-  </data>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
     <value>O(s) ícone(s) do robô Android</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>O robô do Android é reproduzido ou modificado com base no trabalho criado e compartilhado pelo Google e é usado de acordo com os termos descritos na Licença de Atribuição 3.0 do Creative Commons.</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
     <value>Animações do aplicativos</value>
@@ -165,6 +165,9 @@
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>Excluir</value>
   </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Erro na destinação do caminho</value>
+  </data>
   <data name="S_FAILED_CONN" xml:space="preserve">
     <value>falha ao se conectar com</value>
   </data>
@@ -176,6 +179,12 @@
   </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>Erro de Pareamento</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Acesso root não pode ser habilitado no dispositivo selecionado.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Acesso Root</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>Confirmar Exclusão</value>
@@ -210,32 +219,14 @@
   <data name="S_PUSH_PKG" xml:space="preserve">
     <value>Instalar Pacotes</value>
   </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Parear e/ou conectar a um dispositivo WIFI (sem usar mDNS)</value>
+  </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>Reinicie o aplicativo para aplicar as mudanças</value>
   </data>
   <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erro ao ler o arquivo</value>
-  </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>O servidor do ADB precisa ser reinicializado para desativar o mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Desativar mDNS</value>
-  </data>
-  <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>Restaurar</value>
-  </data>
-  <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Erro na destinação do caminho</value>
-  </data>
-  <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>Acesso root não pode ser habilitado no dispositivo selecionado.</value>
-  </data>
-  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Acesso Root</value>
-  </data>
-  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Parear e/ou conectar a um dispositivo WIFI (sem usar mDNS)</value>
   </data>
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
     <value>Não foi possível puxar o arquivo para lê-lo.</value>
@@ -243,14 +234,26 @@
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Erro ao gravar o arquivo</value>
   </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Não foi possível implementar o arquivo de volta ao dispositivo.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>O servidor do ADB precisa ser reinicializado para desativar o mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Desativar mDNS</value>
+  </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
     <value>Iniciar WSA no segundo plano</value>
   </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Puxar</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restaurar</value>
+  </data>
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>Monitoramento do explorador de arquivos</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>Apenas Para Uso do Disco</value>
   </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Redirecionamento do progresso</value>
@@ -263,11 +266,5 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>Monitoramento do explorador de arquivos não está disponível pois os seguintes apps estão ativos:</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Não foi possível implementar o arquivo de volta ao dispositivo.</value>
-  </data>
-  <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Puxar</value>
   </data>
 </root>

@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -195,6 +195,9 @@
   <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
     <value>Błąd utworzenia</value>
   </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Przywróć konflikty</value>
+  </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>Potwierdź odinstalowanie</value>
   </data>
@@ -228,143 +231,29 @@
   <data name="S_READ_FILE_ERROR" xml:space="preserve">
     <value>Nie można ściągnąć pliku w celu jego odczytania.</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>Wdróż AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>Tylko użycie dysku</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>Metoda postępu</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>Wybierz opcję, aby wyświetlić wyjaśnienie</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>Wybierz metodę postępu:</value>
-  </data>
-  <data name="S_NEW_ITEM" xml:space="preserve">
-    <value>Nowy plik</value>
-  </data>
-  <data name="S_NEW_FOLDER" xml:space="preserve">
-    <value>Nowy folder</value>
-  </data>
-  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value>Pokaż rozszerzenia plików</value>
-  </data>
-  <data name="S_BUTTON_DEVICES" xml:space="preserve">
-    <value>Urządzenia</value>
-  </data>
-  <data name="S_MENU_NEW" xml:space="preserve">
-    <value>Nowy</value>
-  </data>
-  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
-    <value>Nazwa pliku</value>
-  </data>
-  <data name="S_REFRESH_DEVICES" xml:space="preserve">
-    <value>Odśwież urządzenia</value>
-  </data>
-  <data name="S_BUTTON_DISABLE" xml:space="preserve">
-    <value>Wyłącz</value>
-  </data>
-  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Kod parowania</value>
-  </data>
-  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
-    <value>Adres IP / Nazwa hosta</value>
-  </data>
-  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
-    <value>Port</value>
-  </data>
-  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
-    <value>Port parowania</value>
-  </data>
-  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
-    <value>Paruj i połącz</value>
-  </data>
-  <data name="S_DEVICE_SAVED" xml:space="preserve">
-    <value>Zapisane urządzenie</value>
-  </data>
-  <data name="S_DEVICE_QR" xml:space="preserve">
-    <value>Parowanie kodem QR</value>
-  </data>
-  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
-    <value>Gotowe do parowania</value>
-  </data>
-  <data name="S_CLEAR_ALL" xml:space="preserve">
-    <value>Wyczyść wszystko</value>
-  </data>
-  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
-    <value>Dodaj nowe urządzenie</value>
-  </data>
-  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
-    <value>[Nieautoryzowane]</value>
-  </data>
-  <data name="S_SERVICE_NONAME" xml:space="preserve">
-    <value>[Usługa]</value>
-  </data>
-  <data name="S_BUTTON_BROWSE" xml:space="preserve">
-    <value>Przeglądaj</value>
-  </data>
-  <data name="S_BUTTON_CONNECT" xml:space="preserve">
-    <value>Połącz</value>
-  </data>
-  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
-    <value>Dostępne {0} z {1}</value>
-  </data>
-  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
-    <value>Pusty</value>
-  </data>
-  <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Nieznany</value>
-  </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Uszkodzony link</value>
-  </data>
   <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
     <value>Błąd przy zapisywaniu pliku</value>
-  </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Serwer ADB musi zostać uruchomiony ponownie, żeby wyłączyć mDNS.</value>
-  </data>
-  <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>Uruchom WSA w tle</value>
-  </data>
-  <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>Przywróć</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Konfliktujące aplikacje</value>
-  </data>
-  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
-    <value>Pobierz ADB</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>Skopiowane do %LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
-    <value>Więcej informacji</value>
-  </data>
-  <data name="S_ENABLED" xml:space="preserve">
-    <value>Włączone</value>
-  </data>
-  <data name="S_DISABLED" xml:space="preserve">
-    <value>Wyłączone</value>
-  </data>
-  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Przywróć konflikty</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
     <value>Nie można przesłać pliku z powrotem na urządzenie.</value>
   </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Serwer ADB musi zostać uruchomiony ponownie, żeby wyłączyć mDNS.</value>
+  </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
     <value>Wyłącz mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Uruchom WSA w tle</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
     <value>Pobierz</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
     <value>Pobierz (Cel Łącza)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Przywróć</value>
   </data>
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>Monitorowanie Eksploratora plików</value>
@@ -378,16 +267,11 @@
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Przenieś do katalogu głównego dysku systemu Windows</value>
   </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>Konfliktujące aplikacje</value>
+  </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>Monitorowanie Eksploratora plików nie jest dostępne, ponieważ uruchomione są następujące aplikacje:</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>Postęp operacji push/pull jest wyświetlany w całkowitej liczbie przesłanych bajtów.
-Procent jest dostępny tylko wtedy, gdy znany jest całkowity rozmiar.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>Nie można wdrożyć pliku wykonywalnego.
-Zamiast tego zostanie użyta metoda pomiaru postępu wykorzystania dysku.</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>Monitorowanie Eksploratora plików umożliwia aplikacji wykonywanie operacji przeciągania/wyciągania ze schowka bezpośrednio do folderu docelowego.
@@ -432,11 +316,8 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
     <value>Dowiedz się więcej o ADB</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>Program pomocniczy do odczytywania postępu operacji push/pull z ADB.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>Może powodować fałszywe wykrycie przez niektóre programy antywirusowe.</value>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Pobierz ADB</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>Zlokalizuj ADB (v{0} przynajmniej):</value>
@@ -450,8 +331,17 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>Kontynuuj</value>
   </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Więcej informacji</value>
+  </data>
   <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
     <value>Monitorowanie Eksploratora plików:</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Włączone</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Wyłączone</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
     <value>0 = wyświetlana nazwa aplikacji. 1 = nowy numer wersji</value>
@@ -497,6 +387,12 @@ Niestety, ze względu na ograniczenia licencyjne nie możemy udostępnić ADB wr
   <data name="S_DELETE_PERMANENT" xml:space="preserve">
     <value>Następujące dane zostaną trwale usunięte:
 {0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Nowy plik</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Nowy folder</value>
   </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Wystąpił błąd podczas próby wyświetlenia zawartości tego folderu.
@@ -614,6 +510,9 @@ Widoczna zawartość może być niekompletna.</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Włącz obsługę APK</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Pokaż rozszerzenia plików</value>
   </data>
   <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
     <value>Pokaż ukryte elementy</value>
@@ -766,6 +665,9 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_BUTTON_FILTER" xml:space="preserve">
     <value>Filtr</value>
   </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Urządzenia</value>
+  </data>
   <data name="S_BUTTON_PUSH" xml:space="preserve">
     <value>Wyślij</value>
   </data>
@@ -786,6 +688,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_MENU_EDIT" xml:space="preserve">
     <value>Edytuj</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Nowy</value>
   </data>
   <data name="S_MENU_FOLDER" xml:space="preserve">
     <value>Folder</value>
@@ -880,6 +785,9 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
     <value>Typ operacji</value>
   </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Nazwa pliku</value>
+  </data>
   <data name="S_COLUMN_PROGRESS" xml:space="preserve">
     <value>Postęp</value>
   </data>
@@ -930,6 +838,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_KILL_PROCESS" xml:space="preserve">
     <value>Zabij proces</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Odśwież urządzenia</value>
   </data>
   <data name="S_RESTART_ADB" xml:space="preserve">
     <value>Zrestartuj ADB</value>
@@ -1195,8 +1106,59 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
     <value>Włącz</value>
   </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Wyłącz</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Kod parowania</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>Adres IP / Nazwa hosta</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Port parowania</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Paruj i połącz</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Zapisane urządzenie</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>Parowanie kodem QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Gotowe do parowania</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Wyczyść wszystko</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Dodaj nowe urządzenie</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Nieautoryzowane]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Usługa]</value>
+  </data>
   <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
     <value>Aktualnie przeglądasz</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Przeglądaj</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Połącz</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>Dostępne {0} z {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Pusty</value>
   </data>
   <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
     <value>Instalator APK</value>
@@ -1316,6 +1278,12 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_FILE_BLOCK" xml:space="preserve">
     <value>Zablokuj urządzenie</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Nieznany</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Uszkodzony link</value>
   </data>
   <data name="S_NAV_HISTORY" xml:space="preserve">
     <value>Historia nawigacji</value>

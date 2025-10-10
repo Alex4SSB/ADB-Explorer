@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -258,15 +258,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>文件資源管理器監聽器</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>部署 AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>僅磁盤使用量</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>進度顯示方式</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>進度重置</value>
   </data>
@@ -281,14 +272,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>由於以下應用程序正在運行，因此無法運行文件資源管理器監聽器：</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>推送 / 拉取 進度以傳輸的縂字節數顯示。
-只有在知道總大小時才會顯示百分比進度。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>無法部署可執行文件。
-將改用磁盤使用量進度顯示方式。</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>啓用文件資源管理器監聽器后，應用可直接拖放/剪貼板拉取操作執行到目標文件夾。
@@ -335,21 +318,6 @@
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>下載 ADB</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>用於從 ADB 讀取推/拉進度的幫助程序。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>可能會錯誤地觸發某些殺毒程序。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>複製到 %LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>選擇一個選項以顯示解釋</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>選擇進度方法：</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>指定 ADB（至少 v{0}）：</value>

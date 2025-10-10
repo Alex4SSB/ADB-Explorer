@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,11 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Android ロボットアイコン</value>
+  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android ロボットは、Google が作成および提供している作品から複製または変更したものであり、クリエイティブ・コモンズ表示 3.0 ライセンスに記載された条件に従って使用しています。</value>
   </data>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Android ロボットアイコン</value>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>アプリアニメーション</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
     <value>APK アイコンは、Apache ライセンス バージョン 2.0 に基づいてライセンスされます。</value>
@@ -137,9 +140,6 @@
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
     <value>ADB実行ファイルを選択</value>
-  </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>アプリアニメーション</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
     <value>アプリ設定をリセット</value>
@@ -258,15 +258,6 @@
   <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
     <value>ファイルエクスプローラーの監視</value>
   </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>AdbProgressRedirection.exe を展開</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>ディスク使用量のみ</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>進捗表示方法</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>進捗状況のリダイレクト</value>
   </data>
@@ -281,14 +272,6 @@
   </data>
   <data name="S_CONFLICTING_APPS" xml:space="preserve">
     <value>次のアプリが実行されているため、ファイル エクスプローラーの監視は利用できません:</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>送受信の進捗状況は、転送された合計バイト数で表示されます。
-パーセンテージは、合計サイズがわかっている場合にのみ表示されます。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>実行ファイルを展開できません。
-代わりに、ディスク使用量を計算して進捗状況が表示されます。</value>
   </data>
   <data name="S_ADVANCED_DRAG" xml:space="preserve">
     <value>ファイルエクスプローラーを監視することで、アプリはドラッグやクリップボードによる受信を宛先フォルダに直接実行できるようになります。
@@ -335,21 +318,6 @@ ADBを承認するには、WSAの詳細設定を開きます。</value>
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>ADBをダウンロード</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>ADB から送受信の進捗状況を読み取るためのヘルパー プログラム。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>一部のウイルス対策プログラムによって誤検知される可能性があります。</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>%LocalAppData%\AdbExplorer にコピーされました</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>説明を表示するにはオプションを選択してください</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>進捗状況を取得する方法を選択:</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
     <value>ADB の場所 (v{0} 以上):</value>

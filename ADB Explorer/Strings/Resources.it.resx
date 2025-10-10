@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -117,18 +117,541 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>L'icona del robot di Android</value>
+  </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Il robot Android viene riprodotto o modificato da un lavoro creato e condiviso da Google e utilizzato secondo i termini descritti nella licenza Creative Commons 3.0.</value>
   </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Animazioni nell'app</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>L'icona APK è rilasciata sotto licenza Apache, versione 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Impossibile ottenere la versione di ADB dal percorso fornito.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>La versione di ADB del percorso fornito è troppo vecchia.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Impossibile sovrascrivere il percorso di ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Seleziona l'eseguibile di ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Reimposta le impostazioni dell'app</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Nuova versione dell'app</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Errore di navigazione</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copia il nome del pacchetto</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copia il percorso dell'elemento</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Ripristina tutti gli elementi</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Svuota il cestino</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Elimina</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Errore nel percorso di destinazione</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>errore nella connessione a</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Errore nella connessione</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Errore nella disconnessione</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Errore nell'accoppiamento</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>L'accesso root non può essere attivato sul dispositivo selezionato.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Accesso root</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Conferma eliminazione</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Elimina permanentemente</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Errore nella creazione</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Conflitti nel ripristino</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Conferma disinstallazione</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Seleziona i pacchetti da installare</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Termina l'emulatore</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Rimuovi dispositivo</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Disconnetti dispositivo</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Operazioni sui file</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Installa pacchetti</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Accoppia e/o connetti un dispositivo WiFi (senza usare mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Riavvia l'app per applicare i cambiamenti</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Errore nella lettura del file</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Non sono riuscito a scaricare il file per leggerlo.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Errore nella scrittura del file</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Impossibile ri-spostare il file sul dispositivo.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Il server ADB deve essere riavviato per disabilitare mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Disabilita mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Avvia WSA in background</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Prendi dal dispositivo (Pull)</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Prendi dal dispositivo (Pull) l'elemento all'origine del collegamento</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Ripristina</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
+    <value>Monitoraggio di Esplora file</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Reindirizzamento del progresso delle operazioni</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Errore nell'elenco della cartella</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Prendi dal dispositivo (Pull) e metti nella root del disco di Windows (C:\)</value>
+  </data>
+  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
+    <value>App in conflitto</value>
+  </data>
+  <data name="S_CONFLICTING_APPS" xml:space="preserve">
+    <value>Il monitoraggio di Esplora file non è disponibile a causa delle seguenti app in esecuzione:</value>
+  </data>
+  <data name="S_ADVANCED_DRAG" xml:space="preserve">
+    <value>Il monitoraggio di Esplora file permette all'app di effettuare le operazioni di Trascina / Rilascia o dagli appunti direttamente nella cartella di destinazione.
+
+Altrimenti, il trasferimento è fatto tramite la cartella temporanea dell'app, dalla quale Esplora file riceve il file come flusso, ma dovrà usare un buffer piccolo.
+Queste due fasi aggiuntive rallentano notevolmente il processo.
+
+La funzione è disattivata automaticamente per altri file manager selezionati.</value>
+  </data>
+  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
+    <value>Attiva solo se intendi utilizzare l'applicazione con Esplora file.
+Puoi sempre modificare la scelta nelle impostazioni.</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Benvenuto in una nuova versione di ADB Explorer!
+Le note di rilascio sono disponibili su GitHub.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>Disco FUSE.
+- I collegamenti simbolici non sono supportati
+- I nomi dei file non possono contenere " * / : &lt; &gt; ? \ |
+- I nomi dei file sono case insensitive (non c'è differenza tra maiuscole e minuscole)
+- L'installazione di APK non è supportata</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>L'applicazione ha molte animazioni che sono abilitate come parte del Fluent design di Windows.
+L'animazione delle viste laterali è sempre disabilitata quando la finestra dell'applicazione è massimizzata su un display secondario.
+
+• Attivando questa impostazione si disattivano tutte le animazioni dell'app, tranne quella delle barre / anelli di progresso e delle barre di utilizzo del disco.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Tutte le impostazioni dell'applicazione verranno ripristinate alla chiusura dell'applicazione.
+Non potrai annullare l'operazione. Vuoi procedere comunque?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Seleziona Avvia se hai già autorizzato ADB su WSA.
+Per approvare ADB, apri le impostazioni avanzate di WSA.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} dei file selezionati non può essere creato nella root del disco di Windows (C:\).</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Scopri di più riguardo ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Scarica ADB</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Posizione di ADB (versione minima: {0}):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Cambia</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Seleziona il percorso di ADB</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continua</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Più informazioni</value>
+  </data>
+  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
+    <value>Monitoraggio Esplora file:</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Abilitato</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Disabilitato</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Una nuova versione ({1}) di {0} è disponibile</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Vai alla pagina delle versioni</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Chiudi</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Vai alle note di rilascio</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>Eseguibile di ADB</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Questa applicazione è un'interfaccia utente per ADB - Android Debug Bridge.
+Per utilizzare l'applicazione, è necessario avere ADB sul PC.
+ADB è disponibile come parte degli Android SDK Platform Tools.
+Puoi usare il link fornito per scaricare gli SDK Platform Tools.
+Purtroppo, non possiamo fornire ADB con l'applicazione a delle restrizioni della licenza.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Aiuto per ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Riavvia ADB adesso</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Riavvia dopo</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Seleziona la destinazione per {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Seleziona la destinazione per gli elementi</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Verranno eliminati i seguenti elementi:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Verranno eliminati definitivamente i seguenti elementi:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Nuovo file</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Nuova cartella</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Si è verificato un errore mentre cercavo di elencare il contenuto della cartella.
+Il contenuto che vedi potrebbe essere incompleto.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} è un antenato della cartella di destinazione.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Sei sicuro di voler terminare questo emulatore?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Sei sicuro di voler togliere questo dispositivo?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Rimuovi {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Termina {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Il seguente pacchetto verrà rimosso:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>I seguenti pacchetti verranno rimossi:
+{0}</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Disinstalla</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Annulla</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Conferma</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Salta</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Sostituisci</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Unisci o Sostituisci</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>C'è un elemento in conflitto</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>C'è un elemento in conflitto in {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>Ci sono {0} elementi in conflitto</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>Ci sono {0} elementi in conflitto in {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Conflitti nell'incolla</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Seleziona le cartelle da inviare</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Seleziona le cartelle da mettere in {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Seleziona i file da inviare</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Seleziona i file da mettere in {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Pulisci</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>Abilita mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Rileva automaticamente i dispositivi</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Ottieni lo stato della batteria</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
+    <value>Abilita i log dei comandi di ADB</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Abilita automaticamente il root</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Salva i dispositivi connessi manualmente</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Apri automaticamente</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Abilita la modalità compatta</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Interrompi l'ottenimento dei dati durante il trasferimento</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Consenti operazioni simultanee su più dispositivi</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Forza la scansione dopo il trasferimento</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Rileva automaticamente i dischi</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
+    <value>Usa il cestino</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>Abilita la gestione degli APK</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Mostra estensioni dei file</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Mostra elementi nascosti</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Mostra app di sistema</value>
+  </data>
+  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
+    <value>Abilita il monitoraggio di Esplora file</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Doppio click su file</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>Non fare niente</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Copialo nella cartella predefinita</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>Aprilo nell'editor</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Sovrascrivi il percorso di ADB</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Cartella predefinita</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Chiaro</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Scuro</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>In base a Windows</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Tema</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Forza lo stile Fluent di Windows</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Disabilita accelerazione hardware</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>Disabilita animazioni</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>Mostra schermata di avvio</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Controlla aggiornamenti</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Grafica</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Cartelle per le operazioni</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Esploratore</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Dischi e funzioni</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Dispositivo</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Dona o Abbonati</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Cartella dei dati dell'app</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>Repository GitHub</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Informativa sulla privacy</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Crediti e Licenze di terze parti</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>Vedi i termini</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[non impostato]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Impostazioni di ricerca</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Esci dalla ricerca</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Cerca</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Comprimi tutto</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Espandi tutto</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Impostazioni</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Nascondi</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Lingua</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>Filtra in base all'operazione sui file</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Abilita auto esecuzione delle operazioni</value>
   </data>
   <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
     <value>Disabilita auto esecuzione delle operazioni
 Annulla tutte le operazioni in corso</value>
   </data>
-  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
-    <value>Abilita auto esecuzione delle operazioni</value>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Gli aggiornamenti del log sono in pausa</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Metti in pausa gli aggiornamenti del log</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Log dei comandi</value>
   </data>
   <data name="S_BUTTON_DRIVES" xml:space="preserve">
     <value>Dischi del dispositivo</value>
@@ -190,6 +713,9 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_MENU_RENAME" xml:space="preserve">
     <value>RInomina</value>
   </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Pacchetto</value>
+  </data>
   <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
     <value>Aggiorna l'ultima modifica</value>
   </data>
@@ -204,6 +730,9 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_MENU_COPY_TEMP" xml:space="preserve">
     <value>Copia nella cartella temporanea</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Pulisci il log dei comandi</value>
   </data>
   <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
     <value>Apri percorso originale</value>
@@ -367,6 +896,9 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_BAT_TEMP" xml:space="preserve">
     <value>Temperatura: {0}°C</value>
   </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Bilancio corrente: {0}A</value>
+  </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Riavvia in</value>
   </data>
@@ -381,6 +913,9 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
     <value>Sideload (con riavvio automatico)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Non connesso</value>
   </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Non autorizzato</value>
@@ -408,6 +943,9 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
     <value>Wireless</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>Cavo</value>
   </data>
   <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
     <value>Nessuna</value>
@@ -469,14 +1007,14 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
     <value>Invio alla shell</value>
   </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>Conflitto durante {0}</value>
+  </data>
   <data name="S_PASTE" xml:space="preserve">
     <value>Incolla</value>
   </data>
   <data name="S_DROP" xml:space="preserve">
     <value>Rilascio</value>
-  </data>
-  <data name="S_PASTE_CONFLICT" xml:space="preserve">
-    <value>Conflitto durante {0}</value>
   </data>
   <data name="S_ACTION_OPERATION" xml:space="preserve">
     <value>operazione</value>
@@ -505,8 +1043,8 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_BUTTON_YES" xml:space="preserve">
     <value>Sì</value>
   </data>
-  <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - Non connesso</value>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root (/)</value>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
     <value>Memoria interna</value>
@@ -543,6 +1081,9 @@ Annulla tutte le operazioni in corso</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
     <value>Il percorso fornito non esiste.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Percorso</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Il menù è vuoto</value>
@@ -589,86 +1130,14 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un file selezionato non è un file / cartella</value>
   </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
-  <data name="GIGA" xml:space="preserve">
-    <value>{0} GB</value>
-  </data>
-  <data name="MEGA" xml:space="preserve">
-    <value>{0} MB</value>
-  </data>
-  <data name="KILO" xml:space="preserve">
-    <value>{0} KB</value>
-  </data>
-  <data name="MILLI" xml:space="preserve">
-    <value>m</value>
-  </data>
-  <data name="MICRO" xml:space="preserve">
-    <value>u</value>
-  </data>
-  <data name="NANO" xml:space="preserve">
-    <value>n</value>
-  </data>
-  <data name="BYTES" xml:space="preserve">
-    <value>{0} B</value>
-  </data>
-  <data name="S_DRAGDROP_COPY" xml:space="preserve">
-    <value>Copia {0} elementi</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
-    <value>Copia {0} elementi in {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
-    <value>Sposta {0} elementi in {1}</value>
-  </data>
-  <data name="S_DRAGDROP_LINK" xml:space="preserve">
-    <value>Crea un collegamento in {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
-    <value>Sposta {0} elementi</value>
-  </data>
-  <data name="S_GOTO_WEBLATE" xml:space="preserve">
-    <value>Vai su Weblate</value>
-  </data>
-  <data name="S_FILE_FIFO" xml:space="preserve">
-    <value>FIFO</value>
-  </data>
-  <data name="S_FILE_UNKNOWN" xml:space="preserve">
-    <value>Sconosciuto</value>
-  </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>Link rotto</value>
-  </data>
-  <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>Cronologia di navigazione</value>
-  </data>
-  <data name="S_REMOVE" xml:space="preserve">
-    <value>Rimuovi</value>
-  </data>
-  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
-    <value>Aggiungi la cartella corrente</value>
-  </data>
-  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
-    <value>Cartelle salvate</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
-    <value>Non chiedere più</value>
-  </data>
-  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
-    <value>File non trovato</value>
-  </data>
-  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
-    <value>Finito senza conferma</value>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Può essere annullato con Reimposta le impostazioni dell'app, o manualmente nel file delle impostazioni</value>
   </data>
   <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
     <value>Fino al prossimo avvio</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Non chiedere più</value>
   </data>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>App WSA</value>
@@ -760,556 +1229,29 @@ Annulla tutte le operazioni in corso</value>
   <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
     <value>{0} falliti</value>
   </data>
-  <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>L'accesso root non può essere attivato sul dispositivo selezionato.</value>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Totale:</value>
   </data>
-  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
-    <value>Seleziona l'eseguibile di ADB</value>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Operazione precedente</value>
   </data>
-  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
-    <value>Reimposta le impostazioni dell'app</value>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>In corso</value>
   </data>
-  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
-    <value>Nuova versione dell'app</value>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>In coda</value>
   </data>
-  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
-    <value>Errore di navigazione</value>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Fallita</value>
   </data>
-  <data name="S_COPY_APK_NAME" xml:space="preserve">
-    <value>Copia il nome del pacchetto</value>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Annullata</value>
   </data>
-  <data name="S_COPY_PATH" xml:space="preserve">
-    <value>Copia il percorso dell'elemento</value>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Precedente</value>
   </data>
-  <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>Ripristina tutti gli elementi</value>
-  </data>
-  <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>Svuota il cestino</value>
-  </data>
-  <data name="S_DELETE_ACTION" xml:space="preserve">
-    <value>Elimina</value>
-  </data>
-  <data name="S_DEST_ERR" xml:space="preserve">
-    <value>Errore nel percorso di destinazione</value>
-  </data>
-  <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>errore nella connessione a</value>
-  </data>
-  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
-    <value>Errore nella connessione</value>
-  </data>
-  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>Errore nella disconnessione</value>
-  </data>
-  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
-    <value>Errore nell'accoppiamento</value>
-  </data>
-  <data name="S_PUSH_PKG" xml:space="preserve">
-    <value>Installa pacchetti</value>
-  </data>
-  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>Accoppia e/o connetti un dispositivo WiFi (senza usare mDNS)</value>
-  </data>
-  <data name="S_RESTART_APP" xml:space="preserve">
-    <value>Riavvia l'app per applicare i cambiamenti</value>
-  </data>
-  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>Errore nella lettura del file</value>
-  </data>
-  <data name="S_READ_FILE_ERROR" xml:space="preserve">
-    <value>Non sono riuscito a scaricare il file per leggerlo.</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
-    <value>Errore nella scrittura del file</value>
-  </data>
-  <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>Il server ADB deve essere riavviato per disabilitare mDNS.</value>
-  </data>
-  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>Disabilita mDNS</value>
-  </data>
-  <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>Avvia WSA in background</value>
-  </data>
-  <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>Ripristina</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_TITLE" xml:space="preserve">
-    <value>Con AdbProgressRedirection.exe</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TITLE" xml:space="preserve">
-    <value>Metodo per la lettura del progresso</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS_TITLE" xml:space="preserve">
-    <value>Con lo spazio usato del disco</value>
-  </data>
-  <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Prendi dal dispositivo (Pull)</value>
-  </data>
-  <data name="S_DISK_USAGE_PROGRESS" xml:space="preserve">
-    <value>Il progresso del trasferimento è visualizzato in byte totali trasferiti.
-La percentuale è disponibile solo se la dimensione totale è conosciuta.</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ERROR" xml:space="preserve">
-    <value>Impossibile usare l'eseguibile.
-Verrà usato lo spazio in uso del disco per il calcolo.</value>
-  </data>
-  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value>Benvenuto in una nuova versione di ADB Explorer!
-Le note di rilascio sono disponibili su GitHub.</value>
-  </data>
-  <data name="S_RESET_SETTINGS" xml:space="preserve">
-    <value>Tutte le impostazioni dell'applicazione verranno ripristinate alla chiusura dell'applicazione.
-Non potrai annullare l'operazione. Vuoi procedere comunque?</value>
-  </data>
-  <data name="S_WSA_LAUNCH" xml:space="preserve">
-    <value>Seleziona Avvia se hai già autorizzato ADB su WSA.
-Per approvare ADB, apri le impostazioni avanzate di WSA.</value>
-  </data>
-  <data name="S_DISABLED" xml:space="preserve">
-    <value>Disabilitato</value>
-  </data>
-  <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>Una nuova versione ({1}) di {0} è disponibile</value>
-  </data>
-  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
-    <value>Vai alla pagina delle versioni</value>
-  </data>
-  <data name="S_BUTTON_CLOSE" xml:space="preserve">
-    <value>Chiudi</value>
-  </data>
-  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
-    <value>Vai alle note di rilascio</value>
-  </data>
-  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
-    <value>Eseguibile di ADB</value>
-  </data>
-  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value>Rimuovi {0}</value>
-  </data>
-  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>Termina {0}</value>
-  </data>
-  <data name="S_REM_APK" xml:space="preserve">
-    <value>Il seguente pacchetto verrà rimosso:
-{0}</value>
-  </data>
-  <data name="S_REM_APK_PLURAL" xml:space="preserve">
-    <value>I seguenti pacchetti verranno rimossi:
-{0}</value>
-  </data>
-  <data name="S_UNINSTALL" xml:space="preserve">
-    <value>Disinstalla</value>
-  </data>
-  <data name="S_CANCEL" xml:space="preserve">
-    <value>Annulla</value>
-  </data>
-  <data name="S_CONFIRM" xml:space="preserve">
-    <value>Conferma</value>
-  </data>
-  <data name="S_SKIP" xml:space="preserve">
-    <value>Salta</value>
-  </data>
-  <data name="S_REPLACE" xml:space="preserve">
-    <value>Sostituisci</value>
-  </data>
-  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
-    <value>Unisci o Sostituisci</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>C'è un elemento in conflitto</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>C'è un elemento in conflitto in {0}</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>Ci sono {0} elementi in conflitto</value>
-  </data>
-  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>Ci sono {0} elementi in conflitto in {1}</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>Abilita mDNS</value>
-  </data>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>L'icona del robot di Android</value>
-  </data>
-  <data name="S_ANIMATION_TITLE" xml:space="preserve">
-    <value>Animazioni nell'app</value>
-  </data>
-  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
-    <value>Impossibile ottenere la versione di ADB dal percorso fornito.</value>
-  </data>
-  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
-    <value>La versione di ADB del percorso fornito è troppo vecchia.</value>
-  </data>
-  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>Accesso root</value>
-  </data>
-  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
-    <value>Conferma eliminazione</value>
-  </data>
-  <data name="S_PERM_DEL" xml:space="preserve">
-    <value>Elimina permanentemente</value>
-  </data>
-  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
-    <value>Errore nella creazione</value>
-  </data>
-  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>Conflitti nel ripristino</value>
-  </data>
-  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
-    <value>Conferma disinstallazione</value>
-  </data>
-  <data name="S_INSTALL_APK" xml:space="preserve">
-    <value>Seleziona i pacchetti da installare</value>
-  </data>
-  <data name="S_REM_EMU" xml:space="preserve">
-    <value>Termina l'emulatore</value>
-  </data>
-  <data name="S_REM_HIST_DEV" xml:space="preserve">
-    <value>Rimuovi dispositivo</value>
-  </data>
-  <data name="S_REM_DEV" xml:space="preserve">
-    <value>Disconnetti dispositivo</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>App in conflitto</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>Il monitoraggio di Esplora file non è disponibile a causa delle seguenti app in esecuzione:</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Il monitoraggio di Esplora file permette all'app di effettuare le operazioni di Trascina / Rilascia o dagli appunti direttamente nella cartella di destinazione.
-
-Altrimenti, il trasferimento è fatto tramite la cartella temporanea dell'app, dalla quale Esplora file riceve il file come flusso, ma dovrà usare un buffer piccolo.
-Queste due fasi aggiuntive rallentano notevolmente il processo.
-
-La funzione è disattivata automaticamente per altri file manager selezionati.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Attiva solo se intendi utilizzare l'applicazione con Esplora file.
-Puoi sempre modificare la scelta nelle impostazioni.</value>
-  </data>
-  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
-    <value>Disco FUSE.
-- I collegamenti simbolici non sono supportati
-- I nomi dei file non possono contenere " * / : &lt; &gt; ? \ |
-- I nomi dei file sono case insensitive (non c'è differenza tra maiuscole e minuscole)
-- L'installazione di APK non è supportata</value>
-  </data>
-  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
-    <value>L'applicazione ha molte animazioni che sono abilitate come parte del Fluent design di Windows.
-L'animazione delle viste laterali è sempre disabilitata quando la finestra dell'applicazione è massimizzata su un display secondario.
-
-• Attivando questa impostazione si disattivano tutte le animazioni dell'app, tranne quella delle barre / anelli di progresso e delle barre di utilizzo del disco.</value>
-  </data>
-  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
-    <value>Scopri di più riguardo ADB</value>
-  </data>
-  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
-    <value>Scarica ADB</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Monitoraggio di Esplora file</value>
-  </data>
-  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
-    <value>Seleziona le cartelle da mettere in {0}</value>
-  </data>
-  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
-    <value>Seleziona i file da inviare</value>
-  </data>
-  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
-    <value>Seleziona i file da mettere in {0}</value>
-  </data>
-  <data name="S_BUTTON_CLEAR" xml:space="preserve">
-    <value>Pulisci</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Rileva automaticamente i dispositivi</value>
-  </data>
-  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Ottieni lo stato della batteria</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Abilita i log dei comandi di ADB</value>
-  </data>
-  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
-    <value>Abilita automaticamente il root</value>
-  </data>
-  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
-    <value>Salva i dispositivi connessi manualmente</value>
-  </data>
-  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Interrompi l'ottenimento dei dati durante il trasferimento</value>
-  </data>
-  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
-    <value>Mostra app di sistema</value>
-  </data>
-  <data name="S_DONATE" xml:space="preserve">
-    <value>Dona o Abbonati</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
-    <value>Dispositivo</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
-    <value>Grafica</value>
-  </data>
-  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
-    <value>Controlla aggiornamenti</value>
-  </data>
-  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Mostra schermata di avvio</value>
-  </data>
-  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
-    <value>Disabilita animazioni</value>
-  </data>
-  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
-    <value>Disabilita accelerazione hardware</value>
-  </data>
-  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
-    <value>Forza lo stile Fluent di Windows</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
-    <value>Tema</value>
-  </data>
-  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
-    <value>Scuro</value>
-  </data>
-  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
-    <value>Chiaro</value>
-  </data>
-  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
-    <value>In base a Windows</value>
-  </data>
-  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
-    <value>Cartella predefinita</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
-    <value>Non fare niente</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Doppio click su file</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
-    <value>Copialo nella cartella predefinita</value>
-  </data>
-  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
-    <value>Aprilo nell'editor</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>Abilita il monitoraggio di Esplora file</value>
-  </data>
-  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
-    <value>Mostra elementi nascosti</value>
-  </data>
-  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
-    <value>Mostra estensioni dei file</value>
-  </data>
-  <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>Abilita la gestione degli APK</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Usa il cestino</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Rileva automaticamente i dischi</value>
-  </data>
-  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Consenti operazioni simultanee su più dispositivi</value>
-  </data>
-  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Forza la scansione dopo il trasferimento</value>
-  </data>
-  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Abilita la modalità compatta</value>
-  </data>
-  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
-    <value>Apri automaticamente</value>
-  </data>
-  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
-    <value>Seleziona le cartelle da inviare</value>
-  </data>
-  <data name="S_REM_DEVICE" xml:space="preserve">
-    <value>Sei sicuro di voler togliere questo dispositivo?</value>
-  </data>
-  <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value>Sei sicuro di voler terminare questo emulatore?</value>
-  </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>Creative Commons</value>
-  </data>
-  <data name="S_NEW_FOLDER" xml:space="preserve">
-    <value>Nuova cartella</value>
-  </data>
-  <data name="S_NEW_ITEM" xml:space="preserve">
-    <value>Nuovo file</value>
-  </data>
-  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
-    <value>Seleziona la destinazione per gli elementi</value>
-  </data>
-  <data name="S_ITEM_DESTINATION" xml:space="preserve">
-    <value>Seleziona la destinazione per {0}</value>
-  </data>
-  <data name="S_RESTART_LATER" xml:space="preserve">
-    <value>Riavvia dopo</value>
-  </data>
-  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>Riavvia ADB adesso</value>
-  </data>
-  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
-    <value>Aiuto per ADB</value>
-  </data>
-  <data name="S_ENABLED" xml:space="preserve">
-    <value>Abilitato</value>
-  </data>
-  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
-    <value>Più informazioni</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>Monitoraggio Esplora file:</value>
-  </data>
-  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>Seleziona il percorso di ADB</value>
-  </data>
-  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
-    <value>Continua</value>
-  </data>
-  <data name="S_BUTTON_CHANGE" xml:space="preserve">
-    <value>Cambia</value>
-  </data>
-  <data name="S_SELECT_PROGRESS_METHOD" xml:space="preserve">
-    <value>Seleziona il metodo per l'ottenimento del progresso:</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_x64" xml:space="preserve">
-    <value>Copiato in %LocalAppData%\AdbExplorer</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION_ARM" xml:space="preserve">
-    <value>Potrebbe essere rilevato come falso positivo da alcuni anti-virus.</value>
-  </data>
-  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
-    <value>Pulisci il log dei comandi</value>
-  </data>
-  <data name="S_MENU_PACKAGE" xml:space="preserve">
-    <value>Pacchetto</value>
-  </data>
-  <data name="S_BUTTON_LOG" xml:space="preserve">
-    <value>Log dei comandi</value>
-  </data>
-  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
-    <value>Metti in pausa gli aggiornamenti del log</value>
-  </data>
-  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
-    <value>Gli aggiornamenti del log sono in pausa</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
-    <value>Lingua</value>
-  </data>
-  <data name="S_ACTION_HIDE" xml:space="preserve">
-    <value>Nascondi</value>
-  </data>
-  <data name="S_SETTINGS_TITLE" xml:space="preserve">
-    <value>Impostazioni</value>
-  </data>
-  <data name="S_EXPAND_ALL" xml:space="preserve">
-    <value>Espandi tutto</value>
-  </data>
-  <data name="S_COLLAPSE_ALL" xml:space="preserve">
-    <value>Comprimi tutto</value>
-  </data>
-  <data name="S_EXIT_SEARCH" xml:space="preserve">
-    <value>Esci dalla ricerca</value>
-  </data>
-  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
-    <value>Impostazioni di ricerca</value>
-  </data>
-  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
-    <value>[non impostato]</value>
-  </data>
-  <data name="S_SEE_TERMS" xml:space="preserve">
-    <value>Vedi i termini</value>
-  </data>
-  <data name="S_PRIVACY_POLICY" xml:space="preserve">
-    <value>Informativa sulla privacy</value>
-  </data>
-  <data name="S_GITHUB_REPO" xml:space="preserve">
-    <value>Repository GitHub</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
-    <value>Esploratore</value>
-  </data>
-  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
-    <value>Operazioni sui file</value>
-  </data>
-  <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>L'icona APK è rilasciata sotto licenza Apache, versione 2.0.</value>
-  </data>
-  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>Impossibile ri-spostare il file sul dispositivo.</value>
-  </data>
-  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>Errore nell'elenco della cartella</value>
-  </data>
-  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>Posizione di ADB (versione minima: {0}):</value>
-  </data>
-  <data name="S_PROGRESS_METHOD_TOOLTIP" xml:space="preserve">
-    <value>Selezionare un'opzione per visualizzare la spiegazione</value>
-  </data>
-  <data name="S_DEPLOY_REDIRECTION" xml:space="preserve">
-    <value>Un programma ausiliario per leggere i progressi del trasferimento da ADB.</value>
-  </data>
-  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
-    <value>Validazione in corso…</value>
-  </data>
-  <data name="S_VALIDATION_ERROR" xml:space="preserve">
-    <value>Errore nella validazione: {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
-    <value>Copia {0}</value>
-  </data>
-  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
-    <value>Copia {0} in {1}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
-    <value>Sposta {0}</value>
-  </data>
-  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
-    <value>Sposta {0} in {1}</value>
-  </data>
-  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
-    <value>{0} di {1}</value>
-  </data>
-  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
-    <value>{0} in {1} ({2})</value>
-  </data>
-  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
-    <value>Incolla {0} elementi tagliati</value>
-  </data>
-  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
-    <value>Incolla {0} elementi copiati</value>
-  </data>
-  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
-    <value>Incolla 1 elemento copiati</value>
-  </data>
-  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
-    <value>Incolla 1 elemento tagliato</value>
-  </data>
-  <data name="S_FILE_SOCKET" xml:space="preserve">
-    <value>Socket (Unix)</value>
-  </data>
-  <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Dispositivo a blocchi (Unix)</value>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Dispositivo a caratteri (Unix)</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>Area ostruita - riaprire la finestra.</value>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Sposta</value>
   </data>
   <data name="S_ACTION_RECYCLE" xml:space="preserve">
     <value>Cestina</value>
@@ -1379,101 +1321,127 @@ L'animazione delle viste laterali è sempre disabilitata quando la finestra dell
 Il progresso della traduzione viene visualizzato per la lingua selezionata.
 Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
-  <data name="S_ACTION_MOVE" xml:space="preserve">
-    <value>Sposta</value>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Vai su Weblate</value>
   </data>
-  <data name="S_FILEOP_CANCELED" xml:space="preserve">
-    <value>Annullata</value>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket (Unix)</value>
   </data>
-  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
-    <value>Precedente</value>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Dispositivo a blocchi (Unix)</value>
   </data>
-  <data name="S_FILEOP_FAILED" xml:space="preserve">
-    <value>Fallita</value>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Dispositivo a caratteri (Unix)</value>
   </data>
-  <data name="S_FILEOP_WAITING" xml:space="preserve">
-    <value>In coda</value>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
   </data>
-  <data name="S_FILEOP_RUNNING" xml:space="preserve">
-    <value>In corso</value>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Sconosciuto</value>
   </data>
-  <data name="S_FILEOP_PREV" xml:space="preserve">
-    <value>Operazione precedente</value>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Link rotto</value>
   </data>
-  <data name="S_FILEOP_TOTAL" xml:space="preserve">
-    <value>Totale:</value>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Cronologia di navigazione</value>
   </data>
-  <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Bilancio corrente: {0}A</value>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Aggiungi la cartella corrente</value>
   </data>
-  <data name="S_ATTRIBUTIONS" xml:space="preserve">
-    <value>Crediti e Licenze di terze parti</value>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Rimuovi</value>
   </data>
-  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
-    <value>Cartella dei dati dell'app</value>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Cartelle salvate</value>
   </data>
-  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value>Dischi e funzioni</value>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
   </data>
-  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
-    <value>Conflitti nell'incolla</value>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
   </data>
-  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
-    <value>Sovrascrivi il percorso di ADB</value>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
   </data>
-  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
-    <value>Cartelle per le operazioni</value>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
   </data>
-  <data name="S_LS_ERROR" xml:space="preserve">
-    <value>Si è verificato un errore mentre cercavo di elencare il contenuto della cartella.
-Il contenuto che vedi potrebbe essere incompleto.</value>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
   </data>
-  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
-    <value>Verranno eliminati i seguenti elementi:
-{0}</value>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
   </data>
-  <data name="S_DELETE_PERMANENT" xml:space="preserve">
-    <value>Verranno eliminati definitivamente i seguenti elementi:
-{0}</value>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
   </data>
-  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
-    <value>Impossibile sovrascrivere il percorso di ADB</value>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
-    <value>Prendi dal dispositivo (Pull) e metti nella root del disco di Windows (C:\)</value>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
   </data>
-  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Prendi dal dispositivo (Pull) l'elemento all'origine del collegamento</value>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
   </data>
-  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>{0} dei file selezionati non può essere creato nella root del disco di Windows (C:\).</value>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copia {0} elementi</value>
   </data>
-  <data name="S_DRIVE_ROOT" xml:space="preserve">
-    <value>Root (/)</value>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Copia {0} elementi in {1}</value>
   </data>
-  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
-    <value>Cavo</value>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Sposta {0} elementi in {1}</value>
   </data>
-  <data name="S_HELP_ON_ADB" xml:space="preserve">
-    <value>Questa applicazione è un'interfaccia utente per ADB - Android Debug Bridge.
-Per utilizzare l'applicazione, è necessario avere ADB sul PC.
-ADB è disponibile come parte degli Android SDK Platform Tools.
-Puoi usare il link fornito per scaricare gli SDK Platform Tools.
-Purtroppo, non possiamo fornire ADB con l'applicazione a delle restrizioni della licenza.</value>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Crea un collegamento in {0}</value>
   </data>
-  <data name="S_SEARCH_VIEW" xml:space="preserve">
-    <value>Cerca</value>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Sposta {0} elementi</value>
   </data>
-  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Percorso</value>
+  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
+    <value>Area ostruita - riaprire la finestra.</value>
   </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Può essere annullato con Reimposta le impostazioni dell'app, o manualmente nel file delle impostazioni</value>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Incolla 1 elemento tagliato</value>
   </data>
-  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value>{0} è un antenato della cartella di destinazione.</value>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Incolla 1 elemento copiati</value>
   </data>
-  <data name="S_REDIRECTION" xml:space="preserve">
-    <value>Reindirizzamento del progresso delle operazioni</value>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Incolla {0} elementi copiati</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Incolla {0} elementi tagliati</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} di {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copia {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copia {0} in {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Sposta {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Sposta {0} in {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>File non trovato</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Finito senza conferma</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Errore nella validazione: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validazione in corso…</value>
   </data>
 </root>
