@@ -221,18 +221,37 @@ public class FileOperationQueue : ViewModelBase
             var pending = Operations.Where(op => op.Status is FileOperation.OperationStatus.Waiting);
             if (pending.Any())
             {
+                // Group by operation type and device
                 var groups = pending.GroupBy(op => op.TypeOnDevice);
                 foreach (var item in groups)
                 {
-                    Func<FileOperation, bool> predicate = op =>
-                        op.Status is FileOperation.OperationStatus.InProgress
-                        && (!Data.Settings.AllowMultiOp || op.TypeOnDevice == item.Key);
+                    List<FileOperation> operations = [item.First()];
+                    if (!Data.Settings.AllowMultiOp)
+                    {
+                        // Skip if there's already an operation in progress on the same device and of the same type
+                        if (Operations.Any(op => op.Status
+                            is FileOperation.OperationStatus.InProgress
+                            && op.TypeOnDevice == item.Key))
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        // AdvancedAdbSharp allows (and boosts performance with) simultaneous sync operations
+                        if (item.First().OperationName
+                            is FileOperation.OperationType.Push
+                            or FileOperation.OperationType.Pull)
+                        {
+                            operations = [.. item];
+                        }
+                    }
 
-                    if (Operations.Any(predicate))
-                        continue;
-
-                    item.First().PropertyChanged += CurrentOperation_PropertyChanged;
-                    item.First().Start();
+                    foreach (var op in operations)
+                    {
+                        op.PropertyChanged += CurrentOperation_PropertyChanged;
+                        op.Start();
+                    }
 
                     CurrentChanged = true;
                 }

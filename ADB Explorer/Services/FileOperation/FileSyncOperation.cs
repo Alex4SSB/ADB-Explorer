@@ -109,29 +109,31 @@ public class FileSyncOperation : FileOperation
                 }
             }
 
-            Parallel.ForEach(Files.Where(f => !f.IsDirectory), (item) =>
+            ParallelOptions options = new()
             {
+                MaxDegreeOfParallelism = Data.Settings.AllowMultiOp ? -1 : 1
+            };
+
+            Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
+            {
+                void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
+
+                using SyncService service = new(Device.Device.DeviceData);
+                var targetPath = FilePath.IsDirectory
+                        ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
+                        : TargetPath.FullPath;
+
                 if (OperationName is OperationType.Push)
                 {
                     // target = [Android parent folder]\[relative path from Windows parent folder to current item]
-                    var targetPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath));
                     using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    using SyncService service = new(Device.Device.DeviceData);
-
                     service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, in isCanceled);
-
-                    void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
                 }
                 else
                 {
                     // target = [Windows parent folder]\[relative path from Android parent folder to current item]
-                    var targetPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath));
                     using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                    using SyncService service = new(Device.Device.DeviceData);
-
                     service.Pull(item.FullPath, stream, SyncProgressCallback, in isCanceled);
-
-                    void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
                 }
             });
 
@@ -197,7 +199,13 @@ public class FileSyncOperation : FileOperation
                 currProgress.TotalPercentage = (int)(total * 100);
             }
 
-            StatusInfo = new InProgSyncProgressViewModel(currProgress);
+            AdbSyncProgressInfo info = currProgress;
+
+            // Total percentage is displayed for single file
+            if (Files.Count() == 1)
+                info = new(currProgress.AndroidPath, currProgress.CurrentFilePercentage, null, currProgress.TotalBytesTransferred);
+
+            StatusInfo = new InProgSyncProgressViewModel(info);
         }
     }
 
