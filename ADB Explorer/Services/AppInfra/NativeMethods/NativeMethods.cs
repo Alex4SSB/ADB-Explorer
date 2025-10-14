@@ -594,7 +594,7 @@ public static partial class NativeMethods
 
         public readonly long GetSize() => ((long)nFileSizeHigh << 32) | nFileSizeLow;
 
-        public override string ToString() => Converters.UnitConverter.BytesToSize((ulong)GetSize());
+        public override string ToString() => Converters.UnitConverter.BytesToSize(GetSize());
     }
 
     #endregion

@@ -1819,6 +1819,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} files.
+        /// </summary>
+        public static string S_FILES_PLURAL {
+            get {
+                return ResourceManager.GetString("S_FILES_PLURAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Filter File Operations.
         /// </summary>
         public static string S_FILTER_FILE_OPS {

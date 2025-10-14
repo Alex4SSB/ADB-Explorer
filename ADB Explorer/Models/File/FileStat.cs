@@ -6,7 +6,7 @@ public class FileStat : AbstractFile, IBaseFile, IFileStat
                     string path,
                     FileType type,
                     bool isLink,
-                    ulong? size,
+                    long? size,
                     DateTime? modifiedTime)
     {
         FullName = fileName;
@@ -25,7 +25,7 @@ public class FileStat : AbstractFile, IBaseFile, IFileStat
 
     public FileType Type { get; set; }
 
-    public ulong? Size { get; set; }
+    public long? Size { get; set; }
 
     public DateTime? ModifiedTime { get; set; }
 

@@ -26,8 +26,11 @@
         /// <param name="smallRound">The number of decimal places to round to when the numeric value is 100 or greater.</param>
         /// <returns>A string representing the size in a human-readable format, including the appropriate unit (e.g., KB, MB,
         /// GB).</returns>
-        public static string BytesToSize(this UInt64 bytes, bool scaleSpace = false, int bigRound = 1, int smallRound = 0)
+        public static string BytesToSize(this long bytes, bool scaleSpace = false, int bigRound = 1, int smallRound = 0)
         {
+            if (bytes < 0)
+                return "";
+
             int scale = (bytes == 0) ? 0 : Convert.ToInt32(Math.Floor(Math.Round(Math.Log(bytes, 1024), 2))); // 0 <= scale <= 6
             double value = bytes / Math.Pow(1024, scale);
             var format = scaleSpace
@@ -55,12 +58,12 @@
             return $"{(Math.Round(value, value < 100 ? bigRound : smallRound))}{(scaleSpace ? " " : "")}{ampScaleTable[scale]}";
         }
 
-        public static string ToTime(this decimal? seconds, bool scaleSpace = false, bool useMilli = true, int digits = 2)
+        public static string ToTime(this double? seconds, bool scaleSpace = false, bool useMilli = true, int digits = 2)
         {
             if (seconds is null)
                 return "";
 
-            TimeSpan span = TimeSpan.FromSeconds((double)seconds);
+            TimeSpan span = TimeSpan.FromSeconds(seconds.Value);
             string resolution;
             string value;
 

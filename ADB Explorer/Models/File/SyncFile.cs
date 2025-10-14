@@ -8,9 +8,15 @@ public class SyncFile : FilePath
 {
     public ObservableList<FileOpProgressInfo> ProgressUpdates { get; private set; } = [];
 
+    public FileOpProgressInfo LastUpdate => ProgressUpdates.LastOrDefault();
+
+    public int? CurrentPercentage => LastUpdate is AdbSyncProgressInfo adbInfo ? adbInfo.CurrentFilePercentage : null;
+
+    public long? BytesTransferred => LastUpdate is AdbSyncProgressInfo adbInfo ? adbInfo.CurrentFileBytesTransferred : null;
+
     public ObservableList<SyncFile> Children { get; private set; } = [];
 
-    public ulong? Size { get; set; }
+    public long? Size { get; set; }
 
     public SyncFile(string androidPath, FileType fileType = FileType.File)
         : base(androidPath, fileType: fileType)
@@ -21,7 +27,7 @@ public class SyncFile : FilePath
     public SyncFile(ShellItem windowsPath, bool includeContent = false)
         : base(windowsPath)
     {
-        Size = IsDirectory ? null : (ulong?)windowsPath.FileInfo.Length;
+        Size = IsDirectory ? null : windowsPath.FileInfo.Length;
 
         if (includeContent && IsDirectory)
         {
@@ -96,7 +102,7 @@ public class SyncFile : FilePath
             {
                 yield return new(fullPath, FileType.File)
                 {
-                    Size = (ulong)group.First().Item2,
+                    Size = group.First().Item2,
                     ProgressUpdates = [new AdbSyncProgressInfo(fullPath, null, null, null)]
                 };
             }

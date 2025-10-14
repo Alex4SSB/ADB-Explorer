@@ -18,7 +18,7 @@ namespace ADB_Test
         [TestMethod]
         public void ToSizeTest()
         {
-            var testVals = new Dictionary<ulong, string>()
+            var testVals = new Dictionary<long, string>()
             {
                 { 0, "0B" },
                 { 300, "300B" },
@@ -40,7 +40,7 @@ namespace ADB_Test
         [TestMethod]
         public void ToTimeTest()
         {
-            Assert.AreEqual("50ms", UnitConverter.ToTime(.05m));
+            Assert.AreEqual("50ms", UnitConverter.ToTime(.05));
             Assert.AreEqual("1:00:00h", UnitConverter.ToTime(3600));
         }
 
@@ -386,7 +386,7 @@ namespace ADB_Test
             var file = new FileClass(descriptor);
 
             Assert.AreEqual("example.txt", file.FullName);
-            Assert.AreEqual((ulong)1024, file.Size.Value);
+            Assert.AreEqual(1024, file.Size.Value);
             Assert.AreEqual(descriptor.ChangeTimeUtc, file.ModifiedTime);
             Assert.AreEqual(AbstractFile.FileType.File, file.Type);
 

@@ -39,7 +39,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private double DataGridContentWidth
         => StyleHelper.FindDescendant<ItemsPresenter>(ExplorerGrid) is ItemsPresenter presenter ? presenter.ActualWidth : 0;
 
-    public string SelectedFilesTotalSize => (SelectedFiles is not null && FileHelper.TotalSize(SelectedFiles) is ulong size and > 0) ? size.BytesToSize() : "";
+    public string SelectedFilesTotalSize => (SelectedFiles is not null && FileHelper.TotalSize(SelectedFiles) is long size and > 0) ? size.BytesToSize() : "";
     public string SelectedFilesCount => $"{ExplorerGrid.SelectedItems.Count}";
 
     private string prevPath = "";

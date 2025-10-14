@@ -177,12 +177,12 @@ public static class FileHelper
         return childPath[..index];
     }
 
-    public static ulong TotalSize(IEnumerable<FileClass> files)
+    public static long TotalSize(IEnumerable<FileClass> files)
     {
         if (files.Any(f => f.Type is not FileType.File || f.IsLink))
             return 0;
 
-        return (ulong)files.Select(f => (decimal)f.Size.GetValueOrDefault(0)).Sum();
+        return files.Select(f => f.Size.GetValueOrDefault(0)).Sum();
     }
 
     /// <summary>

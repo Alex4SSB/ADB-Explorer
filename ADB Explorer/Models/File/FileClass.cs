@@ -11,8 +11,8 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 {
     #region Notify Properties
 
-    private ulong? size;
-    public ulong? Size
+    private long? size;
+    public long? Size
     {
         get => size;
         set => Set(ref size, value);
@@ -170,7 +170,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public string ModifiedTimeString => TabularDateFormatter.Format(ModifiedTime, Thread.CurrentThread.CurrentCulture);
 
-    public string SizeString => Size?.BytesToSize(true);
+    public string SizeString => IsDirectory ? "" : Size?.BytesToSize(true);
 
     #endregion
 
@@ -179,7 +179,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         string path,
         FileType type,
         bool isLink = false,
-        UInt64? size = null,
+        long? size = null,
         DateTime? modifiedTime = null,
         bool isTemp = false)
         : base(path, fileName, type)
@@ -208,7 +208,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         : base(windowsPath)
     {
         Type = IsDirectory ? FileType.Folder : FileType.File;
-        Size = IsDirectory ? null : (ulong?)windowsPath.FileInfo.Length;
+        Size = IsDirectory ? null : windowsPath.FileInfo.Length;
         ModifiedTime = windowsPath.FileInfo?.LastWriteTime;
         IsLink = windowsPath.IsLink;
 
@@ -221,7 +221,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
     public FileClass(FileDescriptor fileDescriptor)
         : base(fileDescriptor.SourcePath, fileDescriptor.Name, fileDescriptor.IsDirectory ? FileType.Folder : FileType.File)
     {
-        Size = (ulong?)fileDescriptor.Length;
+        Size = fileDescriptor.Length;
         ModifiedTime = fileDescriptor.ChangeTimeUtc;
         Type = fileDescriptor.IsDirectory ? FileType.Folder : FileType.File;
     }
@@ -238,7 +238,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
     public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellItem windowsPath) =>
         new(androidTargetPath)
     {
-        Size = windowsPath.IsFolder ? null : (ulong?)windowsPath.FileInfo.Length,
+        Size = windowsPath.IsFolder ? null : windowsPath.FileInfo.Length,
         ModifiedTime = windowsPath.FileInfo?.LastWriteTime,
     };
 

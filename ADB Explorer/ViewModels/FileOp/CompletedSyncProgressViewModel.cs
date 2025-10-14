@@ -12,15 +12,15 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
         this.adbInfo = adbInfo;
     }
 
-    public UInt64 FilesTransferred => adbInfo.FilesTransferred;
+    public long FilesTransferred => adbInfo.FilesTransferred;
 
-    public UInt64 FilesSkipped => adbInfo.FilesSkipped;
+    public long FilesSkipped => adbInfo.FilesSkipped;
 
-    public decimal? AverageRateMBps => adbInfo.AverageRate;
+    public double? AverageRateMBps => adbInfo.AverageRate;
 
-    public UInt64? TotalBytes => adbInfo.TotalBytes;
+    public long? TotalBytes => adbInfo.TotalBytes;
 
-    public decimal? TotalSeconds => adbInfo.TotalTime;
+    public double? TotalSeconds => adbInfo.TotalTime;
 
     public int FileCountCompletedRate => (int)((float)FilesTransferred / (FilesTransferred + FilesSkipped) * 100.0);
 
@@ -32,13 +32,13 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
         {
             if (AverageRateMBps.HasValue)
             {
-                return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize((UInt64)(AverageRateMBps.Value * 1024 * 1024))}/");
+                return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize((long)(AverageRateMBps.Value * 1024 * 1024))}/");
             }
             else
             {
                 if (TotalBytes.HasValue && TotalSeconds.HasValue && TotalSeconds.Value > 0)
                 {
-                    return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize(TotalBytes.Value / (UInt64)TotalSeconds.Value)}/");
+                    return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize(TotalBytes.Value / (long)TotalSeconds.Value)}/");
                 }
 
                 return string.Empty;

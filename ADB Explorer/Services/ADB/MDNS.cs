@@ -57,7 +57,7 @@ public class MDNS : ViewModelBase
 
     private TimeSpan timePassed = TimeSpan.MinValue;
 
-    public string TimePassedString => timePassed == TimeSpan.MinValue ? "" : Converters.UnitConverter.ToTime((decimal)timePassed.TotalSeconds, useMilli: false, digits: 0);
+    public string TimePassedString => timePassed == TimeSpan.MinValue ? "" : Converters.UnitConverter.ToTime(timePassed.TotalSeconds, useMilli: false, digits: 0);
 
     public void UpdateProgress()
     {

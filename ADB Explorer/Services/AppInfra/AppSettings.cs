@@ -361,15 +361,15 @@ public class AppSettings : ViewModelBase
         set => Set(ref showLaunchWsaMessage, value);
     }
 
-    private ulong editorMaxFileSize;
-    public ulong EditorMaxFileSize
+    private long editorMaxFileSize;
+    public long EditorMaxFileSize
     {
         get
         {
             if (editorMaxFileSize == 0)
-                Set<ulong>(ref editorMaxFileSize, 300000);
+                Set(ref editorMaxFileSize, 300000);
 
-            return Get<ulong>(ref editorMaxFileSize, 300000);
+            return Get(ref editorMaxFileSize, 300000);
         }
     }
 

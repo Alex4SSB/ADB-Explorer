@@ -25,8 +25,8 @@ public class DiskUsage : ViewModelBase
         }
     }
 
-    private ulong? readRate;
-    public ulong? ReadRate
+    private long? readRate;
+    public long? ReadRate
     {
         get => readRate;
         set
@@ -40,10 +40,10 @@ public class DiskUsage : ViewModelBase
     }
 
     public bool IsReadActive => ReadRate > AdbExplorerConst.DISK_READ_THRESHOLD && ReadRate < AdbExplorerConst.MAX_DISK_DISPLAY_RATE;
-    public string ReadString => (ReadRate is null || ReadRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : ReadRate.Value).BytesToSize(true) + "/s";
+    public string ReadString => (ReadRate is > 0 and < AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? ReadRate.Value : 0).BytesToSize(true) + "/s";
 
-    private ulong? writeRate;
-    public ulong? WriteRate
+    private long? writeRate;
+    public long? WriteRate
     {
         get => writeRate;
         set
@@ -57,10 +57,10 @@ public class DiskUsage : ViewModelBase
     }
 
     public bool IsWriteActive => WriteRate > AdbExplorerConst.DISK_READ_THRESHOLD && WriteRate < AdbExplorerConst.MAX_DISK_DISPLAY_RATE;
-    public string WriteString => (WriteRate is null || WriteRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : WriteRate.Value).BytesToSize(true) + "/s";
+    public string WriteString => (WriteRate is > 0 and < AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? WriteRate.Value : 0).BytesToSize(true) + "/s";
 
-    private ulong? otherRate;
-    public ulong? OtherRate
+    private long? otherRate;
+    public long? OtherRate
     {
         get => otherRate;
         set
@@ -72,9 +72,9 @@ public class DiskUsage : ViewModelBase
         }
     }
 
-    public string OtherString => (OtherRate is null || OtherRate > AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? 0 : OtherRate.Value).BytesToSize(true) + "/s";
+    public string OtherString => (OtherRate is > 0 and < AdbExplorerConst.MAX_DISK_DISPLAY_RATE ? OtherRate.Value : 0).BytesToSize(true) + "/s";
 
-    public DiskUsage(Process process, ulong? readRate = null, ulong? writeRate = null, ulong? otherRate = null, DateTime? time = null)
+    public DiskUsage(Process process, long? readRate = null, long? writeRate = null, long? otherRate = null, DateTime? time = null)
     {
         Process = process;
         ReadRate = readRate;
@@ -84,7 +84,7 @@ public class DiskUsage : ViewModelBase
         TimeStamp = time ?? DateTime.Now;
     }
 
-    public DiskUsage(ulong? readRate, ulong? writeRate, ulong? otherRate, DateTime? time = null)
+    public DiskUsage(long? readRate, long? writeRate, long? otherRate, DateTime? time = null)
         : this(null, readRate, writeRate, otherRate, time)
     {
 
@@ -109,9 +109,9 @@ public class DiskUsage : ViewModelBase
 
         var time = list.Max(u => u.TimeStamp);
 
-        var read = (ulong)list.Sum(u => (decimal)u.ReadRate);
-        var write = (ulong)list.Sum(u => (decimal)u.WriteRate);
-        var other = (ulong)list.Sum(u => (decimal)u.OtherRate);
+        var read = list.Sum(u => u.ReadRate);
+        var write = list.Sum(u => u.WriteRate);
+        var other = list.Sum(u => u.OtherRate);
 
         return new(read, write, other, time);
     }
@@ -120,9 +120,9 @@ public class DiskUsage : ViewModelBase
     {
         var timeDelta = (TimeStamp - other.TimeStamp).TotalSeconds;
 
-        var totalRead = (ulong)((ReadRate - other.ReadRate) / timeDelta);
-        var totalWrite = (ulong)((WriteRate - other.WriteRate) / timeDelta);
-        var totalOther = (ulong)((OtherRate - other.OtherRate) / timeDelta);
+        var totalRead = (long)((ReadRate - other.ReadRate) / timeDelta);
+        var totalWrite = (long)((WriteRate - other.WriteRate) / timeDelta);
+        var totalOther = (long)((OtherRate - other.OtherRate) / timeDelta);
 
         return new(totalRead, totalWrite, totalOther);
     }
@@ -137,7 +137,7 @@ internal static class DiskUsageHelper
         {
             var counters = NativeMethods.GetProcessIoCounters(process.Handle);
 
-            return new(process, counters.ReadTransferCount, counters.WriteTransferCount, counters.OtherTransferCount);
+            return new(process, (long)counters.ReadTransferCount, (long)counters.WriteTransferCount, (long)counters.OtherTransferCount);
         }
         catch
         {

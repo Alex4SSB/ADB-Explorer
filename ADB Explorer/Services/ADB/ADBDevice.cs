@@ -96,7 +96,7 @@ public partial class ADBService
             }
 
             var name = match.Groups["Name"].Value;
-            var size = UInt64.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
+            var size = long.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
             var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
             var mode = (UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
 

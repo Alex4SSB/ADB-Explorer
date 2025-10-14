@@ -9,7 +9,7 @@ public interface IFileStat
 {
     public FileType Type { get; set; }
 
-    public ulong? Size { get; set; }
+    public long? Size { get; set; }
 
     public DateTime? ModifiedTime { get; set; }
 

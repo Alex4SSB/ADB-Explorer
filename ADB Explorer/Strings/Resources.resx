@@ -1774,4 +1774,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Validating…</value>
     <comment>The info displayed in file operation progress during content validation</comment>
   </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} files</value>
+    <comment>The indication of the number of currently active files (being transferred)</comment>
+  </data>
 </root>

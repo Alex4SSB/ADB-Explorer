@@ -80,9 +80,9 @@ public class LogicalDrive : Drive
 
     public LogicalDrive(GroupCollection match, bool isMMC = false, bool isEmulator = false, string forcePath = "")
         : this(
-              (ulong.Parse(match["size_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              (ulong.Parse(match["used_kB"].Value) * 1024).BytesToSize(true, 1, 0),
-              (ulong.Parse(match["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+              (long.Parse(match["size_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+              (long.Parse(match["used_kB"].Value) * 1024).BytesToSize(true, 1, 0),
+              (long.Parse(match["available_kB"].Value) * 1024).BytesToSize(true, 1, 0),
               sbyte.Parse(match["usage_P"].Value),
               string.IsNullOrEmpty(forcePath) ? match["path"].Value : forcePath,
               isMMC,
