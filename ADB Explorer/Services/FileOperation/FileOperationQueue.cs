@@ -63,7 +63,7 @@ public class FileOperationQueue : ViewModelBase
 
     #endregion
 
-    private readonly Mutex mutex = new Mutex();
+    private readonly Mutex mutex = new();
 
     public FileOperationQueue()
     {
@@ -271,7 +271,8 @@ public class FileOperationQueue : ViewModelBase
     private void CheckForRescan(FileOperation fileOp)
     {
         var target = fileOp.TargetPath.ParentPath;
-        if (Operations.Any(op =>
+        if (fileOp.Device.Device.AndroidVersion < AdbExplorerConst.MIN_MEDIA_SCAN_ANDROID_VER
+            || Operations.Any(op =>
                 op.TypeOnDevice == fileOp.TypeOnDevice
                 && op.TargetPath.ParentPath == target
                 && op.Status is FileOperation.OperationStatus.Waiting or FileOperation.OperationStatus.InProgress))

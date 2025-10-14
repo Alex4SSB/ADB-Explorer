@@ -29,14 +29,15 @@ public static class AdbExplorerConst
         { "/", AbstractDrive.DriveType.Root },
     };
 
+    public const int DIR_LIST_START_COUNT = 100;
+    public const int DIR_LIST_UPDATE_THRESHOLD_MIN = 100;
+    public const int DIR_LIST_UPDATE_START_THRESHOLD_MIN = 10;
+    public const int DIR_LIST_UPDATE_THRESHOLD_MAX = 500;
+
     public static readonly TimeSpan DIR_LIST_VISIBLE_PROGRESS_DELAY = TimeSpan.FromMilliseconds(500);
-    public static readonly int DIR_LIST_START_COUNT = 100;
     public static readonly TimeSpan DIR_LIST_UPDATE_INTERVAL = TimeSpan.FromMilliseconds(500);
     public static readonly TimeSpan DIR_LIST_UPDATE_START_INTERVAL = TimeSpan.FromMilliseconds(100);
     public static readonly TimeSpan SPLASH_DISPLAY_TIME = TimeSpan.FromMilliseconds(2000);
-    public static readonly int DIR_LIST_UPDATE_THRESHOLD_MIN = 100;
-    public static readonly int DIR_LIST_UPDATE_START_THRESHOLD_MIN = 10;
-    public static readonly int DIR_LIST_UPDATE_THRESHOLD_MAX = 500;
     public static readonly TimeSpan MOUSE_DOWN_VALID = TimeSpan.FromMilliseconds(150);
     public static readonly TimeSpan LINK_CLICK_DELAY = TimeSpan.FromMilliseconds(300);
     public static readonly TimeSpan RENAME_CLICK_DELAY = TimeSpan.FromMilliseconds(500);
@@ -54,11 +55,13 @@ public static class AdbExplorerConst
     public static readonly TimeSpan DISK_USAGE_INTERVAL_ACTIVE = TimeSpan.FromMilliseconds(200);
     public static readonly TimeSpan DISK_USAGE_INTERVAL_IDLE = TimeSpan.FromMilliseconds(1000);
 
-    public static readonly sbyte MIN_SUPPORTED_ANDROID_VER = 6;
-    public static readonly sbyte MIN_PKG_UID_ANDROID_VER = 9;
-    public static readonly double MAX_PANE_HEIGHT_RATIO = 0.4;
-    public static readonly int MIN_PANE_HEIGHT = 150;
-    public static readonly double MIN_PANE_HEIGHT_RATIO = 0.15;
+    public const sbyte MIN_SUPPORTED_ANDROID_VER = 6;
+    public const sbyte MIN_PKG_UID_ANDROID_VER = 9;
+    public const sbyte MIN_MEDIA_SCAN_ANDROID_VER = 10;
+
+    public const double MAX_PANE_HEIGHT_RATIO = 0.4;
+    public const int MIN_PANE_HEIGHT = 150;
+    public const double MIN_PANE_HEIGHT_RATIO = 0.15;
 
     public static readonly string[] APK_NAMES = [".APK", ".XAPK", ".APKS", ".APKM", ".APEX"];
     public static readonly string[] INSTALL_APK = [".APK", ".APEX"];
@@ -82,17 +85,17 @@ public static class AdbExplorerConst
 
     public const string ADB_EXPLORER_DATE_FORMAT = "yyyy.MM.dd-HH:mm:ss";
 
-    public static readonly double WINDOW_HEIGHT_RATIO = 0.58;
-    public static readonly double WINDOW_WIDTH_RATIO = 0.56;
+    public const double WINDOW_HEIGHT_RATIO = 0.58;
+    public const double WINDOW_WIDTH_RATIO = 0.56;
 
-    public static readonly double MAX_SEARCH_WIDTH_RATIO = 0.4;
-    public static readonly double DEFAULT_SEARCH_WIDTH = 200;
-    public static readonly double MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE = 800;
-    public static readonly double MIN_SEARCH_WIDTH = 100;
+    public const double MAX_SEARCH_WIDTH_RATIO = 0.4;
+    public const double DEFAULT_SEARCH_WIDTH = 200;
+    public const double MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE = 800;
+    public const double MIN_SEARCH_WIDTH = 100;
 
     public const string APP_SETTINGS_FILE = "App.txt";
 
-    public static readonly int DRIVE_WARNING = 90;
+    public const int DRIVE_WARNING = 90;
 
     public const string WSA_INTERFACE_NAME = "WSLCore";
     public const string WSA_PROCESS_NAME = "WsaClient";
@@ -100,15 +103,15 @@ public static class AdbExplorerConst
     public const string WIN_LOOPBACK_ADDRESS = "127.0.0.1";
     public static readonly string[] LOOPBACK_ADDRESSES = [WIN_LOOPBACK_ADDRESS, LOOPBACK_IP];
     public const string WSA_PACKAGE_NAME = "Windows Subsystem for Android";
+
     public static readonly TimeSpan WSA_LAUNCH_DELAY = TimeSpan.FromSeconds(2);
     public static readonly TimeSpan WSA_CONNECT_TIMEOUT = TimeSpan.FromSeconds(8);
-
     public static readonly TimeSpan EXPLORER_NAV_DELAY = TimeSpan.FromMilliseconds(800);
     public static readonly TimeSpan INIT_NAV_HIDE_FILTER_DELAY = TimeSpan.FromMilliseconds(1000);
 
-    public static readonly ulong DISK_READ_THRESHOLD = 500000;
-    public static readonly ulong DISK_WRITE_THRESHOLD = 500000;
-    public static readonly ulong MAX_DISK_DISPLAY_RATE = 1000000000;
+    public const ulong DISK_READ_THRESHOLD = 500000;
+    public const ulong DISK_WRITE_THRESHOLD = 500000;
+    public const ulong MAX_DISK_DISPLAY_RATE = 1000000000;
 
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 
