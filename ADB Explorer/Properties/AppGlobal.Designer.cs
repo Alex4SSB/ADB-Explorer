@@ -80,7 +80,7 @@ namespace ADB_Explorer.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.9.25090.
+        ///   Looks up a localized string similar to 0.9.25100.
         /// </summary>
         public static string AppVersion {
             get {
