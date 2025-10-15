@@ -1778,4 +1778,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>{0} files</value>
     <comment>The indication of the number of currently active files (being transferred)</comment>
   </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Select ROM for sideload</value>
+    <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM file</value>
+    <comment>The filter name displayed in the open file dialog when opening a ROM for sideload</comment>
+  </data>
 </root>

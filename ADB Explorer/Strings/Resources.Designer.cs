@@ -3076,6 +3076,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ROM file.
+        /// </summary>
+        public static string S_ROM_FILE {
+            get {
+                return ResourceManager.GetString("S_ROM_FILE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Root Access Enabled.
         /// </summary>
         public static string S_ROOT_ENABLED {
@@ -3612,6 +3621,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_UPDATES {
             get {
                 return ResourceManager.GetString("S_SETTINGS_UPDATES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select ROM for sideload.
+        /// </summary>
+        public static string S_SIDELOAD_ROM_TITLE {
+            get {
+                return ResourceManager.GetString("S_SIDELOAD_ROM_TITLE", resourceCulture);
             }
         }
         

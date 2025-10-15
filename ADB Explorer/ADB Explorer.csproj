@@ -57,7 +57,7 @@
     <PackageReference Include="ModernWpfUI" Version="0.9.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.7.0" />
-    <PackageReference Include="System.Management" Version="9.0.9" />
+    <PackageReference Include="System.Management" Version="9.0.10" />
     <PackageReference Include="Vanara.Windows.Shell" Version="4.2.1" />
     <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.2.1" />
   </ItemGroup>

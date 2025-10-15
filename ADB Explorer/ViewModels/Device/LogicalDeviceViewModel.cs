@@ -126,6 +126,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
     public DeviceAction BrowseCommand { get; }
     public DeviceAction RemoveCommand { get; }
     public DeviceAction ToggleRootCommand { get; }
+    public DeviceAction SideloadCommand { get; }
     public List<object> RebootCommands { get; } = [];
 
     #endregion
@@ -152,6 +153,9 @@ public class LogicalDeviceViewModel : DeviceViewModel
             if (item is RebootCommand.RebootType.Title)
                 RebootCommands.Add(new Separator() { Margin = new(-11, 0, -11, 0)});
         }
+
+        SideloadCommand = new(() => Device.Type is DeviceType.Sideload or DeviceType.Recovery && device.Status is DeviceStatus.Ok,
+                              () => DeviceHelper.SideloadDeviceAction(this));
 
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }

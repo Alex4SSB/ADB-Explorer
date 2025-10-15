@@ -458,6 +458,20 @@
                 <ui:FontIcon Glyph="&#xE711;" />
             </MenuItem.Header>
         </MenuItem>
+        <MenuItem Command="{Binding SideloadCommand.Command}" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
+            <MenuItem.Style>
+                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SideloadCommand.IsEnabled}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </MenuItem.Style>
+            <MenuItem.Header>
+                <ui:FontIcon Glyph="&#xE67A;" />
+            </MenuItem.Header>
+        </MenuItem>
     </Menu>
     <Style
         x:Key="DevicesListStyle"

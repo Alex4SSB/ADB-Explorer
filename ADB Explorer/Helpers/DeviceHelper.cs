@@ -99,6 +99,25 @@ public static class DeviceHelper
         Data.RuntimeSettings.DeviceToOpen = device;
     }
 
+    public static void SideloadDeviceAction(LogicalDeviceViewModel device)
+    {
+        OpenFileDialog dialog = new()
+        {
+            Title = Strings.Resources.S_SIDELOAD_ROM_TITLE,
+            Filter = $"{Strings.Resources.S_ROM_FILE}|*.zip",
+            Multiselect = false,
+        };
+
+        if (dialog.ShowDialog() is not true)
+            return;
+
+        var res = ADBService.ExecuteDeviceAdbCommand(device.ID, "sideload", out string stdout, out string stderr, CancellationToken.None, ADBService.EscapeAdbString(dialog.FileName));
+        DialogService.ShowMessage(string.Join('\n', stdout, stderr),
+                                  Strings.Resources.S_REBOOT_SIDELOAD,
+                                  res == 0 ? DialogService.DialogIcon.Informational
+                                           : DialogService.DialogIcon.Critical);
+    }
+
     private static async void RemoveDeviceAction(DeviceViewModel device)
     {
         var message = device.Type is DeviceType.Emulator
