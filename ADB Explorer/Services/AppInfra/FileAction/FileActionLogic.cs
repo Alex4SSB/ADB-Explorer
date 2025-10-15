@@ -806,7 +806,7 @@ internal static class FileActionLogic
             return;
         }
 
-        Data.FileActions.IsRegularItem = Data.RuntimeSettings.IsRootActive
+        Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || Data.RuntimeSettings.IsRootActive
             || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
         Data.FileActions.IsFollowLinkEnabled = !Data.FileActions.IsRecycleBin
@@ -830,9 +830,9 @@ internal static class FileActionLogic
         Data.FileActions.DeleteDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_EMPTY_TRASH : Strings.Resources.S_DELETE_ACTION;
         Data.FileActions.RestoreDescription.Value = Data.FileActions.IsRecycleBin && !Data.SelectedFiles.Any() ? Strings.Resources.S_RESTORE_ALL : Strings.Resources.S_RESTORE_ACTION;
 
-        Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
-        Data.FileActions.IsSelectionIllegalOnFuse = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.FUSE);
-        Data.FileActions.IsSelectionIllegalOnWinRoot = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
+        Data.FileActions.IsSelectionIllegalOnWindows = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
+        Data.FileActions.IsSelectionIllegalOnFuse = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.FUSE);
+        Data.FileActions.IsSelectionIllegalOnWinRoot = Data.SelectedFiles.Any() && !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.WinRoot);
         Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)
             .Distinct(StringComparer.InvariantCultureIgnoreCase)
             .Count() != Data.SelectedFiles.Count();

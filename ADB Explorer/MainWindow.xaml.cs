@@ -1370,7 +1370,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton != MouseButton.Left)
+        if (e.ChangedButton is not MouseButton.Left and not MouseButton.Right)
             return;
 
         if (RowHeight is null && ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(0) is DataGridRow row)
@@ -1717,7 +1717,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ChangedButton is not MouseButton.Left)
+        if (e.ChangedButton is not MouseButton.Left and not MouseButton.Right)
             return;
 
         if (e.OriginalSource is Border)
@@ -1738,6 +1738,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var current = row.GetIndex();
 
         WasSelected = row.IsSelected;
+
+        if (e.ChangedButton is MouseButton.Right && !WasSelected)
+        {
+            ExplorerGrid.UnselectAll();
+            row.IsSelected = true;
+            e.Handled = true;
+            return;
+        }
+
         CopyPaste.DragStatus = e.OriginalSource is TextBlock or Image || row.IsSelected
                      ? CopyPasteService.DragState.Pending
                      : CopyPasteService.DragState.None;

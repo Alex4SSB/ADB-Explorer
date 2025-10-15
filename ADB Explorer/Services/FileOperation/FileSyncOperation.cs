@@ -96,7 +96,8 @@ public class FileSyncOperation : FileOperation
                 var paths = FolderHelper.GetBottomMostFolders(Files)
                     .Select(f => FileHelper.ConcatPaths(TargetPath.FullPath, FileHelper.ExtractRelativePath(f.FullPath, FilePath.FullPath, false)));
 
-                ShellFileOperation.MakeDirs(Device, paths);
+                if (paths.Any())
+                    ShellFileOperation.MakeDirs(Device, paths);
             }
             else
             {
