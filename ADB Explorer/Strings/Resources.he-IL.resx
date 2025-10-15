@@ -1447,4 +1447,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} קבצים</value>
   </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>בחר קובץ ROM לטעינה</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>קובץ ROM</value>
+  </data>
 </root>
