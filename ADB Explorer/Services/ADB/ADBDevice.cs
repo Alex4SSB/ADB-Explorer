@@ -96,18 +96,24 @@ public partial class ADBService
             }
 
             var name = match.Groups["Name"].Value;
-            var size = long.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
+            long? size = long.Parse(match.Groups["Size"].Value, NumberStyles.HexNumber);
             var time = long.Parse(match.Groups["Time"].Value, NumberStyles.HexNumber);
             var mode = (UnixFileMode)UInt32.Parse(match.Groups["Mode"].Value, NumberStyles.HexNumber);
 
             if (SPECIAL_DIRS.Contains(name))
                 return null;
 
+            var type = ParseFileMode(mode);
+            if (mode is UnixFileMode.None || type is FileType.Folder)
+            {
+                size = null;
+            }
+
             return new(
                 fileName: name,
                 path: FileHelper.ConcatPaths(path, name),
-                type: ParseFileMode(mode),
-                size: (mode != 0) ? size : null,
+                type: type,
+                size: size,
                 modifiedTime: (time > 0) ? DateTimeOffset.FromUnixTimeSeconds(time).DateTime.ToLocalTime() : null,
                 isLink: mode.HasFlag(UnixFileMode.S_IFLNK));
         }

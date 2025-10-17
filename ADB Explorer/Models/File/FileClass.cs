@@ -125,13 +125,18 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             if (!IsDirectory)
                 return null;
 
-            var findCmd = ShellCommands.TranslateCommand("find");
-            var target = ADBService.EscapeAdbShellString(FullName);
+            // get absolute paths and sizes of all files, directries are marked with 'd'
+            string[] args =
+            [
+                ADBService.EscapeAdbShellString(FullPath),
+                "-mindepth 1",
+                "\\( -type d -printf '/// %p /// d ///\\n' \\)",
+                "-o",
+                "\\( -type f -printf '/// %p /// %s ///\\n' \\)",
+                "2>&1"
+            ];
 
-            // get relative (to ParentPath) paths and sizes of all files, directries are marked with 'd'
-            string[] args = [ParentPath, "&&", findCmd, target, "-mindepth 1", "\\( -type d -printf '/// %p /// d ///\\n' \\) -o \\( -type f -printf '/// %p /// %s ///\\n' \\)", "2>&1"];
-
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "cd", out string stdout, out _, CancellationToken.None, args);
+            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out string stdout, out _, CancellationToken.None, args);
 
             var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 
@@ -336,21 +341,23 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'))
             { PathType = FilePathType.Windows };
 
-        var fileOp = FileSyncOperation.PullFile(new(this), target, Data.CurrentADBDevice, App.Current.Dispatcher);
+        var children = Children;
+
+        var fileOp = FileSyncOperation.PullFile(new(this, children), target, Data.CurrentADBDevice, App.Current.Dispatcher);
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        (string, long?)[] items = [(FullName, (long?)Size)];
-        if (includeContent && Children is not null)
+        (string, long?)[] items = [(FullName, Size)];
+        if (includeContent && children is not null)
         {
-            items = [..items, ..Children];
+            items = [.. items, .. children];
         }
 
         DateTime? date = IsDirectory ? null : ModifiedTime;
 
         Descriptors = items.Select(item => new FileDescriptor
         {
-            Name = item.Item1,
+            Name = FileHelper.ExtractRelativePath(item.Item1, ParentPath),
             SourcePath = FullPath,
             IsDirectory = item.Item2 is null,
             Length = item.Item2,
@@ -384,7 +391,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                     Thread.Sleep(100);
                 }
                 
-                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, item.Item1, '\\');
+                var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Item1, ParentPath), '\\');
 
                 // Try 10 times to read from the file and write to the stream,
                 // in case the file is still in use by ADB or hasn't appeared yet

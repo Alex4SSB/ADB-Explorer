@@ -75,14 +75,7 @@ public class SyncFile : FilePath
         if (!tree.Any())
             yield break;
 
-        // parent path here is absolute, tree paths are relative to the original parent
-        var relativeParent = parent;
-        while (!tree.First().Item1.Contains(relativeParent))
-        {
-            relativeParent = relativeParent[(relativeParent.IndexOf('/') + 1)..];
-        }
-
-        var groups = tree.GroupBy(f => f.Item1.Split(relativeParent)[1].Trim('/').Split('/')[0]);
+        var groups = tree.GroupBy(f => f.Item1.Split(parent)[1].Trim('/').Split('/')[0]);
 
         foreach (var group in groups.Where(g => g.Key is not null))
         {

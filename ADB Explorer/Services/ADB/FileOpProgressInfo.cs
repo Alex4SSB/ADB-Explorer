@@ -121,7 +121,7 @@ public class AdbSyncStatsInfo
         FilesSkipped = filesSkipped;
 
         if (averageRate == -1 && totalBytes.HasValue && totalTime.HasValue && totalTime > 0)
-            AverageRate = totalBytes.Value / 1000000 / totalTime.Value;
+            AverageRate = totalBytes.Value / 1000000.0 / totalTime.Value;
         else
             AverageRate = averageRate;
     }
