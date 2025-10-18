@@ -52,7 +52,7 @@ public static class DialogService
         if (buttonText is null)
             buttonText = Strings.Resources.S_BUTTON_OK;
 
-        windowDialog.FlowDirection = Thread.CurrentThread.CurrentCulture.TextInfo.IsRightToLeft
+        windowDialog.FlowDirection = Data.RuntimeSettings.IsRTL
             ? FlowDirection.RightToLeft
             : FlowDirection.LeftToRight;
 

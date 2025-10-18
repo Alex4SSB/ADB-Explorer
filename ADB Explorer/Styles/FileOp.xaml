@@ -28,6 +28,7 @@
         BasedOn="{StaticResource BoldInProgressTextBlockStyle}"
         TargetType="TextBlock">
         <Setter Property="TextDecorations" Value="Underline" />
+        <Setter Property="FontFamily" Value="Segoe UI" />
         <Setter Property="Foreground" Value="{DynamicResource FileOpHyperLinkBrush}" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
@@ -357,7 +358,7 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="True">
                             <Setter Property="FlowDirection" Value="RightToLeft" />
                         </DataTrigger>
                     </Style.Triggers>
@@ -395,7 +396,7 @@
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="True">
                             <Setter Property="FlowDirection" Value="RightToLeft" />
                         </DataTrigger>
                     </Style.Triggers>

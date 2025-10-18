@@ -484,7 +484,7 @@ public class AppRuntimeSettings : ViewModelBase
 
     public bool UseFluentStyles => IsWin11 || Data.Settings.ForceFluentStyles;
 
-    public bool IsRTL => Thread.CurrentThread.CurrentCulture.TextInfo.IsRightToLeft;
+    public bool IsRTL => Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft;
 
     #region Event-only properties
 
