@@ -605,11 +605,11 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                                                         DragDropEffects preferredEffect = DragDropEffects.Copy,
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)
     {
-            ExplorerHelper.CheckConflictingApps(isFirstActivation && method is DataObjectMethod.Clipboard);
-            if (isFirstActivation)
-                isFirstActivation = false;
+        //ExplorerHelper.CheckConflictingApps(isFirstActivation && method is DataObjectMethod.Clipboard);
+        //if (isFirstActivation)
+        //    isFirstActivation = false;
 
-            CopyPasteService.ClearTempFolder();
+        CopyPasteService.ClearTempFolder();
 
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);
         Data.FileActions.IsSelectionConflictingOnFuse = Data.SelectedFiles.Select(f => f.FullName)

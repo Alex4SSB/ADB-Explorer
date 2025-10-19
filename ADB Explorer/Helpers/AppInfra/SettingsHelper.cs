@@ -89,7 +89,7 @@ public static class SettingsHelper
         var versionValid = await AdbHelper.CheckAdbVersion();
         var delay = AdbExplorerConst.SPLASH_DISPLAY_TIME - (DateTime.Now - startTime);
         
-        if (!versionValid || !Data.Settings.AdvancedDragSet)
+        if (!versionValid) // || !Data.Settings.AdvancedDragSet
             return;
 
         await Task.Delay(Data.Settings.EnableSplash && delay > TimeSpan.Zero ? delay : TimeSpan.Zero);

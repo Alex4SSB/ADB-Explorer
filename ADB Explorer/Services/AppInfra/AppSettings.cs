@@ -77,20 +77,20 @@ public class AppSettings : ViewModelBase
         set => Set(ref showHiddenItems, value);
     }
 
-    private bool advancedDrag;
+    //private bool advancedDrag;
     public bool AdvancedDrag
     {
-        get => Get(ref advancedDrag, true);
-        set
-        {
-            if (Set(ref advancedDrag, value))
-            {
-                if (!value)
-                    Data.RuntimeSettings.IsAdvancedDragEnabled = false;
-                else
-                    ExplorerHelper.CheckConflictingApps();
-            }
-        }
+        get => false; // Get(ref advancedDrag, true);
+        //set
+        //{
+        //    if (Set(ref advancedDrag, value))
+        //    {
+        //        if (!value)
+        //            Data.RuntimeSettings.IsAdvancedDragEnabled = false;
+        //        else
+        //            ExplorerHelper.CheckConflictingApps();
+        //    }
+        //}
     }
 
     #endregion
@@ -340,11 +340,11 @@ public class AppSettings : ViewModelBase
         set => Set(ref hidePasteNamingInfo, value);
     }
 
-    private bool advancedDragSet;
+    //private bool advancedDragSet;
     public bool AdvancedDragSet
     {
-        get => Get(ref advancedDragSet, false);
-        set => Set(ref advancedDragSet, value);
+        get => true; // Get(ref advancedDragSet, false);
+        //set => Set(ref advancedDragSet, value);
     }
 
     private string lastVersion;
