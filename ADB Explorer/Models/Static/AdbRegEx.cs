@@ -61,5 +61,8 @@
 
         [GeneratedRegex(@"(?<Alias>[^=\s]+)='(?<Target>.+)'")]
         public static partial Regex RE_GET_ALIAS();
+
+        [GeneratedRegex(@"[\d.]+")]
+        public static partial Regex RE_GITHUB_VERSION();
     }
 }

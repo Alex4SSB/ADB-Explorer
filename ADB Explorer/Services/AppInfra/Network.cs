@@ -33,8 +33,24 @@ public static class Network
         if (!json.HasValues)
             return null;
 
-        var ver = json[0]["tag_name"].ToString().TrimStart('v');
-        return new(ver);
+        foreach (var release in json)
+        {
+            if (release["prerelease"].ToObject<bool>() || release["draft"].ToObject<bool>())
+                continue;
+
+            var match = AdbRegEx.RE_GITHUB_VERSION().Match(release["tag_name"].ToString());
+            if (match.Success)
+            {
+                try
+                {
+                    return new(match.Value);
+                }
+                catch
+                { }
+            }
+        }
+
+        return null;
     }
 
     public static string GetWsaIp()
