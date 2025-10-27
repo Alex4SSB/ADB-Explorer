@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>علامه الاندرويد روبوت</value>
+    <value>أيقونات روبوت أندرويد</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>تتم إعادة إنتاج روبوت Android أو تعديله من عمل أنشأته Google وشاركته، ويتم استخدامه وفقًا للبنود الموضّحة في ترخيص Creative Commons 3.0 Attribution.</value>
@@ -281,5 +281,9 @@
   </data>
   <data name="GIGA" xml:space="preserve">
     <value>{0} جيجابايت</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>مرحبا بكم في إصدار جديد من مستكشف إيه دي بي!
+ملاحظات الإصدار موجودة على غيت هاب.</value>
   </data>
 </root>
