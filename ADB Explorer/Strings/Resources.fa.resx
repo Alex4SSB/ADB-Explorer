@@ -135,4 +135,7 @@
   <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
     <value>نسخه ADB از مسیر داده شده خیلی کم است.</value>
   </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>نتوانستیم adb را اووررایت کنیم</value>
+  </data>
 </root>
