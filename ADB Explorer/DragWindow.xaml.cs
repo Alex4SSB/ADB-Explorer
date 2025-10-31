@@ -1,9 +1,7 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
-using System.Windows.Automation;
 using System.Windows.Documents;
-using Vanara.Windows.Shell;
 using static ADB_Explorer.Services.NativeMethods;
 
 namespace ADB_Explorer;
