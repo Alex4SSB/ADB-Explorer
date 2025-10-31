@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Восстановить</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Мониторинг Проводника</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Перенаправление Прогресса</value>
   </data>
@@ -266,24 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Извлечь в корень диска Windows</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Конфликтующие приложения</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>Мониторинг недоступен во время работы этих приложений:</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Monitoring File Explorer позволяет приложению выполнять операции Drag / Clipboard Pull напрямую в целевую папку.
-
-В противном случае Pull выполняется во временную папку приложения, откуда File Explorer получает файл в виде потока, что требует использования небольшого буфера.
-Эти два дополнительных шага значительно замедляют процесс.
-
-Функция автоматически отключается для других выбранных файловых менеджеров.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Включайте только если вы будете использовать приложение вместе с Проводником.
-Этот параметр можно изменить в настройках.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Вас приветствует новая версия ADB Explorer!
@@ -333,9 +312,6 @@
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>Больше информации</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>Мониторинг Проводника:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>Включено</value>
@@ -522,9 +498,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Отображать системные приложения</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>Включить мониторинг проводника</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>Двойной щелчок</value>
@@ -1398,9 +1371,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>Переместить {0} элементов</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>Область перекрыта — снова откройте окно проводника.</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>Вставить 1 вырезанный элемент</value>

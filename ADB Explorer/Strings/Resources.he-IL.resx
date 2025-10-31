@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>שחזר</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>ניטור סייר הקבצים</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>ניתוב ההתקדמות</value>
   </data>
@@ -266,24 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>הורדה לראשית כונן במחשב</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>תוכנות היוצרות התנגשות</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>התוכנות הבאות מונעות כרגע את ניטור סייר הקבצים:</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>ניטור סייר הקבצים מאפשר לתוכנה לבצע פעולות הורדה ע"י גרירה / העתקה ללוח ישירות לתיקיית היעד.
-
-אחרת, ההורדה נעשית לתיקיה זמנית, וסייר הקבצים מקבל משם את הקובץ כתזרים, בחתיכות קטנות.
-שני השלבים הנ"ל מעקבים את תהליך ההורדה משמעותית.
-
-הניטור מבוטל אוטומטית עבור סיירי קבצים צד ג'.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>האיפשור מומלץ רק עבור שימוש מול סייר הקבצים המקורי של וינדוס.
-ניתן לשינוי בהגדרות תמיד.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>ברוכים הבאים לגרסה חדשה של ADB Explorer!
@@ -333,9 +312,6 @@
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>מידע נוסף</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>ניטור סייר הקבצים:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>מאופשר</value>
@@ -522,9 +498,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>הצג אפליקציות מערכת</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>הפעל ניטור סייר הקבצים</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>לחיצה כפולה על קובץ</value>
@@ -1398,9 +1371,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>העבר {0} פריטים</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>האזור מוסתר - יש לפתוח את חלון הסייר מחדש.</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>הדבק פריט 1 שנגזר</value>

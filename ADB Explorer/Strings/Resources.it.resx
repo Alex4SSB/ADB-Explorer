@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Ripristina</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Monitoraggio di Esplora file</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Reindirizzamento del progresso delle operazioni</value>
   </data>
@@ -266,24 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Prendi dal dispositivo (Pull) e metti nella root del disco di Windows (C:\)</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>App in conflitto</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>Il monitoraggio di Esplora file non è disponibile a causa delle seguenti app in esecuzione:</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Il monitoraggio di Esplora file permette all'app di effettuare le operazioni di Trascina / Rilascia o dagli appunti direttamente nella cartella di destinazione.
-
-Altrimenti, il trasferimento è fatto tramite la cartella temporanea dell'app, dalla quale Esplora file riceve il file come flusso, ma dovrà usare un buffer piccolo.
-Queste due fasi aggiuntive rallentano notevolmente il processo.
-
-La funzione è disattivata automaticamente per altri file manager selezionati.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Attiva solo se intendi utilizzare l'applicazione con Esplora file.
-Puoi sempre modificare la scelta nelle impostazioni.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Benvenuto in una nuova versione di ADB Explorer!
@@ -333,9 +312,6 @@ Per approvare ADB, apri le impostazioni avanzate di WSA.</value>
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>Più informazioni</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>Monitoraggio Esplora file:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>Abilitato</value>
@@ -522,9 +498,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Mostra app di sistema</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>Abilita il monitoraggio di Esplora file</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>Doppio click su file</value>
@@ -1398,9 +1371,6 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>Sposta {0} elementi</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>Area ostruita - riaprire la finestra.</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>Incolla 1 elemento tagliato</value>

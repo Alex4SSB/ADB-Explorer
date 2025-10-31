@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -252,20 +252,11 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restaurar</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Monitoramento do explorador de arquivos</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Redirecionamento do progresso</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
     <value>Erro de Diretório de Lista</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Aplicativos em conflito</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>Monitoramento do explorador de arquivos não está disponível pois os seguintes apps estão ativos:</value>
   </data>
   <data name="S_BUTTON_OK" xml:space="preserve">
     <value>Ok</value>
@@ -279,9 +270,6 @@
   <data name="S_MENU_COPY" xml:space="preserve">
     <value>Copiar</value>
   </data>
-  <data name="S_MENU_INSTALL" xml:space="preserve">
-    <value>Instalar</value>
-  </data>
   <data name="S_MENU_EDIT" xml:space="preserve">
     <value>Editar</value>
   </data>
@@ -290,5 +278,8 @@
   </data>
   <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
     <value>Fechar Editor</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Instalar</value>
   </data>
 </root>

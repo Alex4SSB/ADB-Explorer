@@ -62,11 +62,6 @@ public class ProcessHandling
         yield return process;
     }
 
-    public static IEnumerable<string> GetConflictingApps()
-        => Process.GetProcesses()
-        .Where(p => AdbExplorerConst.INCOMPATIBLE_APPS.Contains(p.ProcessName))
-        .Select(p => p.ProcessName);
-
     public static int GetProcessIdFromWindowHandle(HANDLE hwnd)
     {
         GetWindowThreadProcessId(hwnd, out uint processId);

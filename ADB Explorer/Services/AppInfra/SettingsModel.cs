@@ -34,7 +34,6 @@ public static class UISettings
         new(ActionType.ClearAdbPath, () => !string.IsNullOrEmpty(Settings.ManualAdbPath), () => Settings.ManualAdbPath = "", Icons[ActionType.ClearDefaultPath], Strings.Resources.S_BUTTON_CLEAR),
         new(ActionType.ResetApp, () => true, SettingsHelper.ResetAppAction, Icons[ActionType.ResetApp], Strings.Resources.S_RESTART_APP),
         new(ActionType.AnimationInfo, () => true, SettingsHelper.DisableAnimationTipAction, Icons[ActionType.AnimationInfo], Strings.Resources.S_BUTTON_MORE_INFO_TOOLTIP),
-        new(ActionType.AdvancedDragInfo, () => true, SettingsHelper.AdvancedDragTipAction, Icons[ActionType.AnimationInfo], Strings.Resources.S_BUTTON_MORE_INFO_TOOLTIP),
     ];
 
     public static void Init()
@@ -420,7 +419,6 @@ public class SettingsAction : BaseAction
         ClearAdbPath,
         ResetApp,
         AnimationInfo,
-        AdvancedDragInfo,
     }
 
     public ActionType Name { get; }

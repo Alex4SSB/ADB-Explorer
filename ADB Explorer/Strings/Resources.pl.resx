@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Przywróć</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Monitorowanie Eksploratora plików</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Przekierowanie postępu</value>
   </data>
@@ -266,24 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Przenieś do katalogu głównego dysku systemu Windows</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Konfliktujące aplikacje</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>Monitorowanie Eksploratora plików nie jest dostępne, ponieważ uruchomione są następujące aplikacje:</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Monitorowanie Eksploratora plików umożliwia aplikacji wykonywanie operacji przeciągania/wyciągania ze schowka bezpośrednio do folderu docelowego.
-
-W przeciwnym razie pobieranie jest wykonywane do folderu tymczasowego aplikacji, z którego Eksplorator plików odbiera plik w postaci strumienia, który musi korzystać z niewielkiego bufora.
-Te dwa dodatkowe kroki znacznie spowalniają proces.
-
-Funkcja jest automatycznie wyłączana dla innych wybranych menedżerów plików.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Włącz tylko wtedy, gdy zamierzasz korzystać z aplikacji w Eksploratorze plików.
-Zawsze możesz to zmienić w ustawieniach.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Witamy w nowej wersji ADB Explorer!
@@ -333,9 +312,6 @@ Aby zatwierdzić ADB, otwórz ustawienia zaawansowane WSA.</value>
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>Więcej informacji</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>Monitorowanie Eksploratora plików:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>Włączone</value>
@@ -519,9 +495,6 @@ Widoczna zawartość może być niekompletna.</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Pokaż aplikacje systemowe</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>Włącz monitorowanie Eksploratora plików</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>Wybór elementu podwójnym kliknięciem</value>
@@ -1311,9 +1284,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>Przenieś {0} elementów</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>Obszar zablokowany - otwórz ponownie okno Eksploratora.</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>Wklej 1 Wycięty element</value>

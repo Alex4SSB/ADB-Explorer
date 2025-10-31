@@ -24,11 +24,6 @@ public partial class SplashScreen
             ? Visibility.Collapsed
             : Visibility.Visible;
 
-        AdvancedDragPanel.Visibility = Visibility.Collapsed;
-        //AdvancedDragPanel.Visibility = !Data.Settings.AdvancedDragSet && !MissingAdbGrid.Visible()
-        //    ? Visibility.Visible
-        //    : Visibility.Collapsed;
-
         _ = Task.Run(async () =>
         {
             while (Data.RuntimeSettings.IsSplashScreenVisible && MissingAdbGrid.Visible())
@@ -66,25 +61,8 @@ public partial class SplashScreen
         DialogService.ShowMessage(Strings.Resources.S_HELP_ON_ADB, Strings.Resources.S_HELP_ON_ADB_TITLE, DialogService.DialogIcon.Informational);
     }
 
-    private void AdvancedDragInfo_Click(object sender, RoutedEventArgs e)
-    {
-        DialogService.ShowMessage(Strings.Resources.S_ADVANCED_DRAG, Strings.Resources.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Informational);
-    }
-
     private void ConfirmAdvancedDrag_Click(object sender, RoutedEventArgs e)
     {
-        AdvancedDragPanel.Visibility = Visibility.Collapsed;
-
-        //if (AdvancedDragEnabledRadioButton.IsChecked is true)
-        //    Data.Settings.AdvancedDrag = true;
-        //else if (AdvancedDragDisabledRadioButton.IsChecked is true)
-        //    Data.Settings.AdvancedDrag = false;
-        
         CloseSplashScreen();
-    }
-
-    private void RadioButton_Click(object sender, RoutedEventArgs e)
-    {
-        ConfirmAdvancedDrag.IsEnabled = true;
     }
 }

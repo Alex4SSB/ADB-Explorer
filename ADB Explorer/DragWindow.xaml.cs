@@ -73,59 +73,11 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
 
             string explorerTarget = "";
-            
-            if (ElementUnderMouse is not null && WindowUnderMouse is not null && !MouseWithinApp)
-            {
-                try
-                {
-                    if (ElementUnderMouse.Current.ControlType == ControlType.Pane
-                        && ElementUnderMouse.Current.Name == "PopupHost")
-                    {
-                        IsDropAllowed = true;
-                        IsObstructed = true;
-                        DragTooltip.Inlines.Add(Strings.Resources.S_DRAGDROP_OBSTRUCTED);
-                        return;
-                    }
-                    IsObstructed = false;
 
-                    var path = ExplorerHelper.GetPathFromElement(ElementUnderMouse, WindowUnderMouse);
-
-#if !DEPLOY
-                    DebugLog.PrintLine($"Path under mouse: {path}");
-#endif
-
-                    if (string.IsNullOrEmpty(path))
-                    {
-                        explorerTarget = "";
-                        IsDropAllowed = false;
-                    }
-                    else
-                    {
-                        Data.RuntimeSettings.PathUnderMouse = new(path);
-                        IsDropAllowed = Data.RuntimeSettings.PathUnderMouse.IsFolder
-                            && Data.CopyPaste.CurrentDropEffect is not DragDropEffects.Link
-                            && Data.RuntimeSettings.PathUnderMouse.FileInfo.Attributes is not FileAttributes.Archive;
-
-                        string displayName = Data.RuntimeSettings.PathUnderMouse.GetDisplayName(ShellItemDisplayString.NormalDisplay);
-                        if (displayName.Count(c => c == '\\') > 1)
-                            displayName = Data.RuntimeSettings.PathUnderMouse.ParsingName;
-
-                        explorerTarget = FileHelper.GetShortFileName(displayName, 30);
-                    }
-                }
-                catch
-                {
-                    Data.RuntimeSettings.PathUnderMouse = null;
-                    IsDropAllowed = false;
-                }
-            }
-            else
-            {
-                IsObstructed = false;
-                Data.RuntimeSettings.PathUnderMouse = null;
-                if (MouseWithinApp)
-                    IsDropAllowed = true;
-            }
+            IsObstructed = false;
+            Data.RuntimeSettings.PathUnderMouse = null;
+            if (MouseWithinApp)
+                IsDropAllowed = true;
 
             string target = "";
             if (MouseWithinApp)
@@ -267,20 +219,6 @@ public partial class DragWindow : INotifyPropertyChanged
 
     private ExplorerWindow WindowUnderMouse = null;
 
-    private AutomationElement elementUnderMouse = null;
-    public AutomationElement ElementUnderMouse
-    {
-        get => elementUnderMouse;
-        set
-        {
-            if (elementUnderMouse is not null && value is not null && Automation.Compare(elementUnderMouse, value))
-                return;
-
-            elementUnderMouse = value;
-            GetPathUnderMouse();
-        }
-    }
-
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
         Data.CopyPaste.PropertyChanged += (s, e) =>
@@ -322,18 +260,6 @@ public partial class DragWindow : INotifyPropertyChanged
             Left = actualPoint.X - DragImage.ActualWidth / 2;
         }
 
-        if (Data.RuntimeSettings.IsAdvancedDragEnabled)
-        {
-            try
-            {
-                ElementUnderMouse = AutomationElement.FromPoint(point);
-            }
-            catch
-            {
-                ElementUnderMouse = null;
-            }
-        }
-
         var hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
 
         // Shouldn't happen. But if it does, we don't want to do anything.
@@ -353,19 +279,6 @@ public partial class DragWindow : INotifyPropertyChanged
         {
             if (wasWithinApp)
                 Data.CopyPaste.PasteState = DragDropEffects.None;
-
-            var explorerWin = InterceptClipboard.ExplorerWatcher?.AllWindows.FirstOrDefault(win => win.Hwnd == hwndUnderMouse);
-            if (explorerWin is null)
-                return;
-
-            WindowUnderMouse = explorerWin;
-
-            var procName = WindowUnderMouse.Process?.ProcessName;
-
-            Data.RuntimeSettings.DragWithinSlave = procName == Properties.AppGlobal.AppDisplayName;
-
-            if (procName is not "" and not "explorer" && !Data.RuntimeSettings.DragWithinSlave)
-                Data.RuntimeSettings.DragBitmap = null;
         }
         else
             Data.RuntimeSettings.DragWithinSlave = false;

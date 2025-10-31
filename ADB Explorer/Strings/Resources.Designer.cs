@@ -268,39 +268,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Monitoring File Explorer enables the app to perform Drag / Clipboard Pull operations directly to the destination folder.
-        ///
-        ///Otherwise, Pull is performed to the app temp folder, from which File Explorer receives the file as a stream, which has to use a small buffer.
-        ///These two added steps slow down the process significantly.
-        ///
-        ///The feature is auto-disabled for other selected file managers..
-        /// </summary>
-        public static string S_ADVANCED_DRAG {
-            get {
-                return ResourceManager.GetString("S_ADVANCED_DRAG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable only if you intend to use the app with File Explorer.
-        ///You can always change this in the settings..
-        /// </summary>
-        public static string S_ADVANCED_DRAG_SPLASH {
-            get {
-                return ResourceManager.GetString("S_ADVANCED_DRAG_SPLASH", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File Explorer Monitoring.
-        /// </summary>
-        public static string S_ADVANCED_DRAG_TITLE {
-            get {
-                return ResourceManager.GetString("S_ADVANCED_DRAG_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The Android Robot Icon(s).
         /// </summary>
         public static string S_ANDROID_ICONS_TITLE {
@@ -1022,24 +989,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to File Explorer monitoring is not available due to the following apps running:.
-        /// </summary>
-        public static string S_CONFLICTING_APPS {
-            get {
-                return ResourceManager.GetString("S_CONFLICTING_APPS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Conflicting Apps.
-        /// </summary>
-        public static string S_CONFLICTING_APPS_TITLE {
-            get {
-                return ResourceManager.GetString("S_CONFLICTING_APPS_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Copy Package Name.
         /// </summary>
         public static string S_COPY_APK_NAME {
@@ -1347,15 +1296,6 @@ namespace ADB_Explorer.Strings {
         public static string S_DRAGDROP_MOVE_TARGET_SINGLE {
             get {
                 return ResourceManager.GetString("S_DRAGDROP_MOVE_TARGET_SINGLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Area obstructed - reopen Explorer window..
-        /// </summary>
-        public static string S_DRAGDROP_OBSTRUCTED {
-            get {
-                return ResourceManager.GetString("S_DRAGDROP_OBSTRUCTED", resourceCulture);
             }
         }
         
@@ -3373,15 +3313,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable File Explorer Monitoring.
-        /// </summary>
-        public static string S_SETTINGS_EXPLORER_MONITORING {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_EXPLORER_MONITORING", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Force Fluent Styles.
         /// </summary>
         public static string S_SETTINGS_FLUENT {
@@ -3639,15 +3570,6 @@ namespace ADB_Explorer.Strings {
         public static string S_SKIP {
             get {
                 return ResourceManager.GetString("S_SKIP", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to File Explorer Monitoring:.
-        /// </summary>
-        public static string S_SPLASH_MONITORING_TITLE {
-            get {
-                return ResourceManager.GetString("S_SPLASH_MONITORING_TITLE", resourceCulture);
             }
         }
         

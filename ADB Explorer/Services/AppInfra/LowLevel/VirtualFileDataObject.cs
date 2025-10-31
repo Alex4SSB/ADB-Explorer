@@ -619,9 +619,8 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         VirtualFileDataObject vfdo = new(preferredEffect, method);
 
         var includeContent =
-            !Data.RuntimeSettings.IsAdvancedDragEnabled
-                && !Data.FileActions.IsSelectionIllegalOnWindows
-                && !Data.FileActions.IsSelectionConflictingOnFuse
+            !Data.FileActions.IsSelectionIllegalOnWindows
+            && !Data.FileActions.IsSelectionConflictingOnFuse
             && !Data.FileActions.IsRecycleBin;
 
         if (includeContent)
@@ -650,26 +649,8 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             vfdo.SetData(AdbDataFormats.FileContents, []);
             SelfFileGroup = new([]);
         }
-        else // When either advanced drag is enabled, or the selection is illegal for Windows
+        else // When the selection is illegal for Windows
         {
-            if (Data.RuntimeSettings.IsAdvancedDragEnabled)
-            {
-                // Format order is crucial for File Explorer which takes the first format it can handle.
-                // Hence we provide the dummy file first (after Preferred Drop Effect)
-                if (vfdo.Method is DataObjectMethod.DragDrop)
-                    vfdo.SetFileDrop($"AdbExplorerDummyDropFile");
-                else
-                {
-                    DummyFileName = $"AdbExplorerDummyDropFile_{RandomString.GetUniqueKey(10, [.. AdbExplorerConst.WIFI_PAIRING_ALPHABET.Except(AdbExplorerConst.INVALID_NTFS_CHARS)])}";
-
-                    string path = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, DummyFileName, '\\');
-                    File.WriteAllText(path, DateTime.Now.ToString());
-
-                    vfdo.SetFileDrop(path);
-                    Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-                }
-            }
-
             // Next we provide the real file descriptors and file contents.
             // File Explorer isn't supposed to use them, but since it's already implemented,
             // might as well leave it for any other app to use.
@@ -681,29 +662,6 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
 
         return vfdo;
-    }
-
-    private static void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is nameof(Data.RuntimeSettings.PasteDestination)
-                            && Data.RuntimeSettings.PasteDestination is not null
-                            && SelfFiles is not null)
-        {
-            Data.RuntimeSettings.PropertyChanged -= RuntimeSettings_PropertyChanged;
-
-            string filePath = FileHelper.ConcatPaths(Data.RuntimeSettings.PasteDestination, DummyFileName);
-            ExplorerHelper.DeleteNotifyFile(filePath);
-
-            App.Current.Dispatcher.Invoke(() =>
-            {
-                FileActionLogic.PullFiles(Data.RuntimeSettings.PasteDestination, SelfFiles, true);
-
-                // We cannot allow the user to reuse the VFDO, even if it was a copy operation
-                CopyPasteService.ClearTempFolder();
-                Data.CopyPaste.Clear();
-                SelfFiles = null;
-            });
-        }
     }
 
     public enum DataObjectMethod
@@ -721,12 +679,6 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
             if (method is DataObjectMethod.DragDrop)
             {
                 DoDragDrop(dragSource, allowedEffects);
-                if (Data.RuntimeSettings.IsAdvancedDragEnabled
-                    && Data.CopyPaste.DragResult is NativeMethods.HResult.DRAGDROP_S_DROP
-                    && Data.RuntimeSettings.PathUnderMouse is not null)
-                {
-                    FileActionLogic.PullFiles(Data.RuntimeSettings.PathUnderMouse, SelfFiles, true);
-                }
             }
             else if (method is DataObjectMethod.Clipboard)
             {

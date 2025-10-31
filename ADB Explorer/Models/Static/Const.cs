@@ -116,6 +116,4 @@ public static class AdbExplorerConst
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
 
     public static readonly string TEMP_DRAG_FOLDER = $"TempDrag_{Helpers.RandomString.GetUniqueKey(3, [.. WIFI_PAIRING_ALPHABET.Except(INVALID_NTFS_CHARS)])}";
-
-    public static readonly string[] INCOMPATIBLE_APPS = [ "Files", "TOTALCMD", "TOTALCMD64" ];
 }

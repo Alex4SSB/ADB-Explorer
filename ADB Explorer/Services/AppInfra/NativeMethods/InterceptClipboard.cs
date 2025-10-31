@@ -11,7 +11,6 @@ public static partial class NativeMethods
         private static Action _externalClipAction;
         private static Action<string> _externalIpcAction;
         private static HwndSource _hwndSource;
-        public static ExplorerWatcher ExplorerWatcher { get; private set; } = null;
 
         public static HANDLE MainWindowHandle { get; private set; } = IntPtr.Zero;
 
@@ -26,7 +25,6 @@ public static partial class NativeMethods
             {
                 if (e.PropertyName == nameof(Data.RuntimeSettings.DriveViewNav) && Data.RuntimeSettings.DriveViewNav)
                 {
-                    InitWatcher();
                     Data.RuntimeSettings.PropertyChanged -= driveViewHandler;
                 }
             };
@@ -42,38 +40,14 @@ public static partial class NativeMethods
 
                 AddClipboardFormatListener(MainWindowHandle);
 
-                Data.RuntimeSettings.PropertyChanged += (s, e) =>
-                {
-                    if (e.PropertyName == nameof(Data.RuntimeSettings.IsAdvancedDragEnabled))
-                    {
-                        // The DataObject will have to be recreated if the setting changes
-                        if (Data.CopyPaste.IsSelfClipboard)
-                            Data.CopyPaste.Clear();
-
-                        InitWatcher();
-                    }
-                };
-
                 window.Loaded -= windowLoadedHandler;
             };
 
             window.Loaded += windowLoadedHandler;
         }
 
-        private static void InitWatcher()
-        {
-            if (Data.RuntimeSettings.IsAdvancedDragEnabled)
-                ExplorerWatcher = new();
-            else
-            {
-                ExplorerWatcher?.Dispose();
-                ExplorerWatcher = null;
-            }
-        }
-
         public static void Close()
         {
-            ExplorerWatcher?.Dispose();
             RemoveClipboardFormatListener(MainWindowHandle);
             _hwndSource?.RemoveHook(WndProc);
             _hwndSource?.Dispose();

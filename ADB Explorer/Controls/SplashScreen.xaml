@@ -123,50 +123,6 @@
                         <ui:FontIcon Glyph="&#xe73e;" />
                     </Button>
                 </ui:SimpleStackPanel>
-                <ui:SimpleStackPanel
-                    x:Name="AdvancedDragPanel"
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    d:Visibility="Visible"
-                    Spacing="10"
-                    Visibility="Collapsed">
-                    <Grid>
-                        <Button
-                            x:Name="AdvancedDragInfo"
-                            Margin="-270,0,0,0"
-                            HorizontalAlignment="Center"
-                            Click="AdvancedDragInfo_Click"
-                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_MORE_INFO_TOOLTIP}}">
-                            <ui:FontIcon FontSize="14" Glyph="&#xE897;" />
-                        </Button>
-                        <TextBlock
-                            HorizontalAlignment="Center"
-                            FontSize="20"
-                            Text="{Binding Source={x:Static Member=strings:Resources.S_SPLASH_MONITORING_TITLE}}" />
-                    </Grid>
-                    <ui:SimpleStackPanel Spacing="2">
-                        <ui:SimpleStackPanel.Resources>
-                            <Style BasedOn="{StaticResource StretchRadioButton}" TargetType="RadioButton">
-                                <EventSetter Event="Click" Handler="RadioButton_Click" />
-                            </Style>
-                        </ui:SimpleStackPanel.Resources>
-                        <RadioButton x:Name="AdvancedDragEnabledRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_ENABLED}}" />
-                        <RadioButton x:Name="AdvancedDragDisabledRadioButton" Content="{Binding Source={x:Static Member=strings:Resources.S_DISABLED}}" />
-                    </ui:SimpleStackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <ui:FontIcon Margin="0,2,6,0" Glyph="&#xE946;" />
-                        <TextBlock Text="{Binding Source={x:Static Member=strings:Resources.S_ADVANCED_DRAG_SPLASH}}" />
-                    </StackPanel>
-                    <Button
-                        x:Name="ConfirmAdvancedDrag"
-                        HorizontalAlignment="Center"
-                        Click="ConfirmAdvancedDrag_Click"
-                        IsEnabled="False"
-                        Style="{StaticResource AccentButtonStyle}"
-                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_CONTINUE_TOOLTIP}}">
-                        <ui:FontIcon Glyph="&#xe73e;" />
-                    </Button>
-                </ui:SimpleStackPanel>
             </Grid>
             <TextBlock
                 Margin="6,4"

@@ -405,21 +405,5 @@ namespace ADB_Test
             Assert.AreEqual(AbstractFile.FileType.Folder, emptyDir.Type);
             Assert.AreEqual(AbstractFile.FilePathType.Windows, emptyDir.PathType);
         }
-
-        [TestMethod]
-        public void KnownFolderTest()
-        {
-            // The other checks are now irrelevant and heve been removed since the method has changes
-
-            Assert.AreEqual("F:", ExplorerHelper.ParseTreePath("This PC\\Sandisk Cruzer (F:)"));
-
-            // Quick access in Windows 10 can have any folder, hence it is impossible to determine the actual path
-            Assert.IsNull(ExplorerHelper.ParseTreePath("Quick access\\Pictures"));
-
-            // These are virtual locations
-            Assert.IsNull(ExplorerHelper.ParseTreePath("Libraries"));
-            Assert.IsNull(ExplorerHelper.ParseTreePath("Network"));
-            Assert.IsNull(ExplorerHelper.ParseTreePath("This PC"));
-        }
     }
 }

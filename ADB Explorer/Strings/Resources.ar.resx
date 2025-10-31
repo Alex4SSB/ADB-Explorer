@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>اعاده</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>مراقبه متصفح الملفات</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>اعاده توجيه التحميل</value>
   </data>
@@ -266,12 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>­سحب الي جزور مساحه windows</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>تداخل التطبيقات</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>مراقبه متصفح الملفات غير موجود نظراً لوجود تطبيقات مفعله:</value>
   </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
     <value>{0} مجانية من {1}</value>

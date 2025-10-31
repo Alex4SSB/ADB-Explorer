@@ -9,9 +9,6 @@ public static class SettingsHelper
     public static void DisableAnimationTipAction() =>
         DialogService.ShowMessage(Strings.Resources.S_DISABLE_ANIMATION, Strings.Resources.S_ANIMATION_TITLE, DialogService.DialogIcon.Tip);
 
-    public static void AdvancedDragTipAction() =>
-        DialogService.ShowMessage(Strings.Resources.S_ADVANCED_DRAG, Strings.Resources.S_ADVANCED_DRAG_TITLE, DialogService.DialogIcon.Tip);
-
     public static void ResetAppAction()
     {
         Process.Start(Environment.ProcessPath);

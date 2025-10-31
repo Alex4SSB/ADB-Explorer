@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Wiederherstellen</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Datei-Explorer-Überwachung</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Fortschrittsumleitung</value>
   </data>
@@ -266,24 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Ziehen zu Windows-Drive-Wurzel</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Konflikt zwischen Apps</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>Datei-Explorer-Überwachung nicht verfügbar, da folgende Apps laufen :</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Die Überwachung des Datei-Explorers ermöglicht der App, Drag / Clipboard-Pull-Operationen direkt im Zielverzeichnis.
-
-Andernfalls wird der Pull im temporären Ordner der App durchgeführt, von dem der Datei-Explorer die Datei als Stream erhält, den ein kleiner Puffer verwendet.
-Diese beiden zusätzlichen Schritte verlangsamen den Prozess erheblich.
-
-Diese Funktion wird für andere ausgewählte Dateimanager automatisch deaktiviert.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Nur aktivieren, wenn Sie die App gemeinsam mit dem Dateiexplorer verwenden wollen.
-Sie können diese Einstellung jederzeit ändern.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Willkommen zur neuen Version von ADB Explorer!
@@ -333,9 +312,6 @@ Um ADB zu genehmigen, öffnen Sie die erweiterten Einstellungen von WSA.</value>
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>Mehr Informationen</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>Datei-Explorer-Überwachung:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>Aktiviert</value>
@@ -522,9 +498,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>System-Apps anzeigen</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>Datei-Explorer-Überwachung aktivieren</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>Datei-Doppelklick</value>
@@ -1398,9 +1371,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>{0} Elemente verschieben</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>Bereich blockiert - Explorer-Fenster erneut öffnen.</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>1 ausgeschnittenes Element einfügen</value>

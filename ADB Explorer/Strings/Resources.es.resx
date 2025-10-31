@@ -252,9 +252,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restablecer</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>Monitorización del explorador de archivos</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Redirección del progreso</value>
   </data>
@@ -263,12 +260,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Transferir a la raíz de la unidad de Windows</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Aplicaciones en conflicto</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>La monitorización del explorador de archivos no está disponible debido a que se están ejecutando las siguientes aplicaciones:</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>¡Bienvenido a la nueva versión de ADB Explorer!

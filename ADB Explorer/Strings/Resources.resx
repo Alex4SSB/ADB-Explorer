@@ -256,9 +256,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>Restore</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>File Explorer Monitoring</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>Progress Redirection</value>
   </data>
@@ -267,24 +264,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Pull To Windows Drive Root</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>Conflicting Apps</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>File Explorer monitoring is not available due to the following apps running:</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>Monitoring File Explorer enables the app to perform Drag / Clipboard Pull operations directly to the destination folder.
-
-Otherwise, Pull is performed to the app temp folder, from which File Explorer receives the file as a stream, which has to use a small buffer.
-These two added steps slow down the process significantly.
-
-The feature is auto-disabled for other selected file managers.</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>Enable only if you intend to use the app with File Explorer.
-You can always change this in the settings.</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>Welcome to a new ADB Explorer version!
@@ -337,9 +316,6 @@ To approve ADB, open WSA advanced settings.</value>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>More Info</value>
     <comment>The tooltip of a button used to display an info message</comment>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>File Explorer Monitoring:</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>Enabled</value>
@@ -552,10 +528,6 @@ Visible content may be incomplete.</value>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Show System Apps</value>
     <comment>The setting used to allow displaying system apps in package view</comment>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>Enable File Explorer Monitoring</value>
-    <comment>The setting used to enable the monitoring of File Explorer for advanced Drag &amp; Drop / Clipboard</comment>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>File Double Click</value>
@@ -1717,10 +1689,6 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>Move {0} items</value>
     <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>Area obstructed - reopen Explorer window.</value>
-    <comment>The drag tooltip when hovering over an invisible Explorer element</comment>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>Paste 1 Cut Item</value>

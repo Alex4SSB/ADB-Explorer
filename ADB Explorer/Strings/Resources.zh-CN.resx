@@ -255,9 +255,6 @@
   <data name="S_RESTORE_ACTION" xml:space="preserve">
     <value>恢复</value>
   </data>
-  <data name="S_ADVANCED_DRAG_TITLE" xml:space="preserve">
-    <value>文件资源管理器监听器</value>
-  </data>
   <data name="S_REDIRECTION" xml:space="preserve">
     <value>进度重置</value>
   </data>
@@ -266,24 +263,6 @@
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>拉取到 Windows 驱动器根目录</value>
-  </data>
-  <data name="S_CONFLICTING_APPS_TITLE" xml:space="preserve">
-    <value>冲突的应用程序</value>
-  </data>
-  <data name="S_CONFLICTING_APPS" xml:space="preserve">
-    <value>由于以下应用程序正在运行，因此无法运行文件资源管理器监听器：</value>
-  </data>
-  <data name="S_ADVANCED_DRAG" xml:space="preserve">
-    <value>启用文件资源管理器监听器后，应用可直接将拖放/剪贴板拉取操作执行到目标文件夹。
-
-否则文件将先拉取至应用临时目录，再通过小缓冲区流式传输至文件资源管理器。
-这两个额外步骤会显著降低操作速度。
-
-该功能对其他文件管理器会自动禁用。</value>
-  </data>
-  <data name="S_ADVANCED_DRAG_SPLASH" xml:space="preserve">
-    <value>仅在配合文件资源管理器使用时启用此功能。
-您随时可在设置中修改此选项。</value>
   </data>
   <data name="S_NEW_VERSION_MSG" xml:space="preserve">
     <value>欢迎来到 ADB Explorer 的新版本！
@@ -333,9 +312,6 @@
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
     <value>更多信息</value>
-  </data>
-  <data name="S_SPLASH_MONITORING_TITLE" xml:space="preserve">
-    <value>文件资源管理器监控：</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>启用</value>
@@ -522,9 +498,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>显示系统应用</value>
-  </data>
-  <data name="S_SETTINGS_EXPLORER_MONITORING" xml:space="preserve">
-    <value>启用文件资源管理器监听器</value>
   </data>
   <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
     <value>双击文件时</value>
@@ -1398,9 +1371,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DRAGDROP_MOVE" xml:space="preserve">
     <value>移动{0}项</value>
-  </data>
-  <data name="S_DRAGDROP_OBSTRUCTED" xml:space="preserve">
-    <value>区域被遮盖-重新打开文件资源管理器窗口。</value>
   </data>
   <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
     <value>粘贴1剪切项</value>
