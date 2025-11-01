@@ -1013,24 +1013,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Grid
-        x:Key="FileTransferGrid"
-        Width="400"
-        Height="100"
-        VerticalAlignment="Top">
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <ui:ProgressBar
-            Maximum="100"
-            Style="{StaticResource FluentProgressBarStyle}"
-            Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=TransferProgress}" />
-        <TextBlock
-            Grid.Row="1"
-            Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentTransferFile}"
-            TextWrapping="Wrap" />
-    </Grid>
     <Style
         x:Key="NotificationsBorderStyle"
         BasedOn="{StaticResource BorderStyle}"

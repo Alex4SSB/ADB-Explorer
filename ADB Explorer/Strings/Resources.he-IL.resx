@@ -971,9 +971,6 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>אל תציג יותר.</value>
   </data>
-  <data name="S_EXTRACT_TITLE" xml:space="preserve">
-    <value>מחלץ קבצים</value>
-  </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>בטל</value>
   </data>

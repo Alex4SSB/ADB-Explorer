@@ -1507,15 +1507,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Extracting Files.
-        /// </summary>
-        public static string S_EXTRACT_TITLE {
-            get {
-                return ResourceManager.GetString("S_EXTRACT_TITLE", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Fail to override ADB.
         /// </summary>
         public static string S_FAIL_OVERRIDE_TITLE {

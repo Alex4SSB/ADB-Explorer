@@ -685,8 +685,6 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
                 CurrentEffect = allowedEffects;
                 PerformedDropEffect = allowedEffects;
                 Clipboard.SetDataObject(this);
-
-                Data.RuntimeSettings.PasteDestination = null;
             }
             else
                 throw new NotSupportedException();
@@ -789,16 +787,16 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         }
     }
 
-    public static FileContentsStream GetFileContents(System.Windows.IDataObject dataObject, int index)
+    public static IStream GetFileContents(System.Windows.IDataObject dataObject, int index)
         => GetFileContents((System.Runtime.InteropServices.ComTypes.IDataObject)dataObject, index);
 
-    public static FileContentsStream GetFileContents(System.Runtime.InteropServices.ComTypes.IDataObject dataObject, int index)
+    public static IStream GetFileContents(System.Runtime.InteropServices.ComTypes.IDataObject dataObject, int index)
     {
         var fmtEtc = CreateFormat(AdbDataFormats.FileContents, index);
 
         dataObject.GetData(ref fmtEtc, out STGMEDIUM medium);
 
         var stream = (IStream)Marshal.GetObjectForIUnknown(medium.unionmember);
-        return new(stream);
+        return stream;
     }
 }

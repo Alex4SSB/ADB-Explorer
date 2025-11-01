@@ -586,32 +586,17 @@ public class CopyPasteService : ViewModelBase
                 // Will be left in to support any virtual files that don't provide ShellID List Array.
                 else if (dataObject.GetDataPresent(AdbDataFormats.FileContents))
                 {
-                    var abort = false;
-                    var dialog = DialogService.ShowDialog(App.Current.FindResource("FileTransferGrid"), Strings.Resources.S_EXTRACT_TITLE, buttonText: Strings.Resources.S_BUTTON_ABORT);
-                    dialog.Closed += (s, e) =>
-                    {
-                        abort = true;
-                    };
-
                     Task.Run(() =>
                     {
                         string[] files = new string[Descriptors.Length];
 
                         for (int i = 0; i < Descriptors.Length; i++)
                         {
-                            if (abort)
-                                break;
-
                             files[i] = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, Descriptors[i].Name, '\\');
                             if (Descriptors[i].IsDirectory)
                                 continue;
 
-                            App.Current.Dispatcher.Invoke(() =>
-                            {
-                                Data.RuntimeSettings.CurrentTransferFile = Descriptors[i].Name;
-                            });
-
-                            FileContentsStream stream;
+                            System.Runtime.InteropServices.ComTypes.IStream stream;
                             try
                             {
                                 // Try to acquire the stream of each descriptor
@@ -637,17 +622,10 @@ public class CopyPasteService : ViewModelBase
                             // Save the stream to the temp folder, create the parent folder if it doesn't exist
                             Directory.CreateDirectory(FileHelper.GetParentPath(files[i]));
 
-                            stream.Save(files[i]);
-                            App.Current.Dispatcher.Invoke(() =>
-                            {
-                                Data.RuntimeSettings.TransferProgress = 100 * (i / (float)Descriptors.Length);
-                            });
+                            NativeMethods.SaveComStreamToFile(stream, files[i]);
+                            if (Descriptors[i].ChangeTimeUtc is not null)
+                                File.SetLastWriteTime(files[i], Descriptors[i].ChangeTimeUtc.Value.ToLocalTime());
                         }
-
-                        if (abort)
-                            return;
-
-                        App.Current.Dispatcher.Invoke(dialog.Hide);
 
                         IEnumerable<FileClass> shItems = [];
                         try

@@ -935,9 +935,6 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>Nie pokazuj tego ponownie.</value>
   </data>
-  <data name="S_EXTRACT_TITLE" xml:space="preserve">
-    <value>Wypakowywanie plików</value>
-  </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Porzuć</value>
   </data>

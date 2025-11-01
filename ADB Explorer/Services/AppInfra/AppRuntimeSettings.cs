@@ -384,65 +384,6 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref dragWithinSlave, value);
     }
 
-    private ShellItem pathUnderMouse = null;
-    public ShellItem PathUnderMouse
-    {
-        get => pathUnderMouse;
-        set => Set(ref pathUnderMouse, value);
-    }
-
-    private ShellItem pasteDestination = null;
-    public ShellItem PasteDestination
-    {
-        get => pasteDestination;
-        set
-        {
-            // When changing to null or the same path - don't notify
-            if (value is null || pasteDestination?.FileSystemPath == value.FileSystemPath)
-            {
-                pasteDestination = value;
-                return;
-            }
-
-            Set(ref pasteDestination, value);
-        }
-    }
-
-    private float transferProgress = 0;
-    public float TransferProgress
-    {
-        get => transferProgress;
-        set => Set(ref transferProgress, value);
-    }
-
-    private string currentTransferFile = "";
-    public string CurrentTransferFile
-    {
-        get => currentTransferFile;
-        set => Set(ref currentTransferFile, value);
-    }
-
-    private FileSystemWatcher[] watchers = [];
-    public FileSystemWatcher[] Watchers
-    {
-        get => watchers;
-        set => Set(ref watchers, value);
-    }
-
-    private bool isAdvancedDragEnabled = false;
-    public bool IsAdvancedDragEnabled
-    {
-        get => isAdvancedDragEnabled;
-        set => Set(ref isAdvancedDragEnabled, value);
-    }
-
-    public bool IsArm => RuntimeInformation.ProcessArchitecture switch
-    {
-        Architecture.Arm64 or Architecture.Arm or Architecture.Armv6 => true,
-        Architecture.X64 or Architecture.X86 => false,
-        _ => throw new NotSupportedException($"{RuntimeInformation.ProcessArchitecture}"),
-    };
-
     private List<string> savedLocations = null;
     public List<string> SavedLocations
     {

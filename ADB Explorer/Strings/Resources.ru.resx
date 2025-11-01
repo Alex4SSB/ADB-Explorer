@@ -971,9 +971,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>Не показывать снова.</value>
   </data>
-  <data name="S_EXTRACT_TITLE" xml:space="preserve">
-    <value>Извлечение файлов</value>
-  </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Прервать</value>
   </data>

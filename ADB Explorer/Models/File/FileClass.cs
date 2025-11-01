@@ -212,6 +212,15 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         : this(other.FullName, other.FullPath, other.IsDirectory ? FileType.Folder : FileType.File)
     { }
 
+    public FileClass(SyncFile other)
+        : this(other.FullName,
+               other.FullPath,
+               other.IsDirectory ? FileType.Folder : FileType.File,
+               other.SpecialType.HasFlag(SpecialFileType.LinkOverlay),
+               other.Size,
+               other.DateModified)
+    { }
+
     public FileClass(ShellItem windowsPath)
         : base(windowsPath)
     {
@@ -242,13 +251,6 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         modifiedTime: fileStat.ModifiedTime,
         isLink: fileStat.IsLink
     );
-
-    public static FileClass FromWindowsPath(FilePath androidTargetPath, ShellItem windowsPath) =>
-        new(androidTargetPath)
-    {
-        Size = windowsPath.IsFolder ? null : windowsPath.FileInfo.Length,
-        ModifiedTime = windowsPath.FileInfo?.LastWriteTime,
-    };
 
     public override void UpdatePath(string androidPath)
     {
@@ -402,7 +404,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 {
                     try
                     {
-                        var stream = NativeMethods.CreateStreamOnFile(file);
+                        var stream = NativeMethods.GetComStreamFromFile(file);
 
                         if (stream is not null)
                             return stream;

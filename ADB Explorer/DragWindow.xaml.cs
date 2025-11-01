@@ -71,10 +71,7 @@ public partial class DragWindow : INotifyPropertyChanged
             if (hwndUnderMouse == dragWindowHandle)
                 return;
 
-            string explorerTarget = "";
-            Data.RuntimeSettings.PathUnderMouse = null;
             string target = "";
-
             if (MouseWithinApp)
             {
                 if (Data.CopyPaste.IsSelf
@@ -86,10 +83,6 @@ public partial class DragWindow : INotifyPropertyChanged
                 }
 
                 target = FileHelper.GetFullName(Data.CopyPaste.DropTarget);
-            }
-            else
-            {
-                target = explorerTarget;
             }
 
             var format = "";

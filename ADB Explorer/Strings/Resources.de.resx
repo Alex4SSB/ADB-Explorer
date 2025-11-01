@@ -971,9 +971,6 @@ Alle laufenden Vorgänge abbrechen</value>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>Nicht mehr anzeigen.</value>
   </data>
-  <data name="S_EXTRACT_TITLE" xml:space="preserve">
-    <value>Dateien werden extrahiert</value>
-  </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abbrechen</value>
   </data>

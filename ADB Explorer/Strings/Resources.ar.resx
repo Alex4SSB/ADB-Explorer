@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -264,6 +264,10 @@
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>­سحب الي جزور مساحه windows</value>
   </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>مرحبا بكم في إصدار جديد من مستكشف إيه دي بي!
+ملاحظات الإصدار موجودة على غيت هاب.</value>
+  </data>
   <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
     <value>{0} مجانية من {1}</value>
   </data>
@@ -272,9 +276,5 @@
   </data>
   <data name="GIGA" xml:space="preserve">
     <value>{0} جيجابايت</value>
-  </data>
-  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
-    <value>مرحبا بكم في إصدار جديد من مستكشف إيه دي بي!
-ملاحظات الإصدار موجودة على غيت هاب.</value>
   </data>
 </root>

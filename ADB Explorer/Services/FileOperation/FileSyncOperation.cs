@@ -19,7 +19,20 @@ public class FileSyncOperation : FileOperation
         ? FilePath
         : TargetPath;
 
-    public VirtualFileDataObject VFDO { get; set; }
+    public VirtualFileDataObject VFDO { get; set; } = null;
+
+    private DragDropEffects dropEffects = DragDropEffects.None;
+    public DragDropEffects DropEffects
+    {
+        get
+        {
+            return VFDO is null ? dropEffects : VFDO.CurrentEffect;
+        }
+        set
+        {
+            dropEffects = value;
+        }
+    }
 
     public ShellItem OriginalShellItem { get; set; }
 
@@ -101,6 +114,9 @@ public class FileSyncOperation : FileOperation
                 {
                     var targetDirPath = FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(dir.FullPath, FilePath.FullPath, false));
                     Directory.CreateDirectory(targetDirPath);
+
+                    if (Data.Settings.EnableLog && !Data.RuntimeSettings.IsLogPaused)
+                        Data.CommandLog.Add(new($"@Windows: mkdir {targetDirPath}"));
                 }
             }
 
@@ -120,6 +136,9 @@ public class FileSyncOperation : FileOperation
 
                 if (OperationName is OperationType.Push)
                 {
+                    if (Data.Settings.EnableLog && !Data.RuntimeSettings.IsLogPaused)
+                        Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: push {item.FullPath} -> {targetPath}"));
+
                     var lastWriteTime = item.DateModified ?? DateTime.Now;
 
                     // target = [Android parent folder]\[relative path from Windows parent folder to current item]
@@ -128,6 +147,9 @@ public class FileSyncOperation : FileOperation
                 }
                 else
                 {
+                    if (Data.Settings.EnableLog && !Data.RuntimeSettings.IsLogPaused)
+                        Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}"));
+
                     // target = [Windows parent folder]\[relative path from Android parent folder to current item]
                     using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                     service.Pull(item.FullPath, stream, SyncProgressCallback, in isCanceled);

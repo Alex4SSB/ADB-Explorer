@@ -1157,10 +1157,6 @@ Cancel All Running</value>
     <value>Do Not Show This Again.</value>
     <comment>The content of a checkbox used to silence the WSA launch dialog</comment>
   </data>
-  <data name="S_EXTRACT_TITLE" xml:space="preserve">
-    <value>Extracting Files</value>
-    <comment>The title of the dialog showing progress of extraction from an archive</comment>
-  </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abort</value>
     <comment>The content of the button used to abort the extraction process</comment>

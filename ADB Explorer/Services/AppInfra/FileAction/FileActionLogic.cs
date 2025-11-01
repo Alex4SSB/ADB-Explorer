@@ -953,13 +953,14 @@ internal static class FileActionLogic
     {
         FileSyncOperation pushOperation = null;
         var source = new SyncFile(item, true);
-        var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName), source.IsDirectory ? FileType.Folder : FileType.File);
-        
+        var target = new SyncFile(FileHelper.ConcatPaths(targetPath, source.FullName),
+            source.IsDirectory ? FileType.Folder : FileType.File)
+            { Size = source.Size };
+
         App.Current.Dispatcher.Invoke(() =>
         {
-            // TODO: stop using VFDO for direct push
             pushOperation = FileSyncOperation.PushFile(source, target, Data.CurrentADBDevice, App.Current.Dispatcher);
-            pushOperation.VFDO = new() { CurrentEffect = dropEffects };
+            pushOperation.DropEffects = dropEffects;
             pushOperation.OriginalShellItem = originalShellItem;
             pushOperation.PropertyChanged += PushOperation_PropertyChanged;
             Data.FileOpQ.AddOperation(pushOperation);
@@ -989,7 +990,7 @@ internal static class FileActionLogic
                 && Data.DirList.FileList.All(f => f.FullName != op.FilePath.FullName))
             {
                 op.Dispatcher.Invoke(() =>
-                    Data.DirList.FileList.Add(FileClass.FromWindowsPath(op.TargetPath, op.FilePath.ShellItem)));
+                    Data.DirList.FileList.Add(new(op.TargetPath) { ModifiedTime = op.FilePath.DateModified }));
             }
 
             if (op.FilePath.IsDirectory)
@@ -1003,7 +1004,7 @@ internal static class FileActionLogic
             }
 
             // In push we can delete the source once the operation has completed
-            if (op.VFDO.CurrentEffect is DragDropEffects.Move)
+            if (op.DropEffects is DragDropEffects.Move)
             {
                 try
                 {

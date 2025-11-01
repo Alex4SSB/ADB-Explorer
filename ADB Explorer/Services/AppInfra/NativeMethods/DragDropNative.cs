@@ -179,7 +179,7 @@ public static partial class NativeMethods
         IStream pstmTemplate,
         out IStream ppstm);
 
-    public static IStream CreateStreamOnFile(string filePath)
+    public static IStream GetComStreamFromFile(string filePath)
     {
         var result = SHCreateStreamOnFileEx(filePath,
             Vanara.PInvoke.STGM.STGM_READ | Vanara.PInvoke.STGM.STGM_SHARE_DENY_NONE | Vanara.PInvoke.STGM.STGM_DELETEONRELEASE,
@@ -191,5 +191,26 @@ public static partial class NativeMethods
         return result is HResult.Ok
             ? stream
             : null;
+    }
+
+    public static void SaveComStreamToFile(IStream source, string filePath)
+    {
+        // Create a writable stream on a new file
+        SHCreateStreamOnFileEx(filePath,
+            Vanara.PInvoke.STGM.STGM_CREATE | Vanara.PInvoke.STGM.STGM_WRITE | Vanara.PInvoke.STGM.STGM_SHARE_EXCLUSIVE,
+            0,
+            true,
+            null,
+            out IStream dest);
+
+        try
+        {
+            source.CopyTo(dest, long.MaxValue, IntPtr.Zero, IntPtr.Zero);
+            dest.Commit(0);
+        }
+        finally
+        {
+            Marshal.ReleaseComObject(dest);
+        }
     }
 }

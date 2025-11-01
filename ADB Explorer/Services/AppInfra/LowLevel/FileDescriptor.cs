@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
-using ADB_Explorer.Services.AppInfra;
+﻿using ADB_Explorer.Models;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Services.NativeMethods;
 
@@ -34,11 +32,6 @@ public class FileDescriptor
     public Int64? Length { get; set; }
 
     public DateTime? ChangeTimeUtc { get; set; }
-
-    /// <summary>
-    /// Gets or sets an Action that returns the contents of the file.
-    /// </summary>
-    //public Action<System.Runtime.InteropServices.ComTypes.IStream> StreamContents { get; set; }
 
     public Func<bool> SaveToFile { get; set; }
 
@@ -100,50 +93,6 @@ public class FileDescriptor
         }
 
         return null;
-    }
-
-    public static FileDescriptor[] GetFiles(IDataObject dataObject)
-    {
-        if (!dataObject.GetDataPresent(AdbDataFormats.FileContents))
-            return null;
-
-        var descriptors = GetDescriptors(dataObject);
-        for (int i = 0; i < descriptors.Length; i++)
-        {
-            var index = i;
-            var descriptor = descriptors[i];
-            descriptor.SaveToFile = () =>
-            {
-                // Directories do not have a content stream (but the index in the FileContent stream array is still reserved)
-                if (descriptor.IsDirectory)
-                    return false;
-
-                FileContentsStream stream;
-                try
-                {
-                    stream = VirtualFileDataObject.GetFileContents(dataObject, index);
-                }
-                catch (COMException e)
-                {
-                    // This happens on Windows 11 with names longer than 120 characters (as of 23H2), but not on Windows 10
-                    if (e.HResult == (int)HResult.PATH_TOO_LONG)
-                    {
-                        // TODO: Notify the user of too nested files
-                    }
-
-                    return false;
-                }
-
-                var fullPath = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, descriptor.Name, '\\');
-                Directory.CreateDirectory(FileHelper.GetParentPath(fullPath));
-                stream.Save(fullPath);
-                return true;
-            };
-        }
-
-        // TODO: build the file tree
-
-        return descriptors;
     }
 }
 

@@ -914,9 +914,6 @@ Annuler tout en cours</value>
   <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
     <value>Ne plus montrer cela à nouveau.</value>
   </data>
-  <data name="S_EXTRACT_TITLE" xml:space="preserve">
-    <value>Extraction fichiers</value>
-  </data>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abandonner</value>
   </data>
