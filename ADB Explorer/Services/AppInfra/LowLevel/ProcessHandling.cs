@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Models;
-
-namespace ADB_Explorer.Services;
+﻿namespace ADB_Explorer.Services;
 
 public class ProcessHandling
 {
@@ -61,13 +59,4 @@ public class ProcessHandling
 
         yield return process;
     }
-
-    public static int GetProcessIdFromWindowHandle(HANDLE hwnd)
-    {
-        GetWindowThreadProcessId(hwnd, out uint processId);
-        return (int)processId;
-    }
-
-    [DllImport("User32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(HANDLE hWnd, out uint lpdwProcessId);
 }

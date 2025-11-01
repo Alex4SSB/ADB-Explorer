@@ -2,11 +2,9 @@
 
 namespace ADB_Explorer.Services;
 
-#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
-
 public static partial class NativeMethods
 {
-    public sealed class InterceptClipboard : IDisposable
+    public sealed partial class InterceptClipboard : IDisposable
     {
         private static Action _externalClipAction;
         private static Action<string> _externalIpcAction;
@@ -70,11 +68,13 @@ public static partial class NativeMethods
             return IntPtr.Zero;
         }
 
-        [DllImport("User32.dll", SetLastError = true)]
-        private static extern bool AddClipboardFormatListener(HANDLE hwnd);
+        [LibraryImport("User32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool AddClipboardFormatListener(HANDLE hwnd);
 
-        [DllImport("User32.dll", SetLastError = true)]
-        private static extern bool RemoveClipboardFormatListener(HANDLE hwnd);
+        [LibraryImport("User32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static partial bool RemoveClipboardFormatListener(HANDLE hwnd);
 
         public void Dispose() => Close();
     }

@@ -523,7 +523,7 @@ public static partial class NativeMethods
         public int Right;
         public int Bottom;
 
-        public override string ToString()
+        public override readonly string ToString()
             => $"{Left},{Top},{Right},{Bottom}";
     }
 
@@ -534,7 +534,7 @@ public static partial class NativeMethods
 
         public readonly DateTime DateTimeUTC => DateTime.FromFileTime(dwDateTime).ToUniversalTime();
 
-        public override string ToString() => DateTimeUTC.ToString(CultureInfo.CurrentCulture);
+        public override readonly string ToString() => DateTimeUTC.ToString(CultureInfo.CurrentCulture);
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -548,7 +548,7 @@ public static partial class NativeMethods
 
         public readonly long GetSize() => ((long)nFileSizeHigh << 32) | nFileSizeLow;
 
-        public override string ToString() => Converters.UnitConverter.BytesToSize(GetSize());
+        public override readonly string ToString() => Converters.UnitConverter.BytesToSize(GetSize());
     }
 
     #endregion
@@ -571,8 +571,8 @@ public static partial class NativeMethods
     private static extern HANDLE SHGetFileInfo(
         string pszPath, FileFlagsAndAttributes dwFileAttributes, ref SHFILEINFO psfi, uint cbSizeFileInfo, FileInfoFlags uFlags);
 
-    [DllImport("User32.dll")]
-    private static extern HResult DestroyIcon(HANDLE hIcon);
+    [LibraryImport("User32.dll")]
+    private static partial HResult DestroyIcon(HANDLE hIcon);
 
     public static int GetIconIndex(string fileName, FileFlagsAndAttributes dwAttr, FileInfoFlags dwFlags, FileInfoFlags iconState)
     {
@@ -606,11 +606,11 @@ public static partial class NativeMethods
         return icon;
     }
 
-    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
-    private static extern HResult ExtractIconEx(string lpszFile, int nIconIndex, out HANDLE phiconLarge, HANDLE phiconSmall, int nIcons);
+    [LibraryImport("Shell32.dll", EntryPoint = "ExtractIconExW", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial HResult ExtractIconEx(string lpszFile, int nIconIndex, out HANDLE phiconLarge, HANDLE phiconSmall, int nIcons);
 
-    [DllImport("Shell32.dll", CharSet = CharSet.Unicode)]
-    private static extern HResult ExtractIconEx(string lpszFile, int nIconIndex, HANDLE phiconLarge, out HANDLE phiconSmall, int nIcons);
+    [LibraryImport("Shell32.dll", EntryPoint = "ExtractIconExW", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial HResult ExtractIconEx(string lpszFile, int nIconIndex, HANDLE phiconLarge, out HANDLE phiconSmall, int nIcons);
 
     public static Icon ExtractIconByIndex(string filePath, int index, FileToIconConverter.IconSize iconSize)
     {
@@ -630,8 +630,9 @@ public static partial class NativeMethods
         return icon;
     }
 
-    [DllImport("Gdi32.dll")]
-    private static extern bool DeleteObject(HANDLE hObject);
+    [LibraryImport("Gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DeleteObject(HANDLE hObject);
 
     public static void MDeleteObject(HANDLE hObject)
         => DeleteObject(hObject);
@@ -640,8 +641,8 @@ public static partial class NativeMethods
 
     #region File Name & Type
 
-    [DllImport("Shlwapi.dll", CharSet = CharSet.Unicode)]
-    private static extern int StrCmpLogicalW(string psz1, string psz2);
+    [LibraryImport("Shlwapi.dll", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial int StrCmpLogicalW(string psz1, string psz2);
 
     public static int StringCompareLogical(string a, string b) => StrCmpLogicalW(a, b);
 
@@ -676,8 +677,9 @@ public static partial class NativeMethods
         public ulong OtherTransferCount;
     }
 
-    [DllImport("Kernel32.dll")]
-    private static extern bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
+    [LibraryImport("Kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetProcessIoCounters(HANDLE ProcessHandle, out IO_COUNTERS IoCounters);
 
     public static IO_COUNTERS GetProcessIoCounters(HANDLE ProcessHandle)
     {

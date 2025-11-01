@@ -67,17 +67,14 @@ public partial class DragWindow : INotifyPropertyChanged
                 return;
             }
 
-            if (WindowUnderMouse?.Hwnd == dragWindowHandle)
+            // Shouldn't happen. But if it does, we don't want to do anything.
+            if (hwndUnderMouse == dragWindowHandle)
                 return;
 
             string explorerTarget = "";
-
-            IsObstructed = false;
             Data.RuntimeSettings.PathUnderMouse = null;
-            if (MouseWithinApp)
-                IsDropAllowed = true;
-
             string target = "";
+
             if (MouseWithinApp)
             {
                 if (Data.CopyPaste.IsSelf
@@ -173,34 +170,6 @@ public partial class DragWindow : INotifyPropertyChanged
         });
     }
 
-    private bool isObstructed = false;
-    public bool IsObstructed
-    {
-        get => isObstructed;
-        set
-        {
-            if (isObstructed != value)
-            {
-                isObstructed = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private bool isDropAllowed = false;
-    public bool IsDropAllowed
-    {
-        get => isDropAllowed;
-        set
-        {
-            if (isDropAllowed != value)
-            {
-                isDropAllowed = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     private bool mouseWithinApp = true;
     public bool MouseWithinApp
     {
@@ -215,7 +184,7 @@ public partial class DragWindow : INotifyPropertyChanged
         }
     }
 
-    private ExplorerWindow WindowUnderMouse = null;
+    private HANDLE hwndUnderMouse = IntPtr.Zero;
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
@@ -258,7 +227,7 @@ public partial class DragWindow : INotifyPropertyChanged
             Left = actualPoint.X - DragImage.ActualWidth / 2;
         }
 
-        var hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
+        hwndUnderMouse = InterceptMouse.GetWindowUnderMouse();
 
         // Shouldn't happen. But if it does, we don't want to do anything.
         if (hwndUnderMouse == dragWindowHandle)
@@ -269,9 +238,6 @@ public partial class DragWindow : INotifyPropertyChanged
 
         if (!MouseWithinApp && Data.CopyPaste.DragStatus is CopyPasteService.DragState.None)
             Data.RuntimeSettings.DragBitmap = null;
-
-        if (WindowUnderMouse?.Hwnd == hwndUnderMouse)
-            return;
 
         if (!MouseWithinApp)
         {

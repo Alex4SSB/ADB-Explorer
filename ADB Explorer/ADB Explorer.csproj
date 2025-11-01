@@ -12,6 +12,7 @@
     <Configurations>Debug;Release;Deploy</Configurations>
 	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
 	<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

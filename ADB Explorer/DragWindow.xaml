@@ -140,38 +140,6 @@
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Link">
                                         <Setter Property="Glyph" Value="&#xE8AD;" />
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsObstructed}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </ui:FontIcon.Style>
-                    </ui:FontIcon>
-                    <Grid Grid.Column="1">
-                        <Grid.Style>
-                            <Style TargetType="Grid">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsObstructed}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Grid.Style>
-                        <StaticResource ResourceKey="WarningIcon" />
-                    </Grid>
-                    <ui:FontIcon
-                        Grid.Column="1"
-                        Foreground="OrangeRed"
-                        Glyph="&#xE25B;">
-                        <ui:FontIcon.Style>
-                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="True">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </ui:FontIcon.Style>
@@ -180,17 +148,7 @@
                         x:Name="DragTooltip"
                         Grid.Column="1"
                         Foreground="{DynamicResource SystemControlBackgroundBaseHighBrush}"
-                        TextWrapping="Wrap">
-                        <TextBlock.Style>
-                            <Style TargetType="TextBlock">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsDropAllowed}" Value="False">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TextBlock.Style>
-                    </TextBlock>
+                        TextWrapping="Wrap" />
                 </Grid>
             </Border>
         </Grid>

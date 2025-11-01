@@ -1,10 +1,8 @@
 ﻿namespace ADB_Explorer.Services;
 
-#pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
-
 public static partial class NativeMethods
 {
-    public sealed class InterceptMouse : IDisposable
+    public sealed partial class InterceptMouse : IDisposable
     {
         // https://learn.microsoft.com/en-us/archive/blogs/toub/low-level-mouse-hook-in-c
 
@@ -18,7 +16,7 @@ public static partial class NativeMethods
             public HANDLE dwExtraInfo;
         }
 
-        private static LowLevelMouseProc _mouseProc = HookCallback;
+        private static readonly LowLevelMouseProc _mouseProc = HookCallback;
         private static HANDLE _mouseHookID = IntPtr.Zero;
         private static Action<POINT> _mouseMoveAction;
         private static Action _rButtonAction;
@@ -82,25 +80,25 @@ public static partial class NativeMethods
             return WindowUnderMouse;
         }
 
-        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern HANDLE SetWindowsHookEx(WinHooks idHook,
+        [LibraryImport("User32.dll", EntryPoint = "SetWindowsHookExW", SetLastError = true)]
+        private static partial HANDLE SetWindowsHookEx(WinHooks idHook,
             LowLevelMouseProc lpfn, HANDLE hMod, uint dwThreadId);
 
-        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [LibraryImport("User32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool UnhookWindowsHookEx(HANDLE hhk);
+        private static partial bool UnhookWindowsHookEx(HANDLE hhk);
 
-        [DllImport("User32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern HANDLE CallNextHookEx(HANDLE hhk, int nCode,
+        [LibraryImport("User32.dll", SetLastError = true)]
+        private static partial HANDLE CallNextHookEx(HANDLE hhk, int nCode,
             MouseMessages wParam, HANDLE lParam);
 
-        [DllImport("Kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern HANDLE GetModuleHandle(string lpModuleName);
+        [LibraryImport("Kernel32.dll", EntryPoint = "GetModuleHandleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+        private static partial HANDLE GetModuleHandle(string lpModuleName);
 
-        [DllImport("User32.dll")]
-        private static extern HANDLE WindowFromPoint(POINT Point);
+        [LibraryImport("User32.dll")]
+        private static partial HANDLE WindowFromPoint(POINT Point);
 
-        [DllImport("User32.dll", ExactSpelling = true)]
-        private static extern HANDLE GetAncestor(HANDLE hwnd, GaFlags gaFlags);
+        [LibraryImport("User32.dll")]
+        private static partial HANDLE GetAncestor(HANDLE hwnd, GaFlags gaFlags);
     }
 }

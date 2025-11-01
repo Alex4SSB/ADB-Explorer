@@ -3,15 +3,16 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.InteropServices.Marshalling;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
 public static partial class NativeMethods
 {
-    [ComImport]
+    [GeneratedComInterface]
     [Guid("00000121-0000-0000-C000-000000000046")]
     [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-    public interface IDropSource
+    public partial interface IDropSource
     {
         [PreserveSig]
         int QueryContinueDrag(int fEscapePressed, uint grfKeyState);
@@ -42,21 +43,21 @@ public static partial class NativeMethods
         return finalEffect;
     }
 
-    [DllImport("Kernel32.dll")]
-    private static extern HANDLE GlobalLock(HANDLE hMem);
+    [LibraryImport("Kernel32.dll")]
+    private static partial HANDLE GlobalLock(HANDLE hMem);
 
     public static HANDLE MGlobalLock(HANDLE hMem)
         => GlobalLock(hMem);
 
     [return: MarshalAs(UnmanagedType.Bool)]
-    [DllImport("Kernel32.dll")]
-    private static extern bool GlobalUnlock(HANDLE hMem);
+    [LibraryImport("Kernel32.dll")]
+    private static partial bool GlobalUnlock(HANDLE hMem);
 
     public static void MGlobalUnlock(HANDLE hMem)
         => GlobalUnlock(hMem);
 
-    [DllImport("Kernel32.dll")]
-    private static extern HANDLE GlobalSize(HANDLE handle);
+    [LibraryImport("Kernel32.dll")]
+    private static partial HANDLE GlobalSize(HANDLE handle);
 
     public static HANDLE MGlobalSize(HANDLE handle)
         => GlobalSize(handle);
