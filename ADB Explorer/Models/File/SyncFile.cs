@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Converters;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Services;
 using Vanara.Windows.Shell;
 
@@ -18,6 +19,17 @@ public class SyncFile : FilePath
 
     public long? Size { get; set; }
 
+    public double? UnixTime { get; set; }
+    public DateTime? DateModified
+    {
+        get
+        {
+            return ShellItem?.FileInfo is not null
+                ? ShellItem.FileInfo.LastWriteTime
+                : UnixTime.FromUnixTime();
+        }
+    }
+
     public SyncFile(string androidPath, FileType fileType = FileType.File)
         : base(androidPath, fileType: fileType)
     {
@@ -35,7 +47,7 @@ public class SyncFile : FilePath
         }
     }
 
-    public SyncFile(FileClass fileClass, IEnumerable<(string, long?)> tree = null)
+    public SyncFile(FileClass fileClass, IEnumerable<(string, long?, double?)> tree = null)
         : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
         Size = fileClass.Size;
@@ -69,7 +81,7 @@ public class SyncFile : FilePath
         }
     }
 
-    static IEnumerable<SyncFile> GetFolderTree(IEnumerable<(string, long?)> tree, string parent)
+    static IEnumerable<SyncFile> GetFolderTree(IEnumerable<(string, long?, double?)> tree, string parent)
     {
         // empty folder
         if (!tree.Any())
@@ -96,6 +108,7 @@ public class SyncFile : FilePath
                 yield return new(fullPath, FileType.File)
                 {
                     Size = group.First().Item2,
+                    UnixTime = group.First().Item3,
                     ProgressUpdates = [new AdbSyncProgressInfo(fullPath, null, null, null)]
                 };
             }

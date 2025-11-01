@@ -50,7 +50,7 @@
         [GeneratedRegex("\\/\\/\\/ (?<Target>[\\s\\S]+?) \\/\\/\\/ (?<Mode>.*) \\/\\/\\/", RegexOptions.Multiline)]
         public static partial Regex RE_LINK_MODE();
 
-        [GeneratedRegex("\\/\\/\\/ (?<Name>[\\s\\S]+?) \\/\\/\\/ (?<Size>.*) \\/\\/\\/", RegexOptions.Multiline)]
+        [GeneratedRegex("\\/\\/\\/ (?<Name>[\\s\\S]+?) \\/\\/\\/ (?<Size>.*) \\/\\/\\/ (?<Date>.*) \\/\\/\\/", RegexOptions.Multiline)]
         public static partial Regex RE_FIND_TREE();
 
         [GeneratedRegex(@"""*([^""]+\.exe)""*")]

@@ -65,6 +65,8 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         }
     }
 
+    public double? UnixTime => ModifiedTime.ToUnixTime();
+
     private BitmapSource icon = null;
     public BitmapSource Icon
     {
@@ -118,7 +120,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public (string, long?)[] Children
+    public (string, long?, double?)[] Children
     {
         get
         {
@@ -130,9 +132,9 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             [
                 ADBService.EscapeAdbShellString(FullPath),
                 "-mindepth 1",
-                "\\( -type d -printf '/// %p /// d ///\\n' \\)",
+                "\\( -type d -printf '/// %p /// d /// d ///\\n' \\)",
                 "-o",
-                "\\( -type f -printf '/// %p /// %s ///\\n' \\)",
+                "\\( -type f -printf '/// %p /// %s /// %T@ ///\\n' \\)",
                 "2>&1"
             ];
 
@@ -144,7 +146,8 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 .Select(m =>
                 (
                     m.Groups["Name"].Value,
-                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value)
+                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value),
+                    m.Groups["Date"].Value == "d" ? (double?)null : double.Parse(m.Groups["Date"].Value)
                 ))];
         }
     }
@@ -347,7 +350,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        (string, long?)[] items = [(FullName, Size)];
+        (string, long?, double?)[] items = [(FullName, Size, UnixTime)];
         if (includeContent && children is not null)
         {
             items = [.. items, .. children];

@@ -59,11 +59,15 @@ public class FileMoveOperation : AbstractShellFileOperation
         var cmd = OperationName is OperationType.Copy ? "cp" : "mv";
         var flag = "";
 
-        if (OperationName is OperationType.Copy && FilePath.IsDirectory)
-            flag += "r";
+        if (OperationName is OperationType.Copy)
+        {
+            flag += "p"; // Preserve timestamps, ownership, and mode
+            if (FilePath.IsDirectory)
+                flag += "r"; // Recurse into subdirectories (DEST must be a directory)
+        }
 
         if (isLink)
-            flag += "s";
+            flag += "s"; // Symlink instead of copy
 
         if (flag.Length > 0)
             flag = "-" + flag;

@@ -79,11 +79,7 @@ public class FileSyncOperation : FileOperation
             return;
         }
 
-        DateTime lastWriteTime = DateTime.MinValue;
         UnixFileStatus fileMode = UnixFileStatus.AllPermissions | UnixFileStatus.Regular;
-
-        if (OperationName is OperationType.Push)
-            lastWriteTime = FilePath.ShellItem.FileInfo.LastWriteTime;
 
         Mutex mutex = new();
 
@@ -124,6 +120,8 @@ public class FileSyncOperation : FileOperation
 
                 if (OperationName is OperationType.Push)
                 {
+                    var lastWriteTime = item.DateModified ?? DateTime.Now;
+
                     // target = [Android parent folder]\[relative path from Windows parent folder to current item]
                     using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, in isCanceled);
@@ -133,6 +131,9 @@ public class FileSyncOperation : FileOperation
                     // target = [Windows parent folder]\[relative path from Android parent folder to current item]
                     using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                     service.Pull(item.FullPath, stream, SyncProgressCallback, in isCanceled);
+                    
+                    if (item.DateModified is not null)
+                        File.SetLastWriteTime(targetPath, item.DateModified.Value);
                 }
             });
 
