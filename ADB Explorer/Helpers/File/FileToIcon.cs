@@ -116,7 +116,7 @@ public class FileToIconConverter
     {
         string key;
 
-        if (specialType is AbstractFile.SpecialFileType.None)
+        if (specialType.HasFlag(AbstractFile.SpecialFileType.Regular))
             key = Path.GetExtension(fileName).ToLower();
         else
             key = $"#{Enum.GetName(specialType).ToUpper()}#";
@@ -190,7 +190,7 @@ public class FileToIconConverter
         };
     }
 
-    private static T AddToDic<T>(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
+    private static T AddToDic<T>(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
     {
         var bitmapSource = typeof(T) == typeof(BitmapSource);
         var key = ReturnKey(fileName, size, specialType, bitmapSource);
@@ -218,10 +218,10 @@ public class FileToIconConverter
         return (T)iconDic[key];
     }
 
-    private static BitmapSource GetImage(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
+    private static BitmapSource GetImage(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
         => LoadBitmap(GetBitmap(fileName, size, desiredSize, specialType));
 
-    private static Bitmap GetBitmap(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
+    private static Bitmap GetBitmap(string fileName, IconSize size, int desiredSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
     {
         Icon icon;
         var lookup = !ReturnKey(fileName, size, specialType).StartsWith('.')
@@ -269,7 +269,7 @@ public class FileToIconConverter
         _ => throw new NotSupportedException(),
     };
 
-    public static BitmapSource GetImage(string fileName, int iconSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.None)
+    public static BitmapSource GetImage(string fileName, int iconSize, AbstractFile.SpecialFileType specialType = AbstractFile.SpecialFileType.Regular)
     {
         IconSize size = iconSize switch
         {

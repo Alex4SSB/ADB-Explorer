@@ -35,12 +35,13 @@ public abstract class AbstractFile : ViewModelBase
     [Flags]
     public enum SpecialFileType
     {
-        None = 1,
+        Regular = 1,
         Folder = 2,
         Apk = 4,
         BrokenLink = 8,
         Unknown = 16,
         LinkOverlay = 32,
+        Archive = 64,
     }
 
     public static string GetFileTypeName(FileType type) => type switch
@@ -62,7 +63,7 @@ public class FilePath : AbstractFile, IBaseFile
 
     public SpecialFileType SpecialType { get; protected set; }
 
-    public bool IsRegularFile => SpecialType.HasFlag(SpecialFileType.None);
+    public bool IsRegularFile => SpecialType.HasFlag(SpecialFileType.Regular);
 
     public bool IsDirectory => SpecialType.HasFlag(SpecialFileType.Folder);
 
@@ -122,7 +123,7 @@ public class FilePath : AbstractFile, IBaseFile
 
         SpecialType = windowsPath.IsNonArchiveFolder()
             ? SpecialFileType.Folder
-            : SpecialFileType.None;
+            : SpecialFileType.Regular;
     }
 
     public FilePath(string androidPath,
@@ -138,9 +139,13 @@ public class FilePath : AbstractFile, IBaseFile
             SpecialType = SpecialFileType.Folder;
         else
         {
-            SpecialType = AdbExplorerConst.APK_NAMES.Contains(FileHelper.GetExtension(FullName).ToUpper())
+            var ext = FileHelper.GetExtension(FullName).ToUpper();
+            SpecialType = AdbExplorerConst.APK_NAMES.Contains(ext)
                 ? SpecialFileType.Apk
-                : SpecialFileType.None;
+                : SpecialFileType.Regular;
+
+            if (AdbExplorerConst.ARCHIVE_NAMES.Contains(ext))
+                SpecialType |= SpecialFileType.Archive;
         }
 
         Data.Settings.PropertyChanged += (sender, args) =>

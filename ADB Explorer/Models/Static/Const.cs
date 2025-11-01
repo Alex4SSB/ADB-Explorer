@@ -65,6 +65,7 @@ public static class AdbExplorerConst
 
     public static readonly string[] APK_NAMES = [".APK", ".XAPK", ".APKS", ".APKM", ".APEX"];
     public static readonly string[] INSTALL_APK = [".APK", ".APEX"];
+    public static readonly string[] ARCHIVE_NAMES = [".7Z", ".ZIP", ".RAR", ".CAB", ".ISO", ".XZ", ".TXZ", ".LZMA", ".TAR", ".CPIO", ".BZ2", ".BZIP2", ".TBZ2", ".TBZ", ".GZ", ".GZIP", ".TGZ", ".TPZ", ".ZST", ".TZST"];
 
     public static readonly UnicodeCategory[] UNICODE_ICONS = [UnicodeCategory.Surrogate, UnicodeCategory.PrivateUse, UnicodeCategory.OtherSymbol, UnicodeCategory.OtherNotAssigned];
 

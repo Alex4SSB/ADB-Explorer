@@ -275,7 +275,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             FileType.Folder => SpecialFileType.Folder,
             FileType.Unknown => SpecialFileType.Unknown,
             FileType.BrokenLink => SpecialFileType.BrokenLink,
-            _ => SpecialFileType.None
+            _ => SpecialFileType.Regular
         };
 
         if (IsApk)

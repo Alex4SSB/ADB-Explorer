@@ -64,5 +64,8 @@
 
         [GeneratedRegex(@"[\d.]+")]
         public static partial Regex RE_GITHUB_VERSION();
+
+        [GeneratedRegex(@" +(?<Size>\d+) +(?<Date>\d{4}-\d\d-\d\d \d\d:\d\d) +(?<Name>.+)")]
+        public static partial Regex RE_UNZIP_LIST();
     }
 }
