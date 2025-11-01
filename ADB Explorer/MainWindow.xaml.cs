@@ -1194,6 +1194,9 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DataGridRow_KeyDown(object sender, KeyEventArgs e)
     {
+        if (RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen)
+            return;
+
         var key = e.Key;
         switch (key)
         {
@@ -1234,11 +1237,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void OnButtonKeyDown(object sender, KeyEventArgs e)
     {
-        var NavKeys = new[] { Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End };
+        if (RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen)
+            return;
 
         if (Keyboard.IsKeyDown(Key.LeftAlt)
             || Keyboard.IsKeyDown(Key.RightAlt)
-            || !NavKeys.Contains(e.Key))
+            || !NAVIGATION_KEYS.Contains(e.Key))
             return;
 
         bool handle = false;
@@ -1257,7 +1261,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool DriveViewKeyNavigation(Key key)
     {
-        if (DriveList.Items.Count == 0)
+        if (DriveList.Items.Count == 0 || RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen)
             return false;
 
         if (DriveList.SelectedItems.Count == 0)
@@ -1297,7 +1301,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool ExplorerGridKeyNavigation(Key key)
     {
-        if (ExplorerGrid.Items.Count < 1)
+        if (ExplorerGrid.Items.Count < 1 || RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen)
             return false;
 
         switch (key)
