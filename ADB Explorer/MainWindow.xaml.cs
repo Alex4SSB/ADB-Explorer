@@ -198,8 +198,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     FileActions.ItemToSelect = item;
                     break;
                 }
-                else if (altItem is null)
-                    altItem = item;
+                else 
+                    altItem ??= item;
             }
         }
 
@@ -1225,7 +1225,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 break;
 
             case Key.F2:
-                AppActions.List.First(action => action.Name is FileAction.FileActionType.Rename).Command.Execute();
+                AppActions.List.First(action => action.Name is FileActionType.Rename).Command.Execute();
                 break;
 
             default:
@@ -1528,8 +1528,6 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void FilterExplorerItems(bool refreshOnly = false)
     {
-        //https://docs.microsoft.com/en-us/dotnet/desktop/wpf/controls/how-to-group-sort-and-filter-data-in-the-datagrid-control?view=netframeworkdesktop-4.8
-
         if (!FileActions.IsExplorerVisible)
             return;
 
@@ -1584,7 +1582,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         FileOpDetailedGrid.Height -= e.VerticalChange;
 
-        sbyte SimplifyNumber(double num) => num switch
+        static sbyte SimplifyNumber(double num) => num switch
         {
             < 0 => -1,
             > 0 => 1,
@@ -2310,5 +2308,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var menuitem = sender as MenuItem;
 
         FlyoutBase.ShowAttachedFlyout(menuitem);
+    }
+
+    private void Input_KeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.Enter)
+        {
+            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID,
+                "",
+                out var stdout,
+                out var stderr,
+                CancellationToken.None,
+                Input.Text);
+
+            StdOut.Text = stdout;
+            StdErr.Text = stderr;
+        }
     }
 }

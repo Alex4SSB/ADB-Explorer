@@ -1750,4 +1750,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>ROM file</value>
     <comment>The filter name displayed in the open file dialog when opening a ROM for sideload</comment>
   </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+    <comment>The tooltip of the button used to open or close the terminal</comment>
+  </data>
 </root>

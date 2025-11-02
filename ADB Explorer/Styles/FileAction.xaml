@@ -405,6 +405,7 @@
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:LogToggle.List}}" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="0" />
+        <Setter Property="helpers:MenuHelper.ItemMargin" Value="2,0" />
     </Style>
     <Style
         x:Key="DialogExtraButtonsStyle"

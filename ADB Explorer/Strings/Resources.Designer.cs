@@ -3619,6 +3619,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Terminal.
+        /// </summary>
+        public static string S_TERMINAL {
+            get {
+                return ResourceManager.GetString("S_TERMINAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Currently Browsing.
         /// </summary>
         public static string S_TOOLTIP_BROWSING {

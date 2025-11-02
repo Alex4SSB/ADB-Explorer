@@ -125,7 +125,6 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         get
         {
             string stdout = "";
-            string stderr = "";
             if (!IsDirectory)
                 return null;
 
@@ -157,7 +156,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                     """fi; done;"""
                 ];
 
-                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out stderr, CancellationToken.None, args);
+                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
             }
             var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 

@@ -412,6 +412,66 @@
                         </StackPanel>
                         <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
                     </Grid>
+                    <Grid Background="{DynamicResource DevicesListBackground}">
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsTerminalOpen}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="5*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock
+                            Margin="4"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontFamily="Consolas"
+                            Text="stdin" />
+                        <TextBlock
+                            Grid.Row="1"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            FontFamily="Consolas"
+                            Text="stdout" />
+                        <TextBlock
+                            Grid.Row="2"
+                            Margin="4"
+                            VerticalAlignment="Center"
+                            FontFamily="Consolas"
+                            Text="stderr" />
+                        <TextBox
+                            x:Name="Input"
+                            Grid.Column="1"
+                            Margin="4"
+                            FontFamily="Consolas"
+                            KeyUp="Input_KeyUp" />
+                        <TextBox
+                            x:Name="StdOut"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Margin="4"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            FontFamily="Consolas"
+                            VerticalScrollBarVisibility="Visible" />
+                        <TextBox
+                            x:Name="StdErr"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Margin="4"
+                            ui:TextBoxHelper.IsDeleteButtonVisible="False"
+                            FontFamily="Consolas"
+                            VerticalScrollBarVisibility="Visible" />
+                    </Grid>
                 </Grid>
             </Border>
             <Expander
@@ -520,7 +580,7 @@
                             <Run Text=")" />
                         </TextBlock>
                     </StackPanel>
-                    <Menu Margin="6,0,-3,0" Style="{StaticResource LogToggleStyle}" />
+                    <Menu Margin="6,0,-5,0" Style="{StaticResource LogToggleStyle}" />
                 </StackPanel>
             </Grid>
         </Grid>

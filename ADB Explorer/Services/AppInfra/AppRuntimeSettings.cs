@@ -253,6 +253,13 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
+    private bool isTerminalOpen = false;
+    public bool IsTerminalOpen
+    {
+        get => isTerminalOpen;
+        set => Set(ref isTerminalOpen, value);
+    }
+
     private bool isLogOpen = false;
     public bool IsLogOpen
     {

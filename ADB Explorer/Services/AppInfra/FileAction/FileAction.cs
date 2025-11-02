@@ -91,9 +91,14 @@ public static class AppActions
         new(FileActionType.LogToggle,
             () => true,
             Strings.Resources.S_BUTTON_LOG,
-            "\uE756",
+            "\uE9A4",
             () => Data.RuntimeSettings.IsLogOpen ^= true,
             isVisible: Data.FileActions.IsLogToggleVisible),
+        new(FileActionType.TerminalToggle,
+            () => true,
+            Strings.Resources.S_TERMINAL,
+            "\uE756",
+            () => Data.RuntimeSettings.IsTerminalOpen ^= true),
     ];
 
     public static List<FileAction> List { get; } =
@@ -519,6 +524,7 @@ public class FileAction : ViewModelBase
         SearchApkOnWeb,
         CopyMessageToClipboard,
         NavHistory,
+        TerminalToggle,
     }
 
     public FileActionType Name { get; }
