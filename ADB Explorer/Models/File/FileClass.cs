@@ -124,22 +124,41 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
     {
         get
         {
+            string stdout = "";
+            string stderr = "";
             if (!IsDirectory)
                 return null;
 
-            // get absolute paths and sizes of all files, directries are marked with 'd'
-            string[] args =
-            [
-                ADBService.EscapeAdbShellString(FullPath),
-                "-mindepth 1",
-                "\\( -type d -printf '/// %p /// d /// d ///\\n' \\)",
-                "-o",
-                "\\( -type f -printf '/// %p /// %s /// %T@ ///\\n' \\)",
-                "2>&1"
-            ];
+            if (ShellCommands.FindPrintf)
+            {
+                // get absolute paths, sizes and dates of all files, directries are marked with 'd'
+                string[] args =
+                [
+                    ADBService.EscapeAdbShellString(FullPath),
+                    "-mindepth 1",
+                    "\\( -type d -printf '/// %p /// d /// d ///\\n' \\)",
+                    "-o",
+                    "\\( -type f -printf '/// %p /// %s /// %T@ ///\\n' \\)",
+                    "2>&1"
+                ];
 
-            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out string stdout, out _, CancellationToken.None, args);
+                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+            }
+            else // when find does not support -printf
+            {
+                // gives the same result, but much slower since it executes stat on each file *after* performing find
+                string[] args =
+                [
+                    ADBService.EscapeAdbShellString(FullPath),
+                    """-mindepth 1 2>/dev/null | while IFS= read -r f;""",
+                    """do if [ -d \"$f\" ]; then""",
+                    """echo /// $f /// d /// d ///;""",
+                    """else echo /// $f /// $(stat -c '%s /// %Y' \"$f\") ///;""",
+                    """fi; done;"""
+                ];
 
+                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out stderr, CancellationToken.None, args);
+            }
             var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
 
             return [.. matches.Where(m => m.Success)
