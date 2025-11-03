@@ -1325,6 +1325,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
     <value>Walidowanie…</value>
   </data>
   <data name="S_TERMINAL" xml:space="preserve">
-    <value>Podpowiedź przycisku służącego do otwierania lub zamykania terminala</value>
+    <value>Terminal</value>
   </data>
 </root>
