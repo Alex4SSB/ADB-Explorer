@@ -200,6 +200,7 @@ public class LogicalDeviceViewModel : DeviceViewModel
         {
             Device.Root = status;
             OnPropertyChanged(nameof(Root));
+            OnPropertyChanged(nameof(RootString));
 
             if (IsOpen)
                 Data.RuntimeSettings.IsRootActive = status is RootStatus.Enabled;

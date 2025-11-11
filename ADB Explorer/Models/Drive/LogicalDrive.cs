@@ -66,7 +66,15 @@ public class LogicalDrive : Drive
         Available = available;
         UsageP = usageP;
 
-        if (isMMC)
+        if (path == "/")
+        {
+            Type = DriveType.Root;
+        }
+        else if (AdbExplorerConst.DRIVE_TYPES.Where(kv => kv.Value is DriveType.Internal).Any(kv => kv.Key.Contains(path)))
+        {
+            Type = DriveType.Internal;
+        }
+        else if (isMMC)
         {
             Type = DriveType.Expansion;
         }

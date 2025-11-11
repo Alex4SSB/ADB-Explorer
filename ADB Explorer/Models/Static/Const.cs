@@ -22,6 +22,7 @@ public static class AdbExplorerConst
         { "/storage/self/primary", AbstractDrive.DriveType.Internal },
         { "/mnt/sdcard", AbstractDrive.DriveType.Internal },
         { "/storage/emulated", AbstractDrive.DriveType.Internal },
+        { "/mnt/runtime/write/emulated/0", AbstractDrive.DriveType.Internal }, // for emulators
         { RECYCLE_PATH, AbstractDrive.DriveType.Trash },
         { AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin), AbstractDrive.DriveType.Trash },
         { TEMP_PATH, AbstractDrive.DriveType.Temp },

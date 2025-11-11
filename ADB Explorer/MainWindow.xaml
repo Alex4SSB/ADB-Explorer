@@ -821,7 +821,7 @@
                                         x:Name="SettingsSearchBox"
                                         Height="31"
                                         MinHeight="31"
-                                        Padding="30,5,6,6"
+                                        Padding="30,5,30,6"
                                         ui:ControlHelper.PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
                                         GotFocus="SettingsSearchBox_FocusChanged"
                                         LostFocus="SettingsSearchBox_FocusChanged"

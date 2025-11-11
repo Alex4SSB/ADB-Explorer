@@ -115,7 +115,7 @@
             <Setter.Value>
                 <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
                     <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
-                    <Setter Property="Padding" Value="4,5,0,6" />
+                    <Setter Property="Padding" Value="4,5,4,6" />
                     <Setter Property="helpers:StyleHelper.AltBorderBrush" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:MaskedTextBox}, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                 </Style>
             </Setter.Value>
@@ -162,7 +162,7 @@
             <Setter.Value>
                 <Style BasedOn="{StaticResource PortTextBoxStyle}" TargetType="TextBox">
                     <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
-                    <Setter Property="Padding" Value="4,5,0,6" />
+                    <Setter Property="Padding" Value="4,5,4,6" />
                 </Style>
             </Setter.Value>
         </Setter>
