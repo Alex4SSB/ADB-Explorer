@@ -51,6 +51,7 @@ public class SyncFile : FilePath
         : base(fileClass.FullPath, fileClass.FullName, fileClass.Type)
     {
         Size = fileClass.Size;
+        UnixTime = fileClass.ModifiedTime.ToUnixTime();
 
         if (tree is not null && IsDirectory)
             Children = [.. GetFolderTree(tree, FullPath)];
