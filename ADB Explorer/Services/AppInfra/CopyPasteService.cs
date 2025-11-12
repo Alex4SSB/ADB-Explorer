@@ -180,8 +180,7 @@ public class CopyPasteService : ViewModelBase
     {
         get
         {
-            if (_currentFiles is null)
-                _currentFiles = GetCurrentFiles();
+            _currentFiles ??= GetCurrentFiles();
 
             return _currentFiles;
         }

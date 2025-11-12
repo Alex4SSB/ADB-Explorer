@@ -21,7 +21,6 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
     public static FileGroup SelfFileGroup { get; private set; }
     public static IEnumerable<FileClass> SelfFiles { get; private set; }
     public static string DummyFileName { get; private set; }
-    private static bool isFirstActivation = true;
 
     /// <summary>
     /// In-order list of registered data objects.
@@ -550,65 +549,10 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         public Func<(HANDLE, NativeMethods.HResult)> GetData { get; set; }
     }
 
-    /// <summary>
-    /// Simple class that exposes a write-only IStream as a Stream.
-    /// </summary>
-    /// <param name="iStream">IStream instance to wrap.</param>
-    private class IStreamWrapper(IStream iStream) : Stream
-    {
-        /// <summary>
-        /// IStream instance being wrapped.
-        /// </summary>
-        private readonly IStream _iStream = iStream;
-
-        public override bool CanRead => false;
-
-        public override bool CanSeek => false;
-
-        public override bool CanWrite => true;
-
-        public override void Flush()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override long Length => throw new NotImplementedException();
-
-        public override long Position
-        {
-            get => throw new NotImplementedException();
-            set => throw new NotImplementedException();
-        }
-
-        public override int Read(byte[] buffer, int offset, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override long Seek(long offset, SeekOrigin origin)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void SetLength(long value)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            _iStream.Write(buffer[offset..], count, IntPtr.Zero);
-        }
-    }
-
     public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files,
                                                         DragDropEffects preferredEffect = DragDropEffects.Copy,
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)
     {
-        //ExplorerHelper.CheckConflictingApps(isFirstActivation && method is DataObjectMethod.Clipboard);
-        //if (isFirstActivation)
-        //    isFirstActivation = false;
-
         CopyPasteService.ClearTempFolder();
 
         Data.FileActions.IsSelectionIllegalOnWindows = !FileHelper.FileNameLegal(Data.SelectedFiles, FileHelper.RenameTarget.Windows);

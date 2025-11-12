@@ -119,7 +119,7 @@ struct FILEGROUPDESCRIPTOR : IByteStruct
 
     public FILEGROUPDESCRIPTOR(IEnumerable<FileDescriptor> fileDescriptors)
     {
-        descriptors = fileDescriptors.Select(f => new FILEDESCRIPTOR(f)).ToArray();
+        descriptors = [.. fileDescriptors.Select(f => new FILEDESCRIPTOR(f))];
 
         cItems = (uint)descriptors.Length;
     }
@@ -128,10 +128,9 @@ struct FILEGROUPDESCRIPTOR : IByteStruct
         => new()
         {
             cItems = StructureFromBytes<UInt32>(bytes.Take(sizeof(UInt32))),
-            descriptors = bytes.Skip(sizeof(UInt32))
+            descriptors = [.. bytes.Skip(sizeof(UInt32))
                                .Chunk(Marshal.SizeOf<FILEDESCRIPTOR>())
-                               .Select(FILEDESCRIPTOR.FromBytes)
-                               .ToArray()
+                               .Select(FILEDESCRIPTOR.FromBytes)]
         };
 
     public static FILEGROUPDESCRIPTOR FromStream(MemoryStream stream)
