@@ -31,6 +31,10 @@ internal static class NavigationToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Up),
             "\uE197",
             StyleHelper.ContentAnimation.Bounce),
+        new IconMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh),
+            AppActions.Icons[FileAction.FileActionType.Refresh],
+            StyleHelper.ContentAnimation.RotateCW),
         ];
 
 }
@@ -231,7 +235,7 @@ internal static class PathContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.EditCurrentPath), AppActions.Icons[FileAction.FileActionType.Edit]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyCurrentPath), AppActions.Icons[FileAction.FileActionType.Copy]),
         new SubMenuSeparator(),
-        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh), "\uE72C"),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Refresh), AppActions.Icons[FileAction.FileActionType.Refresh]),
     ];
 }
 

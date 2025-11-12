@@ -49,6 +49,7 @@ public static class AppActions
         { FileActionType.HideSettings, "\uE761" },
         { FileActionType.SearchApkOnWeb, "\uF6FA" },
         { FileActionType.Home, "\uE80F" },
+        { FileActionType.Refresh, "\uE72C" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } =
@@ -182,7 +183,8 @@ public static class AppActions
             () => Data.FileActions.IsRefreshEnabled && !Data.FileActions.ListingInProgress,
             () => Data.RuntimeSettings.Refresh = true,
             Strings.Resources.S_MENU_REFRESH,
-            new(Key.F5)),
+            new(Key.F5),
+            true),
         new(FileActionType.CopyCurrentPath,
             () => Data.FileActions.IsCopyCurrentPathEnabled,
             () => Clipboard.SetText(Data.CurrentPath),
