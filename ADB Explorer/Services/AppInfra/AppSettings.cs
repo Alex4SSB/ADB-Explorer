@@ -77,22 +77,6 @@ public class AppSettings : ViewModelBase
         set => Set(ref showHiddenItems, value);
     }
 
-    //private bool advancedDrag;
-    public bool AdvancedDrag
-    {
-        get => false; // Get(ref advancedDrag, true);
-        //set
-        //{
-        //    if (Set(ref advancedDrag, value))
-        //    {
-        //        if (!value)
-        //            Data.RuntimeSettings.IsAdvancedDragEnabled = false;
-        //        else
-        //            ExplorerHelper.CheckConflictingApps();
-        //    }
-        //}
-    }
-
     #endregion
 
     #region Double Click
@@ -246,6 +230,13 @@ public class AppSettings : ViewModelBase
         set => Set(ref rescanOnPush, value);
     }
 
+    private bool keepDateModified;
+    public bool KeepDateModified
+    {
+        get => Get(ref keepDateModified, true);
+        set => Set(ref keepDateModified, value);
+    }
+
     #endregion
 
     #region about
@@ -338,13 +329,6 @@ public class AppSettings : ViewModelBase
     {
         get => Get(ref hidePasteNamingInfo, false);
         set => Set(ref hidePasteNamingInfo, value);
-    }
-
-    //private bool advancedDragSet;
-    public bool AdvancedDragSet
-    {
-        get => true; // Get(ref advancedDragSet, false);
-        //set => Set(ref advancedDragSet, value);
     }
 
     private string lastVersion;

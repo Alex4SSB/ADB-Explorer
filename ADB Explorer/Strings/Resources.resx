@@ -1754,4 +1754,8 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Terminal</value>
     <comment>The tooltip of the button used to open or close the terminal</comment>
   </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Preserve File Date Modified</value>
+    <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
+  </data>
 </root>

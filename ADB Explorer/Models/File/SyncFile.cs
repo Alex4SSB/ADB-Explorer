@@ -24,6 +24,9 @@ public class SyncFile : FilePath
     {
         get
         {
+            if (!Data.Settings.KeepDateModified)
+                return null;
+
             return ShellItem?.FileInfo is not null
                 ? ShellItem.FileInfo.LastWriteTime
                 : UnixTime.FromUnixTime();

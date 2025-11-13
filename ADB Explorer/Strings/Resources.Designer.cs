@@ -19,7 +19,7 @@ namespace ADB_Explorer.Strings {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -3390,6 +3390,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_HIDDEN_ITEMS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_HIDDEN_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preserve File Date Modified.
+        /// </summary>
+        public static string S_SETTINGS_KEEP_MODIFIED_DATE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_KEEP_MODIFIED_DATE", resourceCulture);
             }
         }
         

@@ -135,9 +135,9 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 [
                     ADBService.EscapeAdbShellString(FullPath),
                     "-mindepth 1",
-                    "\\( -type d -printf '/// %p /// d /// d ///\\n' \\)",
+                    """\( -type d -printf '/// %p /// d /// d ///\n' \)""",
                     "-o",
-                    "\\( -type f -printf '/// %p /// %s /// %T@ ///\\n' \\)",
+                    $"""\( -type f -printf '/// %p /// %s /// {(Data.Settings.KeepDateModified ? "%T@" : "d")} ///\n' \)""",
                     "2>&1"
                 ];
 
@@ -152,7 +152,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                     """-mindepth 1 2>/dev/null | while IFS= read -r f;""",
                     """do if [ -d \"$f\" ]; then""",
                     """echo /// $f /// d /// d ///;""",
-                    """else echo /// $f /// $(stat -c '%s /// %Y' \"$f\") ///;""",
+                    $"""else echo /// $f /// $(stat -c '%s /// %Y' {(Data.Settings.KeepDateModified ? "\\\"$f\\\")" : ") d")} ///;""",
                     """fi; done;"""
                 ];
 

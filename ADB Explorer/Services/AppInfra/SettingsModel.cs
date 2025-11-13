@@ -63,6 +63,7 @@ public static class UISettings
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.StopPollingOnSync)), Strings.Resources.S_SETTINGS_STOP_ON_SYNC),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.AllowMultiOp)), Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS),
                 new BoolSetting(appSettings.GetProperty(nameof(Settings.RescanOnPush)), Strings.Resources.S_SETTINGS_MEDIA_RESCAN),
+                new BoolSetting(appSettings.GetProperty(nameof(Settings.KeepDateModified)), Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
