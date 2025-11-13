@@ -97,7 +97,7 @@ public static class AdbExplorerConst
 
     public const string APP_SETTINGS_FILE = "App.txt";
 
-    public const int DRIVE_WARNING = 97;
+    public const int DRIVE_WARNING = 99;
 
     public const string WSA_INTERFACE_NAME = "WSLCore";
     public const string WSA_PROCESS_NAME = "WsaClient";
