@@ -392,6 +392,13 @@ internal class FileActionsEnable : ViewModelBase
         set => Set(ref isApkWebSearchEnabled, value);
     }
 
+    private bool isOpenApkLocationEnabled = false;
+    public bool IsOpenApkLocationEnabled
+    {
+        get => isOpenApkLocationEnabled;
+        set => Set(ref isOpenApkLocationEnabled, value);
+    }
+
     private bool isRenameUnixLegal = false;
     public bool IsRenameUnixLegal
     {

@@ -748,8 +748,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void DoubleClick(object source)
     {
-        if (source is not FileClass file || FileActions.IsRecycleBin)
+        if (FileActions.IsRecycleBin)
             return;
+
+        if (source is not FileClass file)
+        {
+            if (source is Package apk)
+                FileActionLogic.OpenApkLocation(apk);
+
+            return;
+        }
 
         if (file.Type is FileType.Folder)
         {

@@ -434,6 +434,12 @@ public static class AppActions
             () => NavHistory.MenuHistory.Value.Any() && !Data.FileActions.ListingInProgress,
             () => { },
             Strings.Resources.S_NAV_HISTORY),
+        new(FileActionType.OpenPackageLocation,
+            () => Data.FileActions.IsOpenApkLocationEnabled,
+            () => FileActionLogic.OpenApkLocation(),
+            Strings.Resources.S_MENU_OPEN_LOCATION,
+            new(Key.Enter),
+            true),
     ];
 
     public static List<KeyBinding> Bindings =>
@@ -527,6 +533,7 @@ public class FileAction : ViewModelBase
         CopyMessageToClipboard,
         NavHistory,
         TerminalToggle,
+        OpenPackageLocation,
     }
 
     public FileActionType Name { get; }

@@ -796,7 +796,8 @@ internal static class FileActionLogic
         Data.FileActions.IsRefreshEnabled = Data.FileActions.IsDriveViewVisible || Data.FileActions.IsExplorerVisible;
         Data.FileActions.IsCopyCurrentPathEnabled = Data.FileActions.IsExplorerVisible && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
 
-        Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1 && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
+        Data.FileActions.IsOpenApkLocationEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1;
+        Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsOpenApkLocationEnabled && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
 
         if (Data.FileActions.IsAppDrive)
         {
@@ -1219,6 +1220,18 @@ internal static class FileActionLogic
         var file = Data.DirList.FileList.FirstOrDefault(f => f.FullPath == target);
         if (file is not null)
             Data.FileActions.ItemToSelect = file;
+    }
+
+    public static void OpenApkLocation(Package apk = null)
+    {
+        apk ??= Data.SelectedPackages.First();
+
+        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "pm", out string stdout, out var _, CancellationToken.None, "path", apk.Name);
+
+        if (res == 0 && !string.IsNullOrEmpty(stdout))
+        {
+            Data.RuntimeSettings.LocationToNavigate = new(FileHelper.GetParentPath(stdout.Replace("package:", "")));
+        }
     }
 
     public static void ApkWebSearch()

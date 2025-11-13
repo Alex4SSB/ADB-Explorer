@@ -98,7 +98,8 @@ internal static class MainToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename),
             AppActions.Icons[FileAction.FileActionType.Rename],
             StyleHelper.ContentAnimation.Bounce,
-            18),
+            18,
+            isVisible: Data.FileActions.IsNewMenuVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Restore),
             AppActions.Icons[FileAction.FileActionType.Restore],
@@ -108,6 +109,12 @@ internal static class MainToolBar
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Delete),
             AppActions.Icons[FileAction.FileActionType.Delete],
             iconSize: 18),
+        new IconMenu(
+            AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation),
+            AppActions.Icons[FileAction.FileActionType.FollowLink],
+            StyleHelper.ContentAnimation.RightMarquee,
+            18,
+            isVisible: Data.FileActions.IsUninstallVisible),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Uninstall),
             AppActions.Icons[FileAction.FileActionType.Uninstall],
@@ -198,6 +205,7 @@ internal static class ExplorerContextMenu
         new SubMenuSeparator(),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icons[FileAction.FileActionType.Rename]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
+        new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation), AppActions.Icons[FileAction.FileActionType.FollowLink]),
         new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new Controls.PathIcon()),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.More),
