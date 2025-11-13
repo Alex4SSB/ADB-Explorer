@@ -94,6 +94,18 @@ public partial class DragWindow : INotifyPropertyChanged
                 int sourceLength = target is null ? 30 : 45 - target.Length;
                 var source = FileHelper.GetShortFileName(Data.CopyPaste.DragFiles[0], sourceLength);
 
+                if (Data.FileActions.IsAppDrive)
+                {
+                    result = string.Format(Strings.Resources.S_DRAG_INSTALL_SINGLE, source);
+                    var apkSplit = result.Split(source);
+
+                    DragTooltip.Inlines.Add(new Run(apkSplit[0]) { Foreground = blueBrush });
+                    DragTooltip.Inlines.Add(source);
+                    DragTooltip.Inlines.Add(new Run(apkSplit[1]) { Foreground = blueBrush });
+                    
+                    return;
+                }
+
                 if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Link)
                 {
                     result = string.Format(Strings.Resources.S_DRAGDROP_LINK, target);
@@ -134,6 +146,14 @@ public partial class DragWindow : INotifyPropertyChanged
             }
             else
             {
+                if (Data.FileActions.IsAppDrive)
+                {
+                    result = string.Format(Strings.Resources.S_DRAG_INSTALL_MULTIPLE, count);
+                    DragTooltip.Inlines.Add(new Run(result) { Foreground = blueBrush });
+
+                    return;
+                }
+
                 if (Data.CopyPaste.CurrentDropEffect is DragDropEffects.Move)
                 {
                     format = string.IsNullOrEmpty(target)

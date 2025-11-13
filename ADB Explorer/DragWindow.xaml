@@ -140,6 +140,9 @@
                                     <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Link">
                                         <Setter Property="Glyph" Value="&#xE8AD;" />
                                     </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                                        <Setter Property="Glyph" Value="&#xE896;" />
+                                    </DataTrigger>
                                 </Style.Triggers>
                             </Style>
                         </ui:FontIcon.Style>

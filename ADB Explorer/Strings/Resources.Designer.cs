@@ -1219,6 +1219,24 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Install {0} APKs.
+        /// </summary>
+        public static string S_DRAG_INSTALL_MULTIPLE {
+            get {
+                return ResourceManager.GetString("S_DRAG_INSTALL_MULTIPLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Install {0}.
+        /// </summary>
+        public static string S_DRAG_INSTALL_SINGLE {
+            get {
+                return ResourceManager.GetString("S_DRAG_INSTALL_SINGLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Copy {0} items.
         /// </summary>
         public static string S_DRAGDROP_COPY {

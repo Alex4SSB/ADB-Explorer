@@ -1758,4 +1758,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Preserve File Date Modified</value>
     <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
   </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Install {0}</value>
+    <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Install {0} APKs</value>
+    <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
+  </data>
 </root>
