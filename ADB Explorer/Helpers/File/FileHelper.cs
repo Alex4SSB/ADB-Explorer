@@ -329,4 +329,56 @@ public static class FileHelper
 
         return RelationType.Unrelated;
     }
+
+    public static IEnumerable<FileClass> GetFilesFromTree((string, long?, double?)[] tree) => 
+        tree.Select(t => new FileClass(GetFullName(t.Item1), t.Item1, t.Item2 is null ? FileType.Folder : FileType.File, size: t.Item2)
+        { ModifiedTime = t.Item3.FromUnixTime() });
+
+    public static (string, long?, double?)[] GetFolderTree(IEnumerable<string> paths, bool isFolder = true)
+    {
+        string stdout = "";
+        var files = string.Join(" ", paths.Select(p => ADBService.EscapeAdbShellString(p)));
+        var depth = isFolder ? "-mindepth 1" : "";
+
+        if (ShellCommands.FindPrintf)
+        {
+            // get absolute paths, sizes and dates of all files, directries are marked with 'd'
+            string[] args =
+            [
+                files,
+                depth,
+                """\( -type d -printf '/// %p /// d /// d ///\n' \)""",
+                "-o",
+                $"""\( -type f -printf '/// %p /// %s /// {(Data.Settings.KeepDateModified ? "%T@" : "d")} ///\n' \)""",
+                "2>&1"
+            ];
+
+            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+        }
+        else // when find does not support -printf
+        {
+            // gives the same result, but much slower since it executes stat on each file *after* performing find
+            string[] args =
+            [
+                files,
+                depth,
+                """2>/dev/null | while IFS= read -r f;""",
+                """do if [ -d \"$f\" ]; then""",
+                """echo /// $f /// d /// d ///;""",
+                $"""else echo /// $f /// $(stat -c '%s /// %Y' {(Data.Settings.KeepDateModified ? "\\\"$f\\\")" : ") d")} ///;""",
+                """fi; done;"""
+            ];
+
+            ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
+        }
+        var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
+
+        return [.. matches.Where(m => m.Success)
+                .Select(m =>
+                (
+                    m.Groups["Name"].Value,
+                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
+                    m.Groups["Date"].Value == "d" ? (double?)null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
+                ))];
+    }
 }

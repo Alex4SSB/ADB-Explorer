@@ -803,8 +803,6 @@ public class CopyPasteService : ViewModelBase
         // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts.
         // We receive full paths of the top level items in AdbDragList and FileDrop.
 
-        // TODO: FileGroupDescriptor gives full hierarchy, so GetFullName is not good
-
         HashSet<string> fileNames = new(filePaths.Select(FileHelper.GetFullName), comparer);
         HashSet<string> existingItems;
 
@@ -887,8 +885,6 @@ public class CopyPasteService : ViewModelBase
 
         // Prepare a set with file system dependent comparison. Currently we only check for top level conflicts.
         // We receive full paths of the top level items in AdbDragList and FileDrop.
-
-        // TODO: FileGroupDescriptor gives full hierarchy, so GetFullName is not good
 
         HashSet<string> fileNames = new(filePaths.Select(f => f.FullName), comparer);
         HashSet<string> existingItems;

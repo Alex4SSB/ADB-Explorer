@@ -549,6 +549,23 @@ public sealed class VirtualFileDataObject : ViewModelBase, System.Runtime.Intero
         public Func<(HANDLE, NativeMethods.HResult)> GetData { get; set; }
     }
 
+    public static VirtualFileDataObject PrepareTransfer(IEnumerable<Package> packages,
+                                                        DataObjectMethod method = DataObjectMethod.DragDrop)
+    {
+        Data.FileActions.IsSelectionIllegalOnWindows =
+        Data.FileActions.IsSelectionConflictingOnFuse = false;
+
+        CopyPasteService.ClearTempFolder();
+        VirtualFileDataObject vfdo = new(DragDropEffects.Copy, method);
+
+        var files = FileHelper.GetFilesFromTree(FileHelper.GetFolderTree(packages.Select(p => p.Path), false)).ToList();
+        vfdo.Operations = [.. files.Select(f => f.PrepareDescriptors(vfdo))];
+        vfdo.SetFileDescriptors(files.SelectMany(f => f.Descriptors));
+        vfdo.SetAdbDrag(files, Data.CurrentADBDevice);
+
+        return vfdo;
+    }
+
     public static VirtualFileDataObject PrepareTransfer(IEnumerable<FileClass> files,
                                                         DragDropEffects preferredEffect = DragDropEffects.Copy,
                                                         DataObjectMethod method = DataObjectMethod.DragDrop)

@@ -94,7 +94,7 @@ public partial class DragWindow : INotifyPropertyChanged
                 int sourceLength = target is null ? 30 : 45 - target.Length;
                 var source = FileHelper.GetShortFileName(Data.CopyPaste.DragFiles[0], sourceLength);
 
-                if (Data.FileActions.IsAppDrive)
+                if (Data.FileActions.IsAppDrive && MouseWithinApp)
                 {
                     result = string.Format(Strings.Resources.S_DRAG_INSTALL_SINGLE, source);
                     var apkSplit = result.Split(source);
@@ -146,7 +146,7 @@ public partial class DragWindow : INotifyPropertyChanged
             }
             else
             {
-                if (Data.FileActions.IsAppDrive)
+                if (Data.FileActions.IsAppDrive && MouseWithinApp)
                 {
                     result = string.Format(Strings.Resources.S_DRAG_INSTALL_MULTIPLE, count);
                     DragTooltip.Inlines.Add(new Run(result) { Foreground = blueBrush });
@@ -194,6 +194,8 @@ public partial class DragWindow : INotifyPropertyChanged
 
             mouseWithinApp = value;
             GetPathUnderMouse();
+
+            OnPropertyChanged();
         }
     }
 

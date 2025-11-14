@@ -464,7 +464,7 @@ public static class ShellFileOperation
 
         ObservableList<Package> packages = [];
         string stdout = "";
-        string[] args = ["list", "packages", "-s"];
+        string[] args = ["list", "packages", "-s", "-f"];
         if (optionalParams)
             args = [.. args, "-U", "--show-versioncode"];
 

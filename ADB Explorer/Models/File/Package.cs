@@ -14,7 +14,14 @@ public class Package : ViewModelBase, IBrowserItem
     public string Name
     {
         get => name;
-        set => Set(ref name, value);
+        private set => Set(ref name, value);
+    }
+
+    private string path;
+    public string Path
+    {
+        get => path;
+        private set => Set(ref path, value);
     }
 
     public string DisplayName => Name;
@@ -23,21 +30,21 @@ public class Package : ViewModelBase, IBrowserItem
     public PackageType Type
     {
         get => type;
-        set => Set(ref type, value);
+        private set => Set(ref type, value);
     }
 
     private long? uid = null;
     public long? Uid
     {
         get => uid;
-        set => Set(ref uid, value);
+        private set => Set(ref uid, value);
     }
 
     private long? version = null;
     public long? Version
     {
         get => version;
-        set => Set(ref version, value);
+        private set => Set(ref version, value);
     }
 
     public static Package New(string package, PackageType type)
@@ -46,13 +53,14 @@ public class Package : ViewModelBase, IBrowserItem
         if (!match.Success)
             return null;
 
-        return new Package(match.Groups["package"].Value, type, match.Groups["uid"].Value, match.Groups["version"].Value);
+        return new Package(match.Groups["Name"].Value, type, match.Groups["Uid"].Value, match.Groups["Version"].Value, match.Groups["Path"].Value);
     }
 
-    public Package(string name, PackageType type, string uid, string version)
+    public Package(string name, PackageType type, string uid, string version, string path)
     {
         Name = name;
         Type = type;
+        Path = path;
 
         if (long.TryParse(uid, out long resU))
             Uid = resU;
@@ -63,6 +71,6 @@ public class Package : ViewModelBase, IBrowserItem
 
     public override string ToString()
     {
-        return $"{Name}\n{Type}\n{Uid}\n{Version}";
+        return $"{Name}\n{Type}\n{Uid}\n{Version}\n{Path}";
     }
 }

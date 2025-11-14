@@ -8,7 +8,7 @@ public class DoubleEquals : IValueConverter
         {
             if (double.TryParse(paramString, out double result))
             {
-                var val = double.Parse($"{value}");
+                var val = double.Parse($"{value}", CultureInfo.InvariantCulture);
 
                 return val == result;
             }

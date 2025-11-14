@@ -527,6 +527,25 @@ internal static class FileActionLogic
         IsPasteEnabled();
     }
 
+    public static void CutItems(bool isCopy = false)
+    {
+        if (Data.FileActions.IsAppDrive)
+            CopyPackages(Data.SelectedPackages);
+        else
+            CutFiles(Data.SelectedFiles, isCopy);
+    }
+
+    public static void CopyPackages(IEnumerable<Package> items)
+    {
+        Data.FileActions.CopyEnabled = false;
+        Data.FileActions.CutEnabled = true;
+
+        IsPasteEnabled();
+
+        var vfdo = VirtualFileDataObject.PrepareTransfer(items, VirtualFileDataObject.DataObjectMethod.Clipboard);
+        vfdo?.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.Clipboard, allowedEffects: DragDropEffects.Copy);
+    }
+
     public static void CutFiles(IEnumerable<FileClass> items, bool isCopy = false)
     {
         var itemsToCut = Data.DevicesObject.Current.Root is not AbstractDevice.RootStatus.Enabled
@@ -876,11 +895,18 @@ internal static class FileActionLogic
                                       && Data.FileActions.IsRegularItem
                                       && (!Data.FileActions.IsFollowLinkEnabled || Data.RuntimeSettings.IsRootActive);
 
-        Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
-                                       && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy)
-                                       && Data.FileActions.IsRegularItem
-                                       && !Data.FileActions.IsRecycleBin;
-
+        if (Data.FileActions.IsAppDrive)
+        {
+            Data.FileActions.CopyEnabled = Data.SelectedPackages.Any();
+        }
+        else
+        {
+            Data.FileActions.CopyEnabled = Data.SelectedFiles.AnyAll(f => f.Type is not FileType.BrokenLink)
+                                           && !(allSelectedAreCut && Data.CopyPaste.PasteState is DragDropEffects.Copy)
+                                           && Data.FileActions.IsRegularItem
+                                           && !Data.FileActions.IsRecycleBin;
+        }
+        
         IsPasteEnabled();
 
         // APK enabled in settings
@@ -1244,12 +1270,7 @@ internal static class FileActionLogic
     {
         apk ??= Data.SelectedPackages.First();
 
-        var res = ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "pm", out string stdout, out var _, CancellationToken.None, "path", apk.Name);
-
-        if (res == 0 && !string.IsNullOrEmpty(stdout))
-        {
-            Data.RuntimeSettings.LocationToNavigate = new(FileHelper.GetParentPath(stdout.Replace("package:", "")));
-        }
+        Data.RuntimeSettings.LocationToNavigate = new(FileHelper.GetParentPath(apk.Path));
     }
 
     public static void ApkWebSearch()

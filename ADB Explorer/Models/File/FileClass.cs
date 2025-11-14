@@ -120,55 +120,9 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileNameSort SortName { get; private set; }
 
-    public (string, long?, double?)[] Children
-    {
-        get
-        {
-            string stdout = "";
-            if (!IsDirectory)
-                return null;
-
-            if (ShellCommands.FindPrintf)
-            {
-                // get absolute paths, sizes and dates of all files, directries are marked with 'd'
-                string[] args =
-                [
-                    ADBService.EscapeAdbShellString(FullPath),
-                    "-mindepth 1",
-                    """\( -type d -printf '/// %p /// d /// d ///\n' \)""",
-                    "-o",
-                    $"""\( -type f -printf '/// %p /// %s /// {(Data.Settings.KeepDateModified ? "%T@" : "d")} ///\n' \)""",
-                    "2>&1"
-                ];
-
-                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
-            }
-            else // when find does not support -printf
-            {
-                // gives the same result, but much slower since it executes stat on each file *after* performing find
-                string[] args =
-                [
-                    ADBService.EscapeAdbShellString(FullPath),
-                    """-mindepth 1 2>/dev/null | while IFS= read -r f;""",
-                    """do if [ -d \"$f\" ]; then""",
-                    """echo /// $f /// d /// d ///;""",
-                    $"""else echo /// $f /// $(stat -c '%s /// %Y' {(Data.Settings.KeepDateModified ? "\\\"$f\\\")" : ") d")} ///;""",
-                    """fi; done;"""
-                ];
-
-                ADBService.ExecuteDeviceAdbShellCommand(Data.CurrentADBDevice.ID, "find", out stdout, out _, CancellationToken.None, args);
-            }
-            var matches = AdbRegEx.RE_FIND_TREE().Matches(stdout);
-
-            return [.. matches.Where(m => m.Success)
-                .Select(m =>
-                (
-                    m.Groups["Name"].Value,
-                    m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value),
-                    m.Groups["Date"].Value == "d" ? (double?)null : double.Parse(m.Groups["Date"].Value)
-                ))];
-        }
-    }
+    public (string, long?, double?)[] Children => !IsDirectory
+        ? null 
+        : FileHelper.GetFolderTree([FullPath]);
 
     public IEnumerable<FileDescriptor> Descriptors { get; private set; }
 
@@ -361,7 +315,11 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
 
     public FileSyncOperation PrepareDescriptors(VirtualFileDataObject vfdo, bool includeContent = true)
     {
-        SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FullName, '\\'))
+        var name = Data.FileActions.IsAppDrive
+            ? Data.SelectedPackages.FirstOrDefault(pkg => pkg.Path == FullPath)?.Name + ".apk"
+            : FullName;
+
+        SyncFile target = new(FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, name, '\\'))
             { PathType = FilePathType.Windows };
 
         var children = Children;
@@ -370,13 +328,11 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         fileOp.PropertyChanged += PullOperation_PropertyChanged;
         fileOp.VFDO = vfdo;
 
-        (string, long?, double?)[] items = [(FullName, Size, UnixTime)];
+        (string, long?, double?)[] items = [(name, Size, UnixTime)];
         if (includeContent && children is not null)
         {
             items = [.. items, .. children];
         }
-
-        DateTime? date = IsDirectory ? null : ModifiedTime;
 
         Descriptors = items.Select(item => new FileDescriptor
         {
@@ -384,7 +340,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
             SourcePath = FullPath,
             IsDirectory = item.Item2 is null,
             Length = item.Item2,
-            ChangeTimeUtc = date,
+            ChangeTimeUtc = item.Item3.FromUnixTime(),
             Stream = () =>
             {
                 var isActive = App.Current.Dispatcher.Invoke(() => App.Current.MainWindow.IsActive);
@@ -413,7 +369,7 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
                 {
                     Thread.Sleep(100);
                 }
-                
+
                 var file = FileHelper.ConcatPaths(Data.RuntimeSettings.TempDragPath, FileHelper.ExtractRelativePath(item.Item1, ParentPath), '\\');
 
                 // Try 10 times to read from the file and write to the stream,

@@ -753,7 +753,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
         if (source is not FileClass file)
         {
-            if (source is Package apk)
+            if (source is Package apk && !FileActions.ListingInProgress)
                 FileActionLogic.OpenApkLocation(apk);
 
             return;
@@ -1929,21 +1929,31 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
         {
             if (ExplorerGrid.SelectedItems.Count > 0
-                && ExplorerGrid.SelectedItems[0] is FileClass
+                && ExplorerGrid.SelectedItems[0] is FileClass or Package
                 && !abortDrag)
             {
                 CopyPaste.DragStatus = CopyPasteService.DragState.Active;
                 WasDragging = true;
 
-                var selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
-                var vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+                IEnumerable<FileClass> selectedItems;
+                VirtualFileDataObject vfdo;
+                if (FileActions.IsAppDrive)
+                {
+                    vfdo = VirtualFileDataObject.PrepareTransfer(ExplorerGrid.SelectedItems.Cast<Package>());
+                    selectedItems = VirtualFileDataObject.SelfFiles;
+                }
+                else
+                {
+                    selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
+                    vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+                }
 
                 if (vfdo is not null)
                 {
                     CopyPaste.UpdateSelfVFDO(true);
                     RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
 
-                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, vfdo.PreferredDropEffect.Value);
                 }
             }
             else
