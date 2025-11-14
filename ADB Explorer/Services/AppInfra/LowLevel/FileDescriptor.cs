@@ -76,7 +76,16 @@ public class FileDescriptor
     public static FileDescriptor[] GetDescriptors(IDataObject dataObject)
     {
         if (Data.CopyPaste.IsSelf)
-            return VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
+        {
+            try
+            {
+                return VirtualFileDataObject.SelfFileGroup?.FileDescriptors?.ToArray();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
 
         try
         {

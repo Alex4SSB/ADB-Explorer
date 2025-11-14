@@ -545,7 +545,7 @@ internal class FileActionsEnable : ViewModelBase
     public bool MoreEnabled => EditFileEnabled || UpdateModifiedEnabled;
     public bool NameReadOnly => !RenameEnabled;
     public bool EmptyTrash => IsRecycleBin && !DeleteEnabled && !RestoreEnabled;
-    public bool IsPasteStateVisible => IsExplorerVisible && !IsAppDrive && Data.CopyPaste.PasteSource is not CopyPasteService.DataSource.None;
+    public bool IsPasteStateVisible => IsExplorerVisible && Data.CopyPaste.PasteSource is not CopyPasteService.DataSource.None;
     public bool IsEditorTextChanged => OriginalEditorText != EditorText;
 
     #endregion

@@ -1,5 +1,4 @@
-﻿using ADB_Explorer.Converters;
-using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using Vanara.Windows.Shell;
@@ -281,7 +280,7 @@ internal static class FileActionLogic
         if (Data.CopyPaste.IsDrag)
             return;
 
-        // Explorer view but not app drive AND source is clipboard
+        // Explorer view AND source is clipboard
         if (Data.FileActions.IsPasteStateVisible && Data.CopyPaste.Files.Length > 0)
         {
             Data.FileActions.CutItemsCount.Value = Data.CopyPaste.Files.Length.ToString();
@@ -298,19 +297,36 @@ internal static class FileActionLogic
             return;
         }
 
+        string stringFormat;
         if (Data.CopyPaste.Files.Length > 1)
         {
-            var stringFormat = Data.CopyPaste.PasteState is DragDropEffects.Move
-                ? Strings.Resources.S_PASTE_PLURAL_CUT_ITEMS
-                : Strings.Resources.S_PASTE_PLURAL_COPIED_ITEMS;
+            if (Data.FileActions.IsAppDrive)
+            {
+                stringFormat = Strings.Resources.S_DRAG_INSTALL_MULTIPLE;
+            }
+            else
+            {
+                stringFormat = Data.CopyPaste.PasteState is DragDropEffects.Move
+                    ? Strings.Resources.S_PASTE_PLURAL_CUT_ITEMS
+                    : Strings.Resources.S_PASTE_PLURAL_COPIED_ITEMS;
+            }
 
             Data.FileActions.PasteDescription.Value = string.Format(stringFormat, Data.CopyPaste.Files.Length);
         }
         else
         {
-            Data.FileActions.PasteDescription.Value = Data.CopyPaste.PasteState is DragDropEffects.Move
-                ? Strings.Resources.S_PASTE_ONE_CUT_ITEM
-                : Strings.Resources.S_PASTE_ONE_COPIED_ITEM;
+            if (Data.FileActions.IsAppDrive)
+            {
+                stringFormat = string.Format(Strings.Resources.S_DRAG_INSTALL_SINGLE, Data.CopyPaste.CurrentFiles.FirstOrDefault()?.NoExtName);
+            }
+            else
+            {
+                stringFormat = Data.CopyPaste.PasteState is DragDropEffects.Move
+                    ? Strings.Resources.S_PASTE_ONE_CUT_ITEM
+                    : Strings.Resources.S_PASTE_ONE_COPIED_ITEM;
+            }
+
+            Data.FileActions.PasteDescription.Value = stringFormat;
         }
 
         Data.FileActions.PasteEnabled = EnableUiPaste();
@@ -381,7 +397,7 @@ internal static class FileActionLogic
             && Data.CopyPaste.IsVirtual
             && Data.CopyPaste.Descriptors.Length == files.Length)
         {
-            files = Data.CopyPaste.Descriptors.Select(d => d.Name).ToArray();
+            files = [.. Data.CopyPaste.Descriptors.Select(d => d.Name)];
         }
 
         Data.FileActions.IsPastingInDescendant = files.Length == 1
@@ -489,6 +505,11 @@ internal static class FileActionLogic
 
     private static void PastingOnFuse(string targetPath, string[] files)
     {
+        if (Data.FileActions.IsAppDrive)
+        {
+            Data.FileActions.IsPastingIllegalOnFuse = Data.CopyPaste.IsSelf && DriveHelper.GetCurrentDrive(files[0])?.IsFUSE is true;
+            return;
+        }
         bool isFuse = DriveHelper.GetCurrentDrive(targetPath)?.IsFUSE is true;
 
         Data.FileActions.IsPastingIllegalOnFuse = isFuse
@@ -752,6 +773,9 @@ internal static class FileActionLogic
     {
         Data.DirList?.FileList?.Clear();
         Data.Packages.Clear();
+        Data.SelectedFiles = [];
+        Data.SelectedPackages = [];
+
         Data.FileActions.PushFilesFoldersEnabled =
         Data.FileActions.PullEnabled =
         Data.FileActions.DeleteEnabled =
@@ -799,14 +823,6 @@ internal static class FileActionLogic
         Data.FileActions.IsOpenApkLocationEnabled = Data.FileActions.IsAppDrive && Data.SelectedPackages.Count() == 1;
         Data.FileActions.IsApkWebSearchEnabled = Data.FileActions.IsOpenApkLocationEnabled && !string.IsNullOrEmpty(Data.RuntimeSettings.DefaultBrowserPath);
 
-        if (Data.FileActions.IsAppDrive)
-        {
-            Data.FileActions.IsCopyItemPathEnabled = Data.SelectedPackages.Count() == 1;
-
-            Data.RuntimeSettings.FilterActions = true;
-            return;
-        }
-
         Data.FileActions.IsRegularItem = !Data.SelectedFiles.Any() || Data.RuntimeSettings.IsRootActive
             || Data.SelectedFiles.AnyAll(item => item.Type is FileType.File or FileType.Folder);
 
@@ -844,7 +860,7 @@ internal static class FileActionLogic
                                        && !Data.FileActions.IsSelectionIllegalOnWindows
                                        && !Data.FileActions.IsSelectionConflictingOnFuse;
 
-        Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
+        Data.FileActions.ContextPushEnabled = !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive && (!Data.SelectedFiles.Any() || (Data.SelectedFiles.Count() == 1 && Data.SelectedFiles.First().IsDirectory));
 
         Data.FileActions.RenameEnabled = !Data.FileActions.IsRecycleBin
                                          && Data.SelectedFiles.Count() == 1
@@ -877,9 +893,11 @@ internal static class FileActionLogic
                                                  && !(Data.DevicesObject?.Current?.Type is AbstractDevice.DeviceType.Recovery
                                                  && Data.FileActions.IsTemp);
 
-        Data.FileActions.IsCopyItemPathEnabled = Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
+        Data.FileActions.IsCopyItemPathEnabled = Data.FileActions.IsAppDrive
+            ? Data.SelectedPackages.Count() == 1
+            : Data.SelectedFiles.Count() == 1 && !Data.FileActions.IsRecycleBin;
 
-        Data.FileActions.ContextNewEnabled = !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin;
+        Data.FileActions.ContextNewEnabled = !Data.SelectedFiles.Any() && !Data.FileActions.IsRecycleBin && !Data.FileActions.IsAppDrive;
 
         Data.FileActions.SubmenuUninstallEnabled = Data.CurrentDrive?.IsFUSE is not true
             && Data.SelectedFiles.AnyAll(file => file.IsInstallApk)
