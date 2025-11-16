@@ -1423,4 +1423,13 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   <data name="S_TERMINAL" xml:space="preserve">
     <value>טרמינל</value>
   </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>שמור על תאריך שינוי אחרון</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>התקן {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>התקן {0} חבילות</value>
+  </data>
 </root>
