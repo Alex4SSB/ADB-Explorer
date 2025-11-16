@@ -332,7 +332,7 @@ Um ADB zu genehmigen, öffnen Sie die erweiterten Einstellungen von WSA.</value>
     <value>Zu den Versionshinweisen gehen</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
-    <value>ADB ausführbare Datei</value>
+    <value>Ausführbare ADB-Datei</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
     <value>Diese App ist eine Benutzeroberfläche für ADB - Android Debug Bridge.
@@ -1422,5 +1422,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>ROM-Datei</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Datei-Änderungsdatum beibehalten</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>{0} installieren</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>{0} APKs installieren</value>
   </data>
 </root>
