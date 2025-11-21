@@ -108,7 +108,7 @@
                 Style="{StaticResource RightHorizontalItemsControlStyle}" />
         </Grid>
     </DataTemplate>
-    <DataTemplate x:Key="ComboSettingTemplate" DataType="services:ComboSetting">
+    <DataTemplate x:Key="CultureInfoSettingTemplate">
         <DataTemplate.Resources>
             <Style BasedOn="{StaticResource TextBlockStyle}" TargetType="TextBlock" />
         </DataTemplate.Resources>
@@ -366,13 +366,13 @@
     <helpers:SettingsTemplateSelector
         x:Key="GroupedSettingsTemplateSelector"
         BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
-        ComboSettingTemplate="{StaticResource ComboSettingTemplate}"
+        CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
         EnumSettingTemplate="{StaticResource GropuedEnumSettingTemplate}"
         StringSettingTemplate="{StaticResource StringSettingTemplate}" />
     <helpers:SettingsTemplateSelector
         x:Key="SortedSettingsTemplateSelector"
         BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
-        ComboSettingTemplate="{StaticResource ComboSettingTemplate}"
+        CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
         EnumSettingTemplate="{StaticResource SortedEnumSettingTemplate}"
         StringSettingTemplate="{StaticResource StringSettingTemplate}" />
     <Style

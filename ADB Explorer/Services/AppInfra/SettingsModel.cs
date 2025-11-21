@@ -1,5 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.ViewModels;
+using System.Linq.Expressions;
 using static ADB_Explorer.Models.Data;
 using static ADB_Explorer.Services.SettingsAction;
 
@@ -38,54 +39,49 @@ public static class UISettings
 
     public static void Init()
     {
-        Type appSettings = Settings.GetType();
-
         SettingsList =
         [
             new SettingsGroup("ADB",
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableMdns)), Strings.Resources.S_SETTINGS_ENABLE_MDNS),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDevices)), Strings.Resources.S_SETTINGS_POLL_DEVICES),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollBattery)), Strings.Resources.S_SETTINGS_POLL_BATTERY),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableLog)), Strings.Resources.S_SETTINGS_ENABLE_LOG),
+                new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS),
+                new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES),
+                new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY),
+                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_SETTINGS_ENABLE_LOG),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoRoot)), Strings.Resources.S_SETTINGS_AUTO_ROOT),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.SaveDevices)), Strings.Resources.S_SETTINGS_SAVE_DEVICES),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.AutoOpen)), Strings.Resources.S_SETTINGS_AUTO_OPEN),
+                new BoolSetting(() => Settings.AutoRoot, Strings.Resources.S_SETTINGS_AUTO_ROOT),
+                new BoolSetting(() => Settings.SaveDevices, Strings.Resources.S_SETTINGS_SAVE_DEVICES),
+                new BoolSetting(() => Settings.AutoOpen, Strings.Resources.S_SETTINGS_AUTO_OPEN),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_FILE_OP_TOOLTIP,
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableCompactView)), Strings.Resources.S_SETTINGS_COMPACT_VIEW),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.StopPollingOnSync)), Strings.Resources.S_SETTINGS_STOP_ON_SYNC),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.AllowMultiOp)), Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.RescanOnPush)), Strings.Resources.S_SETTINGS_MEDIA_RESCAN),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.KeepDateModified)), Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE),
+                new BoolSetting(() => Settings.EnableCompactView, Strings.Resources.S_SETTINGS_COMPACT_VIEW),
+                new BoolSetting(() => Settings.StopPollingOnSync, Strings.Resources.S_SETTINGS_STOP_ON_SYNC),
+                new BoolSetting(() => Settings.AllowMultiOp, Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS),
+                new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN),
+                new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.PollDrives)), Strings.Resources.S_SETTINGS_POLL_DRIVES),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableRecycle)), Strings.Resources.S_SETTINGS_ENABLE_TRASH),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableApk)), Strings.Resources.S_SETTINGS_APK),
+                new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES),
+                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_SETTINGS_ENABLE_TRASH),
+                new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowExtensions)), Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowHiddenItems)), Strings.Resources.S_SETTINGS_HIDDEN_ITEMS),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ShowSystemPackages)), Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: appSettings.GetProperty(nameof(Settings.EnableApk))),
-                //new BoolSetting(appSettings.GetProperty(nameof(Settings.AdvancedDrag)),
-                //    Strings.Resources.S_SETTINGS_EXPLORER_MONITORING,
-                //    commands: [ SettingsActions.Find(a => a.Name is ActionType.AdvancedDragInfo) ]),
+                new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS),
+                new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS),
+                new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: () => Settings.EnableApk),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK,
             [
-                new DoubleClickSetting(appSettings.GetProperty(nameof(Settings.DoubleClick)), Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK, new() {
+                new DoubleClickSetting(() => Settings.DoubleClick, Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK, new() {
                     { AppSettings.DoubleClickAction.none, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_NONE },
                     { AppSettings.DoubleClickAction.pull, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_PULL },
                     { AppSettings.DoubleClickAction.edit, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_OPEN } }),
@@ -93,13 +89,13 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,
             [
-                new StringSetting(appSettings.GetProperty(nameof(Settings.DefaultFolder)),
+                new StringSetting(() => Settings.DefaultFolder,
                                   Strings.Resources.S_SETTINGS_DEFAULT_FOLDER,
                                   commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeDefaultPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ClearDefaultPath),
                                   ]),
-                new StringSetting(appSettings.GetProperty(nameof(Settings.ManualAdbPath)),
+                new StringSetting(() => Settings.ManualAdbPath,
                                   Strings.Resources.S_SETTINGS_OVERRIDE_ADB,
                                   commands: [
                                       SettingsActions.Find(a => a.Name is ActionType.ChangeAdbPath),
@@ -110,7 +106,7 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_THEME,
             [
-                new ThemeSetting(appSettings.GetProperty(nameof(Settings.Theme)), Strings.Resources.S_SETTINGS_GROUP_THEME, new() {
+                new ThemeSetting(() => Settings.Theme, Strings.Resources.S_SETTINGS_GROUP_THEME, new() {
                     { AppSettings.AppTheme.light, Strings.Resources.S_SETTINGS_THEME_LIGHT },
                     { AppSettings.AppTheme.dark, Strings.Resources.S_SETTINGS_THEME_DARK },
                     { AppSettings.AppTheme.windowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT } }),
@@ -118,24 +114,24 @@ public static class UISettings
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_GRAPHICS,
             [
-                new ComboSetting(appSettings.GetProperty(nameof(Settings.UICulture)),
+                new ComboSetting<CultureInfo>(() => Settings.UICulture,
                                  Strings.Resources.S_SETTINGS_LANGUAGE,
                                  SettingsHelper.GetAvailableLanguages(),
                                  Settings.CultureTranslationProgress,
                                  commands: SettingsActions.Find(a => a.Name is ActionType.ResetApp)),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.ForceFluentStyles)), Strings.Resources.S_SETTINGS_FLUENT, visibleProp: RuntimeSettings.GetType().GetProperty(nameof(AppRuntimeSettings.HideForceFluent))),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.SwRender)), Strings.Resources.S_SETTINGS_DISABLE_HW),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.DisableAnimation)),
+                new BoolSetting(() => Settings.ForceFluentStyles, Strings.Resources.S_SETTINGS_FLUENT, visibleProp: () => RuntimeSettings.HideForceFluent),
+                new BoolSetting(() => Settings.SwRender, Strings.Resources.S_SETTINGS_DISABLE_HW),
+                new BoolSetting(() => Settings.DisableAnimation,
                                 Strings.Resources.S_SETTINGS_ANIMATION,
                                 commands: [
                                     SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                     SettingsActions.Find(a => a.Name is ActionType.AnimationInfo),
                                 ]),
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.EnableSplash)), Strings.Resources.S_SETTINGS_SPLASH),
+                new BoolSetting(() => Settings.EnableSplash, Strings.Resources.S_SETTINGS_SPLASH),
             ]),
             new Ungrouped(
             [
-                new BoolSetting(appSettings.GetProperty(nameof(Settings.CheckForUpdates)), Strings.Resources.S_SETTINGS_UPDATES)
+                new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES)
                 { GroupName = Strings.Resources.S_SETTINGS_GROUP_ABOUT },
             ]),
         ];
@@ -238,6 +234,17 @@ public abstract class AbstractSetting : SettingsBase
         }
     }
 
+    public static PropertyInfo ExtractPropertyInfo<T>(Expression<Func<T>> expr)
+    {
+        if (expr?.Body is MemberExpression member
+            && member.Member is PropertyInfo info)
+        {
+            return info;
+        }
+
+        return null;
+    }
+
 }
 
 public class BoolSetting : AbstractSetting
@@ -248,8 +255,8 @@ public class BoolSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public BoolSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, commands)
+    public BoolSetting(Expression<Func<bool>> propertyExpr, string description, Expression<Func<bool>> visibleProp = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, ExtractPropertyInfo(visibleProp), commands)
     { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -273,8 +280,8 @@ public class StringSetting : AbstractSetting
         set => valueProp.SetValue(Settings, value);
     }
 
-    public StringSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, commands)
+    public StringSetting(Expression<Func<string>> propertyExpr, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, commands)
     { }
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -290,26 +297,25 @@ public class StringSetting : AbstractSetting
     }
 }
 
-public class ComboSetting : AbstractSetting
+public class ComboSetting<T> : AbstractSetting
 {
-    public object Value
+    public T Value
     {
-        get => valueProp.GetValue(Settings);
+        get => (T)valueProp.GetValue(Settings);
         set => valueProp.SetValue(Settings, value);
     }
 
-    public IEnumerable<object> Options { get; } = [];
+    public IEnumerable<T> Options { get; } = [];
 
     public ObservableProperty<string> ObservableAltLabel { get; } = new();
 
     public string AltLabel { get; private set; } = null;
 
-    public ComboSetting(PropertyInfo valueProp, string description, IEnumerable<object> options, ObservableProperty<string> altLabel = null, params BaseAction[] commands)
-        : base(valueProp, description, null, commands)
+    public ComboSetting(Expression<Func<T>> propertyExpr, string description, IEnumerable<T> options, ObservableProperty<string> altLabel = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, null, commands)
     {
         Options = options;
         ObservableAltLabel = altLabel;
-
 
         if (ObservableAltLabel is not null)
         {
@@ -322,7 +328,6 @@ public class ComboSetting : AbstractSetting
             AltLabel = ObservableAltLabel.Value;
         }
     }
-
 
     protected override void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -365,19 +370,25 @@ public class EnumSetting : AbstractSetting
 
 public class ThemeSetting : EnumSetting
 {
-    public ThemeSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.AppTheme, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, commands)
+    public ThemeSetting(Expression<Func<AppSettings.AppTheme>> propertyExpr, string description, Dictionary<AppSettings.AppTheme, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, commands)
     {
-        Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
+        var sourceProp = ExtractPropertyInfo(propertyExpr);
+        Buttons.AddRange(enumNames.Select(val =>
+        {
+            
+            return new EnumRadioButton(val.Key, val.Value, sourceProp);
+        }));
     }
 }
 
 public class DoubleClickSetting : EnumSetting
 {
-    public DoubleClickSetting(PropertyInfo valueProp, string description, Dictionary<AppSettings.DoubleClickAction, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
-        : base(valueProp, description, visibleProp, commands)
+    public DoubleClickSetting(Expression<Func<AppSettings.DoubleClickAction>> propertyExpr, string description, Dictionary<AppSettings.DoubleClickAction, string> enumNames, PropertyInfo visibleProp = null, params BaseAction[] commands)
+        : base(ExtractPropertyInfo(propertyExpr), description, visibleProp, commands)
     {
-        Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, valueProp)));
+        var sourceProp = ExtractPropertyInfo(propertyExpr);
+        Buttons.AddRange(enumNames.Select(val => new EnumRadioButton(val.Key, val.Value, sourceProp)));
     }
 }
 

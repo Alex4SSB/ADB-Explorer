@@ -497,7 +497,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style BasedOn="{StaticResource FluentExpanderStyle}" TargetType="ComboBox" />
+    <Style BasedOn="{StaticResource FluentComboBoxStyle}" TargetType="ComboBox" />
 
     <Style
         x:Key="DataGridComboBoxStyle"
