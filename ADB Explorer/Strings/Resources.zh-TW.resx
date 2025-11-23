@@ -419,16 +419,16 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>合并或替換</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
-    <value>有 1 個衝突項</value>
+    <value>有一個衝突</value>
   </data>
   <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
-    <value>在 {0} 中有 1 個衝突項</value>
+    <value>{0} 個中有一個衝突</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
-    <value>有 {0} 個衝突項</value>
+    <value>有 {0} 個衝突</value>
   </data>
   <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
-    <value>在 {1} 中有 {0} 個衝突項</value>
+    <value>{1} 中有 {0} 個衝突</value>
   </data>
   <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
     <value>粘貼衝突</value>
@@ -1308,5 +1308,128 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>未知的檔案類型</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>毫(m)</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>微(u)</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>納(n)</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>複製 {0} 個</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>複製 {0} 個到 {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>移動 {0} 個到 {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>於 {0} 新增連結</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>移動 {0} 個</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>貼上一個剪下項</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>貼上一個複製項</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>貼上 {0} 個複製項</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>貼上 {0} 個剪下項</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} 費時 {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>完成 {0} 個，共 {1} 個</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>複製 {0} 個</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>複製 {0} 個到 {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>移動 {0} 個</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>無目標檔的連結</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>瀏覽史</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>新增目前位置</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>儲存的位置</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>移動 {0} 個到 {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>未找到檔案</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>未確認而離開了</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>操作錯誤: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>檢查中…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} 個檔案</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>選擇 ROM 以進行非官方載入</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM 檔案</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>終端機</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>安裝 {0} 個 APK</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>安裝 {0} 個</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>保留檔案修改日</value>
   </data>
 </root>
