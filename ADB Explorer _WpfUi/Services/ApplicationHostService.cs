@@ -1,10 +1,8 @@
-﻿using ADB_Explorer__WpfUi.Views.Pages;
-using ADB_Explorer__WpfUi.Views.Windows;
-using Microsoft.Extensions.DependencyInjection;
+﻿using ADB_Explorer.Views.Windows;
 using Microsoft.Extensions.Hosting;
 using Wpf.Ui;
 
-namespace ADB_Explorer__WpfUi.Services
+namespace ADB_Explorer.Services
 {
     /// <summary>
     /// Managed host of the application.

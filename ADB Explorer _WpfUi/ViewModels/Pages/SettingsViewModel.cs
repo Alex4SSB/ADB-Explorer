@@ -1,65 +1,44 @@
-﻿using Wpf.Ui.Abstractions.Controls;
-using Wpf.Ui.Appearance;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using ADB_Explorer.Services;
+using Wpf.Ui.Abstractions.Controls;
 
-namespace ADB_Explorer__WpfUi.ViewModels.Pages
+namespace ADB_Explorer.ViewModels.Pages;
+
+public partial class SettingsViewModel : ObservableObject, INavigationAware
 {
-    public partial class SettingsViewModel : ObservableObject, INavigationAware
+    private bool _isInitialized = false;
+
+    [ObservableProperty]
+    private ObservableList<AbstractGroup> _settingsList = [];
+
+    public Task OnNavigatedToAsync()
     {
-        private bool _isInitialized = false;
+        if (!_isInitialized)
+            InitializeViewModel();
 
-        [ObservableProperty]
-        private string _appVersion = String.Empty;
-
-        [ObservableProperty]
-        private ApplicationTheme _currentTheme = ApplicationTheme.Unknown;
-
-        public Task OnNavigatedToAsync()
-        {
-            if (!_isInitialized)
-                InitializeViewModel();
-
-            return Task.CompletedTask;
-        }
-
-        public Task OnNavigatedFromAsync() => Task.CompletedTask;
-
-        private void InitializeViewModel()
-        {
-            CurrentTheme = ApplicationThemeManager.GetAppTheme();
-            AppVersion = $"UiDesktopApp1 - {GetAssemblyVersion()}";
-
-            _isInitialized = true;
-        }
-
-        private string GetAssemblyVersion()
-        {
-            return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version?.ToString()
-                ?? String.Empty;
-        }
-
-        [RelayCommand]
-        private void OnChangeTheme(string parameter)
-        {
-            switch (parameter)
-            {
-                case "theme_light":
-                    if (CurrentTheme == ApplicationTheme.Light)
-                        break;
-
-                    ApplicationThemeManager.Apply(ApplicationTheme.Light);
-                    CurrentTheme = ApplicationTheme.Light;
-
-                    break;
-
-                default:
-                    if (CurrentTheme == ApplicationTheme.Dark)
-                        break;
-
-                    ApplicationThemeManager.Apply(ApplicationTheme.Dark);
-                    CurrentTheme = ApplicationTheme.Dark;
-
-                    break;
-            }
-        }
+        return Task.CompletedTask;
     }
+
+    public Task OnNavigatedFromAsync() => Task.CompletedTask;
+
+    private void InitializeViewModel()
+    {
+        Data.Settings.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(AppSettings.Theme))
+            {
+                AdbThemeService.SetTheme(Data.Settings.Theme);
+            }
+        };
+
+        if (SettingsList.Count == 0)
+        {
+            UISettings.Init();
+            SettingsList = UISettings.SettingsList;
+        }
+        
+        _isInitialized = true;
+    }
+
 }

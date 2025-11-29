@@ -1,15 +1,14 @@
-﻿using ADB_Explorer__WpfUi.Models;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using Wpf.Ui.Abstractions.Controls;
 
-namespace ADB_Explorer__WpfUi.ViewModels.Pages
+namespace ADB_Explorer.ViewModels.Pages
 {
     public partial class DataViewModel : ObservableObject, INavigationAware
     {
         private bool _isInitialized = false;
 
-        [ObservableProperty]
-        private IEnumerable<DataColor> _colors;
+        //[ObservableProperty]
+        //private IEnumerable<DataColor> _colors;
 
         public Task OnNavigatedToAsync()
         {
@@ -23,25 +22,25 @@ namespace ADB_Explorer__WpfUi.ViewModels.Pages
 
         private void InitializeViewModel()
         {
-            var random = new Random();
-            var colorCollection = new List<DataColor>();
+            //var random = new Random();
+            //var colorCollection = new List<DataColor>();
 
-            for (int i = 0; i < 8192; i++)
-                colorCollection.Add(
-                    new DataColor
-                    {
-                        Color = new SolidColorBrush(
-                            Color.FromArgb(
-                                (byte)200,
-                                (byte)random.Next(0, 250),
-                                (byte)random.Next(0, 250),
-                                (byte)random.Next(0, 250)
-                            )
-                        )
-                    }
-                );
+            //for (int i = 0; i < 8192; i++)
+            //    colorCollection.Add(
+            //        new DataColor
+            //        {
+            //            Color = new SolidColorBrush(
+            //                Color.FromArgb(
+            //                    (byte)200,
+            //                    (byte)random.Next(0, 250),
+            //                    (byte)random.Next(0, 250),
+            //                    (byte)random.Next(0, 250)
+            //                )
+            //            )
+            //        }
+            //    );
 
-            Colors = colorCollection;
+            //Colors = colorCollection;
 
             _isInitialized = true;
         }

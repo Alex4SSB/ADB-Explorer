@@ -1,4 +1,4 @@
-﻿namespace ADB_Explorer__WpfUi.ViewModels.Pages
+﻿namespace ADB_Explorer.ViewModels.Pages
 {
     public partial class DashboardViewModel : ObservableObject
     {

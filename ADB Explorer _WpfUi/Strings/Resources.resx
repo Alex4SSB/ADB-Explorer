@@ -1,0 +1,1769 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>The Android Robot Icon(s)</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>The Android robot is reproduced or modified from work created and shared by Google and used according to terms described in the Creative Commons 3.0 Attribution License.</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>App Animations</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>The APK icon is licensed under the Apache License, Version 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Could not get ADB version from provided path.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>ADB version from provided path is too low.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Fail to override ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Select ADB Executable</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Reset App Settings</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>New App Version</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Navigation Error</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Copy Package Name</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Copy Item Path</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Restore All Items</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Empty Recycle Bin</value>
+    <comment>The action to empty the recycle bin</comment>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Destination Path Error</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>failed to connect to</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Connection Error</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Disconnection Error</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Pairing Error</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>Root access cannot be enabled on selected device.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>Root Access</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Confirm Delete</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Permanently Delete</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Create Error</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Restore Conflicts</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Confirm Uninstall</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Select packages to install</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Kill Emulator</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Remove Device</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Disconnect Device</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>File Operations</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Install Packages</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Pair and/or connect a WiFi device (without using mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Restart app for changes to take effect</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Error Reading File</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Could not pull file in order to read it.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Error Writing File</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Could not push file back to device.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB server needs to be restarted in order to disable mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Disable mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Launch WSA in background</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Pull</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Pull (Link Target)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Progress Redirection</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>List Directory Error</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Pull To Windows Drive Root</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Welcome to a new ADB Explorer version!
+The release notes are available on GitHub.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE drive.
+• Symbolic links are not supported
+• File names cannot contain " * / : &lt; &gt; ? \ |
+• File names are case insensitive
+• Installation of APKs is not supported</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>The app has many animations that are enabled as part of the fluent design.
+The side views animation is always disabled when the app window is maximized on a secondary display.
+
+• Checking this setting disables all app animations except progress bars, progress rings, and drive usage bars.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>All app settings will be reset upon closing the app.
+This cannot be undone. Are you sure?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Select Launch if ADB is already authorized in WSA.
+To approve ADB, open WSA advanced settings.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} of the selected files cannot be created under a Windows drive root.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Learn More About ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Download ADB</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Locate ADB (v{0} at least):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Change</value>
+    <comment>The content of a button used to change a path</comment>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Select ADB Path</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Continue</value>
+    <comment>The tooltip of a button used to continue to the next step</comment>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>More Info</value>
+    <comment>The tooltip of a button used to display an info message</comment>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Enabled</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>A new {0}, version {1}, is available</value>
+    <comment>0 = App display name. 1 = new version number</comment>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Go To Version Page</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Close</value>
+    <comment>The content of a button to dismiss a message dialog</comment>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Go To Release Notes</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>ADB Executable</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>This app is a UI for ADB - Android Debug Bridge.
+To use the app, you need to have ADB on your PC.
+ADB is available as part of the Android SDK Platform Tools.
+You can use the provided link to download the SDK Platform Tools.
+Unfortunately, we cannot provide ADB with the app due to licensing restrictions.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Help On ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Restart ADB Now</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Restart Later</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Select destination for {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Select destination for multiple items</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>The following will be deleted:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>The following will be permanently deleted:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>New File</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>New Folder</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>An error occurred while trying to list the contents of this folder.
+Visible content may be incomplete.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} is an ancestor of the destination folder.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Are you sure you want to kill this emulator?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Are you sure you want to remove this device?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Remove {0}</value>
+    <comment>0 = Device name to remove</comment>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Kill {0}</value>
+    <comment>0 = Emulator name to kill</comment>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>The following will be removed:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>The following will be removed:
+{0} packages</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Uninstall</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>The content of a button used to cancel an operation</comment>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Confirm</value>
+    <comment>The content of a button used to confirm an operation</comment>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Skip</value>
+    <comment>The content of a button used to skip files in a merge dialog</comment>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Replace</value>
+    <comment>The content of a button used to replace files in a merge dialog</comment>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Merge or Replace</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>There is 1 conflicting item</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>There is 1 conflicting item in {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>There are {0} conflicting items</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>There are {0} conflicting items in {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Paste Conflicts</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Select folders to push</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Select folders to push into {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Select files to push</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Select files to push into {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Clear</value>
+    <comment>The tooltip of a button used to clear a textbox</comment>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>Enable mDNS</value>
+    <comment>The setting used to toggle mDNS enabled state</comment>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Poll For Devices</value>
+    <comment>The setting used to toggle polling for devices</comment>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Poll For Battery Status</value>
+    <comment>The setting used to toggle battery status polling</comment>
+  </data>
+  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
+    <value>Enable Command Log</value>
+    <comment>The setting used to toggle command log enabled state</comment>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Automatically Enable Root</value>
+    <comment>The setting used to enable automatically enabling root when a device connects</comment>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Save Manually Connected Devices</value>
+    <comment>The setting used to toggle saving devices that were manually added</comment>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Automatically Open For Browsing</value>
+    <comment>The setting used to toggle automatically opening the only connected device or the last connected device</comment>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Enable Compact View</value>
+    <comment>The setting used to enable the file operations compact view</comment>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Stop Polling On Push/Pull</value>
+    <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Allow Simultaneous Operations</value>
+    <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Force Media Rescan On Push</value>
+    <comment>The setting used to enable forcing the device to perform a media rescan after a successful push operation batch</comment>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Poll For Drives</value>
+    <comment>The setting used to toggle polling for device drives when in drive view</comment>
+  </data>
+  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
+    <value>Enable Recycle Bin</value>
+    <comment>The setting used to enable the recycle bin (trash)</comment>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>Enable APK Handling</value>
+    <comment>The setting used to enable everything related to APK</comment>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Show File Name Extensions</value>
+    <comment>The setting used to enable showing file name extension</comment>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Show Hidden Items</value>
+    <comment>The setting used to enable showing hidden items in the browser</comment>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Show System Apps</value>
+    <comment>The setting used to allow displaying system apps in package view</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>File Double Click</value>
+    <comment>The title of the settings group used to control what happens when a non-folder item is double clicked in the browser</comment>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>None</value>
+    <comment>The setting used to disable any action when double clicking a non-folder item in the browser</comment>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Pull To Default Folder</value>
+    <comment>The setting used to pull a non-folder item to the default folder when double clicking it in the browser</comment>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>Open In Editor</value>
+    <comment>The setting used to open a non-folder item in the text editor when double clicking it in the browser</comment>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Override ADB Path</value>
+    <comment>The setting used to override the system default ADB path</comment>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Default Folder</value>
+    <comment>The setting used to set the app's default folder for browsing and double click pull</comment>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Light</value>
+    <comment>The setting used to force light theme in the app</comment>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Dark</value>
+    <comment>The setting used to force dark theme in the app</comment>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Windows Default</value>
+    <comment>The setting to use the default theme set by Windows</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Theme</value>
+    <comment>The title of the settings group used to control the app theme</comment>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Force Fluent Styles</value>
+    <comment>The setting used in Windows 10 to force the app to use the fluent style design</comment>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Disable Hardware Acceleration</value>
+    <comment>The setting used to disable HW / GPU acceleration</comment>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>Disable Animations</value>
+    <comment>The setting used to disable app animations</comment>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>Display Splash Screen</value>
+    <comment>The setting used to enable showing the splash screen on app startup</comment>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Check For Updates</value>
+    <comment>The setting used to enable checking for updates in non MS Store installs</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Graphics</value>
+    <comment>The title of the settings group for graphics settings</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Working Directories</value>
+    <comment>The title of the settings group that defines the working directories</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Explorer</value>
+    <comment>The title of the settings group that defines the explorer / browser behavior</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Drives &amp; Features</value>
+    <comment>The title of the settings group for settings of drives and similar features</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Device</value>
+    <comment>The title of the settings group for (Android) device settings</comment>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Donate or Sponsor</value>
+    <comment>The content of the button that redirects to our GitHub Sponsors page</comment>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>App Data Folder</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>GitHub repository</value>
+    <comment>The title of the hyperlink to our GitHub repository</comment>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Privacy Policy</value>
+    <comment>The title of the hyperlink to our privacy policy</comment>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Attributions &amp; Third Party Licenses</value>
+    <comment>The title of the about section listing licenses</comment>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>See terms</value>
+    <comment>The tooltip of the button that shows license(s)</comment>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[not set]</value>
+    <comment>The placeholder text for a textbox whose value hasn't been set</comment>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Search Settings</value>
+    <comment>The placeholder of the textbox used to search through the settings</comment>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Exit Search</value>
+    <comment>The tooltip of the button used to hide the settings search textbox</comment>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Search View</value>
+    <comment>The tooltip of the button used to show the settings search textbox</comment>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Collapse All</value>
+    <comment>The tooltip of the button used to collapse all settings groups</comment>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Expand All</value>
+    <comment>The tooltip of the button used to expand all settings groups</comment>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Settings</value>
+    <comment>The title of the settings view</comment>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Hide</value>
+    <comment>The tooltip of a button used to hide a view</comment>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Language</value>
+    <comment>The setting used to set the UI language to a language different than Windows</comment>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+    <comment>The content of an OK button on a message dialog</comment>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Filter File Operations</value>
+    <comment>The content of a button used to toggle file operations filtering</comment>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Enable Auto Play</value>
+    <comment>The content of a button used to toggle automatic processing of the file operations</comment>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Disable Auto Play
+Cancel All Running</value>
+    <comment>The tooltip of the file operations auto play button in its alt state</comment>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Log Updates Are Paused</value>
+    <comment>The tooltip of a button used to pause updates to the command log, in its off state</comment>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Pause Log Updates</value>
+    <comment>The tooltip of a button used to pause updates to the command log, in its on state</comment>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Command Log</value>
+    <comment>The tooltip of a button used to show / hide the command log</comment>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Device Drives</value>
+    <comment>The tooltip of a button used to switch to the drive view</comment>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Back</value>
+    <comment>The tooltip of a button used to navigate backwards in the file browser</comment>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Forward</value>
+    <comment>The tooltip of a button used to navigate forward in the file browser</comment>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Up</value>
+    <comment>The tooltip of a button used to navigate to the parent location in the file browser</comment>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Filter</value>
+    <comment>The tooltip of a button used to hide the file browser filter box</comment>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Devices</value>
+    <comment>The tooltip of a button used to open the devices view</comment>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Push</value>
+    <comment>The tooltip of the button used to initiate a push operation</comment>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Folders</value>
+    <comment>The submenu for selecting folders to push</comment>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Files</value>
+    <comment>The submenu to select files to push</comment>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Refresh</value>
+    <comment>The menu item used to refresh the current location in the file browser</comment>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Copy</value>
+    <comment>The menu used to select files for copy</comment>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>More</value>
+    <comment>The menu item hiding more options under it</comment>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Edit</value>
+    <comment>The menu item to edit the current path</comment>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>New</value>
+    <comment>The menu to create new files and folders</comment>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Folder</value>
+    <comment>The menu used to create a new folder</comment>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>File</value>
+    <comment>The menu used to create a new file</comment>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Select All</value>
+    <comment>The menu used to select all items currently visible in the file browser</comment>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Cut</value>
+    <comment>The menu used to cut files</comment>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Paste Link</value>
+    <comment>The menu used to paste a link of the copied item</comment>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Rename</value>
+    <comment>The menu used to rename a file or folder</comment>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Package</value>
+    <comment>The menu item containing package actions</comment>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Update Time Modified</value>
+    <comment>The menu used to update the time modified of files using their names</comment>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Close Editor</value>
+    <comment>The tooltip of a button used to close the text editor</comment>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Save Changes</value>
+    <comment>The tooltip of a button to save the changes made in the text editor</comment>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Install</value>
+    <comment>The menu to install app packages</comment>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Copy To Temp</value>
+    <comment>The menu used to copy selected APK files to the temp drive</comment>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Clear Command Log</value>
+    <comment>The button used to clear the command log</comment>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Open Item Location</value>
+    <comment>The menu used to open the (source) location to a symbolic link</comment>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Search In Browser</value>
+    <comment>The menu used to open the default web browser and search for a package name from the installed apps view</comment>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Copy to clipboard</value>
+    <comment>The tooltip of the button in the message dialog used to copy the message to the clipboard</comment>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB Disk Usage</value>
+    <comment>The title of the tooltip of the transfer speed icon</comment>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Read: {0}</value>
+    <comment>ADB disk read speed. 0 = the speed including MB/s</comment>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Write: {0}</value>
+    <comment>ADB disk write speed. 0 = the speed including MB/s</comment>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>Other: {0}</value>
+    <comment>ADB disk other speed (other than file transfers). 0 = the speed including MB/s</comment>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Checks for updates on each launch</value>
+    <comment>The tooltip of the setting that enables checking for updates</comment>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>About</value>
+    <comment>The title of the settings about group</comment>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>item</value>
+    <comment>The toolbar folder items count display, singular</comment>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>items</value>
+    <comment>The toolbar folder items count display, plural</comment>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>This folder is empty.</value>
+    <comment>The notification displayed when a folder is empty on a rooted device</comment>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Unable to get list.</value>
+    <comment>The notification displayed when the package view is empty</comment>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>No items match current filter.</value>
+    <comment>The notification displayed when a non empty folder / package view is filtered such that no items match</comment>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;This folder &lt;Italic&gt;looks&lt;/Italic&gt; empty&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… to the naked eye&lt;/Span&gt;&lt;/Span&gt;</value>
+    <comment>The sentence which is being translated here: This folder looks empty … to the naked eye</comment>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>item selected</value>
+    <comment>The toolbar folder items selected count</comment>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>items selected</value>
+    <comment>The toolbar folder items selected count, plural form</comment>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Operation Type</value>
+    <comment>File operations detailed data grid column name for the type of the operation icon</comment>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>File Name</value>
+    <comment>File operations detailed data grid column name for the file name of the operation</comment>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Progress</value>
+    <comment>File operations detailed data grid column name for the progress / status of the operation</comment>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Source</value>
+    <comment>File operations detailed data grid column name for the source path of the operation</comment>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Destination</value>
+    <comment>File operations detailed data grid column name for the destination path of the operation</comment>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Added</value>
+    <comment>File operations detailed data grid column name for the time the operation was added</comment>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Icon</value>
+    <comment>File browser data grid column tooltip for the file icon</comment>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Name</value>
+    <comment>File browser data grid column name for the file name</comment>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Original Location</value>
+    <comment>File browser data grid column name for the original location of an item in the recycle bin</comment>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Date Modified</value>
+    <comment>File browser data grid column name for the file date modified</comment>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Type</value>
+    <comment>File browser data grid column name for the type of the item</comment>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Size</value>
+    <comment>File browser data grid column name for the size of the file</comment>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Date Deleted</value>
+    <comment>File browser data grid column name for the date a file in the recycle bin was deleted</comment>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>User ID</value>
+    <comment>App view data grid column name for the package owner user ID</comment>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Version</value>
+    <comment>App view data grid column name for the installed package version</comment>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB Server Unresponsive</value>
+    <comment>The notification displayed when the server is unresponsive</comment>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Time from last server response</value>
+    <comment>The tooltip displayed when ADB server is unresponsive</comment>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+    <comment>Seconds display (eg. 6s)</comment>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Kill Server</value>
+    <comment>The content of a button to kill ADB server</comment>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Kill Process</value>
+    <comment>The content of a button to kill the process of ADB</comment>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Refresh Devices</value>
+    <comment>The tooltip of a button to manually refresh the device list</comment>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Restart ADB</value>
+    <comment>The content of a button to restart ADB server</comment>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>Server is down</value>
+    <comment>A notification indicating that ADB server is down</comment>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Awaiting response: {0}</value>
+    <comment>The notification displayed when the app is waiting too long for a response (0 - in seconds) from the server</comment>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+    <comment>Milliseconds display (eg. 300ms)</comment>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+    <comment>Minutes display (eg. 2m)</comment>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
+    <comment>Hours display (eg. 8h)</comment>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;</value>
+    <comment>The notification displayed when mDNS server has been turned off</comment>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Click to enable server and polling</value>
+    <comment>The tooltip of the checkbox to enable the mDNS server</comment>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>Server is up and running</value>
+    <comment>The tooltip of the mDNS checkbox when the server is on</comment>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Limited Support</value>
+    <comment>The tooltip displayed for too low Android versions</comment>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Some operations have failed</value>
+    <comment>The tooltip displayed when some file operations have failed</comment>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>Root Access Enabled</value>
+    <comment>The tooltip displayed when root access on the Android device is currently enabled</comment>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>Root Can Be Enabled</value>
+    <comment>The tooltip displayed when an Android device supports root access</comment>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Recovery</value>
+    <comment>The Android recovery mode</comment>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Voltage: {0}v</value>
+    <comment>The battery voltage indicator</comment>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Temperature: {0}°C</value>
+    <comment>The battery temperature indicator</comment>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Current Balance: {0}A</value>
+    <comment>The battery current balance indicator, in Amperes</comment>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Reboot Into</value>
+    <comment>The title of the menu to select a device reboot option</comment>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>System Image</value>
+    <comment>The menu option to reboot the device into the Android system</comment>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+    <comment>The menu option to reboot the device into the bootloader</comment>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+    <comment>The menu option to reboot the device into side-load mode</comment>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (Auto Reboot)</value>
+    <comment>The menu option to reboot the device into side-load mode, with auto reboot</comment>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+    <comment>A device that is no longer online</comment>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Unauthorized</value>
+    <comment>A device that hasn't authorized ADB yet</comment>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulator</value>
+    <comment>An emulated Android device (other than WSA)</comment>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS Service</value>
+    <comment>An mDNS service of a device in the network - this is just the discovery mechanism, and the device isn't connected yet</comment>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+    <comment>A device that is connected to the PC by USB</comment>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+    <comment>A device that was manually connected over WiFi, without using mDNS</comment>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+    <comment>Windows Subsystem for Android - an Android emulator by Microsoft, now discontinued</comment>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Battery Status Unknown</value>
+    <comment>The battery status indicator when the status is unknown</comment>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, Plugged In</value>
+    <comment>Battery percentage when device is charging</comment>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Wireless</value>
+    <comment>Battery charging source indicator - wireless charging</comment>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+    <comment>Battery charging source indicator - AC charging</comment>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>None</value>
+    <comment>Battery charging source indicator - no source of charging</comment>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+    <comment>Battery state is unknown</comment>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Charging</value>
+    <comment>Battery state is charging</comment>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Discharging</value>
+    <comment>Battery state is discharging</comment>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Not Charging</value>
+    <comment>Battery state is not charging (but plugged in)</comment>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Full</value>
+    <comment>Battery state is full - done charging</comment>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
+    <comment>Battery status indicator title</comment>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Health: {0}</value>
+    <comment>Battery health indicator title</comment>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Good</value>
+    <comment>Battery health indicator - good</comment>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Overheat</value>
+    <comment>Battery health indicator - overheat</comment>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Dead</value>
+    <comment>Battery health indicator - dead</comment>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Over Voltage</value>
+    <comment>Battery health indicator - over voltage</comment>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Unspecified failure</value>
+    <comment>Battery health indicator - unspecified failure</comment>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Cold</value>
+    <comment>Battery health indicator - cold</comment>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Launch</value>
+    <comment>The content of the button to launch WSA</comment>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA Launch</value>
+    <comment>The title of the dialog message to launch WSA</comment>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Do Not Show This Again.</value>
+    <comment>The content of a checkbox used to silence the WSA launch dialog</comment>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Abort</value>
+    <comment>The content of the button used to abort the extraction process</comment>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Sending To Shell</value>
+    <comment>The title of a dialog displayed when data of files is being sent to the shell</comment>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} Conflict</value>
+    <comment>The title of the dialog reporting a merge conflict. 0 = Paste / Drop</comment>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Paste</value>
+    <comment>The file paste operation</comment>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Drop</value>
+    <comment>The file drop operation</comment>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Operation</value>
+    <comment>Used for file operation actions</comment>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Operations</value>
+    <comment>Used for file operation actions, plural</comment>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Validate {0}</value>
+    <comment>Validate a file operation, by comparing MD5 of source and target files</comment>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Link</value>
+    <comment>A link to an unknown file type</comment>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Link)</value>
+    <comment>A link to a {0} file type</comment>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Android Application Package</value>
+    <comment>The type name for APK files</comment>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows Executable</value>
+    <comment>For executable file type</comment>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Recycle Bin</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Yes</value>
+    <comment>A dialog button</comment>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+    <comment>The root drive - /</comment>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Internal Storage</value>
+    <comment>The home / main user space drive</comment>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Installed Apps</value>
+    <comment>The drive displaying the installed applications</comment>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>µSD Card</value>
+    <comment>A micro SD card drive</comment>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG Drive</value>
+    <comment>A flash drive connected by USB to the device</comment>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Emulated Drive</value>
+    <comment>A drive on an emulator device</comment>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Temp</value>
+    <comment>The user space temp drive - /data/local/tmp</comment>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>File name illegal on target file system: {0}</value>
+    <comment>0 = file name</comment>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Content mismatch</value>
+    <comment>The error displayed when validation of a file operation resulted in different MD5 checksums of the source and target</comment>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Missing from target location</value>
+    <comment>The error displayed when during validation of a file operation the file was not found in the target location</comment>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Permanent Deletion</value>
+    <comment>The location displayed in the target column of a permanent delete file operation</comment>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>N/A</value>
+    <comment>Displayed in the source / target of a file operation when those are unknown</comment>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Provided path does not exist.</value>
+    <comment>Displayed when an invalid path argument is provided for app launch</comment>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Custom App Data Path</value>
+    <comment>The title of the error message when an invalid path argument is provided</comment>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Menu Is Empty</value>
+    <comment>Displayed when the context menu is empty</comment>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Copy</value>
+    <comment>A copy of an item. 0 = item name</comment>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Adheres to Unix naming rules (via ADB)</value>
+    <comment>Will be shown if a file name doesn't meet Unix naming rules</comment>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Adheres to FUSE naming rules</value>
+    <comment>Will show if a file name doesn't meet FUSE naming rules</comment>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Adheres to Windows naming rules</value>
+    <comment>Will show if a file name doesn't meet Windows naming rules</comment>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Adheres to Windows drive root naming rules</value>
+    <comment>Will show if a file name doesn't meet Windows drive root naming rules</comment>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Unique in current location</value>
+    <comment>Will show if a file name isn't unique in the current location, according to the file system naming rules</comment>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Warnings</value>
+    <comment>The title of the paste and pull warnings popup</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>A selected file violates Windows naming rules</value>
+    <comment>Will show if a selected file doesn't meet Windows naming rules</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>A selected file violates Windows drive root naming rules</value>
+    <comment>Will show if a selected file doesn't meet Windows drive root naming rules</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Some selected files have conflicting names on FUSE / Windows</value>
+    <comment>Will show when selecting files on a non-FUSE drive whose names differ only by upper / lower case</comment>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>A selected file violates FUSE naming rules</value>
+    <comment>Will show if a selected file doesn't meet FUSE naming rules</comment>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Some copied files have conflicting names on FUSE</value>
+    <comment>Will show when copied files' names differ only by upper / lower case</comment>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>A copied file violates FUSE naming rules</value>
+    <comment>Will show if a copied file doesn't meet FUSE naming rules</comment>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>A selected item is not a file / folder</value>
+    <comment>Will show when selecting an item that can't be copied</comment>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Can be undone using Reset App Settings, or manually in settings file</value>
+    <comment>The tooltip displayed on the "Never show again" checkbox in the paste warnings popup</comment>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>Until next app launch</value>
+    <comment>The tooltip of the button used to hide the paste warnings popup</comment>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Never Show Again</value>
+    <comment>The paste popup permanent hide checkbox content</comment>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA App</value>
+    <comment>Represents the WSA app, not the device itself</comment>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root Status: {0}</value>
+    <comment>0 = the status (enabled, forbidden, etc.)</comment>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Unchecked</value>
+    <comment>Root status - it is yet unknown whether the device supports root access</comment>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Forbidden</value>
+    <comment>Root access - the device does not support root access</comment>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Enable</value>
+    <comment>Toggle button - enable</comment>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Disable</value>
+    <comment>Toggle button - disable</comment>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Pairing Code</value>
+    <comment>The placeholder text for the pairing code textbox</comment>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP Address / Host Name</value>
+    <comment>The placeholder text for the IP address textbox</comment>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Port</value>
+    <comment>The placeholder text for the connect port textbox</comment>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Pairing Port</value>
+    <comment>The placeholder text for the pairing port textbox</comment>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Pair &amp; Connect</value>
+    <comment>The content of a button to pair and connect a new manually connected device</comment>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Saved Device</value>
+    <comment>A saved device that has been manually connected</comment>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR Pairing</value>
+    <comment>An mDNS service device that is in the process of pairing using the QR code</comment>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Ready To Pair</value>
+    <comment>An mDNS service device that is ready to pair</comment>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Clear All</value>
+    <comment>The tooltip of a button used to clear all textboxes in the connect new device</comment>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Add New Device</value>
+    <comment>The tooltip of the new device icon</comment>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Unauthorized]</value>
+    <comment>The name displayed for a device that hasn't authorized ADB yet, and we don't know its name</comment>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[Service]</value>
+    <comment>The name displayed for a service device for which we don't have a name yet</comment>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Currently Browsing</value>
+    <comment>The tooltip displayed for the device that is currently open for browsing</comment>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Browse</value>
+    <comment>The content of the button to open a device for browsing</comment>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Connect</value>
+    <comment>The button to try to connect an old / new device manually</comment>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} free of {1}</value>
+    <comment>0 = free space on drive (in B/KB/MB/GB). 1 = total drive capacity (in B/KB/MB/GB)</comment>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Empty</value>
+    <comment>The notification displayed on the recycle bin drive when it is empty</comment>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK Installer</value>
+    <comment>The item count on the temp drive, singular</comment>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK Installers</value>
+    <comment>The item count on the temp drive, plural</comment>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Packages</value>
+    <comment>The installed apps drive items count display, plural</comment>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Error: {0}</value>
+    <comment>0 = an internal error message</comment>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Validated</value>
+    <comment>A file operation status - validated</comment>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Completed</value>
+    <comment>A file operation status - completed</comment>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} Failed</value>
+    <comment>File operation sub items failed status. 0 = failed items count</comment>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Total:</value>
+    <comment>File operation total sub items count</comment>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Previous Operation</value>
+    <comment>A file operation from a previous batch</comment>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>Running</value>
+    <comment>File operation status - running (in progress)</comment>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>Queued</value>
+    <comment>File operation status - queued (waiting)</comment>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Failed</value>
+    <comment>File operation status - failed</comment>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Canceled</value>
+    <comment>File operation status - canceled</comment>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Previous</value>
+    <comment>File operation status - A file operation from a previous batch</comment>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Move</value>
+    <comment>The action to move a file (cut-paste)</comment>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>Recycle</value>
+    <comment>The action to recycle an item - send it to the trash</comment>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Update</value>
+    <comment>The action to update the date modified of a file according to its name</comment>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% Used</value>
+    <comment>The tooltip for the drive usage percentage progress bar</comment>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Scroll Here</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Top</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Bottom</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Page Up</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Page Down</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Scroll Up</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Scroll Down</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Left Edge</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Right Edge</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Page Left</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Page Right</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Scroll Left</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Scroll Right</value>
+    <comment>ScrollBar ContextMenu</comment>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Undo</value>
+    <comment>TextBox ContextMenu</comment>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Redo</value>
+    <comment>TextBox ContextMenu</comment>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Notifications</value>
+    <comment>The title of the notifications area in the settings pane</comment>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Click to display more info</value>
+    <comment>The tooltip of a button used to display a notification message</comment>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>App Language</value>
+    <comment>The title of the notification message about the app language</comment>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Select your app language of choice in the settings.
+Translation progress is displayed for the selected language.
+Please help us localize the app to your language on Weblate.</value>
+    <comment>The content of the app language notification message </comment>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Go to Weblate</value>
+    <comment>The content of the button used to open the link to our project on Weblate</comment>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+    <comment>The socket Unix file type</comment>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Block Device</value>
+    <comment>The block device Unix file type</comment>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Char Device</value>
+    <comment>The char device Unix file type</comment>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+    <comment>The FIFO (First-In First-Out) Unix file type</comment>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Unknown</value>
+    <comment>An unknown file type</comment>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Broken Link</value>
+    <comment>A symbolic link that points to a file that doesn't exist</comment>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>Navigation History</value>
+    <comment>The tooltip of the menu that displays the navigation history</comment>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Add Current Location</value>
+    <comment>The button used to add the current location (path) to the saved locations list</comment>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Remove</value>
+    <comment>The tooltip of the button used to remove a saved location from the list</comment>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Saved Locations</value>
+    <comment>The tooltip of the button used to open the saved locations menu</comment>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+    <comment>The notation for KiloBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+    <comment>The notation for MegaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+    <comment>The notation for GigaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+    <comment>The notation for TeraBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+    <comment>The notation for PetaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+    <comment>The notation for ExaBytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+    <comment>The notation for milli (Ampere) when displaying battery usage</comment>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+    <comment>The notation for micro (Ampere) when displaying battery usage</comment>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+    <comment>The notation for nano (Ampere) when displaying battery usage</comment>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+    <comment>The notation for Bytes when displaying file size or drive usage</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Copy {0} items</value>
+    <comment>The drag tooltip in copy mode. 0 - number of items being dragged</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Copy {0} items to {1}</value>
+    <comment>The drag tooltip in copy mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Move {0} items to {1}</value>
+    <comment>The drag tooltip in move mode when the target is known. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Create link in {0}</value>
+    <comment>The drag tooltip in link mode. 0 - the destination under the mouse</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Move {0} items</value>
+    <comment>The drag tooltip in move mode. 0 - number of items being dragged, 1 - the destination under the mouse</comment>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Paste 1 Cut Item</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Paste 1 Copied Item</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Paste {0} Copied Items</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Paste {0} Cut Items</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} in {1} ({2})</value>
+    <comment>0 - file size, 1 - transfer time, 2 - speed. ex: 9MB in 1.2s (7.5MB/s)</comment>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} of {1}</value>
+    <comment>0 - number of completed files, 1 - total files. ex: 2 of 3</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Copy {0}</value>
+    <comment>The drag tooltip in copy mode. 0 - the item being dragged</comment>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Copy {0} to {1}</value>
+    <comment>The drag tooltip in copy mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Move {0}</value>
+    <comment>The drag tooltip in move mode. 0 - the item being dragged</comment>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Move {0} to {1}</value>
+    <comment>The drag tooltip in move mode when the target is known. 0 - the item being dragged, 1 - the destination under the mouse</comment>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>File not found</value>
+    <comment>The error message displayed when a sync operation is about to start but the source file is missing</comment>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Finished with no confirmation</value>
+    <comment>The error message displayed when a sync operation has finished but ADB did not provide a confirmation</comment>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Validation error: {0}</value>
+    <comment>The title of the error message displayed on a file operation validation error</comment>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Validating…</value>
+    <comment>The info displayed in file operation progress during content validation</comment>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} files</value>
+    <comment>The indication of the number of currently active files (being transferred)</comment>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Select ROM for sideload</value>
+    <comment>The title of the open file dialog for selecting a ROM image to sideload</comment>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM file</value>
+    <comment>The filter name displayed in the open file dialog when opening a ROM for sideload</comment>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+    <comment>The tooltip of the button used to open or close the terminal</comment>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Preserve File Date Modified</value>
+    <comment>The name of the setting to enable preserving the "Date Modified" of files on push / pull operations</comment>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Install {0}</value>
+    <comment>The drag tooltip when dragging a single APK file over the installed apps view. 0 - the name of the APK</comment>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Install {0} APKs</value>
+    <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
+  </data>
+</root>

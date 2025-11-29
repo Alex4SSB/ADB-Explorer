@@ -1,10 +1,12 @@
-﻿using ADB_Explorer__WpfUi.ViewModels.Windows;
+﻿using ADB_Explorer.Models;
+using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels.Windows;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
-namespace ADB_Explorer__WpfUi.Views.Windows
+namespace ADB_Explorer.Views.Windows
 {
     public partial class MainWindow : INavigationWindow
     {
@@ -20,6 +22,7 @@ namespace ADB_Explorer__WpfUi.Views.Windows
             DataContext = this;
 
             SystemThemeWatcher.Watch(this);
+            AdbThemeService.SetTheme(Data.Settings.Theme);
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);

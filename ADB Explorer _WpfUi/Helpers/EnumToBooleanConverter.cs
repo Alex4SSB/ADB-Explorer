@@ -1,8 +1,9 @@
-﻿using System.Globalization;
+﻿using ADB_Explorer.Services;
+using System.Globalization;
 using System.Windows.Data;
 using Wpf.Ui.Appearance;
 
-namespace ADB_Explorer__WpfUi.Helpers
+namespace ADB_Explorer.Helpers
 {
     internal class EnumToBooleanConverter : IValueConverter
     {
@@ -13,12 +14,12 @@ namespace ADB_Explorer__WpfUi.Helpers
                 throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
             }
 
-            if (!Enum.IsDefined(typeof(ApplicationTheme), value))
+            if (!Enum.IsDefined(typeof(AppSettings.AppTheme), value))
             {
                 throw new ArgumentException("ExceptionEnumToBooleanConverterValueMustBeAnEnum");
             }
 
-            var enumValue = Enum.Parse(typeof(ApplicationTheme), enumString);
+            var enumValue = Enum.Parse(typeof(AppSettings.AppTheme), enumString);
 
             return enumValue.Equals(value);
         }
@@ -30,7 +31,7 @@ namespace ADB_Explorer__WpfUi.Helpers
                 throw new ArgumentException("ExceptionEnumToBooleanConverterParameterMustBeAnEnumName");
             }
 
-            return Enum.Parse(typeof(ApplicationTheme), enumString);
+            return Enum.Parse(typeof(AppSettings.AppTheme), enumString);
         }
     }
 }
