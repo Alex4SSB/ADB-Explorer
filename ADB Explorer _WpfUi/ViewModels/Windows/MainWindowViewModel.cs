@@ -25,15 +25,15 @@ public partial class MainWindowViewModel : ObservableObject
     };
 
     [ObservableProperty]
-    private ObservableCollection<object> _footerMenuItems = new()
-    {
+    private ObservableCollection<object> _footerMenuItems =
+    [
         new NavigationViewItem()
         {
-            Content = "Settings",
+            Content = Strings.Resources.S_SETTINGS_TITLE,
             Icon = new FontIcon { Glyph = "\uE713" },
             TargetPageType = typeof(Views.Pages.SettingsPage)
         }
-    };
+    ];
 
     [ObservableProperty]
     private ObservableCollection<Wpf.Ui.Controls.MenuItem> _trayMenuItems = new()

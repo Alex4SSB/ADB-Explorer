@@ -15,7 +15,8 @@ namespace ADB_Explorer.Views.Windows
         public MainWindow(
             MainWindowViewModel viewModel,
             INavigationViewPageProvider navigationViewPageProvider,
-            INavigationService navigationService
+            INavigationService navigationService,
+            IContentDialogService contentDialogService
         )
         {
             ViewModel = viewModel;
@@ -26,6 +27,7 @@ namespace ADB_Explorer.Views.Windows
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);
+            contentDialogService.SetDialogHost(RootContentDialog);
 
             navigationService.SetNavigationControl(RootNavigation);
         }

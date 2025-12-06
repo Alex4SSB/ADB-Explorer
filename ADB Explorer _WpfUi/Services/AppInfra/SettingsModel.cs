@@ -168,11 +168,10 @@ public class SettingsGroup : AbstractGroup
 
     public string Name { get; set; }
 
-    public SettingsGroup(string name, List<AbstractSetting> children, params SettingsAction[] commands)
+    public SettingsGroup(string name, List<AbstractSetting> children)
     {
         Name = name;
         Children = children;
-        Commands = commands;
         
         Children.ForEach(c => c.GroupName = Name);
 
@@ -191,6 +190,8 @@ public class SettingsSeparator : AbstractGroup
 
 public class Ungrouped : AbstractGroup
 {
+    public string Name => null;
+
     public Ungrouped(List<AbstractSetting> children)
     {
         Children = children;

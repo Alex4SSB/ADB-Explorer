@@ -23,25 +23,21 @@ internal class AdbThemeService
 
                 break;
         }
+
+        var actualTheme = ApplicationThemeManager.GetSystemTheme();
+
+        Task.Run(() =>
+        {
+            var keys = ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys;
+            string[] brushes = new string[keys.Count];
+            keys.CopyTo(brushes, 0);
+
+            Parallel.ForEach(brushes, (brush) => SetResourceColor(actualTheme, brush));
+        });
+    }
+
+    public static void SetResourceColor(SystemTheme theme, string resource)
+    {
+        App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
     }
 }
-
-//    public static void SetTheme(ApplicationTheme theme) => App.Current.Dispatcher.Invoke(() =>
-//    {
-//        ThemeManager.Current.ApplicationTheme = theme;
-
-//        Task.Run(() =>
-//        {
-//            var keys = ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys;
-//            string[] brushes = new string[keys.Count];
-//            keys.CopyTo(brushes, 0);
-
-//            Parallel.ForEach(brushes, (brush) => SetResourceColor(theme, brush));
-//        });
-//    });
-
-//    public static void SetResourceColor(ApplicationTheme theme, string resource)
-//    {
-//        App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
-//    }
-//}

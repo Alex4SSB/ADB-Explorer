@@ -1,7 +1,11 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
+using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
+using Wpf.Ui;
 using Wpf.Ui.Abstractions.Controls;
+using Wpf.Ui.Controls;
+using Wpf.Ui.Extensions;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -41,4 +45,61 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         _isInitialized = true;
     }
 
+    [RelayCommand]
+    private void SponsorButton()
+    {
+        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.SPONSOR}\"");
+    }
+
+    private DateTime appDataClick = DateTime.MinValue;
+
+    [RelayCommand]
+    private void AppDataHyperlink()
+    {
+        if (DateTime.Now - appDataClick < AdbExplorerConst.LINK_CLICK_DELAY)
+            return;
+
+        appDataClick = DateTime.Now;
+        Process.Start("explorer.exe", Data.AppDataPath);
+    }
+
+    [RelayCommand]
+    private async Task AndroidRobotLicense()
+    {
+        StackPanel stack = new()
+        {
+            Children =
+            {
+                new Wpf.Ui.Controls.TextBlock()
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
+                    Margin = new Thickness(0, 0, 0, 8),
+                },
+                new Wpf.Ui.Controls.TextBlock()
+                {
+                    TextWrapping = TextWrapping.Wrap,
+                    Text = Strings.Resources.S_APK_ICON_LIC,
+                    Margin = new Thickness(0, 0, 0, 8),
+                },
+                new HyperlinkButton()
+                {
+                    Content = Strings.Resources.S_CC_NAME,
+                    ToolTip = Links.L_CC_LIC,
+                    NavigateUri = Links.L_CC_LIC.OriginalString,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                }
+            },
+        };
+
+        var contentDialogService = App.Services.GetRequiredService<IContentDialogService>();
+        await contentDialogService.ShowSimpleDialogAsync(
+            new SimpleContentDialogCreateOptions()
+            {
+                Title = Strings.Resources.S_ANDROID_ICONS_TITLE,
+                Content = stack,
+                CloseButtonText = Strings.Resources.S_BUTTON_OK,
+            }
+        );
+    }
 }

@@ -235,15 +235,17 @@
         x:Key="ScrollViewerStyle"
         BasedOn="{StaticResource DefaultScrollViewerStyle}"
         TargetType="ScrollViewer">
-        --><!--<Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="True" />
+    -->
+    <!--<Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="True" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
                 <Setter Property="ui:ScrollViewerHelper.AutoHideScrollBars" Value="False" />
             </DataTrigger>
-        </Style.Triggers>--><!--
+        </Style.Triggers>-->
+    <!--
     </Style>-->
     <!--<Style BasedOn="{StaticResource ScrollViewerStyle}" TargetType="ScrollViewer" />-->
-    <Style TargetType="ui:HyperlinkButton">
+    <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
         <Setter Property="Foreground" Value="{DynamicResource HyperLinkBrush}" />
         <Style.Triggers>

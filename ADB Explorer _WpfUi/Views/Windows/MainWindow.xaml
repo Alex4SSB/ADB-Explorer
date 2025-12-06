@@ -29,7 +29,7 @@
         <ui:NavigationView
             x:Name="RootNavigation"
             Grid.Row="1"
-            Padding="42,0,42,0"
+            Padding="42,0,42,10"
             BreadcrumbBar="{Binding ElementName=BreadcrumbBar}"
             FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
             FrameMargin="0"

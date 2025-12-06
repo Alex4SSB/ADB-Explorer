@@ -6,7 +6,6 @@ using ADB_Explorer.ViewModels.Windows;
 using ADB_Explorer.Views.Pages;
 using ADB_Explorer.Views.Windows;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Wpf.Ui;
 using Wpf.Ui.DependencyInjection;
@@ -40,6 +39,8 @@ public partial class App
 
             // Service containing navigation, same as INavigationWindow... but without window
             services.AddSingleton<INavigationService, NavigationService>();
+
+            services.AddSingleton<IContentDialogService, ContentDialogService>();
 
             // Main window with navigation
             services.AddSingleton<INavigationWindow, MainWindow>();

@@ -11,6 +11,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Light" />
                 <ui:ControlsDictionary />
+                <ResourceDictionary Source="Styles\Colors.xaml" />
                 <ResourceDictionary Source="Styles\BasicStyles.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
             </ResourceDictionary.MergedDictionaries>
