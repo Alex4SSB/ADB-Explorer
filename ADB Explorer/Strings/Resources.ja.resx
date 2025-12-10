@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1419,5 +1419,17 @@ Weblate でアプリをあなたの言語にローカライズできるよう、
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>ROMファイル</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>ターミナル</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>ファイルの更新日付を保持する</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>{0} をインストールする</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>{0} 個のAPKをインストールする</value>
   </data>
 </root>
