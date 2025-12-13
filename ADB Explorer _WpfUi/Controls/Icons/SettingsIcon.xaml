@@ -1,0 +1,38 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.SettingsIcon"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ADB_Explorer.Controls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:services="clr-namespace:ADB_Explorer.Services"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    mc:Ignorable="d">
+    <Grid>
+        <ui:FontIcon FontSize="18" Glyph="&#xE713;" />
+        <Ellipse
+            Width="8"
+            Height="8"
+            Margin="0,-7,-8,0"
+            HorizontalAlignment="Right"
+            VerticalAlignment="Top"
+            d:Visibility="Visible"
+            Fill="{StaticResource EditorTextChangedBrush}"
+            StrokeThickness="1">
+            <Ellipse.Style>
+                <Style TargetType="Ellipse">
+                    <Setter Property="Stroke" Value="Black" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=ActualTheme}" Value="Dark">
+                            <Setter Property="Stroke" Value="Transparent" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Ellipse.Style>
+        </Ellipse>
+    </Grid>
+</UserControl>

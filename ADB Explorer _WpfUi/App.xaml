@@ -14,6 +14,7 @@
                 <ResourceDictionary Source="Styles\Colors.xaml" />
                 <ResourceDictionary Source="Styles\BasicStyles.xaml" />
                 <ResourceDictionary Source="Styles\CustomStyles.xaml" />
+                <ResourceDictionary Source="Styles\FileAction.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <FontFamily x:Key="SymbolThemeFontFamily">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>

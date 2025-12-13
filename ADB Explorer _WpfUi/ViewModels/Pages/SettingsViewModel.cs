@@ -1,11 +1,9 @@
-﻿using ADB_Explorer.Helpers;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
-using Wpf.Ui;
 using Wpf.Ui.Abstractions.Controls;
-using Wpf.Ui.Controls;
-using Wpf.Ui.Extensions;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -66,23 +64,22 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     [RelayCommand]
     private async Task AndroidRobotLicense()
     {
-        StackPanel stack = new()
+        SimpleStackPanel stack = new()
         {
+            Spacing = 8,
             Children =
             {
-                new Wpf.Ui.Controls.TextBlock()
+                new TextBlock()
                 {
                     TextWrapping = TextWrapping.Wrap,
                     Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
-                    Margin = new Thickness(0, 0, 0, 8),
                 },
-                new Wpf.Ui.Controls.TextBlock()
+                new TextBlock()
                 {
                     TextWrapping = TextWrapping.Wrap,
                     Text = Strings.Resources.S_APK_ICON_LIC,
-                    Margin = new Thickness(0, 0, 0, 8),
                 },
-                new HyperlinkButton()
+                new Wpf.Ui.Controls.HyperlinkButton()
                 {
                     Content = Strings.Resources.S_CC_NAME,
                     ToolTip = Links.L_CC_LIC,
@@ -92,14 +89,9 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             },
         };
 
-        var contentDialogService = App.Services.GetRequiredService<IContentDialogService>();
-        await contentDialogService.ShowSimpleDialogAsync(
-            new SimpleContentDialogCreateOptions()
-            {
-                Title = Strings.Resources.S_ANDROID_ICONS_TITLE,
-                Content = stack,
-                CloseButtonText = Strings.Resources.S_BUTTON_OK,
-            }
-        );
+        App.Current.Dispatcher.Invoke(() =>
+        {
+            DialogService.ShowContent(stack, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
+        });
     }
 }

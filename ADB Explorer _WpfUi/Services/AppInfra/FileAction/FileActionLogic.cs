@@ -1,8 +1,6 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
-using ADB_Explorer.ViewModels.Pages;
-using Microsoft.Extensions.DependencyInjection;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 

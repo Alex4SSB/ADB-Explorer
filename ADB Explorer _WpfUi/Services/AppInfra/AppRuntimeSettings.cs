@@ -2,6 +2,7 @@
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
 using System.Collections;
+using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
@@ -368,6 +369,13 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => dragWithinSlave;
         set => Set(ref dragWithinSlave, value);
+    }
+
+    private SystemTheme actualTheme = SystemTheme.Light;
+    public SystemTheme ActualTheme
+    {
+        get => actualTheme;
+        set => Set(ref actualTheme, value);
     }
 
     private List<string> savedLocations = null;

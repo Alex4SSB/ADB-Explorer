@@ -150,38 +150,6 @@ public static class SettingsHelper
         }
     }
 
-    public static void ShowAndroidRobotLicense()
-    {
-        StackPanel stack = new()
-        {
-            Children =
-            {
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
-                },
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.Resources.S_APK_ICON_LIC,
-                },
-                new Wpf.Ui.Controls.HyperlinkButton()
-                {
-                    Content = Strings.Resources.S_CC_NAME,
-                    ToolTip = Links.L_CC_LIC,
-                    NavigateUri = Links.L_CC_LIC.OriginalString,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                }
-            },
-        };
-
-        App.Current.Dispatcher.Invoke(() =>
-        {
-            DialogService.ShowDialog(stack, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
-        });
-    }
-
     public static IEnumerable<CultureInfo> GetAvailableLanguages()
     {
         string assemblyName = Assembly.GetEntryAssembly()?.GetName().Name;

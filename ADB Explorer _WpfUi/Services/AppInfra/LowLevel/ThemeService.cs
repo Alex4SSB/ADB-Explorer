@@ -1,4 +1,5 @@
-﻿using Wpf.Ui.Appearance;
+﻿using ADB_Explorer.Models;
+using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
@@ -25,6 +26,7 @@ internal class AdbThemeService
         }
 
         var actualTheme = ApplicationThemeManager.GetSystemTheme();
+        Data.RuntimeSettings.ActualTheme = actualTheme;
 
         Task.Run(() =>
         {

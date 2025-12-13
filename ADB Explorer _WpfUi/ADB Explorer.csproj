@@ -37,6 +37,21 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Controls\Icons\InstallIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\PushIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\SettingsIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\UninstallIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Controls\Icons\ResetSettingsIcon.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Properties\AppGlobal.Designer.cs">
       <DependentUpon>AppGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>

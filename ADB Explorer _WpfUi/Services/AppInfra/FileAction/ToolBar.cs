@@ -1,4 +1,4 @@
-﻿//using ADB_Explorer.Controls;
+﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 
@@ -325,7 +325,7 @@ internal static class ResetSettings
     public static ObservableList<IMenuItem> List { get; } =
     [
         new CompoundDualAction(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ResetSettings),
-            new()),
+            new ResetSettingsIcon()),
     ];
 }
 
