@@ -623,7 +623,11 @@ public class FileAction : ViewModelBase
                       bool clearClipboard = false)
         : this(name, new(canExecute, action), description.Value, gesture, useForGesture, clearClipboard)
     {
-        description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) => Description = e.NewValue;
+        description.PropertyChanged += (object sender, PropertyChangedEventArgs<string> e) =>
+        {
+            Description = e.NewValue;
+            OnPropertyChanged(nameof(Description));
+        };
     }
 
     public override string ToString()

@@ -14,6 +14,9 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     [ObservableProperty]
     private ObservableList<AbstractGroup> _settingsList = [];
 
+    [ObservableProperty]
+    private IEnumerable<AbstractSetting> _sortedSettings = [];
+
     public Task OnNavigatedToAsync()
     {
         if (!_isInitialized)
@@ -38,6 +41,7 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         {
             UISettings.Init();
             SettingsList = UISettings.SettingsList;
+            SortedSettings = UISettings.SortSettings;
         }
         
         _isInitialized = true;

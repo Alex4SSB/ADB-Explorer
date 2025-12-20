@@ -396,8 +396,8 @@
     </Style>
     <Style
         x:Key="SettingsControlsMenuStyle"
-        BasedOn="{StaticResource ToolBarStyle}"
-        TargetType="Menu">
+        BasedOn="{StaticResource AdbToolBarStyle}"
+        TargetType="controls:AdbMenu">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:SettingsControls.List}}" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="True" />
         <Setter Property="helpers:MenuHelper.ItemPadding" Value="8,5,8,4" />

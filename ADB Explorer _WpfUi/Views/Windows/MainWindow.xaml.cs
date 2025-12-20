@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Windows;
 using Wpf.Ui;
@@ -30,6 +31,17 @@ namespace ADB_Explorer.Views.Windows
             contentDialogService.SetDialogHost(RootContentDialog);
 
             navigationService.SetNavigationControl(RootNavigation);
+
+            RootNavigation.Navigated += RootNavigation_Navigated;
+        }
+
+        private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
+        {
+            PageHeader.Content = args.Page switch
+            {
+                Pages.SettingsPage => new SettingsPageHeader(),
+                _ => null
+            };
         }
 
         #region INavigationWindow methods

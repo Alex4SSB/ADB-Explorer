@@ -77,7 +77,7 @@ public static class SettingsHelper
 
     public static void SetSymbolFont()
     {
-        Application.Current.Resources["SymbolThemeFontFamily"] = App.Current.FindResource(Data.RuntimeSettings.UseFluentStyles ? "FluentSymbolThemeFontFamily" : "AltSymbolThemeFontFamily");
+        Application.Current.Resources["SymbolThemeFontFamily"] = App.Current.FindResource("FluentSymbolThemeFontFamily");
     }
 
     public static async void SplashScreenTask()

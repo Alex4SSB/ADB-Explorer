@@ -85,6 +85,12 @@ public abstract class ActionBase : ViewModelBase, IMenuItem
             IsVisible = isVisible;
             isVisible.PropertyChanged += (sender, e) => IsVisible = e.NewValue;
         }
+
+        Action.PropertyChanged += (sender, e) =>
+        {
+            if (e.PropertyName == nameof(FileAction.Description))
+                OnPropertyChanged(nameof(Tooltip));
+        };
     }
 
     protected ActionBase()

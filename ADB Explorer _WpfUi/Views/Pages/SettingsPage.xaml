@@ -46,6 +46,16 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style
+            x:Key="SettingsListViewStyle"
+            BasedOn="{StaticResource ListViewStyle}"
+            TargetType="ui:ListView">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                    <Setter Property="FlowDirection" Value="RightToLeft" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
         <DataTemplate x:Key="SettingsActionTemplate" DataType="services:SettingsAction">
             <ui:Button
                 Appearance="Primary"
@@ -177,6 +187,7 @@
                         HorizontalAlignment="Stretch"
                         VerticalContentAlignment="Center"
                         helpers:StyleHelper.PopupPlacement="Center"
+                        ContextMenu="{x:Null}"
                         ItemsSource="{Binding Options}"
                         MaxDropDownHeight="287"
                         SelectedValue="{Binding Value, Mode=TwoWay}">
@@ -344,7 +355,8 @@
             <ui:ListView
                 ItemContainerStyle="{StaticResource StretchListViewItem}"
                 ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
-                ItemsSource="{Binding Buttons}" />
+                ItemsSource="{Binding Buttons}"
+                Style="{StaticResource SettingsListViewStyle}" />
         </DataTemplate>
         <DataTemplate x:Key="SortedEnumSettingTemplate" DataType="services:EnumSetting">
             <DataTemplate.Resources>
@@ -354,10 +366,11 @@
                 Margin="0,4,0,0"
                 Header="{Binding Description}"
                 IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-                <ListView
+                <ui:ListView
                     ItemContainerStyle="{StaticResource StretchListViewItem}"
                     ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
-                    ItemsSource="{Binding Buttons}" />
+                    ItemsSource="{Binding Buttons}"
+                    Style="{StaticResource SettingsListViewStyle}" />
             </Expander>
         </DataTemplate>
         <helpers:SettingsTemplateSelector
@@ -418,21 +431,26 @@
                 <ui:ListView
                     ItemContainerStyle="{StaticResource StretchListViewItem}"
                     ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
-                    ItemsSource="{Binding Children}" />
+                    ItemsSource="{Binding Children}"
+                    Style="{StaticResource SettingsListViewStyle}" />
             </Expander>
         </DataTemplate>
     </Page.Resources>
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                        <Setter Property="FlowDirection" Value="RightToLeft" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
         <Grid.ColumnDefinitions>
             <ColumnDefinition MinWidth="350" MaxWidth="500" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <controls:AdbMenu Margin="10" Style="{StaticResource ResetAppSettingsMenuStyle}" />
-        <StackPanel Grid.Row="1">
+        <StackPanel>
             <ui:ListView
                 x:Name="SettingsList"
                 HorizontalAlignment="Stretch"
@@ -440,7 +458,7 @@
                 ItemTemplate="{StaticResource SettingsExpanderTemplate}"
                 ItemsSource="{Binding ViewModel.SettingsList}">
                 <ui:ListView.Style>
-                    <Style BasedOn="{StaticResource ListViewStyle}" TargetType="ui:ListView">
+                    <Style BasedOn="{StaticResource SettingsListViewStyle}" TargetType="ui:ListView">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -452,11 +470,11 @@
             <ui:ListView
                 x:Name="SortedSettings"
                 FocusVisualStyle="{x:Null}"
-                ItemContainerStyle="{StaticResource SettingsGroupContainer}"
+                ItemContainerStyle="{StaticResource SortedListViewItem}"
                 ItemTemplateSelector="{StaticResource SortedSettingsTemplateSelector}"
-                ItemsSource="{Binding ViewModel.SettingsList}">
+                ItemsSource="{Binding ViewModel.SortedSettings}">
                 <ui:ListView.Style>
-                    <Style BasedOn="{StaticResource ListViewStyle}" TargetType="ui:ListView">
+                    <Style BasedOn="{StaticResource SettingsListViewStyle}" TargetType="ui:ListView">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -469,6 +487,7 @@
                 <Expander.Style>
                     <Style BasedOn="{StaticResource DefaultExpanderStyle}" TargetType="Expander">
                         <Setter Property="Header" Value="{Binding Source={x:Static strings:Resources.S_SETTINGS_GROUP_ABOUT}}" />
+                        <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded, Mode=OneWay}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
                                 <Setter Property="Visibility" Value="Collapsed" />
