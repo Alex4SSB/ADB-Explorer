@@ -47,13 +47,13 @@ public static class UISettings
                 new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES),
                 new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY),
                 new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_SETTINGS_ENABLE_LOG),
-            ]),
+            ], "\uE8CC"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
             [
                 new BoolSetting(() => Settings.AutoRoot, Strings.Resources.S_SETTINGS_AUTO_ROOT),
                 new BoolSetting(() => Settings.SaveDevices, Strings.Resources.S_SETTINGS_SAVE_DEVICES),
                 new BoolSetting(() => Settings.AutoOpen, Strings.Resources.S_SETTINGS_AUTO_OPEN),
-            ]),
+            ], "\uE8EA"),
             new SettingsGroup(Strings.Resources.S_FILE_OP_TOOLTIP,
             [
                 new BoolSetting(() => Settings.EnableCompactView, Strings.Resources.S_SETTINGS_COMPACT_VIEW),
@@ -61,26 +61,26 @@ public static class UISettings
                 new BoolSetting(() => Settings.AllowMultiOp, Strings.Resources.S_SETTINGS_PARALLEL_OPERATIONS),
                 new BoolSetting(() => Settings.RescanOnPush, Strings.Resources.S_SETTINGS_MEDIA_RESCAN),
                 new BoolSetting(() => Settings.KeepDateModified, Strings.Resources.S_SETTINGS_KEEP_MODIFIED_DATE),
-            ]),
+            ], "\uEADF"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
             [
                 new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES),
                 new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_SETTINGS_ENABLE_TRASH),
                 new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK),
-            ]),
+            ], "\uE8CE"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,
             [
                 new BoolSetting(() => Settings.ShowExtensions, Strings.Resources.S_SETTINGS_SHOW_EXTENSIONS),
                 new BoolSetting(() => Settings.ShowHiddenItems, Strings.Resources.S_SETTINGS_HIDDEN_ITEMS),
                 new BoolSetting(() => Settings.ShowSystemPackages, Strings.Resources.S_SETTINGS_SYSTEM_APPS, visibleProp: () => Settings.EnableApk),
-            ]),
+            ], "\uEC50"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK,
             [
                 new DoubleClickSetting(() => Settings.DoubleClick, Strings.Resources.S_SETTINGS_GROUP_DOUBLE_CLICK, new() {
                     { AppSettings.DoubleClickAction.None, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_NONE },
                     { AppSettings.DoubleClickAction.Pull, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_PULL },
                     { AppSettings.DoubleClickAction.Edit, Strings.Resources.S_SETTINGS_DOUBLE_CLICK_OPEN } }),
-            ]),
+            ], "\uE7C9"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_WORK_DIRS,
             [
                 new StringSetting(() => Settings.DefaultFolder,
@@ -96,14 +96,14 @@ public static class UISettings
                                       SettingsActions.Find(a => a.Name is ActionType.ClearAdbPath),
                                       SettingsActions.Find(a => a.Name is ActionType.ResetApp),
                                   ]),
-            ]),
+            ], "\uE62F"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_THEME,
             [
                 new ThemeSetting(() => Settings.Theme, Strings.Resources.S_SETTINGS_GROUP_THEME, new() {
                     { AppSettings.AppTheme.Light, Strings.Resources.S_SETTINGS_THEME_LIGHT },
                     { AppSettings.AppTheme.Dark, Strings.Resources.S_SETTINGS_THEME_DARK },
                     { AppSettings.AppTheme.WindowsDefault, Strings.Resources.S_SETTINGS_THEME_DEFAULT } }),
-            ]),
+            ], "\uE2B1"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_GRAPHICS,
             [
                 new ComboSetting<CultureInfo>(() => Settings.UICulture,
@@ -120,7 +120,7 @@ public static class UISettings
                 //                    SettingsActions.Find(a => a.Name is ActionType.AnimationInfo),
                 //                ]),
                 new BoolSetting(() => Settings.EnableSplash, Strings.Resources.S_SETTINGS_SPLASH),
-            ]),
+            ], "\uF2B7"),
             new Ungrouped(
             [
                 new BoolSetting(() => Settings.CheckForUpdates, Strings.Resources.S_SETTINGS_UPDATES)
@@ -168,12 +168,17 @@ public class SettingsGroup : AbstractGroup
 
     public string Name { get; set; }
 
-    public SettingsGroup(string name, List<AbstractSetting> children)
+    public string Icon { get; }
+
+    public SettingsGroup(string name, List<AbstractSetting> children, string icon = "")
     {
         Name = name;
         Children = children;
-        
+        Icon = icon;
+
         Children.ForEach(c => c.GroupName = Name);
+
+        Children.OfType<EnumSetting>().ForEach(es => es.Icon = icon);
 
         RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
     }
@@ -343,6 +348,8 @@ public class EnumSetting : AbstractSetting
         get => isExpanded;
         set => Set(ref isExpanded, value);
     }
+
+    public string Icon { get; set; }
 
     public List<EnumRadioButton> Buttons { get; } = [];
 

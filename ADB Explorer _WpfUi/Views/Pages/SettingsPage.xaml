@@ -56,6 +56,22 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <TextBlock
+            x:Key="SettingsGroupArrow"
+            Margin="0,0,2,0"
+            x:Shared="False"
+            FontSize="10">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Text" Value="→" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                            <Setter Property="Text" Value="←" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
         <DataTemplate x:Key="SettingsActionTemplate" DataType="services:SettingsAction">
             <ui:Button
                 Appearance="Primary"
@@ -98,10 +114,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
-                            <TextBlock
-                                Margin="0,0,2,0"
-                                FontSize="10"
-                                Text="→" />
+                            <ContentControl Content="{StaticResource SettingsGroupArrow}" />
                             <TextBlock FontSize="10" Text="{Binding GroupName}" />
                         </StackPanel>
                     </Grid>
@@ -261,10 +274,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock
-                            Margin="0,0,2,0"
-                            FontSize="10"
-                            Text="→" />
+                        <ContentControl Content="{StaticResource SettingsGroupArrow}" />
                         <TextBlock FontSize="10" Text="{Binding GroupName}" />
                     </StackPanel>
                 </Grid>
@@ -326,10 +336,7 @@
                                 </Style.Triggers>
                             </Style>
                         </StackPanel.Style>
-                        <TextBlock
-                            Margin="0,0,2,0"
-                            FontSize="10"
-                            Text="→" />
+                        <ContentControl Content="{StaticResource SettingsGroupArrow}" />
                         <TextBlock FontSize="10" Text="{Binding GroupName}" />
                     </StackPanel>
                 </Grid>
@@ -362,10 +369,16 @@
             <DataTemplate.Resources>
                 <Style BasedOn="{StaticResource TextBlockStyle}" TargetType="TextBlock" />
             </DataTemplate.Resources>
-            <Expander
-                Margin="0,4,0,0"
-                Header="{Binding Description}"
-                IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+            <Expander Margin="0,4,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:FontIcon
+                            Margin="0,0,10,0"
+                            FontSize="22"
+                            Glyph="{Binding Icon}" />
+                        <TextBlock Text="{Binding Description}" />
+                    </StackPanel>
+                </Expander.Header>
                 <ui:ListView
                     ItemContainerStyle="{StaticResource StretchListViewItem}"
                     ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
@@ -409,6 +422,10 @@
             <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
                 <Expander.Header>
                     <StackPanel Orientation="Horizontal">
+                        <ui:FontIcon
+                            Margin="0,0,10,0"
+                            FontSize="22"
+                            Glyph="{Binding Icon}" />
                         <TextBlock Text="{Binding Name}" />
                         <StackPanel Orientation="Horizontal">
                             <StackPanel.Style>
@@ -436,7 +453,7 @@
             </Expander>
         </DataTemplate>
     </Page.Resources>
-    <Grid>
+    <Grid HorizontalAlignment="Stretch">
         <Grid.Style>
             <Style TargetType="Grid">
                 <Style.Triggers>
@@ -447,10 +464,14 @@
             </Style>
         </Grid.Style>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MinWidth="350" MaxWidth="500" />
+            <ColumnDefinition />
+            <ColumnDefinition
+                Width="2*"
+                MinWidth="380"
+                MaxWidth="600" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <StackPanel>
+        <StackPanel Grid.Column="1">
             <ui:ListView
                 x:Name="SettingsList"
                 HorizontalAlignment="Stretch"
@@ -486,7 +507,6 @@
             <Expander x:Name="SettingsAboutExpander" Margin="0,3">
                 <Expander.Style>
                     <Style BasedOn="{StaticResource DefaultExpanderStyle}" TargetType="Expander">
-                        <Setter Property="Header" Value="{Binding Source={x:Static strings:Resources.S_SETTINGS_GROUP_ABOUT}}" />
                         <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded, Mode=OneWay}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
@@ -495,6 +515,15 @@
                         </Style.Triggers>
                     </Style>
                 </Expander.Style>
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:FontIcon
+                            Margin="0,0,10,0"
+                            FontSize="22"
+                            Glyph="&#xE946;" />
+                        <TextBlock Text="{Binding Source={x:Static strings:Resources.S_SETTINGS_GROUP_ABOUT}}" />
+                    </StackPanel>
+                </Expander.Header>
                 <StackPanel>
                     <TextBlock
                         HorizontalAlignment="Center"

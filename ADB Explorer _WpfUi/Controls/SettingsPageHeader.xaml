@@ -14,81 +14,90 @@
     mc:Ignorable="d">
     <Grid Margin="42,0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition MinWidth="350" MaxWidth="500" />
+            <ColumnDefinition />
+            <ColumnDefinition
+                Width="2*"
+                MinWidth="380"
+                MaxWidth="600" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <local:AdbMenu x:Name="SettingsControlsMenu" Style="{StaticResource SettingsControlsMenuStyle}" />
-            <TextBlock
-                Grid.ColumnSpan="2"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                FontSize="20"
-                FontWeight="SemiBold"
-                Text="{Binding Source={x:Static Member=strings:Resources.S_SETTINGS_TITLE}}">
-                <TextBlock.Style>
-                    <Style TargetType="TextBlock">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
-                                <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBlock.Style>
-            </TextBlock>
-            <Grid Grid.Column="1">
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <local:AdbMenu x:Name="SettingsControlsMenu" Style="{StaticResource SettingsControlsMenuStyle}" />
+                <TextBlock
+                    Grid.ColumnSpan="3"
+                    Margin="0,0,0,4"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="SemiBold"
+                    Text="{Binding Source={x:Static Member=strings:Resources.S_SETTINGS_TITLE}}">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <Grid Grid.Column="1">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
+                    <!--
+                        GotFocus="SettingsSearchBox_FocusChanged"
+                        LostFocus="SettingsSearchBox_FocusChanged"
+                    -->
+                    <ui:TextBox
+                        x:Name="SettingsSearchBox"
+                        Height="31"
+                        MinHeight="31"
+                        Padding="30,5,30,6"
+                        PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
+                        Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <ui:FontIcon
+                        Margin="6,0,0,0"
+                        HorizontalAlignment="Left"
+                        Glyph="&#xE721;"
+                        IsHitTestVisible="False"
+                        Opacity="0.7" />
+                </Grid>
+                <local:AdbMenu
+                    Grid.Column="2"
+                    Margin="0"
+                    Style="{StaticResource ResetAppSettingsMenuStyle}" />
+            </Grid>
+            <Grid Grid.Row="1" Margin="0,0,0,4">
                 <Grid.Style>
                     <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
-                                <Setter Property="Visibility" Value="Collapsed" />
+                            <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Grid.Style>
-                <!--
-                    GotFocus="SettingsSearchBox_FocusChanged"
-                    LostFocus="SettingsSearchBox_FocusChanged"
-                -->
-                <ui:TextBox
-                    x:Name="SettingsSearchBox"
-                    Height="31"
-                    MinHeight="31"
-                    Padding="30,5,30,6"
-                    PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
-                    Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                <ui:FontIcon
-                    Margin="6,0,0,0"
-                    HorizontalAlignment="Left"
-                    Glyph="&#xE721;"
-                    IsHitTestVisible="False"
-                    Opacity="0.7" />
+                <Separator Style="{x:Null}" />
             </Grid>
+
         </Grid>
-        <Grid Grid.Row="1" Margin="0,0,0,4">
-            <Grid.Style>
-                <Style TargetType="Grid">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
-                            <Setter Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Grid.Style>
-            <Separator Style="{x:Null}" />
-        </Grid>
-        <local:AdbMenu
-            Grid.Column="1"
-            Margin="10,4"
-            Style="{StaticResource ResetAppSettingsMenuStyle}" />
     </Grid>
 </UserControl>
