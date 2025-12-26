@@ -1,4 +1,5 @@
 ﻿using ADB_Explorer.Controls;
+using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Windows;
@@ -25,6 +26,8 @@ namespace ADB_Explorer.Views.Windows
 
             SystemThemeWatcher.Watch(this);
             AdbThemeService.SetTheme(Data.Settings.Theme);
+            AdbHelper.EnableMdns();
+            AdbHelper.CheckAdbVersion();
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);
@@ -40,6 +43,7 @@ namespace ADB_Explorer.Views.Windows
             PageHeader.Content = args.Page switch
             {
                 Pages.SettingsPage => new SettingsPageHeader(),
+                Pages.DevicesPage => new DevicesPageHeader(),
                 _ => null
             };
         }

@@ -235,20 +235,7 @@
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
-    <Style x:Key="QrBackgroundStyle" TargetType="Border">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="CornerRadius" Value="0,0,5,5" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
-                <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="Background" Value="#FFFBFBFB" />
-        <Setter Property="Margin" Value="-6,-2" />
-    </Style>
+    
     <Style
         x:Key="RootIconStyle"
         BasedOn="{StaticResource DeviceHeaderIcon}"
@@ -570,141 +557,6 @@
         </Setter>
     </Style>
     <Style
-        x:Key="ExpanderHeaderProgressBarStyle"
-        BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BorderThickness" Value="0,1" />
-        <Setter Property="Background" Value="Transparent" />
-    </Style>
-    <Style
-        x:Key="MdnsProgressBarStyle"
-        BasedOn="{StaticResource ExpanderHeaderProgressBarStyle}"
-        TargetType="ui:ProgressBar">
-        <Setter Property="Margin" Value="0,0,0,-1" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Value" Value="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=Progress}" Value="100">
-                <Setter Property="IsIndeterminate" Value="True" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Foreground" Value="Red" />
-                <Setter Property="Value" Value="100" />
-                <Setter Property="IsIndeterminate" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsMdnsExpanderOpen}" Value="True">
-                <Setter Property="Padding" Value="0" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="MdnsExpanderStyle"
-        BasedOn="{StaticResource FluentExpanderStyle}"
-        TargetType="Expander">
-        <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsMdnsExpanderOpen, Mode=TwoWay}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
-                <Setter Property="IsEnabled" Value="False" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=EnableMdns}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="MdnsOffPanelStyle" TargetType="ui:SimpleStackPanel">
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Disabled">
-                <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="MdnsCheckBoxStyle"
-        BasedOn="{StaticResource CheckBoxStyle}"
-        TargetType="CheckBox">
-        <Setter Property="Content">
-            <Setter.Value>
-                <TextBlock Text="mDNS">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="False">
-                                    <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundBaseHighBrush}" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-            </Setter.Value>
-        </Setter>
-        <Setter Property="Margin" Value="0,-5" />
-        <Setter Property="MinWidth" Value="50" />
-        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ENABLE_MDNS}}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
-                <Setter Property="IsEnabled" Value="False" />
-                <Setter Property="IsChecked" Value="{x:Null}" />
-                <Setter Property="helpers:StyleHelper.ThreeStateGlyph" Value="&#xE897;" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
-                <Setter Property="IsChecked" Value="{x:Null}" />
-                <Setter Property="helpers:StyleHelper.ThreeStateGlyph" Value="&#xE711;" />
-                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_SERVER_DOWN}}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="Running">
-                <Setter Property="IsChecked" Value="True" />
-                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_MDNS_ON}}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="DevicesPollingProgressRingStyle"
-        BasedOn="{StaticResource FluentProgressRingStyle}"
-        TargetType="ui:ProgressRing">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsPollingStopped}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
-        x:Key="DevicesManualPollingButtonStyle"
-        BasedOn="{StaticResource ButtonStyle}"
-        TargetType="Button">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollDevices}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="MdnsInProgressPanelStyle" TargetType="StackPanel">
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
-                <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="MdnsDownPanelStyle" TargetType="ui:SimpleStackPanel">
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="NotRunning">
-                <Setter Property="Visibility" Value="Visible" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="DriveViewScrollViewerStyle"
         BasedOn="{StaticResource ScrollViewerStyle}"
         TargetType="ScrollViewer">
@@ -1023,15 +875,23 @@
                 </DataTemplate>
             </Setter.Value>
         </Setter>
+    </Style>-->
+    <Style
+        x:Key="ExpanderHeaderProgressBarStyle"
+        BasedOn="{StaticResource {x:Type ProgressBar}}"
+        TargetType="ProgressBar">
+        <!--<Setter Property="CornerRadius" Value="0" />-->
+        <Setter Property="BorderThickness" Value="0,1" />
+        <Setter Property="Background" Value="Transparent" />
     </Style>
     <Style
         x:Key="RtlButtonStyle"
-        BasedOn="{StaticResource ButtonStyle}"
+        BasedOn="{StaticResource DefaultButtonStyle}"
         TargetType="Button">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
                 <Setter Property="FlowDirection" Value="RightToLeft" />
             </DataTrigger>
         </Style.Triggers>
-    </Style>-->
+    </Style>
 </ResourceDictionary>

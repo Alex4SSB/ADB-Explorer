@@ -48,8 +48,8 @@ public partial class App
 
             services.AddSingleton<DashboardPage>();
             services.AddSingleton<DashboardViewModel>();
-            services.AddSingleton<DataPage>();
-            services.AddSingleton<DataViewModel>();
+            services.AddSingleton<DevicesPage>();
+            services.AddSingleton<DevicesViewModel>();
 
             services.AddSingleton<SettingsService>();
             services.AddSingleton<SettingsPage>();

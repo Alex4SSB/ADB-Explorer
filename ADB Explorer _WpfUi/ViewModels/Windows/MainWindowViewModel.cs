@@ -21,7 +21,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_BUTTON_DEVICES, TextTrimming = TextTrimming.CharacterEllipsis },
             Icon = new FontIcon { Glyph = "\uE8CC" },
-            TargetPageType = typeof(Views.Pages.DataPage),
+            TargetPageType = typeof(Views.Pages.DevicesPage),
             ToolTip = Strings.Resources.S_BUTTON_DEVICES
         }
     ];

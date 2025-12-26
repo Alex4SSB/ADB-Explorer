@@ -23,13 +23,6 @@
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     mc:Ignorable="d">
     <Page.Resources>
-        <Style
-            x:Key="SettingsToggleStyle"
-            BasedOn="{StaticResource ToggleButtonStyle}"
-            TargetType="ToggleButton">
-            <Setter Property="TextElement.FontSize" Value="20" />
-            <Setter Property="TextElement.FontFamily" Value="{StaticResource SymbolThemeFontFamily}" />
-        </Style>
         <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -451,6 +444,7 @@
                                     </Style.Triggers>
                                 </Style>
                             </StackPanel.Style>
+                            <TextBlock Text=" - " />
                             <TextBlock Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=AdbVersionString}" />
                         </StackPanel>
                     </StackPanel>

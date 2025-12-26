@@ -188,7 +188,7 @@ public class AppRuntimeSettings : ViewModelBase
         }
     }
 
-    public string AdbVersionString => $"\u200E - v{AdbVersion}";
+    public string AdbVersionString => $"v{AdbVersion}";
 
     private bool isSplashScreenVisible = true;
     public bool IsSplashScreenVisible
@@ -436,6 +436,7 @@ public class AppRuntimeSettings : ViewModelBase
     public bool RefreshExplorerSorting { get => false; set => OnPropertyChanged(); }
     public bool FinalizeSplash { get => false; set => OnPropertyChanged(); }
     public bool RefreshBreadcrumbs { get => false; set => OnPropertyChanged(); }
+    public bool RefreshQrImage { get => false; set => OnPropertyChanged(); }
 
     #endregion
 }
