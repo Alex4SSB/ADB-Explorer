@@ -29,6 +29,9 @@ namespace ADB_Explorer.Views.Pages
                 case nameof(AppRuntimeSettings.SearchText):
                     FilterSettings();
                     break;
+                case nameof(AppRuntimeSettings.GroupsExpanded):
+                    SettingsAboutExpander.IsExpanded = Data.RuntimeSettings.GroupsExpanded;
+                    break;
                 default:
                     break;
             }

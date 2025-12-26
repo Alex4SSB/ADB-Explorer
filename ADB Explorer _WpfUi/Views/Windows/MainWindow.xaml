@@ -49,11 +49,11 @@
             <ui:NavigationView.Header>
                 <ContentPresenter x:Name="PageHeader" />
             </ui:NavigationView.Header>
-            <ui:NavigationView.ContentOverlay>
+            <!--<ui:NavigationView.ContentOverlay>
                 <Grid>
                     <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
                 </Grid>
-            </ui:NavigationView.ContentOverlay>
+            </ui:NavigationView.ContentOverlay>-->
         </ui:NavigationView>
 
         <ContentPresenter

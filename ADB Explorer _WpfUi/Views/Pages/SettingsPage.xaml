@@ -92,6 +92,15 @@
                 </Grid.ColumnDefinitions>
                 <CheckBox Visibility="{Binding Visibility}">
                     <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
+                                        <Setter Property="Margin" Value="0,-2,0,0" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
                         <Grid.RowDefinitions>
                             <RowDefinition />
                             <RowDefinition />
@@ -106,10 +115,10 @@
                                 <Style TargetType="StackPanel">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=CheckBox}, Path=IsMouseOver}" Value="False">
-                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="Visibility" Value="Hidden" />
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
-                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Setter Property="Visibility" Value="Hidden" />
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
@@ -224,6 +233,7 @@
                                         <TextBlock HorizontalAlignment="Left" Text="{Binding NativeName}">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
+                                                    <Setter Property="FlowDirection" Value="LeftToRight" />
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding TextInfo.IsRightToLeft}" Value="True">
                                                             <Setter Property="FlowDirection" Value="RightToLeft" />
@@ -507,7 +517,6 @@
             <Expander x:Name="SettingsAboutExpander" Margin="0,3">
                 <Expander.Style>
                     <Style BasedOn="{StaticResource DefaultExpanderStyle}" TargetType="Expander">
-                        <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=GroupsExpanded, Mode=OneWay}" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -530,7 +539,10 @@
                         FontFamily="{StaticResource Nunito}"
                         FontSize="18"
                         Text="{x:Static app_prop:AppGlobal.AppDisplayName}" />
-                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        FlowDirection="LeftToRight"
+                        Orientation="Horizontal">
                         <TextBlock VerticalAlignment="Bottom" Text="v" />
                         <TextBlock
                             VerticalAlignment="Bottom"

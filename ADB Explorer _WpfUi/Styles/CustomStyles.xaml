@@ -223,7 +223,6 @@
         <Style.Resources>
             <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                 <Setter Property="FontSize" Value="14" />
-                <Setter Property="ui:Button.Appearance" Value="Primary" />
                 <Setter Property="Glyph" Value="&#xE72C;" />
                 <Style.Triggers>
                     <Trigger Property="Opacity" Value="0">
@@ -232,7 +231,7 @@
                 </Style.Triggers>
             </Style>
         </Style.Resources>
-        <Setter Property="Padding" Value="2" />
+        <Setter Property="Padding" Value="2,2,3,2" />
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
