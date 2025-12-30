@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+	<RollForward>Major</RollForward>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app_icon_2023_combined.ico</ApplicationIcon>
     <UseWPF>true</UseWPF>
