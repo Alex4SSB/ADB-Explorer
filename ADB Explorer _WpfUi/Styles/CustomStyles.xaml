@@ -59,19 +59,6 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DeviceHeaderIcon"
-        BasedOn="{StaticResource GlyphFont}"
-        TargetType="ui:FontIcon">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsMouseOver}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=ToggleButton, Mode=FindAncestor}, Path=IsPressed}" Value="True">
-                <Setter Property="Foreground" Value="{DynamicResource DriveForegroundPressed}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="False" />
@@ -235,7 +222,7 @@
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
-    
+
     <Style
         x:Key="RootIconStyle"
         BasedOn="{StaticResource DeviceHeaderIcon}"
@@ -375,18 +362,25 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="StretchListViewItem" TargetType="ListViewItem">
+    <Style x:Key="StretchListViewItem" TargetType="ui:ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="ListViewItem">
-                    <Grid Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}">
+                <ControlTemplate TargetType="ui:ListViewItem">
+                    <!--  Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}"  -->
+                    <Grid >
                         <ContentPresenter />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+    <ItemsPanelTemplate x:Key="HorizontalListViewPanelTemplate">
+        <WrapPanel
+            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
+            ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
+            ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
+    </ItemsPanelTemplate>
     <!--<Style
         x:Key="BlueFontIconStyle"
         BasedOn="{StaticResource GlyphFont}"
@@ -531,10 +525,6 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="MaskedTextBoxStyle" TargetType="controls:MaskedTextBox">
-        <Setter Property="ValidationType" Value="None" />
-        <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />
-    </Style>
     <Style
         x:Key="EditorTextBoxStyle"
         BasedOn="{StaticResource MaskedTextBoxStyle}"
@@ -651,12 +641,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <ItemsPanelTemplate x:Key="HorizontalListViewPanelTemplate">
-        <WrapPanel
-            Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=(FrameworkElement.ActualWidth)}"
-            ItemHeight="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemHeight}"
-            ItemWidth="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}, Path=(ListView.View).ItemWidth}" />
-    </ItemsPanelTemplate>
     <Style x:Key="SelectionBorderStyle" TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
         <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
@@ -876,6 +860,20 @@
             </Setter.Value>
         </Setter>
     </Style>-->
+    <Style x:Key="MaskedTextBoxStyle" TargetType="controls:MaskedTextBox">
+        <Setter Property="ValidationType" Value="None" />
+        <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />
+    </Style>
+    <Style
+        x:Key="DeviceExpanderStyle"
+        BasedOn="{StaticResource DefaultExpanderStyle}"
+        TargetType="Expander">
+        <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="None" />
+        <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
+        <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
+        <Setter Property="IsExpanded" Value="{Binding DeviceSelected, Mode=TwoWay}" />
+        <Setter Property="MinHeight" Value="40" />
+    </Style>
     <Style
         x:Key="ExpanderHeaderProgressBarStyle"
         BasedOn="{StaticResource {x:Type ProgressBar}}"

@@ -9,7 +9,7 @@ public class Devices : AbstractDevice
 {
     #region Full properties
 
-    private ObservableList<DeviceViewModel> uiDevices = new();
+    private ObservableList<DeviceViewModel> uiDevices = [];
     public ObservableList<DeviceViewModel> UIList
     {
         get => uiDevices;
@@ -18,7 +18,7 @@ public class Devices : AbstractDevice
 
     public DateTime LastUpdate { get; set; }
 
-    public List<string> RootDevices { get; protected set; } = new();
+    public List<string> RootDevices { get; protected set; } = [];
 
     public NewDeviceViewModel CurrentNewDevice { get; set; }
 
@@ -47,6 +47,7 @@ public class Devices : AbstractDevice
 
     public Devices()
     {
+        UIList.Add(new MdnsDeviceViewModel());
         UIList.Add(new NewDeviceViewModel(new()));
         UIList.Add(new WsaPkgDeviceViewModel(new()));
 

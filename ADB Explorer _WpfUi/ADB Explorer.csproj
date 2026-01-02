@@ -53,6 +53,9 @@
     <Compile Update="Controls\Icons\ResetSettingsIcon.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Controls\MaskedTextBox.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Properties\AppGlobal.Designer.cs">
       <DependentUpon>AppGlobal.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -62,6 +65,27 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Views\Battery\CompactBatteryControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Battery\DetailedBatteryControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\HistoryDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\LogicalDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\NewDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\ServiceDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\Device\WsaPkgDeviceControl.xaml.cs">
+      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
 

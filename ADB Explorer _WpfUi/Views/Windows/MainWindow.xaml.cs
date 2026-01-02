@@ -26,8 +26,8 @@ namespace ADB_Explorer.Views.Windows
 
             SystemThemeWatcher.Watch(this);
             AdbThemeService.SetTheme(Data.Settings.Theme);
-            AdbHelper.EnableMdns();
             AdbHelper.CheckAdbVersion();
+            Data.DevicesObject = new();
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);
