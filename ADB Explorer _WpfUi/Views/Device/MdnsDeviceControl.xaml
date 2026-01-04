@@ -11,8 +11,6 @@
     xmlns:models="clr-namespace:ADB_Explorer.Models"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
     mc:Ignorable="d">
     <UserControl.Resources>
         <converters:StringFormatConverter x:Key="StringFormatConverter" />
@@ -43,13 +41,9 @@
             x:Key="MdnsExpanderStyle"
             BasedOn="{StaticResource DeviceExpanderStyle}"
             TargetType="Expander">
-            <Setter Property="IsExpanded" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsMdnsExpanderOpen, Mode=TwoWay}" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsManualPairingInProgress}" Value="True">
                     <Setter Property="IsEnabled" Value="False" />
-                </DataTrigger>
-                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.Settings}, Path=EnableMdns}" Value="False">
-                    <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>

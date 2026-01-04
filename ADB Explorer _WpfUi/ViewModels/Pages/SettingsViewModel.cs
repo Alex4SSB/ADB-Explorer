@@ -15,7 +15,14 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     private ObservableList<AbstractGroup> _settingsList = [];
 
     [ObservableProperty]
-    private IEnumerable<AbstractSetting> _sortedSettings = [];
+    private ICollectionView _sortedSettings;
+
+    [ObservableProperty]
+    private string _searchText = "";
+
+    Predicate<object> SettingsFilterPredicate => sett =>
+        ((AbstractSetting)sett).Description.Contains(SearchText, StringComparison.OrdinalIgnoreCase)
+        || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
 
     public Task OnNavigatedToAsync()
     {
@@ -41,9 +48,23 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         {
             UISettings.Init();
             SettingsList = UISettings.SettingsList;
-            SortedSettings = UISettings.SortSettings;
+            
+            SortedSettings = CollectionViewSource.GetDefaultView(UISettings.SortSettings);
+            SortedSettings.Filter = SettingsFilterPredicate;
         }
-        
+
+        PropertyChanged += (_, e) =>
+        {
+            switch (e.PropertyName)
+            {
+                case nameof(SearchText):
+                    SortedSettings.Refresh();
+                    break;
+                default:
+                    break;
+            }
+        };
+
         _isInitialized = true;
     }
 

@@ -38,7 +38,7 @@
                     Margin="0,0,0,4"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    FontSize="20"
+                    FontSize="24"
                     FontWeight="SemiBold"
                     Text="{Binding Source={x:Static Member=strings:Resources.S_SETTINGS_TITLE}}">
                     <TextBlock.Style>
@@ -61,17 +61,13 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <!--
-                        GotFocus="SettingsSearchBox_FocusChanged"
-                        LostFocus="SettingsSearchBox_FocusChanged"
-                    -->
                     <ui:TextBox
                         x:Name="SettingsSearchBox"
                         Height="31"
                         MinHeight="31"
                         Padding="30,5,30,6"
                         PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
-                        Text="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     <ui:FontIcon
                         Margin="6,0,0,0"
                         HorizontalAlignment="Left"

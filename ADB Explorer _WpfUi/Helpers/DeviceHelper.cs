@@ -244,6 +244,10 @@ public static class DeviceHelper
 
     public static readonly Predicate<DeviceViewModel> DevicePredicate = device =>
     {
+        // The mDNS device cannot hide itself when in a listview
+        if (device is MdnsDeviceViewModel)
+            return Data.Settings.EnableMdns;
+
         // current device cannot be hidden
         if (device is LogicalDeviceViewModel { IsOpen: true })
             return true;
@@ -319,7 +323,7 @@ public static class DeviceHelper
         return true;
     };
 
-    public static readonly Predicate<object> devicePredicate = d => DevicePredicate((DeviceViewModel)d);
+    public static readonly Predicate<object> DevicesFilter = d => DevicePredicate((DeviceViewModel)d);
 
     public static void FilterDevices(ICollectionView collectionView)
     {
@@ -332,7 +336,7 @@ public static class DeviceHelper
             return;
         }
 
-        collectionView.Filter = new(devicePredicate);
+        collectionView.Filter = new(DevicesFilter);
         collectionView.SortDescriptions.Clear();
         collectionView.SortDescriptions.Add(new SortDescription(nameof(DeviceViewModel.Type), ListSortDirection.Ascending));
     }

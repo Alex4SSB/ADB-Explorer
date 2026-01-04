@@ -4,66 +4,47 @@ using ADB_Explorer.Services;
 using ADB_Explorer.ViewModels.Pages;
 using Wpf.Ui.Abstractions.Controls;
 
-namespace ADB_Explorer.Views.Pages
+namespace ADB_Explorer.Views.Pages;
+
+public partial class SettingsPage : INavigableView<SettingsViewModel>
 {
-    public partial class SettingsPage : INavigableView<SettingsViewModel>
+    public SettingsViewModel ViewModel { get; }
+
+    public SettingsPage(SettingsViewModel viewModel)
     {
-        public SettingsViewModel ViewModel { get; }
+        Thread.CurrentThread.CurrentCulture =
+        Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
 
-        public SettingsPage(SettingsViewModel viewModel)
+        ViewModel = viewModel;
+        DataContext = this;
+
+        InitializeComponent();
+
+        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        Data.Settings.PropertyChanged += Settings_PropertyChanged;
+    }
+
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
         {
-            Thread.CurrentThread.CurrentCulture =
-            Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
-
-            ViewModel = viewModel;
-            DataContext = this;
-
-            InitializeComponent();
-
-            Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-            Data.Settings.PropertyChanged += Settings_PropertyChanged;
+            case nameof(AppSettings.EnableMdns):
+                AdbHelper.EnableMdns();
+                break;
+            default:
+                break;
         }
+    }
 
-        private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
         {
-            switch (e.PropertyName)
-            {
-                case nameof(AppSettings.EnableMdns):
-                    AdbHelper.EnableMdns();
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case nameof(AppRuntimeSettings.SearchText):
-                    FilterSettings();
-                    break;
-                case nameof(AppRuntimeSettings.GroupsExpanded):
-                    SettingsAboutExpander.IsExpanded = Data.RuntimeSettings.GroupsExpanded;
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void FilterSettings()
-        {
-            var collectionView = CollectionViewSource.GetDefaultView(SortedSettings.ItemsSource);
-            if (collectionView is null)
-                return;
-
-            if (string.IsNullOrEmpty(Data.RuntimeSettings.SearchText))
-                collectionView.Filter = null;
-            else
-            {
-                collectionView.Filter = sett => ((AbstractSetting)sett).Description.Contains(Data.RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase)
-                                                || (sett is EnumSetting enumSett && enumSett.Buttons.Any(button => button.Name.Contains(Data.RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase)));
-            }
+            case nameof(AppRuntimeSettings.GroupsExpanded):
+                SettingsAboutExpander.IsExpanded = Data.RuntimeSettings.GroupsExpanded;
+                break;
+            default:
+                break;
         }
     }
 }

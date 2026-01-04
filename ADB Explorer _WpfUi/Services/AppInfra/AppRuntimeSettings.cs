@@ -56,13 +56,6 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref groupsExpanded, value);
     }
 
-    private string searchText = "";
-    public string SearchText
-    {
-        get => searchText;
-        set => Set(ref searchText, value);
-    }
-
     private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
     public double MaxSearchBoxWidth
     {

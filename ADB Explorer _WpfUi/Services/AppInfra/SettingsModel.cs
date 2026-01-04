@@ -355,17 +355,7 @@ public class EnumSetting : AbstractSetting
 
     public EnumSetting(PropertyInfo valueProp, string description, PropertyInfo visibleProp = null, params BaseAction[] commands)
         : base(valueProp, description, visibleProp, commands)
-    {
-        RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-    }
-
-    private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(AppRuntimeSettings.SearchText))
-        {
-            IsExpanded = !string.IsNullOrEmpty(RuntimeSettings.SearchText) && Buttons.Any(button => button.Name.Contains(RuntimeSettings.SearchText, StringComparison.OrdinalIgnoreCase));
-        }
-    }
+    { }
 }
 
 public class ThemeSetting : EnumSetting

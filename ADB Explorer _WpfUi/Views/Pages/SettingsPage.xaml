@@ -372,22 +372,39 @@
             <DataTemplate.Resources>
                 <Style BasedOn="{StaticResource TextBlockStyle}" TargetType="TextBlock" />
             </DataTemplate.Resources>
-            <Expander Margin="0,4,0,0" IsExpanded="{Binding IsExpanded, Mode=TwoWay}">
-                <Expander.Header>
-                    <StackPanel Orientation="Horizontal">
+            <Grid Margin="0,6">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="45" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Border
+                    Background="{DynamicResource ExpanderHeaderBackground}"
+                    BorderThickness="1"
+                    CornerRadius="4,4,0,0">
+                    <StackPanel Margin="12,0" Orientation="Horizontal">
                         <ui:FontIcon
                             Margin="0,0,10,0"
                             FontSize="22"
                             Glyph="{Binding Icon}" />
-                        <TextBlock Text="{Binding Description}" />
+                        <TextBlock
+                            VerticalAlignment="Center"
+                            FontSize="{DynamicResource ControlContentThemeFontSize}"
+                            Text="{Binding Description}" />
                     </StackPanel>
-                </Expander.Header>
-                <ui:ListView
-                    ItemContainerStyle="{StaticResource StretchListViewItem}"
-                    ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
-                    ItemsSource="{Binding Buttons}"
-                    Style="{StaticResource SettingsListViewStyle}" />
-            </Expander>
+                </Border>
+                <Border
+                    Grid.Row="1"
+                    Background="{DynamicResource ExpanderContentBackground}"
+                    BorderThickness="1,0,1,1"
+                    CornerRadius="0,0,4,4">
+                    <ui:ListView
+                        Margin="24,10"
+                        ItemContainerStyle="{StaticResource StretchListViewItem}"
+                        ItemTemplate="{StaticResource EnumRadioButtonTemplate}"
+                        ItemsSource="{Binding Buttons}"
+                        Style="{StaticResource SettingsListViewStyle}" />
+                </Border>
+            </Grid>
         </DataTemplate>
         <helpers:SettingsTemplateSelector
             x:Key="GroupedSettingsTemplateSelector"
@@ -404,7 +421,7 @@
         <Style
             x:Key="SettingsGroupContainer"
             BasedOn="{StaticResource StretchListViewItem}"
-            TargetType="ListViewItem">
+            TargetType="ui:ListViewItem">
             <Setter Property="Margin" Value="0,3" />
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Name}" Value="{x:Null}">
@@ -415,7 +432,7 @@
         <Style
             x:Key="SortedListViewItem"
             BasedOn="{StaticResource StretchListViewItem}"
-            TargetType="ListViewItem">
+            TargetType="ui:ListViewItem">
             <Setter Property="Margin" Value="0,-4,0,4" />
         </Style>
         <DataTemplate x:Key="SettingsExpanderTemplate" DataType="services:SettingsGroup">

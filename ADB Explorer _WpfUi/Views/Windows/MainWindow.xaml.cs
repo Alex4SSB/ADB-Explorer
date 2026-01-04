@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.ViewModels.Pages;
 using ADB_Explorer.ViewModels.Windows;
 using Wpf.Ui;
 using Wpf.Ui.Abstractions;
@@ -38,12 +39,15 @@ namespace ADB_Explorer.Views.Windows
             RootNavigation.Navigated += RootNavigation_Navigated;
         }
 
+        private readonly SettingsPageHeader settingsPageHeader = new() { DataContext = App.Services.GetService<SettingsViewModel>() };
+        private readonly DevicesPageHeader devicesPageHeader = new() { DataContext = App.Services.GetService<DevicesViewModel>() };
+
         private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
         {
             PageHeader.Content = args.Page switch
             {
-                Pages.SettingsPage => new SettingsPageHeader(),
-                Pages.DevicesPage => new DevicesPageHeader(),
+                Pages.SettingsPage => settingsPageHeader,
+                Pages.DevicesPage => devicesPageHeader,
                 _ => null
             };
         }

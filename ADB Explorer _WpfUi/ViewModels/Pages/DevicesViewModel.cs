@@ -1,4 +1,6 @@
-﻿using Wpf.Ui.Abstractions.Controls;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
+using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.ViewModels.Pages;
 
@@ -6,13 +8,15 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
 {
     private bool _isInitialized = false;
 
-    //[ObservableProperty]
-    //private IEnumerable<DataColor> _colors;
+    [ObservableProperty]
+    private ICollectionView _devicesView;
 
     public Task OnNavigatedToAsync()
     {
         if (!_isInitialized)
             InitializeViewModel();
+        else
+            DevicesView.Refresh();
 
         return Task.CompletedTask;
     }
@@ -21,25 +25,8 @@ public partial class DevicesViewModel : ObservableObject, INavigationAware
 
     private void InitializeViewModel()
     {
-        //var random = new Random();
-        //var colorCollection = new List<DataColor>();
-
-        //for (int i = 0; i < 8192; i++)
-        //    colorCollection.Add(
-        //        new DataColor
-        //        {
-        //            Color = new SolidColorBrush(
-        //                Color.FromArgb(
-        //                    (byte)200,
-        //                    (byte)random.Next(0, 250),
-        //                    (byte)random.Next(0, 250),
-        //                    (byte)random.Next(0, 250)
-        //                )
-        //            )
-        //        }
-        //    );
-
-        //Colors = colorCollection;
+        DevicesView = CollectionViewSource.GetDefaultView(Data.DevicesObject.UIList);
+        DevicesView.Filter = DeviceHelper.DevicesFilter;
 
         _isInitialized = true;
     }
