@@ -320,15 +320,6 @@ internal static class LogControls
     ];
 }
 
-internal static class ResetSettings
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        new CompoundDualAction(AppActions.List.Find(a => a.Name is FileAction.FileActionType.ResetSettings),
-            new ResetSettingsIcon()),
-    ];
-}
-
 internal static class SettingsControls
 {
     public static ObservableList<IMenuItem> List { get; } =

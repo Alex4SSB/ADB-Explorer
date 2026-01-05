@@ -119,4 +119,20 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             DialogService.ShowContent(stack, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
         });
     }
+
+    [RelayCommand]
+    private async Task ResetSettings()
+    {
+        var result = await DialogService.ShowConfirmation(
+                        Strings.Resources.S_RESET_SETTINGS,
+                        Strings.Resources.S_RESET_SETTINGS_TITLE,
+                        primaryText: Strings.Resources.S_CONFIRM,
+                        cancelText: Strings.Resources.S_CANCEL,
+                        icon: DialogService.DialogIcon.Exclamation);
+
+        if (result.Item1 == Wpf.Ui.Controls.ContentDialogResult.None)
+            return;
+
+        Data.RuntimeSettings.ResetAppSettings = true;
+    }
 }

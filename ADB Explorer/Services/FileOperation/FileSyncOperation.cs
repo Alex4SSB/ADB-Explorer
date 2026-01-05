@@ -215,14 +215,21 @@ public class FileSyncOperation : FileOperation
 
         if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
-            var total = (float)Files.Sum(f => f.BytesTransferred) / TotalBytes;
+            var total = (double)Files.Sum(f => f.BytesTransferred) / TotalBytes;
             currProgress.TotalPercentage = (int)(total * 100);
+            if (currProgress.TotalPercentage is < 0 or > 100)
+            {
+                if (Files.Count() == 1)
+                    currProgress.TotalPercentage = currProgress.CurrentFilePercentage;
+                else
+                    currProgress.TotalPercentage = null;
+            }
 
             AdbSyncProgressInfo info = currProgress;
 
             // Total percentage is displayed for single file
             if (Files.Count() == 1)
-                info = new(currProgress.AndroidPath, currProgress.CurrentFilePercentage, null, currProgress.TotalBytesTransferred);
+                info = new(currProgress.AndroidPath, currProgress.CurrentFilePercentage, null, currProgress.BytesTransferred);
             else if(ActiveFiles.Count() > 1)
             {
                 info = new(string.Format(Strings.Resources.S_FILES_PLURAL, ActiveFiles.Count()),

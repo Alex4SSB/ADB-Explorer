@@ -1217,34 +1217,15 @@ internal static class FileActionLogic
         });
     }
 
-    public static async void ResetAppSettings()
-    {
-        var result = await DialogService.ShowConfirmation(
-                        Strings.Resources.S_RESET_SETTINGS,
-                        Strings.Resources.S_RESET_SETTINGS_TITLE,
-                        primaryText: Strings.Resources.S_CONFIRM,
-                        cancelText: Strings.Resources.S_CANCEL,
-                        icon: DialogService.DialogIcon.Exclamation);
-
-        if (result.Item1 == Wpf.Ui.Controls.ContentDialogResult.None)
-            return;
-
-        Data.RuntimeSettings.ResetAppSettings = true;
-    }
-
     public static void ToggleSettingsSort()
     {
         Data.RuntimeSettings.SortedView ^= true;
         Data.FileActions.IsExpandSettingsVisible.Value ^= true;
-
-        Data.RuntimeSettings.RefreshSettingsControls = true;
     }
 
     public static void ToggleSettingsExpand()
     {
         Data.RuntimeSettings.GroupsExpanded ^= true;
-
-        Data.RuntimeSettings.RefreshSettingsControls = true;
     }
 
     public static async void FollowLink()

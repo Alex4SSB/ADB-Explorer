@@ -75,10 +75,14 @@
                         IsHitTestVisible="False"
                         Opacity="0.7" />
                 </Grid>
-                <local:AdbMenu
+                <ui:Button
                     Grid.Column="2"
-                    Margin="0"
-                    Style="{StaticResource ResetAppSettingsMenuStyle}" />
+                    Padding="8"
+                    Appearance="Danger"
+                    Command="{Binding ResetSettingsCommand}"
+                    ToolTip="{Binding Source={x:Static Member=strings:Resources.S_RESET_SETTINGS_TITLE}}">
+                    <local:ResetSettingsIcon FlowDirection="LeftToRight" />
+                </ui:Button>
             </Grid>
             <Grid Grid.Row="1" Margin="0,0,0,4">
                 <Grid.Style>
