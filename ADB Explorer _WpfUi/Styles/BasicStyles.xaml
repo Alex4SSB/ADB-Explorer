@@ -284,7 +284,7 @@
                         VerticalAlignment="{TemplateBinding VerticalAlignment}"
                         Background="Transparent">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="21" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid Height="20">
@@ -465,6 +465,7 @@
                                 <Condition Property="IsChecked" Value="False" />
                                 <Condition Property="IsEnabled" Value="True" />
                             </MultiTrigger.Conditions>
+                            <Setter TargetName="CheckGlyph" Property="Fill" Value="{DynamicResource RadioButtonForeground}" />
                             <Setter TargetName="OuterEllipse" Property="Fill" Value="{DynamicResource RadioButtonOuterEllipseFillPointerOver}" />
                         </MultiTrigger>
                         <MultiTrigger>
