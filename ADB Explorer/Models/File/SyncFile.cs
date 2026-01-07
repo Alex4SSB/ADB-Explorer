@@ -11,7 +11,7 @@ public class SyncFile : FilePath
 
     public FileOpProgressInfo LastUpdate => ProgressUpdates.LastOrDefault();
 
-    public int? CurrentPercentage => LastUpdate is AdbSyncProgressInfo adbInfo ? adbInfo.CurrentFilePercentage : null;
+    public double? CurrentPercentage => LastUpdate is AdbSyncProgressInfo adbInfo ? adbInfo.CurrentFilePercentage : null;
 
     public long? BytesTransferred => LastUpdate is AdbSyncProgressInfo adbInfo ? adbInfo.CurrentFileBytesTransferred : null;
 

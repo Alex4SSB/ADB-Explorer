@@ -278,7 +278,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
+                <TextBlock Margin="4,0,0,0" Text="{Binding PercentageString, Mode=OneWay}" />
                 <TextBlock Text="%" />
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
@@ -329,7 +329,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock Margin="4,0,0,0" Text="{Binding TotalPercentage, Mode=OneWay}" />
+                <TextBlock Margin="4,0,0,0" Text="{Binding PercentageString, Mode=OneWay}" />
                 <TextBlock Text="%" />
             </StackPanel>
         </Grid>

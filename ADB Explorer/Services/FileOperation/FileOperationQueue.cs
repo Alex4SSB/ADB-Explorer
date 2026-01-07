@@ -309,7 +309,7 @@ public class FileOperationQueue : ViewModelBase
 
         if (e.PropertyName is nameof(FileOperation.StatusInfo)
             && op.Status is FileOperation.OperationStatus.InProgress
-            && op.StatusInfo is InProgSyncProgressViewModel { TotalPercentage: int percentage })
+            && op.StatusInfo is InProgSyncProgressViewModel { TotalPercentage: double percentage })
         {
             op.LastProgress = percentage;
             UpdateProgress();

@@ -200,7 +200,7 @@ public class FileSyncOperation : FileOperation
         item.Size ??= eventArgs.TotalBytesToReceive;
 
         mutex.WaitOne();
-        progressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, (int)eventArgs.ProgressPercentage, eventArgs.ReceivedBytesSize));
+        progressUpdates.Add(new AdbSyncProgressInfo(item.FullPath, null, eventArgs.ProgressPercentage, eventArgs.ReceivedBytesSize));
         mutex.ReleaseMutex();
 
         TransferEnd = DateTime.Now;
@@ -215,14 +215,14 @@ public class FileSyncOperation : FileOperation
 
         if (progressUpdates.LastOrDefault() is AdbSyncProgressInfo currProgress and not null)
         {
-            var total = (float)Files.Sum(f => f.BytesTransferred) / TotalBytes;
-            currProgress.TotalPercentage = (int)(total * 100);
+            var total = (double)Files.Sum(f => f.BytesTransferred) / TotalBytes;
+            currProgress.TotalPercentage = total * 100;
 
             AdbSyncProgressInfo info = currProgress;
 
             // Total percentage is displayed for single file
             if (Files.Count() == 1)
-                info = new(currProgress.AndroidPath, currProgress.CurrentFilePercentage, null, currProgress.TotalBytesTransferred);
+                info = new(currProgress.AndroidPath, currProgress.TotalPercentage, null, currProgress.CurrentFileBytesTransferred);
             else if(ActiveFiles.Count() > 1)
             {
                 info = new(string.Format(Strings.Resources.S_FILES_PLURAL, ActiveFiles.Count()),
