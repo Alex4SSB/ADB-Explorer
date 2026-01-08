@@ -77,7 +77,8 @@
                 </Grid>
                 <ui:Button
                     Grid.Column="2"
-                    Padding="8"
+                    Padding="8,7"
+                    Margin="4"
                     Appearance="Danger"
                     Command="{Binding ResetSettingsCommand}"
                     ToolTip="{Binding Source={x:Static Member=strings:Resources.S_RESET_SETTINGS_TITLE}}">

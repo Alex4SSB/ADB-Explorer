@@ -526,6 +526,12 @@
                 </ui:ListView.Style>
             </ui:ListView>
             <Expander x:Name="SettingsAboutExpander" Margin="0,3">
+                <Expander.Resources>
+                    <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip">
+                        <!--  most tooltips here contain links, which must be LTR regardless of page FlowDirection  -->
+                        <Setter Property="FlowDirection" Value="LeftToRight" />
+                    </Style>
+                </Expander.Resources>
                 <Expander.Style>
                     <Style BasedOn="{StaticResource DefaultExpanderStyle}" TargetType="Expander">
                         <Style.Triggers>
@@ -588,13 +594,13 @@
                             NavigateUri="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}"
                             ToolTip="{Binding Source={x:Static Member=resources:Links.ADB_EXPLORER_PRIVACY}}" />
                     </controls:SimpleStackPanel>
-                    <CheckBox>
+                    <CheckBox
+                        HorizontalAlignment="Stretch"
+                        Content="{Binding Source={x:Static strings:Resources.S_SETTINGS_UPDATES}}"
+                        IsChecked="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}"
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_UPDATES}}">
                         <CheckBox.Style>
                             <Style BasedOn="{StaticResource StretchCheckBoxStyle}" TargetType="CheckBox">
-                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_TOOLTIP_UPDATES}}" />
-                                <Setter Property="IsChecked" Value="{Binding Source={x:Static models:Data.Settings}, Path=CheckForUpdates}" />
-                                <Setter Property="Content" Value="{Binding Source={x:Static strings:Resources.S_SETTINGS_UPDATES}}" />
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsAppDeployed}" Value="True">
                                         <Setter Property="Visibility" Value="Collapsed" />
@@ -602,6 +608,10 @@
                                 </Style.Triggers>
                             </Style>
                         </CheckBox.Style>
+                        <CheckBox.Resources>
+                            <!--  force FlowDirection based on page  -->
+                            <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip" />
+                        </CheckBox.Resources>
                     </CheckBox>
                     <TextBlock
                         Margin="0,20,0,6"
@@ -632,7 +642,12 @@
                         <ui:HyperlinkButton
                             Command="{Binding ViewModel.AndroidRobotLicenseCommand}"
                             Content="{x:Static strings:Resources.S_ANDROID_ICONS_TITLE}"
-                            ToolTip="{x:Static strings:Resources.S_SEE_TERMS}" />
+                            ToolTip="{x:Static strings:Resources.S_SEE_TERMS}">
+                            <ui:HyperlinkButton.Resources>
+                                <!--  force FlowDirection based on page  -->
+                                <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip" />
+                            </ui:HyperlinkButton.Resources>
+                        </ui:HyperlinkButton>
                     </controls:SimpleStackPanel>
                 </StackPanel>
             </Expander>
