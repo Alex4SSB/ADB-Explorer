@@ -25,8 +25,8 @@
     <PackageReference Include="QRCoder.Xaml" Version="1.7.0" />
     <PackageReference Include="System.Management" Version="10.0.1" />
     <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.2.1" />
-    <PackageReference Include="WPF-UI" Version="4.1.0" />
-    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.1.0" />
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
+    <PackageReference Include="WPF-UI.DependencyInjection" Version="4.2.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0 " />
   </ItemGroup>

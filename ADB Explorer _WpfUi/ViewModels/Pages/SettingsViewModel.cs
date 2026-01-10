@@ -1,5 +1,4 @@
 ﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
@@ -12,7 +11,13 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
     private bool _isInitialized = false;
 
     [ObservableProperty]
-    private ObservableList<AbstractGroup> _settingsList = [];
+    private ICollectionView _settingsList;
+
+    [ObservableProperty]
+    private SettingsGroup _selectedGroup;
+
+    [ObservableProperty]
+    private ICollectionView _groupContent;
 
     [ObservableProperty]
     private ICollectionView _sortedSettings;
@@ -44,15 +49,6 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             }
         };
 
-        if (SettingsList.Count == 0)
-        {
-            UISettings.Init();
-            SettingsList = UISettings.SettingsList;
-            
-            SortedSettings = CollectionViewSource.GetDefaultView(UISettings.SortSettings);
-            SortedSettings.Filter = SettingsFilterPredicate;
-        }
-
         PropertyChanged += (_, e) =>
         {
             switch (e.PropertyName)
@@ -60,10 +56,20 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
                 case nameof(SearchText):
                     SortedSettings.Refresh();
                     break;
+                case nameof(SelectedGroup):
+                    GroupContent = CollectionViewSource.GetDefaultView(SelectedGroup.Children);
+                    break;
                 default:
                     break;
             }
         };
+
+        UISettings.Init();
+        SettingsList = CollectionViewSource.GetDefaultView(UISettings.SettingsList);
+        SelectedGroup = (SettingsGroup)UISettings.SettingsList.FirstOrDefault();
+
+        SortedSettings = CollectionViewSource.GetDefaultView(UISettings.SortSettings);
+        SortedSettings.Filter = SettingsFilterPredicate;
 
         _isInitialized = true;
     }
@@ -86,39 +92,36 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         Process.Start("explorer.exe", Data.AppDataPath);
     }
 
-    [RelayCommand]
-    private async Task AndroidRobotLicense()
+    static readonly SimpleStackPanel AndroidRobotStackPanel = new()
     {
-        SimpleStackPanel stack = new()
+        Spacing = 8,
+        Children =
         {
-            Spacing = 8,
-            Children =
+            new TextBlock()
             {
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
-                },
-                new TextBlock()
-                {
-                    TextWrapping = TextWrapping.Wrap,
-                    Text = Strings.Resources.S_APK_ICON_LIC,
-                },
-                new Wpf.Ui.Controls.HyperlinkButton()
-                {
-                    Content = Strings.Resources.S_CC_NAME,
-                    ToolTip = Links.L_CC_LIC,
-                    NavigateUri = Links.L_CC_LIC.OriginalString,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                }
+                TextWrapping = TextWrapping.Wrap,
+                Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
             },
-        };
+            new TextBlock()
+            {
+                TextWrapping = TextWrapping.Wrap,
+                Text = Strings.Resources.S_APK_ICON_LIC,
+            },
+            new Wpf.Ui.Controls.HyperlinkButton()
+            {
+                Content = Strings.Resources.S_CC_NAME,
+                ToolTip = new ToolTip() { Content = Links.L_CC_LIC, FlowDirection = FlowDirection.LeftToRight },
+                NavigateUri = Links.L_CC_LIC.OriginalString,
+                HorizontalAlignment = HorizontalAlignment.Center,
+            }
+        },
+    };
 
-        App.Current.Dispatcher.Invoke(() =>
-        {
-            DialogService.ShowContent(stack, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
-        });
-    }
+    [RelayCommand]
+    private async Task AndroidRobotLicense() => App.Current.Dispatcher.Invoke(() =>
+    {
+        DialogService.ShowContent(AndroidRobotStackPanel, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
+    });
 
     [RelayCommand]
     private async Task ResetSettings()

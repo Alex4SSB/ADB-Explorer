@@ -3205,6 +3205,15 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to On.
+        /// </summary>
+        public static string S_SETTINGS_ACTIVE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_ACTIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disable Animations.
         /// </summary>
         public static string S_SETTINGS_ANIMATION {
@@ -3408,6 +3417,15 @@ namespace ADB_Explorer.Strings {
         public static string S_SETTINGS_HIDDEN_ITEMS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_HIDDEN_ITEMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Off.
+        /// </summary>
+        public static string S_SETTINGS_INACTIVE {
+            get {
+                return ResourceManager.GetString("S_SETTINGS_INACTIVE", resourceCulture);
             }
         }
         

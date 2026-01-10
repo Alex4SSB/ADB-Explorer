@@ -8,7 +8,7 @@ public partial class MainWindowViewModel : ObservableObject
     private string _applicationTitle = Properties.AppGlobal.AppDisplayName;
 
     [ObservableProperty]
-    private ObservableCollection<object> _menuItems =
+    private ObservableCollection<NavigationViewItem> _menuItems =
     [
         new NavigationViewItem()
         {
@@ -27,7 +27,7 @@ public partial class MainWindowViewModel : ObservableObject
     ];
 
     [ObservableProperty]
-    private ObservableCollection<object> _footerMenuItems =
+    private ObservableCollection<NavigationViewItem> _footerMenuItems =
     [
         new NavigationViewItem()
         {

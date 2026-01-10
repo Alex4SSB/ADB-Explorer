@@ -1220,12 +1220,6 @@ internal static class FileActionLogic
     public static void ToggleSettingsSort()
     {
         Data.RuntimeSettings.SortedView ^= true;
-        Data.FileActions.IsExpandSettingsVisible.Value ^= true;
-    }
-
-    public static void ToggleSettingsExpand()
-    {
-        Data.RuntimeSettings.GroupsExpanded ^= true;
     }
 
     public static async void FollowLink()

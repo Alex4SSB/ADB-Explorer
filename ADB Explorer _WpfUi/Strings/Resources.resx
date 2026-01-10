@@ -1766,4 +1766,12 @@ Please help us localize the app to your language on Weblate.</value>
     <value>Install {0} APKs</value>
     <comment>The drag tooltip when dragging multiple APK files over the installed apps view. 0 - number of APKs being dragged</comment>
   </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>On</value>
+    <comment>The label of the switch toggle on a setting when it is on / active / enabled</comment>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Off</value>
+    <comment>The label of the switch toggle on a setting when it is off / inactive / disabled</comment>
+  </data>
 </root>

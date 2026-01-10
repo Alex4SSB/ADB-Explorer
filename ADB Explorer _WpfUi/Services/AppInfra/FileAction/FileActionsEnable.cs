@@ -509,8 +509,6 @@ public class FileActionsEnable : ViewModelBase
 
     public ObservableProperty<bool> IsUninstallVisible = new() { Value = false };
 
-    public ObservableProperty<bool> IsExpandSettingsVisible = new() { Value = true };
-
     public ObservableProperty<bool> IsLogToggleVisible = new() { Value = Data.Settings.EnableLog };
 
     public ObservableProperty<bool> IsApkActionsVisible = new() { Value = Data.Settings.EnableApk };

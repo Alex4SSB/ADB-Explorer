@@ -40,9 +40,6 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
     {
         switch (e.PropertyName)
         {
-            case nameof(AppRuntimeSettings.GroupsExpanded):
-                SettingsAboutExpander.IsExpanded = Data.RuntimeSettings.GroupsExpanded;
-                break;
             default:
                 break;
         }

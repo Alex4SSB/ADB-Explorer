@@ -23,7 +23,7 @@
     </Style>
     <Style
         x:Key="StretchRadioButton"
-        BasedOn="{StaticResource AdbRadioButtonStyle}"
+        BasedOn="{StaticResource DefaultRadioButtonStyle}"
         TargetType="RadioButton">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -86,6 +86,7 @@
         BasedOn="{StaticResource FluentTooltipStyle}"
         TargetType="ToolTip">
         <Setter Property="Visibility" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=PlacementTarget, Converter={StaticResource TrimmedTooltip}}" />
+        <Setter Property="FlowDirection" Value="{Binding RelativeSource={RelativeSource Mode=TemplatedParent}, Path=FlowDirection}" />
     </Style>
     <Style
         x:Key="TooltipTextBoxStyle"
@@ -218,7 +219,7 @@
                 </Style.Triggers>
             </Style>
         </Style.Resources>
-        <Setter Property="Padding" Value="2,2,3,2" />
+        <Setter Property="Padding" Value="2,2,3,3" />
         <Setter Property="Margin" Value="0,0,4,0" />
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
@@ -368,7 +369,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ui:ListViewItem">
                     <!--  Width="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ScrollContentPresenter}, Path=ActualWidth}"  -->
-                    <Grid >
+                    <Grid>
                         <ContentPresenter />
                     </Grid>
                 </ControlTemplate>

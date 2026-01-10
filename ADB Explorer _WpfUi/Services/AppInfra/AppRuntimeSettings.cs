@@ -49,13 +49,6 @@ public class AppRuntimeSettings : ViewModelBase
         set => Set(ref sortedView, value);
     }
 
-    private bool groupsExpanded = false;
-    public bool GroupsExpanded
-    {
-        get => groupsExpanded;
-        set => Set(ref groupsExpanded, value);
-    }
-
     private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
     public double MaxSearchBoxWidth
     {

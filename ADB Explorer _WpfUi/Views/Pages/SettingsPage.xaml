@@ -411,13 +411,15 @@
             BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
             CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
             EnumSettingTemplate="{StaticResource GropuedEnumSettingTemplate}"
-            StringSettingTemplate="{StaticResource StringSettingTemplate}" />
+            InfoSettingTemplate="{x:Null}"
+            TextboxSettingTemplate="{StaticResource StringSettingTemplate}" />
         <helpers:SettingsTemplateSelector
             x:Key="SortedSettingsTemplateSelector"
             BoolSettingTemplate="{StaticResource BoolSettingTemplate}"
             CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
             EnumSettingTemplate="{StaticResource SortedEnumSettingTemplate}"
-            StringSettingTemplate="{StaticResource StringSettingTemplate}" />
+            InfoSettingTemplate="{x:Null}"
+            TextboxSettingTemplate="{StaticResource StringSettingTemplate}" />
         <Style
             x:Key="SettingsGroupContainer"
             BasedOn="{StaticResource StretchListViewItem}"
@@ -490,9 +492,14 @@
                 Width="2*"
                 MinWidth="380"
                 MaxWidth="600" />
-            <ColumnDefinition />
+            <!--<ColumnDefinition />-->
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="1">
+        <!--<ui:ListView
+            ItemContainerStyle="{StaticResource StretchListViewItem}"
+            ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
+            ItemsSource="{Binding ViewModel.GroupContent}"
+            Style="{StaticResource SettingsListViewStyle}" />-->
+        <StackPanel Grid.Column="1" Visibility="Collapsed">
             <ui:ListView
                 x:Name="SettingsList"
                 HorizontalAlignment="Stretch"
@@ -528,7 +535,9 @@
             <Expander x:Name="SettingsAboutExpander" Margin="0,3">
                 <Expander.Resources>
                     <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip">
+
                         <!--  most tooltips here contain links, which must be LTR regardless of page FlowDirection  -->
+
                         <Setter Property="FlowDirection" Value="LeftToRight" />
                     </Style>
                 </Expander.Resources>
@@ -609,7 +618,9 @@
                             </Style>
                         </CheckBox.Style>
                         <CheckBox.Resources>
+
                             <!--  force FlowDirection based on page  -->
+
                             <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip" />
                         </CheckBox.Resources>
                     </CheckBox>
@@ -644,7 +655,9 @@
                             Content="{x:Static strings:Resources.S_ANDROID_ICONS_TITLE}"
                             ToolTip="{x:Static strings:Resources.S_SEE_TERMS}">
                             <ui:HyperlinkButton.Resources>
+
                                 <!--  force FlowDirection based on page  -->
+
                                 <Style BasedOn="{StaticResource DefaultToolTipStyle}" TargetType="ToolTip" />
                             </ui:HyperlinkButton.Resources>
                         </ui:HyperlinkButton>
