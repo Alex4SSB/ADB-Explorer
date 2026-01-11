@@ -28,6 +28,7 @@ An interface to ADB that allows browsing, transferring, and editing of files wit
 </a>
 
 <br></br>
+[Development process of the new WpfUi based version of the app](https://github.com/Alex4SSB/ADB-Explorer/discussions/291)
 <h2 align="left"/>Translation</h2>
 Help with translation is most welcome - please visit our translation project on Weblate: https://hosted.weblate.org/engage/adb-explorer/
 
