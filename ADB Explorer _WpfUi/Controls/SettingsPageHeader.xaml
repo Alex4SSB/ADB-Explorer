@@ -67,7 +67,10 @@
                 <ui:FontIcon Glyph="{Binding Icon}" />
             </ui:Button>
         </DataTemplate>
-        <Grid x:Key="SettingsCardHeader" x:Shared="False">
+        <Grid
+            x:Key="SettingsCardHeader"
+            MinHeight="37"
+            x:Shared="False">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -389,6 +392,13 @@
             LongDescriptionTemplate="{StaticResource LongDescriptionSettingTemplate}"
             MultiLinkSettingTemplate="{StaticResource MultiLinkSettingTemplate}"
             TextboxSettingTemplate="{StaticResource TextboxSettingTemplate}" />
+        <Style
+            x:Key="SettingsContainerStyle"
+            BasedOn="{StaticResource StretchListViewItem}"
+            TargetType="ui:ListViewItem">
+            <Setter Property="Margin" Value="0,4,0,0" />
+            <Setter Property="Visibility" Value="{Binding Visibility}" />
+        </Style>
     </UserControl.Resources>
     <Grid Margin="42,10">
         <Grid.ColumnDefinitions>
@@ -416,9 +426,9 @@
                     </Grid.ColumnDefinitions>
                     <local:AdbMenu x:Name="SettingsControlsMenu" Style="{StaticResource SettingsControlsMenuStyle}" />
                     <TextBlock
-                        Grid.ColumnSpan="3"
+                        Grid.Column="1"
                         Margin="0,0,0,4"
-                        HorizontalAlignment="Center"
+                        HorizontalAlignment="Left"
                         VerticalAlignment="Center"
                         FontSize="24"
                         FontWeight="SemiBold"
@@ -459,7 +469,7 @@
                     </Grid>
                     <ui:Button
                         Grid.Column="2"
-                        Margin="4"
+                        Margin="8,4,4,4"
                         Padding="8,7"
                         Appearance="Danger"
                         Command="{Binding ResetSettingsCommand}"
@@ -468,7 +478,36 @@
                     </ui:Button>
                 </Grid>
             </Border>
+            <ui:DynamicScrollViewer Grid.Row="1">
+                <ui:ListView
+                    x:Name="SortedSettings"
+                    Margin="0,0,14,0"
+                    FocusVisualStyle="{x:Null}"
+                    ItemContainerStyle="{StaticResource SettingsContainerStyle}"
+                    ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
+                    ItemsSource="{Binding SortedSettings}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ui:ListView.Style>
+                        <Style BasedOn="{StaticResource ListViewStyle}" TargetType="ui:ListView">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ui:ListView.Style>
+                </ui:ListView>
+            </ui:DynamicScrollViewer>
             <Grid Grid.Row="1" Margin="0,0,0,4">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
@@ -531,16 +570,10 @@
                 <ui:DynamicScrollViewer Grid.Row="1" Grid.Column="1">
                     <ui:ListView
                         Margin="0,0,14,0"
+                        ItemContainerStyle="{StaticResource SettingsContainerStyle}"
                         ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
                         ItemsSource="{Binding GroupContent}"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ui:ListView.ItemContainerStyle>
-                            <Style BasedOn="{StaticResource StretchListViewItem}" TargetType="ui:ListViewItem">
-                                <Setter Property="Margin" Value="0,4,0,0" />
-                                <Setter Property="Visibility" Value="{Binding Visibility}" />
-                            </Style>
-                        </ui:ListView.ItemContainerStyle>
-                    </ui:ListView>
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
                 </ui:DynamicScrollViewer>
             </Grid>
             <!--<Grid Grid.Row="1" Margin="0,0,0,4">

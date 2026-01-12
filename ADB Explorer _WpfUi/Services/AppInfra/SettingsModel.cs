@@ -13,8 +13,8 @@ public static class UISettings
     public static ObservableList<Notification> Notifications { get; set; } = [];
 
     public static IEnumerable<AbstractSetting> SortSettings => SettingsList.SelectMany(group => group.Children)
-        .Where(set => set.Visibility is Visibility.Visible)
-        .OrderBy(sett => sett.Description);
+        .Where(set => set.Visibility is Visibility.Visible && set.Description != Properties.AppGlobal.AppDisplayName)
+        .OrderBy(sett => sett.Description).Prepend(SettingsList.SelectMany(group => group.Children).First(s => s.Description == Properties.AppGlobal.AppDisplayName));
 
     private static readonly Dictionary<ActionType, string> Icons = new()
     {

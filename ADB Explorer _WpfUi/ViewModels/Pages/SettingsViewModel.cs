@@ -49,6 +49,17 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             }
         };
 
+        Data.RuntimeSettings.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(AppRuntimeSettings.SortedView))
+            {
+                if (Data.RuntimeSettings.SortedView)
+                    SortedSettings.Refresh();
+                else
+                    GroupContent.Refresh();
+            }
+        };
+
         PropertyChanged += (_, e) =>
         {
             switch (e.PropertyName)

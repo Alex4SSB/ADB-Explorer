@@ -19,29 +19,5 @@ public partial class SettingsPage : INavigableView<SettingsViewModel>
         DataContext = this;
 
         InitializeComponent();
-
-        Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
-        Data.Settings.PropertyChanged += Settings_PropertyChanged;
-    }
-
-    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            case nameof(AppSettings.EnableMdns):
-                AdbHelper.EnableMdns();
-                break;
-            default:
-                break;
-        }
-    }
-
-    private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        switch (e.PropertyName)
-        {
-            default:
-                break;
-        }
     }
 }
