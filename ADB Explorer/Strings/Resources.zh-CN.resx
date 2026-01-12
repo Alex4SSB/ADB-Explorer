@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -1419,5 +1419,17 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>侧载的ROM</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>终端</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>保存文件修改日期</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>安装 {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>安装 {0} 个 APK</value>
   </data>
 </root>
