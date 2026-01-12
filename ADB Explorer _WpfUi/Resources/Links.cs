@@ -18,4 +18,10 @@ public static class Links
     public static readonly Uri SPONSOR = new("https://github.com/sponsors/Alex4SSB");
     public static readonly Uri WEBLATE = new("https://hosted.weblate.org/engage/adb-explorer/");
     public static readonly Uri ADVANCED_SHARP_ADB = new("https://github.com/SharpAdb/AdvancedSharpAdbClient");
+    public static readonly Uri MVVM_TOOLKIT = new("https://github.com/CommunityToolkit/dotnet");
+    public static readonly Uri EMOJI_WPF = new("https://github.com/samhocevar/emoji.wpf");
+    public static readonly Uri API_CODEPACK = new("https://github.com/contre/Windows-API-Code-Pack-1.1");
+    public static readonly Uri JSON = new("https://www.newtonsoft.com/json");
+    public static readonly Uri QR_CODER = new("https://github.com/Shane32/QRCoder");
+    public static readonly Uri VANARA = new("https://github.com/dahall/vanara");
 }

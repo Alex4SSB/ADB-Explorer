@@ -14,6 +14,16 @@
     d:DesignWidth="600"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <Style x:Key="CollapsedTextBlock" TargetType="TextBlock">
+            <Style.Triggers>
+                <Trigger Property="Text" Value="">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+                <Trigger Property="Text" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
         <Style x:Key="RightHorizontalItemsControlStyle" TargetType="ItemsControl">
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="VerticalAlignment" Value="Center" />
@@ -27,6 +37,24 @@
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileOpQ}, Path=IsActive}" Value="True">
                     <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="LinkTooltipStyle"
+            BasedOn="{StaticResource FluentTooltipStyle}"
+            TargetType="ToolTip">
+            <Setter Property="FlowDirection" Value="LeftToRight" />
+        </Style>
+        <Style
+            x:Key="SettingsIconStyle"
+            BasedOn="{StaticResource GlyphFont}"
+            TargetType="ui:FontIcon">
+            <Setter Property="Glyph" Value="{Binding Icon}" />
+            <Setter Property="FontSize" Value="22" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Icon}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
                 </DataTrigger>
             </Style.Triggers>
         </Style>
@@ -44,10 +72,7 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ui:FontIcon
-                Margin="0,0,10,0"
-                FontSize="22"
-                Glyph="{Binding Icon}" />
+            <ui:FontIcon Margin="0,0,10,0" Style="{StaticResource SettingsIconStyle}" />
             <TextBlock
                 Grid.Column="1"
                 VerticalAlignment="Center"
@@ -61,6 +86,19 @@
             <Setter Property="MinHeight" Value="70" />
             <Setter Property="Header" Value="{StaticResource SettingsCardHeader}" />
         </Style>
+        <Style
+            x:Key="SettingsCardActionStyle"
+            BasedOn="{StaticResource DefaultUiCardActionStyle}"
+            TargetType="ui:CardAction">
+            <Setter Property="MinHeight" Value="70" />
+            <Setter Property="IsChevronVisible" Value="False" />
+            <Setter Property="Command" Value="{Binding Command.Command}" />
+            <Setter Property="ToolTip">
+                <Setter.Value>
+                    <ToolTip Content="{Binding ToolTip}" Style="{StaticResource LinkTooltipStyle}" />
+                </Setter.Value>
+            </Setter>
+        </Style>
         <DataTemplate x:Key="InfoSettingTemplate" DataType="services:InfoSetting">
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
                 <ui:CardControl.Header>
@@ -69,29 +107,121 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
+                        <ui:FontIcon Margin="0,0,10,0" Style="{StaticResource SettingsIconStyle}" />
+                        <Grid>
+                            <Grid.Style>
+                                <Style TargetType="Grid">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HeaderAlignment}" Value="Center">
+                                            <Setter Property="Grid.ColumnSpan" Value="2" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                FontFamily="{Binding FontFamily}"
+                                FontSize="{Binding FontSize}"
+                                Text="{Binding Description}"
+                                TextAlignment="{Binding HeaderAlignment}"
+                                TextWrapping="Wrap" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Style="{StaticResource CollapsedTextBlock}"
+                                Text="{Binding AltText}"
+                                TextAlignment="{Binding HeaderAlignment}" />
+                        </Grid>
+                    </Grid>
+                </ui:CardControl.Header>
+            </ui:CardControl>
+        </DataTemplate>
+        <DataTemplate x:Key="LinkSettingTemplate" DataType="services:LinkSetting">
+            <ui:CardAction Style="{StaticResource SettingsCardActionStyle}">
+                <ui:CardAction.Content>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition />
-                            <RowDefinition />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <ui:FontIcon
+                        <ContentPresenter
                             Grid.RowSpan="2"
                             Margin="0,0,10,0"
-                            FontSize="22"
-                            Glyph="{Binding Icon}" />
+                            Content="{Binding IconContent}"
+                            FlowDirection="LeftToRight" />
                         <TextBlock
                             Grid.Column="1"
                             VerticalAlignment="Center"
-                            FontFamily="{Binding FontFamily}"
-                            FontSize="{Binding FontSize}"
                             Text="{Binding Description}"
                             TextWrapping="Wrap" />
                         <TextBlock
                             Grid.Row="1"
                             Grid.Column="1"
+                            Style="{StaticResource CollapsedTextBlock}"
                             Text="{Binding AltText}" />
+                        <ui:FontIcon
+                            Grid.Column="2"
+                            HorizontalAlignment="Right"
+                            Glyph="&#xE8A7;">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="True">
+                                            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+                                            <Setter Property="RenderTransform">
+                                                <Setter.Value>
+                                                    <ScaleTransform ScaleX="-1" />
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
                     </Grid>
-                </ui:CardControl.Header>
-            </ui:CardControl>
+                </ui:CardAction.Content>
+            </ui:CardAction>
+        </DataTemplate>
+        <DataTemplate x:Key="MultiLinkSettingTemplate" DataType="services:MultiLinkSetting">
+            <ui:CardExpander Header="{StaticResource SettingsCardHeader}">
+                <ItemsControl FlowDirection="LeftToRight" ItemsSource="{Binding Links}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="6" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ui:HyperlinkButton Content="{Binding Description}" NavigateUri="{Binding Url}">
+                                <ui:HyperlinkButton.Style>
+                                    <Style BasedOn="{StaticResource DefaultUiHyperlinkButtonStyle}" TargetType="ui:HyperlinkButton">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <ToolTip Content="{Binding Url}" Style="{StaticResource LinkTooltipStyle}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ui:HyperlinkButton.Style>
+                            </ui:HyperlinkButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ui:CardExpander>
+        </DataTemplate>
+        <DataTemplate x:Key="LongDescriptionSettingTemplate" DataType="services:LongDescriptionSetting">
+            <ui:CardExpander Header="{StaticResource SettingsCardHeader}">
+                <TextBlock Text="{Binding AltText}" TextWrapping="Wrap" />
+            </ui:CardExpander>
         </DataTemplate>
         <DataTemplate x:Key="BoolSettingTemplate" DataType="services:BoolSetting">
             <ui:CardControl Style="{StaticResource SettingsCardHeaderStyle}">
@@ -255,6 +385,9 @@
             CultureInfoSettingTemplate="{StaticResource CultureInfoSettingTemplate}"
             EnumSettingTemplate="{StaticResource GroupedEnumSettingTemplate}"
             InfoSettingTemplate="{StaticResource InfoSettingTemplate}"
+            LinkSettingTemplate="{StaticResource LinkSettingTemplate}"
+            LongDescriptionTemplate="{StaticResource LongDescriptionSettingTemplate}"
+            MultiLinkSettingTemplate="{StaticResource MultiLinkSettingTemplate}"
             TextboxSettingTemplate="{StaticResource TextboxSettingTemplate}" />
     </UserControl.Resources>
     <Grid Margin="42,10">
@@ -347,6 +480,7 @@
                 <Border
                     Grid.RowSpan="2"
                     Margin="0,0,6,0"
+                    VerticalAlignment="Top"
                     BorderBrush="Gray"
                     BorderThickness="0,0,1,0">
                     <ui:ListView
@@ -394,19 +528,20 @@
                     Margin="10,6"
                     FontSize="24"
                     Text="{Binding SelectedGroup.Name}" />
-                <ui:ListView
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
-                    ItemsSource="{Binding GroupContent}"
-                    ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                    <ui:ListView.ItemContainerStyle>
-                        <Style BasedOn="{StaticResource StretchListViewItem}" TargetType="ui:ListViewItem">
-                            <Setter Property="Margin" Value="0,4,0,0" />
-                            <Setter Property="Visibility" Value="{Binding Visibility}" />
-                        </Style>
-                    </ui:ListView.ItemContainerStyle>
-                </ui:ListView>
+                <ui:DynamicScrollViewer Grid.Row="1" Grid.Column="1">
+                    <ui:ListView
+                        Margin="0,0,14,0"
+                        ItemTemplateSelector="{StaticResource GroupedSettingsTemplateSelector}"
+                        ItemsSource="{Binding GroupContent}"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ui:ListView.ItemContainerStyle>
+                            <Style BasedOn="{StaticResource StretchListViewItem}" TargetType="ui:ListViewItem">
+                                <Setter Property="Margin" Value="0,4,0,0" />
+                                <Setter Property="Visibility" Value="{Binding Visibility}" />
+                            </Style>
+                        </ui:ListView.ItemContainerStyle>
+                    </ui:ListView>
+                </ui:DynamicScrollViewer>
             </Grid>
             <!--<Grid Grid.Row="1" Margin="0,0,0,4">
                 <Grid.Style>

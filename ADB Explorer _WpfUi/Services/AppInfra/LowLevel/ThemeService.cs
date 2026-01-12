@@ -7,39 +7,43 @@ internal class AdbThemeService
 {
     public static void SetTheme(AppSettings.AppTheme theme)
     {
+        SystemTheme actualTheme = SystemTheme.Unknown;
+
         switch (theme)
         {
             case AppSettings.AppTheme.Light:
                 ApplicationThemeManager.Apply(ApplicationTheme.Light);
-
+                actualTheme = SystemTheme.Light;
                 break;
 
             case AppSettings.AppTheme.Dark:
                 ApplicationThemeManager.Apply(ApplicationTheme.Dark);
-
+                actualTheme = SystemTheme.Dark;
                 break;
 
             case AppSettings.AppTheme.WindowsDefault:
                 ApplicationThemeManager.ApplySystemTheme();
-
+                actualTheme = ApplicationThemeManager.GetSystemTheme();
                 break;
         }
 
-        var actualTheme = ApplicationThemeManager.GetSystemTheme();
         Data.RuntimeSettings.ActualTheme = actualTheme;
 
-        Task.Run(() =>
+        var dictionaries = Application.Current.Resources.MergedDictionaries;
+
+        // Find the current theme dictionary
+        var currentTheme = dictionaries.FirstOrDefault(d =>
+            d.Source != null &&
+            d.Source.OriginalString.StartsWith("/Themes/", StringComparison.OrdinalIgnoreCase));
+
+        if (currentTheme != null)
         {
-            var keys = ((ResourceDictionary)Application.Current.Resources["DynamicBrushes"]).Keys;
-            string[] brushes = new string[keys.Count];
-            keys.CopyTo(brushes, 0);
+            dictionaries.Remove(currentTheme);
+        }
 
-            Parallel.ForEach(brushes, (brush) => SetResourceColor(actualTheme, brush));
+        dictionaries.Insert(0, new ResourceDictionary
+        {
+            Source = new($"/Themes/{actualTheme}.xaml", UriKind.Relative)
         });
-    }
-
-    public static void SetResourceColor(SystemTheme theme, string resource)
-    {
-        App.Current.Dispatcher.Invoke(() => Application.Current.Resources[resource] = new SolidColorBrush((Color)Application.Current.Resources[$"{theme}{resource}"]));
     }
 }

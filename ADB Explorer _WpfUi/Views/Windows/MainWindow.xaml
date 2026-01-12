@@ -47,7 +47,7 @@
             MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneWay}"
             PaneDisplayMode="LeftFluent">
             <ui:NavigationView.Header>
-                <ContentPresenter x:Name="PageHeader" />
+                <ContentPresenter x:Name="PageHeader" Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ui:NavigationView}, Path=ActualHeight}" />
             </ui:NavigationView.Header>
             <!--<ui:NavigationView.ContentOverlay>
                 <Grid>

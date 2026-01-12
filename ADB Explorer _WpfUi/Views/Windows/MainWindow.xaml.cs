@@ -29,6 +29,7 @@ namespace ADB_Explorer.Views.Windows
             AdbThemeService.SetTheme(Data.Settings.Theme);
             AdbHelper.CheckAdbVersion();
             Data.DevicesObject = new();
+            Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);

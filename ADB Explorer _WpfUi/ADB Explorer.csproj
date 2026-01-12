@@ -11,6 +11,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
 	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<Configurations>Debug;Release;Deploy</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
