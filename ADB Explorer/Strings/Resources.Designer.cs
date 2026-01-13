@@ -3223,7 +3223,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to APK Handling.
+        ///   Looks up a localized string similar to APK Support.
         /// </summary>
         public static string S_SETTINGS_APK {
             get {
