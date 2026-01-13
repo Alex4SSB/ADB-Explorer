@@ -462,20 +462,16 @@ Visible content may be incomplete.</value>
     <comment>The tooltip of a button used to clear a textbox</comment>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>Enable mDNS</value>
+    <value>mDNS</value>
     <comment>The setting used to toggle mDNS enabled state</comment>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Poll For Devices</value>
+    <value>Polling For Devices</value>
     <comment>The setting used to toggle polling for devices</comment>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Poll For Battery Status</value>
+    <value>Polling For Battery Status</value>
     <comment>The setting used to toggle battery status polling</comment>
-  </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Enable Command Log</value>
-    <comment>The setting used to toggle command log enabled state</comment>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Automatically Enable Root</value>
@@ -490,7 +486,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to toggle automatically opening the only connected device or the last connected device</comment>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Enable Compact View</value>
+    <value>Compact View</value>
     <comment>The setting used to enable the file operations compact view</comment>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
@@ -498,7 +494,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to stop device and battery polling when there are active push or pull operations</comment>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Allow Simultaneous Operations</value>
+    <value>Simultaneous Operations</value>
     <comment>The setting used to allow performing simultaneous operations on separate devices</comment>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
@@ -506,15 +502,11 @@ Visible content may be incomplete.</value>
     <comment>The setting used to enable forcing the device to perform a media rescan after a successful push operation batch</comment>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Poll For Drives</value>
+    <value>Polling For Drives</value>
     <comment>The setting used to toggle polling for device drives when in drive view</comment>
   </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Enable Recycle Bin</value>
-    <comment>The setting used to enable the recycle bin (trash)</comment>
-  </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>Enable APK Handling</value>
+    <value>APK Support</value>
     <comment>The setting used to enable everything related to APK</comment>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
@@ -582,7 +574,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to disable app animations</comment>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Display Splash Screen</value>
+    <value>Splash Screen</value>
     <comment>The setting used to enable showing the splash screen on app startup</comment>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">

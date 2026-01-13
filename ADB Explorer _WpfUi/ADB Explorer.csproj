@@ -19,16 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AdvancedSharpAdbClient" Version="3.5.15" />
+    <PackageReference Include="AdvancedSharpAdbClient" Version="3.6.16" />
     <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="QRCoder.Xaml" Version="1.7.0" />
-    <PackageReference Include="System.Management" Version="10.0.1" />
-    <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.2.1" />
+    <PackageReference Include="System.Management" Version="10.0.2" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="5.0.0" />
     <PackageReference Include="WPF-UI" Version="4.2.0" />
     <PackageReference Include="WPF-UI.DependencyInjection" Version="4.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0 " />
   </ItemGroup>
 

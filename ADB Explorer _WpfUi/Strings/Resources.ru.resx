@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ ADB доступен как часть Android SDK Platform Tools.
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Запрос статуса батареи</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Включить логирование</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Автоматически включить ROOT</value>
   </data>
@@ -483,9 +480,6 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Запрос по устройствам</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Включить корзину</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Включить поддержку APK</value>

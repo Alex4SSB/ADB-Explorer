@@ -457,9 +457,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Ottieni lo stato della batteria</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Abilita i log dei comandi di ADB</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Abilita automaticamente il root</value>
   </data>
@@ -483,9 +480,6 @@ Il contenuto che vedi potrebbe essere incompleto.</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Rileva automaticamente i dischi</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Usa il cestino</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Abilita la gestione degli APK</value>
@@ -1410,5 +1404,26 @@ Aiutaci a localizzare l'app nella vostra lingua su Weblate.</value>
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Validazione in corso…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} file</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Seleziona ROM per sideload</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>File ROM</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminale</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Mantieni "data ultima modifica" del file</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Installare {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Installa {0} APK</value>
   </data>
 </root>

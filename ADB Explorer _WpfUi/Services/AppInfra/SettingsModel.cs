@@ -113,7 +113,7 @@ public static class UISettings
                 new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS, icon: "\uED14"),
                 new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES, icon: "\uEBDE"),
                 new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY, icon: "\uEE63"),
-                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_SETTINGS_ENABLE_LOG, icon: "\uE9A4"),
+                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG, icon: "\uE9A4"),
             ], "\uE8CC"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
             [
@@ -132,7 +132,7 @@ public static class UISettings
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
             [
                 new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES, icon: "\uEBC4"),
-                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_SETTINGS_ENABLE_TRASH, icon: "\uE74D"),
+                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH, icon: "\uE74D"),
                 new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK, icon: "\uE7B8"),
             ], "\uE8CE"),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_EXPLORER,

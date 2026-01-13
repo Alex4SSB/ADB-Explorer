@@ -3223,7 +3223,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable APK Handling.
+        ///   Looks up a localized string similar to APK Support.
         /// </summary>
         public static string S_SETTINGS_APK {
             get {
@@ -3250,7 +3250,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Compact View.
+        ///   Looks up a localized string similar to Compact View.
         /// </summary>
         public static string S_SETTINGS_COMPACT_VIEW {
             get {
@@ -3304,29 +3304,11 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enable Command Log.
-        /// </summary>
-        public static string S_SETTINGS_ENABLE_LOG {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ENABLE_LOG", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable mDNS.
+        ///   Looks up a localized string similar to mDNS.
         /// </summary>
         public static string S_SETTINGS_ENABLE_MDNS {
             get {
                 return ResourceManager.GetString("S_SETTINGS_ENABLE_MDNS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Enable Recycle Bin.
-        /// </summary>
-        public static string S_SETTINGS_ENABLE_TRASH {
-            get {
-                return ResourceManager.GetString("S_SETTINGS_ENABLE_TRASH", resourceCulture);
             }
         }
         
@@ -3466,7 +3448,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Allow Simultaneous Operations.
+        ///   Looks up a localized string similar to Simultaneous Operations.
         /// </summary>
         public static string S_SETTINGS_PARALLEL_OPERATIONS {
             get {
@@ -3475,7 +3457,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Battery Status.
+        ///   Looks up a localized string similar to Polling For Battery Status.
         /// </summary>
         public static string S_SETTINGS_POLL_BATTERY {
             get {
@@ -3484,7 +3466,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Devices.
+        ///   Looks up a localized string similar to Polling For Devices.
         /// </summary>
         public static string S_SETTINGS_POLL_DEVICES {
             get {
@@ -3493,7 +3475,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Drives.
+        ///   Looks up a localized string similar to Polling For Drives.
         /// </summary>
         public static string S_SETTINGS_POLL_DRIVES {
             get {
@@ -3520,7 +3502,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Display Splash Screen.
+        ///   Looks up a localized string similar to Splash Screen.
         /// </summary>
         public static string S_SETTINGS_SPLASH {
             get {

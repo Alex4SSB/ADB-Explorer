@@ -117,10 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value />
-  </data>
-  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>অ্যান্ড্রয়েড রোবটটি পুনরুত্পাদন করা হয়েছে বা Google দ্বারা তৈরি এবং ভাগ করা কাজ থেকে পরিবর্তিত হয়েছে এবং ক্রিয়েটিভ কমন্স 3.0 অ্যাট্রিবিউশন লাইসেন্সে বর্ণিত শর্তাবলী অনুসারে ব্যবহার করা হয়েছে।</value>
-  </data>
 </root>
