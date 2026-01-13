@@ -455,7 +455,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>סריקה אחר מכשירים</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>סרוק מצב סוללה</value>
+    <value>סריקת מצב סוללה</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>הפעל גישת Root אוטומטית</value>
