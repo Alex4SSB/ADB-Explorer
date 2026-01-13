@@ -482,7 +482,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>סריקה אחר כוננים</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>הפעל טיפול ב APK</value>
+    <value>תמיכה ב APK</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>הצג סיומות בשמות קבצים</value>
@@ -533,7 +533,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>בטל אנימציות</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>הצג מסך נחיתה</value>
+    <value>מסך נחיתה</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>בדוק אחר עדכונים</value>
@@ -1425,5 +1425,11 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>התקן {0} חבילות</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>פעיל</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>לא פעיל</value>
   </data>
 </root>
