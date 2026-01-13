@@ -3457,7 +3457,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Poll For Battery Status.
+        ///   Looks up a localized string similar to Polling For Battery Status.
         /// </summary>
         public static string S_SETTINGS_POLL_BATTERY {
             get {

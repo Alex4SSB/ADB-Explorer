@@ -470,7 +470,7 @@ Visible content may be incomplete.</value>
     <comment>The setting used to toggle polling for devices</comment>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Poll For Battery Status</value>
+    <value>Polling For Battery Status</value>
     <comment>The setting used to toggle battery status polling</comment>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
