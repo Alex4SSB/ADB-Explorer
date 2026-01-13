@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Akkustatus abfragen</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Befehlsprotokoll aktivieren</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Root automatisch aktivieren</value>
   </data>
@@ -483,9 +480,6 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Laufwerke abfragen</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Papierkorb aktivieren</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>APK-Verarbeitung aktivieren</value>
@@ -1411,9 +1405,6 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Wird validiert…</value>
   </data>
-  <data name="S_TERMINAL" xml:space="preserve">
-    <value>Terminal</value>
-  </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} Dateien</value>
   </data>
@@ -1422,6 +1413,9 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>ROM-Datei</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
   </data>
   <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
     <value>Datei-Änderungsdatum beibehalten</value>

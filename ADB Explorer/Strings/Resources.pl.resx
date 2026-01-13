@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -370,6 +370,9 @@ Niestety, ze względu na ograniczenia licencyjne nie możemy udostępnić ADB wr
   <data name="S_NEW_FOLDER" xml:space="preserve">
     <value>Nowy folder</value>
   </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Creative Commons</value>
+  </data>
   <data name="S_LS_ERROR" xml:space="preserve">
     <value>Wystąpił błąd podczas próby wyświetlenia zawartości tego folderu.
 Widoczna zawartość może być niekompletna.</value>
@@ -454,9 +457,6 @@ Widoczna zawartość może być niekompletna.</value>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Statystyki dotyczące stanu baterii</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Włącz dziennik poleceń</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Automatyczne włączanie roota</value>
   </data>
@@ -480,9 +480,6 @@ Widoczna zawartość może być niekompletna.</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Statystyki dla dysków</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Włącz kosz</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Włącz obsługę APK</value>
@@ -806,6 +803,9 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
     <value>Czas od ostatniej odpowiedzi serwera</value>
   </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
     <value>Zabij serwer</value>
   </data>
@@ -823,6 +823,15 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Oczekiwanie na odpowiedź: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}m</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}h</value>
   </data>
   <data name="S_MDNS_OFF" xml:space="preserve">
     <value>&lt;Span&gt;• Statystyki usług są WYŁĄCZONE&lt;LineBreak /&gt;• Serwer &lt;Italic&gt;może&lt;/Italic&gt; być WŁĄCZONY&lt;/Span&gt;</value>
@@ -863,17 +872,35 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
     <value>Obraz systemu</value>
   </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Bootloader</value>
+  </data>
   <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
     <value>Tryb Sideload</value>
   </data>
   <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
     <value>Tryb Sideload (Automatyczne Uruchomienie)</value>
   </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Offline</value>
+  </data>
   <data name="S_STATUS_UNAUTH" xml:space="preserve">
     <value>{0} - Nieautoryzowane</value>
   </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Emulator</value>
+  </data>
   <data name="S_TYPE_SERVICE" xml:space="preserve">
     <value>Usługa mDNS</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
   </data>
   <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
     <value>Nieznany stan baterii</value>
@@ -904,6 +931,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_BAT_STATE_FULL" xml:space="preserve">
     <value>Pełne</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Status: {0}</value>
   </data>
   <data name="S_BAT_HEALTH" xml:space="preserve">
     <value>Zdrowie: {0}</value>
@@ -959,6 +989,12 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_ACTION_VALIDATE" xml:space="preserve">
     <value>Sprawdź {0}</value>
   </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Link</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Link)</value>
+  </data>
   <data name="S_FILE_TYPE_APK" xml:space="preserve">
     <value>Pakiet aplikacji na Androida</value>
   </data>
@@ -970,6 +1006,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_BUTTON_YES" xml:space="preserve">
     <value>Tak</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
   </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
     <value>Pamięć wewnętrzna</value>
@@ -1067,6 +1106,9 @@ Anuluj wszystkie uruchomione</value>
   <data name="S_DEVICE_WSA_APP" xml:space="preserve">
     <value>Aplikacja WSA</value>
   </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root Status: {0}</value>
+  </data>
   <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
     <value>Nie sprawdzony</value>
   </data>
@@ -1138,6 +1180,9 @@ Anuluj wszystkie uruchomione</value>
   </data>
   <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
     <value>Pakiety</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Błąd: {0}</value>
   </data>
   <data name="S_FILEOP_VALIDATED" xml:space="preserve">
     <value>Zweryfikowany</value>
@@ -1249,6 +1294,12 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_FILE_BLOCK" xml:space="preserve">
     <value>Zablokuj urządzenie</value>
   </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Typ urządzenia</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>Nieznany</value>
   </data>
@@ -1266,6 +1317,36 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Zapisane lokalizacje</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
   </data>
   <data name="S_DRAGDROP_COPY" xml:space="preserve">
     <value>Skopiuj {0} elementów</value>
@@ -1324,90 +1405,6 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Walidowanie…</value>
   </data>
-  <data name="S_TERMINAL" xml:space="preserve">
-    <value>Terminal</value>
-  </data>
-  <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0}s</value>
-  </data>
-  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
-    <value>{0}ms</value>
-  </data>
-  <data name="S_MINUTES_SHORT" xml:space="preserve">
-    <value>{0}m</value>
-  </data>
-  <data name="S_HOURS_SHORT" xml:space="preserve">
-    <value>{0}h</value>
-  </data>
-  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
-    <value>Bootloader</value>
-  </data>
-  <data name="S_STATUS_OFFLINE" xml:space="preserve">
-    <value>{0} - Offline</value>
-  </data>
-  <data name="S_TYPE_EMULATOR" xml:space="preserve">
-    <value>Emulator</value>
-  </data>
-  <data name="S_TYPE_USB" xml:space="preserve">
-    <value>USB</value>
-  </data>
-  <data name="S_TYPE_WIFI" xml:space="preserve">
-    <value>WiFi</value>
-  </data>
-  <data name="S_TYPE_WSA" xml:space="preserve">
-    <value>WSA</value>
-  </data>
-  <data name="S_BAT_STATUS" xml:space="preserve">
-    <value>Status: {0}</value>
-  </data>
-  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
-    <value>Link</value>
-  </data>
-  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
-    <value>{0} (Link)</value>
-  </data>
-  <data name="S_DRIVE_ROOT" xml:space="preserve">
-    <value>Root</value>
-  </data>
-  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
-    <value>Root Status: {0}</value>
-  </data>
-  <data name="S_FILEOP_ERROR" xml:space="preserve">
-    <value>Błąd: {0}</value>
-  </data>
-  <data name="S_FILE_FIFO" xml:space="preserve">
-    <value>FIFO</value>
-  </data>
-  <data name="KILO" xml:space="preserve">
-    <value>{0} KB</value>
-  </data>
-  <data name="MEGA" xml:space="preserve">
-    <value>{0} MB</value>
-  </data>
-  <data name="GIGA" xml:space="preserve">
-    <value>{0} GB</value>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-  </data>
-  <data name="MILLI" xml:space="preserve">
-    <value>m</value>
-  </data>
-  <data name="MICRO" xml:space="preserve">
-    <value>u</value>
-  </data>
-  <data name="NANO" xml:space="preserve">
-    <value>n</value>
-  </data>
-  <data name="BYTES" xml:space="preserve">
-    <value>{0} B</value>
-  </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} pliki</value>
   </data>
@@ -1417,6 +1414,9 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   <data name="S_ROM_FILE" xml:space="preserve">
     <value>plik ROM</value>
   </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Terminal</value>
+  </data>
   <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
     <value>Zachowaj datę modyfikacji pliku</value>
   </data>
@@ -1425,11 +1425,5 @@ Prosimy o pomoc w ltłumaczeniu aplikacji na Twój język w Weblate.</value>
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>Zainstaluj {0} plików APK</value>
-  </data>
-  <data name="S_CC_NAME" xml:space="preserve">
-    <value>Creative Commons</value>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Typ urządzenia</value>
   </data>
 </root>

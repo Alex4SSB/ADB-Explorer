@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>电池状态查询</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>启用命令日志</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>自动启用 Root 权限</value>
   </data>
@@ -483,9 +480,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>轮询设备</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>启用回收站</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>启用 APK 处理</value>

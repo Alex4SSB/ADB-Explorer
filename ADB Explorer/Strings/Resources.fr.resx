@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Sondage pour statut batterie</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Activer journal commandes</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Activer Root automatiquement</value>
   </data>
@@ -472,11 +469,17 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
     <value>Activer vue compacte</value>
   </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Arrêt du rafraichissage de la batterie en push/pull</value>
+  </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
     <value>Permettre opérations simultanées</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Activer la corbeille</value>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Forcage du re-scan des média sur un Push</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Recherche de disques</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>Activer gestion APK</value>
@@ -490,6 +493,9 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
     <value>Afficher apps système</value>
   </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Double-clic sur fichier</value>
+  </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
     <value>Aucune</value>
   </data>
@@ -498,6 +504,9 @@ Le contenu visible peut être incomplet.</value>
   </data>
   <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
     <value>Ouvrir dans éditeur</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Forçage du chemin d'ADB</value>
   </data>
   <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
     <value>Dossier par défaut</value>
@@ -537,6 +546,12 @@ Le contenu visible peut être incomplet.</value>
   </data>
   <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
     <value>Explorateur</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Disques et fonctionnalités</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Appareil</value>
   </data>
   <data name="S_DONATE" xml:space="preserve">
     <value>Faire un don ou parrainer</value>
@@ -583,6 +598,9 @@ Le contenu visible peut être incomplet.</value>
   <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
     <value>Langue</value>
   </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ok</value>
+  </data>
   <data name="S_FILTER_FILE_OPS" xml:space="preserve">
     <value>Filtrer opérations fichier</value>
   </data>
@@ -601,6 +619,9 @@ Annuler tout en cours</value>
   </data>
   <data name="S_BUTTON_LOG" xml:space="preserve">
     <value>Historique de commandes</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Disques d'appareil</value>
   </data>
   <data name="S_BUTTON_BACK" xml:space="preserve">
     <value>Retour</value>
@@ -782,6 +803,9 @@ Annuler tout en cours</value>
   <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
     <value>Temps depuis la dernière réponse du serveur</value>
   </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}s</value>
+  </data>
   <data name="S_KILL_SERVER" xml:space="preserve">
     <value>Tuer serveur</value>
   </data>
@@ -809,6 +833,9 @@ Annuler tout en cours</value>
   <data name="S_HOURS_SHORT" xml:space="preserve">
     <value>{0} h</value>
   </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• La recherche de services est OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;</value>
+  </data>
   <data name="S_ENABLE_MDNS" xml:space="preserve">
     <value>Cliquez pour activer serveur et interrogation</value>
   </data>
@@ -827,17 +854,32 @@ Annuler tout en cours</value>
   <data name="S_ROOT_POSSIBLE" xml:space="preserve">
     <value>Root activable</value>
   </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Mode Restauration</value>
+  </data>
   <data name="S_BAT_VOLT" xml:space="preserve">
     <value>Voltage : {0} V</value>
   </data>
   <data name="S_BAT_TEMP" xml:space="preserve">
     <value>Température : {0} °C</value>
   </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Charge actuelle : {0}A</value>
+  </data>
   <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
     <value>Redémarrer en</value>
   </data>
   <data name="S_REBOOT_SYSTEM" xml:space="preserve">
     <value>Image système</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Menu de boot</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Chargement déporté</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Chargement déporté (redémarrage auto)</value>
   </data>
   <data name="S_STATUS_OFFLINE" xml:space="preserve">
     <value>{0} - Hors ligne</value>
@@ -854,6 +896,9 @@ Annuler tout en cours</value>
   <data name="S_TYPE_USB" xml:space="preserve">
     <value>USB</value>
   </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
   <data name="S_TYPE_WSA" xml:space="preserve">
     <value>WSA</value>
   </data>
@@ -862,6 +907,12 @@ Annuler tout en cours</value>
   </data>
   <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
     <value>{0} %, Branché</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Sans-fil</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>CA</value>
   </data>
   <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
     <value>Aucun</value>
@@ -917,6 +968,9 @@ Annuler tout en cours</value>
   <data name="S_BUTTON_ABORT" xml:space="preserve">
     <value>Abandonner</value>
   </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Envoi au terminal</value>
+  </data>
   <data name="S_PASTE_CONFLICT" xml:space="preserve">
     <value>Conflit {0}</value>
   </data>
@@ -953,6 +1007,9 @@ Annuler tout en cours</value>
   <data name="S_BUTTON_YES" xml:space="preserve">
     <value>Oui</value>
   </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+  </data>
   <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
     <value>Stockage interne</value>
   </data>
@@ -961,6 +1018,12 @@ Annuler tout en cours</value>
   </data>
   <data name="S_DRIVE_SD" xml:space="preserve">
     <value>Carte microSD</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>Clé OTG</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Disque virtuel</value>
   </data>
   <data name="S_DRIVE_TEMP" xml:space="preserve">
     <value>Temp</value>
@@ -1031,6 +1094,9 @@ Annuler tout en cours</value>
   <data name="S_POPUP_NON_FILE" xml:space="preserve">
     <value>Un élément sélectionné n’est pas un fichier / dossier</value>
   </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Peut être annulé en remettant à zéro les paramètres de l'application, ou manuellement dans le fichier de configuration</value>
+  </data>
   <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
     <value>Jusqu’au prochain lancement de l’app</value>
   </data>
@@ -1049,8 +1115,14 @@ Annuler tout en cours</value>
   <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
     <value>Interdit</value>
   </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Autorisé</value>
+  </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
     <value>Désactiver</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Code d'appairage</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
     <value>Adresse IP / Nom d’hôte</value>
@@ -1063,6 +1135,9 @@ Annuler tout en cours</value>
   </data>
   <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
     <value>Appairer et connecter</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Appareil enregistré</value>
   </data>
   <data name="S_DEVICE_QR" xml:space="preserve">
     <value>Appairage QR</value>
@@ -1082,6 +1157,9 @@ Annuler tout en cours</value>
   <data name="S_SERVICE_NONAME" xml:space="preserve">
     <value>[Service]</value>
   </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Actuellement exploré</value>
+  </data>
   <data name="S_BUTTON_BROWSE" xml:space="preserve">
     <value>Parcourir</value>
   </data>
@@ -1099,6 +1177,9 @@ Annuler tout en cours</value>
   </data>
   <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
     <value>Installateurs APK</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Paquets</value>
   </data>
   <data name="S_FILEOP_ERROR" xml:space="preserve">
     <value>Erreur : {0}</value>
@@ -1154,6 +1235,18 @@ Annuler tout en cours</value>
   <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
     <value>Bas</value>
   </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Page précédente</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Page suivante</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Remonter</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Descendre</value>
+  </data>
   <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
     <value>Bord gauche</value>
   </data>
@@ -1165,6 +1258,12 @@ Annuler tout en cours</value>
   </data>
   <data name="ScrollBar_PageRightCommand" xml:space="preserve">
     <value>Page droite</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>déplacer à gauche</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>déplacer à droite</value>
   </data>
   <data name="S_MENU_UNDO" xml:space="preserve">
     <value>Défaire</value>
@@ -1189,6 +1288,18 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   <data name="S_GOTO_WEBLATE" xml:space="preserve">
     <value>Aller à Weblate</value>
   </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Socket</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Bloc appareil</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Char Appareil</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>Inconnu</value>
   </data>
@@ -1206,6 +1317,24 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_SAVED_LOCATIONS" xml:space="preserve">
     <value>Emplacements sauvegardés</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>mA</value>
@@ -1275,141 +1404,6 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_FILEOP_VALIDATING" xml:space="preserve">
     <value>Validation…</value>
-  </data>
-  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
-    <value>Arrêt du rafraichissage de la batterie en push/pull</value>
-  </data>
-  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
-    <value>Forcage du re-scan des média sur un Push</value>
-  </data>
-  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Recherche de disques</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
-    <value>Double-clic sur fichier</value>
-  </data>
-  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
-    <value>Forçage du chemin d'ADB</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
-    <value>Disques et fonctionnalités</value>
-  </data>
-  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
-    <value>Appareil</value>
-  </data>
-  <data name="S_BUTTON_OK" xml:space="preserve">
-    <value>Ok</value>
-  </data>
-  <data name="S_BUTTON_DRIVES" xml:space="preserve">
-    <value>Disques d'appareil</value>
-  </data>
-  <data name="S_SECONDS_SHORT" xml:space="preserve">
-    <value>{0}s</value>
-  </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• La recherche de services est OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;</value>
-  </data>
-  <data name="S_RECOVERY_MODE" xml:space="preserve">
-    <value>Mode Restauration</value>
-  </data>
-  <data name="S_BAT_BALANCE" xml:space="preserve">
-    <value>Charge actuelle : {0}A</value>
-  </data>
-  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
-    <value>Menu de boot</value>
-  </data>
-  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
-    <value>Chargement déporté</value>
-  </data>
-  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
-    <value>Chargement déporté (redémarrage auto)</value>
-  </data>
-  <data name="S_TYPE_WIFI" xml:space="preserve">
-    <value>WiFi</value>
-  </data>
-  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
-    <value>Sans-fil</value>
-  </data>
-  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
-    <value>CA</value>
-  </data>
-  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
-    <value>Envoi au terminal</value>
-  </data>
-  <data name="S_DRIVE_ROOT" xml:space="preserve">
-    <value>Root</value>
-  </data>
-  <data name="S_DRIVE_OTG" xml:space="preserve">
-    <value>Clé OTG</value>
-  </data>
-  <data name="S_DRIVE_EMULATED" xml:space="preserve">
-    <value>Disque virtuel</value>
-  </data>
-  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
-    <value>Peut être annulé en remettant à zéro les paramètres de l'application, ou manuellement dans le fichier de configuration</value>
-  </data>
-  <data name="S_BUTTON_ENABLE" xml:space="preserve">
-    <value>Autorisé</value>
-  </data>
-  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>Code d'appairage</value>
-  </data>
-  <data name="S_DEVICE_SAVED" xml:space="preserve">
-    <value>Appareil enregistré</value>
-  </data>
-  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
-    <value>Actuellement exploré</value>
-  </data>
-  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
-    <value>Paquets</value>
-  </data>
-  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
-    <value>Page précédente</value>
-  </data>
-  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
-    <value>Page suivante</value>
-  </data>
-  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
-    <value>Remonter</value>
-  </data>
-  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
-    <value>Descendre</value>
-  </data>
-  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
-    <value>déplacer à gauche</value>
-  </data>
-  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
-    <value>déplacer à droite</value>
-  </data>
-  <data name="S_FILE_SOCKET" xml:space="preserve">
-    <value>Socket</value>
-  </data>
-  <data name="S_FILE_BLOCK" xml:space="preserve">
-    <value>Bloc appareil</value>
-  </data>
-  <data name="S_FILE_CHAR" xml:space="preserve">
-    <value>Char Appareil</value>
-  </data>
-  <data name="S_FILE_FIFO" xml:space="preserve">
-    <value>FIFO</value>
-  </data>
-  <data name="KILO" xml:space="preserve">
-    <value>{0} KB</value>
-  </data>
-  <data name="MEGA" xml:space="preserve">
-    <value>{0} MB</value>
-  </data>
-  <data name="GIGA" xml:space="preserve">
-    <value>{0} GB</value>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
   </data>
   <data name="S_FILES_PLURAL" xml:space="preserve">
     <value>{0} fichiers</value>

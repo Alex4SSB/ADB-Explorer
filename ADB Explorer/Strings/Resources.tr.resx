@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ Görünen içerik eksik olabilir.</value>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>Pil Durumu Yoklaması</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>Komut Günlüğünü Etkinleştir</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Otomatik olarak Root'u Etkinleştir</value>
   </data>
@@ -483,9 +480,6 @@ Görünen içerik eksik olabilir.</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>Sürücü Yoklaması</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>Geri Dönüşümü Aç</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>APK Yönetimini Etkinleştir</value>

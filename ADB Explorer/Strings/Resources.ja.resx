@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>バッテリーステータスのポーリング</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>コマンドログを有効にする</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>自動的にroot権限を有効にする</value>
   </data>
@@ -483,9 +480,6 @@ ADBはAndroid SDK Platform Toolsの一部として提供されています。
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>ドライブのポーリング</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>ごみ箱を有効にする</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>APK の操作を有効化</value>

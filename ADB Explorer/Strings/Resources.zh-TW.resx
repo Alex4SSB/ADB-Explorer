@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -457,9 +457,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
     <value>電池狀態查詢</value>
   </data>
-  <data name="S_SETTINGS_ENABLE_LOG" xml:space="preserve">
-    <value>啓用命令日志</value>
-  </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>自動啓用 Root 權限</value>
   </data>
@@ -483,9 +480,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
     <value>輪詢設備</value>
-  </data>
-  <data name="S_SETTINGS_ENABLE_TRASH" xml:space="preserve">
-    <value>啓用回收站</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
     <value>啓用 APK 處理</value>
@@ -1109,17 +1103,26 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_POPUP_CHECKBOX" xml:space="preserve">
     <value>不再顯示</value>
   </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA 應用程式</value>
+  </data>
   <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
     <value>Root 狀態：{0}</value>
   </data>
-  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
-    <value>WSA 應用程式</value>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>未檢查</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>禁止</value>
   </data>
   <data name="S_BUTTON_ENABLE" xml:space="preserve">
     <value>切換鈕 - 啟用</value>
   </data>
   <data name="S_BUTTON_DISABLE" xml:space="preserve">
     <value>切換鈕 - 停用</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>配對碼</value>
   </data>
   <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
     <value>IP 位址 / 主機名稱</value>
@@ -1277,15 +1280,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
     <value>App 語言</value>
   </data>
-  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
-    <value>未檢查</value>
-  </data>
-  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
-    <value>禁止</value>
-  </data>
-  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
-    <value>配對碼</value>
-  </data>
   <data name="S_LANG_NOTIFICATION" xml:space="preserve">
     <value>在設定中的語言項選擇應用程式語言。
 會顯示所選語言的翻譯完成度。
@@ -1308,6 +1302,39 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_FILE_UNKNOWN" xml:space="preserve">
     <value>未知的檔案類型</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>無目標檔的連結</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>瀏覽史</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>新增目前位置</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>移除</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>儲存的位置</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
   </data>
   <data name="MILLI" xml:space="preserve">
     <value>毫(m)</value>
@@ -1363,39 +1390,6 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
     <value>移動 {0} 個</value>
   </data>
-  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
-    <value>無目標檔的連結</value>
-  </data>
-  <data name="S_NAV_HISTORY" xml:space="preserve">
-    <value>瀏覽史</value>
-  </data>
-  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
-    <value>新增目前位置</value>
-  </data>
-  <data name="S_REMOVE" xml:space="preserve">
-    <value>移除</value>
-  </data>
-  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
-    <value>儲存的位置</value>
-  </data>
-  <data name="KILO" xml:space="preserve">
-    <value>{0} KB</value>
-  </data>
-  <data name="MEGA" xml:space="preserve">
-    <value>{0} MB</value>
-  </data>
-  <data name="GIGA" xml:space="preserve">
-    <value>{0} GB</value>
-  </data>
-  <data name="TERA" xml:space="preserve">
-    <value>{0} TB</value>
-  </data>
-  <data name="PETA" xml:space="preserve">
-    <value>{0} PB</value>
-  </data>
-  <data name="EXA" xml:space="preserve">
-    <value>{0} EB</value>
-  </data>
   <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
     <value>移動 {0} 個到 {1}</value>
   </data>
@@ -1423,13 +1417,13 @@ ADB 包含在 Android SDK Platform Tools 中。
   <data name="S_TERMINAL" xml:space="preserve">
     <value>終端機</value>
   </data>
-  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
-    <value>安裝 {0} 個 APK</value>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>保留檔案修改日</value>
   </data>
   <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
     <value>安裝 {0} 個</value>
   </data>
-  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
-    <value>保留檔案修改日</value>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>安裝 {0} 個 APK</value>
   </data>
 </root>
