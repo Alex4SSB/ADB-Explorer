@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -449,7 +449,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Отчистить</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>Включить mDNS</value>
+    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>Опрос по устройствам</value>
@@ -467,13 +467,13 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Авто открытие для обзора</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Включить компактный вид</value>
+    <value>Компактный вид</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Прекращать опрос при передаче файлов</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Разрешить одновременные операции</value>
+    <value>Одновременные операции</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Автообновление медиатеки после копирования</value>
@@ -482,7 +482,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Запрос по устройствам</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>Включить поддержку APK</value>
+    <value>Поддержка APK</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Отображать тип файла</value>
@@ -533,7 +533,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Отключить анимации</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Отключить заставку</value>
+    <value>Заставка</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Проверить наличие обновлений</value>
@@ -1416,5 +1416,20 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_TERMINAL" xml:space="preserve">
     <value>Терминал</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Сохранение дату изменения файла</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Установить {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Установить {0} APK</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Вкл.</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Выкл.</value>
   </data>
 </root>
