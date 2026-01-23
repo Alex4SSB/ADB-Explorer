@@ -1217,11 +1217,6 @@ internal static class FileActionLogic
         });
     }
 
-    public static void ToggleSettingsSort()
-    {
-        Data.RuntimeSettings.SortedView ^= true;
-    }
-
     public static async void FollowLink()
     {
         var target = Data.SelectedFiles.First().LinkTarget;

@@ -74,13 +74,6 @@ public static class AppActions
             Icons[FileActionType.PauseLogs],
             () => Data.RuntimeSettings.IsLogPaused ^= true,
             Strings.Resources.S_LOG_UPDATES_ALT),
-        new(FileActionType.SortSettings,
-            () => true,
-            Strings.Resources.S_EXIT_SEARCH,
-            Icons[FileActionType.FileOpRemove],
-            FileActionLogic.ToggleSettingsSort,
-            Strings.Resources.S_SEARCH_VIEW,
-            "\uE721"),
         new(FileActionType.LogToggle,
             () => true,
             Strings.Resources.S_BUTTON_LOG,
@@ -392,7 +385,6 @@ public static class AppActions
             () => Data.CommandLog.Count > 0,
             () => Data.RuntimeSettings.ClearLogs = true,
             Strings.Resources.S_MENU_CLEAR_LOG),
-        ToggleActions.Find(a => a.FileAction.Name is FileActionType.SortSettings).FileAction,
         new(FileActionType.FileOpValidate,
             () => !Data.FileOpQ.IsActive && Data.FileActions.SelectedFileOps.Value.AnyAll(op => op.ValidationAllowed),
             Security.ValidateOps,
@@ -444,7 +436,7 @@ public static class AppActions
 
     private static void ToggleDevicesPane()
     {
-        Data.RuntimeSettings.IsDevicesPaneOpen ^= true;
+        Data.RuntimeSettings.IsDevicesView ^= true;
 
         //if (Data.RuntimeSettings.IsDevicesPaneOpen)
         //    Data.RuntimeSettings.IsSettingsPaneOpen = false;
@@ -508,7 +500,6 @@ public class FileAction : ViewModelBase
         FileOpRemove,
         PauseLogs,
         ClearLogs,
-        SortSettings,
         LogToggle,
         FileOpValidate,
         FileOpFilter,

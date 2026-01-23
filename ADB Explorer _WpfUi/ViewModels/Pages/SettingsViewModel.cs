@@ -1,6 +1,4 @@
-﻿using ADB_Explorer.Controls;
-using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
+﻿using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using Wpf.Ui.Abstractions.Controls;
 
@@ -49,17 +47,6 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
             }
         };
 
-        Data.RuntimeSettings.PropertyChanged += (_, e) =>
-        {
-            if (e.PropertyName == nameof(AppRuntimeSettings.SortedView))
-            {
-                if (Data.RuntimeSettings.SortedView)
-                    SortedSettings.Refresh();
-                else
-                    GroupContent.Refresh();
-            }
-        };
-
         PropertyChanged += (_, e) =>
         {
             switch (e.PropertyName)
@@ -67,9 +54,19 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
                 case nameof(SearchText):
                     SortedSettings.Refresh();
                     break;
+
                 case nameof(SelectedGroup):
                     GroupContent = CollectionViewSource.GetDefaultView(SelectedGroup.Children);
                     break;
+
+                case nameof(SortedView):
+                    if (SortedView)
+                        SortedSettings.Refresh();
+                    else
+                        GroupContent.Refresh();
+
+                    break;
+
                 default:
                     break;
             }
@@ -85,54 +82,14 @@ public partial class SettingsViewModel : ObservableObject, INavigationAware
         _isInitialized = true;
     }
 
+    [ObservableProperty]
+    private bool _sortedView;
+
     [RelayCommand]
-    private void SponsorButton()
+    private void SortSettings()
     {
-        Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"{Links.SPONSOR}\"");
+        SortedView ^= true;
     }
-
-    private DateTime appDataClick = DateTime.MinValue;
-
-    [RelayCommand]
-    private void AppDataHyperlink()
-    {
-        if (DateTime.Now - appDataClick < AdbExplorerConst.LINK_CLICK_DELAY)
-            return;
-
-        appDataClick = DateTime.Now;
-        Process.Start("explorer.exe", Data.AppDataPath);
-    }
-
-    static readonly SimpleStackPanel AndroidRobotStackPanel = new()
-    {
-        Spacing = 8,
-        Children =
-        {
-            new TextBlock()
-            {
-                TextWrapping = TextWrapping.Wrap,
-                Text = Strings.Resources.S_ANDROID_ROBOT_LIC,
-            },
-            new TextBlock()
-            {
-                TextWrapping = TextWrapping.Wrap,
-                Text = Strings.Resources.S_APK_ICON_LIC,
-            },
-            new Wpf.Ui.Controls.HyperlinkButton()
-            {
-                Content = Strings.Resources.S_CC_NAME,
-                ToolTip = new ToolTip() { Content = Links.L_CC_LIC, FlowDirection = FlowDirection.LeftToRight },
-                NavigateUri = Links.L_CC_LIC.OriginalString,
-                HorizontalAlignment = HorizontalAlignment.Center,
-            }
-        },
-    };
-
-    [RelayCommand]
-    private async Task AndroidRobotLicense() => App.Current.Dispatcher.Invoke(() =>
-    {
-        DialogService.ShowContent(AndroidRobotStackPanel, Strings.Resources.S_ANDROID_ICONS_TITLE, DialogService.DialogIcon.Informational);
-    });
 
     [RelayCommand]
     private async Task ResetSettings()

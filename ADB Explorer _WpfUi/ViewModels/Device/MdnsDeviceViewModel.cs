@@ -1,11 +1,20 @@
 ﻿using ADB_Explorer.Helpers;
-
+using ADB_Explorer.Models;
 namespace ADB_Explorer.ViewModels;
 
 public class MdnsDeviceViewModel : DeviceViewModel
 {
-    public MdnsDeviceViewModel() : base(null)
+    protected new Device Device { get; set; }
+
+    public MdnsDeviceViewModel(MdnsDevice device) : base(device)
     {
+        Device = device;
+
         AdbHelper.EnableMdns();
     }
+}
+
+public class MdnsDevice : Device
+{
+    
 }

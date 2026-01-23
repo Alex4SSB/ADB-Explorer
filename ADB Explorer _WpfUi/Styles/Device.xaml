@@ -28,6 +28,23 @@
         </Style.Triggers>
     </Style>
     <Style
+        x:Key="RootIconStyle"
+        BasedOn="{StaticResource DeviceHeaderIcon}"
+        TargetType="ui:FontIcon">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Root}" Value="Disabled">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_POSSIBLE}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                <Setter Property="Visibility" Value="Visible" />
+                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
+            </DataTrigger>
+        </Style.Triggers>
+        <Setter Property="Visibility" Value="Collapsed" />
+    </Style>
+    <Style
         x:Key="DeviceStatusFontSizeStyle"
         BasedOn="{StaticResource DeviceHeaderIcon}"
         TargetType="ui:FontIcon">
@@ -335,21 +352,21 @@
     </Style>
     <Style
         x:Key="DeviceActionsMenuItemStyle"
-        BasedOn="{StaticResource AdbMenuItemStyle}"
-        TargetType="MenuItem">
-        <Setter Property="Height" Value="30" />
+        BasedOn="{StaticResource WpfUiMenuItem}"
+        TargetType="ui:MenuItem">
+        <!--<Setter Property="Height" Value="30" />-->
         <Setter Property="VerticalAlignment" Value="Center" />
         <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
+            <!--<DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Height" Value="32" />
-            </DataTrigger>
+            </DataTrigger>-->
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
                 <Setter Property="FlowDirection" Value="RightToLeft" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Menu x:Key="DeviceActionsMenu" x:Shared="False">
-        <Menu.Resources>
+    <controls:AdbMenu x:Key="DeviceActionsMenu" x:Shared="False">
+        <controls:AdbMenu.Resources>
             <Style BasedOn="{StaticResource DisabledGlyphStyle}" TargetType="ui:FontIcon">
                 <Setter Property="FontSize" Value="18" />
                 <Setter Property="Margin" Value="-5,2" />
@@ -362,9 +379,9 @@
                     </Trigger>
                 </Style.Triggers>
             </Style>
-        </Menu.Resources>
-        <Menu.Style>
-            <Style BasedOn="{StaticResource MenuStyle}" TargetType="Menu">
+        </controls:AdbMenu.Resources>
+        <controls:AdbMenu.Style>
+            <Style BasedOn="{StaticResource AdbMenuStyle}" TargetType="controls:AdbMenu">
                 <Setter Property="IsEnabled" Value="False" />
                 <Setter Property="Height" Value="30" />
                 <Style.Triggers>
@@ -376,22 +393,26 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-        </Menu.Style>
-        <MenuItem ToolTip="{Binding Source={x:Static strings:Resources.S_ROOT_FORBID_TITLE}}">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
+        </controls:AdbMenu.Style>
+        <ui:MenuItem Height="38" ToolTip="{Binding Source={x:Static strings:Resources.S_ROOT_FORBID_TITLE}}">
+            <ui:MenuItem.Style>
+                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="ui:MenuItem">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Type}" Value="Sideload">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </MenuItem.Style>
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE7EF;" />
-            </MenuItem.Header>
-            <MenuItem IsEnabled="False">
-                <MenuItem.Header>
+            </ui:MenuItem.Style>
+            <ui:MenuItem.Header>
+                <ui:FontIcon
+                    Margin="-4,-8"
+                    FontSize="18"
+                    Glyph="&#xE7EF;"
+                    Style="{StaticResource GlyphFont}" />
+            </ui:MenuItem.Header>
+            <ui:MenuItem IsEnabled="False">
+                <ui:MenuItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontWeight="Bold">
                             <TextBlock.Text>
@@ -405,8 +426,8 @@
                             <Run Text="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_RECOVERY_MODE}}" />
                         </TextBlock>
                     </StackPanel>
-                </MenuItem.Header>
-            </MenuItem>
+                </ui:MenuItem.Header>
+            </ui:MenuItem>
             <Separator>
                 <Separator.Style>
                     <Style BasedOn="{StaticResource {x:Static MenuItem.SeparatorStyleKey}}" TargetType="Separator">
@@ -422,9 +443,9 @@
                     </Style>
                 </Separator.Style>
             </Separator>
-            <MenuItem Command="{Binding ToggleRootCommand.Command}">
-                <MenuItem.Style>
-                    <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+            <ui:MenuItem Command="{Binding ToggleRootCommand.Command}">
+                <ui:MenuItem.Style>
+                    <Style BasedOn="{StaticResource WpfUiMenuItem}" TargetType="ui:MenuItem">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Root}" Value="Forbidden">
                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -434,8 +455,8 @@
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
-                </MenuItem.Style>
-                <MenuItem.Header>
+                </ui:MenuItem.Style>
+                <ui:MenuItem.Header>
                     <TextBlock>
                         <TextBlock.Style>
                             <Style BasedOn="{StaticResource DisabledTextBlockStyle}" TargetType="TextBlock">
@@ -448,51 +469,56 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                </MenuItem.Header>
-            </MenuItem>
-        </MenuItem>
-        <MenuItem
+                </ui:MenuItem.Header>
+            </ui:MenuItem>
+        </ui:MenuItem>
+        <ui:MenuItem
+            Height="38"
             ItemsSource="{Binding RebootCommands}"
             Style="{StaticResource DeviceActionsMenuItemStyle}"
             ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_DEVICE_REBOOT_TITLE}}">
-            <MenuItem.ItemContainerStyle>
-                <Style BasedOn="{StaticResource AdbMenuItemStyle}" TargetType="MenuItem">
+            <ui:MenuItem.ItemContainerStyle>
+                <Style  TargetType="MenuItem">
                     <Setter Property="Command" Value="{Binding Command}" />
                 </Style>
-            </MenuItem.ItemContainerStyle>
-            <MenuItem.Header>
-                <ui:FontIcon Glyph="&#xE777;" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Command="{Binding RemoveCommand.Command}" ToolTip="{Binding RemoveCommand.Description}">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
+            </ui:MenuItem.ItemContainerStyle>
+            <ui:MenuItem.Header>
+                <ui:FontIcon
+                    Margin="-4,-8"
+                    FontSize="18"
+                    Glyph="&#xE777;"
+                    Style="{StaticResource GlyphFont}" />
+            </ui:MenuItem.Header>
+        </ui:MenuItem>
+        <ui:MenuItem Command="{Binding RemoveCommand.Command}" ToolTip="{Binding RemoveCommand.Description}">
+            <ui:MenuItem.Style>
+                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="ui:MenuItem">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding RemoveCommand.IsEnabled}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </MenuItem.Style>
-            <MenuItem.Header>
+            </ui:MenuItem.Style>
+            <ui:MenuItem.Header>
                 <ui:FontIcon Glyph="&#xE711;" />
-            </MenuItem.Header>
-        </MenuItem>
-        <MenuItem Command="{Binding SideloadCommand.Command}" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
-            <MenuItem.Style>
-                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="MenuItem">
+            </ui:MenuItem.Header>
+        </ui:MenuItem>
+        <ui:MenuItem Command="{Binding SideloadCommand.Command}" ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_REBOOT_SIDELOAD}}">
+            <ui:MenuItem.Style>
+                <Style BasedOn="{StaticResource DeviceActionsMenuItemStyle}" TargetType="ui:MenuItem">
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding SideloadCommand.IsEnabled}" Value="False">
                             <Setter Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
-            </MenuItem.Style>
-            <MenuItem.Header>
+            </ui:MenuItem.Style>
+            <ui:MenuItem.Header>
                 <ui:FontIcon Glyph="&#xE67A;" />
-            </MenuItem.Header>
-        </MenuItem>
-    </Menu>
+            </ui:MenuItem.Header>
+        </ui:MenuItem>
+    </controls:AdbMenu>
     <Style
         x:Key="DevicesListStyle"
         BasedOn="{StaticResource SplitViewBorderStyle}"

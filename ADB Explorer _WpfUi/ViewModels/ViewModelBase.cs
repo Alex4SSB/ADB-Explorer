@@ -1,6 +1,6 @@
 ﻿namespace ADB_Explorer.ViewModels;
 
-public abstract class ViewModelBase : INotifyPropertyChanged
+public abstract class ViewModelBase : ObservableObject, INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler PropertyChanged;
 

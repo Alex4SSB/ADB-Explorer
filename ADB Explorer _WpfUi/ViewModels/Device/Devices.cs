@@ -47,7 +47,7 @@ public class Devices : AbstractDevice
 
     public Devices()
     {
-        UIList.Add(new MdnsDeviceViewModel());
+        UIList.Add(new MdnsDeviceViewModel(new()));
         UIList.Add(new NewDeviceViewModel(new()));
         UIList.Add(new WsaPkgDeviceViewModel(new()));
 
@@ -158,7 +158,7 @@ public class Devices : AbstractDevice
 
     public bool UpdateDevices(IEnumerable<LogicalDeviceViewModel> other)
     {
-        var result = UpdateDevices(UIList, other);
+        var result = App.Current.Dispatcher.Invoke(() => UpdateDevices(UIList, other));
         OnPropertyChanged(nameof(Count));
 
         UpdateLogicalIp();
@@ -295,7 +295,7 @@ public class Devices : AbstractDevice
     public bool SetOpenDevice(string selectedId)
         => SetOpenDevice(AvailableDevices().FirstOrDefault(device => device.ID == selectedId));
 
-    public bool SetOpenDevice(LogicalDeviceViewModel device)
+    public static bool SetOpenDevice(LogicalDeviceViewModel? device)
     {
         if (Data.RuntimeSettings.DeviceToOpen is null && device is null)
             return false;

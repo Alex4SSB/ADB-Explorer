@@ -424,7 +424,33 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <local:AdbMenu x:Name="SettingsControlsMenu" Style="{StaticResource SettingsControlsMenuStyle}" />
+                    <ui:Button
+                        Margin="4,0,8,0"
+                        Padding="11,5,11,5"
+                        Command="{Binding SortSettingsCommand}">
+                        <ui:Button.Style>
+                            <Style BasedOn="{StaticResource DefaultUiButtonStyle}" TargetType="ui:Button">
+                                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_SEARCH_VIEW}}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SortedView}" Value="True">
+                                        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_EXIT_SEARCH}}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:Button.Style>
+                        <ui:FontIcon FontSize="20">
+                            <ui:FontIcon.Style>
+                                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                    <Setter Property="Glyph" Value="&#xE721;" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SortedView}" Value="True">
+                                            <Setter Property="Glyph" Value="&#xE711;" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:FontIcon.Style>
+                        </ui:FontIcon>
+                    </ui:Button>
                     <TextBlock
                         Grid.Column="1"
                         Margin="0,0,0,4"
@@ -436,7 +462,7 @@
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
+                                    <DataTrigger Binding="{Binding SortedView}" Value="True">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -447,7 +473,7 @@
                         <Grid.Style>
                             <Style TargetType="Grid">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
+                                    <DataTrigger Binding="{Binding SortedView}" Value="False">
                                         <Setter Property="Visibility" Value="Collapsed" />
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -455,8 +481,7 @@
                         </Grid.Style>
                         <ui:TextBox
                             x:Name="SettingsSearchBox"
-                            Height="31"
-                            MinHeight="31"
+                            Height="32"
                             Padding="30,5,30,6"
                             PlaceholderText="{x:Static strings:Resources.S_SEARCH_SETTINGS}"
                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
@@ -490,7 +515,7 @@
                     <ui:ListView.Style>
                         <Style BasedOn="{StaticResource ListViewStyle}" TargetType="ui:ListView">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="False">
+                                <DataTrigger Binding="{Binding SortedView}" Value="False">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
                             </Style.Triggers>
@@ -502,7 +527,7 @@
                 <Grid.Style>
                     <Style TargetType="Grid">
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=SortedView}" Value="True">
+                            <DataTrigger Binding="{Binding SortedView}" Value="True">
                                 <Setter Property="Visibility" Value="Collapsed" />
                             </DataTrigger>
                         </Style.Triggers>

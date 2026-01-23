@@ -49,6 +49,10 @@
                 MaxWidth="250" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
         <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" MinWidth="24" />
@@ -74,6 +78,28 @@
                 FontSize="24"
                 FontWeight="SemiBold"
                 Text="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_DEVICES}}" />
+        </Grid>
+        <Grid
+            Grid.Row="1"
+            Grid.ColumnSpan="3"
+            Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="4*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <ui:ListView
+                x:Name="DevicesList"
+                Grid.Column="1"
+                HorizontalAlignment="Center"
+                ItemsSource="{Binding DevicesView}"
+                Style="{StaticResource DevicesListViewStyle}">
+                <ui:ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <local:MasonryPanel />
+                    </ItemsPanelTemplate>
+                </ui:ListView.ItemsPanel>
+            </ui:ListView>
         </Grid>
     </Grid>
 </UserControl>

@@ -99,7 +99,7 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <StaticResource ResourceKey="DeviceActionsMenu" />
-            <Button
+            <ui:Button
                 Grid.Column="1"
                 HorizontalAlignment="Right"
                 Command="{Binding BrowseCommand.Command}"

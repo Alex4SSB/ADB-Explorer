@@ -146,13 +146,16 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
         ToggleRootCommand = DeviceHelper.ToggleRootDeviceCommand(this);
 
-        foreach (RebootCommand.RebootType item in Enum.GetValues<RebootCommand.RebootType>())
+        App.Current.Dispatcher.Invoke(() =>
         {
-            RebootCommands.Add(new RebootCommand(this, item));
+            foreach (RebootCommand.RebootType item in Enum.GetValues<RebootCommand.RebootType>())
+            {
+                RebootCommands.Add(new RebootCommand(this, item));
 
-            if (item is RebootCommand.RebootType.Title)
-                RebootCommands.Add(new Separator() { Margin = new(-11, 0, -11, 0)});
-        }
+                if (item is RebootCommand.RebootType.Title)
+                    RebootCommands.Add(new Separator() { Margin = new(-11, 0, -11, 0) });
+            }
+        });
 
         SideloadCommand = new(() => Device.Type is DeviceType.Sideload or DeviceType.Recovery && device.Status is DeviceStatus.Ok,
                               () => DeviceHelper.SideloadDeviceAction(this));

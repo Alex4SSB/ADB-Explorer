@@ -2,6 +2,7 @@
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels.Pages;
 using ADB_Explorer.ViewModels.Windows;
 using Wpf.Ui;
@@ -30,6 +31,9 @@ namespace ADB_Explorer.Views.Windows
             AdbHelper.CheckAdbVersion();
             Data.DevicesObject = new();
             Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
+            Data.FileOpQ = new();
+            NativeMethods.InterceptClipboard.Init(this, Data.CopyPaste.GetClipboardPasteItems, IpcService.AcceptIpcMessage);
+            //DeviceHelper.UpdateWsaPkgStatus();
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);
@@ -40,17 +44,34 @@ namespace ADB_Explorer.Views.Windows
             RootNavigation.Navigated += RootNavigation_Navigated;
         }
 
-        private readonly SettingsPageHeader settingsPageHeader = new() { DataContext = App.Services.GetService<SettingsViewModel>() };
-        private readonly DevicesPageHeader devicesPageHeader = new() { DataContext = App.Services.GetService<DevicesViewModel>() };
+        private SettingsPageHeader SettingsPageHeader
+        {
+            get
+            {
+                field ??= new() { DataContext = App.Services.GetService<SettingsViewModel>() };
+                return field;
+            }
+        } = null;
+
+        private DevicesPageHeader DevicesPageHeader
+        {
+            get
+            {
+                field ??= new() { DataContext = App.Services.GetService<DevicesViewModel>() };
+                return field;
+            }
+        } = null;
 
         private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
         {
             PageHeader.Content = args.Page switch
             {
-                Pages.SettingsPage => settingsPageHeader,
-                Pages.DevicesPage => devicesPageHeader,
+                Pages.SettingsPage => SettingsPageHeader,
+                Pages.DevicesPage => DevicesPageHeader,
                 _ => null
             };
+
+            Data.RuntimeSettings.IsDevicesView = args.Page is Pages.DevicesPage;
         }
 
         #region INavigationWindow methods
@@ -86,6 +107,11 @@ namespace ADB_Explorer.Views.Windows
         public void SetServiceProvider(IServiceProvider serviceProvider)
         {
             throw new NotImplementedException();
+        }
+
+        private void FluentWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Navigate(typeof(Pages.DevicesPage));
         }
     }
 }

@@ -345,7 +345,7 @@ public static class DeviceHelper
     {
         Data.DevicesObject.Current?.UpdateBattery();
 
-        if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && !Data.RuntimeSettings.IsDevicesPaneOpen)
+        if (DateTime.Now - Data.DevicesObject.LastUpdate <= AdbExplorerConst.BATTERY_UPDATE_INTERVAL && !Data.RuntimeSettings.IsDevicesView)
             return;
 
         var items = Data.DevicesObject.LogicalDeviceViewModels.Where(device => !device.IsOpen);
@@ -399,15 +399,6 @@ public static class DeviceHelper
 
             return true;
         });
-    }
-
-    public static void CollapseDevices()
-    {
-        // To make sure value changes to true
-        Data.RuntimeSettings.CollapseDevices = false;
-        Data.RuntimeSettings.CollapseDevices = true;
-
-        Data.RuntimeSettings.IsPathBoxFocused = false;
     }
 
     public static void UpdateDevicesRootAccess()
@@ -511,7 +502,6 @@ public static class DeviceHelper
                             Data.DevicesObject.StoreHistoryDevices();
                     }
 
-                    CollapseDevices();
                     DeviceListSetup(newDeviceAddress);
                 }
 
@@ -548,17 +538,15 @@ public static class DeviceHelper
         if (Data.DevicesObject.Current is null || Data.DevicesObject.Current.IsOpen && Data.DevicesObject.Current.Status is not DeviceStatus.Ok)
         {
             DriveHelper.ClearDrives();
-            Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
+            Devices.SetOpenDevice(null);
         }
 
         if (Data.DevicesObject.DevicesAvailable(true))
             return;
 
-        CollapseDevices();
+        Devices.SetOpenDevice(null);
 
-        Data.DevicesObject.SetOpenDevice((LogicalDeviceViewModel)null);
-
-        Data.CopyPaste.GetClipboardPasteItems();
+        App.Current.Dispatcher.Invoke(Data.CopyPaste.GetClipboardPasteItems);
 
         FileActionLogic.ClearExplorer();
         Data.FileActions.IsExplorerVisible = false;
@@ -611,7 +599,7 @@ public static class DeviceHelper
             if (!t.Result)
                 return;
 
-            Data.DevicesObject.SetOpenDevice(device);
+            Devices.SetOpenDevice(device);
             Data.CurrentADBDevice = new(Data.DevicesObject.Current);
             Data.RuntimeSettings.InitLister = true;
         }));
@@ -701,13 +689,13 @@ public static class DeviceHelper
     public static void OpenDevice(LogicalDeviceViewModel device)
     {
         Data.CurrentADBDevice = new(device);
-        Data.DevicesObject.SetOpenDevice(device);
+        Devices.SetOpenDevice(device);
         Data.RuntimeSettings.InitLister = true;
         FileActionLogic.ClearExplorer();
         NavHistory.Reset();
         InitDevice();
 
-        Data.RuntimeSettings.IsDevicesPaneOpen = false;
+        Data.RuntimeSettings.IsDevicesView = false;
     }
 
     public static void ConnectWsaDevice()

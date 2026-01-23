@@ -87,11 +87,7 @@ public abstract class DeviceViewModel : AbstractDevice
 
     private void RuntimeSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(AppRuntimeSettings.CollapseDevices) && Data.RuntimeSettings.CollapseDevices)
-        {
-            DeviceSelected = false;
-        }
-        else if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice))
+        if (e.PropertyName == nameof(AppRuntimeSettings.ConnectNewDevice))
         {
             OnPropertyChanged(nameof(IsDeviceConnectionInProgress));
         }

@@ -23,7 +23,7 @@ public partial class MainWindowViewModel : ObservableObject
             Icon = new FontIcon { Glyph = "\uE8CC" },
             TargetPageType = typeof(Views.Pages.DevicesPage),
             ToolTip = Strings.Resources.S_BUTTON_DEVICES
-        }
+        },
     ];
 
     [ObservableProperty]

@@ -67,14 +67,14 @@
                             </Style>
                         </TextBlock.Style>
                     </TextBlock>
-                    <Button
+                    <ui:Button
                         Grid.Column="2"
                         Command="{Binding RemoveCommand.Command}"
                         Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                         Style="{StaticResource RestartAppButtonStyle}"
                         ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
                         <ui:FontIcon Glyph="&#xE74D;" />
-                    </Button>
+                    </ui:Button>
                 </Grid>
             </Border>
         </Expander.Header>
@@ -86,13 +86,13 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <ui:FontIcon Glyph="&#xE774;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
-                    <TextBox
+                    <ui:TextBox
                         Grid.Column="1"
                         Padding="4,5,0,6"
                         d:Background="LightGray"
                         IsReadOnly="True">
-                        <TextBox.Style>
-                            <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="TextBox">
+                        <ui:TextBox.Style>
+                            <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="ui:TextBox">
                                 <Setter Property="Text" Value="{Binding IpAddress}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
@@ -100,8 +100,8 @@
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
-                        </TextBox.Style>
-                    </TextBox>
+                        </ui:TextBox.Style>
+                    </ui:TextBox>
                 </Grid>
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -127,7 +127,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Separator />
-                    <Button
+                    <ui:Button
                         Grid.Column="1"
                         Margin="4,0"
                         Style="{StaticResource ConnectNewDeviceButtonStyle}" />

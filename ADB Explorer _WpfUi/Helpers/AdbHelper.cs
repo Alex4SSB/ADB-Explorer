@@ -29,10 +29,7 @@ internal static class AdbHelper
             Data.MdnsService.State = MDNS.MdnsState.Disabled;
         }
 
-        if (Data.RuntimeSettings.IsMdnsExpanderOpen)
-        {
-            UpdateQrClass();
-        }
+        UpdateQrClass();
     }
 
     private static void UpdateQrClass() => Data.RuntimeSettings.RefreshQrImage = true;

@@ -320,14 +320,6 @@ internal static class LogControls
     ];
 }
 
-internal static class SettingsControls
-{
-    public static ObservableList<IMenuItem> List { get; } =
-    [
-        AppActions.ToggleActions.Find(a => a.FileAction.Name is FileAction.FileActionType.SortSettings).Button,
-    ];
-}
-
 internal static class LogToggle
 {
     public static ObservableList<IMenuItem> List { get; } =

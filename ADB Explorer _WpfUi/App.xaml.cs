@@ -31,6 +31,8 @@ public partial class App
 
             services.AddHostedService<ApplicationHostService>();
 
+            services.AddHostedService<DevicePollingService>();
+
             // Theme manipulation
             services.AddSingleton<IThemeService, ThemeService>();
 

@@ -224,23 +224,6 @@
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
 
-    <Style
-        x:Key="RootIconStyle"
-        BasedOn="{StaticResource DeviceHeaderIcon}"
-        TargetType="ui:FontIcon">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Root}" Value="Disabled">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="Foreground" Value="{DynamicResource AdbButtonForegroundPressedOrDisabled}" />
-                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_POSSIBLE}}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                <Setter Property="Visibility" Value="Visible" />
-                <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ROOT_ENABLED}}" />
-            </DataTrigger>
-        </Style.Triggers>
-        <Setter Property="Visibility" Value="Collapsed" />
-    </Style>
     <!--<Style
         x:Key="UpperProgressBarStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"

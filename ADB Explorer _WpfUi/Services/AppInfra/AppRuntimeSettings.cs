@@ -6,27 +6,12 @@ using Wpf.Ui.Appearance;
 
 namespace ADB_Explorer.Services;
 
-public class AppRuntimeSettings : ViewModelBase
+public partial class AppRuntimeSettings : ViewModelBase
 {
     public bool ResetAppSettings { get; set; } = false;
 
-    private bool isDevicesPaneOpen = false;
-    public bool IsDevicesPaneOpen
-    {
-        get => isDevicesPaneOpen;
-        set
-        {
-            if (Set(ref isDevicesPaneOpen, value))
-                DeviceHelper.CollapseDevices();
-        }
-    }
-
-    private bool isMdnsExpanderOpen = false;
-    public bool IsMdnsExpanderOpen
-    {
-        get => isMdnsExpanderOpen;
-        set => Set(ref isMdnsExpanderOpen, value);
-    }
+    [ObservableProperty]
+    private bool _isDevicesView;
 
     private bool isOperationsViewOpen = false;
     public bool IsOperationsViewOpen
@@ -36,17 +21,9 @@ public class AppRuntimeSettings : ViewModelBase
         {
             if (Set(ref isOperationsViewOpen, value))
             {
-                DeviceHelper.CollapseDevices();
                 IsDetailedPeekMode = false;
             }
         }
-    }
-
-    private bool sortedView = false;
-    public bool SortedView
-    {
-        get => sortedView;
-        set => Set(ref sortedView, value);
     }
 
     private double maxSearchBoxWidth = AdbExplorerConst.DEFAULT_SEARCH_WIDTH;
@@ -54,13 +31,6 @@ public class AppRuntimeSettings : ViewModelBase
     {
         get => maxSearchBoxWidth;
         set => Set(ref maxSearchBoxWidth, value);
-    }
-
-    private bool collapseDevices = false;
-    public bool CollapseDevices
-    {
-        get => collapseDevices;
-        set => Set(ref collapseDevices, value);
     }
 
     private bool collapseDrives = false;
