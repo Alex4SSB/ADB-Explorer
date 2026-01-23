@@ -449,13 +449,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>清空</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>启用 mDNS</value>
+    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
     <value>轮询设备</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>电池状态查询</value>
+    <value>轮询电池状态</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>自动启用 Root 权限</value>
@@ -467,13 +467,13 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>自动打开以进行浏览</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>启用紧凑视图</value>
+    <value>紧凑视图</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>停止 推送 / 拉取 轮询</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>允许同时操作</value>
+    <value>同时操作</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>在 Push 时强制媒体重新扫描</value>
@@ -482,7 +482,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>轮询设备</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>启用 APK 处理</value>
+    <value>APK 支持</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>显示文件扩展名</value>
@@ -533,7 +533,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>禁用动画</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>显示启动画面</value>
+    <value>启动画面</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>检查更新</value>
@@ -1425,5 +1425,11 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>安装 {0} 个 APK</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>开</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>关</value>
   </data>
 </root>
