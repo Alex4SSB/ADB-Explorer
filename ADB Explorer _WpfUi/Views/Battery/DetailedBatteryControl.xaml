@@ -45,6 +45,12 @@
                                 <Trigger Property="Text" Value="">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </Trigger>
+                                <DataTrigger Binding="{Binding FullyCharged}" Value="True">
+                                    <Setter Property="Foreground" Value="#FF1DB159" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding BatteryLow}" Value="True">
+                                    <Setter Property="Foreground" Value="#FFF44336" />
+                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Style.Resources>

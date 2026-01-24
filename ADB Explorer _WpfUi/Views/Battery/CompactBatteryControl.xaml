@@ -33,6 +33,14 @@
                         </ToolTip>
                     </Setter.Value>
                 </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding FullyCharged}" Value="True">
+                        <Setter Property="Foreground" Value="#FF1DB159" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding BatteryLow}" Value="True">
+                        <Setter Property="Foreground" Value="#FFF44336" />
+                    </DataTrigger>
+                </Style.Triggers>
             </Style>
         </ui:FontIcon.Style>
     </ui:FontIcon>
