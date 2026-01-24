@@ -12,9 +12,9 @@
     d:DataContext="{d:DesignInstance Type=viewmodels:NewDeviceViewModel}"
     d:Width="200"
     mc:Ignorable="d">
-    <Expander d:IsExpanded="True">
-        <Expander.Style>
-            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
+    <ui:CardControl>
+        <ui:CardControl.Style>
+            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="ui:CardControl">
                 <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
                     <Setter.Value>
                         <Border BorderBrush="{DynamicResource NewDeviceAltBorder}" BorderThickness="0,1" />
@@ -33,8 +33,8 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-        </Expander.Style>
-        <Expander.Header>
+        </ui:CardControl.Style>
+        <ui:CardControl.Header>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -49,14 +49,14 @@
                     Text="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_ADD_NEW_DEVICE}}" />
                 <ui:Button
                     Grid.Column="2"
+                    Appearance="Caution"
                     Command="{Binding ClearCommand.Command}"
-                    Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
                     Style="{StaticResource RestartAppButtonStyle}"
                     ToolTip="{Binding Mode=OneWay, Source={x:Static Member=strings:Resources.S_CLEAR_ALL}}">
                     <ui:FontIcon Glyph="&#xE711;" />
                 </ui:Button>
             </Grid>
-        </Expander.Header>
+        </ui:CardControl.Header>
         <Grid Style="{StaticResource DeviceContentGridStyle}">
             <controls:SimpleStackPanel Style="{StaticResource NewDeviceStackPanelStyle}">
                 <Grid>
@@ -124,5 +124,5 @@
                 </Grid>
             </controls:SimpleStackPanel>
         </Grid>
-    </Expander>
+    </ui:CardControl>
 </UserControl>

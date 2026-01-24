@@ -148,6 +148,9 @@ public class LogicalDeviceViewModel : DeviceViewModel
 
         App.Current.Dispatcher.Invoke(() =>
         {
+            Thread.CurrentThread.CurrentCulture =
+            Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
+
             foreach (RebootCommand.RebootType item in Enum.GetValues<RebootCommand.RebootType>())
             {
                 RebootCommands.Add(new RebootCommand(this, item));

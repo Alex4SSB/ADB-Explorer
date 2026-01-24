@@ -14,6 +14,8 @@ public partial class MdnsDeviceControl : UserControl
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
 
         InitializeComponent();
+
+        AdbHelper.UpdateMdns();
     }
 
     private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)

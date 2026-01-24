@@ -88,18 +88,42 @@
                 <ColumnDefinition Width="4*" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
-            <ui:ListView
-                x:Name="DevicesList"
+            <local:SimpleStackPanel
                 Grid.Column="1"
                 HorizontalAlignment="Center"
-                ItemsSource="{Binding DevicesView}"
-                Style="{StaticResource DevicesListViewStyle}">
-                <ui:ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <local:MasonryPanel />
-                    </ItemsPanelTemplate>
-                </ui:ListView.ItemsPanel>
-            </ui:ListView>
+                Orientation="Horizontal">
+                <ui:ListView
+                    x:Name="LogicalDevicesList"
+                    ItemsSource="{Binding PrimaryDevicesView}"
+                    Style="{StaticResource DevicesListViewStyle}">
+                    <ui:ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <local:MasonryPanel Columns="1" Margin="0,0,6,0"/>
+                        </ItemsPanelTemplate>
+                    </ui:ListView.ItemsPanel>
+                </ui:ListView>
+                <ui:ListView
+                    x:Name="VirtualDevicesList"
+                    ItemsSource="{Binding SecondaryDevicesView}"
+                    Style="{StaticResource DevicesListViewStyle}">
+                    <ui:ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <local:MasonryPanel Margin="0,0,6,0">
+                                <local:MasonryPanel.Style>
+                                    <Style TargetType="local:MasonryPanel">
+                                        <Setter Property="Columns" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=LogicalDevicesList, Path=Items.Count}" Value="0">
+                                                <Setter Property="Columns" Value="2" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </local:MasonryPanel.Style>
+                            </local:MasonryPanel>
+                        </ItemsPanelTemplate>
+                    </ui:ListView.ItemsPanel>
+                </ui:ListView>
+            </local:SimpleStackPanel>
         </Grid>
     </Grid>
 </UserControl>

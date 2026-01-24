@@ -1,6 +1,5 @@
 ﻿using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
-using ADB_Explorer.Resources;
 using ADB_Explorer.Services;
 
 namespace ADB_Explorer.ViewModels;
@@ -28,6 +27,8 @@ public class Devices : AbstractDevice
 
     #region Read only lists
 
+    public IEnumerable<DeviceViewModel> PrimaryDevices => UIList?.Where(device => device is not MdnsDeviceViewModel and not NewDeviceViewModel);
+    public IEnumerable<DeviceViewModel> SecondaryDevices => UIList?.Where(device => device is MdnsDeviceViewModel or NewDeviceViewModel);
     public IEnumerable<LogicalDeviceViewModel> LogicalDeviceViewModels => UIList?.OfType<LogicalDeviceViewModel>();
     public IEnumerable<ServiceDeviceViewModel> ServiceDeviceViewModels => UIList?.OfType<ServiceDeviceViewModel>();
     public IEnumerable<HistoryDeviceViewModel> HistoryDeviceViewModels => UIList?.OfType<HistoryDeviceViewModel>();

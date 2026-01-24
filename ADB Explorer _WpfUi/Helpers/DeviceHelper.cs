@@ -252,7 +252,7 @@ public static class DeviceHelper
         if (device is LogicalDeviceViewModel { IsOpen: true })
             return true;
 
-        if (device is LogicalDeviceViewModel && device.Type is DeviceType.Service)
+        if (device is LogicalDeviceViewModel logDev && device.Type is DeviceType.Service)
         {
             if (device.Status is DeviceStatus.Offline)
             {
@@ -261,9 +261,14 @@ public static class DeviceHelper
             }
 
             // if there's a logical service and a remote device with the same IP - hide the logical service
-            return !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
+            var res = !Data.DevicesObject.LogicalDeviceViewModels.Any(l => l.IpAddress == device.IpAddress
                                                     && l.Type is DeviceType.Remote or DeviceType.Local
                                                     && l.Status is DeviceStatus.Ok);
+
+            if (res)
+                logDev.UseIdForName = false;
+
+            return res;
         }
 
         if (device is LogicalDeviceViewModel && device.Type is DeviceType.Remote)
@@ -317,7 +322,7 @@ public static class DeviceHelper
         if (device is LogicalDeviceViewModel logicalDev && logicalDev.Type is not DeviceType.Emulator)
         {
             // if there are multiple logical devices of the same model, display their ID instead
-            logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name)) > 1;
+            logicalDev.UseIdForName = Data.DevicesObject.LogicalDeviceViewModels.Count(dev => dev.Name.Equals(logicalDev.Name) && dev.IpAddress != logicalDev.IpAddress) > 1;
         }
 
         return true;

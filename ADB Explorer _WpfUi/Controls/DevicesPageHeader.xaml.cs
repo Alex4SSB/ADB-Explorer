@@ -43,7 +43,8 @@ public partial class DevicesPageHeader : UserControl
             Thread.CurrentThread.CurrentCulture =
             Thread.CurrentThread.CurrentUICulture = Data.Settings.UICulture;
 
-            DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(DevicesList.ItemsSource));
+            DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(LogicalDevicesList.ItemsSource));
+            DeviceHelper.FilterDevices(CollectionViewSource.GetDefaultView(VirtualDevicesList.ItemsSource));
         });
     }
 }
