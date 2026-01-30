@@ -819,7 +819,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>הפעל ADB מחדש</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>השרת אינו פועל</value>
+    <value>שרת ה-mDNS אינו פועל</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>ממתין לתשובה: {0}</value>
@@ -840,7 +840,7 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>לחצו כדי לאפשר את השרת והסריקה</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>השרת פועל</value>
+    <value>שרת ה-mDNS פועל</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>תמיכה חלקית</value>
@@ -1431,5 +1431,8 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>לא פעיל</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>בודק את מצב שרת ה-mDNS…</value>
   </data>
 </root>
