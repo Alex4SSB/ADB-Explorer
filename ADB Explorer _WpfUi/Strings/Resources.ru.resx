@@ -819,7 +819,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Перезапустить ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Сервер отключен</value>
+    <value>mDNS-сервер отключен</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Ожидание ответа: {0}</value>
@@ -840,7 +840,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Нажмите, чтобы включить сервер и опрос</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Сервер запущен</value>
+    <value>mDNS-сервер работает</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Ограниченная поддержка</value>
@@ -1431,5 +1431,8 @@ ADB доступен как часть Android SDK Platform Tools.
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>Выкл.</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Проверка статуса mDNS-сервера…</value>
   </data>
 </root>

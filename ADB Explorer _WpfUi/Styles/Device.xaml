@@ -57,16 +57,9 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style
-        x:Key="DeviceNameTextBlockStyle"
-        BasedOn="{StaticResource TooltipTextBlockStyle}"
-        TargetType="TextBlock">
+    <Style x:Key="DeviceNameTextBlockStyle" TargetType="TextBlock">
         <Setter Property="HorizontalAlignment" Value="Left" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
-        </Style.Triggers>
+        <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
     <Style x:Key="DeviceStatusGridStyle" TargetType="Grid">
         <Style.Triggers>
@@ -372,10 +365,6 @@
         x:Key="DeviceExpanderStyle"
         BasedOn="{StaticResource AdbCardControl}"
         TargetType="ui:CardControl">
-        <Setter Property="helpers:ExpanderHelper.ExpanderArrow" Value="None" />
-        <Setter Property="helpers:ExpanderHelper.IsListItem" Value="True" />
-        <Setter Property="helpers:ExpanderHelper.IsExpandEnabled" Value="True" />
-        <!--<Setter Property="IsExpanded" Value="True" />-->
         <Setter Property="MinHeight" Value="40" />
     </Style>
 </ResourceDictionary>

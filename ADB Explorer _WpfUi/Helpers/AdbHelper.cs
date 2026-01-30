@@ -22,7 +22,7 @@ internal static class AdbHelper
         if (Data.MdnsService.State == MDNS.MdnsState.Disabled)
         {
             Data.MdnsService.State = MDNS.MdnsState.InProgress;
-            AdbHelper.MdnsCheck();
+            MdnsCheck();
         }
         else
         {

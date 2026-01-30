@@ -30,10 +30,6 @@ public partial class MdnsDeviceControl : UserControl
         }
     }
 
-    private void MdnsOffTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
-
-    private void MdnsCheckBox_Click(object sender, RoutedEventArgs e) => AdbHelper.UpdateMdns();
-
     private void RestartAdbButton_Click(object sender, RoutedEventArgs e)
     {
         ADBService.KillAdbServer();

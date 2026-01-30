@@ -98,7 +98,7 @@
                     Style="{StaticResource DevicesListViewStyle}">
                     <ui:ListView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <local:MasonryPanel Columns="1" Margin="0,0,6,0"/>
+                            <local:MasonryPanel Margin="0,0,6,0" Columns="1" />
                         </ItemsPanelTemplate>
                     </ui:ListView.ItemsPanel>
                 </ui:ListView>

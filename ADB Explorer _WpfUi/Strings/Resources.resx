@@ -954,7 +954,7 @@ Cancel All Running</value>
     <comment>The content of a button to restart ADB server</comment>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Server is down</value>
+    <value>mDNS server is down</value>
     <comment>A notification indicating that ADB server is down</comment>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
@@ -973,17 +973,9 @@ Cancel All Running</value>
     <value>{0}h</value>
     <comment>Hours display (eg. 8h)</comment>
   </data>
-  <data name="S_MDNS_OFF" xml:space="preserve">
-    <value>&lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;</value>
-    <comment>The notification displayed when mDNS server has been turned off</comment>
-  </data>
-  <data name="S_ENABLE_MDNS" xml:space="preserve">
-    <value>Click to enable server and polling</value>
-    <comment>The tooltip of the checkbox to enable the mDNS server</comment>
-  </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Server is up and running</value>
-    <comment>The tooltip of the mDNS checkbox when the server is on</comment>
+    <value>mDNS server is up and running</value>
+    <comment>A notification indicating mDNS server is on</comment>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Limited Support</value>
@@ -1765,5 +1757,9 @@ Please help us localize the app to your language on Weblate.</value>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>Off</value>
     <comment>The label of the switch toggle on a setting when it is off / inactive / disabled</comment>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Checking mDNS server status…</value>
+    <comment>The notification displayed when waiting for a status response from the server</comment>
   </data>
 </root>

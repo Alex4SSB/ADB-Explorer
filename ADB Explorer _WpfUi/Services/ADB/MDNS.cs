@@ -34,14 +34,6 @@ public class MDNS : ViewModelBase
         }
     }
 
-    public void CheckMdns()
-    {
-        if (ADBService.CheckMDNS())
-            State = MdnsState.Running;
-        else
-            State = MdnsState.NotRunning;
-    }
-
     private double progress;
     public double Progress
     {

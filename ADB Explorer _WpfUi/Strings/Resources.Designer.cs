@@ -1489,15 +1489,6 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Click to enable server and polling.
-        /// </summary>
-        public static string S_ENABLE_MDNS {
-            get {
-                return ResourceManager.GetString("S_ENABLE_MDNS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Enabled.
         /// </summary>
         public static string S_ENABLED {
@@ -2067,16 +2058,16 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;Span&gt;• Polling for services is OFF&lt;LineBreak /&gt;• Server &lt;Italic&gt;might&lt;/Italic&gt; be ON&lt;/Span&gt;.
+        ///   Looks up a localized string similar to Checking mDNS server status….
         /// </summary>
-        public static string S_MDNS_OFF {
+        public static string S_MDNS_IN_PROGRESS {
             get {
-                return ResourceManager.GetString("S_MDNS_OFF", resourceCulture);
+                return ResourceManager.GetString("S_MDNS_IN_PROGRESS", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Server is up and running.
+        ///   Looks up a localized string similar to mDNS server is up and running.
         /// </summary>
         public static string S_MDNS_ON {
             get {
@@ -3178,7 +3169,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Server is down.
+        ///   Looks up a localized string similar to mDNS server is down.
         /// </summary>
         public static string S_SERVER_DOWN {
             get {

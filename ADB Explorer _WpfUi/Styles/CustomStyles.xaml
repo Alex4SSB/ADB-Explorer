@@ -862,9 +862,9 @@
         x:Key="ExpanderHeaderProgressBarStyle"
         BasedOn="{StaticResource {x:Type ProgressBar}}"
         TargetType="ProgressBar">
-        <!--<Setter Property="CornerRadius" Value="0" />-->
         <Setter Property="BorderThickness" Value="0,1" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
     <Style
         x:Key="RtlButtonStyle"
