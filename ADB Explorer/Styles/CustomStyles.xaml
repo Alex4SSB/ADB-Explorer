@@ -655,7 +655,6 @@
         </Setter>
         <Setter Property="Margin" Value="0,-5" />
         <Setter Property="MinWidth" Value="50" />
-        <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_ENABLE_MDNS}}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=State}" Value="InProgress">
                 <Setter Property="IsEnabled" Value="False" />

@@ -622,9 +622,7 @@
                                         <ui:SimpleStackPanel
                                             Margin="4"
                                             Spacing="6"
-                                            Style="{StaticResource MdnsOffPanelStyle}">
-                                            <TextBlock helpers:TextHelper.AltText="{Binding Source={x:Static Member=strings:Resources.S_MDNS_OFF}}" Loaded="EmptyNonRootTextBlock_Loaded" />
-                                        </ui:SimpleStackPanel>
+                                            Style="{StaticResource MdnsOffPanelStyle}" />
                                         <Border Style="{StaticResource QrBackgroundStyle}">
                                             <Image
                                                 x:Name="PairingQrImage"
