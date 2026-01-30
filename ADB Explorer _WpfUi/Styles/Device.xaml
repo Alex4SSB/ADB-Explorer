@@ -334,16 +334,7 @@
         x:Key="DeviceActionsMenuItemStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
         TargetType="ui:MenuItem">
-        <!--<Setter Property="Height" Value="30" />-->
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Style.Triggers>
-            <!--<DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                <Setter Property="Height" Value="32" />
-            </DataTrigger>-->
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
-        </Style.Triggers>
     </Style>
 
     <Style

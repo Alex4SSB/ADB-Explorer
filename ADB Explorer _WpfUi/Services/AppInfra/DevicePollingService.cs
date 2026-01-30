@@ -67,7 +67,7 @@ public class DevicePollingService : BackgroundService
 
         Data.DevicesObject.UpdateLogicalIp();
 
-        if (Data.MdnsService.State is MDNS.MdnsState.Running)
+        if (Data.MdnsService?.State is MDNS.MdnsState.Running)
             DeviceHelper.ListServices(WiFiPairingService.GetServices());
     }
 

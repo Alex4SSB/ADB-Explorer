@@ -17,21 +17,6 @@ internal static class AdbHelper
         return Data.RuntimeSettings.AdbVersion >= AdbExplorerConst.MIN_ADB_VERSION;
     });
 
-    public static void UpdateMdns()
-    {
-        if (Data.MdnsService.State == MDNS.MdnsState.Disabled)
-        {
-            Data.MdnsService.State = MDNS.MdnsState.InProgress;
-            MdnsCheck();
-        }
-        else
-        {
-            Data.MdnsService.State = MDNS.MdnsState.Disabled;
-        }
-
-        UpdateQrClass();
-    }
-
     private static void UpdateQrClass() => Data.RuntimeSettings.RefreshQrImage = true;
 
     public static void MdnsCheck()
@@ -53,11 +38,18 @@ internal static class AdbHelper
         ADBService.IsMdnsEnabled = Data.Settings.EnableMdns;
         if (Data.Settings.EnableMdns)
         {
-            Data.QrClass = new();
+            if (Data.MdnsService?.State is MDNS.MdnsState.Disabled)
+            {
+                Data.MdnsService.State = MDNS.MdnsState.InProgress;
+                
+                Data.MdnsService.QrClass = new();
+                MdnsCheck();
+                UpdateQrClass();
+            }
         }
         else
         {
-            if (Data.MdnsService.State is MDNS.MdnsState.Running)
+            if (Data.MdnsService?.State is MDNS.MdnsState.Running)
             {
                 var result = await DialogService.ShowConfirmation(Strings.Resources.S_DISABLE_MDNS,
                                                                   Strings.Resources.S_DISABLE_MDNS_TITLE,
@@ -67,10 +59,11 @@ internal static class AdbHelper
 
                 if (result.Item1 is Wpf.Ui.Controls.ContentDialogResult.Primary)
                     ADBService.KillAdbServer();
-            }
 
-            Data.QrClass = null;
-            Data.MdnsService.State = MDNS.MdnsState.Disabled;
+                Data.MdnsService.QrClass = null;
+                Data.MdnsService.State = MDNS.MdnsState.Disabled;
+                UpdateQrClass();
+            }
         }
     });
 

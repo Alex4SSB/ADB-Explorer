@@ -40,9 +40,8 @@ public static class Data
 
     public static Devices DevicesObject { get; set; }
 
-    public static MDNS MdnsService { get; set; } = new();
+    public static MDNS MdnsService { get; set; }
 
-    public static PairingQrClass QrClass { get; set; }
 
     public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];
 

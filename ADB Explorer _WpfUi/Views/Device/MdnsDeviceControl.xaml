@@ -134,7 +134,7 @@
                     x:Name="PairingQrImage"
                     Margin="6"
                     RenderOptions.EdgeMode="Aliased"
-                    Source="{Binding Source={x:Static Member=models:Data.QrClass}, Path=Image}" />
+                    Source="{Binding Source={x:Static Member=models:Data.MdnsService}, Path=QrClass.Image}" />
             </Border>
             <controls:SimpleStackPanel
                 Margin="14,16"

@@ -27,7 +27,10 @@
                     <ui:FontIcon Glyph="{Binding TypeIcon}" />
                     <Grid Style="{StaticResource DeviceStatusGridStyle}">
                         <ui:FontIcon Style="{StaticResource DeviceStatusIconStyle}" />
-                        <ui:FontIcon Foreground="{Binding RelativeSource={RelativeSource AncestorType=Border, Mode=FindAncestor, AncestorLevel=2}, Path=Background}" Glyph="{Binding StatusIcon}" />
+                        <ui:FontIcon
+                            Margin="0,0,1,0"
+                            Foreground="{DynamicResource FlyoutBackground}"
+                            Glyph="{Binding StatusIcon}" />
                     </Grid>
                 </Grid>
                 <TextBlock Grid.Column="1" Margin="4">

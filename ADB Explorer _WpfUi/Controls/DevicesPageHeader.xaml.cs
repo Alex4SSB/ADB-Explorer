@@ -18,6 +18,20 @@ public partial class DevicesPageHeader : UserControl
 
         Data.DevicesObject.UIList.CollectionChanged += UIList_CollectionChanged;
         Data.DevicesObject.PropertyChanged += DevicesObject_PropertyChanged;
+        Data.Settings.PropertyChanged += Settings_PropertyChanged;
+    }
+
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(AppSettings.EnableMdns):
+                FilterDevices();
+
+                break;
+            default:
+                break;
+        }
     }
 
     private void RefreshDevicesButton_Click(object sender, RoutedEventArgs e)

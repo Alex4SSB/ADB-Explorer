@@ -1,28 +1,7 @@
-﻿using ADB_Explorer.Helpers;
-using ADB_Explorer.Models;
+﻿using ADB_Explorer.Models;
 using static ADB_Explorer.Models.AdbExplorerConst;
 
 namespace ADB_Explorer.Services;
-
-public class PairingQrClass
-{
-    public string ServiceName { get; }
-    public string Password { get; }
-    public SolidColorBrush Background { get; }
-    public SolidColorBrush Foreground { get; }
-
-    public DrawingImage Image => string.IsNullOrEmpty(PairingString) ? null : QrGenerator.GenerateQR(PairingString, Background, Foreground);
-    public string PairingString => WiFiPairingService.CreatePairingString(ServiceName, Password);
-
-    public PairingQrClass()
-    {
-        ServiceName = PAIRING_SERVICE_PREFIX + RandomString.GetUniqueKey(10);
-        Password = RandomString.GetUniqueKey(12);
-
-        Background = (SolidColorBrush)App.Current.FindResource("QrBackgroundBrush");
-        Foreground = (SolidColorBrush)App.Current.FindResource("QrForegroundBrush");
-    }
-}
 
 public class WiFiPairingService
 {

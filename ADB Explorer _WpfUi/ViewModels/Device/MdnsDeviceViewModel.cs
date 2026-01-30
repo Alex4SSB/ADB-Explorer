@@ -9,8 +9,6 @@ public class MdnsDeviceViewModel : DeviceViewModel
     public MdnsDeviceViewModel(MdnsDevice device) : base(device)
     {
         Device = device;
-
-        AdbHelper.EnableMdns();
     }
 }
 

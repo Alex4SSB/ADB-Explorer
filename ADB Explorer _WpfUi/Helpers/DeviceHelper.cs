@@ -374,9 +374,13 @@ public static class DeviceHelper
 
         Data.DevicesObject.UpdateServices(viewModels);
 
+        var qrClass = Data.MdnsService?.QrClass;
+        if (qrClass is null)
+            return;
+
         var qrServices = Data.DevicesObject.ServiceDeviceViewModels.Where(service =>
             service.MdnsType == ServiceDevice.ServiceType.QrCode
-            && service.ID == Data.QrClass.ServiceName);
+            && service.ID == qrClass.ServiceName);
 
         if (qrServices.Any())
         {
@@ -387,8 +391,11 @@ public static class DeviceHelper
     public static async Task<bool> PairService(ServiceDeviceViewModel service)
     {
         var code = service.MdnsType == ServiceDevice.ServiceType.QrCode
-            ? Data.QrClass.Password
+            ? Data.MdnsService?.QrClass?.Password
             : service.PairingCode;
+
+        if (string.IsNullOrEmpty(code))
+            return false;
 
         return await Task.Run(() =>
         {

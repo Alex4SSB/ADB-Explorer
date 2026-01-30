@@ -116,6 +116,13 @@
                                             <DataTrigger Binding="{Binding ElementName=LogicalDevicesList, Path=Items.Count}" Value="0">
                                                 <Setter Property="Columns" Value="2" />
                                             </DataTrigger>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding ElementName=LogicalDevicesList, Path=Items.Count}" Value="0" />
+                                                    <Condition Binding="{Binding ElementName=VirtualDevicesList, Path=Items.Count}" Value="1" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Columns" Value="1" />
+                                            </MultiDataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </local:MasonryPanel.Style>
