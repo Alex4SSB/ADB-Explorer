@@ -48,8 +48,8 @@ public partial class App
             services.AddSingleton<INavigationWindow, MainWindow>();
             services.AddSingleton<MainWindowViewModel>();
 
-            services.AddSingleton<DashboardPage>();
-            services.AddSingleton<DashboardViewModel>();
+            services.AddSingleton<ExplorerPage>();
+            services.AddSingleton<ExplorerViewModel>();
             services.AddSingleton<DevicesPage>();
             services.AddSingleton<DevicesViewModel>();
 

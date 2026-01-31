@@ -368,4 +368,118 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style
+        x:Key="DataGridColumnHeaderStyle"
+        BasedOn="{StaticResource DefaultUiDataGridColumnHeaderStyle}"
+        TargetType="DataGridColumnHeader">
+        <!--  BasedOn="{StaticResource AdbDataGridColumnHeaderStyle}"  -->
+        <!--<Setter Property="Background" Value="Transparent" />-->
+        <!--<Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />-->
+        <Setter Property="FontWeight" Value="Regular" />
+    </Style>
+
+    <Style
+        x:Key="ExplorerGridStyle"
+        BasedOn="{StaticResource DefaultUiDataGridStyle}"
+        TargetType="ui:DataGrid">
+        <Setter Property="MinRowHeight" Value="32" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsRecycleBin}" Value="False">
+                <Setter Property="AllowDrop" Value="True" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--<Style BasedOn="{StaticResource DataGridStyle}" TargetType="DataGrid" />-->
+
+    <Style x:Key="FluentDataGridRowBorderStyle" TargetType="Border">
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="Margin" Value="0,2" />
+    </Style>
+
+    <ControlTemplate x:Key="DataGridRowTemplate" TargetType="DataGridRow">
+        <Border
+            x:Name="RowBorder"
+            HorizontalAlignment="Left"
+            Background="{TemplateBinding Background}"
+            BorderBrush="{TemplateBinding BorderBrush}"
+            BorderThickness="{TemplateBinding BorderThickness}"
+            SnapsToDevicePixels="True"
+            Style="{StaticResource FluentDataGridRowBorderStyle}">
+            <DataGridCellsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+        </Border>
+    </ControlTemplate>
+
+    <Storyboard
+        x:Key="EnterDragStoryboard"
+        Storyboard.TargetProperty="(helpers:SelectionHelper.SelectionInProgress)"
+        Duration="00:00:00.0">
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.0">
+            <DiscreteBooleanKeyFrame KeyTime="00:00:00.0" Value="True" />
+        </BooleanAnimationUsingKeyFrames>
+    </Storyboard>
+
+    <Storyboard
+        x:Key="LeaveDragStoryboard"
+        Storyboard.TargetProperty="(helpers:SelectionHelper.SelectionInProgress)"
+        Duration="00:00:00.0">
+        <BooleanAnimationUsingKeyFrames BeginTime="00:00:00.0">
+            <DiscreteBooleanKeyFrame KeyTime="00:00:00.0" Value="False" />
+        </BooleanAnimationUsingKeyFrames>
+    </Storyboard>
+
+    <Style x:Key="BaseRowStyle" TargetType="DataGridRow">
+        <Setter Property="helpers:SelectionHelper.SelectionInProgress" Value="False" />
+        <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
+        <Setter Property="Visibility" Value="Visible" />
+        <Setter Property="AllowDrop" Value="False" />
+        <!--<Setter Property="ui:ControlHelper.CornerRadius" Value="2" />-->
+        <Setter Property="Margin" Value="3,0,0,0" />
+        <Setter Property="Template" Value="{StaticResource DataGridRowTemplate}" />
+        <Style.Triggers>
+            <EventTrigger RoutedEvent="PreviewDragEnter">
+                <BeginStoryboard Storyboard="{StaticResource EnterDragStoryboard}" />
+            </EventTrigger>
+            <EventTrigger RoutedEvent="PreviewDragLeave">
+                <BeginStoryboard Storyboard="{StaticResource LeaveDragStoryboard}" />
+            </EventTrigger>
+            <EventTrigger RoutedEvent="MouseLeave">
+                <BeginStoryboard Storyboard="{StaticResource LeaveDragStoryboard}" />
+            </EventTrigger>
+            <Trigger Property="helpers:SelectionHelper.SelectionInProgress" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MouseOverBackground}" />
+            </Trigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource MouseOverBackground}" />
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SelectedBackground}" />
+            </Trigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
+                <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <Setter Property="AllowDrop" Value="True" />
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource SelectedInactiveBackground}" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
 </ResourceDictionary>

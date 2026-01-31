@@ -3,11 +3,11 @@ using Wpf.Ui.Abstractions.Controls;
 
 namespace ADB_Explorer.Views.Pages
 {
-    public partial class DashboardPage : INavigableView<DashboardViewModel>
+    public partial class ExplorerPage : INavigableView<ExplorerViewModel>
     {
-        public DashboardViewModel ViewModel { get; }
+        public ExplorerViewModel ViewModel { get; }
 
-        public DashboardPage(DashboardViewModel viewModel)
+        public ExplorerPage(ExplorerViewModel viewModel)
         {
             ViewModel = viewModel;
             DataContext = this;

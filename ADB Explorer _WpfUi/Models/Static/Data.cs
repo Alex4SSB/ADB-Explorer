@@ -30,7 +30,7 @@ public static class Data
 
     public static ObservableList<Package> Packages { get; set; } = [];
 
-    public static Version AppVersion => new(ADB_Explorer.Properties.AppGlobal.AppVersion);
+    public static Version AppVersion => new(Properties.AppGlobal.AppVersion);
 
     public static FileActionsEnable FileActions { get; set; } = new();
 
@@ -41,7 +41,6 @@ public static class Data
     public static Devices DevicesObject { get; set; }
 
     public static MDNS MdnsService { get; set; }
-
 
     public static IEnumerable<FileClass> SelectedFiles { get; set; } = [];
 

@@ -32,6 +32,7 @@ internal class MenuTemplateSelector : DataTemplateSelector
         IconMenu => IconMenuTemplate,
         AltObjectMenu => AltObjectTemplate,
         CompoundIconMenu => CompoundIconMenuTemplate,
+        null => new(),
         _ => throw new NotSupportedException(),
     };
 }

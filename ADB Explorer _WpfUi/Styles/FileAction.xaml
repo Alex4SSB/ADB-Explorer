@@ -116,6 +116,9 @@
     <DataTemplate x:Key="SubMenuTemplate">
         <TextBlock Text="{Binding}" TextOptions.TextFormattingMode="Display" />
     </DataTemplate>
+    <DataTemplate x:Key="SubMenuSeparatorTemplate">
+        <Separator Margin="5,3" Background="Gray" />
+    </DataTemplate>
     <helpers:MenuTemplateSelector
         x:Key="MenuTemplateSelector"
         AltObjectTemplate="{StaticResource AltObjectMenuTemplate}"
@@ -128,7 +131,7 @@
         GeneralSubMenuTemplate="{x:Null}"
         IconMenuTemplate="{StaticResource IconMenuTemplate}"
         SeparatorTemplate="{StaticResource MenuSeparatorTemplate}"
-        SubMenuSeparatorTemplate="{x:Null}"
+        SubMenuSeparatorTemplate="{StaticResource SubMenuSeparatorTemplate}"
         SubMenuTemplate="{StaticResource SubMenuTemplate}" />
     <Style
         x:Key="ActionMenuItemStyle"
@@ -314,21 +317,21 @@
     </Style>
     <Style
         x:Key="BaseContextMenuStyle"
-        BasedOn="{StaticResource AdbContextMenuStyle}"
-        TargetType="ContextMenu">
-        <!--<Setter Property="ItemTemplateSelector" Value="{StaticResource MenuTemplateSelector}" />
-        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />-->
+        BasedOn="{StaticResource UiContextMenu}"
+        TargetType="controls:AdbContextMenu">
+        <Setter Property="ItemTemplateSelector" Value="{StaticResource MenuTemplateSelector}" />
+        <Setter Property="ItemContainerStyleSelector" Value="{StaticResource MenuStyleSelector}" />
     </Style>
     <Style
         x:Key="ExplorerContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
-        TargetType="ContextMenu">
+        TargetType="controls:AdbContextMenu">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:ExplorerContextMenu.List}}" />
     </Style>
     <Style
         x:Key="PathBoxContextMenuStyle"
         BasedOn="{StaticResource BaseContextMenuStyle}"
-        TargetType="ContextMenu">
+        TargetType="controls:AdbContextMenu">
         <Setter Property="ItemsSource" Value="{Binding Source={x:Static Member=services:PathContextMenu.List}}" />
     </Style>
     <Style

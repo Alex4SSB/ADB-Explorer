@@ -2,7 +2,9 @@
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
 using ADB_Explorer.ViewModels;
+using ADB_Explorer.Views.Pages;
 using Windows.Management.Deployment;
+using Wpf.Ui;
 using static ADB_Explorer.Models.AbstractDevice;
 
 namespace ADB_Explorer.Helpers;
@@ -702,7 +704,10 @@ public static class DeviceHelper
     {
         Data.CurrentADBDevice = new(device);
         Devices.SetOpenDevice(device);
+
+        App.Services.GetService<INavigationService>()?.Navigate(typeof(ExplorerPage));
         Data.RuntimeSettings.InitLister = true;
+        
         FileActionLogic.ClearExplorer();
         NavHistory.Reset();
         InitDevice();

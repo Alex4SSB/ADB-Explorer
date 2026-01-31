@@ -1,0 +1,108 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.LogicalDriveControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:LogicalDriveViewModel}"
+    mc:Ignorable="d">
+    <ui:Button
+        MouseDoubleClick="Button_MouseDoubleClick"
+        PreviewMouseUp="Button_PreviewMouseUp"
+        Style="{StaticResource DriveItemStyle}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <ui:FontIcon Grid.RowSpan="3" Style="{StaticResource DriveIconStyle}" />
+            <StackPanel
+                Grid.Column="2"
+                HorizontalAlignment="Left"
+                Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style BasedOn="{StaticResource DriveNameTextBlockStyle}" TargetType="TextBlock" />
+                </StackPanel.Resources>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                                <Setter Property="FlowDirection" Value="RightToLeft" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="{Binding DisplayName}" />
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Type}" Value="External">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Type}" Value="Emulated">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text=" (" />
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontFamily="{StaticResource ConsoleFont}"
+                        FontWeight="Regular"
+                        Text="{Binding ID}" />
+                    <TextBlock Text=")" />
+                </StackPanel>
+            </StackPanel>
+            <ProgressBar
+                Grid.Row="1"
+                Grid.Column="2"
+                Margin="0,6"
+                Value="{Binding UsageP, Mode=OneWay}">
+                <ProgressBar.Style>
+                    <Style BasedOn="{StaticResource DriveUsageBarStyle}" TargetType="ProgressBar">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ProgressBar.Style>
+            </ProgressBar>
+            <StackPanel
+                Grid.Row="2"
+                Grid.Column="2"
+                Orientation="Horizontal">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding UsageP}" Value="-1">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Style="{StaticResource TextBlockStyle}" TextTrimming="CharacterEllipsis">
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_FREE_SPACE}">
+                            <Binding Path="Available" />
+                            <Binding Path="Size" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </StackPanel>
+        </Grid>
+    </ui:Button>
+</UserControl>

@@ -62,12 +62,22 @@ namespace ADB_Explorer.Views.Windows
             }
         } = null;
 
+        private ExplorerPageHeader ExplorerPageHeader
+        {
+            get
+            {
+                field ??= new() { DataContext = App.Services.GetService<ExplorerViewModel>() };
+                return field;
+            }
+        } = null;
+
         private void RootNavigation_Navigated(NavigationView sender, NavigatedEventArgs args)
         {
             PageHeader.Content = args.Page switch
             {
                 Pages.SettingsPage => SettingsPageHeader,
                 Pages.DevicesPage => DevicesPageHeader,
+                Pages.ExplorerPage => ExplorerPageHeader,
                 _ => null
             };
 

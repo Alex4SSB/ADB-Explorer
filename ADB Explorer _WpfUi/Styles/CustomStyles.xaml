@@ -129,18 +129,18 @@
     <Style
         x:Key="FileNameTextBlockStyle"
         BasedOn="{StaticResource TooltipTextBlockStyle}"
-        TargetType="ui:TextBlock" />
+        TargetType="TextBlock" />
     <Style
         x:Key="ExplorerGridCellStyle"
         BasedOn="{StaticResource FileNameTextBlockStyle}"
-        TargetType="ui:TextBlock">
+        TargetType="TextBlock">
         <Setter Property="Margin" Value="4,0" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
         <Setter Property="Opacity" Value="1" />
         <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
-    <!--<Style
+    <Style
         x:Key="DirectoryGridCellStyle"
         BasedOn="{StaticResource ExplorerGridCellStyle}"
         TargetType="TextBlock">
@@ -152,20 +152,12 @@
                 <Setter Property="Opacity" Value="0.5" />
             </DataTrigger>
             <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                <Setter Property="Foreground" Value="{DynamicResource SystemControlBackgroundAccentBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </DataTrigger>
             <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
                     <Condition Binding="{Binding CutState}" Value="Copy" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True" />
-                    <Condition Binding="{Binding CutState}" Value="Copy" />
-                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=(ui:ThemeManager.ActualTheme)}" Value="Light" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=ActualTheme}" Value="Light" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
             </MultiDataTrigger>
@@ -188,7 +180,7 @@
     <Style x:Key="ExplorerViewBackgroundStyle" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource ControlBackground}" />
     </Style>
-    <Style x:Key="SeparatorStyle" TargetType="Separator">
+    <!--<Style x:Key="SeparatorStyle" TargetType="Separator">
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Height" Value="0" />
@@ -393,7 +385,7 @@
             </DataTrigger>
         </Style.Triggers>-->
     </Style>
-    <!--<DataTemplate x:Key="FileIconTemplate">
+    <DataTemplate x:Key="FileIconTemplate">
         <Grid>
             <Grid>
                 <Grid.Style>
@@ -452,6 +444,27 @@
         </Grid>
     </DataTemplate>
     <Style
+        x:Key="FileNameEditingElementStyle"
+        BasedOn="{StaticResource DefaultUiTextBoxStyle}"
+        TargetType="ui:TextBox">
+        <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsRtlName}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DriveViewScrollViewerStyle" TargetType="ScrollViewer">
+        <!--  BasedOn="{StaticResource ScrollViewerStyle}"  -->
+        <Setter Property="AllowDrop" Value="False" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <!--<Style
         x:Key="UnresponsiveServerBorderStyle"
         BasedOn="{StaticResource BorderStyle}"
         TargetType="Border">
@@ -530,17 +543,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style
-        x:Key="DriveViewScrollViewerStyle"
-        BasedOn="{StaticResource ScrollViewerStyle}"
-        TargetType="ScrollViewer">
-        <Setter Property="AllowDrop" Value="False" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsDriveViewVisible}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
+
     <Style
         x:Key="ListViewStyle"
         BasedOn="{StaticResource DefaultListViewStyle}"
@@ -615,16 +618,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="ListViewItemContainerStyle" TargetType="ListViewItem">
-        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="ListViewItem">
-                    <ContentPresenter />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+
     <Style x:Key="SelectionBorderStyle" TargetType="Border">
         <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
         <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
@@ -785,18 +779,7 @@
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="Black" />
     </Style>
-    <Style
-        x:Key="FileNameEditingElementStyle"
-        BasedOn="{StaticResource TextBoxFluentStyle}"
-        TargetType="TextBox">
-        <Setter Property="Text" Value="{Binding DisplayName, Mode=OneWay}" />
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding IsRtlName}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
+
     <Style
         x:Key="NotificationsBorderStyle"
         BasedOn="{StaticResource BorderStyle}"
@@ -806,11 +789,21 @@
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>-->
+    <Style x:Key="ListViewItemContainerStyle" TargetType="ui:ListViewItem">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ui:ListViewItem">
+                    <ContentPresenter HorizontalAlignment="Left" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     <Style
         x:Key="HomeViewItemStyle"
-        BasedOn="{StaticResource BaseButtonStyle}"
-        TargetType="Button">
+        BasedOn="{StaticResource DefaultUiButtonStyle}"
+        TargetType="ui:Button">
         <Setter Property="Width" Value="280" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
@@ -820,12 +813,12 @@
     <Style
         x:Key="HomeSavedLocationsListStyle"
         BasedOn="{StaticResource ListViewStyle}"
-        TargetType="ListView">
+        TargetType="ui:ListView">
         <Setter Property="SelectionMode" Value="Single" />
         <Setter Property="ItemsPanel" Value="{StaticResource HorizontalListViewPanelTemplate}" />
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
-                <Style BasedOn="{StaticResource ListViewItemContainerStyle}" TargetType="ListViewItem">
+                <Style BasedOn="{StaticResource ListViewItemContainerStyle}" TargetType="ui:ListViewItem">
                     <Setter Property="Margin" Value="5" />
                 </Style>
             </Setter.Value>
@@ -833,17 +826,17 @@
         <Setter Property="ItemTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <Button
+                    <ui:Button
                         Height="32"
                         Background="Transparent"
                         Command="{Binding NavigateAction.Command}"
                         Style="{StaticResource HomeViewItemStyle}">
                         <emoji:TextBlock Style="{StaticResource TooltipTextBlockStyle}" Text="{Binding Path}" />
-                    </Button>
+                    </ui:Button>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
-    </Style>-->
+    </Style>
     <Style x:Key="MaskedTextBoxStyle" TargetType="controls:MaskedTextBox">
         <Setter Property="ValidationType" Value="None" />
         <Setter Property="ControlStyle" Value="{StaticResource NumericTextBoxStyle}" />
@@ -875,5 +868,80 @@
                 <Setter Property="FlowDirection" Value="RightToLeft" />
             </DataTrigger>
         </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DriveItemStyle"
+        BasedOn="{StaticResource HomeViewItemStyle}"
+        TargetType="ui:Button">
+        <Setter Property="Height" Value="60" />
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsMouseOver}" Value="False" />
+                    <Condition Binding="{Binding DriveSelected}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="Transparent" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DriveUsageBarStyle"
+        BasedOn="{StaticResource {x:Type ProgressBar}}"
+        TargetType="ProgressBar">
+        <Setter Property="ToolTip">
+            <Setter.Value>
+                <TextBlock>
+                    <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource StringFormatConverter}" ConverterParameter="{x:Static strings:Resources.S_DRIVE_USAGE_TOOLTIP}">
+                            <Binding Path="UsageP" />
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding UsageWarning}" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource RedStripedBrush}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DriveIconStyle"
+        BasedOn="{StaticResource GlyphFont}"
+        TargetType="ui:FontIcon">
+        <Setter Property="Glyph" Value="{Binding DriveIcon}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="32" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Type}" Value="Unknown">
+                <Setter Property="Visibility" Value="Hidden" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="DriveNameTextBlockStyle"
+        BasedOn="{StaticResource TextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Text" Value="{Binding DisplayName}" />
+    </Style>
+    <Style
+        x:Key="DriveItemsCountTextBlockStyle"
+        BasedOn="{StaticResource TextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style
+        x:Key="DriveContainerStyle"
+        BasedOn="{StaticResource ListViewItemContainerStyle}"
+        TargetType="ui:ListViewItem">
+        <Setter Property="Margin" Value="5" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Top" />
+        <Setter Property="IsSelected" Value="{Binding DriveSelected, Mode=TwoWay}" />
+        <Setter Property="IsEnabled" Value="{Binding DriveEnabled}" />
     </Style>
 </ResourceDictionary>

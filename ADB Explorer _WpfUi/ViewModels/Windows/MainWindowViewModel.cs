@@ -14,7 +14,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             Content = new Wpf.Ui.Controls.TextBlock() { FontSize = 12, Text = Strings.Resources.S_SETTINGS_GROUP_EXPLORER, TextTrimming = TextTrimming.CharacterEllipsis },
             Icon = new FontIcon { Glyph = "\uEC50" },
-            TargetPageType = typeof(Views.Pages.DashboardPage),
+            TargetPageType = typeof(Views.Pages.ExplorerPage),
             ToolTip = Strings.Resources.S_SETTINGS_GROUP_EXPLORER
         },
         new NavigationViewItem()

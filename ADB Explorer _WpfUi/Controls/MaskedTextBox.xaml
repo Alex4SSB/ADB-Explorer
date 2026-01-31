@@ -21,15 +21,13 @@
                 <KeyBinding Key="Return" Command="{Binding EnterCommand}" />
             </ui:TextBox.InputBindings>
         </ui:TextBox>
-        <Border VerticalAlignment="Bottom">
+        <!--  this is placed on top of the TextBox's AccentBorder to avoid modifying the whole template  -->
+        <Border VerticalAlignment="Stretch" CornerRadius="0,0,4,4">
             <Border.Style>
                 <Style TargetType="Border">
                     <Setter Property="BorderThickness" Value="0,0,0,1" />
                     <Setter Property="BorderBrush" Value="{Binding ElementName=TextBoxControl, Path=(helpers:StyleHelper.AltBorderBrush)}" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
                         <DataTrigger Binding="{Binding ElementName=TextBoxControl, Path=IsFocused}" Value="True">
                             <Setter Property="BorderThickness" Value="0,0,0,2" />
                         </DataTrigger>
