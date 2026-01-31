@@ -160,7 +160,7 @@
     <value>Восстановить все элементы</value>
   </data>
   <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>Очистить Карзину</value>
+    <value>Очистить Корзину</value>
   </data>
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>Удалить</value>
