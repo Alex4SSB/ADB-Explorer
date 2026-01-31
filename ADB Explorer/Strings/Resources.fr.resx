@@ -819,7 +819,7 @@ Annuler tout en cours</value>
     <value>Redémarrer ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Le serveur est indisponible</value>
+    <value>Serveur mDNS est hors service</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>En attente de réponse : {0}</value>
@@ -840,7 +840,7 @@ Annuler tout en cours</value>
     <value>Cliquez pour activer le serveur et l'interrogation</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Serveur opérationnel et fonctionnel</value>
+    <value>Serveur mDNS est opérationnel et fonctionne</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Support limité</value>
@@ -1431,5 +1431,8 @@ Veuillez nous aider à localiser l’application dans votre langue sur Weblate.<
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>Désactivé</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Vérification de l’état du serveur mDNS…</value>
   </data>
 </root>
