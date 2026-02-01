@@ -157,4 +157,28 @@
   <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
     <value>Файлові операції</value>
   </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Встановити пакети</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Сполучення та/або підключення пристрою Wi-Fi (без використання mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Перезапустіть програму для набутя чинності</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Помилка Читання Файлу</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Не вдалося витягнути файл для читання.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Помилка Запису Файлу</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Не вдалося відправити обратно файл на пристрій.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>Щоб вимкнути mDNS, потрібно перезапустити сервер ADB.</value>
+  </data>
 </root>
