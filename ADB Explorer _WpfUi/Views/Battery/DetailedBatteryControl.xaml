@@ -1,0 +1,92 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.DetailedBatteryControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    d:DataContext="{d:DesignInstance Type=models:Battery}"
+    mc:Ignorable="d">
+    <UserControl.Style>
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ChargeState}" Value="Unknown">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Level}" Value="{x:Null}">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Style>
+    <controls:SimpleStackPanel
+        VerticalAlignment="Center"
+        Orientation="Horizontal"
+        Spacing="6">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Level}" />
+            <TextBlock Text="%" />
+        </StackPanel>
+        <ui:FontIcon
+            Glyph="{Binding BatteryIcon}"
+            ToolTipService.InitialShowDelay="0"
+            ToolTipService.Placement="Top"
+            ToolTipService.ShowDuration="60000">
+            <ui:FontIcon.Style>
+                <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                    <Style.Resources>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </Trigger>
+                                <DataTrigger Binding="{Binding FullyCharged}" Value="True">
+                                    <Setter Property="Foreground" Value="#FF1DB159" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding BatteryLow}" Value="True">
+                                    <Setter Property="Foreground" Value="#FFF44336" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Style.Resources>
+                    <Setter Property="ToolTip">
+                        <Setter.Value>
+                            <controls:SimpleStackPanel Spacing="4">
+                                <controls:SimpleStackPanel.Style>
+                                    <Style TargetType="controls:SimpleStackPanel">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                                                <Setter Property="FlowDirection" Value="RightToLeft" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </controls:SimpleStackPanel.Style>
+                                <TextBlock Text="{Binding BatteryStateString}" />
+                                <TextBlock Text="{Binding BatteryHealthString}" />
+                                <TextBlock Text="{Binding VoltageString}" />
+                                <TextBlock Text="{Binding CurrentConsumption}" />
+                                <TextBlock Text="{Binding TemperatureString}" />
+                            </controls:SimpleStackPanel>
+                        </Setter.Value>
+                    </Setter>
+                    <Style.Triggers>
+                        <Trigger Property="DataContext" Value="{x:Null}">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding Source={x:Static models:Data.Settings}, Path=PollBattery}" Value="False">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding ChargeState}" Value="Unknown">
+                            <Setter Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ui:FontIcon.Style>
+        </ui:FontIcon>
+    </controls:SimpleStackPanel>
+</UserControl>

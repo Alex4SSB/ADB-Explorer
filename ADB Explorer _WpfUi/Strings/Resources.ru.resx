@@ -1,0 +1,1438 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
+    <value>Символ(ы) Робота Андроид</value>
+  </data>
+  <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
+    <value>Робот Android воспроизводится или модифицируется на основе работы, созданной и распространяемой Google, и используется в соответствии с условиями, описанными в лицензии Creative Commons 3.0 с указанием авторства.</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Анимации</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Иконка APK лицензирована Apache License, Version 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Не удалось получить версию ADB с заданного пути.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>Версия ADB с предоставленного пути слишком низкая.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Не удалось предопределить ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Выберите исполняемый файл ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Обнулить Настройки Программы</value>
+  </data>
+  <data name="S_NEW_VERSION_TITLE" xml:space="preserve">
+    <value>Новая версия программы</value>
+  </data>
+  <data name="S_NAV_ERR_TITLE" xml:space="preserve">
+    <value>Ошибка навигации</value>
+  </data>
+  <data name="S_COPY_APK_NAME" xml:space="preserve">
+    <value>Скопировать имя Пакета</value>
+  </data>
+  <data name="S_COPY_PATH" xml:space="preserve">
+    <value>Скопировать путь объекта</value>
+  </data>
+  <data name="S_RESTORE_ALL" xml:space="preserve">
+    <value>Восстановить все элементы</value>
+  </data>
+  <data name="S_EMPTY_TRASH" xml:space="preserve">
+    <value>Очистить Карзину</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="S_DEST_ERR" xml:space="preserve">
+    <value>Ошибка пути</value>
+  </data>
+  <data name="S_FAILED_CONN" xml:space="preserve">
+    <value>не удалось подключиться к</value>
+  </data>
+  <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
+    <value>Ошибка подключения</value>
+  </data>
+  <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
+    <value>Ошибка при отключении</value>
+  </data>
+  <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
+    <value>Ошибка соединения</value>
+  </data>
+  <data name="S_ROOT_FORBID" xml:space="preserve">
+    <value>ROOT доступ не может быть включен на этом устройстве.</value>
+  </data>
+  <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
+    <value>ROOT доступ</value>
+  </data>
+  <data name="S_DEL_CONF_TITLE" xml:space="preserve">
+    <value>Подтвердите Удаление</value>
+  </data>
+  <data name="S_PERM_DEL" xml:space="preserve">
+    <value>Удалить навсегда</value>
+  </data>
+  <data name="S_CREATE_ERR_TITLE" xml:space="preserve">
+    <value>Ошибка при создании</value>
+  </data>
+  <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
+    <value>Ошибки при восстановлении</value>
+  </data>
+  <data name="S_CONF_UNI_TITLE" xml:space="preserve">
+    <value>Подтвердите удаление</value>
+  </data>
+  <data name="S_INSTALL_APK" xml:space="preserve">
+    <value>Выбрать пакеты для установки</value>
+  </data>
+  <data name="S_REM_EMU" xml:space="preserve">
+    <value>Убить эмулятор</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Удалить устройство</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Отключить устройство</value>
+  </data>
+  <data name="S_FILE_OP_TOOLTIP" xml:space="preserve">
+    <value>Файловые операции</value>
+  </data>
+  <data name="S_PUSH_PKG" xml:space="preserve">
+    <value>Установить пакеты</value>
+  </data>
+  <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
+    <value>Соединить и/или подключить Wi-Fi устройство (не используя mDNS)</value>
+  </data>
+  <data name="S_RESTART_APP" xml:space="preserve">
+    <value>Перезапустить программу, чтобы изменения вступили в силу</value>
+  </data>
+  <data name="S_READ_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Ошибка чтения файла</value>
+  </data>
+  <data name="S_READ_FILE_ERROR" xml:space="preserve">
+    <value>Не удалось извлечь файл для его чтения.</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR_TITLE" xml:space="preserve">
+    <value>Ошибка записи файла</value>
+  </data>
+  <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
+    <value>Не удалось отправить файл обратно на устройство.</value>
+  </data>
+  <data name="S_DISABLE_MDNS" xml:space="preserve">
+    <value>ADB-сервер необходимо перезапустить, чтобы отключить mDNS.</value>
+  </data>
+  <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
+    <value>Отключить mDNS</value>
+  </data>
+  <data name="S_WSA_PKG_TIP" xml:space="preserve">
+    <value>Запустить WSA в фоне</value>
+  </data>
+  <data name="S_PULL_ACTION" xml:space="preserve">
+    <value>Извлечь</value>
+  </data>
+  <data name="S_PULL_ACTION_LINK" xml:space="preserve">
+    <value>Извлечь (Ссылка)</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Восстановить</value>
+  </data>
+  <data name="S_REDIRECTION" xml:space="preserve">
+    <value>Перенаправление Прогресса</value>
+  </data>
+  <data name="S_LS_ERROR_TITLE" xml:space="preserve">
+    <value>Ошибка директории</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
+    <value>Извлечь в корень диска Windows</value>
+  </data>
+  <data name="S_NEW_VERSION_MSG" xml:space="preserve">
+    <value>Вас приветствует новая версия ADB Explorer!
+Список изменений доступен на GitHub.</value>
+  </data>
+  <data name="S_FUSE_DRIVE_TOOLTIP" xml:space="preserve">
+    <value>FUSE устройство.
+• Ссылки с символами не поддерживаются
+• Имя файла не может содержать следующие символы " * / : &lt; &gt; ? \ |
+• Имена файлов нечувствительны к регистру
+• Установка APK не поддерживается</value>
+  </data>
+  <data name="S_DISABLE_ANIMATION" xml:space="preserve">
+    <value>В приложении используется множество анимаций, включённых как часть Fluent Design.
+Анимация боковых панелей всегда отключается, когда окно приложения развёрнуто на втором мониторе.
+
+• Если включить эту настройку, отключатся все анимации приложения, кроме индикаторов загрузки (progress bars, progress rings) и шкал использования диска.</value>
+  </data>
+  <data name="S_RESET_SETTINGS" xml:space="preserve">
+    <value>Все настройки будут сброшены при закрытии приложения.
+Это действие нельзя отменить. Вы уверены?</value>
+  </data>
+  <data name="S_WSA_LAUNCH" xml:space="preserve">
+    <value>Выберите Запустить, если ADB уже авторизован в WSA.
+Чтобы разрешить ADB, откройте расширенные настройки WSA.</value>
+  </data>
+  <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
+    <value>{0} выбранных файлов не могут быть созданы в корне диска Windows.</value>
+  </data>
+  <data name="S_ADB_LEARN_MORE" xml:space="preserve">
+    <value>Узнайте больше про ADB</value>
+  </data>
+  <data name="S_ADB_DOWNLOAD" xml:space="preserve">
+    <value>Скачать ADB</value>
+  </data>
+  <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
+    <value>Обнаружить ADB (v{0} как минимум):</value>
+  </data>
+  <data name="S_BUTTON_CHANGE" xml:space="preserve">
+    <value>Изменить</value>
+  </data>
+  <data name="S_SELECT_ADB_PATH" xml:space="preserve">
+    <value>Выберите путь к ADB</value>
+  </data>
+  <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
+    <value>Продолжить</value>
+  </data>
+  <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
+    <value>Больше информации</value>
+  </data>
+  <data name="S_ENABLED" xml:space="preserve">
+    <value>Включено</value>
+  </data>
+  <data name="S_DISABLED" xml:space="preserve">
+    <value>Выключено</value>
+  </data>
+  <data name="S_NEW_VERSION" xml:space="preserve">
+    <value>Для {0} доступна новая версия {1}</value>
+  </data>
+  <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
+    <value>Перейти на страницу версии</value>
+  </data>
+  <data name="S_BUTTON_CLOSE" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="S_GO_TO_RELEASE_NOTES" xml:space="preserve">
+    <value>Перейти к списку изменений</value>
+  </data>
+  <data name="S_ADB_EXECUTABLE" xml:space="preserve">
+    <value>Исполняемый файл ADB</value>
+  </data>
+  <data name="S_HELP_ON_ADB" xml:space="preserve">
+    <value>Это приложение - Графический интерфейс для ADB - Android Debug Bridge.
+Для его использования на вашем компьютере должны быть установлены ADB.
+ADB доступен как часть Android SDK Platform Tools.
+Используйте предоставленную ссылку для скачивания Android SDK Platform Tools.
+К сожалению мы не можем предоставить ADB с приложением ввиду лицензионных ограничений.</value>
+  </data>
+  <data name="S_HELP_ON_ADB_TITLE" xml:space="preserve">
+    <value>Помощь с ADB</value>
+  </data>
+  <data name="S_RESTART_ADB_NOW" xml:space="preserve">
+    <value>Перезапустить ADB Сейчас</value>
+  </data>
+  <data name="S_RESTART_LATER" xml:space="preserve">
+    <value>Перезапустить позже</value>
+  </data>
+  <data name="S_ITEM_DESTINATION" xml:space="preserve">
+    <value>Выберите назначение для {0}</value>
+  </data>
+  <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
+    <value>Выберите назначение для нескольких элементов</value>
+  </data>
+  <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
+    <value>Следующие элементы будут стерты:
+{0}</value>
+  </data>
+  <data name="S_DELETE_PERMANENT" xml:space="preserve">
+    <value>Следующие элементы будут безвозвратно удалены:
+{0}</value>
+  </data>
+  <data name="S_NEW_ITEM" xml:space="preserve">
+    <value>Новый файл</value>
+  </data>
+  <data name="S_NEW_FOLDER" xml:space="preserve">
+    <value>Новая папка</value>
+  </data>
+  <data name="S_CC_NAME" xml:space="preserve">
+    <value>Лицензия Creative Commons (CC)</value>
+  </data>
+  <data name="S_LS_ERROR" xml:space="preserve">
+    <value>Во время чтения этой папки произошла ошибка.
+Контент может отображаться неправильно.</value>
+  </data>
+  <data name="S_PASTE_ANCESTOR" xml:space="preserve">
+    <value>{0} является родительской папкой для целевой директории.</value>
+  </data>
+  <data name="S_KILL_EMULATOR" xml:space="preserve">
+    <value>Вы действительно хотите завершить эмулятор?</value>
+  </data>
+  <data name="S_REM_DEVICE" xml:space="preserve">
+    <value>Вы уверены, что хотите удалить это устройство?</value>
+  </data>
+  <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
+    <value>Удалить {0}</value>
+  </data>
+  <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
+    <value>Отключить {0}</value>
+  </data>
+  <data name="S_REM_APK" xml:space="preserve">
+    <value>Следующие элементы будут удалены:
+{0}</value>
+  </data>
+  <data name="S_REM_APK_PLURAL" xml:space="preserve">
+    <value>Следующие элементы будут удалены:
+{0} пакетов</value>
+  </data>
+  <data name="S_UNINSTALL" xml:space="preserve">
+    <value>Деинсталлировать</value>
+  </data>
+  <data name="S_CANCEL" xml:space="preserve">
+    <value>Отмена</value>
+  </data>
+  <data name="S_CONFIRM" xml:space="preserve">
+    <value>Подтвердить</value>
+  </data>
+  <data name="S_SKIP" xml:space="preserve">
+    <value>Пропустить</value>
+  </data>
+  <data name="S_REPLACE" xml:space="preserve">
+    <value>Заменить</value>
+  </data>
+  <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
+    <value>Объединить или заменить</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS" xml:space="preserve">
+    <value>Конфликтует 1 элемент</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>Конфликтует 1 элемент 1 в {0}</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>{0} конфликтующих элементов</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>{0} конфликтующих элементов в {1}</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>Ошибка копирования</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>Выберите папки для отправки</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>Выберите папки для отправки в {0}</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>Выберите файлы для отправки</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>Выберите файлы для отправки в {0}</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>Отчистить</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>Опрос по устройствам</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>Запрос статуса батареи</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>Автоматически включить ROOT</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>Сохранять устройства подключённые вручную</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>Авто открытие для обзора</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>Компактный вид</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>Прекращать опрос при передаче файлов</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>Одновременные операции</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>Автообновление медиатеки после копирования</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>Запрос по устройствам</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>Поддержка APK</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>Отображать тип файла</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>Отображать скрытые элементы</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>Отображать системные приложения</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>Двойной щелчок</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>Извлечь в папку по умолчанию</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>Открыть в редакторе</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>Предопределить путь к ADB</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>Папка по умолчанию</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>Темная</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Как в Windows</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>Тема</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>Принудительные стили</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>Отключить аппаратное ускорение</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>Отключить анимации</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>Заставка</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>Проверить наличие обновлений</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>Внешний вид</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>Рабочие директории</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>Проводник</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>Устройства и Возможности</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>Устройство</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>Поддержать</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>Папка App Data</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>Ссылка на GitHub</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>Политика конфиденциальности</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>Сторонние лицензии</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>Показать условия</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[не назначено]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>Поиск настроек</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>Закрыть поиск</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>Свернуть все</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>Развернуть все</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>Скрыть</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>Язык</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>Ок</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>Фильтр операций</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>Включить авто воспроизведение</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>Отключить авто воспроизведение
+Отмена всех запусков</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>Логирование остановлено</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>Остановить логирование</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>Логи</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>Накопители устройств</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>Вперед</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>Вверх</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>Фильтр</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>Устройства</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>Отправить</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>Папки</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>Файлы</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>Обновить</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>Копировать</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>Больше</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>Создать</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>Папка</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>Файл</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>Выбрать все</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>Вырезать</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>Вставить ссылку</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>Переименовать</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>Пакет</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>Время изменения</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>Закрыть редактор</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>Сохранить изменения</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>Копировать во временную папку</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>Отчистить лог</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>Открыть расположение элемента</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>Найти в интернете</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>Копировать в буфер</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>Использование диска</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>Чтение: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>Запись: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>Другое: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>Проверять обновление при запуске</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>О программе</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>Элемент</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>Элементы</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>Эта папка пуста.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>Невозможно получить список.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>Нет соответствующих элементов.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;Эта папка &lt;Italic&gt;выглядит&lt;/Italic&gt; пустой&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… по крайней мере невооруженным взглядом&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>Выбранный элемент</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>Выбранные элементы</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>Тип операции</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>Прогресс</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>Источник</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>Назначение</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>Добавлено</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>Иконка</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>Имя</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>Исходное расположение</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>Дата изменения</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>Тип</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>Размер</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>Дата удаления</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>ID пользователя</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>Версия</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB не отвечает</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>Время последнего ответа ADB</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}сек.</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>Отключить сервер ADB</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>Отключить процесс ADB</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>Обновить устройства</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>Перезапустить ADB</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS-сервер отключен</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>Ожидание ответа: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}мс</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}мин</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}час</value>
+  </data>
+  <data name="S_MDNS_OFF" xml:space="preserve">
+    <value>&lt;Span&gt;• Режим опроса служб: ВЫКЛ&lt;LineBreak /&gt;• Сервер &lt;Italic&gt;возможно&lt;/Italic&gt; активен&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ENABLE_MDNS" xml:space="preserve">
+    <value>Нажмите, чтобы включить сервер и опрос</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS-сервер работает</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>Ограниченная поддержка</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>Некоторые операции не выполнены</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>ROOT доступ включен</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>ROOT может быть включен</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>Режим Восстановления</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>Напряжение: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>Температура: {0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>Баланс тока: {0}А</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>Перезагрузить в</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>Образ системы</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>Загрузчик</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>Sideload</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>Sideload (Авто перезагрузка)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - Отключено</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - Не авторизовано</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>Эмулятор</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS Сервис</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>Wi-Fi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>Статус аккумулятора неизвестен</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, Подключено</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>Беспровод</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>Нет</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>Неизвестен</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>Зарядка</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>Разряжается</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>Не заряжается</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>Заряжено</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>Статус: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>Здоровье: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>Хорошо</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>Перегрев</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>Труп</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>Высокое напряжение</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>Нетипичный сбой</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>Переохлаждение</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>Запустить</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>Запуск WSA</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>Не показывать снова.</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>Прервать</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>Отправка</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} конфликт</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>Вставить</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>Сброс</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>Операция</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>Операции</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>Сверить {0}</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>Ссылка</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (Ссылка)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Приложение Android</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Исполняемый файл Windows</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>Корзина</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>Да</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>Root</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>Внутреннее хранилище</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>Установленные приложения</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>SD Карта</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>Устройство OTG</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>Эмулируемое устройство</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>Временная Папка</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>Имя файла недопустимо в конечной файловой системе: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>Ошибка сверки</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>Отсутствующие элементы</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>Безвозвратное удаление</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>Неизвестно</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>Путь не существует.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>Произвольный путь</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>Пусто</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - Копировать</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Соблюдение правил именования Unix (через ADB)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования Windows</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Соблюдайте правила именования корневых дисков Windows</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>Уникальность в текущем местоположении</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>Предупреждения</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>Имя файла нарушает правила Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования корня диска Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>Некоторые выбранные файлы имеют противоречивые имена в FUSE / Windows</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>Выбранный файл нарушает правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>Некоторые скопированные файлы имеют противоречивые имена в FUSE</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>Скопированный файл нарушает правила именования FUSE</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>Выбранный элемент не является файлом/папкой</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>Можно отменить сбросив настройки приложения</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>До следующего запуска</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>Никогда не показывать снова</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>Приложение WSA</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>Root статус: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>Не проверено</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>Запрещено</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>Включить</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>Отключено</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>Код соединения</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP Адрес / Имя хоста</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>Порт</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>Порт соединения</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>Соединить и подключить</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>Сохраненное устройство</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>Соединение по QR</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>Готово к соединению</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>Отчистить всё</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>Добавить новое устройство</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[Не авторизовано]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[сервис]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>Сейчас просматривается</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>Просмотр</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>Подключить</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{0} свободно из {1}</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>Корзина пуста</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>Установщик APK</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>Установщики APK</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>Пакеты</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>Ошибка: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>Сверено</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>Завершено</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0} провалено</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>Всего:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>Предыдущая операция</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>В процессе</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>На очереди</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>Провалено</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>Отменено</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>Предыдущий</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>Переместить</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>В корзину</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>Обновление</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% использовано</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>Листать сюда</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>Верх</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>Низ</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>Страница вверх</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>Страница вниз</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>Листать вверх</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>Листать вниз</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>Левый край</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>Правый край</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>Страница влево</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>Страница вправо</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>Листать влево</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>Листать вправо</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>Повторить</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>Уведомления</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>Нажмите чтобы отобразить больше информации</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>Язык приложения</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>Выберите ваш язык в настройках.
+Прогресс перевода на выбранный язык.
+Помогите с переводом на ваш язык на Weblate.</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Перейти на Weblate</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>Сокет</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>Устройство Block</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>Устройство Char</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>Неизвестный</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>Неработающая ссылка</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>История навигации</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>Добавить текущее местоположение</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>Стереть</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>Сохранённые пути</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} КБ</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} МБ</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} ГБ</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} ТБ</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} ПБ</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} ЕБ</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>милли</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>микро</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>нано</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} Б</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>Копировать {0} элементов</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>Копировать {0} элементов в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>Переместить {0} элементов в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>Создать ссылку в {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>Переместить {0} элементов</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>Вставить 1 вырезанный элемент</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>Вставить 1 скопированный элемент</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>Вставить {0} скопированных элементов</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>Вставить {0} вырезанных элементов</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{0} за {1} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{0} из {1}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>Копировать {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>Копировать {0} в {1}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>Переместить {0}</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>Переместить {0} в {1}</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>Файл не найден</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>Завершено без подтверждения</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>Ошибка проверки целостности: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>Проверка…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0} файлов</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>Выберите ROM для боковой загрузки</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM-файл</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>Терминал</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>Сохранение дату изменения файла</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>Установить {0}</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>Установить {0} APK</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Вкл.</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Выкл.</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>Проверка статуса mDNS-сервера…</value>
+  </data>
+</root>

@@ -1,0 +1,96 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows10.0.22621.0</TargetFramework>
+	<RollForward>Major</RollForward>
+	<RootNamespace>ADB_Explorer</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>app_icon_2023_combined.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>AnyCPU;x64;ARM64</Platforms>
+    <SupportedOSPlatformVersion>10.0.18362.0</SupportedOSPlatformVersion>
+    <Configurations>Debug;Release;Deploy</Configurations>
+	<GenerateSatelliteAssembliesForCore>true</GenerateSatelliteAssembliesForCore>
+	<InterceptorsNamespaces>$(InterceptorsNamespaces);Microsoft.Extensions.Configuration.Binder.SourceGeneration</InterceptorsNamespaces>
+	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="PortableLauncher.bat" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="app_icon_2023_combined.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AdvancedSharpAdbClient" Version="3.4.14" />
+    <PackageReference Include="Emoji.Wpf" Version="0.3.4" />
+    <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
+    <PackageReference Include="ModernWpfUI" Version="0.9.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="QRCoder.Xaml" Version="1.7.0" />
+    <PackageReference Include="System.Management" Version="9.0.10" />
+    <PackageReference Include="Vanara.Windows.Shell.Common" Version="4.2.1" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <Compile Update="Properties\AppGlobal.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>AppGlobal.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Strings\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\AppGlobal.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppGlobal.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Strings\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="app_icon_black_2023_256px.png" />
+    <Content Include="PortableLauncher.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\APK_format_icon_2014-2019_.ico" />
+    <Resource Include="Resources\Fonts\Nunito-VariableFont_wght.ttf" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <None Update="app_icon_2023_combined.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+	
+</Project>
