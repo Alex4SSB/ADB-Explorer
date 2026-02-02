@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -118,16 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>안드로이드 로봇 아이콘(s)</value>
+    <value>안드로이드 로봇 아이콘</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
-    <value>Android 로봇은 Google에서 제작하여 공유한 저작물을 복제하거나 수정한 것으로 크리에이티브 커먼즈 3.0 저작자 표시 라이선스의 약관에 따라 사용되었습니다.</value>
+    <value>Android 로봇은 Google에서 제작하여 공유한 저작물을 복제하거나 수정한 것으로, Creative Commons 3.0 저작자 표시 라이선스에 명시된 조건에 따라 사용됩니다.</value>
   </data>
   <data name="S_ANIMATION_TITLE" xml:space="preserve">
     <value>앱 애니메이션</value>
   </data>
   <data name="S_APK_ICON_LIC" xml:space="preserve">
-    <value>APK 아이콘은 Apache License, Version 2.0에 따라 라이선스가 부여됩니다.</value>
+    <value>APK 아이콘은 Apache License 버전 2.0에 따라 라이선스가 부여됩니다.</value>
   </data>
   <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
     <value>제공된 경로에서 ADB 버전을 가져올 수 없습니다.</value>
@@ -139,7 +139,7 @@
     <value>ADB 재정의 실패</value>
   </data>
   <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
-    <value>ADB 실행 파일을 선택하세요</value>
+    <value>ADB 실행 파일 선택</value>
   </data>
   <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
     <value>앱 설정 초기화</value>
@@ -148,43 +148,43 @@
     <value>새 앱 버전</value>
   </data>
   <data name="S_NAV_ERR_TITLE" xml:space="preserve">
-    <value>내비게이션 오류</value>
+    <value>탐색 오류</value>
   </data>
   <data name="S_COPY_APK_NAME" xml:space="preserve">
     <value>패키지 이름 복사</value>
   </data>
   <data name="S_COPY_PATH" xml:space="preserve">
-    <value>복사 항목 경로</value>
+    <value>항목 경로 복사</value>
   </data>
   <data name="S_RESTORE_ALL" xml:space="preserve">
-    <value>모든 아이템 복원</value>
+    <value>모든 항목 복원</value>
   </data>
   <data name="S_EMPTY_TRASH" xml:space="preserve">
-    <value>빈 Recycle Bin</value>
+    <value>휴지통 비우기</value>
   </data>
   <data name="S_DELETE_ACTION" xml:space="preserve">
     <value>삭제</value>
   </data>
   <data name="S_DEST_ERR" xml:space="preserve">
-    <value>목적지 경로 오류</value>
+    <value>대상 경로 오류</value>
   </data>
   <data name="S_FAILED_CONN" xml:space="preserve">
-    <value>연결에 실패했습니다</value>
+    <value>연결 실패</value>
   </data>
   <data name="S_FAILED_CONN_TITLE" xml:space="preserve">
     <value>연결 오류</value>
   </data>
   <data name="S_DISCONN_FAILED_TITLE" xml:space="preserve">
-    <value>연결 끊김 오류</value>
+    <value>연결 해제 오류</value>
   </data>
   <data name="S_PAIR_ERR_TITLE" xml:space="preserve">
     <value>페어링 오류</value>
   </data>
   <data name="S_ROOT_FORBID" xml:space="preserve">
-    <value>선택한 기기에서는 루트 액세스를 활성화할 수 없습니다.</value>
+    <value>선택한 장치에서 루트 권한을 활성화할 수 없습니다.</value>
   </data>
   <data name="S_ROOT_FORBID_TITLE" xml:space="preserve">
-    <value>루트 액세스</value>
+    <value>루트 권한</value>
   </data>
   <data name="S_DEL_CONF_TITLE" xml:space="preserve">
     <value>삭제 확인</value>
@@ -196,13 +196,13 @@
     <value>생성 오류</value>
   </data>
   <data name="S_RESTORE_CONF_TITLE" xml:space="preserve">
-    <value>충돌 복구</value>
+    <value>복원 충돌</value>
   </data>
   <data name="S_CONF_UNI_TITLE" xml:space="preserve">
     <value>제거 확인</value>
   </data>
   <data name="S_INSTALL_APK" xml:space="preserve">
-    <value>설치할 패키지를 선택하세요</value>
+    <value>설치할 패키지 선택</value>
   </data>
   <data name="S_REM_EMU" xml:space="preserve">
     <value>에뮬레이터 종료</value>
@@ -220,7 +220,7 @@
     <value>패키지 설치</value>
   </data>
   <data name="S_NEW_DEVICE_TIP" xml:space="preserve">
-    <value>WiFi 장치를 페어링 및/또는 연결합니다. (mDNS를 사용하지 않고 )</value>
+    <value>WiFi 장치 페어링 및/또는 연결 (mDNS 미사용)</value>
   </data>
   <data name="S_RESTART_APP" xml:space="preserve">
     <value>변경 사항을 적용하려면 앱을 다시 시작하세요</value>
@@ -235,31 +235,31 @@
     <value>파일 쓰기 오류</value>
   </data>
   <data name="S_WRITE_FILE_ERROR" xml:space="preserve">
-    <value>파일을 기기로 다시 전송할 수 없습니다.</value>
+    <value>파일을 장치로 다시 전송할 수 없습니다.</value>
   </data>
   <data name="S_DISABLE_MDNS" xml:space="preserve">
-    <value>mDNS를 비활성화하려면 ADB 서버를 재시작해야 합니다.</value>
+    <value>mDNS를 비활성화하려면 ADB 서버를 다시 시작해야 합니다.</value>
   </data>
   <data name="S_DISABLE_MDNS_TITLE" xml:space="preserve">
-    <value>mDNS를 비활성화합니다</value>
+    <value>mDNS 비활성화</value>
   </data>
   <data name="S_WSA_PKG_TIP" xml:space="preserve">
-    <value>WSA를 백그라운드에서 실행합니다</value>
+    <value>백그라운드에서 WSA 실행</value>
   </data>
   <data name="S_PULL_ACTION" xml:space="preserve">
-    <value>Pull (가져오기)</value>
+    <value>가져오기</value>
   </data>
   <data name="S_PULL_ACTION_LINK" xml:space="preserve">
-    <value>Pull (링크 대상)</value>
+    <value>가져오기 (링크 대상)</value>
   </data>
   <data name="S_RESTORE_ACTION" xml:space="preserve">
-    <value>복원하다</value>
+    <value>복원</value>
   </data>
   <data name="S_REDIRECTION" xml:space="preserve">
-    <value>진행 방향 전환</value>
+    <value>진행 상황 리디렉션</value>
   </data>
   <data name="S_LS_ERROR_TITLE" xml:space="preserve">
-    <value>목록 디렉터리 오류</value>
+    <value>디렉터리 목록 오류</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL_TITLE" xml:space="preserve">
     <value>Windows 드라이브 루트로 가져오기</value>
@@ -290,28 +290,28 @@
 ADB를 승인하려면 WSA 고급 설정을 여십시오.</value>
   </data>
   <data name="S_WIN_ROOT_ILLEGAL" xml:space="preserve">
-    <value>선택한 파일 중 {0}개는 Windows 드라이브 루트에 생성할 수 없습니다.</value>
+    <value>선택한 파일 중 {0}개는 Windows 드라이브 루트 아래에 생성할 수 없습니다.</value>
   </data>
   <data name="S_ADB_LEARN_MORE" xml:space="preserve">
-    <value>ADB에 대해 더 자세히 알아보세요</value>
+    <value>ADB에 대해 자세히 알아보기</value>
   </data>
   <data name="S_ADB_DOWNLOAD" xml:space="preserve">
     <value>ADB 다운로드</value>
   </data>
   <data name="S_LOCATE_ADB_TITLE" xml:space="preserve">
-    <value>ADB를 찾으십시오(최소 v{0}):</value>
+    <value>ADB 찾기 (최소 v{0}):</value>
   </data>
   <data name="S_BUTTON_CHANGE" xml:space="preserve">
     <value>변경</value>
   </data>
   <data name="S_SELECT_ADB_PATH" xml:space="preserve">
-    <value>ADB 경로를 선택하세요</value>
+    <value>ADB 경로 선택</value>
   </data>
   <data name="S_BUTTON_CONTINUE_TOOLTIP" xml:space="preserve">
     <value>계속</value>
   </data>
   <data name="S_BUTTON_MORE_INFO_TOOLTIP" xml:space="preserve">
-    <value>더 자세한 정보</value>
+    <value>추가 정보</value>
   </data>
   <data name="S_ENABLED" xml:space="preserve">
     <value>활성화됨</value>
@@ -320,7 +320,7 @@ ADB를 승인하려면 WSA 고급 설정을 여십시오.</value>
     <value>비활성화됨</value>
   </data>
   <data name="S_NEW_VERSION" xml:space="preserve">
-    <value>새로운 {0}, 버전 {1}이 출시되었습니다</value>
+    <value>새로운 {0} 버전 {1}을(를) 사용할 수 있습니다</value>
   </data>
   <data name="S_GO_TO_VERSION_PAGE" xml:space="preserve">
     <value>버전 페이지로 이동</value>
@@ -332,7 +332,7 @@ ADB를 승인하려면 WSA 고급 설정을 여십시오.</value>
     <value>릴리스 노트로 이동</value>
   </data>
   <data name="S_ADB_EXECUTABLE" xml:space="preserve">
-    <value>ADB 실행</value>
+    <value>ADB 실행 파일</value>
   </data>
   <data name="S_HELP_ON_ADB" xml:space="preserve">
     <value>이 앱은 ADB(Android Debug Bridge)의 사용자 인터페이스입니다.
@@ -345,16 +345,16 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
     <value>ADB 도움말</value>
   </data>
   <data name="S_RESTART_ADB_NOW" xml:space="preserve">
-    <value>지금 ADB를 재시작</value>
+    <value>지금 ADB 다시 시작</value>
   </data>
   <data name="S_RESTART_LATER" xml:space="preserve">
     <value>나중에 다시 시작</value>
   </data>
   <data name="S_ITEM_DESTINATION" xml:space="preserve">
-    <value>{0}의 목적지를 선택하세요</value>
+    <value>{0}의 대상 선택</value>
   </data>
   <data name="S_ITEM_DESTINATION_PLURAL" xml:space="preserve">
-    <value>여러 항목에 대한 대상 선택</value>
+    <value>여러 항목의 대상 선택</value>
   </data>
   <data name="S_DELETE_CONFIRMATION" xml:space="preserve">
     <value>다음 항목이 삭제됩니다:
@@ -378,19 +378,19 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
 보이는 콘텐츠가 불완전할 수 있습니다.</value>
   </data>
   <data name="S_PASTE_ANCESTOR" xml:space="preserve">
-    <value>{0}은 대상 폴더의 상위 폴더입니다.</value>
+    <value>{0}은(는) 대상 폴더의 상위 폴더입니다.</value>
   </data>
   <data name="S_KILL_EMULATOR" xml:space="preserve">
-    <value>이 에뮬레이터를 정말로 종료하시겠습니까?</value>
+    <value>이 에뮬레이터를 종료하시겠습니까?</value>
   </data>
   <data name="S_REM_DEVICE" xml:space="preserve">
     <value>이 장치를 제거하시겠습니까?</value>
   </data>
   <data name="S_REM_DEVICE_TITLE" xml:space="preserve">
-    <value>제거 {0}</value>
+    <value>{0} 제거</value>
   </data>
   <data name="S_KILL_EMULATOR_TITLE" xml:space="preserve">
-    <value>종료 {0}</value>
+    <value>{0} 종료</value>
   </data>
   <data name="S_REM_APK" xml:space="preserve">
     <value>다음 항목이 제거됩니다:
@@ -410,15 +410,1023 @@ ADB는 Android SDK 플랫폼 도구에 포함되어 있습니다.
     <value>확인</value>
   </data>
   <data name="S_SKIP" xml:space="preserve">
-    <value>생략</value>
+    <value>건너뛰기</value>
   </data>
   <data name="S_REPLACE" xml:space="preserve">
-    <value>덮어쓰기</value>
+    <value>바꾸기</value>
   </data>
   <data name="S_MERGE_OR_REPLACE" xml:space="preserve">
-    <value>병합 또는 덮어쓰기</value>
+    <value>병합 또는 바꾸기</value>
   </data>
   <data name="S_CONFLICT_ITEMS" xml:space="preserve">
     <value>충돌하는 항목이 1개 있습니다</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_DESTINATION" xml:space="preserve">
+    <value>{0}에 충돌하는 항목이 1개 있습니다</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL" xml:space="preserve">
+    <value>충돌하는 항목이 {0}개 있습니다</value>
+  </data>
+  <data name="S_CONFLICT_ITEMS_PLURAL_DESTINATION" xml:space="preserve">
+    <value>{1}에 충돌하는 항목이 {0}개 있습니다</value>
+  </data>
+  <data name="S_PASTE_CONFLICTS_TITLE" xml:space="preserve">
+    <value>붙여넣기 충돌</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH" xml:space="preserve">
+    <value>푸시할 폴더 선택</value>
+  </data>
+  <data name="S_SELECT_FOLDER_PUSH_DESTINATION" xml:space="preserve">
+    <value>{0}에 푸시할 폴더 선택</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH" xml:space="preserve">
+    <value>푸시할 파일 선택</value>
+  </data>
+  <data name="S_SELECT_FILE_PUSH_DESTINATION" xml:space="preserve">
+    <value>{0}에 푸시할 파일 선택</value>
+  </data>
+  <data name="S_BUTTON_CLEAR" xml:space="preserve">
+    <value>지우기</value>
+  </data>
+  <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
+    <value>mDNS</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
+    <value>장치 폴링</value>
+  </data>
+  <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
+    <value>배터리 상태 폴링</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
+    <value>자동으로 루트 활성화</value>
+  </data>
+  <data name="S_SETTINGS_SAVE_DEVICES" xml:space="preserve">
+    <value>수동 연결 장치 저장</value>
+  </data>
+  <data name="S_SETTINGS_AUTO_OPEN" xml:space="preserve">
+    <value>자동으로 탐색 열기</value>
+  </data>
+  <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
+    <value>간결한 보기</value>
+  </data>
+  <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
+    <value>푸시/풀 시 폴링 중지</value>
+  </data>
+  <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
+    <value>동시 작업</value>
+  </data>
+  <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
+    <value>푸시 시 미디어 재스캔 강제</value>
+  </data>
+  <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
+    <value>드라이브 폴링</value>
+  </data>
+  <data name="S_SETTINGS_APK" xml:space="preserve">
+    <value>APK 지원</value>
+  </data>
+  <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
+    <value>파일 확장자 표시</value>
+  </data>
+  <data name="S_SETTINGS_HIDDEN_ITEMS" xml:space="preserve">
+    <value>숨김 항목 표시</value>
+  </data>
+  <data name="S_SETTINGS_SYSTEM_APPS" xml:space="preserve">
+    <value>시스템 앱 표시</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DOUBLE_CLICK" xml:space="preserve">
+    <value>파일 더블 클릭</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_NONE" xml:space="preserve">
+    <value>없음</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_PULL" xml:space="preserve">
+    <value>기본 폴더로 가져오기</value>
+  </data>
+  <data name="S_SETTINGS_DOUBLE_CLICK_OPEN" xml:space="preserve">
+    <value>편집기에서 열기</value>
+  </data>
+  <data name="S_SETTINGS_OVERRIDE_ADB" xml:space="preserve">
+    <value>ADB 경로 재정의</value>
+  </data>
+  <data name="S_SETTINGS_DEFAULT_FOLDER" xml:space="preserve">
+    <value>기본 폴더</value>
+  </data>
+  <data name="S_SETTINGS_THEME_LIGHT" xml:space="preserve">
+    <value>밝게</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DARK" xml:space="preserve">
+    <value>어둡게</value>
+  </data>
+  <data name="S_SETTINGS_THEME_DEFAULT" xml:space="preserve">
+    <value>Windows 기본값</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_THEME" xml:space="preserve">
+    <value>테마</value>
+  </data>
+  <data name="S_SETTINGS_FLUENT" xml:space="preserve">
+    <value>플루언트 스타일 강제</value>
+  </data>
+  <data name="S_SETTINGS_DISABLE_HW" xml:space="preserve">
+    <value>하드웨어 가속 비활성화</value>
+  </data>
+  <data name="S_SETTINGS_ANIMATION" xml:space="preserve">
+    <value>애니메이션 비활성화</value>
+  </data>
+  <data name="S_SETTINGS_SPLASH" xml:space="preserve">
+    <value>시작 화면</value>
+  </data>
+  <data name="S_SETTINGS_UPDATES" xml:space="preserve">
+    <value>업데이트 확인</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_GRAPHICS" xml:space="preserve">
+    <value>그래픽</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_WORK_DIRS" xml:space="preserve">
+    <value>작업 디렉터리</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_EXPLORER" xml:space="preserve">
+    <value>탐색기</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DRIVES" xml:space="preserve">
+    <value>드라이브 및 기능</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_DEVICE" xml:space="preserve">
+    <value>장치</value>
+  </data>
+  <data name="S_DONATE" xml:space="preserve">
+    <value>기부 또는 후원</value>
+  </data>
+  <data name="S_APP_DATA_FOLDER" xml:space="preserve">
+    <value>앱 데이터 폴더</value>
+  </data>
+  <data name="S_GITHUB_REPO" xml:space="preserve">
+    <value>GitHub 저장소</value>
+  </data>
+  <data name="S_PRIVACY_POLICY" xml:space="preserve">
+    <value>개인정보 처리방침</value>
+  </data>
+  <data name="S_ATTRIBUTIONS" xml:space="preserve">
+    <value>저작자 표시 및 타사 라이선스</value>
+  </data>
+  <data name="S_SEE_TERMS" xml:space="preserve">
+    <value>약관 보기</value>
+  </data>
+  <data name="S_PLACEHOLDER_NOT_SET" xml:space="preserve">
+    <value>[설정되지 않음]</value>
+  </data>
+  <data name="S_SEARCH_SETTINGS" xml:space="preserve">
+    <value>설정 검색</value>
+  </data>
+  <data name="S_EXIT_SEARCH" xml:space="preserve">
+    <value>검색 종료</value>
+  </data>
+  <data name="S_SEARCH_VIEW" xml:space="preserve">
+    <value>검색 보기</value>
+  </data>
+  <data name="S_COLLAPSE_ALL" xml:space="preserve">
+    <value>모두 접기</value>
+  </data>
+  <data name="S_EXPAND_ALL" xml:space="preserve">
+    <value>모두 펼치기</value>
+  </data>
+  <data name="S_SETTINGS_TITLE" xml:space="preserve">
+    <value>설정</value>
+  </data>
+  <data name="S_ACTION_HIDE" xml:space="preserve">
+    <value>숨기기</value>
+  </data>
+  <data name="S_SETTINGS_LANGUAGE" xml:space="preserve">
+    <value>언어</value>
+  </data>
+  <data name="S_BUTTON_OK" xml:space="preserve">
+    <value>확인</value>
+  </data>
+  <data name="S_FILTER_FILE_OPS" xml:space="preserve">
+    <value>파일 작업 필터링</value>
+  </data>
+  <data name="S_ENABLE_AUTO_PLAY" xml:space="preserve">
+    <value>자동 재생 활성화</value>
+  </data>
+  <data name="S_LOG_UPDATES_PAUSE" xml:space="preserve">
+    <value>로그 업데이트 일시 중지됨</value>
+  </data>
+  <data name="S_LOG_UPDATES_ALT" xml:space="preserve">
+    <value>로그 업데이트 일시 중지</value>
+  </data>
+  <data name="S_BUTTON_LOG" xml:space="preserve">
+    <value>명령 로그</value>
+  </data>
+  <data name="S_BUTTON_DRIVES" xml:space="preserve">
+    <value>장치 드라이브</value>
+  </data>
+  <data name="S_BUTTON_BACK" xml:space="preserve">
+    <value>뒤로</value>
+  </data>
+  <data name="S_BUTTON_FORWARD" xml:space="preserve">
+    <value>앞으로</value>
+  </data>
+  <data name="S_BUTTON_UP" xml:space="preserve">
+    <value>위로</value>
+  </data>
+  <data name="S_BUTTON_FILTER" xml:space="preserve">
+    <value>필터</value>
+  </data>
+  <data name="S_BUTTON_DEVICES" xml:space="preserve">
+    <value>장치</value>
+  </data>
+  <data name="S_BUTTON_PUSH" xml:space="preserve">
+    <value>푸시</value>
+  </data>
+  <data name="S_MENU_FOLDERS" xml:space="preserve">
+    <value>폴더</value>
+  </data>
+  <data name="S_MENU_FILES" xml:space="preserve">
+    <value>파일</value>
+  </data>
+  <data name="S_MENU_REFRESH" xml:space="preserve">
+    <value>새로 고침</value>
+  </data>
+  <data name="S_MENU_COPY" xml:space="preserve">
+    <value>복사</value>
+  </data>
+  <data name="S_MENU_MORE" xml:space="preserve">
+    <value>더 보기</value>
+  </data>
+  <data name="S_MENU_EDIT" xml:space="preserve">
+    <value>편집</value>
+  </data>
+  <data name="S_MENU_NEW" xml:space="preserve">
+    <value>새로 만들기</value>
+  </data>
+  <data name="S_MENU_FOLDER" xml:space="preserve">
+    <value>폴더</value>
+  </data>
+  <data name="S_MENU_FILE" xml:space="preserve">
+    <value>파일</value>
+  </data>
+  <data name="S_MENU_SELECT_ALL" xml:space="preserve">
+    <value>모두 선택</value>
+  </data>
+  <data name="S_MENU_CUT" xml:space="preserve">
+    <value>잘라내기</value>
+  </data>
+  <data name="S_MENU_PASTE_LINK" xml:space="preserve">
+    <value>링크 붙여넣기</value>
+  </data>
+  <data name="S_MENU_RENAME" xml:space="preserve">
+    <value>이름 바꾸기</value>
+  </data>
+  <data name="S_MENU_PACKAGE" xml:space="preserve">
+    <value>패키지</value>
+  </data>
+  <data name="S_MENU_UPDATE_MODIFIED" xml:space="preserve">
+    <value>수정 시간 업데이트</value>
+  </data>
+  <data name="S_MENU_CLOSE_EDITOR" xml:space="preserve">
+    <value>편집기 닫기</value>
+  </data>
+  <data name="S_MENU_SAVE_CHANGES" xml:space="preserve">
+    <value>변경 사항 저장</value>
+  </data>
+  <data name="S_MENU_INSTALL" xml:space="preserve">
+    <value>설치</value>
+  </data>
+  <data name="S_MENU_COPY_TEMP" xml:space="preserve">
+    <value>임시로 복사</value>
+  </data>
+  <data name="S_MENU_CLEAR_LOG" xml:space="preserve">
+    <value>명령 로그 지우기</value>
+  </data>
+  <data name="S_MENU_OPEN_LOCATION" xml:space="preserve">
+    <value>항목 위치 열기</value>
+  </data>
+  <data name="S_MENU_SEARCH_WEB" xml:space="preserve">
+    <value>브라우저에서 검색</value>
+  </data>
+  <data name="S_BUTTON_COPY_TO_CLIP" xml:space="preserve">
+    <value>클립보드에 복사</value>
+  </data>
+  <data name="S_ADB_DISK_USAGE" xml:space="preserve">
+    <value>ADB 디스크 사용량</value>
+  </data>
+  <data name="S_DISK_USAGE_READ" xml:space="preserve">
+    <value>읽기: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_WRITE" xml:space="preserve">
+    <value>쓰기: {0}</value>
+  </data>
+  <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
+    <value>기타: {0}</value>
+  </data>
+  <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
+    <value>앱 실행 시마다 업데이트 확인</value>
+  </data>
+  <data name="S_SETTINGS_GROUP_ABOUT" xml:space="preserve">
+    <value>정보</value>
+  </data>
+  <data name="S_BROWSER_ITEMS" xml:space="preserve">
+    <value>항목</value>
+  </data>
+  <data name="S_BROWSER_ITEMS_PLURAL" xml:space="preserve">
+    <value>항목</value>
+  </data>
+  <data name="S_FOLDER_EMPTY" xml:space="preserve">
+    <value>이 폴더는 비어 있습니다.</value>
+  </data>
+  <data name="S_EMPTY_APP_DRIVE" xml:space="preserve">
+    <value>목록을 가져올 수 없습니다.</value>
+  </data>
+  <data name="S_EMPTY_FILTER" xml:space="preserve">
+    <value>현재 필터와 일치하는 항목이 없습니다.</value>
+  </data>
+  <data name="S_NON_ROOT_EMPTY_FOLDER" xml:space="preserve">
+    <value>&lt;Span&gt;이 폴더는 &lt;Italic&gt;비어 있는 것처럼&lt;/Italic&gt; 보입니다&lt;LineBreak /&gt;&lt;Span FontSize="10"&gt;… 겉보기에는&lt;/Span&gt;&lt;/Span&gt;</value>
+  </data>
+  <data name="S_ITEMS_SELECTED" xml:space="preserve">
+    <value>항목 선택됨</value>
+  </data>
+  <data name="S_ITEMS_SELECTED_PLURAL" xml:space="preserve">
+    <value>항목 선택됨</value>
+  </data>
+  <data name="S_COLUMN_OP_TYPE" xml:space="preserve">
+    <value>작업 유형</value>
+  </data>
+  <data name="S_COLUMN_FILE_NAME" xml:space="preserve">
+    <value>파일 이름</value>
+  </data>
+  <data name="S_COLUMN_PROGRESS" xml:space="preserve">
+    <value>진행률</value>
+  </data>
+  <data name="S_COLUMN_SOURCE" xml:space="preserve">
+    <value>소스</value>
+  </data>
+  <data name="S_COLUMN_DESTINATION" xml:space="preserve">
+    <value>대상</value>
+  </data>
+  <data name="S_COLUMN_ADDED" xml:space="preserve">
+    <value>추가됨</value>
+  </data>
+  <data name="S_COLUMN_ICON" xml:space="preserve">
+    <value>아이콘</value>
+  </data>
+  <data name="S_COLUMN_NAME" xml:space="preserve">
+    <value>이름</value>
+  </data>
+  <data name="S_COLUMN_ORIGINAL_LOCATION" xml:space="preserve">
+    <value>원래 위치</value>
+  </data>
+  <data name="S_COLUMN_DATE_MODIFIED" xml:space="preserve">
+    <value>수정한 날짜</value>
+  </data>
+  <data name="S_COLUMN_TYPE" xml:space="preserve">
+    <value>유형</value>
+  </data>
+  <data name="S_COLUMN_SIZE" xml:space="preserve">
+    <value>크기</value>
+  </data>
+  <data name="S_COLUMN_DATE_DELETED" xml:space="preserve">
+    <value>삭제한 날짜</value>
+  </data>
+  <data name="S_COLUMN_USER_ID" xml:space="preserve">
+    <value>사용자 ID</value>
+  </data>
+  <data name="S_COLUMN_VERSION" xml:space="preserve">
+    <value>버전</value>
+  </data>
+  <data name="S_SERVER_UNRESPONSIVE" xml:space="preserve">
+    <value>ADB 서버 응답 없음</value>
+  </data>
+  <data name="S_TOOLTIP_UNRESPONSIVE" xml:space="preserve">
+    <value>마지막 서버 응답 이후 시간</value>
+  </data>
+  <data name="S_SECONDS_SHORT" xml:space="preserve">
+    <value>{0}초</value>
+  </data>
+  <data name="S_KILL_SERVER" xml:space="preserve">
+    <value>서버 종료</value>
+  </data>
+  <data name="S_KILL_PROCESS" xml:space="preserve">
+    <value>프로세스 종료</value>
+  </data>
+  <data name="S_REFRESH_DEVICES" xml:space="preserve">
+    <value>장치 새로 고침</value>
+  </data>
+  <data name="S_RESTART_ADB" xml:space="preserve">
+    <value>ADB 다시 시작</value>
+  </data>
+  <data name="S_SERVER_DOWN" xml:space="preserve">
+    <value>mDNS 서버가 다운되었습니다</value>
+  </data>
+  <data name="S_AWAITING_RESPONSE" xml:space="preserve">
+    <value>응답 대기 중: {0}</value>
+  </data>
+  <data name="S_MILLISECONDS_SHORT" xml:space="preserve">
+    <value>{0}ms</value>
+  </data>
+  <data name="S_MINUTES_SHORT" xml:space="preserve">
+    <value>{0}분</value>
+  </data>
+  <data name="S_HOURS_SHORT" xml:space="preserve">
+    <value>{0}시간</value>
+  </data>
+  <data name="S_MDNS_ON" xml:space="preserve">
+    <value>mDNS 서버가 실행 중입니다</value>
+  </data>
+  <data name="S_LIMITED_SUPPORT" xml:space="preserve">
+    <value>제한된 지원</value>
+  </data>
+  <data name="S_FAILED_OPERATIONS" xml:space="preserve">
+    <value>일부 작업이 실패했습니다</value>
+  </data>
+  <data name="S_ROOT_ENABLED" xml:space="preserve">
+    <value>루트 권한 활성화됨</value>
+  </data>
+  <data name="S_ROOT_POSSIBLE" xml:space="preserve">
+    <value>루트 권한 활성화 가능</value>
+  </data>
+  <data name="S_RECOVERY_MODE" xml:space="preserve">
+    <value>복구 모드</value>
+  </data>
+  <data name="S_BAT_VOLT" xml:space="preserve">
+    <value>전압: {0}v</value>
+  </data>
+  <data name="S_BAT_TEMP" xml:space="preserve">
+    <value>온도: {0}°C</value>
+  </data>
+  <data name="S_BAT_BALANCE" xml:space="preserve">
+    <value>전류 밸런스: {0}A</value>
+  </data>
+  <data name="S_DEVICE_REBOOT_TITLE" xml:space="preserve">
+    <value>재부팅</value>
+  </data>
+  <data name="S_REBOOT_SYSTEM" xml:space="preserve">
+    <value>시스템 이미지</value>
+  </data>
+  <data name="S_REBOOT_BOOTLOADER" xml:space="preserve">
+    <value>부트로더</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD" xml:space="preserve">
+    <value>사이드로드</value>
+  </data>
+  <data name="S_REBOOT_SIDELOAD_AUTO" xml:space="preserve">
+    <value>사이드로드 (자동 재부팅)</value>
+  </data>
+  <data name="S_STATUS_OFFLINE" xml:space="preserve">
+    <value>{0} - 오프라인</value>
+  </data>
+  <data name="S_STATUS_UNAUTH" xml:space="preserve">
+    <value>{0} - 승인되지 않음</value>
+  </data>
+  <data name="S_TYPE_EMULATOR" xml:space="preserve">
+    <value>에뮬레이터</value>
+  </data>
+  <data name="S_TYPE_SERVICE" xml:space="preserve">
+    <value>mDNS 서비스</value>
+  </data>
+  <data name="S_TYPE_USB" xml:space="preserve">
+    <value>USB</value>
+  </data>
+  <data name="S_TYPE_WIFI" xml:space="preserve">
+    <value>WiFi</value>
+  </data>
+  <data name="S_TYPE_WSA" xml:space="preserve">
+    <value>WSA</value>
+  </data>
+  <data name="S_BAT_STATUS_UNKNOWN" xml:space="preserve">
+    <value>배터리 상태 알 수 없음</value>
+  </data>
+  <data name="S_BAT_STATUS_PLUGGED" xml:space="preserve">
+    <value>{0}%, 충전 중</value>
+  </data>
+  <data name="S_BAT_SOURCE_WIRELESS" xml:space="preserve">
+    <value>무선</value>
+  </data>
+  <data name="S_BAT_SOURCE_AC" xml:space="preserve">
+    <value>AC</value>
+  </data>
+  <data name="S_BAT_SOURCE_NONE" xml:space="preserve">
+    <value>없음</value>
+  </data>
+  <data name="S_BAT_STATE_UNKNOWN" xml:space="preserve">
+    <value>알 수 없음</value>
+  </data>
+  <data name="S_BAT_STATE_CHARGING" xml:space="preserve">
+    <value>충전 중</value>
+  </data>
+  <data name="S_BAT_STATE_DISCHARGING" xml:space="preserve">
+    <value>방전 중</value>
+  </data>
+  <data name="S_BAT_STATE_NOT_CHARGING" xml:space="preserve">
+    <value>충전 안 함</value>
+  </data>
+  <data name="S_BAT_STATE_FULL" xml:space="preserve">
+    <value>완충됨</value>
+  </data>
+  <data name="S_BAT_STATUS" xml:space="preserve">
+    <value>상태: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH" xml:space="preserve">
+    <value>상태: {0}</value>
+  </data>
+  <data name="S_BAT_HEALTH_GOOD" xml:space="preserve">
+    <value>양호</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVERHEAT" xml:space="preserve">
+    <value>과열</value>
+  </data>
+  <data name="S_BAT_HEALTH_DEAD" xml:space="preserve">
+    <value>수명 다함</value>
+  </data>
+  <data name="S_BAT_HEALTH_OVER_VOLTAGE" xml:space="preserve">
+    <value>과전압</value>
+  </data>
+  <data name="S_BAT_HEALTH_UNSPECIFIED_FAILURE" xml:space="preserve">
+    <value>알 수 없는 오류</value>
+  </data>
+  <data name="S_BAT_HEALTH_COLD" xml:space="preserve">
+    <value>저온</value>
+  </data>
+  <data name="S_BUTTON_LAUNCH" xml:space="preserve">
+    <value>실행</value>
+  </data>
+  <data name="S_WSA_DIALOG_TITLE" xml:space="preserve">
+    <value>WSA 실행</value>
+  </data>
+  <data name="S_DONT_SHOW_AGAIN" xml:space="preserve">
+    <value>다시 표시하지 않기.</value>
+  </data>
+  <data name="S_BUTTON_ABORT" xml:space="preserve">
+    <value>중단</value>
+  </data>
+  <data name="S_SEND_TO_SHELL_TITLE" xml:space="preserve">
+    <value>셸로 전송 중</value>
+  </data>
+  <data name="S_PASTE_CONFLICT" xml:space="preserve">
+    <value>{0} 충돌</value>
+  </data>
+  <data name="S_PASTE" xml:space="preserve">
+    <value>붙여넣기</value>
+  </data>
+  <data name="S_DROP" xml:space="preserve">
+    <value>놓기</value>
+  </data>
+  <data name="S_ACTION_OPERATION" xml:space="preserve">
+    <value>작업</value>
+  </data>
+  <data name="S_ACTION_OPERATION_PLURAL" xml:space="preserve">
+    <value>작업</value>
+  </data>
+  <data name="S_ACTION_VALIDATE" xml:space="preserve">
+    <value>{0} 검증</value>
+  </data>
+  <data name="S_FILE_TYPE_LINK" xml:space="preserve">
+    <value>링크</value>
+  </data>
+  <data name="S_KNOWN_TYPE_LINK" xml:space="preserve">
+    <value>{0} (링크)</value>
+  </data>
+  <data name="S_FILE_TYPE_APK" xml:space="preserve">
+    <value>Android 애플리케이션 패키지</value>
+  </data>
+  <data name="S_FILE_TYPE_EXE" xml:space="preserve">
+    <value>Windows 실행 파일</value>
+  </data>
+  <data name="S_DRIVE_TRASH" xml:space="preserve">
+    <value>휴지통</value>
+  </data>
+  <data name="S_BUTTON_YES" xml:space="preserve">
+    <value>예</value>
+  </data>
+  <data name="S_DRIVE_ROOT" xml:space="preserve">
+    <value>루트</value>
+  </data>
+  <data name="S_DRIVE_INTERNAL_STORAGE" xml:space="preserve">
+    <value>내부 저장소</value>
+  </data>
+  <data name="S_DRIVE_APPS" xml:space="preserve">
+    <value>설치된 앱</value>
+  </data>
+  <data name="S_DRIVE_SD" xml:space="preserve">
+    <value>µSD 카드</value>
+  </data>
+  <data name="S_DRIVE_OTG" xml:space="preserve">
+    <value>OTG 드라이브</value>
+  </data>
+  <data name="S_DRIVE_EMULATED" xml:space="preserve">
+    <value>에뮬레이트된 드라이브</value>
+  </data>
+  <data name="S_DRIVE_TEMP" xml:space="preserve">
+    <value>임시</value>
+  </data>
+  <data name="S_NAME_ILLEGAL_FS" xml:space="preserve">
+    <value>대상 파일 시스템에서 잘못된 파일 이름: {0}</value>
+  </data>
+  <data name="S_VALIDATE_MISMATCH" xml:space="preserve">
+    <value>내용 불일치</value>
+  </data>
+  <data name="S_VALIDATE_MISSING" xml:space="preserve">
+    <value>대상 위치에 없음</value>
+  </data>
+  <data name="S_LOCATION_PERM_DEL" xml:space="preserve">
+    <value>영구 삭제</value>
+  </data>
+  <data name="S_LOCATION_NA" xml:space="preserve">
+    <value>해당 없음</value>
+  </data>
+  <data name="S_PATH_INVALID" xml:space="preserve">
+    <value>제공된 경로가 존재하지 않습니다.</value>
+  </data>
+  <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
+    <value>사용자 지정 앱 데이터 경로</value>
+  </data>
+  <data name="S_MENU_EMPTY" xml:space="preserve">
+    <value>메뉴가 비어 있습니다</value>
+  </data>
+  <data name="S_ITEM_COPY" xml:space="preserve">
+    <value>{0} - 복사본</value>
+  </data>
+  <data name="S_POPUP_UNIX_NAMING" xml:space="preserve">
+    <value>Unix 명명 규칙 준수 (ADB 통해)</value>
+  </data>
+  <data name="S_POPUP_FUSE_NAMING" xml:space="preserve">
+    <value>FUSE 명명 규칙 준수</value>
+  </data>
+  <data name="S_POPUP_WINDOWS_NAMING" xml:space="preserve">
+    <value>Windows 명명 규칙 준수</value>
+  </data>
+  <data name="S_POPUP_DRIVE_ROOT_NAMING" xml:space="preserve">
+    <value>Windows 드라이브 루트 명명 규칙 준수</value>
+  </data>
+  <data name="S_POPUP_UNIQUE_NAME" xml:space="preserve">
+    <value>현재 위치에서 고유</value>
+  </data>
+  <data name="S_POPUP_WARNING" xml:space="preserve">
+    <value>경고</value>
+  </data>
+  <data name="S_POPUP_SELECTED_WINDOWS_NAMING" xml:space="preserve">
+    <value>선택한 파일이 Windows 명명 규칙을 위반합니다</value>
+  </data>
+  <data name="S_POPUP_SELECTED_DRIVE_ROOT" xml:space="preserve">
+    <value>선택한 파일이 Windows 드라이브 루트 명명 규칙을 위반합니다</value>
+  </data>
+  <data name="S_POPUP_SELECTED_UNIQUE" xml:space="preserve">
+    <value>일부 선택한 파일이 FUSE / Windows에서 충돌하는 이름을 가지고 있습니다</value>
+  </data>
+  <data name="S_POPUP_SELECTED_FUSE" xml:space="preserve">
+    <value>선택한 파일이 FUSE 명명 규칙을 위반합니다</value>
+  </data>
+  <data name="S_POPUP_COPIED_UNIQUE" xml:space="preserve">
+    <value>일부 복사된 파일이 FUSE에서 충돌하는 이름을 가지고 있습니다</value>
+  </data>
+  <data name="S_POPUP_COPIED_FUSE_NAMING" xml:space="preserve">
+    <value>복사된 파일이 FUSE 명명 규칙을 위반합니다</value>
+  </data>
+  <data name="S_POPUP_NON_FILE" xml:space="preserve">
+    <value>선택한 항목이 파일/폴더가 아닙니다</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX_TOOLTIP" xml:space="preserve">
+    <value>앱 설정 초기화를 사용하거나 설정 파일에서 수동으로 실행 취소할 수 있습니다</value>
+  </data>
+  <data name="S_POPUP_HIDE_TOOLTIP" xml:space="preserve">
+    <value>다음 앱 실행 시까지</value>
+  </data>
+  <data name="S_POPUP_CHECKBOX" xml:space="preserve">
+    <value>다시 표시하지 않음</value>
+  </data>
+  <data name="S_DEVICE_WSA_APP" xml:space="preserve">
+    <value>WSA 앱</value>
+  </data>
+  <data name="S_ROOT_STATUS_TITLE" xml:space="preserve">
+    <value>루트 상태: {0}</value>
+  </data>
+  <data name="S_STAT_ROOT_UNCHECKED" xml:space="preserve">
+    <value>확인되지 않음</value>
+  </data>
+  <data name="S_STAT_ROOT_FORBIDDEN" xml:space="preserve">
+    <value>금지됨</value>
+  </data>
+  <data name="S_BUTTON_ENABLE" xml:space="preserve">
+    <value>활성화</value>
+  </data>
+  <data name="S_BUTTON_DISABLE" xml:space="preserve">
+    <value>비활성화</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_CODE" xml:space="preserve">
+    <value>페어링 코드</value>
+  </data>
+  <data name="S_PLACEHOLDER_HOST" xml:space="preserve">
+    <value>IP 주소 / 호스트 이름</value>
+  </data>
+  <data name="S_PLACEHOLDER_PORT" xml:space="preserve">
+    <value>포트</value>
+  </data>
+  <data name="S_PLACEHOLDER_PAIRING_PORT" xml:space="preserve">
+    <value>페어링 포트</value>
+  </data>
+  <data name="S_BUTTON_PAIR_CONNECT" xml:space="preserve">
+    <value>페어링 및 연결</value>
+  </data>
+  <data name="S_DEVICE_SAVED" xml:space="preserve">
+    <value>저장된 장치</value>
+  </data>
+  <data name="S_DEVICE_QR" xml:space="preserve">
+    <value>QR 페어링</value>
+  </data>
+  <data name="S_DEVICE_READY_PAIR" xml:space="preserve">
+    <value>페어링 준비됨</value>
+  </data>
+  <data name="S_CLEAR_ALL" xml:space="preserve">
+    <value>모두 지우기</value>
+  </data>
+  <data name="S_ADD_NEW_DEVICE" xml:space="preserve">
+    <value>새 장치 추가</value>
+  </data>
+  <data name="S_DEVICE_UNAUTH_NONAME" xml:space="preserve">
+    <value>[승인되지 않음]</value>
+  </data>
+  <data name="S_SERVICE_NONAME" xml:space="preserve">
+    <value>[서비스]</value>
+  </data>
+  <data name="S_TOOLTIP_BROWSING" xml:space="preserve">
+    <value>현재 탐색 중</value>
+  </data>
+  <data name="S_BUTTON_BROWSE" xml:space="preserve">
+    <value>탐색</value>
+  </data>
+  <data name="S_BUTTON_CONNECT" xml:space="preserve">
+    <value>연결</value>
+  </data>
+  <data name="S_DRIVE_FREE_SPACE" xml:space="preserve">
+    <value>{1} 중 {0} 사용 가능</value>
+  </data>
+  <data name="S_DRIVE_EMPTY_TRASH" xml:space="preserve">
+    <value>비어 있음</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS" xml:space="preserve">
+    <value>APK 설치 프로그램</value>
+  </data>
+  <data name="S_DRIVE_APK_ITEMS_PLURAL" xml:space="preserve">
+    <value>APK 설치 프로그램</value>
+  </data>
+  <data name="S_DRIVE_PACKAGE_PLURAL" xml:space="preserve">
+    <value>패키지</value>
+  </data>
+  <data name="S_FILEOP_ERROR" xml:space="preserve">
+    <value>오류: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATED" xml:space="preserve">
+    <value>검증됨</value>
+  </data>
+  <data name="S_FILEOP_COMPLETED" xml:space="preserve">
+    <value>완료됨</value>
+  </data>
+  <data name="S_FILEOP_SUBITEM_FAILED" xml:space="preserve">
+    <value>{0}개 실패</value>
+  </data>
+  <data name="S_FILEOP_TOTAL" xml:space="preserve">
+    <value>합계:</value>
+  </data>
+  <data name="S_FILEOP_PREV" xml:space="preserve">
+    <value>이전 작업</value>
+  </data>
+  <data name="S_FILEOP_RUNNING" xml:space="preserve">
+    <value>실행 중</value>
+  </data>
+  <data name="S_FILEOP_WAITING" xml:space="preserve">
+    <value>대기 중</value>
+  </data>
+  <data name="S_FILEOP_FAILED" xml:space="preserve">
+    <value>실패</value>
+  </data>
+  <data name="S_FILEOP_CANCELED" xml:space="preserve">
+    <value>취소됨</value>
+  </data>
+  <data name="S_FILEOP_PREVIOUS" xml:space="preserve">
+    <value>이전</value>
+  </data>
+  <data name="S_ACTION_MOVE" xml:space="preserve">
+    <value>이동</value>
+  </data>
+  <data name="S_ACTION_RECYCLE" xml:space="preserve">
+    <value>휴지통으로 이동</value>
+  </data>
+  <data name="S_ACTION_UPDATE" xml:space="preserve">
+    <value>업데이트</value>
+  </data>
+  <data name="S_DRIVE_USAGE_TOOLTIP" xml:space="preserve">
+    <value>{0}% 사용됨</value>
+  </data>
+  <data name="ScrollBar_ScrollHereCommand" xml:space="preserve">
+    <value>여기로 스크롤</value>
+  </data>
+  <data name="ScrollBar_ScrollToTopCommand" xml:space="preserve">
+    <value>맨 위로</value>
+  </data>
+  <data name="ScrollBar_ScrollToBottomCommand" xml:space="preserve">
+    <value>맨 아래로</value>
+  </data>
+  <data name="ScrollBar_PageUpCommand" xml:space="preserve">
+    <value>페이지 위로</value>
+  </data>
+  <data name="ScrollBar_PageDownCommand" xml:space="preserve">
+    <value>페이지 아래로</value>
+  </data>
+  <data name="ScrollBar_LineUpCommand" xml:space="preserve">
+    <value>위로 스크롤</value>
+  </data>
+  <data name="ScrollBar_LineDownCommand" xml:space="preserve">
+    <value>아래로 스크롤</value>
+  </data>
+  <data name="ScrollBar_ScrollToLeftEndCommand" xml:space="preserve">
+    <value>왼쪽 가장자리</value>
+  </data>
+  <data name="ScrollBar_ScrollToRightEndCommand" xml:space="preserve">
+    <value>오른쪽 가장자리</value>
+  </data>
+  <data name="ScrollBar_PageLeftCommand" xml:space="preserve">
+    <value>페이지 왼쪽으로</value>
+  </data>
+  <data name="ScrollBar_PageRightCommand" xml:space="preserve">
+    <value>페이지 오른쪽으로</value>
+  </data>
+  <data name="ScrollBar_LineLeftCommand" xml:space="preserve">
+    <value>왼쪽으로 스크롤</value>
+  </data>
+  <data name="ScrollBar_LineRightCommand" xml:space="preserve">
+    <value>오른쪽으로 스크롤</value>
+  </data>
+  <data name="S_MENU_UNDO" xml:space="preserve">
+    <value>실행 취소</value>
+  </data>
+  <data name="S_MENU_REDO" xml:space="preserve">
+    <value>다시 실행</value>
+  </data>
+  <data name="S_NOTIFICATIONS_TITLE" xml:space="preserve">
+    <value>알림</value>
+  </data>
+  <data name="S_TOOLTIP_MORE_INFO" xml:space="preserve">
+    <value>클릭하여 추가 정보 표시</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION_TITLE" xml:space="preserve">
+    <value>앱 언어</value>
+  </data>
+  <data name="S_GOTO_WEBLATE" xml:space="preserve">
+    <value>Weblate로 이동</value>
+  </data>
+  <data name="S_FILE_SOCKET" xml:space="preserve">
+    <value>소켓</value>
+  </data>
+  <data name="S_FILE_BLOCK" xml:space="preserve">
+    <value>블록 장치</value>
+  </data>
+  <data name="S_FILE_CHAR" xml:space="preserve">
+    <value>문자 장치</value>
+  </data>
+  <data name="S_FILE_FIFO" xml:space="preserve">
+    <value>FIFO</value>
+  </data>
+  <data name="S_FILE_UNKNOWN" xml:space="preserve">
+    <value>알 수 없음</value>
+  </data>
+  <data name="S_FILE_BROKEN_LINK" xml:space="preserve">
+    <value>끊어진 링크</value>
+  </data>
+  <data name="S_NAV_HISTORY" xml:space="preserve">
+    <value>탐색 기록</value>
+  </data>
+  <data name="S_ADD_CURRENT_LOC" xml:space="preserve">
+    <value>현재 위치 추가</value>
+  </data>
+  <data name="S_REMOVE" xml:space="preserve">
+    <value>제거</value>
+  </data>
+  <data name="S_SAVED_LOCATIONS" xml:space="preserve">
+    <value>저장된 위치</value>
+  </data>
+  <data name="KILO" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="MEGA" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="GIGA" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="TERA" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="PETA" xml:space="preserve">
+    <value>{0} PB</value>
+  </data>
+  <data name="EXA" xml:space="preserve">
+    <value>{0} EB</value>
+  </data>
+  <data name="MILLI" xml:space="preserve">
+    <value>m</value>
+  </data>
+  <data name="MICRO" xml:space="preserve">
+    <value>u</value>
+  </data>
+  <data name="NANO" xml:space="preserve">
+    <value>n</value>
+  </data>
+  <data name="BYTES" xml:space="preserve">
+    <value>{0} B</value>
+  </data>
+  <data name="S_DRAGDROP_COPY" xml:space="preserve">
+    <value>{0}개 항목 복사</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET" xml:space="preserve">
+    <value>{0}개 항목을 {1}에 복사</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET" xml:space="preserve">
+    <value>{0}개 항목을 {1}(으)로 이동</value>
+  </data>
+  <data name="S_DRAGDROP_LINK" xml:space="preserve">
+    <value>{0}에 링크 만들기</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE" xml:space="preserve">
+    <value>{0}개 항목 이동</value>
+  </data>
+  <data name="S_PASTE_ONE_CUT_ITEM" xml:space="preserve">
+    <value>잘라낸 항목 1개 붙여넣기</value>
+  </data>
+  <data name="S_PASTE_ONE_COPIED_ITEM" xml:space="preserve">
+    <value>복사한 항목 1개 붙여넣기</value>
+  </data>
+  <data name="S_PASTE_PLURAL_COPIED_ITEMS" xml:space="preserve">
+    <value>복사한 항목 {0}개 붙여넣기</value>
+  </data>
+  <data name="S_PASTE_PLURAL_CUT_ITEMS" xml:space="preserve">
+    <value>잘라낸 항목 {0}개 붙여넣기</value>
+  </data>
+  <data name="S_FILE_PROGRESS_TRANSFER" xml:space="preserve">
+    <value>{1}에서 {0} ({2})</value>
+  </data>
+  <data name="S_COMPLETED_FILES_NUM" xml:space="preserve">
+    <value>{1} 중 {0}</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_SINGLE" xml:space="preserve">
+    <value>{0} 복사</value>
+  </data>
+  <data name="S_DRAGDROP_COPY_TARGET_SINGLE" xml:space="preserve">
+    <value>{0}을(를) {1}에 복사</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_SINGLE" xml:space="preserve">
+    <value>{0} 이동</value>
+  </data>
+  <data name="S_DRAGDROP_MOVE_TARGET_SINGLE" xml:space="preserve">
+    <value>{0}을(를) {1}(으)로 이동</value>
+  </data>
+  <data name="S_SYNC_FILE_NOT_FOUND" xml:space="preserve">
+    <value>파일을 찾을 수 없음</value>
+  </data>
+  <data name="S_SYNC_NO_CONFIRM" xml:space="preserve">
+    <value>확인 없이 완료됨</value>
+  </data>
+  <data name="S_VALIDATION_ERROR" xml:space="preserve">
+    <value>검증 오류: {0}</value>
+  </data>
+  <data name="S_FILEOP_VALIDATING" xml:space="preserve">
+    <value>검증 중…</value>
+  </data>
+  <data name="S_FILES_PLURAL" xml:space="preserve">
+    <value>{0}개 파일</value>
+  </data>
+  <data name="S_SIDELOAD_ROM_TITLE" xml:space="preserve">
+    <value>사이드로드할 ROM 선택</value>
+  </data>
+  <data name="S_ROM_FILE" xml:space="preserve">
+    <value>ROM 파일</value>
+  </data>
+  <data name="S_TERMINAL" xml:space="preserve">
+    <value>터미널</value>
+  </data>
+  <data name="S_SETTINGS_KEEP_MODIFIED_DATE" xml:space="preserve">
+    <value>파일 수정 날짜 유지</value>
+  </data>
+  <data name="S_DRAG_INSTALL_SINGLE" xml:space="preserve">
+    <value>{0} 설치</value>
+  </data>
+  <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
+    <value>{0}개 APK 설치</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>켜기</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>끄기</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>mDNS 서버 상태 확인 중…</value>
+  </data>
+  <data name="S_AUTO_PLAY_DISABLE" xml:space="preserve">
+    <value>자동 재생 비활성화
+실행 중인 작업 모두 취소</value>
+  </data>
+  <data name="S_LANG_NOTIFICATION" xml:space="preserve">
+    <value>설정에서 원하는 앱 언어를 선택하세요.
+선택한 언어의 번역 진행 상황이 표시됩니다.
+Weblate에서 앱을 해당 언어로 현지화하는 데 도움을 주세요.</value>
   </data>
 </root>
