@@ -59,7 +59,7 @@
             : using a System.ComponentModel.TypeConverter
             : and then encoded with base64 encoding.
     -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+  <xsd:schema xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" id="root">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
       <xsd:complexType>
@@ -119,5 +119,38 @@
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
     <value>Ikona(y) robota Android</value>
+  </data>
+  <data name="S_ANIMATION_TITLE" xml:space="preserve">
+    <value>Animace v aplikaci</value>
+  </data>
+  <data name="S_APK_ICON_LIC" xml:space="preserve">
+    <value>Ikona APK je chráněna licencí Apache License, verze 2.0.</value>
+  </data>
+  <data name="S_MISSING_ADB_OVERRIDE" xml:space="preserve">
+    <value>Nelze načíst verzi ADB z uvedeného umístění.</value>
+  </data>
+  <data name="S_ADB_VERSION_LOW_OVERRIDE" xml:space="preserve">
+    <value>ADB verze z uvedené cesty je zastaralá.</value>
+  </data>
+  <data name="S_FAIL_OVERRIDE_TITLE" xml:space="preserve">
+    <value>Nepodařilo se přepsat ADB</value>
+  </data>
+  <data name="S_OVERRIDE_ADB_BROWSE" xml:space="preserve">
+    <value>Vyber exe soubor ADB</value>
+  </data>
+  <data name="S_RESET_SETTINGS_TITLE" xml:space="preserve">
+    <value>Resetovat nastavení aplikace</value>
+  </data>
+  <data name="S_DELETE_ACTION" xml:space="preserve">
+    <value>Smazat</value>
+  </data>
+  <data name="S_REM_HIST_DEV" xml:space="preserve">
+    <value>Odebrat zařízení</value>
+  </data>
+  <data name="S_REM_DEV" xml:space="preserve">
+    <value>Odpojit zařízení</value>
+  </data>
+  <data name="S_RESTORE_ACTION" xml:space="preserve">
+    <value>Obnova ze zálohy</value>
   </data>
 </root>
