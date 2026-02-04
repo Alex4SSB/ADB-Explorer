@@ -1433,6 +1433,6 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>关</value>
   </data>
   <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
-    <value>正在检查服务器状态...…</value>
+    <value>正在检查服务器状态…</value>
   </data>
 </root>
