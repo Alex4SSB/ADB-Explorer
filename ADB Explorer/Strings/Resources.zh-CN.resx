@@ -720,7 +720,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>写入速度: {0}</value>
   </data>
   <data name="S_DISK_USAGE_OTHER" xml:space="preserve">
-    <value>其它速度: {0}</value>
+    <value>其他速度: {0}</value>
   </data>
   <data name="S_TOOLTIP_UPDATES" xml:space="preserve">
     <value>每次启动时检查更新</value>
@@ -819,7 +819,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>重启 ADB</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>服务器停止运行</value>
+    <value>mDNS 服务器停止运行</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>等待回复: {0}</value>
@@ -840,7 +840,7 @@ ADB 包含在 Android SDK Platform Tools 中。
     <value>点击以启用服务器和轮询</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>服务器正常运行</value>
+    <value>服务器正在运行中</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>有限的支持</value>
@@ -1431,5 +1431,8 @@ ADB 包含在 Android SDK Platform Tools 中。
   </data>
   <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
     <value>关</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>正在检查服务器状态...…</value>
   </data>
 </root>
