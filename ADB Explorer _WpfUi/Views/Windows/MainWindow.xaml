@@ -18,9 +18,9 @@
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
     ExtendsContentIntoTitleBar="True"
     Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    Loaded="FluentWindow_Loaded"
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
-    Loaded="FluentWindow_Loaded"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
     <Grid>
@@ -43,6 +43,7 @@
             Padding="42,0,42,10"
             FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
             FrameMargin="0"
+            PreviewMouseDown="RootNavigation_PreviewMouseDown"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleVisible="False"
             MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneWay}"

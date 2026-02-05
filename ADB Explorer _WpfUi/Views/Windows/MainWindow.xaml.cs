@@ -123,5 +123,13 @@ namespace ADB_Explorer.Views.Windows
         {
             Navigate(typeof(Pages.DevicesPage));
         }
+
+        private void RootNavigation_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
+            {
+                e.Handled = true;
+            }
+        }
     }
 }

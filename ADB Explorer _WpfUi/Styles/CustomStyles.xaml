@@ -10,8 +10,6 @@
     xmlns:services="clr-namespace:ADB_Explorer.Services"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
-    <converters:CompletedStatsConverter x:Key="CompletedStatsConverter" />
-    <converters:DoubleEquals x:Key="DoubleEquals" />
     <converters:TrimmedTooltipConverter x:Key="TrimmedTooltip" />
     <converters:FileOpProgressConverter x:Key="FileOpProgressConverter" />
     <converters:StringFormatConverter x:Key="StringFormatConverter" />
@@ -163,9 +161,12 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="BaseCellStyle" TargetType="DataGridCell">
+    <Style
+        x:Key="BaseCellStyle"
+        BasedOn="{StaticResource DefaultDataGridCellStyle}"
+        TargetType="DataGridCell">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />
+        <!--<Setter Property="Foreground" Value="{DynamicResource SystemControlPageTextBaseHighBrush}" />-->
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>

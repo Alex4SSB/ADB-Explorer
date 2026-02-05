@@ -112,7 +112,6 @@
             MouseDown="ExplorerGrid_MouseDown"
             MouseMove="ExplorerGrid_MouseMove"
             RowStyle="{StaticResource RowStyle}"
-            SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
             SelectionChanged="ExplorerGrid_SelectionChanged"
             SelectionMode="Extended"
             SelectionUnit="FullRow"
