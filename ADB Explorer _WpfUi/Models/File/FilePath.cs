@@ -83,17 +83,22 @@ public class FilePath : AbstractFile, IBaseFile
         protected set => Set(ref fullName, value);
     }
     public string NoExtName => IsRegularFile ? FullName[..^Extension.Length] : FullName;
+    public bool NameIsRtl => TextHelper.ContainsRtl(NoExtName);
+    public bool ExtensionIsRtl => TextHelper.ContainsRtl(Extension);
+    public FlowDirection NameFlowDirection => NameIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
     public string DisplayName
     {
         get
         {
             var noExtName = NoExtName;
+            // Display RTL names correctly in LTR mode.
             // Add RTL mark to end of RTL file names with LTR extensions.
             // This prevents numbers and punctuation from breaking the RTL ordering.
-            if (TextHelper.ContainsRtl(NoExtName)
+            if (!Data.RuntimeSettings.IsRTL
+                && NameIsRtl
                 && NoExtName[^1] != TextHelper.RTL_MARK
-                && !TextHelper.ContainsRtl(Extension))
+                && !ExtensionIsRtl)
             {
                 noExtName = $"{NoExtName}{TextHelper.RTL_MARK}";
             }

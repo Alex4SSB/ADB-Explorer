@@ -54,6 +54,9 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         private set => Set(ref typeName, value);
     }
 
+    public bool TypeIsRtl => TextHelper.ContainsRtl(TypeName);
+    public FlowDirection TypeFlowDirection => TypeIsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+
     private DateTime? modifiedTime;
     public DateTime? ModifiedTime
     {

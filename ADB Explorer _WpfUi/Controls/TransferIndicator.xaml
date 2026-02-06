@@ -1,0 +1,107 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Controls.TransferIndicator"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="transferIndicator"
+    ToolTipService.InitialShowDelay="0"
+    ToolTipService.Placement="Top"
+    ToolTipService.ShowDuration="60000"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+    </UserControl.Resources>
+    <Grid DataContext="{Binding ElementName=transferIndicator}">
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Path
+                Margin="2,10,0,0"
+                Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                StrokeThickness="1.5">
+                <Path.Data>M5,2.5L10,7.5 0,7.5 5,2.5z</Path.Data>
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsUpVisible}" Value="False">
+                                <Setter Property="Fill" Value="Transparent" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+            <Path
+                Margin="12,6,0,0"
+                Stroke="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                StrokeThickness="1.5">
+                <Path.Data>M0,2.5L10,2.5 5,7.5 0,2.5z</Path.Data>
+                <Path.Style>
+                    <Style TargetType="Path">
+                        <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDownVisible}" Value="False">
+                                <Setter Property="Fill" Value="Transparent" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Path.Style>
+            </Path>
+        </Grid>
+        <Grid>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="False">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <ui:FontIcon
+                Margin="-10,4,0,0"
+                FontFamily="Segoe Fluent Icons"
+                Glyph="&#xEDD7;" />
+            <ui:FontIcon
+                Margin="10,-4,0,0"
+                FontFamily="Segoe Fluent Icons"
+                Glyph="&#xEDD8;" />
+            <ui:FontIcon Margin="-10,4,0,0" Glyph="&#xEDDB;">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="FontSize" Value="14" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsUpVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+            <ui:FontIcon Margin="10,-4,0,0" Glyph="&#xEDDC;">
+                <ui:FontIcon.Style>
+                    <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                        <Setter Property="FontSize" Value="14" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsDownVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:FontIcon.Style>
+            </ui:FontIcon>
+        </Grid>
+    </Grid>
+</UserControl>

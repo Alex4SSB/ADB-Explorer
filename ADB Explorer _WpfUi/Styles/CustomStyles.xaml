@@ -26,10 +26,13 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
-    <!--<Style x:Key="FluentProgressBarStyle" TargetType="ui:ProgressBar">
-        <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
+    <Style
+        x:Key="FluentProgressBarStyle"
+        BasedOn="{StaticResource {x:Type ProgressBar}}"
+        TargetType="ProgressBar">
+        <!--<Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />-->
         <Setter Property="ToolTipService.InitialShowDelay" Value="400" />
-        <Style.Triggers>
+        <!--<Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=UseFluentStyles}" Value="True">
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
             </DataTrigger>
@@ -40,7 +43,7 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
             </MultiDataTrigger>
-        </Style.Triggers>
+        </Style.Triggers>-->
     </Style>
     <Style x:Key="FluentProgressRingStyle" TargetType="ui:ProgressRing">
         <Setter Property="Foreground" Value="{StaticResource SystemControlHighlightAccentBrush}" />
@@ -60,7 +63,7 @@
     <Style x:Key="MenuStyle" TargetType="Menu">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="helpers:MenuHelper.IsButtonMenu" Value="False" />
-    </Style>-->
+    </Style>
     <Style
         x:Key="NumericTextBoxStyle"
         BasedOn="{StaticResource DefaultUiTextBoxStyle}"
@@ -217,10 +220,10 @@
         <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_RESTART_APP}}" />
     </Style>
 
-    <!--<Style
+    <Style
         x:Key="UpperProgressBarStyle"
         BasedOn="{StaticResource FluentProgressBarStyle}"
-        TargetType="ui:ProgressBar">
+        TargetType="ProgressBar">
         <Setter Property="Visibility" Value="Collapsed" />
         <Setter Property="IsIndeterminate" Value="False" />
         <Setter Property="ToolTip" Value="{Binding StringProgress}" />
@@ -238,7 +241,7 @@
                 <Setter Property="IsIndeterminate" Value="True" />
             </Trigger>
         </Style.Triggers>
-    </Style>-->
+    </Style>
     <Style x:Key="ItemsCountStackPanelStyle" TargetType="StackPanel">
         <Setter Property="Visibility" Value="Visible" />
         <Style.Triggers>
@@ -465,6 +468,16 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+    <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
+        <!--<Setter Property="PlaceholderText" Value="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_FILTER}}" />-->
+        <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
+        <Setter Property="Icon" Value="&#xE71C;" />
+        <Setter Property="IsActive" Value="{Binding ElementName=MainWin, Path=IsActive, Mode=OneWay}" />
+        <Setter Property="IsEnabled" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}" />
+        <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
+        <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
+        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />
+    </Style>
     <!--<Style
         x:Key="UnresponsiveServerBorderStyle"
         BasedOn="{StaticResource BorderStyle}"
@@ -478,16 +491,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="SearchBoxStyle" TargetType="controls:SearchBox">
-        <Setter Property="ui:ControlHelper.PlaceholderText" Value="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_FILTER}}" />
-        <Setter Property="DefaultControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.DEFAULT_SEARCH_WIDTH}}" />
-        <Setter Property="Icon" Value="&#xE71C;" />
-        <Setter Property="IsActive" Value="{Binding ElementName=MainWin, Path=IsActive, Mode=OneWay}" />
-        <Setter Property="IsEnabled" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=HomeEnabled}" />
-        <Setter Property="MaxControlWidth" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=MaxSearchBoxWidth}" />
-        <Setter Property="MinControlWidth" Value="{Binding Source={x:Static Member=models:AdbExplorerConst.MIN_SEARCH_WIDTH}}" />
-        <Setter Property="Text" Value="{Binding Source={x:Static Member=models:Data.FileActions}, Path=ExplorerFilter, Mode=TwoWay}" />
-    </Style>
+
     <Style
         x:Key="EditorControlsBorderStyle"
         BasedOn="{StaticResource BorderStyle}"
@@ -620,11 +624,7 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="SelectionBorderStyle" TargetType="Border">
-        <Setter Property="BorderBrush" Value="{StaticResource SelectionRectangleBorderBrush}" />
-        <Setter Property="Background" Value="{StaticResource SelectionRectangleFill}" />
-        <Setter Property="BorderThickness" Value="1" />
-    </Style>
+
     <Style
         x:Key="WindowStyle"
         BasedOn="{StaticResource DefaultWindowStyle}"
@@ -636,6 +636,48 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
+
+
+
+
+    <Style
+        x:Key="ExtendedViewFileOpExpanderStyle"
+        BasedOn="{StaticResource FluentExpanderStyle}"
+        TargetType="Expander">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableCompactView}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="IsExpanded" Value="True" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDetailedPeekMode}" Value="True">
+                <Setter Property="IsExpanded" Value="True" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="DragBackgroundStyle" TargetType="Border">
+        <Style.Triggers>
+            <Trigger Property="Background" Value="White">
+                <Setter Property="BorderThickness" Value="1" />
+            </Trigger>
+        </Style.Triggers>
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="Black" />
+    </Style>
+
+    <Style
+        x:Key="NotificationsBorderStyle"
+        BasedOn="{StaticResource BorderStyle}"
+        TargetType="Border">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>-->
     <Style
         x:Key="StatusBarSeparatorStyle"
         BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"
@@ -690,17 +732,6 @@
         </Style.Triggers>
     </Style>
     <Style
-        x:Key="ItemsCountStyle"
-        BasedOn="{StaticResource MarginedTextBlockStyle}"
-        TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
-                <Setter Property="Text" Value="" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style
         x:Key="ItemsCountSuffixStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
@@ -709,6 +740,17 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="1">
                 <Setter Property="Text" Value="{Binding Source={x:Static strings:Resources.S_BROWSER_ITEMS}}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style
+        x:Key="ItemsCountStyle"
+        BasedOn="{StaticResource MarginedTextBlockStyle}"
+        TargetType="TextBlock">
+        <Setter Property="Text" Value="{Binding ElementName=ExplorerGrid, Path=Items.Count}" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
+                <Setter Property="Text" Value="" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -753,44 +795,6 @@
             </Setter.Value>
         </Setter>
     </Style>
-    <Style
-        x:Key="ExtendedViewFileOpExpanderStyle"
-        BasedOn="{StaticResource FluentExpanderStyle}"
-        TargetType="Expander">
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding Source={x:Static models:Data.Settings}, Path=EnableCompactView}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="True" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="IsExpanded" Value="True" />
-            </MultiDataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDetailedPeekMode}" Value="True">
-                <Setter Property="IsExpanded" Value="True" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="DragBackgroundStyle" TargetType="Border">
-        <Style.Triggers>
-            <Trigger Property="Background" Value="White">
-                <Setter Property="BorderThickness" Value="1" />
-            </Trigger>
-        </Style.Triggers>
-        <Setter Property="CornerRadius" Value="3" />
-        <Setter Property="BorderThickness" Value="0" />
-        <Setter Property="BorderBrush" Value="Black" />
-    </Style>
-
-    <Style
-        x:Key="NotificationsBorderStyle"
-        BasedOn="{StaticResource BorderStyle}"
-        TargetType="Border">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Source={x:Static Member=services:UISettings.Notifications}, Path=Count}" Value="0">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>-->
     <Style x:Key="ListViewItemContainerStyle" TargetType="ui:ListViewItem">
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
@@ -854,7 +858,7 @@
     </Style>
     <Style
         x:Key="ExpanderHeaderProgressBarStyle"
-        BasedOn="{StaticResource {x:Type ProgressBar}}"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ProgressBar">
         <Setter Property="BorderThickness" Value="0,1" />
         <Setter Property="Background" Value="Transparent" />
@@ -887,7 +891,7 @@
     </Style>
     <Style
         x:Key="DriveUsageBarStyle"
-        BasedOn="{StaticResource {x:Type ProgressBar}}"
+        BasedOn="{StaticResource FluentProgressBarStyle}"
         TargetType="ProgressBar">
         <Setter Property="ToolTip">
             <Setter.Value>

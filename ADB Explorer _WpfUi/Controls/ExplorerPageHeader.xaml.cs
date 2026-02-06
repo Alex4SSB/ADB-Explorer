@@ -783,99 +783,127 @@ public partial class ExplorerPageHeader : UserControl
         if (Mouse.LeftButton is MouseButtonState.Released)
             CopyPaste.ClearDrag();
 
-        //var point = e.GetPosition(ExplorerCanvas);
-        //bool withinEditingCell = false;
-        //DataGridCell cell = ExplorerGrid.SelectedCells.Count > 0
-        //                    ? CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1])
-        //                    : null;
+        var point = e.GetPosition(ExplorerCanvas);
+        bool withinEditingCell = false;
+        DataGridCell cell = ExplorerGrid.SelectedCells.Count > 0
+                            ? CellConverter.GetDataGridCell(ExplorerGrid.SelectedCells[1])
+                            : null;
 
-        //if (IsInEditMode)
-        //{
-        //    withinEditingCell = VisualTreeHelper.GetDescendantBounds(cell).Contains(e.GetPosition(cell));
-        //}
+        if (IsInEditMode)
+        {
+            withinEditingCell = VisualTreeHelper.GetDescendantBounds(cell).Contains(e.GetPosition(cell));
+        }
 
-        //var abortDrag = e.LeftButton == MouseButtonState.Released
-        //    || !RuntimeSettings.IsExplorerLoaded
-        //    || MouseDownPoint == NullPoint
-        //    || withinEditingCell
-        //    || SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu);
+        var abortDrag = e.LeftButton == MouseButtonState.Released
+            || !RuntimeSettings.IsExplorerLoaded
+            || MouseDownPoint == NullPoint
+            || withinEditingCell
+            || SelectionHelper.GetIsMenuOpen(ExplorerGrid.ContextMenu);
 
-        //if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
-        //{
-        //    if (ExplorerGrid.SelectedItems.Count > 0
-        //        && ExplorerGrid.SelectedItems[0] is FileClass or Package
-        //        && !abortDrag)
-        //    {
-        //        CopyPaste.DragStatus = CopyPasteService.DragState.Active;
-        //        WasDragging = true;
+        if (CopyPaste.DragStatus is CopyPasteService.DragState.Pending && (MouseDownPoint - point).LengthSquared >= 25)
+        {
+            if (ExplorerGrid.SelectedItems.Count > 0
+                && ExplorerGrid.SelectedItems[0] is FileClass or Package
+                && !abortDrag)
+            {
+                CopyPaste.DragStatus = CopyPasteService.DragState.Active;
+                WasDragging = true;
 
-        //        IEnumerable<FileClass> selectedItems;
-        //        VirtualFileDataObject vfdo;
-        //        if (FileActions.IsAppDrive)
-        //        {
-        //            vfdo = VirtualFileDataObject.PrepareTransfer(ExplorerGrid.SelectedItems.Cast<Package>());
-        //            selectedItems = VirtualFileDataObject.SelfFiles;
-        //        }
-        //        else
-        //        {
-        //            selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
-        //            vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
-        //        }
+                IEnumerable<FileClass> selectedItems;
+                VirtualFileDataObject vfdo;
+                if (FileActions.IsAppDrive)
+                {
+                    vfdo = VirtualFileDataObject.PrepareTransfer(ExplorerGrid.SelectedItems.Cast<Package>());
+                    selectedItems = VirtualFileDataObject.SelfFiles;
+                }
+                else
+                {
+                    selectedItems = ExplorerGrid.SelectedItems.Cast<FileClass>();
+                    vfdo = VirtualFileDataObject.PrepareTransfer(selectedItems, DragDropEffects.Copy | DragDropEffects.Move | DragDropEffects.Link);
+                }
 
-        //        if (vfdo is not null)
-        //        {
-        //            CopyPaste.UpdateSelfVFDO(true);
-        //            RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
+                if (vfdo is not null)
+                {
+                    CopyPaste.UpdateSelfVFDO(true);
+                    RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(selectedItems.First());
 
-        //            vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, vfdo.PreferredDropEffect.Value);
-        //        }
-        //    }
-        //    else
-        //        CopyPaste.DragStatus = CopyPasteService.DragState.None;
-        //}
+                    vfdo.SendObjectToShell(VirtualFileDataObject.DataObjectMethod.DragDrop, cell, vfdo.PreferredDropEffect.Value);
+                }
+            }
+            else
+                CopyPaste.DragStatus = CopyPasteService.DragState.None;
+        }
 
-        //if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None || WasDragging)
-        //{
-        //    SelectionRect.Visibility = Visibility.Collapsed;
-        //    return;
-        //}
-        //var scroller = StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid);
-        //var horizontal = scroller.ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
-        //var vertical = scroller.ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
+        if (abortDrag || CopyPaste.DragStatus is not CopyPasteService.DragState.None || WasDragging)
+        {
+            SelectionRect.Visibility = Visibility.Collapsed;
+            return;
+        }
+        var scroller = StyleHelper.FindDescendant<ScrollViewer>(ExplorerGrid);
+        var horizontal = scroller.ComputedHorizontalScrollBarVisibility is Visibility.Visible ? 1 : 0;
+        var vertical = scroller.ComputedVerticalScrollBarVisibility is Visibility.Visible ? 1 : 0;
 
-        //if (!SelectionRect.IsVisible
-        //    && ((point.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
-        //    || (point.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)))
-        //{
-        //    MouseDownPoint = point;
-        //}
+        if (!SelectionRect.IsVisible
+            && ((point.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal)
+            || (point.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)))
+        {
+            MouseDownPoint = point;
+        }
 
-        //if (MouseDownPoint.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal
-        //    || MouseDownPoint.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)
-        //    return;
+        if (MouseDownPoint.Y > ExplorerCanvas.ActualHeight - SystemParameters.HorizontalScrollBarHeight * horizontal
+            || MouseDownPoint.X > ExplorerCanvas.ActualWidth - SystemParameters.VerticalScrollBarWidth * vertical)
+            return;
 
-        //SelectionRect.Visibility = Visibility.Visible;
-        //if (point.Y > MouseDownPoint.Y)
-        //{
-        //    Canvas.SetTop(SelectionRect, MouseDownPoint.Y);
-        //}
-        //else
-        //{
-        //    Canvas.SetTop(SelectionRect, point.Y);
-        //}
-        //if (point.X > MouseDownPoint.X)
-        //{
-        //    Canvas.SetLeft(SelectionRect, MouseDownPoint.X);
-        //}
-        //else
-        //{
-        //    Canvas.SetLeft(SelectionRect, point.X);
-        //}
+        SelectionRect.Visibility = Visibility.Visible;
+        if (point.Y > MouseDownPoint.Y)
+        {
+            Canvas.SetTop(SelectionRect, MouseDownPoint.Y);
+        }
+        else
+        {
+            Canvas.SetTop(SelectionRect, point.Y);
+        }
+        if (point.X > MouseDownPoint.X)
+        {
+            Canvas.SetLeft(SelectionRect, MouseDownPoint.X);
+        }
+        else
+        {
+            Canvas.SetLeft(SelectionRect, point.X);
+        }
 
-        //SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
-        //SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
+        SelectionRect.Height = Math.Abs(MouseDownPoint.Y - point.Y);
+        SelectionRect.Width = Math.Abs(MouseDownPoint.X - point.X);
 
-        //SelectRows(point);
+        SelectRows(point);
+    }
+
+    private void SelectRows(Point mousePosition)
+    {
+        Rect selection = new(Canvas.GetLeft(SelectionRect),
+                             Canvas.GetTop(SelectionRect),
+                             SelectionRect.Width,
+                             SelectionRect.Height);
+
+        for (int i = 0; i < ExplorerGrid.ItemContainerGenerator.Items.Count; i++)
+        {
+            if (ExplorerGrid.ItemContainerGenerator.ContainerFromIndex(i) is not DataGridRow row)
+                continue;
+
+            Rect rowRect = new(row.TranslatePoint(new(), ExplorerGrid), row.DesiredSize);
+            row.IsSelected = rowRect.IntersectsWith(selection);
+
+            rowRect.Inflate(double.PositiveInfinity, 0);
+            if (rowRect.Contains(mousePosition))
+                SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, row.GetIndex());
+        }
+
+        if (ExplorerGrid.SelectedItems.Count == 1
+            && (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift))
+        {
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+        }
     }
 
     private void ExplorerGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -953,5 +981,32 @@ public partial class ExplorerPageHeader : UserControl
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
+    }
+
+    private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        SelectionRect.Visibility = Visibility.Collapsed;
+
+        if (SelectionHelper.GetFirstSelectedIndex(ExplorerGrid) < 0
+            || Keyboard.Modifiers is not ModifierKeys.Control and not ModifierKeys.Shift)
+        {
+            SelectionHelper.SetFirstSelectedIndex(ExplorerGrid, SelectionHelper.GetNextSelectedIndex(ExplorerGrid));
+        }
+    }
+
+    private void GridBackgroundBlock_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        RuntimeSettings.IsPathBoxFocused = false;
+        DriveHelper.ClearSelectedDrives();
+    }
+
+    private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        RuntimeSettings.IsPathBoxFocused = false;
+    }
+
+    private void Grid_MouseEnter(object sender, MouseEventArgs e)
+    {
+        MouseDownPoint = NullPoint;
     }
 }
