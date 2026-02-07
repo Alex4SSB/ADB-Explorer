@@ -50,6 +50,7 @@ public static class AppActions
         { FileActionType.SearchApkOnWeb, "\uF6FA" },
         { FileActionType.Home, "\uE80F" },
         { FileActionType.Refresh, "\uE72C" },
+        { FileActionType.CopyItemPath, "\uE62F" },
     };
 
     public static List<ToggleMenu> ToggleActions { get; } =

@@ -69,31 +69,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Grid Height="48" Margin="0,0,7,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
-            <Border
-                Grid.Column="1"
-                Background="Transparent"
-                MouseDown="Window_MouseDown" />
-            <StackPanel
-                Grid.Column="2"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
-                <!--<local:AdbMenu Style="{StaticResource FileOpMenuStyle}" />
-                <local:AdbMenu Style="{StaticResource SettingsMenuStyle}" />-->
-            </StackPanel>
-        </Grid>
-        <Grid
-            Grid.Row="1"
-            Height="48"
-            MouseEnter="Grid_MouseEnter">
+        <Grid Height="48" MouseEnter="Grid_MouseEnter">
             <StackPanel>
-                <Separator />
                 <Grid Margin="6,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -120,6 +97,29 @@
                 Maximum="1"
                 SmallChange="0.0001"
                 Style="{StaticResource UpperProgressBarStyle}" />
+        </Grid>
+        <Grid
+            Grid.Row="1"
+            Height="48"
+            Margin="0,0,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <local:AdbMenu x:Name="MainToolBar" Style="{StaticResource MainToolBarStyle}" />
+            <Border
+                Grid.Column="1"
+                Background="Transparent"
+                MouseDown="Window_MouseDown" />
+            <StackPanel
+                Grid.Column="2"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <!--<local:AdbMenu Style="{StaticResource FileOpMenuStyle}" />
+                <local:AdbMenu Style="{StaticResource SettingsMenuStyle}" />-->
+            </StackPanel>
+            <Separator Grid.ColumnSpan="3" VerticalAlignment="Bottom" />
         </Grid>
         <Border Grid.Row="2" MouseDown="GridBackgroundBlock_MouseDown">
             <Grid>
@@ -402,7 +402,10 @@
                     <Separator Style="{StaticResource DiskUsageSeparatorStyle}" />
                 </StackPanel>
                 <views:DetailedBatteryControl x:Name="CurrentDeviceBatteryIcon" DataContext="{Binding Battery}" />
-                <StackPanel Orientation="Horizontal" Style="{StaticResource AndroidTextBlockStyle}">
+                <StackPanel
+                    Margin="0,1,0,0"
+                    Orientation="Horizontal"
+                    Style="{StaticResource AndroidTextBlockStyle}">
                     <Separator Style="{StaticResource CurrentDeviceBatterySeparatorStyle}" />
                     <ui:FontIcon Style="{DynamicResource UnsupportedIconStyle}" />
                     <TextBlock Text="Android " />

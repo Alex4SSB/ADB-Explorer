@@ -333,7 +333,7 @@
     <Style
         x:Key="DeviceActionsMenuItemStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
 

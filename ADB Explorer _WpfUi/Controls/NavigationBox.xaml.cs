@@ -258,7 +258,7 @@ public partial class NavigationBox : UserControl
             return;
 
         locations = SeparatePath(path);
-        breadcrumbs = locations.Select(item => item.NameSubMenu).ToList();
+        breadcrumbs = [.. locations.Select(item => item.NameSubMenu)];
         breadcrumbs[^1].IsLast = true;
 
         var template = (DataTemplate)Resources["BreadcrumbTemplate"];

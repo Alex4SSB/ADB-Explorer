@@ -103,7 +103,9 @@
     </DataTemplate>
     <DataTemplate x:Key="MenuSeparatorTemplate">
         <Border
+            Width="1"
             Height="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=MenuItem}, Path=ActualHeight}"
+            Margin="-2,0"
             BorderBrush="{StaticResource MenuSeparatorColor}"
             BorderThickness="1,0,0,0" />
     </DataTemplate>
@@ -136,19 +138,22 @@
     <Style
         x:Key="ActionMenuItemStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="Command" Value="{Binding Action.Command.Command}" />
         <Setter Property="ItemsSource" Value="{Binding Children}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsVisible}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL}" Value="True">
+                <Setter Property="FlowDirection" Value="RightToLeft" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
         x:Key="IconMenuStyle"
         BasedOn="{StaticResource ActionMenuItemStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="Padding" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource MenuItemConverter}, ConverterParameter=Padding}" />
         <Setter Property="Margin" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Converter={StaticResource MenuItemConverter}, ConverterParameter=Margin}" />
         <Setter Property="MinWidth" Value="40" />
@@ -166,17 +171,17 @@
     <Style
         x:Key="DynamicAltTextStyle"
         BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="ToolTipService.IsEnabled" Value="{Binding IsTooltipVisible}" />
     </Style>
     <Style
         x:Key="AnimatedNotifyStyle"
         BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="ui:MenuItem" />
+        TargetType="controls:AdbMenuItem" />
     <Style
         x:Key="AltObjectMenuStyle"
         BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="helpers:StyleHelper.ContentAnimation" Value="RotateCW" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsOperationsViewOpen}" Value="False">
@@ -207,14 +212,14 @@
     <Style
         x:Key="MenuSeparatorStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="IsEnabled" Value="False" />
         <Setter Property="Padding" Value="4,0" />
     </Style>
     <Style
         x:Key="SubMenuSeparatorStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -236,7 +241,7 @@
     <Style
         x:Key="SubMenuItemStyle"
         BasedOn="{StaticResource ActionMenuItemStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="Header" Value="{Binding Action.Description}" />
         <Setter Property="InputGestureText" Value="{Binding Action.GestureString}" />
         <Setter Property="Icon" Value="{StaticResource MenuIcon}" />
@@ -244,7 +249,7 @@
     <Style
         x:Key="DummySubMenuStyle"
         BasedOn="{StaticResource SubMenuItemStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsEnabled}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed" />
@@ -254,13 +259,13 @@
     <Style
         x:Key="CompoundIconSubMenuStyle"
         BasedOn="{StaticResource SubMenuItemStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="Icon" Value="{Binding CompoundIcon}" />
     </Style>
     <Style
         x:Key="DualActionButtonStyle"
         BasedOn="{StaticResource IconMenuStyle}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="IsCheckable" Value="{Binding IsCheckable}" />
         <Setter Property="IsChecked" Value="{Binding IsChecked}" />
         <!--<Setter Property="helpers:MenuHelper.CheckBackground" Value="{Binding CheckBackground}" />-->
@@ -268,7 +273,7 @@
     <Style
         x:Key="GeneralSubMenuStyle"
         BasedOn="{StaticResource WpfUiMenuItem}"
-        TargetType="ui:MenuItem">
+        TargetType="controls:AdbMenuItem">
         <Setter Property="FlowDirection" Value="LeftToRight" />
         <Setter Property="Header" Value="{Binding Content}" />
         <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />

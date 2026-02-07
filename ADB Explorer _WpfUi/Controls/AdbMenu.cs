@@ -3,8 +3,17 @@
 public class AdbMenu : Menu
 {
     protected override DependencyObject GetContainerForItemOverride()
-        => new Wpf.Ui.Controls.MenuItem();
+        => new AdbMenuItem();
 
     protected override bool IsItemItsOwnContainerOverride(object item)
-        => item is Wpf.Ui.Controls.MenuItem;
+        => item is AdbMenuItem;
+}
+
+public class AdbMenuItem : Wpf.Ui.Controls.MenuItem
+{
+    protected override DependencyObject GetContainerForItemOverride()
+        => new AdbMenuItem();
+
+    protected override bool IsItemItsOwnContainerOverride(object item)
+        => item is AdbMenuItem;
 }

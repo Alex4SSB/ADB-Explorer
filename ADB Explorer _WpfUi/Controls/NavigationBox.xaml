@@ -16,20 +16,20 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <DataTemplate x:Key="BreadcrumbFlyoutItemTemplate">
-            <ui:MenuItem
+            <local:AdbMenuItem
                 Margin="2"
                 Command="{Binding Action.Command.Command}"
                 Icon="{StaticResource MenuIcon}"
                 Style="{StaticResource WpfUiMenuItem}">
-                <ui:MenuItem.Header>
+                <local:AdbMenuItem.Header>
                     <TextBlock Text="{Binding Action.Description}" TextOptions.TextFormattingMode="Display" />
-                </ui:MenuItem.Header>
-            </ui:MenuItem>
+                </local:AdbMenuItem.Header>
+            </local:AdbMenuItem>
         </DataTemplate>
         <DataTemplate x:Key="SavedItemTemplate">
-            <ui:MenuItem>
-                <ui:MenuItem.Style>
-                    <Style BasedOn="{StaticResource WpfUiMenuItem}" TargetType="ui:MenuItem">
+            <local:AdbMenuItem>
+                <local:AdbMenuItem.Style>
+                    <Style BasedOn="{StaticResource WpfUiMenuItem}" TargetType="local:AdbMenuItem">
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding AddAction.IsEnabled}" Value="True">
                                 <Setter Property="Header">
@@ -79,8 +79,8 @@
                             </Setter.Value>
                         </Setter>
                     </Style>
-                </ui:MenuItem.Style>
-            </ui:MenuItem>
+                </local:AdbMenuItem.Style>
+            </local:AdbMenuItem>
         </DataTemplate>
         <ItemsControl
             x:Key="OverflowItemsControl"
@@ -133,7 +133,7 @@
                             </Setter>-->
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
-                                    <ContextMenu Style="{StaticResource PathBoxContextMenuStyle}" />
+                                    <local:AdbContextMenu Style="{StaticResource PathBoxContextMenuStyle}" />
                                 </Setter.Value>
                             </Setter>
                             <Style.Triggers>
@@ -151,21 +151,27 @@
                 <ui:FontIcon
                     Margin="2,0"
                     VerticalAlignment="Center"
-                    FontSize="8"
-                    Glyph="&#xE970;">
+                    FontSize="8">
                     <ui:FontIcon.Style>
-                        <Style TargetType="ui:FontIcon">
+                        <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                            <Setter Property="Glyph" Value="&#xE970;" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLast}" Value="True">
                                     <Setter Property="Visibility" Value="Collapsed" />
                                 </DataTrigger>
+                                <Trigger Property="FlowDirection" Value="RightToLeft">
+                                    <Setter Property="Glyph" Value="&#xE973;" />
+                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </ui:FontIcon.Style>
                 </ui:FontIcon>
             </StackPanel>
         </DataTemplate>
-        <ToolTip x:Key="FuseTooltip" Content="{Binding Source={x:Static Member=strings:Resources.S_FUSE_DRIVE_TOOLTIP}}" />
+        <ToolTip
+            x:Key="FuseTooltip"
+            MaxWidth="300"
+            Content="{Binding Source={x:Static Member=strings:Resources.S_FUSE_DRIVE_TOOLTIP}}" />
     </UserControl.Resources>
     <Grid
         Height="{Binding Height}"
@@ -177,6 +183,7 @@
             Height="{Binding Height}"
             VerticalAlignment="Center"
             d:Background="LightGray"
+            FlowDirection="LeftToRight"
             GotFocus="PathBox_GotFocus"
             KeyDown="PathBox_KeyDown"
             LostFocus="PathBox_LostFocus">
@@ -198,11 +205,11 @@
         </ui:TextBox>
         <ProgressBar
             x:Name="LoadingProgressBar"
+            Height="35"
             Margin="0,0,0,0"
             VerticalAlignment="Stretch"
-            Height="35"
-            BorderBrush="Transparent"
             Background="Transparent"
+            BorderBrush="Transparent"
             Foreground="{StaticResource NavigationBarProgressBrush}"
             IsHitTestVisible="False">
             <ProgressBar.Style>

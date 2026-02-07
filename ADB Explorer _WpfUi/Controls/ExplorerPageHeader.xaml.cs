@@ -119,11 +119,73 @@ public partial class ExplorerPageHeader : UserControl
                     FilterExplorerItems();
                     break;
 
+                case nameof(AppRuntimeSettings.LocationToNavigate):
+                    if (RuntimeSettings.LocationToNavigate is null)
+                        return;
+
+                    switch (RuntimeSettings.LocationToNavigate.Location)
+                    {
+                        case Navigation.SpecialLocation.Back:
+                            bfNavigation = true;
+                            NavigateToLocation(NavHistory.GoBack());
+                            break;
+                        case Navigation.SpecialLocation.Forward:
+                            bfNavigation = true;
+                            NavigateToLocation(NavHistory.GoForward());
+                            break;
+                        case Navigation.SpecialLocation.Up:
+                            bfNavigation = false;
+                            NavigateToPath(ParentPath);
+                            break;
+                        default:
+                            bfNavigation = false;
+                            if (FileActions.IsDriveViewVisible && RuntimeSettings.LocationToNavigate.Location is Navigation.SpecialLocation.DriveView)
+                                FileActionLogic.RefreshDrives(true);
+                            else
+                                NavigateToLocation(RuntimeSettings.LocationToNavigate);
+                            break;
+                    }
+                    break;
+
+                case nameof(AppRuntimeSettings.FilterActions):
+                    Task.Run(() =>
+                    {
+                        if (FileActions.IsAppDrive || FileActions.IsRecycleBin || DevicesObject.Current is null)
+                            FilterFileActions();
+                    });
+                    Task.Run(() =>
+                    {
+                        FilterExplorerContextMenu();
+                        ExplorerContextMenu.UpdateSeparators();
+                    });
+                    break;
+
                 default:
                     break;
             }
         });
     }
+
+    private void FilterFileActions() => Dispatcher.Invoke(() => MainToolBar.Items?.Refresh());
+
+    private void FilterExplorerContextMenu() => Dispatcher.Invoke(() =>
+    {
+        var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ContextMenu.ItemsSource);
+        if (collectionView is null)
+            return;
+
+        Predicate<object> predicate = m =>
+        {
+            var menu = m as SubMenu;
+
+            if (menu.Children is null)
+                return menu.Action.Command.IsEnabled;
+            else
+                return menu.Action.Command.IsEnabled && menu.Children.Any(child => child.Action.Command.IsEnabled);
+        };
+
+        collectionView.Filter = predicate;
+    });
 
     private void FilterExplorerItems(bool refreshOnly = false)
     {
@@ -181,8 +243,8 @@ public partial class ExplorerPageHeader : UserControl
         switch (e.PropertyName)
         {
             case nameof(DirectoryLister.IsProgressVisible):
-                //UnfinishedBlock.Visible(DirList.IsProgressVisible);
-                //NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
+                UnfinishedBlock.Visible(DirList.IsProgressVisible);
+                NavigationBox.IsLoadingProgressVisible = DirList.IsProgressVisible;
                 break;
 
             case nameof(DirectoryLister.InProgress):
@@ -257,7 +319,7 @@ public partial class ExplorerPageHeader : UserControl
         ExplorerGrid.Focus();
         CurrentPath = realPath;
 
-        //NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
+        NavigationBox.Path = realPath == RECYCLE_PATH ? AdbLocation.StringFromLocation(Navigation.SpecialLocation.RecycleBin) : realPath;
         ParentPath = FileHelper.GetParentPath(CurrentPath);
         CurrentDrive = DriveHelper.GetCurrentDrive(CurrentPath);
 
@@ -379,8 +441,8 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.IsDriveViewVisible = true;
         UpdateFileOp();
 
-        //NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
-        //NavigationBox.Path = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
+        NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
+        NavigationBox.Path = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
         DriveList.ItemsSource = DevicesObject.Current.Drives;
@@ -389,9 +451,9 @@ public partial class ExplorerPageHeader : UserControl
         if (DriveList.SelectedIndex > -1)
             SelectionHelper.GetListViewItemContainer(DriveList).Focus();
 
-        //HomeSavedLocationsList.ItemsSource = NavigationBox.SavedItems;
-        //if (NavigationBox.SavedItems.Count == 0)
-        //    Settings.HomeLocationsExpanded = false;
+        HomeSavedLocationsList.ItemsSource = NavigationBox.SavedItems;
+        if (NavigationBox.SavedItems.Count == 0)
+            Settings.HomeLocationsExpanded = false;
     }
 
     private void UpdateFileOp(bool onlyProgress = true)

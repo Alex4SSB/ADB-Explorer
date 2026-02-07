@@ -27,16 +27,36 @@
     <controls:SimpleStackPanel
         VerticalAlignment="Center"
         Orientation="Horizontal"
-        Spacing="6">
-        <StackPanel Orientation="Horizontal">
+        Spacing="6"
+        ToolTipService.InitialShowDelay="0"
+        ToolTipService.Placement="Top"
+        ToolTipService.ShowDuration="60000">
+        <controls:SimpleStackPanel.ToolTip>
+            <controls:SimpleStackPanel Spacing="4">
+                <controls:SimpleStackPanel.Style>
+                    <Style TargetType="controls:SimpleStackPanel">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                                <Setter Property="FlowDirection" Value="RightToLeft" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </controls:SimpleStackPanel.Style>
+                <TextBlock Text="{Binding BatteryStateString}" />
+                <TextBlock Text="{Binding BatteryHealthString}" />
+                <TextBlock Text="{Binding VoltageString}" />
+                <TextBlock Text="{Binding CurrentConsumption}" />
+                <TextBlock Text="{Binding TemperatureString}" />
+            </controls:SimpleStackPanel>
+        </controls:SimpleStackPanel.ToolTip>
+        <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
             <TextBlock Text="{Binding Level}" />
             <TextBlock Text="%" />
         </StackPanel>
         <ui:FontIcon
-            Glyph="{Binding BatteryIcon}"
-            ToolTipService.InitialShowDelay="0"
-            ToolTipService.Placement="Top"
-            ToolTipService.ShowDuration="60000">
+            Margin="0,0,0,-2"
+            VerticalAlignment="Center"
+            Glyph="{Binding BatteryIcon}">
             <ui:FontIcon.Style>
                 <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
                     <Style.Resources>
@@ -54,26 +74,6 @@
                             </Style.Triggers>
                         </Style>
                     </Style.Resources>
-                    <Setter Property="ToolTip">
-                        <Setter.Value>
-                            <controls:SimpleStackPanel Spacing="4">
-                                <controls:SimpleStackPanel.Style>
-                                    <Style TargetType="controls:SimpleStackPanel">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                                                <Setter Property="FlowDirection" Value="RightToLeft" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </controls:SimpleStackPanel.Style>
-                                <TextBlock Text="{Binding BatteryStateString}" />
-                                <TextBlock Text="{Binding BatteryHealthString}" />
-                                <TextBlock Text="{Binding VoltageString}" />
-                                <TextBlock Text="{Binding CurrentConsumption}" />
-                                <TextBlock Text="{Binding TemperatureString}" />
-                            </controls:SimpleStackPanel>
-                        </Setter.Value>
-                    </Setter>
                     <Style.Triggers>
                         <Trigger Property="DataContext" Value="{x:Null}">
                             <Setter Property="Visibility" Value="Collapsed" />

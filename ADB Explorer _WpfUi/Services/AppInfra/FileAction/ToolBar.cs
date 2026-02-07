@@ -15,7 +15,7 @@ internal static class NavigationToolBar
             altAction: AppActions.List.Find(a => a.Name is FileAction.FileActionType.KeyboardHome)),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Back),
-            "\uE72B",
+            Data.RuntimeSettings.IsRTL ? "\uE72A" : "\uE72B",
             StyleHelper.ContentAnimation.LeftMarquee),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.NavHistory),
@@ -25,7 +25,7 @@ internal static class NavigationToolBar
             NavHistory.MenuHistory),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Forward),
-            "\uE72A",
+            Data.RuntimeSettings.IsRTL ? "\uE72B" : "\uE72A",
             StyleHelper.ContentAnimation.RightMarquee),
         new IconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Up),
@@ -42,17 +42,17 @@ internal static class NavigationToolBar
 internal static class MainToolBar
 {
     public static ObservableList<IMenuItem> List { get; } = [
-        new AnimatedNotifyMenu(
-            AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenDevices),
-            Data.DevicesObject.ObservableCount,
-            "\uE8CC"),
-        new MenuSeparator(),
+        //new AnimatedNotifyMenu(
+        //    AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenDevices),
+        //    Data.DevicesObject.ObservableCount,
+        //    "\uE8CC"),
+        //new MenuSeparator(),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            new()),
+            new PullIcon()),
         new CompoundIconMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Push),
-            new(),
+            new PushIcon(),
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFiles), AppActions.Icons[FileAction.FileActionType.NewFile]),
@@ -126,7 +126,7 @@ internal static class MainToolBar
             iconSize: 20,
             children:
             [
-                new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new()),
+                new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icons[FileAction.FileActionType.CopyItemPath]),
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.SearchApkOnWeb),
                     AppActions.Icons[FileAction.FileActionType.SearchApkOnWeb],
                     isVisible: Data.FileActions.IsApkActionsVisible),
@@ -179,10 +179,10 @@ internal static class ExplorerContextMenu
     public static ObservableList<SubMenu> List { get; } = [
         new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.Pull),
-            new()),
+            new PullIcon()),
         new CompoundIconSubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.ContextPush),
-            new(),
+            new PushIcon(),
             children:
             [
                 new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.PushFolders), AppActions.Icons[FileAction.FileActionType.PushFolders]),
@@ -206,7 +206,7 @@ internal static class ExplorerContextMenu
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.Rename), AppActions.Icons[FileAction.FileActionType.Rename]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.FollowLink), AppActions.Icons[FileAction.FileActionType.FollowLink]),
         new SubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenPackageLocation), AppActions.Icons[FileAction.FileActionType.FollowLink]),
-        new CompoundIconSubMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), new ()),
+        new (AppActions.List.Find(a => a.Name is FileAction.FileActionType.CopyItemPath), AppActions.Icons[FileAction.FileActionType.CopyItemPath]),
         new SubMenu(
             AppActions.List.Find(a => a.Name is FileAction.FileActionType.More),
             AppActions.Icons[FileAction.FileActionType.More],
@@ -266,7 +266,7 @@ internal static class SettingsMenu
     public static ObservableList<IMenuItem> List { get; } =
     [
         new CompoundIconMenu(AppActions.List.Find(a => a.Name is FileAction.FileActionType.OpenSettings),
-            new()),
+            new SettingsIcon()),
     ];
 }
 
