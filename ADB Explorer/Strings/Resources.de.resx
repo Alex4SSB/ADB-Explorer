@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Das Android-Roboter-Symbol</value>
+    <value>Android-Roboter-Symbol(e)</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Das Android-Roboter-Logo wurde aus einer von Google erstellten und geteilten Arbeit reproduziert oder geändert und wird gemäß den Bedingungen der Creative Commons 3.0-Attributionslizenz verwendet.</value>
@@ -449,13 +449,13 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Löschen</value>
   </data>
   <data name="S_SETTINGS_ENABLE_MDNS" xml:space="preserve">
-    <value>mDNS aktivieren</value>
+    <value>mDNS</value>
   </data>
   <data name="S_SETTINGS_POLL_DEVICES" xml:space="preserve">
-    <value>Geräte abfragen</value>
+    <value>Abfragung von Geräten</value>
   </data>
   <data name="S_SETTINGS_POLL_BATTERY" xml:space="preserve">
-    <value>Akkustatus abfragen</value>
+    <value>Abfragung vom Akkustatus</value>
   </data>
   <data name="S_SETTINGS_AUTO_ROOT" xml:space="preserve">
     <value>Root automatisch aktivieren</value>
@@ -467,22 +467,22 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Automatisch zum Durchsuchen öffnen</value>
   </data>
   <data name="S_SETTINGS_COMPACT_VIEW" xml:space="preserve">
-    <value>Kompaktansicht aktivieren</value>
+    <value>Kompaktansicht</value>
   </data>
   <data name="S_SETTINGS_STOP_ON_SYNC" xml:space="preserve">
     <value>Stopen Sie das Polling bei Push/Pull</value>
   </data>
   <data name="S_SETTINGS_PARALLEL_OPERATIONS" xml:space="preserve">
-    <value>Gleichzeitige Operationen zulassen</value>
+    <value>Gleichzeitige Operationen</value>
   </data>
   <data name="S_SETTINGS_MEDIA_RESCAN" xml:space="preserve">
     <value>Media-Rescan erzwingen bei Push</value>
   </data>
   <data name="S_SETTINGS_POLL_DRIVES" xml:space="preserve">
-    <value>Laufwerke abfragen</value>
+    <value>Abfragung von Laufwerken</value>
   </data>
   <data name="S_SETTINGS_APK" xml:space="preserve">
-    <value>APK-Verarbeitung aktivieren</value>
+    <value>APK-Unterstützung</value>
   </data>
   <data name="S_SETTINGS_SHOW_EXTENSIONS" xml:space="preserve">
     <value>Dateinamenserweiterungen anzeigen</value>
@@ -533,7 +533,7 @@ Der angezeigte Inhalt ist möglicherweise unvollständig.</value>
     <value>Animationen deaktivieren</value>
   </data>
   <data name="S_SETTINGS_SPLASH" xml:space="preserve">
-    <value>Startbildschirm anzeigen</value>
+    <value>Begrüßungsbildschirm</value>
   </data>
   <data name="S_SETTINGS_UPDATES" xml:space="preserve">
     <value>Auf Aktualisierungen prüfen</value>
@@ -819,7 +819,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>ADB neu starten</value>
   </data>
   <data name="S_SERVER_DOWN" xml:space="preserve">
-    <value>Server ist ausgefallen</value>
+    <value>mDNS-Server ist ausgefallen</value>
   </data>
   <data name="S_AWAITING_RESPONSE" xml:space="preserve">
     <value>Warten auf Antwort: {0}</value>
@@ -840,7 +840,7 @@ Alle laufenden Vorgänge abbrechen</value>
     <value>Server &amp; Polling an</value>
   </data>
   <data name="S_MDNS_ON" xml:space="preserve">
-    <value>Server ist hochgefahren und läuft</value>
+    <value>mDNS-Server ist hochgefahren und läuft</value>
   </data>
   <data name="S_LIMITED_SUPPORT" xml:space="preserve">
     <value>Eingeschränkte Unterstützung</value>
@@ -1425,5 +1425,14 @@ Bitte helfen Sie uns, die App in Ihre Sprache auf Weblate zu übersetzen.</value
   </data>
   <data name="S_DRAG_INSTALL_MULTIPLE" xml:space="preserve">
     <value>{0} APKs installieren</value>
+  </data>
+  <data name="S_SETTINGS_ACTIVE" xml:space="preserve">
+    <value>Ein</value>
+  </data>
+  <data name="S_SETTINGS_INACTIVE" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="S_MDNS_IN_PROGRESS" xml:space="preserve">
+    <value>mDNS-Serverstatus wird überprüft…</value>
   </data>
 </root>
