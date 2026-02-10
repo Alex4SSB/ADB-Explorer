@@ -34,8 +34,6 @@ public partial class ExplorerPageHeader : UserControl
     //private readonly DragWindow dw = new();
 
     private static Point NullPoint => new(-1, -1);
-    public string SelectedFilesTotalSize => (SelectedFiles is not null && FileHelper.TotalSize(SelectedFiles) is long size and > 0) ? size.BytesToSize() : "";
-    public string SelectedFilesCount => $"{ExplorerGrid.SelectedItems.Count}";
     private double? RowHeight { get; set; }
     private double ColumnHeaderHeight => (double)FindResource("DataGridColumnHeaderHeight") + ScrollContentPresenterMargin;
     private double ScrollContentPresenterMargin => RuntimeSettings.UseFluentStyles ? ((Thickness)FindResource("DataGridScrollContentPresenterMargin")).Top : 0;
@@ -78,6 +76,12 @@ public partial class ExplorerPageHeader : UserControl
 
         InitializeComponent();
 
+        AppActions.Bindings.ForEach(binding =>
+        {
+            InputBindings.Add(binding);
+            ExplorerGrid.InputBindings.Add(binding);
+        });
+
         SelectionTimer.Tick += SelectionTimer_Tick;
     }
 
@@ -85,9 +89,7 @@ public partial class ExplorerPageHeader : UserControl
     {
         SelectedFiles = FileActions.IsAppDrive ? [] : ExplorerGrid.SelectedItems.OfType<FileClass>();
         SelectedPackages = FileActions.IsAppDrive ? ExplorerGrid.SelectedItems.OfType<Package>() : [];
-        //OnPropertyChanged(nameof(SelectedFilesTotalSize));
-        //OnPropertyChanged(nameof(SelectedFilesCount));
-        //FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
+        FileActions.SelectedItemsCount = FileActions.IsAppDrive ? SelectedPackages.Count() : SelectedFiles.Count();
 
         FileActionLogic.UpdateFileActions();
         //MainToolBar.Items?.Refresh();
@@ -1071,4 +1073,40 @@ public partial class ExplorerPageHeader : UserControl
     {
         MouseDownPoint = NullPoint;
     }
+
+    private void Window_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (FileActions.ListingInProgress && e.ChangedButton is MouseButton.XButton1 or MouseButton.XButton2)
+        {
+            e.Handled = true;
+            return;
+        }
+
+        e.Handled = e.ChangedButton switch
+        {
+            MouseButton.XButton1 => NavHistory.NavigateBF(Navigation.SpecialLocation.Back),
+            MouseButton.XButton2 => NavHistory.NavigateBF(Navigation.SpecialLocation.Forward),
+            _ => false,
+        };
+    }
+
+    private void MainWin_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (CopyPaste.IsDrag && CopyPaste.DragStatus is not CopyPasteService.DragState.Active && e.Key is Key.Escape)
+            RuntimeSettings.DragBitmap = null;
+    }
+
+    private void MainWindow_OnPreviewKeyUp(object sender, KeyEventArgs e)
+    {
+        if (e.Key is Key.System && CopyPaste.IsDrag)
+            e.Handled = true;
+    }
+
+    private void MainWindow_OnPreviewQueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+    {
+        if (e.EscapePressed)
+            RuntimeSettings.DragBitmap = null;
+    }
+
+    private void EmptyNonRootTextBlock_Loaded(object sender, RoutedEventArgs e) => TextHelper.BuildLocalizedInlines(sender, e);
 }

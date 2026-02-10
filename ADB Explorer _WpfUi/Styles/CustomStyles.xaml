@@ -251,9 +251,6 @@
             <DataTrigger Binding="{Binding ElementName=ItemsCountBlock, Path=Text}" Value="">
                 <Setter Property="Visibility" Value="Hidden" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style x:Key="ItemsCountContainerStyle" TargetType="StackPanel">
@@ -272,16 +269,13 @@
             <DataTrigger Binding="{Binding ElementName=SelectedItemsBlock, Path=Text}" Value="0">
                 <Setter Property="Visibility" Value="Hidden" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
-                <Setter Property="FlowDirection" Value="RightToLeft" />
-            </DataTrigger>
         </Style.Triggers>
     </Style>
     <Style
         x:Key="SelectedItemsStyle"
         BasedOn="{StaticResource MarginedTextBlockStyle}"
         TargetType="TextBlock">
-        <Setter Property="Text" Value="{Binding ElementName=MainWin, Path=SelectedFilesCount}" />
+        <Setter Property="Text" Value="{Binding SelectedFilesCount}" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
                 <Setter Property="Text" Value="0" />
@@ -304,10 +298,10 @@
     </Style>
     <Style x:Key="TotalSizeStyle" TargetType="TextBlock">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="0">
+            <DataTrigger Binding="{Binding SelectedFilesTotalSize}" Value="0">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=TotalSizeBlock, Path=Text}" Value="">
+            <DataTrigger Binding="{Binding SelectedFilesTotalSize}" Value="">
                 <Setter Property="Visibility" Value="Collapsed" />
             </DataTrigger>
             <DataTrigger Binding="{Binding ElementName=ExplorerGrid, Path=Visibility}" Value="Collapsed">
@@ -577,52 +571,8 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}" />
-        <Setter Property="Visibility" Value="Collapsed" />
-        <Style.Triggers>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
-                    <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
-                    <Condition Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Visibility" Value="Visible" />
-            </MultiDataTrigger>
-            <DataTrigger Binding="{Binding ElementName=NavigationBox, Path=Mode}" Value="None">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
-                <Setter Property="Visibility" Value="Collapsed" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
-    <Style x:Key="EmptyFolderAltPromptStyle" TargetType="TextBlock">
-        <Style.Triggers>
-            <DataTrigger Binding="{Binding Root}" Value="Enabled">
-                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_FOLDER_EMPTY}}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
-                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_APP_DRIVE}}" />
-            </DataTrigger>
-            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
-                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_FILTER}}" />
-            </DataTrigger>
-        </Style.Triggers>
-    </Style>
+
+
 
 
     <Style
@@ -678,6 +628,52 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>-->
+    <Style x:Key="NonRootEmptyFolderStyle" TargetType="StackPanel">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="EmptyFolderAltPromptStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Root}" Value="Enabled">
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_FOLDER_EMPTY}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_APP_DRIVE}}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=IsFiltered}" Value="True">
+                <Setter Property="Text" Value="{Binding Source={x:Static Member=strings:Resources.S_EMPTY_FILTER}}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    <Style x:Key="EmptyFolderGridStyle" TargetType="Grid">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="DataContext" Value="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=CurrentDevice}" />
+        <Setter Property="Visibility" Value="Collapsed" />
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding ElementName=ExplorerGrid, Path=Items.Count}" Value="0" />
+                    <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsExplorerVisible}" Value="True" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.FileActions}, Path=ListingInProgress}" Value="False" />
+                    <Condition Binding="{Binding Source={x:Static models:Data.RuntimeSettings}, Path=IsLogOpen}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Visibility" Value="Visible" />
+            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding ElementName=NavigationBox, Path=Mode}" Value="None">
+                <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
     <Style
         x:Key="StatusBarSeparatorStyle"
         BasedOn="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}"

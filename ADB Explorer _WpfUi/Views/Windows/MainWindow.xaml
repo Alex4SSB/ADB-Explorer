@@ -44,6 +44,7 @@
             FooterMenuItemsSource="{Binding ViewModel.FooterMenuItems, Mode=OneWay}"
             FrameMargin="0"
             PreviewMouseDown="RootNavigation_PreviewMouseDown"
+            PreviewKeyDown="RootNavigation_PreviewKeyDown"
             IsBackButtonVisible="Collapsed"
             IsPaneToggleVisible="False"
             MenuItemsSource="{Binding ViewModel.MenuItems, Mode=OneWay}"

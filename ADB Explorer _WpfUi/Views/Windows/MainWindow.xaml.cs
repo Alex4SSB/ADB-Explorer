@@ -131,5 +131,10 @@ namespace ADB_Explorer.Views.Windows
                 e.Handled = true;
             }
         }
+
+        private void RootNavigation_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }

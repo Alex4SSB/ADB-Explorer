@@ -9,13 +9,19 @@
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:pages="clr-namespace:ADB_Explorer.ViewModels.Pages"
     xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:views="clr-namespace:ADB_Explorer.Views"
+    d:DataContext="{d:DesignInstance Type=pages:ExplorerViewModel}"
     d:DesignHeight="450"
     d:DesignWidth="800"
     MouseDown="Window_MouseDown"
+    MouseUp="Window_MouseUp"
+    PreviewKeyDown="MainWin_PreviewKeyDown"
+    PreviewKeyUp="MainWindow_OnPreviewKeyUp"
+    PreviewQueryContinueDrag="MainWindow_OnPreviewQueryContinueDrag"
     mc:Ignorable="d">
     <UserControl.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
@@ -347,6 +353,15 @@
                     </Border>
                     <!--<local:RenameTooltip x:Name="RenameTooltip" Visibility="Hidden" />-->
                 </Canvas>
+                <Grid Margin="0,40" Style="{StaticResource EmptyFolderGridStyle}">
+                    <StackPanel Style="{StaticResource NonRootEmptyFolderStyle}">
+                        <TextBlock
+                            helpers:TextHelper.AltText="{Binding Source={x:Static Member=strings:Resources.S_NON_ROOT_EMPTY_FOLDER}}"
+                            Loaded="EmptyNonRootTextBlock_Loaded"
+                            TextAlignment="Center" />
+                    </StackPanel>
+                    <TextBlock Style="{StaticResource EmptyFolderAltPromptStyle}" />
+                </Grid>
             </Grid>
         </Border>
         <Grid
@@ -354,7 +369,6 @@
             Height="30"
             Margin="6,0">
             <Grid.Resources>
-                <!--<Style BasedOn="{StaticResource StatusBarSeparatorStyle}" TargetType="Separator" />-->
                 <Style BasedOn="{StaticResource MarginedTextBlockStyle}" TargetType="TextBlock" />
             </Grid.Resources>
             <Grid.ColumnDefinitions>
@@ -385,10 +399,9 @@
                     <TextBlock Text=" " />
                     <TextBlock Style="{StaticResource SelectedItemsSuffixStyle}" />
                     <TextBlock
-                        x:Name="TotalSizeBlock"
                         Margin="6,4,0,4"
                         Style="{StaticResource TotalSizeStyle}"
-                        Text="{Binding ElementName=MainWin, Path=SelectedFilesTotalSize}" />
+                        Text="{Binding SelectedFilesTotalSize}" />
                 </StackPanel>
             </StackPanel>
             <StackPanel

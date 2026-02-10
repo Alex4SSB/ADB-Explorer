@@ -790,40 +790,43 @@ internal static class FileActionLogic
 
     public static void ClearExplorer(bool clearDevice = true)
     {
-        Data.DirList?.FileList?.Clear();
-        Data.Packages.Clear();
-        Data.SelectedFiles = [];
-        Data.SelectedPackages = [];
-
-        Data.FileActions.PushFilesFoldersEnabled =
-        Data.FileActions.PullEnabled =
-        Data.FileActions.DeleteEnabled =
-        Data.FileActions.RenameEnabled =
-        Data.FileActions.HomeEnabled =
-        Data.FileActions.NewEnabled =
-        Data.FileActions.PasteEnabled =
-        Data.FileActions.IsUninstallVisible.Value =
-        Data.FileActions.CutEnabled =
-        Data.FileActions.CopyEnabled =
-        Data.FileActions.IsExplorerVisible =
-        Data.FileActions.PackageActionsEnabled =
-        Data.FileActions.IsCopyItemPathEnabled =
-        Data.FileActions.UpdateModifiedEnabled =
-        Data.FileActions.IsFollowLinkEnabled =
-        Data.RuntimeSettings.IsExplorerLoaded =
-        Data.FileActions.ParentEnabled = false;
-
-        Data.FileActions.ExplorerFilter = "";
-
-        if (clearDevice)
+        App.Current.Dispatcher.Invoke(() =>
         {
-            Data.CurrentDisplayNames.Clear();
-            Data.CurrentPath = null;
-            Data.RuntimeSettings.CurrentDevice = null;
-            Data.RuntimeSettings.ClearNavBox = true;
+            Data.DirList?.FileList?.Clear();
+            Data.Packages.Clear();
+            Data.SelectedFiles = [];
+            Data.SelectedPackages = [];
 
-            UpdateFileActions();
-        }
+            Data.FileActions.PushFilesFoldersEnabled =
+            Data.FileActions.PullEnabled =
+            Data.FileActions.DeleteEnabled =
+            Data.FileActions.RenameEnabled =
+            Data.FileActions.HomeEnabled =
+            Data.FileActions.NewEnabled =
+            Data.FileActions.PasteEnabled =
+            Data.FileActions.IsUninstallVisible.Value =
+            Data.FileActions.CutEnabled =
+            Data.FileActions.CopyEnabled =
+            Data.FileActions.IsExplorerVisible =
+            Data.FileActions.PackageActionsEnabled =
+            Data.FileActions.IsCopyItemPathEnabled =
+            Data.FileActions.UpdateModifiedEnabled =
+            Data.FileActions.IsFollowLinkEnabled =
+            Data.RuntimeSettings.IsExplorerLoaded =
+            Data.FileActions.ParentEnabled = false;
+
+            Data.FileActions.ExplorerFilter = "";
+
+            if (clearDevice)
+            {
+                Data.CurrentDisplayNames.Clear();
+                Data.CurrentPath = null;
+                Data.RuntimeSettings.CurrentDevice = null;
+                Data.RuntimeSettings.ClearNavBox = true;
+
+                UpdateFileActions();
+            }
+        });
 
         Data.RuntimeSettings.FilterActions = true;
     }
