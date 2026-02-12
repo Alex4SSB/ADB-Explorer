@@ -116,11 +116,6 @@ public partial class ExplorerPageHeader : UserControl
                     InitLister();
                     break;
 
-                case nameof(AppRuntimeSettings.ExplorerSource):
-                    ExplorerGrid.ItemsSource = RuntimeSettings.ExplorerSource;
-                    FilterExplorerItems();
-                    break;
-
                 case nameof(AppRuntimeSettings.LocationToNavigate):
                     if (RuntimeSettings.LocationToNavigate is null)
                         return;
@@ -188,51 +183,6 @@ public partial class ExplorerPageHeader : UserControl
 
         collectionView.Filter = predicate;
     });
-
-    private void FilterExplorerItems(bool refreshOnly = false)
-    {
-        if (!FileActions.IsExplorerVisible)
-            return;
-
-        var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
-        if (collectionView is null)
-            return;
-
-        if (refreshOnly)
-            collectionView.Refresh();
-
-        if (FileActions.IsAppDrive)
-        {
-            collectionView.Filter = Settings.ShowSystemPackages
-                ? FileHelper.PkgFilter()
-                : pkg => ((Package)pkg).Type is Package.PackageType.User;
-
-            if (collectionView.SortDescriptions.All(d => d.PropertyName != nameof(Package.Type)))
-            {
-                ExplorerGrid.Columns[8].SortDirection = ListSortDirection.Descending;
-
-                collectionView.SortDescriptions.Add(new(nameof(Package.Type), ListSortDirection.Descending));
-            }
-        }
-        else
-        {
-            collectionView.Filter = !Settings.ShowHiddenItems
-                ? FileHelper.HideFiles()
-                : file => !FileHelper.IsHiddenRecycleItem((FileClass)file);
-
-            if (!collectionView.SortDescriptions.Any(d => d.PropertyName
-                    is nameof(FileClass.IsTemp)
-                    or nameof(FileClass.IsDirectory)
-                    or nameof(FileClass.SortName)))
-            {
-                ExplorerGrid.Columns[1].SortDirection = ListSortDirection.Ascending;
-
-                collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
-                collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListSortDirection.Descending));
-                collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), ListSortDirection.Ascending));
-            }
-        }
-    }
 
     private void InitLister()
     {
@@ -345,20 +295,6 @@ public partial class ExplorerPageHeader : UserControl
         FileActions.ContextNewEnabled =
         FileActions.ContextPushEnabled =
         FileActions.NewEnabled = !FileActions.IsRecycleBin && !FileActions.IsAppDrive;
-
-        OriginalPath.Visibility =
-        OriginalDate.Visibility = Visible(FileActions.IsRecycleBin);
-
-        PackageName.Visibility =
-        PackageType.Visibility =
-        PackageUid.Visibility =
-        PackageVersion.Visibility = Visible(FileActions.IsAppDrive);
-
-        IconColumn.Visibility =
-        NameColumn.Visibility =
-        DateColumn.Visibility =
-        TypeColumn.Visibility =
-        SizeColumn.Visibility = Visible(!FileActions.IsAppDrive);
 
         FileActions.CopyPathDescription.Value = FileActions.IsAppDrive ? Strings.Resources.S_COPY_APK_NAME : Strings.Resources.S_COPY_PATH;
 

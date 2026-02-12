@@ -14,6 +14,7 @@
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:views="clr-namespace:ADB_Explorer.Views"
+    x:Name="ExplorerHeader"
     d:DataContext="{d:DesignInstance Type=pages:ExplorerViewModel}"
     d:DesignHeight="450"
     d:DesignWidth="800"
@@ -25,9 +26,9 @@
     mc:Ignorable="d">
     <UserControl.Resources>
         <sys:Int16 x:Key="FontSize">13</sys:Int16>
-        <CollectionViewSource x:Key="FileListView" Source="{Binding Source={x:Static Member=models:Data.DirList}, Path=FileList}" />
         <local:AdbContextMenu x:Key="RowContextMenu" Style="{StaticResource ExplorerContextMenuStyle}" />
         <converters:StringFormatConverter x:Key="StringFormatConverter" />
+        <helpers:BindingProxy x:Key="ViewModelProxy" Data="{Binding}" />
         <Style
             x:Key="DataGridCellStyle"
             BasedOn="{StaticResource BaseCellStyle}"
@@ -175,7 +176,7 @@
                     GridLinesVisibility="None"
                     HeadersVisibility="Column"
                     IsReadOnly="False"
-                    ItemsSource="{Binding Source={StaticResource FileListView}, NotifyOnSourceUpdated=True}"
+                    ItemsSource="{Binding ExplorerItemsSource}"
                     KeyboardNavigation.TabNavigation="Once"
                     MouseDown="ExplorerGrid_MouseDown"
                     MouseMove="ExplorerGrid_MouseMove"
@@ -191,7 +192,8 @@
                             MaxWidth="24"
                             CanUserResize="False"
                             CellTemplate="{StaticResource FileIconTemplate}"
-                            IsReadOnly="True">
+                            IsReadOnly="True"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                             <DataGridTemplateColumn.HeaderStyle>
                                 <Style BasedOn="{StaticResource DataGridColumnHeaderStyle}" TargetType="DataGridColumnHeader">
                                     <Setter Property="ToolTip" Value="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_ICON}}" />
@@ -203,7 +205,9 @@
                             Width="300"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                             IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
-                            SortMemberPath="FullName">
+                            SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.NameColumnSortDirection, Mode=TwoWay}"
+                            SortMemberPath="FullName"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
                                     <ui:TextBox
@@ -227,17 +231,24 @@
                             x:Name="OriginalPath"
                             Width="180"
                             Binding="{Binding TrashIndex.ParentPath}"
-                            ElementStyle="{StaticResource DirectoryGridCellStyle}"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_ORIGINAL_LOCATION}}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.RecycleBinColumnVisibility}">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
+                                    <Setter Property="FlowDirection" Value="LeftToRight" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                         <DataGridTextColumn
                             x:Name="DateColumn"
                             Width="Auto"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_DATE_MODIFIED}}"
                             IsReadOnly="True"
-                            SortMemberPath="ModifiedTime">
+                            SortMemberPath="ModifiedTime"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -258,7 +269,8 @@
                             Width="150"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                             IsReadOnly="True"
-                            SortMemberPath="TypeName">
+                            SortMemberPath="TypeName"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <emoji:TextBlock
@@ -275,7 +287,8 @@
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_SIZE}}"
                             IsReadOnly="True"
-                            SortMemberPath="Size">
+                            SortMemberPath="Size"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                             <DataGridTextColumn.ElementStyle>
                                 <Style BasedOn="{StaticResource DirectoryGridCellStyle}" TargetType="TextBlock">
                                     <Setter Property="Text" Value="{Binding SizeString}" />
@@ -303,7 +316,8 @@
                             ElementStyle="{StaticResource DirectoryGridCellStyle}"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_DATE_DELETED}}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.RecycleBinColumnVisibility}" />
                         <DataGridTextColumn
                             x:Name="PackageName"
                             Width="400"
@@ -311,7 +325,8 @@
                             ElementStyle="{StaticResource ExplorerGridCellStyle}"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
                         <DataGridTextColumn
                             x:Name="PackageType"
                             Width="100"
@@ -319,7 +334,9 @@
                             ElementStyle="{StaticResource ExplorerGridCellStyle}"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True"
+                            SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageTypeColumnSortDirection, Mode=TwoWay}"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
                         <DataGridTextColumn
                             x:Name="PackageUid"
                             Width="100"
@@ -327,7 +344,8 @@
                             ElementStyle="{StaticResource ExplorerGridCellStyle}"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_USER_ID}}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
                         <DataGridTextColumn
                             x:Name="PackageVersion"
                             Width="100"
@@ -335,7 +353,8 @@
                             ElementStyle="{StaticResource ExplorerGridCellStyle}"
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_VERSION}}"
-                            IsReadOnly="True" />
+                            IsReadOnly="True"
+                            Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
                     </ui:DataGrid.Columns>
                 </ui:DataGrid>
                 <Canvas x:Name="ExplorerCanvas" PreviewMouseUp="ExplorerCanvas_PreviewMouseUp">
