@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="S_ANDROID_ICONS_TITLE" xml:space="preserve">
-    <value>Android Robot İcon(lar)</value>
+    <value>Android Robot İkon(lar)</value>
   </data>
   <data name="S_ANDROID_ROBOT_LIC" xml:space="preserve">
     <value>Android robotu, Google tarafından oluşturulan ve paylaşılan bir çalışmadan çoğaltılmış veya değiştirilmiş olup Creative Commons 3.0 Atıf Lisansı'nda açıklanan şartlara uygun şekilde kullanılmıştır.</value>
