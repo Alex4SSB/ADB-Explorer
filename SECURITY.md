@@ -1,0 +1,112 @@
+# Security Policy
+
+## Supported Versions
+
+We take the security of ADB Explorer seriously. Security updates are provided for the following versions:
+
+| Version | Supported          |
+| ------- | ------------------ |
+| Latest  | :white_check_mark: |
+| < Latest| :x:                |
+
+## Reporting a Vulnerability
+
+We appreciate responsible disclosure of security vulnerabilities. There are multiple ways to report a security issue:
+
+### Option 1: Private Vulnerability Reporting (Recommended)
+
+1. Navigate to the [Security tab](https://github.com/Alex4SSB/ADB-Explorer/security) of this repository
+2. Click on "Report a vulnerability" 
+3. Fill in the details of the vulnerability
+4. Submit the report
+
+This method ensures:
+- The vulnerability remains private until a fix is released
+- Automatic CVE assignment through GitHub
+- Proper credit for the discovery
+- Coordinated disclosure process
+
+### Option 2: Direct Contact
+
+If you prefer not to use GitHub's vulnerability reporting system, you can:
+- Open a public issue with the label "bug" (for non-critical vulnerabilities)
+- Contact the maintainer directly through GitHub
+
+### What to Include
+
+When reporting a vulnerability, please include:
+
+1. **Description**: Clear description of the vulnerability
+2. **Steps to Reproduce**: Detailed steps to reproduce the issue
+3. **Impact**: Potential impact and severity assessment
+4. **Proof of Concept**: If applicable, code or screenshots demonstrating the issue
+5. **Suggested Fix**: If you have ideas for remediation (optional)
+
+## Response Timeline
+
+- **Initial Response**: Within 48 hours of report
+- **Status Update**: Within 7 days with assessment and timeline
+- **Fix Development**: Depends on severity and complexity
+- **Disclosure**: After fix is available and deployed
+
+## Security Advisory Process
+
+When a vulnerability is reported via GitHub's private reporting system:
+
+1. **Report Received**: Maintainer receives notification
+2. **Assessment**: Vulnerability is assessed for severity and impact
+3. **Accept & Draft**: Maintainer accepts the report and opens it as a draft advisory
+4. **Fix Development**: Code fix is developed and tested
+5. **Review**: Reporter can review the fix in the advisory
+6. **Publish**: Advisory is published along with the fixed release
+7. **CVE Assignment**: GitHub automatically assigns a CVE ID
+
+## For Maintainers: Accepting Security Advisories
+
+If you're unable to access the GitHub Security Advisory page (e.g., due to antivirus blocking):
+
+### Troubleshooting Access Issues
+
+1. **Try a Different Browser**: Use an alternative browser or private/incognito mode
+2. **Disable Antivirus Temporarily**: Some AV software may block the GitHub Security page
+3. **Use GitHub Mobile**: Try accessing from the GitHub mobile app
+4. **Clear Browser Cache**: Clear cache and cookies, then retry
+5. **Check Browser Extensions**: Disable security-related browser extensions temporarily
+6. **Alternative Network**: Try accessing from a different network or device
+
+### Alternative CVE Assignment Process
+
+If you cannot access GitHub's advisory system:
+
+1. Implement and commit the security fix
+2. Ask the reporter to submit details directly to [MITRE](https://cveform.mitre.org/)
+3. Reference your fix commit in the CVE request
+4. The reporter can still receive credit for the discovery
+
+## Credit
+
+Security researchers who responsibly disclose vulnerabilities will be:
+- Credited in the release notes
+- Mentioned in the security advisory (if using GitHub's system)
+- Listed in this file's Hall of Fame section
+
+## Hall of Fame
+
+We'd like to thank the following security researchers for their responsible disclosure:
+
+- [@blankshiro](https://github.com/blankshiro) - For reporting a security vulnerability (February 2026)
+
+## Security Best Practices
+
+If you're contributing code to ADB Explorer, please:
+
+1. Never commit sensitive data (credentials, API keys, etc.)
+2. Validate and sanitize all user inputs
+3. Use parameterized queries to prevent injection attacks
+4. Keep dependencies up to date
+5. Follow secure coding practices
+6. Run security scans before submitting PRs
+
+## Contact
+
+For urgent security matters that cannot be handled through the normal channels, you may attempt to contact the repository owner through GitHub's direct messaging system.
