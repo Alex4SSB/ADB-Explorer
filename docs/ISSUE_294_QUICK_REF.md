@@ -78,10 +78,10 @@ Once you successfully accept and open as draft:
 
 ## Timeline
 
-- ✅ Feb 13, 04:54 - @blankshiro opened issue #294
-- ✅ Feb 13, 07:37 - You enabled private vulnerability reporting
-- ✅ Feb 13, 09:49 - You committed a fix
-- ✅ Feb 13, 09:49 - Issue #294 closed (fix complete)
+- ✅ 2026-02-13 04:54 - @blankshiro opened issue #294
+- ✅ 2026-02-13 07:37 - You enabled private vulnerability reporting
+- ✅ 2026-02-13 09:49 - You committed a fix
+- ✅ 2026-02-13 09:49 - Issue #294 closed (fix complete)
 - ⏳ **PENDING** - Accept advisory and open as draft
 - ⏳ **PENDING** - Publish advisory with CVE
 
