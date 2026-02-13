@@ -396,7 +396,7 @@
 
     <!--<Style BasedOn="{StaticResource DataGridStyle}" TargetType="DataGrid" />-->
 
-    <!--<Style x:Key="FluentDataGridRowBorderStyle" TargetType="Border">
+    <Style x:Key="FluentDataGridRowBorderStyle" TargetType="Border">
         <Setter Property="CornerRadius" Value="3" />
         <Setter Property="Margin" Value="0,2" />
     </Style>
@@ -410,9 +410,38 @@
             BorderThickness="{TemplateBinding BorderThickness}"
             SnapsToDevicePixels="True"
             Style="{StaticResource FluentDataGridRowBorderStyle}">
-            <DataGridCellsPresenter ItemsPanel="{TemplateBinding ItemsPanel}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Rectangle
+                    x:Name="ActiveRectangle"
+                    Width="3"
+                    Height="18"
+                    Margin="0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Fill="{DynamicResource ListViewItemPillFillBrush}"
+                    RadiusX="2"
+                    RadiusY="2"
+                    Visibility="Collapsed" />
+                <DataGridCellsPresenter
+                    Grid.Column="1"
+                    ItemsPanel="{TemplateBinding ItemsPanel}"
+                    SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+            </Grid>
         </Border>
-    </ControlTemplate>-->
+        <ControlTemplate.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
+                    <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="True" />
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="ActiveRectangle" Property="Visibility" Value="Visible" />
+            </MultiDataTrigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
 
     <Storyboard
         x:Key="EnterDragStoryboard"
@@ -437,12 +466,10 @@
         BasedOn="{StaticResource DefaultDataGridRowStyle}"
         TargetType="DataGridRow">
         <Setter Property="helpers:SelectionHelper.SelectionInProgress" Value="False" />
-        <!--<Setter Property="Background" Value="{DynamicResource ControlBackground}" />-->
         <Setter Property="Visibility" Value="Visible" />
         <Setter Property="AllowDrop" Value="False" />
-        <!--<Setter Property="ui:ControlHelper.CornerRadius" Value="2" />-->
         <Setter Property="Margin" Value="3,0,0,0" />
-        <!--<Setter Property="Template" Value="{StaticResource DataGridRowTemplate}" />-->
+        <Setter Property="Template" Value="{StaticResource DataGridRowTemplate}" />
         <Style.Triggers>
             <EventTrigger RoutedEvent="PreviewDragEnter">
                 <BeginStoryboard Storyboard="{StaticResource EnterDragStoryboard}" />
@@ -453,7 +480,7 @@
             <EventTrigger RoutedEvent="MouseLeave">
                 <BeginStoryboard Storyboard="{StaticResource LeaveDragStoryboard}" />
             </EventTrigger>
-            <!--<Trigger Property="helpers:SelectionHelper.SelectionInProgress" Value="True">
+            <Trigger Property="helpers:SelectionHelper.SelectionInProgress" Value="True">
                 <Setter Property="Background" Value="{DynamicResource MouseOverBackground}" />
             </Trigger>
             <Trigger Property="IsMouseOver" Value="True">
@@ -461,14 +488,14 @@
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
                 <Setter Property="Background" Value="{DynamicResource SelectedBackground}" />
-            </Trigger>-->
+            </Trigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="False">
                 <Setter Property="AllowDrop" Value="{Binding IsDirectory}" />
             </DataTrigger>
             <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True">
                 <Setter Property="AllowDrop" Value="True" />
             </DataTrigger>
-            <!--<MultiDataTrigger>
+            <MultiDataTrigger>
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=IsSelected}" Value="True" />
                     <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
@@ -482,7 +509,7 @@
                     <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=IsActive}" Value="False" />
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{DynamicResource SelectedMouseOverInactiveBackground}" />
-            </MultiDataTrigger>-->
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
 </ResourceDictionary>

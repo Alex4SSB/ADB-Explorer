@@ -153,15 +153,8 @@
                 <Setter Property="Opacity" Value="0.5" />
             </DataTrigger>
             <DataTrigger Binding="{Binding CutState}" Value="Copy">
-                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight2Brush}" />
+                <Setter Property="Foreground" Value="{DynamicResource AccentButtonBackground}" />
             </DataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding CutState}" Value="Copy" />
-                    <Condition Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=ActualTheme}" Value="Light" />
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorDark1Brush}" />
-            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     <Style

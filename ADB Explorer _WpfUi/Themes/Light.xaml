@@ -9,4 +9,10 @@
     <SolidColorBrush x:Key="HyperLinkBrush" Color="#FF1155CC" />
     <SolidColorBrush x:Key="SponsorIconBrush" Color="#FFBF3989" />
     <SolidColorBrush x:Key="RootTitleBrush" Color="#FFC23400" />
+
+    <SolidColorBrush x:Key="MouseOverBackground" Color="#FFE5F3FF" />
+    <SolidColorBrush x:Key="SelectedBackground" Color="#FFCCE8FF" />
+    <SolidColorBrush x:Key="SelectedInactiveBackground" Color="#FFD9D9D9" />
+    <SolidColorBrush x:Key="SelectedMouseOverInactiveBackground" Color="#FFCCE8FF" />
+    <SolidColorBrush x:Key="DeviceMouseOverBackground" Color="#FFC9C9C9" />
 </ResourceDictionary>

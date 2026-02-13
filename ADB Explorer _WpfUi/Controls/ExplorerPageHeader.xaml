@@ -205,7 +205,7 @@
                             Width="300"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_NAME}}"
                             IsReadOnly="{Binding Source={x:Static Member=models:Data.FileActions}, Path=NameReadOnly}"
-                            SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.NameColumnSortDirection, Mode=TwoWay}"
+                            SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.NameColumnSortDirection}"
                             SortMemberPath="FullName"
                             Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.FolderColumnVisibility}">
                             <DataGridTemplateColumn.CellEditingTemplate>
@@ -335,7 +335,7 @@
                             FontSize="{Binding Source={StaticResource FontSize}}"
                             Header="{Binding Source={x:Static Member=strings:Resources.S_COLUMN_TYPE}}"
                             IsReadOnly="True"
-                            SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageTypeColumnSortDirection, Mode=TwoWay}"
+                            SortDirection="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageTypeColumnSortDirection}"
                             Visibility="{Binding Source={StaticResource ViewModelProxy}, Path=Data.PackageColumnVisibility}" />
                         <DataGridTextColumn
                             x:Name="PackageUid"
