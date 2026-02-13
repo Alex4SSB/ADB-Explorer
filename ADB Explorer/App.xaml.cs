@@ -10,7 +10,7 @@ namespace ADB_Explorer;
 public partial class App : Application
 {
     private static string SettingsFilePath;
-    private static readonly JsonSerializerSettings JsonSettings = new() { TypeNameHandling = TypeNameHandling.Objects };
+    private static readonly JsonSerializerSettings JsonSettings = new() { TypeNameHandling = TypeNameHandling.None };
 
     private void Application_Startup(object sender, StartupEventArgs e)
     {
