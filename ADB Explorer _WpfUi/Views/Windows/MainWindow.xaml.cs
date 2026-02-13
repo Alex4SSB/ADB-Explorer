@@ -134,7 +134,7 @@ namespace ADB_Explorer.Views.Windows
 
         private void RootNavigation_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            e.Handled = true;
+            
         }
     }
 }

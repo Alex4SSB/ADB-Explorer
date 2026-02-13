@@ -7,16 +7,67 @@ namespace ADB_Explorer.ViewModels.Pages;
 
 public partial class ExplorerViewModel : ObservableObject
 {
+
+    [ObservableProperty]
+    private ICollectionView _explorerItemsSource;
+
+    [ObservableProperty]
+    private ICollectionView _driveItemsSource;
+
+    [ObservableProperty]
+    private ListSortDirection? _nameColumnSortDirection;
+
+    [ObservableProperty]
+    private ListSortDirection? _packageTypeColumnSortDirection;
+
+    public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize() : "";
+    public string SelectedFilesCount => $"{(Data.FileActions.IsAppDrive ? Data.SelectedPackages.Count() : Data.SelectedFiles.Count())}";
+
+    public Visibility FolderColumnVisibility
+        => Data.FileActions.IsAppDrive ? Visibility.Collapsed : Visibility.Visible;
+
+    public Visibility RecycleBinColumnVisibility
+        => Data.FileActions.IsRecycleBin ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility PackageColumnVisibility
+        => Data.FileActions.IsAppDrive ? Visibility.Visible : Visibility.Collapsed;
+
     public ExplorerViewModel()
     {
         Data.FileActions.PropertyChanged += FileActions_PropertyChanged;
         Data.RuntimeSettings.PropertyChanged += RuntimeSettings_PropertyChanged;
+        Data.Settings.PropertyChanged += Settings_PropertyChanged;
+    }
+
+    private void Settings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        switch (e.PropertyName)
+        {
+            case nameof(AppSettings.EnableApk):
+            case nameof(AppSettings.EnableRecycle):
+                UpdateDriveView();
+                break;
+
+            default:
+                break;
+        }
     }
 
     private void RuntimeSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(AppRuntimeSettings.ExplorerSource))
-            UpdateExplorerView();
+        switch (e.PropertyName)
+        {
+            case nameof(AppRuntimeSettings.ExplorerSource):
+                UpdateExplorerView();
+                break;
+
+            case nameof(AppRuntimeSettings.FilterDrives):
+                UpdateDriveView();
+                break;
+
+            default:
+                break;
+        }
     }
 
     private void FileActions_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -35,21 +86,16 @@ public partial class ExplorerViewModel : ObservableObject
                 OnPropertyChanged(nameof(PackageColumnVisibility));
                 break;
 
+            case nameof(FileActionsEnable.IsDriveViewVisible):
+                UpdateDriveView();
+                break;
+
             default:
                 break;
         }
     }
 
-    [ObservableProperty]
-    private ICollectionView _explorerItemsSource;
-
-    [ObservableProperty]
-    private ListSortDirection? _nameColumnSortDirection;
-
-    [ObservableProperty]
-    private ListSortDirection? _packageTypeColumnSortDirection;
-
-    public void UpdateExplorerView()
+    private void UpdateExplorerView()
     {
         App.Current.Dispatcher.Invoke(() =>
         {
@@ -100,16 +146,40 @@ public partial class ExplorerViewModel : ObservableObject
         });
     }
 
-    public string SelectedFilesTotalSize => (Data.SelectedFiles is not null && FileHelper.TotalSize(Data.SelectedFiles) is long size and > 0) ? size.BytesToSize() : "";
-    public string SelectedFilesCount => $"{(Data.FileActions.IsAppDrive ? Data.SelectedPackages.Count() : Data.SelectedFiles.Count())}";
+    private void UpdateDriveView()
+    {
+        var source = Data.DevicesObject.Current.Drives;
+        if (source is null)
+            return;
 
-    public Visibility FolderColumnVisibility
-        => Data.FileActions.IsAppDrive ? Visibility.Collapsed : Visibility.Visible;
+        var view = CollectionViewSource.GetDefaultView(source);
+        if (view is null)
+            return;
 
-    public Visibility RecycleBinColumnVisibility
-        => Data.FileActions.IsRecycleBin ? Visibility.Visible : Visibility.Collapsed;
+        if (view.Filter is not null)
+        {
+            view.Refresh();
+            return;
+        }
 
-    public Visibility PackageColumnVisibility
-        => Data.FileActions.IsAppDrive ? Visibility.Visible : Visibility.Collapsed;
+        Predicate<object> predicate = d =>
+        {
+            var drive = (DriveViewModel)d;
+
+            return drive.Type switch
+            {
+                AbstractDrive.DriveType.Trash => Data.Settings.EnableRecycle,
+                AbstractDrive.DriveType.Temp or AbstractDrive.DriveType.Package => Data.Settings.EnableApk,
+                _ => true,
+            };
+        };
+
+        view.Filter = predicate;
+
+        if (view.SortDescriptions.All(d => d.PropertyName != nameof(DriveViewModel.Type)))
+            view.SortDescriptions.Add(new(nameof(DriveViewModel.Type), ListSortDirection.Ascending));
+
+        DriveItemsSource = view;
+    }
 
 }

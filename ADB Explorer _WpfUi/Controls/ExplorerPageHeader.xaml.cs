@@ -3,6 +3,7 @@ using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
 using ADB_Explorer.Services.AppInfra;
+using ADB_Explorer.ViewModels;
 using static ADB_Explorer.Helpers.VisibilityHelper;
 using static ADB_Explorer.Models.AbstractFile;
 using static ADB_Explorer.Models.AdbExplorerConst;
@@ -76,6 +77,9 @@ public partial class ExplorerPageHeader : UserControl
 
         InitializeComponent();
 
+        KeyDown += new KeyEventHandler(OnButtonKeyDown);
+        PreviewTextInput += new TextCompositionEventHandler(MainWindow_PreviewTextInput);
+
         AppActions.Bindings.ForEach(binding =>
         {
             InputBindings.Add(binding);
@@ -83,6 +87,147 @@ public partial class ExplorerPageHeader : UserControl
         });
 
         SelectionTimer.Tick += SelectionTimer_Tick;
+    }
+
+    private void MainWindow_PreviewTextInput(object sender, TextCompositionEventArgs e)
+    {
+        //RuntimeSettings.IsDevicesPaneOpen
+        //    || RuntimeSettings.IsSettingsPaneOpen
+        //    ||
+        if (SearchBox.IsFocused
+            || NavigationBox.Mode is NavigationBox.ViewMode.Path
+            || FileActions.IsExplorerEditing)
+            return;
+
+        var selected = ExplorerGrid.SelectedItems.Count;
+        var selectedIndex = ExplorerGrid.SelectedIndex;
+        object altItem = null;
+
+        for (int i = 0; i < ExplorerGrid.Items.Count; i++)
+        {
+            var item = ExplorerGrid.Items[i];
+            var name = item.ToString();
+
+            if (name.StartsWith(e.Text, StringComparison.OrdinalIgnoreCase))
+            {
+                if (selected != 1 || selectedIndex < i)
+                {
+                    FileActions.ItemToSelect = item;
+                    break;
+                }
+                else
+                    altItem ??= item;
+            }
+        }
+
+        if (selectedIndex == ExplorerGrid.SelectedIndex && altItem is not null)
+            FileActions.ItemToSelect = altItem;
+    }
+
+    private void OnButtonKeyDown(object sender, KeyEventArgs e)
+    {
+        //if (RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen)
+        //    return;
+
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)
+            || !NAVIGATION_KEYS.Contains(e.Key))
+            return;
+
+        bool handle = false;
+
+        if (FileActions.IsExplorerVisible)
+        {
+            handle |= ExplorerGridKeyNavigation(e.Key);
+        }
+        else if (FileActions.IsDriveViewVisible)
+        {
+            handle |= DriveViewKeyNavigation(e.Key);
+        }
+
+        e.Handled = handle;
+    }
+
+    private bool DriveViewKeyNavigation(Key key)
+    {
+        if (DriveList.Items.Count == 0) // || RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen
+            return false;
+
+        if (DriveList.SelectedItems.Count == 0)
+        {
+            switch (key)
+            {
+                case Key.Left or Key.Up:
+                    DriveList.SelectedIndex = DriveList.Items.Count - 1;
+                    break;
+
+                case Key.Right or Key.Down:
+                    DriveList.SelectedIndex = 0;
+                    break;
+
+                default:
+                    return false;
+            }
+
+            SelectionHelper.GetListViewItemContainer(DriveList).Focus();
+            return true;
+        }
+
+        switch (key)
+        {
+            case Key.Enter:
+                ((DriveViewModel)DriveList.SelectedItem).BrowseCommand.Execute();
+                return true;
+
+            case Key.Escape:
+                // Should've been clear selected drives, but causes inconsistent behavior
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    private bool ExplorerGridKeyNavigation(Key key)
+    {
+        if (ExplorerGrid.Items.Count < 1) // || RuntimeSettings.IsSettingsPaneOpen || RuntimeSettings.IsDevicesPaneOpen
+            return false;
+
+        switch (key)
+        {
+            case Key.Escape:
+                ExplorerGrid.UnselectAll();
+                break;
+
+            case Key.Down or Key.Up or Key.Home or Key.End:
+                if (bfNavigation)
+                {
+                    SelectionHelper.SetCurrentSelectedIndex(ExplorerGrid, ExplorerGrid.SelectedIndex);
+                    bfNavigation = false;
+                }
+
+                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+                    ExplorerGrid.MultiSelect(key);
+                else
+                    ExplorerGrid.SingleSelect(key);
+                break;
+
+            case Key.Enter:
+                if (ExplorerGrid.SelectedCells.Count < 1 || IsInEditMode)
+                    return false;
+
+                if (ExplorerGrid.SelectedItems.Count == 1 && ((FilePath)ExplorerGrid.SelectedItem).IsDirectory)
+                    DoubleClick(ExplorerGrid.SelectedItem);
+                break;
+
+            case Key.Apps:
+                ExplorerGrid.ContextMenu.IsOpen = true;
+                break;
+
+            default:
+                return false;
+        }
+
+        return true;
     }
 
     private void SelectionTimer_Tick(object sender, EventArgs e)
@@ -157,10 +302,47 @@ public partial class ExplorerPageHeader : UserControl
                     });
                     break;
 
+                case nameof(AppRuntimeSettings.IsPathBoxFocused):
+                    IsPathBoxFocused(RuntimeSettings.IsPathBoxFocused
+                                     ?? NavigationBox.Mode
+                                     is NavigationBox.ViewMode.Breadcrumbs);
+
+                    RuntimeSettings.AutoHideSearchBox = true;
+                    break;
+
+                case nameof(AppRuntimeSettings.SelectAll):
+                    if (ExplorerGrid.Items.Count == ExplorerGrid.SelectedItems.Count)
+                        ExplorerGrid.UnselectAll();
+                    else
+                        ExplorerGrid.SelectAll();
+                    break;
+
                 default:
                     break;
             }
         });
+    }
+
+    private void IsPathBoxFocused(bool isFocused)
+    {
+        if (isFocused)
+            _focusPathBox();
+        else
+            _unfocusPathBox();
+
+        void _focusPathBox()
+        {
+            NavigationBox.Mode = NavigationBox.ViewMode.Path;
+        }
+
+        void _unfocusPathBox()
+        {
+            if (NavigationBox.Mode is NavigationBox.ViewMode.None)
+                return;
+
+            NavigationBox.UnfocusTarget = ExplorerGrid;
+            NavigationBox.Mode = NavigationBox.ViewMode.Breadcrumbs;
+        }
     }
 
     private void FilterFileActions() => Dispatcher.Invoke(() => MainToolBar.Items?.Refresh());
@@ -383,7 +565,6 @@ public partial class ExplorerPageHeader : UserControl
         NavigationBox.Path = AdbLocation.StringFromLocation(Navigation.SpecialLocation.DriveView);
         NavHistory.Navigate(Navigation.SpecialLocation.DriveView);
 
-        DriveList.ItemsSource = DevicesObject.Current.Drives;
         CurrentDrive = null;
 
         if (DriveList.SelectedIndex > -1)
@@ -414,6 +595,10 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DataGridCell_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
     {
+        if (e.OriginalSource is DataGridCell && e.TargetRect == Rect.Empty)
+        {
+            e.Handled = true;
+        }
     }
 
     private void DataGridCell_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -518,6 +703,14 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (e.ChangedButton is not MouseButton.Left || ClickCount < 0)
             return;
+
+        if (SelectionRect.IsVisible)
+        {
+            SelectionRect.Visibility = Visibility.Collapsed;
+            e.Handled = true;
+
+            return;
+        }
 
         e.Handled = CellMouseUp(sender, e);
 
@@ -725,10 +918,23 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)
     {
+        SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
     }
 
     private void ExplorerGrid_ContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
+        var point = Mouse.GetPosition(ExplorerGrid);
+        if (point.Y < ColumnHeaderHeight || WasDragging)
+        {
+            WasDragging = false;
+
+            SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, false);
+            e.Handled = true;
+            return;
+        }
+
+        SelectionHelper.SetIsMenuOpen(ExplorerGrid.ContextMenu, true);
+        FileActionLogic.UpdateFileActions();
     }
 
     private void ExplorerGrid_MouseDown(object sender, MouseButtonEventArgs e)
@@ -937,6 +1143,23 @@ public partial class ExplorerPageHeader : UserControl
 
     private void ExplorerGrid_Sorting(object sender, DataGridSortingEventArgs e)
     {
+        if (FileActions.IsAppDrive)
+            return;
+
+        var collectionView = CollectionViewSource.GetDefaultView(ExplorerGrid.ItemsSource);
+        var sortDirection = ListHelper.Invert(e.Column.SortDirection);
+        e.Column.SortDirection = sortDirection;
+
+        collectionView.SortDescriptions.Clear();
+        collectionView.SortDescriptions.Add(new(nameof(FileClass.IsTemp), ListSortDirection.Descending));
+        collectionView.SortDescriptions.Add(new(nameof(FileClass.IsDirectory), ListHelper.Invert(sortDirection)));
+
+        if (e.Column.SortMemberPath != nameof(FileClass.FullName))
+            collectionView.SortDescriptions.Add(new(e.Column.SortMemberPath, sortDirection));
+
+        collectionView.SortDescriptions.Add(new(nameof(FileClass.SortName), sortDirection));
+
+        e.Handled = true;
     }
 
     private void NameColumnEdit_KeyDown(object sender, KeyEventArgs e)
@@ -972,15 +1195,43 @@ public partial class ExplorerPageHeader : UserControl
 
     private void NameColumnEdit_Loaded(object sender, RoutedEventArgs e)
     {
-        
+        var textBox = sender as TextBox;
+        textBox.Focus();
+
+        var editPoint = textBox.TranslatePoint(new(), ExplorerCanvas);
+        //Canvas.SetTop(RenameTooltip, editPoint.Y - RenameTooltip.ActualHeight - 4);
+        //Canvas.SetLeft(RenameTooltip, editPoint.X + 4);
+        //RenameTooltip.Visibility = Visibility.Visible;
     }
 
     private void NameColumnEdit_LostFocus(object sender, RoutedEventArgs e)
     {
+        FileActionLogic.Rename(sender as TextBox);
+        //RenameTooltip.Visibility = Visibility.Hidden;
     }
 
     private void NameColumnEdit_TextChanged(object sender, TextChangedEventArgs e)
     {
+        var textBox = sender as TextBox;
+        var file = (FileClass)textBox.DataContext;
+        textBox.FilterString(CurrentDrive.IsFUSE
+            ? INVALID_NTFS_CHARS
+            : INVALID_UNIX_CHARS);
+
+        FileActions.IsRenameUnixLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Unix);
+        FileActions.IsRenameFuseLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.FUSE);
+        FileActions.IsRenameWindowsLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.Windows);
+        FileActions.IsRenameDriveRootLegal = FileHelper.FileNameLegal(textBox.Text, FileHelper.RenameTarget.WinRoot);
+
+        var fullName = Settings.ShowExtensions
+            ? textBox.Text
+            : textBox.Text + file.Extension;
+
+        var comparison = CurrentDrive.IsFUSE
+            ? StringComparison.InvariantCultureIgnoreCase
+            : StringComparison.InvariantCulture;
+
+        FileActions.IsRenameUnique = !DirList.FileList.Except([file]).Any(f => f.FullName.Equals(fullName, comparison));
     }
 
     private void ExplorerCanvas_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -1030,6 +1281,11 @@ public partial class ExplorerPageHeader : UserControl
     {
         if (CopyPaste.IsDrag && CopyPaste.DragStatus is not CopyPasteService.DragState.Active && e.Key is Key.Escape)
             RuntimeSettings.DragBitmap = null;
+        else
+        {
+            if (!FileActions.IsExplorerEditing && RuntimeSettings.IsPathBoxFocused is not true)
+                OnButtonKeyDown(sender, e);
+        }
     }
 
     private void MainWindow_OnPreviewKeyUp(object sender, KeyEventArgs e)

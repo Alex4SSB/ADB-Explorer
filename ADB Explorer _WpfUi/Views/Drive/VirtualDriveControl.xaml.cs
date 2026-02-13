@@ -14,19 +14,25 @@ public partial class VirtualDriveControl : UserControl
 
     private void Button_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        ((DriveViewModel)((Button)sender).DataContext).BrowseCommand.Execute();
+        if (sender is Button button && button.DataContext is DriveViewModel viewModel)
+        {
+            viewModel.BrowseCommand.Execute();
+        }
     }
 
     private void Button_PreviewMouseUp(object sender, MouseButtonEventArgs e)
     {
-        ((DriveViewModel)((Button)sender).DataContext).SelectCommand.Execute();
+        if (sender is Button button && button.DataContext is DriveViewModel viewModel)
+        {
+            viewModel.SelectCommand.Execute();
+        }
     }
 
     private void Button_KeyUp(object sender, KeyEventArgs e)
     {
-        if (e.Key is Key.Enter)
+        if (e.Key is Key.Enter && sender is Button button && button.DataContext is DriveViewModel viewModel)
         {
-            ((DriveViewModel)((Button)sender).DataContext).BrowseCommand.Execute();
+            viewModel.BrowseCommand.Execute();
             e.Handled = true;
         }
     }

@@ -311,6 +311,9 @@ public partial class NavigationBox : UserControl
         DisplayPath = AdbLocation.LocationFromString(Path) is Navigation.SpecialLocation.None ? Path : "";
 
         PathBox.SelectAll();
+
+        if (Data.RuntimeSettings.IsPathBoxFocused is not true)
+            Data.RuntimeSettings.IsPathBoxFocused = true;
     }
 
     private void PathBox_KeyDown(object sender, KeyEventArgs e)

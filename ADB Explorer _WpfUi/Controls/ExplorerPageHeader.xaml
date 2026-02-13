@@ -148,6 +148,7 @@
                             <ui:ListView
                                 x:Name="DriveList"
                                 HorizontalAlignment="Stretch"
+                                ItemsSource="{Binding DriveItemsSource}"
                                 Style="{StaticResource DriveListViewStyle}">
                                 <ui:ListView.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -211,6 +212,7 @@
                             <DataGridTemplateColumn.CellEditingTemplate>
                                 <DataTemplate>
                                     <ui:TextBox
+                                        FlowDirection="{Binding NameFlowDirection}"
                                         KeyDown="NameColumnEdit_KeyDown"
                                         Loaded="NameColumnEdit_Loaded"
                                         LostFocus="NameColumnEdit_LostFocus"
