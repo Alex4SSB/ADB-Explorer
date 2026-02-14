@@ -1,0 +1,52 @@
+name: Monthly ADB Version Check
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Check for new platform-tools versions
+        id: check
+        run: |
+          set -o pipefail
+          output="$(python scripts/verify_adb_download.py --check-new-only 2>&1)"
+          status=$?
+          printf '%s\n' "$output"
+          if [ "$status" -ne 0 ]; then
+            echo "new_versions=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "new_versions=false" >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo "details<<EOF"
+            printf '%s\n' "$output"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - name: Open issue for new platform-tools versions
+        if: steps.check.outputs.new_versions == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "New Android platform-tools version detected";
+            const body = `A new platform-tools version was detected by \`scripts/verify_adb_download.py --check-new-only\`.\n\nOutput:\n\n\`\`\`\n${{ steps.check.outputs.details }}\n\`\`\``;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              body,
+              assignees: [context.repo.owner],
+            });
