@@ -553,7 +553,7 @@ This document lists all official Android Debug Bridge (ADB) platform-tools versi
 #### Platform-Tools 27.0.0 (November 2017)
 **Windows:**
 - URL: https://dl.google.com/android/repository/platform-tools_r27.0.0-windows.zip
-- MD5: 8d9f4e0a8d4f9f9e0d0f0e0d0e0d0e0d
+- MD5: To be verified by downloading from official source
 
 **macOS:**
 - URL: https://dl.google.com/android/repository/platform-tools_r27.0.0-darwin.zip
