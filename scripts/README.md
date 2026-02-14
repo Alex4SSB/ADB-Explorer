@@ -8,7 +8,6 @@ A Python script to verify the integrity of downloaded ADB platform-tools package
 
 ### Requirements
 - Python 3.6 or higher
-- No external dependencies (uses standard library only)
 
 ### Usage
 
@@ -25,6 +24,26 @@ python verify_adb_download.py platform-tools_r35.0.2-windows.zip --expected-hash
 Compute only a specific algorithm:
 ```bash
 python verify_adb_download.py platform-tools_r35.0.2-windows.zip --algorithm sha256
+```
+
+Fetch all available releases and compute missing SHA-256 values:
+```bash
+python verify_adb_download.py --fetch-missing-sha256
+```
+
+Preview missing SHA-256 entries without downloading:
+```bash
+python verify_adb_download.py --fetch-missing-sha256 --dry-run
+```
+
+Update the official list file with computed SHA-256 values:
+```bash
+python verify_adb_download.py --fetch-missing-sha256 --update-official-list
+```
+
+Append new releases (when not already present in the official list):
+```bash
+python verify_adb_download.py --fetch-missing-sha256 --append-new-releases
 ```
 
 ### Example Output
@@ -48,6 +67,17 @@ Verification complete!
 - `file_path` - Path to the platform-tools zip file (required)
 - `--expected-hash` - Expected hash value to compare against (optional)
 - `--algorithm` - Hash algorithm to use: `md5`, `sha1`, `sha256`, or `all` (default: `all`)
+- `--fetch-missing-sha256` - Fetch all available releases and compute missing SHA-256 hashes
+- `--dry-run` - List missing SHA-256 entries without downloading
+- `--update-official-list` - Update `OFFICIAL_ADB_VERSIONS.md` with newly computed SHA-256 values
+- `--append-new-releases` - Append new releases to `OFFICIAL_ADB_VERSIONS.md` when missing
+- Release dates for newly appended entries are pulled from the official platform-tools release notes when available.
+ - The fetcher also uses the release notes list to discover older releases (down to 24.0.4) that aren't in `OFFICIAL_ADB_VERSIONS.md` yet.
+ - If a download fails with 404, the script will try alternate URL patterns (e.g., `platform-tools_35.0.2` in addition to `platform-tools_r35.0.2`).
+- `--normalize-official-list` - Sort versions and normalize URLs to the existing Google download pattern (r vs non-r).
+- `--sync-official-list` - Rebuild the list using Google release notes only (removes versions not listed, such as 34.0.2 if absent).
+- `--platform` - Filter releases by platform (default: `windows`)
+- `--official-list` - Path to `OFFICIAL_ADB_VERSIONS.md` (default: repo root)
 
 ### Notes
 
