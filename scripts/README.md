@@ -53,4 +53,5 @@ Verification complete!
 
 - Always verify downloads from official sources
 - Compare computed hashes with values from `OFFICIAL_ADB_VERSIONS.md`
-- Use SHA-256 for newer versions, MD5 for older versions (pre-r28)
+- **Prefer SHA-256 for verification** - MD5 is cryptographically broken and should only be used for legacy compatibility with older ADB versions (pre-r28) that only provide MD5 checksums
+- For security-critical applications, always use SHA-256 or stronger hash algorithms

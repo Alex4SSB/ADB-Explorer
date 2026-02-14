@@ -5,6 +5,9 @@ ADB Platform-Tools Download Verifier
 This script helps verify the integrity of downloaded ADB platform-tools packages
 by computing their checksums and comparing them with known values.
 
+Note: MD5 is cryptographically broken and should only be used for legacy
+compatibility with older ADB versions. Use SHA-256 when available.
+
 Usage:
     python verify_adb_download.py <file_path>
     python verify_adb_download.py <file_path> --expected-hash <hash>
@@ -19,13 +22,19 @@ import hashlib
 import os
 import sys
 
+# Use larger chunk size for better I/O performance
+CHUNK_SIZE = 65536  # 64KB
+
 
 def compute_md5(file_path):
-    """Compute MD5 hash of a file."""
+    """Compute MD5 hash of a file.
+    
+    Note: MD5 is cryptographically broken. Use only for legacy compatibility.
+    """
     hash_md5 = hashlib.md5()
     try:
         with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
+            for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
     except FileNotFoundError:
@@ -41,7 +50,7 @@ def compute_sha256(file_path):
     hash_sha256 = hashlib.sha256()
     try:
         with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
+            for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
                 hash_sha256.update(chunk)
         return hash_sha256.hexdigest()
     except FileNotFoundError:
@@ -57,7 +66,7 @@ def compute_sha1(file_path):
     hash_sha1 = hashlib.sha1()
     try:
         with open(file_path, "rb") as f:
-            for chunk in iter(lambda: f.read(4096), b""):
+            for chunk in iter(lambda: f.read(CHUNK_SIZE), b""):
                 hash_sha1.update(chunk)
         return hash_sha1.hexdigest()
     except FileNotFoundError:
@@ -121,6 +130,11 @@ Examples:
     print(f"File size: {format_file_size(get_file_size(args.file_path))}")
     print()
     
+    # Initialize hash variables
+    md5_hash = None
+    sha1_hash = None
+    sha256_hash = None
+    
     # Compute hashes
     if args.algorithm in ['md5', 'all']:
         print("Computing MD5...")
@@ -144,13 +158,13 @@ Examples:
         
         # Determine which hash matches
         match_found = False
-        if args.algorithm in ['md5', 'all'] and expected_hash == md5_hash:
+        if md5_hash and expected_hash == md5_hash:
             print("✓ MD5 hash matches!")
             match_found = True
-        elif args.algorithm in ['sha1', 'all'] and expected_hash == sha1_hash:
+        elif sha1_hash and expected_hash == sha1_hash:
             print("✓ SHA-1 hash matches!")
             match_found = True
-        elif args.algorithm in ['sha256', 'all'] and expected_hash == sha256_hash:
+        elif sha256_hash and expected_hash == sha256_hash:
             print("✓ SHA-256 hash matches!")
             match_found = True
         
