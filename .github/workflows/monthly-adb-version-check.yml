@@ -1,0 +1,82 @@
+name: Scheduled ADB Version Check
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      CHECK_SCRIPT: scripts/verify_adb_download.py
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Check for new platform-tools versions
+        id: check
+        run: |
+          output="$(python "$CHECK_SCRIPT" --check-new-only 2>&1)"
+          status=$?
+          printf '%s\n' "$output"
+          if [ "$status" -ne 0 ]; then
+            if printf '%s\n' "$output" | grep -q "New platform-tools versions detected"; then
+              echo "new_versions=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "new_versions=false" >> "$GITHUB_OUTPUT"
+              exit "$status"
+            fi
+          else
+            echo "new_versions=false" >> "$GITHUB_OUTPUT"
+          fi
+          {
+            echo "details<<EOF"
+            printf '%s\n' "$output"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - name: Open issue for new platform-tools versions
+        if: steps.check.outputs.new_versions == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const title = "New Android platform-tools version(s) detected";
+            const rawDetails = process.env.DETAILS || "";
+            const details = rawDetails.trim().length
+              ? rawDetails
+              : "No output was captured from the check command; please verify the workflow run.";
+            const maxFenceAttempts = 5;
+            const backtickFallback = "'";
+            let fence = "```";
+            for (let i = 0; i < maxFenceAttempts; i += 1) {
+              if (!details.includes(fence)) {
+                break;
+              }
+              fence += "`";
+            }
+            const bodyDetails = details.includes(fence)
+              ? details.replace(/`/g, backtickFallback)
+              : details;
+            const scriptPath = process.env.CHECK_SCRIPT;
+            if (!scriptPath) {
+              throw new Error("CHECK_SCRIPT is not set. Define it in the workflow job env.");
+            }
+            const command = `python ${scriptPath} --check-new-only`;
+            const body = `New platform-tools version(s) were detected by \`${command}\`.\n\nOutput:\n\n${fence}\n${bodyDetails}\n${fence}`;
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body,
+            });
+        env:
+          DETAILS: ${{ steps.check.outputs.details }}
