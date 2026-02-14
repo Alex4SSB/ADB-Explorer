@@ -26,6 +26,7 @@ import tempfile
 import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
+import zipfile
 
 # Use larger chunk size for better I/O performance
 CHUNK_SIZE = 65536  # 64KB
@@ -72,6 +73,23 @@ def compute_sha256(file_path):
         sys.exit(1)
 
 
+def compute_sha256_for_zip_entry(zip_path, entry_name):
+    """Compute SHA-256 hash for a file inside a zip archive."""
+    hash_sha256 = hashlib.sha256()
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zip_handle:
+            with zip_handle.open(entry_name) as entry:
+                for chunk in iter(lambda: entry.read(CHUNK_SIZE), b""):
+                    hash_sha256.update(chunk)
+        return hash_sha256.hexdigest()
+    except KeyError:
+        print(f"Warning: {entry_name} not found in {zip_path}")
+        return None
+    except Exception as exc:
+        print(f"Error reading {entry_name} from {zip_path}: {exc}")
+        return None
+
+
 def compute_sha1(file_path):
     """Compute SHA-1 hash of a file."""
     hash_sha1 = hashlib.sha1()
@@ -115,7 +133,7 @@ def get_repo_root():
 def read_official_versions(file_path):
     """Parse OFFICIAL_ADB_VERSIONS.md and return URL -> SHA-256 mapping."""
     entries = read_official_entries(file_path)
-    return {entry["url"]: entry.get("sha256") for entry in entries}
+    return {entry["url"]: entry.get("zip_sha256") for entry in entries}
 
 
 def read_official_entries(file_path):
@@ -126,56 +144,51 @@ def read_official_entries(file_path):
 
     header_pattern = re.compile(r"^####\s+Platform-Tools\s+([0-9.]+(?:\s+RC\d+)?)\s*(?:\(([^)]+)\))?", re.IGNORECASE)
     url_pattern = re.compile(r"^-\s*URL:\s*(.*)$", re.IGNORECASE)
-    sha256_pattern = re.compile(r"^-\s*SHA-256:\s*(.*)$", re.IGNORECASE)
+    sha256_pattern = re.compile(r"^-\s*(ZIP|EXE)?\s*SHA-256:\s*(.*)$", re.IGNORECASE)
 
     current_version = None
     current_date = None
-    current_url = None
+    current_entry = None
 
     with open(file_path, "r", encoding="utf-8") as file_handle:
         for line in file_handle:
             stripped = line.strip()
             header_match = header_pattern.match(stripped)
             if header_match:
-                if current_url:
-                    entries.append({
-                        "version": current_version,
-                        "date": current_date,
-                        "url": current_url,
-                        "sha256": None,
-                    })
-                    current_url = None
+                if current_entry:
+                    entries.append(current_entry)
+                    current_entry = None
                 current_version = header_match.group(1).strip()
                 current_date = header_match.group(2).strip() if header_match.group(2) else None
                 continue
-
             url_match = url_pattern.match(stripped)
             if url_match:
-                current_url = url_match.group(1).strip()
+                if current_entry:
+                    entries.append(current_entry)
+                current_entry = {
+                    "version": current_version,
+                    "date": current_date,
+                    "url": url_match.group(1).strip(),
+                    "zip_sha256": None,
+                    "exe_sha256": None,
+                }
                 continue
 
             sha_match = sha256_pattern.match(stripped)
-            if sha_match and current_url:
-                value = sha_match.group(1).strip()
+            if sha_match and current_entry:
+                label = (sha_match.group(1) or "ZIP").upper()
+                value = sha_match.group(2).strip()
                 if not value or "to be verified" in value.lower():
                     sha_value = "???"
                 else:
                     sha_value = value
-                entries.append({
-                    "version": current_version,
-                    "date": current_date,
-                    "url": current_url,
-                    "sha256": sha_value,
-                })
-                current_url = None
+                if label == "EXE":
+                    current_entry["exe_sha256"] = sha_value
+                else:
+                    current_entry["zip_sha256"] = sha_value
 
-    if current_url:
-        entries.append({
-            "version": current_version,
-            "date": current_date,
-            "url": current_url,
-            "sha256": None,
-        })
+    if current_entry:
+        entries.append(current_entry)
 
     return entries
 
@@ -386,6 +399,7 @@ def normalize_official_versions_file(
     release_dates=None,
     strict_google_list=False,
     sha256_by_version=None,
+    exe_sha256_by_version=None,
 ):
     """Sort versions and normalize URLs to the pattern that exists on Google."""
     if not os.path.isfile(file_path):
@@ -409,8 +423,10 @@ def normalize_official_versions_file(
             current["date"] = entry["date"]
         if entry.get("url") and not current.get("url"):
             current["url"] = entry["url"]
-        if entry.get("sha256") and not current.get("sha256"):
-            current["sha256"] = entry["sha256"]
+        if entry.get("zip_sha256") and not current.get("zip_sha256"):
+            current["zip_sha256"] = entry["zip_sha256"]
+        if entry.get("exe_sha256") and not current.get("exe_sha256"):
+            current["exe_sha256"] = entry["exe_sha256"]
         by_version[version] = current
 
     if strict_google_list:
@@ -424,7 +440,11 @@ def normalize_official_versions_file(
         if sha256_by_version:
             for version, sha_value in sha256_by_version.items():
                 if version in by_version:
-                    by_version[version]["sha256"] = sha_value
+                    by_version[version]["zip_sha256"] = sha_value
+        if exe_sha256_by_version:
+            for version, sha_value in exe_sha256_by_version.items():
+                if version in by_version:
+                    by_version[version]["exe_sha256"] = sha_value
     else:
         for version, entry in by_version.items():
             if not entry.get("date"):
@@ -484,12 +504,14 @@ def normalize_official_versions_file(
     for entry in normalized_entries:
         date_value = entry.get("date") or "Unknown date"
         url_value = entry.get("url") or "(no official URL found)"
-        sha_value = entry.get("sha256") or "To be verified by downloading from official source"
+        zip_sha_value = entry.get("zip_sha256") or "???"
+        exe_sha_value = entry.get("exe_sha256") or "???"
         blocks.extend([
             f"#### Platform-Tools {entry['version']} ({date_value})\n",
             f"**{platform_label}:**\n",
             f"- URL: {url_value}\n",
-            f"- SHA-256: {sha_value}\n",
+            f"- ZIP SHA-256: {zip_sha_value}\n",
+            f"- EXE SHA-256: {exe_sha_value}\n",
             "\n",
             "---\n",
             "\n",
@@ -501,20 +523,36 @@ def normalize_official_versions_file(
     return True
 
 
-def update_official_versions_file(file_path, updates, updates_by_version=None, url_updates=None, url_updates_by_version=None):
+def update_official_versions_file(
+    file_path,
+    updates,
+    updates_by_version=None,
+    url_updates=None,
+    url_updates_by_version=None,
+    exe_updates=None,
+    exe_updates_by_version=None,
+):
     """Update SHA-256 and URL entries in OFFICIAL_ADB_VERSIONS.md for matching URLs or versions."""
-    if not updates and not updates_by_version and not url_updates and not url_updates_by_version:
+    if (
+        not updates
+        and not updates_by_version
+        and not url_updates
+        and not url_updates_by_version
+        and not exe_updates
+        and not exe_updates_by_version
+    ):
         return 0
     if not os.path.isfile(file_path):
         print(f"Error: Official versions file not found: {file_path}")
         return 0
 
     url_pattern = re.compile(r"^-\s*URL:\s*(.*)$", re.IGNORECASE)
-    sha_pattern = re.compile(r"^-\s*SHA-256:\s*(.*)$", re.IGNORECASE)
+    sha_pattern = re.compile(r"^-\s*(ZIP|EXE)?\s*SHA-256:\s*(.*)$", re.IGNORECASE)
     header_pattern = re.compile(r"^####\s+Platform-Tools\s+([0-9.]+)", re.IGNORECASE)
     updated_lines = []
     current_url = None
     current_version = None
+    current_exe_seen = False
     updated = 0
 
     with open(file_path, "r", encoding="utf-8") as file_handle:
@@ -523,6 +561,7 @@ def update_official_versions_file(file_path, updates, updates_by_version=None, u
             header_match = header_pattern.match(stripped)
             if header_match:
                 current_version = header_match.group(1).strip()
+                current_exe_seen = False
                 updated_lines.append(line)
                 continue
 
@@ -544,15 +583,31 @@ def update_official_versions_file(file_path, updates, updates_by_version=None, u
 
             sha_match = sha_pattern.match(stripped)
             if sha_match:
+                label = (sha_match.group(1) or "ZIP").upper()
                 sha_value = None
-                if current_url and current_url in updates:
-                    sha_value = updates[current_url]
-                elif updates_by_version and current_version and current_version in updates_by_version:
-                    sha_value = updates_by_version[current_version]
+                if label == "EXE":
+                    current_exe_seen = True
+                    if current_url and exe_updates and current_url in exe_updates:
+                        sha_value = exe_updates[current_url]
+                    elif exe_updates_by_version and current_version and current_version in exe_updates_by_version:
+                        sha_value = exe_updates_by_version[current_version]
+                else:
+                    if current_url and current_url in updates:
+                        sha_value = updates[current_url]
+                    elif updates_by_version and current_version and current_version in updates_by_version:
+                        sha_value = updates_by_version[current_version]
                 if sha_value:
-                    updated_lines.append(f"- SHA-256: {sha_value}\n")
+                    updated_lines.append(f"- {label} SHA-256: {sha_value}\n")
                     updated += 1
-                    current_url = None
+                    if label == "ZIP" and not current_exe_seen:
+                        exe_value = None
+                        if current_url and exe_updates and current_url in exe_updates:
+                            exe_value = exe_updates[current_url]
+                        elif exe_updates_by_version and current_version and current_version in exe_updates_by_version:
+                            exe_value = exe_updates_by_version[current_version]
+                        if exe_value:
+                            updated_lines.append(f"- EXE SHA-256: {exe_value}\n")
+                            updated += 1
                     continue
 
             updated_lines.append(line)
@@ -606,12 +661,14 @@ def append_new_releases(file_path, new_entries, platform="windows"):
         version = entry.get("version") or "Unknown"
         date_value = entry.get("date") or "Unknown date"
         url = entry.get("url")
-        sha256_value = entry.get("sha256") or "???"
+        zip_sha256_value = entry.get("zip_sha256") or "???"
+        exe_sha256_value = entry.get("exe_sha256") or "???"
         blocks.extend([
             f"#### Platform-Tools {version} ({date_value})\n",
             f"**{platform_label}:**\n",
             f"- URL: {url}\n",
-            f"- SHA-256: {sha256_value}\n",
+            f"- ZIP SHA-256: {zip_sha256_value}\n",
+            f"- EXE SHA-256: {exe_sha256_value}\n",
             "\n",
             "---\n",
             "\n",
@@ -690,8 +747,35 @@ Examples:
         action='store_true',
         help='Rebuild OFFICIAL_ADB_VERSIONS.md using the Google release notes list'
     )
+    parser.add_argument(
+        '--check-new-only',
+        action='store_true',
+        help='Check for new stable versions not listed in OFFICIAL_ADB_VERSIONS.md'
+    )
 
     args = parser.parse_args()
+
+    if args.check_new_only:
+        official_list = args.official_list
+        if official_list is None:
+            official_list = os.path.join(get_repo_root(), "OFFICIAL_ADB_VERSIONS.md")
+        official_entries = read_official_entries(official_list)
+        existing_versions = {entry.get("version") for entry in official_entries if entry.get("version")}
+        release_dates = fetch_release_dates()
+        google_versions = set(release_dates.keys())
+        new_versions = sorted(
+            [version for version in google_versions if version not in existing_versions],
+            key=parse_version_key,
+            reverse=True,
+        )
+        if new_versions:
+            print("New platform-tools versions detected:")
+            for version in new_versions:
+                date_value = release_dates.get(version) or "Unknown date"
+                print(f"- {version} ({date_value})")
+            sys.exit(1)
+        print("No new platform-tools versions found.")
+        return
 
     if args.fetch_missing_sha256:
         official_list = args.official_list
@@ -776,6 +860,8 @@ Examples:
 
         updates = {}
         updates_by_version = {}
+        exe_updates = {}
+        exe_updates_by_version = {}
         url_updates = {}
         url_updates_by_version = {}
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -799,6 +885,11 @@ Examples:
                 if entry.get("version"):
                     updates_by_version[entry["version"]] = sha256_value
                     url_updates_by_version[entry["version"]] = resolved_url
+                exe_hash = compute_sha256_for_zip_entry(destination, "platform-tools/adb.exe")
+                if exe_hash:
+                    exe_updates[resolved_url] = exe_hash
+                    if entry.get("version"):
+                        exe_updates_by_version[entry["version"]] = exe_hash
                 print(f"SHA-256: {sha256_value}")
 
         if updates:
@@ -814,6 +905,8 @@ Examples:
                     updates_by_version=updates_by_version,
                     url_updates=url_updates,
                     url_updates_by_version=url_updates_by_version,
+                    exe_updates=exe_updates,
+                    exe_updates_by_version=exe_updates_by_version,
                 )
                 if updated_count:
                     print(f"\nUpdated official versions file: {official_list}")
@@ -845,6 +938,7 @@ Examples:
                 release_dates=release_dates,
                 strict_google_list=args.sync_official_list,
                 sha256_by_version=updates_by_version,
+                exe_sha256_by_version=exe_updates_by_version,
             ):
                 action_label = "Synced" if args.sync_official_list else "Normalized"
                 print(f"\n{action_label} official versions file: {official_list}")

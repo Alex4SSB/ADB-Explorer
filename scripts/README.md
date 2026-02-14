@@ -46,6 +46,11 @@ Append new releases (when not already present in the official list):
 python verify_adb_download.py --fetch-missing-sha256 --append-new-releases
 ```
 
+Check only for new stable versions (non-RC) not listed in `OFFICIAL_ADB_VERSIONS.md`:
+```bash
+python verify_adb_download.py --check-new-only
+```
+
 ### Example Output
 
 ```
@@ -76,6 +81,7 @@ Verification complete!
  - If a download fails with 404, the script will try alternate URL patterns (e.g., `platform-tools_35.0.2` in addition to `platform-tools_r35.0.2`).
 - `--normalize-official-list` - Sort versions and normalize URLs to the existing Google download pattern (r vs non-r).
 - `--sync-official-list` - Rebuild the list using Google release notes only (removes versions not listed, such as 34.0.2 if absent).
+- `--check-new-only` - Print new stable versions not listed in `OFFICIAL_ADB_VERSIONS.md` and exit non-zero if any are found.
 - `--platform` - Filter releases by platform (default: `windows`)
 - `--official-list` - Path to `OFFICIAL_ADB_VERSIONS.md` (default: repo root)
 
