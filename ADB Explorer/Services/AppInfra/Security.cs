@@ -7,12 +7,12 @@ namespace ADB_Explorer.Services;
 
 public static class Security
 {
-    public static string CalculateWindowsFileHash(string path)
+    public static string CalculateWindowsFileHash(string path, bool useSHA = false)
     {
         try
         {
             using StreamReader reader = new(path);
-            return CalculateWindowsFileHash(reader.BaseStream);
+            return CalculateWindowsFileHash(reader.BaseStream, useSHA);
         }
         catch (Exception)
         {
@@ -20,10 +20,21 @@ public static class Security
         }
     }
 
-    public static string CalculateWindowsFileHash(Stream file)
+    /// <summary>
+    /// Calculates the cryptographic hash of the specified file stream using either the MD5 or SHA256 algorithm.
+    /// </summary>
+    /// <remarks>SHA256 provides a stronger hash than MD5 and is recommended for security-sensitive scenarios.
+    /// The stream must not be modified during the hashing process.</remarks>
+    /// <param name="file">A readable stream positioned at the beginning of the file to compute the hash for.</param>
+    /// <param name="useSHA">Specifies whether to use the SHA256 algorithm. If <see langword="true"/>, SHA256 is used; otherwise, MD5 is
+    /// used.</param>
+    /// <returns>A hexadecimal *UPPERCASE* string representation of the computed hash value.</returns>
+    public static string CalculateWindowsFileHash(Stream file, bool useSHA = false)
     {
-        var hash = MD5.HashData(file);
-
+        var hash = useSHA
+            ? SHA256.HashData(file)
+            : MD5.HashData(file);
+        
         return Convert.ToHexString(hash);
     }
 
@@ -50,7 +61,7 @@ public static class Security
         var folderHashes = folders.AsParallel().SelectMany(f => CalculateWindowsFolderHash(f, parent)).AsEnumerable();
 
         var files = Directory.GetFiles(path);
-        var fileHashes = files.AsParallel().ToDictionary(f => FileHelper.ExtractRelativePath(f, parent).Replace('\\', '/'), CalculateWindowsFileHash);
+        var fileHashes = files.AsParallel().ToDictionary(f => FileHelper.ExtractRelativePath(f, parent).Replace('\\', '/'), f => CalculateWindowsFileHash(f));
         
         return new(folderHashes.Concat(fileHashes));
     }

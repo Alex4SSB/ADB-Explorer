@@ -26,6 +26,9 @@
         [GeneratedRegex(@"^Version[\t ]*(?<version>[\d.]+)[\s\S]*^Installed as (?<Path>.+)$", RegexOptions.Multiline)]
         public static partial Regex RE_ADB_VERSION();
 
+        [GeneratedRegex(@"EXE SHA-256: (?<Hash>[0-9a-zA-Z]+)$", RegexOptions.Multiline)]
+        public static partial Regex RE_ADB_LIST_HASH();
+
         [GeneratedRegex(@"(?:INSTALL_FAILED_INVALID_APK.*?)(?<package>com\.[\w.]+)(?:])")]
         public static partial Regex RE_PACKAGE_NAME();
 

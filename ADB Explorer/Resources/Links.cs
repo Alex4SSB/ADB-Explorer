@@ -18,4 +18,5 @@ public static class Links
     public static readonly Uri SPONSOR = new("https://github.com/sponsors/Alex4SSB");
     public static readonly Uri WEBLATE = new("https://hosted.weblate.org/engage/adb-explorer/");
     public static readonly Uri ADVANCED_SHARP_ADB = new("https://github.com/SharpAdb/AdvancedSharpAdbClient");
+    public static readonly Uri REPO_ADB_VER_LIST = new("https://raw.githubusercontent.com/Alex4SSB/ADB-Explorer/master/OFFICIAL_ADB_VERSIONS.md");
 }

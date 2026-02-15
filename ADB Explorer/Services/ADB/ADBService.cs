@@ -431,12 +431,38 @@ public partial class ADBService
         return CountFiles(deviceID, TEMP_PATH, includeNames: INSTALL_APK.Select(name => "*" + name));
     }
 
+    static IEnumerable<string> _repoHashList = null;
+    static IEnumerable<string> RepoHashList
+    {
+        get
+        {
+            _repoHashList ??= Network.GetAdbVersionListAsync().Result;
+
+            return _repoHashList;
+        }
+    }
+
     public static void VerifyAdbVersion(string adbPath)
     {
         if (string.IsNullOrEmpty(adbPath))
         {
             RuntimeSettings.AdbVersion = new(0, 0, 0);
             return;
+        }
+
+        var adbSHA = Security.CalculateWindowsFileHash(adbPath.Trim('\\', '"'), true);
+        if (adbSHA is not null)
+        {
+            bool isValidHash = AdbVersions.HashList.Contains(adbSHA);
+
+            if (!isValidHash)
+            {
+                if (!RepoHashList.Contains(adbSHA))
+                {
+                    RuntimeSettings.AdbVersion = null;
+                    return;
+                }
+            }
         }
 
         int exitCode = 1;
