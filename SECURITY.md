@@ -95,6 +95,7 @@ Security researchers who responsibly disclose vulnerabilities will be:
 We'd like to thank the following security researchers for their responsible disclosure:
 
 - [@blankshiro](https://github.com/blankshiro) - For reporting a security vulnerability (February 2026)
+- [@AgentMisterious](https://github.com/AgentMisterious) - For reporting a security vulnerability (February 2026)
 
 ## Security Best Practices
 
