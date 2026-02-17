@@ -1,4 +1,7 @@
 ﻿using ADB_Explorer.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 
@@ -6,13 +9,21 @@ namespace ADB_Explorer.Services;
 
 public static class Network
 {
-    private static readonly HttpClient Client = new();
+    private static readonly HttpClient Client = new(new HttpClientHandler { AutomaticDecompression = DecompressionMethods.All });
+
+    static Network()
+    {
+        Client.DefaultRequestHeaders.UserAgent.ParseAdd("ADB-Explorer");
+        Client.Timeout = TimeSpan.FromSeconds(20);
+    }
 
     public static async Task<string> GetRequestAsync(Uri url)
     {
         try
         {
-            return await Client.GetStringAsync(url);
+            using var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
         }
         catch (Exception)
         {
@@ -20,35 +31,42 @@ public static class Network
         }
     }
 
+    public static async Task<IEnumerable<string>> GetAdbVersionListAsync()
+    {
+        var response = await GetRequestAsync(Resources.Links.REPO_ADB_VER_LIST).ConfigureAwait(false);
+        if (response is null)
+            return null;
+
+        return AdbVersions.ParseFromVersionList(response).ToArray();
+    }
+
     public static async Task<Version> LatestAppReleaseAsync()
     {
-        //Client.DefaultRequestHeaders.Add("User-Agent", "Unity web player");
+        var response = await GetRequestAsync(Resources.Links.REPO_RELEASES_URL).ConfigureAwait(false);
+        if (response is null)
+            return null;
 
-        //var response = await GetRequestAsync(Resources.Links.REPO_RELEASES_URL);
-        //if (response is null)
-        //    return null;
+        JArray json = (JArray)JsonConvert.DeserializeObject(response);
 
-        //JArray json = (JArray)JsonConvert.DeserializeObject(response);
+        if (!json.HasValues)
+            return null;
 
-        //if (!json.HasValues)
-        //    return null;
+        foreach (var release in json)
+        {
+            if (release["prerelease"].ToObject<bool>() || release["draft"].ToObject<bool>())
+                continue;
 
-        //foreach (var release in json)
-        //{
-        //    if (release["prerelease"].ToObject<bool>() || release["draft"].ToObject<bool>())
-        //        continue;
-
-        //    var match = AdbRegEx.RE_GITHUB_VERSION().Match(release["tag_name"].ToString());
-        //    if (match.Success)
-        //    {
-        //        try
-        //        {
-        //            return new(match.Value);
-        //        }
-        //        catch
-        //        { }
-        //    }
-        //}
+            var match = AdbRegEx.RE_GITHUB_VERSION().Match(release["tag_name"].ToString());
+            if (match.Success)
+            {
+                try
+                {
+                    return new(match.Value);
+                }
+                catch
+                { }
+            }
+        }
 
         return null;
     }
@@ -66,7 +84,7 @@ public static class Network
         var ipv4 = addresses.Where(add => add.Address.AddressFamily is System.Net.Sockets.AddressFamily.InterNetwork);
         if (!ipv4.Any())
             return null;
-        
+
         return ipv4.First().Address.ToString();
     }
 

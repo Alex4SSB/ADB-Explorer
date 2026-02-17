@@ -95,7 +95,7 @@ public static class AdbExplorerConst
     public const double MAX_WINDOW_WIDTH_FOR_SEARCH_AUTO_COLLAPSE = 800;
     public const double MIN_SEARCH_WIDTH = 100;
 
-    public const string APP_SETTINGS_FILE = "App.txt";
+    public const string APP_SETTINGS_FILE = "settings.json";
 
     public const int DRIVE_WARNING = 99;
 
@@ -116,8 +116,6 @@ public static class AdbExplorerConst
     public const long MAX_DISK_DISPLAY_RATE = 1000000000;
 
     public static readonly Point DRAG_OFFSET_DEFAULT = new(48, 89);
-
-    public static readonly string TEMP_DRAG_FOLDER = $"TempDrag_{Helpers.RandomString.GetUniqueKey(3, [.. WIFI_PAIRING_ALPHABET.Except(INVALID_NTFS_CHARS)])}";
 
     public static readonly Key[] NAVIGATION_KEYS = [Key.Enter, Key.Up, Key.Down, Key.Left, Key.Right, Key.Escape, Key.Home, Key.End];
 }

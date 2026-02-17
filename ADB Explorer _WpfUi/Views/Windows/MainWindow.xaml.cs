@@ -26,14 +26,7 @@ namespace ADB_Explorer.Views.Windows
             ViewModel = viewModel;
             DataContext = this;
 
-            SystemThemeWatcher.Watch(this);
-            AdbThemeService.SetTheme(Data.Settings.Theme);
-            AdbHelper.CheckAdbVersion();
-            Data.DevicesObject = new();
-            Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
-            Data.FileOpQ = new();
-            NativeMethods.InterceptClipboard.Init(this, Data.CopyPaste.GetClipboardPasteItems, IpcService.AcceptIpcMessage);
-            //DeviceHelper.UpdateWsaPkgStatus();
+            Initialize();
 
             InitializeComponent();
             SetPageService(navigationViewPageProvider);
@@ -42,6 +35,24 @@ namespace ADB_Explorer.Views.Windows
             navigationService.SetNavigationControl(RootNavigation);
 
             RootNavigation.Navigated += RootNavigation_Navigated;
+        }
+
+        private async void Initialize()
+        {
+            SystemThemeWatcher.Watch(this);
+            AdbThemeService.SetTheme(Data.Settings.Theme);
+            Data.DevicesObject = new();
+
+            if (!await AdbHelper.CheckAdbVersion())
+            {
+                return;
+            }
+
+            Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
+            Data.FileOpQ = new();
+            NativeMethods.InterceptClipboard.Init(this, Data.CopyPaste.GetClipboardPasteItems, IpcService.AcceptIpcMessage);
+            
+            //DeviceHelper.UpdateWsaPkgStatus();
         }
 
         private SettingsPageHeader SettingsPageHeader

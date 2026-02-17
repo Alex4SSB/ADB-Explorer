@@ -74,9 +74,17 @@ public partial class App
     /// </summary>
     private async void OnStartup(object sender, StartupEventArgs e)
     {
+        // Read to force it to be set to Windows' culture
+        _ = Data.Settings.OriginalCulture;
+
+        // Similar to %LocalAppData%\ADB Explorer (but avoids virtualization for Store versions)
+        Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+
+        var settingsPath = "";
         if (e.Args.Length > 0)
         {
-            if (!Directory.Exists(e.Args[0]))
+            // verify that the provided path is valid - it should not exist as a directory, but its parent directory should exist
+            if (!Directory.Exists(FileHelper.GetParentPath(e.Args[0])) || Directory.Exists(e.Args[0]))
             {
                 MessageBox.Show($"{Strings.Resources.S_PATH_INVALID}\n\n{e.Args[0]}", Strings.Resources.S_CUSTOM_DATA_PATH, MessageBoxButton.OK, MessageBoxImage.Error);
 
@@ -84,42 +92,16 @@ public partial class App
                 return;
             }
 
-            Data.AppDataPath = e.Args[0];
+            settingsPath = Path.GetFullPath(e.Args[0]);
         }
         else
-            Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData"), AdbExplorerConst.APP_DATA_FOLDER);
-
-        // Read to force it to be set to Windows' culture
-        _ = Data.Settings.OriginalCulture;
-
-        //SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+            settingsPath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
 
         var settings = Services.GetRequiredService<SettingsService>();
-        settings.Load();
-
-        //var settingsVM = Services.GetRequiredService<SettingsViewModel>();
-        //await Dispatcher.Invoke(settingsVM.OnNavigatedToAsync);
+        settings.Load(settingsPath);
 
         try
         {
-            // if settings file exists in local app data - try to read it from there, otherwise try to read it from the isolated storage (old method)
-            //if (File.Exists(SettingsFilePath))
-            //{
-            //    using StreamReader appDataReader = new(SettingsFilePath);
-            //    ReadSettingsFile(appDataReader);
-            //}
-            //else
-            //{
-            //    if (!Directory.Exists(Data.AppDataPath))
-            //        Directory.CreateDirectory(Data.AppDataPath);
-
-            //    using IsolatedStorageFileStream stream = new(AdbExplorerConst.APP_SETTINGS_FILE,
-            //                                                 FileMode.Open,
-            //                                                 IsolatedStorageFile.GetUserStoreForDomain());
-            //    using StreamReader reader = new(stream);
-            //    ReadSettingsFile(reader);
-            //}
-
             if (!Data.Settings.UICulture.Equals(CultureInfo.InvariantCulture))
             {
                 Thread.CurrentThread.CurrentUICulture =

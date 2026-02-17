@@ -357,17 +357,22 @@ public partial class AppRuntimeSettings : ViewModelBase
 
     public string AdbPath { get; set; }
 
-    public string TempDragPath => FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.TEMP_DRAG_FOLDER, '\\');
+    private string tempDragPath = null;
+    public string TempDragPath
+    {
+        get
+        {
+            tempDragPath ??= Directory.CreateTempSubdirectory().FullName;
+
+            return tempDragPath;
+        }
+    }
 
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
-    public bool IsWin11 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_VERSION;
-
     public bool Is22H2 => Environment.OSVersion.Version >= AdbExplorerConst.WIN11_22H2;
 
-    public bool HideForceFluent => false; // !IsWin11;
-
-    public bool UseFluentStyles => true; // IsWin11 || Data.Settings.ForceFluentStyles;
+    public bool UseFluentStyles => true;
 
     public bool IsRTL => Thread.CurrentThread.CurrentUICulture.TextInfo.IsRightToLeft;
 

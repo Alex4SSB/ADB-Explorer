@@ -15,7 +15,7 @@ public partial class MdnsDeviceControl : UserControl
 
         Data.MdnsService = new();
         AdbHelper.EnableMdns();
-
+        
         InitializeComponent();
     }
 
