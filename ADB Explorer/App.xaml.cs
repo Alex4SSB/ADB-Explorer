@@ -17,9 +17,13 @@ public partial class App : Application
         // Read to force it to be set to Windows' culture
         _ = Data.Settings.OriginalCulture;
 
+        // Similar to %LocalAppData%\ADB Explorer (but avoids virtualization for Store versions)
+        Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
+
         if (e.Args.Length > 0)
         {
-            if (!Directory.Exists(e.Args[0]))
+            // verify that the provided path is valid - it should not exist as a directory, but its parent directory should exist
+            if (!Directory.Exists(FileHelper.GetParentPath(e.Args[0])) || Directory.Exists(e.Args[0]))
             {
                 MessageBox.Show($"{Strings.Resources.S_PATH_INVALID}\n\n{e.Args[0]}", Strings.Resources.S_CUSTOM_DATA_PATH, MessageBoxButton.OK, MessageBoxImage.Error);
                 
@@ -27,12 +31,10 @@ public partial class App : Application
                 return;
             }
 
-            Data.AppDataPath = e.Args[0];
+            SettingsFilePath = Path.GetFullPath(e.Args[0]);
         }
         else
-            Data.AppDataPath = Path.Combine(Environment.GetEnvironmentVariable("USERPROFILE"), "AppData", "Local", AdbExplorerConst.APP_DATA_FOLDER);
-
-        SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
+            SettingsFilePath = FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.APP_SETTINGS_FILE, '\\');
         
         try
         {

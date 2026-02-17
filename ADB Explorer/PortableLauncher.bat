@@ -1,3 +1,3 @@
 @echo off
-start "" "ADB Explorer.exe" ./
+start "" "ADB Explorer.exe" ./App.txt
 exit

@@ -1016,7 +1016,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Custom App Data Path.
+        ///   Looks up a localized string similar to Custom App Settings Path.
         /// </summary>
         public static string S_CUSTOM_DATA_PATH {
             get {
@@ -2527,7 +2527,7 @@ namespace ADB_Explorer.Strings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Provided path does not exist..
+        ///   Looks up a localized string similar to Argument must specify full path of a new or existing settings file..
         /// </summary>
         public static string S_PATH_INVALID {
             get {

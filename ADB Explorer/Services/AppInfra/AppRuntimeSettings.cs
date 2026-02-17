@@ -414,7 +414,16 @@ public class AppRuntimeSettings : ViewModelBase
 
     public string AdbPath { get; set; }
 
-    public string TempDragPath => FileHelper.ConcatPaths(Data.AppDataPath, AdbExplorerConst.TEMP_DRAG_FOLDER, '\\');
+    private string tempDragPath = null;
+    public string TempDragPath
+    {
+        get
+        {
+            tempDragPath ??= Directory.CreateTempSubdirectory().FullName;
+
+            return tempDragPath; 
+        }
+    }
 
     public bool IsAppDeployed => Environment.CurrentDirectory.ToUpper() == @"C:\WINDOWS\SYSTEM32";
 
