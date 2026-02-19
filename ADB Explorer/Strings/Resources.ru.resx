@@ -1044,7 +1044,7 @@ ADB доступен как часть Android SDK Platform Tools.
     <value>Неизвестно</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Путь не существует.</value>
+    <value>Аргумент должен указать полный путь нового или существующего файла настроек.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
     <value>Произвольный путь</value>
