@@ -1044,10 +1044,10 @@ ADB מסופק כחלק מ Android SDK Platform Tools.
     <value>אינו ידוע</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>הנתיב שסופק אינו קיים.</value>
+    <value>הארגומנט חייב לציין נתיב מלא של קובץ הגדרות חדש או קיים.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>נתיב נתוני אפליקציה מותאם אישית</value>
+    <value>נתיב קובץ הגדרות אפליקציה מותאם אישית</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>התפריט ריק</value>

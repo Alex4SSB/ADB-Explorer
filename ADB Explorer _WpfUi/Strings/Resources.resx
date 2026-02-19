@@ -1245,11 +1245,11 @@ Cancel All Running</value>
     <comment>Displayed in the source / target of a file operation when those are unknown</comment>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Provided path does not exist.</value>
+    <value>Argument must specify full path of a new or existing settings file.</value>
     <comment>Displayed when an invalid path argument is provided for app launch</comment>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Custom App Data Path</value>
+    <value>Custom App Settings Path</value>
     <comment>The title of the error message when an invalid path argument is provided</comment>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">

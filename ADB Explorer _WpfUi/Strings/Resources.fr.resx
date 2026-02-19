@@ -1044,10 +1044,10 @@ Annuler tout en cours</value>
     <value>N/D</value>
   </data>
   <data name="S_PATH_INVALID" xml:space="preserve">
-    <value>Le chemin fourni n’existe pas.</value>
+    <value>L'argument doit spécifier le chemin complet d'un fichier de paramètres nouveau ou existant.</value>
   </data>
   <data name="S_CUSTOM_DATA_PATH" xml:space="preserve">
-    <value>Chemin de données d’app personnalisé</value>
+    <value>Chemin de données de paramètre personnalisé</value>
   </data>
   <data name="S_MENU_EMPTY" xml:space="preserve">
     <value>Menu est vide</value>
