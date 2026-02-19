@@ -298,7 +298,15 @@ public partial class ADBService
         public string MmcProp => Props.GetValueOrDefault(MMC_PROP);
         public string OtgProp => Props.GetValueOrDefault(OTG_PROP);
 
-        public Task<string> GetAndroidVersion() => Task.Run(() => Props.GetValueOrDefault(ANDROID_VERSION, ""));
+        public byte? AndroidVersion;
+
+        public Task<string> GetAndroidVersion() => Task.Run(() =>
+        {
+            var version = Props.GetValueOrDefault(ANDROID_VERSION, "");
+            AndroidVersion = byte.TryParse(version.Split('.')[0], out byte ver) ? ver : null;
+
+            return version;
+        });
 
         public static Dictionary<string, string> GetBatteryInfo(LogicalDevice device)
         {
