@@ -264,16 +264,6 @@ public abstract class FileOperation : ViewModelBase
         TargetAction = new(
             () => IsTargetNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(true));
-
-        Device.Device.PropertyChanged += Device_PropertyChanged;
-    }
-
-    private void Device_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(Device.Status))
-        {
-            Data.RuntimeSettings.SortFileOps = true;
-        }
     }
 
     private void OpenLocation(bool target)
