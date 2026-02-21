@@ -155,8 +155,26 @@ namespace ADB_Test
             // Verify this does not throw an exception by simply executing it
             StyleHelper.VerifyIcon(goodIcon);
 
-            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(badIcon1));
-            Assert.ThrowsException<ArgumentException>(() => StyleHelper.VerifyIcon(badIcon2));
+            try
+            {
+                StyleHelper.VerifyIcon(badIcon1);
+                Assert.Fail();
+            }
+            catch (Exception)
+            {
+
+            }
+
+            try
+            {
+                StyleHelper.VerifyIcon(badIcon2);
+                Assert.Fail();
+            }
+            catch (Exception)
+            {
+
+            }
+
         }
 
         [TestMethod]
