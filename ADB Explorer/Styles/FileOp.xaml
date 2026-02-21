@@ -307,7 +307,7 @@
                         </Style.Triggers>
                     </Style>
                 </StackPanel.Style>
-                <TextBlock Margin="4,0,0,0" Text="{Binding CurrentFilePercentage, Mode=OneWay}" />
+                <TextBlock Margin="4,0,0,0" Text="{Binding CurrentPercentageString, Mode=OneWay}" />
                 <TextBlock Text="%" />
             </StackPanel>
         </Grid>

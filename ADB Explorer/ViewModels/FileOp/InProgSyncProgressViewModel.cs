@@ -27,6 +27,8 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
 
     public double? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
 
+    public string CurrentPercentageString => $"{CurrentFilePercentage:0.0}";
+
     public long? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
 
     public string CurrentFilePath => adbInfo?.AndroidPath;
