@@ -231,7 +231,7 @@ public class LogicalDeviceViewModelEqualityComparer : IEqualityComparer<LogicalD
 {
     public bool Equals(LogicalDeviceViewModel x, LogicalDeviceViewModel y)
     {
-        return x.ID == y.ID && x.Status == y.Status;
+        return x.ID == y.ID && x.Status == y.Status && x.DeviceData == y.DeviceData;
     }
 
     public int GetHashCode([DisallowNull] LogicalDeviceViewModel obj)

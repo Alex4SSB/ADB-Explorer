@@ -9,7 +9,7 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
 
     public InProgSyncProgressViewModel() : base(FileOperation.OperationStatus.InProgress)
     {
-        
+
     }
 
     public InProgSyncProgressViewModel(AdbSyncProgressInfo adbInfo) : this()
@@ -17,13 +17,17 @@ internal class InProgSyncProgressViewModel : FileOpProgressViewModel
         this.adbInfo = adbInfo;
     }
 
-    public int? TotalPercentage => adbInfo?.TotalPercentage;
+    public string PercentageString => $"{adbInfo?.TotalPercentage:0.0}";
+
+    public double? TotalPercentage => adbInfo?.TotalPercentage;
 
     public long? TotalBytesTransferred => adbInfo?.TotalBytesTransferred;
 
     public string TotalBytes => TotalBytesTransferred?.BytesToSize();
 
-    public int? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
+    public double? CurrentFilePercentage => adbInfo?.CurrentFilePercentage;
+
+    public string CurrentPercentageString => $"{CurrentFilePercentage:0.0}";
 
     public long? CurrentFileBytesTransferred => adbInfo?.CurrentFileBytesTransferred;
 

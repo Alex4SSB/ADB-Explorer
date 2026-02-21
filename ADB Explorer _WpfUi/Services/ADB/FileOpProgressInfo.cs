@@ -67,19 +67,23 @@ public class SyncErrorInfo : FileOpErrorInfo
     public string WindowsPath { get; protected set; }
 
     private SyncErrorInfo()
-    {
+    { }
 
+    public SyncErrorInfo(string androidPath, string message)
+        : base(message)
+    {
+        AndroidPath = androidPath;
     }
 }
 
 public class AdbSyncProgressInfo : FileOpProgressInfo
 {
-    public int? TotalPercentage { get; set; }
-    public int? CurrentFilePercentage { get; }
+    public double? TotalPercentage { get; set; }
+    public double? CurrentFilePercentage { get; }
     public long? CurrentFileBytesTransferred { get; }
     public long? TotalBytesTransferred { get; }
 
-    public AdbSyncProgressInfo(string currentFile, int? totalPercentage, int? currentFilePercentage, long? currentFileBytesTransferred)
+    public AdbSyncProgressInfo(string currentFile, double? totalPercentage, double? currentFilePercentage, long? currentFileBytesTransferred)
     {
         AndroidPath = currentFile;
         TotalPercentage = totalPercentage;

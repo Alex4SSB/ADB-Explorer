@@ -1,7 +1,8 @@
-﻿//using ADB_Explorer.Controls;
+﻿using ADB_Explorer.Controls;
 using ADB_Explorer.Helpers;
 using ADB_Explorer.Models;
 using ADB_Explorer.ViewModels;
+using Wpf.Ui.Controls;
 using static ADB_Explorer.Services.FileAction;
 
 namespace ADB_Explorer.Services;
@@ -207,22 +208,20 @@ public abstract class FileOperation : ViewModelBase
         _ => throw new NotSupportedException(),
     };
 
-    public virtual FrameworkElement OpIcon => new();
-        
-    //    => OperationName switch
-    //{
-    //    OperationType.Pull => new PullIcon(),
-    //    OperationType.Push => new PushIcon(),
-    //    OperationType.Recycle => new RecycleIcon(),
-    //    OperationType.Move => new FontIcon() { Glyph = "\uE8DE" },
-    //    OperationType.Delete => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Delete] },
-    //    OperationType.Copy => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Copy] },
-    //    OperationType.Restore => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Restore] },
-    //    OperationType.Update => new FontIcon() { Glyph = AppActions.Icons[FileActionType.UpdateModified] },
-    //    OperationType.Install => null, // gets overridden
-    //    OperationType.Rename => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Rename] },
-    //    _ => throw new NotSupportedException(),
-    //};
+    public virtual FrameworkElement OpIcon => OperationName switch
+    {
+        OperationType.Pull => new PullIcon(),
+        OperationType.Push => new PushIcon(),
+        OperationType.Recycle => new RecycleIcon(),
+        OperationType.Move => new FontIcon() { Glyph = "\uE8DE" },
+        OperationType.Delete => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Delete] },
+        OperationType.Copy => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Copy] },
+        OperationType.Restore => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Restore] },
+        OperationType.Update => new FontIcon() { Glyph = AppActions.Icons[FileActionType.UpdateModified] },
+        OperationType.Install => null, // gets overridden
+        OperationType.Rename => new FontIcon() { Glyph = AppActions.Icons[FileActionType.Rename] },
+        _ => throw new NotSupportedException(),
+    };
 
     public bool ValidationAllowed
     {
@@ -266,16 +265,6 @@ public abstract class FileOperation : ViewModelBase
         TargetAction = new(
             () => IsTargetNavigable && !Data.FileActions.ListingInProgress,
             () => OpenLocation(true));
-
-        Device.Device.PropertyChanged += Device_PropertyChanged;
-    }
-
-    private void Device_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(Device.Status))
-        {
-            Data.RuntimeSettings.SortFileOps = true;
-        }
     }
 
     private void OpenLocation(bool target)

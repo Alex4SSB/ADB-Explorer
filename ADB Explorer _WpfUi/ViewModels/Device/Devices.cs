@@ -211,7 +211,7 @@ public class Devices : AbstractDevice
     {
         return other is not null
             && !LogicalDeviceViewModels.OrderBy(thisDevice => thisDevice.ID).SequenceEqual(
-                other.OrderBy(otherDevice => otherDevice.ID), new DeviceViewModelEqualityComparer());
+                other.OrderBy(otherDevice => otherDevice.ID), new LogicalDeviceViewModelEqualityComparer());
     }
 
     #endregion

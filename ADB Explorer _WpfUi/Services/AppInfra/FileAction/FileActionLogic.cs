@@ -1194,7 +1194,7 @@ internal static class FileActionLogic
             FileOpControlsMutex.WaitOne(0);
 
             var changed = false;
-            var plural = Data.FileActions.SelectedFileOps.Value.Count() > 1;
+            var plural = Data.FileActions.SelectedFileOps.Value.Count() != 1;
             var opString = plural
                 ? Strings.Resources.S_ACTION_OPERATION_PLURAL
                 : Strings.Resources.S_ACTION_OPERATION;
@@ -1251,5 +1251,14 @@ internal static class FileActionLogic
         var apk = Data.SelectedPackages.First();
         
         Process.Start(Data.RuntimeSettings.DefaultBrowserPath, $"\"? {apk.Name}\"");
+    }
+
+    public static void RemoveFileOps()
+    {
+        var ops = Data.FileActions.SelectedFileOps.Value;
+        if (!ops.Any())
+            ops = Data.FileOpQ.Operations;
+
+        Data.FileOpQ.Operations.RemoveAll(ops);
     }
 }

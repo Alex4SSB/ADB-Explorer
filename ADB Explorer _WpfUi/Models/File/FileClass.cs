@@ -177,6 +177,10 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         IsTemp = isTemp;
         
         SortName = new(fileName);
+
+        // Use a weak event pattern to prevent Settings from rooting this object
+        WeakEventManager<INotifyPropertyChanged, PropertyChangedEventArgs>.AddHandler(
+            Data.Settings, nameof(Data.Settings.PropertyChanged), OnSettingsPropertyChanged);
     }
 
     public FileClass(FileClass other)
@@ -226,6 +230,14 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         modifiedTime: fileStat.ModifiedTime,
         isLink: fileStat.IsLink
     );
+
+    private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs args)
+    {
+        if (args.PropertyName == nameof(Data.Settings.ShowExtensions))
+        {
+            OnPropertyChanged(nameof(DisplayName));
+        }
+    }
 
     public override void UpdatePath(string androidPath)
     {
