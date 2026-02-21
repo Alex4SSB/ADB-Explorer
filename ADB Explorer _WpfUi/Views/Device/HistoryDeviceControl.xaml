@@ -1,0 +1,164 @@
+﻿<UserControl
+    x:Class="ADB_Explorer.Views.HistoryDeviceControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:ADB_Explorer.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:helpers="clr-namespace:ADB_Explorer.Helpers"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:viewmodels="clr-namespace:ADB_Explorer.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:HistoryDeviceViewModel}"
+    d:Width="200"
+    mc:Ignorable="d">
+    <Expander d:IsExpanded="True">
+        <Expander.Style>
+            <Style BasedOn="{StaticResource DeviceExpanderStyle}" TargetType="Expander">
+                <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
+                    <Setter.Value>
+                        <Border BorderBrush="{DynamicResource HistoryDeviceBottomBorderBrush}" BorderThickness="0,1" />
+                    </Setter.Value>
+                </Setter>
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsDeviceConnectionInProgress}" Value="True">
+                        <Setter Property="helpers:ExpanderHelper.HeaderBottomContent">
+                            <Setter.Value>
+                                <ProgressBar
+                                    Foreground="{DynamicResource HistoryDeviceBottomBorderBrush}"
+                                    IsIndeterminate="True"
+                                    Style="{StaticResource ExpanderHeaderProgressBarStyle}" />
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Expander.Style>
+        <Expander.Header>
+            <Border
+                Margin="-5"
+                Padding="5,4"
+                ClipToBounds="True"
+                Style="{StaticResource BorderStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="{Binding TypeIcon}" Style="{StaticResource DeviceStatusFontSizeStyle}" />
+                    <TextBlock Grid.Column="1" Margin="4">
+                        <TextBlock.Style>
+                            <Style BasedOn="{StaticResource DeviceNameTextBlockStyle}" TargetType="TextBlock">
+                                <Setter Property="Text" Value="{Binding DeviceName}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsDeviceNameValid}" Value="False">
+                                        <Setter Property="Text" Value="{Binding IpAddress}" />
+                                        <Setter Property="FontFamily" Value="{StaticResource ConsoleFont}" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding IsIpAddressValid}" Value="False" />
+                                            <Condition Binding="{Binding IsDeviceNameValid}" Value="False" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Text" Value="{Binding HostName}" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <ui:Button
+                        Grid.Column="2"
+                        Command="{Binding RemoveCommand.Command}"
+                        Opacity="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Expander}, Path=(helpers:ExpanderHelper.ExpansionProgress)}"
+                        Style="{StaticResource RestartAppButtonStyle}"
+                        ToolTip="{Binding Source={x:Static Member=strings:Resources.S_REM_HIST_DEV}}">
+                        <ui:FontIcon Glyph="&#xE74D;" />
+                    </ui:Button>
+                </Grid>
+            </Border>
+        </Expander.Header>
+        <Grid Style="{StaticResource DeviceContentGridStyle}">
+            <controls:SimpleStackPanel Style="{StaticResource NewDeviceStackPanelStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE774;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_HOST}}" />
+                    <ui:TextBox
+                        Grid.Column="1"
+                        Padding="4,5,0,6"
+                        d:Background="LightGray"
+                        IsReadOnly="True">
+                        <ui:TextBox.Style>
+                            <Style BasedOn="{StaticResource NumericTextBoxStyle}" TargetType="ui:TextBox">
+                                <Setter Property="Text" Value="{Binding IpAddress}" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsIpAddressValid}" Value="False">
+                                        <Setter Property="Text" Value="{Binding HostName}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:TextBox.Style>
+                    </ui:TextBox>
+                </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE177;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PORT}}" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePortBoxStyle}" />
+                </Grid>
+                <Grid>
+                    <Grid.Resources>
+                        <Style TargetType="Separator">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPairingEnabled}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Separator />
+                    <ui:Button
+                        Grid.Column="1"
+                        Margin="4,0"
+                        Style="{StaticResource ConnectNewDeviceButtonStyle}" />
+                    <Separator Grid.Column="2" />
+                </Grid>
+                <Grid Style="{StaticResource NewDevicePairingGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon Glyph="&#xE8F9;" ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_CODE}}" />
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingCodeBoxStyle}" />
+                </Grid>
+                <Grid Style="{StaticResource NewDevicePairingGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid Margin="-1,0,4,0">
+                        <ui:FontIcon
+                            Margin="0"
+                            Glyph="&#xE177;"
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
+                        <ui:FontIcon
+                            Glyph="&#xEA21;"
+                            Style="{StaticResource NewDevicePairingPortAsteriskStyle}"
+                            ToolTip="{Binding Source={x:Static Member=strings:Resources.S_PLACEHOLDER_PAIRING_PORT}}" />
+                    </Grid>
+                    <controls:MaskedTextBox Grid.Column="1" Style="{StaticResource NewDevicePairingPortBoxStyle}" />
+                </Grid>
+            </controls:SimpleStackPanel>
+        </Grid>
+    </Expander>
+</UserControl>

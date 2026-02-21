@@ -83,7 +83,9 @@ public class AdbSyncProgressInfo : FileOpProgressInfo
     public long? CurrentFileBytesTransferred { get; }
     public long? TotalBytesTransferred { get; }
 
-    public AdbSyncProgressInfo(string currentFile, double? totalPercentage, double? currentFilePercentage, long? currentFileBytesTransferred)
+    public long? BytesTransferred => CurrentFileBytesTransferred ?? TotalBytesTransferred;
+
+    public AdbSyncProgressInfo(string currentFile, int? totalPercentage, int? currentFilePercentage, long? currentFileBytesTransferred)
     {
         AndroidPath = currentFile;
         TotalPercentage = totalPercentage;

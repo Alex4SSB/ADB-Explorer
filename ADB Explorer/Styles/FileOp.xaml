@@ -256,7 +256,10 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
+
+            <TextBlock Margin="4,0" Text="{Binding TotalBytes, Mode=OneWay}" />
+
+            <!--<ui:ProgressBar Style="{StaticResource FileOpProgressStyle}" Value="{Binding TotalPercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}" />
             <ui:ProgressBar Grid.Row="1" Value="{Binding CurrentFilePercentage, Mode=OneWay, Converter={StaticResource FileOpProgressConverter}}">
                 <ui:ProgressBar.Style>
                     <Style BasedOn="{StaticResource FluentProgressBarStyle}" TargetType="ui:ProgressBar">
@@ -267,7 +270,7 @@
                         </Style.Triggers>
                     </Style>
                 </ui:ProgressBar.Style>
-            </ui:ProgressBar>
+            </ui:ProgressBar>-->
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <StackPanel.Style>
                     <Style TargetType="StackPanel">

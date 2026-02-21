@@ -46,7 +46,7 @@ public static class UISettings
                 new BoolSetting(() => Settings.EnableMdns, Strings.Resources.S_SETTINGS_ENABLE_MDNS),
                 new BoolSetting(() => Settings.PollDevices, Strings.Resources.S_SETTINGS_POLL_DEVICES),
                 new BoolSetting(() => Settings.PollBattery, Strings.Resources.S_SETTINGS_POLL_BATTERY),
-                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_BUTTON_LOG),
+                new BoolSetting(() => Settings.EnableLog, Strings.Resources.S_SETTINGS_ENABLE_LOG),
             ]),
             new SettingsSeparator(),
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DEVICE,
@@ -68,7 +68,7 @@ public static class UISettings
             new SettingsGroup(Strings.Resources.S_SETTINGS_GROUP_DRIVES,
             [
                 new BoolSetting(() => Settings.PollDrives, Strings.Resources.S_SETTINGS_POLL_DRIVES),
-                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_DRIVE_TRASH),
+                new BoolSetting(() => Settings.EnableRecycle, Strings.Resources.S_SETTINGS_ENABLE_TRASH),
                 new BoolSetting(() => Settings.EnableApk, Strings.Resources.S_SETTINGS_APK),
             ]),
             new SettingsSeparator(),

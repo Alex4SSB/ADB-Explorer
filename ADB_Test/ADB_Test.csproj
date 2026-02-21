@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADB Explorer\ADB Explorer.csproj" />
+    <ProjectReference Include="..\ADB Explorer\ADB Explorer _ModernWPF.csproj" />
   </ItemGroup>
 
 </Project>
