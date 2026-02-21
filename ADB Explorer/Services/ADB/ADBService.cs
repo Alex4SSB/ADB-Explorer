@@ -442,36 +442,46 @@ public partial class ADBService
         }
     }
 
+    /// <summary>
+    /// Verifies ADB.exe hash against known valid versions and its version.<br/>
+    /// AdbPath and AdbVersion in RuntimeSettings are set accordingly based on the results of the verification.
+    /// </summary>
+    /// <remarks>
+    /// Sets AdbVersion to: <br/>
+    /// • null if the ADB executable is not recognized as valid <br/>
+    /// • 0.0.0 if ADB is valid but the version cannot be determined <br/>
+    /// • the actual version if it can be determined
+    /// </remarks>
     public static void VerifyAdbVersion(string adbPath)
     {
-        if (string.IsNullOrEmpty(adbPath))
-        {
-            RuntimeSettings.AdbVersion = new(0, 0, 0);
-            return;
-        }
-
         string trimmedPath = adbPath.Trim('"');
 
-        // Forbid UNC paths for security reasons
-        if (trimmedPath.StartsWith(@"\\"))
+        if (string.IsNullOrEmpty(trimmedPath)
+            || trimmedPath.StartsWith(@"\\")    // Forbid UNC paths for security reasons
+            || !File.Exists(trimmedPath))
         {
             RuntimeSettings.AdbVersion = null;
             return;
         }
 
+        bool isHashValid = false;
         var adbSHA = Security.CalculateWindowsFileHash(trimmedPath, true);
         if (adbSHA is not null)
         {
-            bool isValidHash = AdbVersions.HashList.Contains(adbSHA);
+            // First check against the hardcoded list of known ADB versions
+            isHashValid = AdbVersions.HashList.Contains(adbSHA);
 
-            if (!isValidHash)
+            if (!isHashValid)
             {
-                if (!RepoHashList.Contains(adbSHA))
-                {
-                    RuntimeSettings.AdbVersion = null;
-                    return;
-                }
+                // If not found, check against the list retrieved from the repository (which is updated more frequently)
+                isHashValid = RepoHashList.Contains(adbSHA);
             }
+        }
+
+        if (!isHashValid)
+        {
+            RuntimeSettings.AdbVersion = null;
+            return;
         }
 
         int exitCode = 1;
@@ -488,6 +498,7 @@ public partial class ADBService
             return;
         }
 
+        // Update the path in case we got it from environment PATH
         var match = RE_ADB_VERSION().Match(stdout);
         RuntimeSettings.AdbPath = match.Groups["Path"].Value.Trim();
 
