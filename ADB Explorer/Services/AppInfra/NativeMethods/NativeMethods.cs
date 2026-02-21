@@ -528,11 +528,23 @@ public static partial class NativeMethods
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct FILETIME(DateTime dateUTC)
+    public struct FILETIME
     {
-        public long dwDateTime = dateUTC.ToLocalTime().ToFileTime();
+        public FILETIME(DateTime dateUTC)
+        {
+            dwDateTime = dateUTC.ToLocalTime().ToFileTime();
+        }
+
+        public FILETIME(System.Runtime.InteropServices.ComTypes.FILETIME fileTime)
+        {
+            dwDateTime = ((long)fileTime.dwHighDateTime << 32) + fileTime.dwLowDateTime;
+        }
+
+        public long dwDateTime;
 
         public readonly DateTime DateTimeUTC => DateTime.FromFileTime(dwDateTime).ToUniversalTime();
+
+        public readonly DateTime DateTimeLocal => DateTime.FromFileTime(dwDateTime).ToLocalTime();
 
         public override readonly string ToString() => DateTimeUTC.ToString(CultureInfo.CurrentCulture);
     }

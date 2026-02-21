@@ -1,6 +1,7 @@
 ﻿using ADB_Explorer.Converters;
 using ADB_Explorer.Models;
 using ADB_Explorer.Services;
+using Vanara.PInvoke;
 using Vanara.Windows.Shell;
 using static ADB_Explorer.Models.AbstractFile;
 
@@ -380,5 +381,32 @@ public static class FileHelper
                     m.Groups["Size"].Value == "d" ? (long?)null : long.Parse(m.Groups["Size"].Value, CultureInfo.InvariantCulture),
                     m.Groups["Date"].Value == "d" ? (double?)null : double.Parse(m.Groups["Date"].Value, CultureInfo.InvariantCulture)
                 ))];
+    }
+
+    public static (long? Size, DateTime? ModifiedTime) GetShellSizeDate(ShellItem shellItem, bool isDirectory)
+    {
+        long? size = null;
+        DateTime? modifiedTime = null;
+
+        try
+        {
+            size = isDirectory ? null : shellItem.FileInfo.Length;
+            modifiedTime = shellItem.FileInfo.LastWriteTime;
+        }
+        catch (Exception)
+        {
+            if (!isDirectory
+                && shellItem.Properties.TryGetValue<ulong>(Ole32.PROPERTYKEY.System.Size, out var sz))
+            {
+                size = (long)sz;
+            }
+
+            if (shellItem.Properties.TryGetValue<System.Runtime.InteropServices.ComTypes.FILETIME>(Ole32.PROPERTYKEY.System.DateModified, out var modified))
+            {
+                modifiedTime = new NativeMethods.FILETIME(modified).DateTimeLocal;
+            }
+        }
+
+        return (size, modifiedTime);
     }
 }

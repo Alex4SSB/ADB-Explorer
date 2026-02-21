@@ -20,6 +20,8 @@ public class SyncFile : FilePath
     public long? Size { get; set; }
 
     public double? UnixTime { get; set; }
+
+    private readonly DateTime? dateModified;
     public DateTime? DateModified
     {
         get
@@ -27,9 +29,7 @@ public class SyncFile : FilePath
             if (!Data.Settings.KeepDateModified)
                 return null;
 
-            return ShellItem?.FileInfo is not null
-                ? ShellItem.FileInfo.LastWriteTime
-                : UnixTime.FromUnixTime();
+            return dateModified ?? UnixTime.FromUnixTime();
         }
     }
 
@@ -42,7 +42,7 @@ public class SyncFile : FilePath
     public SyncFile(ShellItem windowsPath, bool includeContent = false)
         : base(windowsPath)
     {
-        Size = IsDirectory ? null : windowsPath.FileInfo.Length;
+        (Size, dateModified) = FileHelper.GetShellSizeDate(windowsPath, IsDirectory);
 
         if (includeContent && IsDirectory)
         {

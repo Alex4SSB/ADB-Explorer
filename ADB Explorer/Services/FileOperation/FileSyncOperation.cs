@@ -124,11 +124,14 @@ public class FileSyncOperation : FileOperation
             {
                 MaxDegreeOfParallelism = Data.Settings.AllowMultiOp ? -1 : 1
             };
+            bool useV2 = Device.AndroidVersion >= 11;
 
             Parallel.ForEach(Files.Where(f => !f.IsDirectory), options, (item) =>
             {
                 void SyncProgressCallback(SyncProgressChangedEventArgs eventArgs) => AddUpdates(item, eventArgs, mutex);
 
+                // Open a new connection for each file to allow parallel transfers, maximizing throughput of the medium.
+                // Connecting by both USB and WiFi at the same time causes instability and doesn't seem to improve the speed further.
                 using SyncService service = new(Device.Device.DeviceData);
                 var targetPath = FilePath.IsDirectory
                         ? FileHelper.ConcatPaths(TargetPath, FileHelper.ExtractRelativePath(item.FullPath, FilePath.FullPath))
@@ -143,7 +146,7 @@ public class FileSyncOperation : FileOperation
 
                     // target = [Android parent folder]\[relative path from Windows parent folder to current item]
                     using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, Device.AndroidVersion >= 11, in isCanceled);
+                    service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useV2, in isCanceled);
                 }
                 else
                 {
@@ -152,7 +155,7 @@ public class FileSyncOperation : FileOperation
 
                     // target = [Windows parent folder]\[relative path from Android parent folder to current item]
                     using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                    service.Pull(item.FullPath, stream, SyncProgressCallback, Device.AndroidVersion >= 11, in isCanceled);
+                    service.Pull(item.FullPath, stream, SyncProgressCallback, useV2, in isCanceled);
                     
                     if (item.DateModified is not null)
                         File.SetLastWriteTime(targetPath, item.DateModified.Value);

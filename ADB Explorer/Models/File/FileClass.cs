@@ -197,9 +197,9 @@ public class FileClass : FilePath, IFileStat, IBrowserItem
         : base(windowsPath)
     {
         Type = IsDirectory ? FileType.Folder : FileType.File;
-        Size = IsDirectory ? null : windowsPath.FileInfo.Length;
-        ModifiedTime = windowsPath.FileInfo?.LastWriteTime;
         IsLink = windowsPath.IsLink;
+
+        (Size, ModifiedTime) = FileHelper.GetShellSizeDate(windowsPath, IsDirectory);
 
         GetIcon();
         TypeName = GetTypeName();
