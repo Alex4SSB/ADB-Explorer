@@ -129,7 +129,11 @@ public class SyncFile : FilePath
 
         if (!IsDirectory || newUpdates.All(u => u.AndroidPath is not null && u.AndroidPath.Equals(FullPath)))
         {
-            ProgressUpdates.AddRange(newUpdates);
+            if (ProgressUpdates.Count > 0 && ProgressUpdates.Last().GetType() == newUpdates.First().GetType())
+                ProgressUpdates = [.. newUpdates];
+            else
+                ProgressUpdates.AddRange(newUpdates);
+
             return;
         }
 
@@ -194,6 +198,24 @@ public class SyncFile : FilePath
         copy.PathType = FilePathType.Windows;
 
         return copy;
+    }
+
+    /// <summary>
+    /// Recursively clears progress updates for this file and all children,
+    /// and disposes any ShellItem COM wrappers to free unmanaged memory.
+    /// </summary>
+    public void ClearAll()
+    {
+        ProgressUpdates.Clear();
+        ShellItem?.Dispose();
+        ShellItem = null;
+
+        foreach (var child in Children)
+        {
+            child.ClearAll();
+        }
+
+        Children.Clear();
     }
 }
 

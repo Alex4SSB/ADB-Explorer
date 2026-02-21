@@ -67,8 +67,12 @@ public class SyncErrorInfo : FileOpErrorInfo
     public string WindowsPath { get; protected set; }
 
     private SyncErrorInfo()
-    {
+    { }
 
+    public SyncErrorInfo(string androidPath, string message)
+        : base(message)
+    {
+        AndroidPath = androidPath;
     }
 }
 

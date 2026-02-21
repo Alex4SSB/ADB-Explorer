@@ -147,14 +147,6 @@ public class FilePath : AbstractFile, IBaseFile
             if (AdbExplorerConst.ARCHIVE_NAMES.Contains(ext))
                 SpecialType |= SpecialFileType.Archive;
         }
-
-        Data.Settings.PropertyChanged += (sender, args) =>
-        {
-            if (args.PropertyName == nameof(Data.Settings.ShowExtensions))
-            {
-                OnPropertyChanged(nameof(DisplayName));
-            }
-        };
     }
 
     public virtual void UpdatePath(string newPath)

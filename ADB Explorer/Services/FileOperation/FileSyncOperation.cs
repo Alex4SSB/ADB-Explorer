@@ -144,21 +144,35 @@ public class FileSyncOperation : FileOperation
 
                     var lastWriteTime = item.DateModified ?? DateTime.Now;
 
-                    // target = [Android parent folder]\[relative path from Windows parent folder to current item]
-                    using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                    service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useV2, in isCanceled);
+                    try
+                    {
+                        // target = [Android parent folder]\[relative path from Windows parent folder to current item]
+                        using var stream = new FileStream(item.FullPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                        service.Push(stream, targetPath, fileMode, lastWriteTime, SyncProgressCallback, useV2, in isCanceled);
+                    }
+                    catch (Exception e)
+                    {
+                        AddUpdates([ new SyncErrorInfo(item.FullPath, e.Message) ]);
+                    }
                 }
                 else
                 {
                     if (Data.Settings.EnableLog && !Data.RuntimeSettings.IsLogPaused)
                         Data.CommandLog.Add(new($"@AdvancedSharpAdbClient: pull {item.FullPath} -> {targetPath}"));
 
-                    // target = [Windows parent folder]\[relative path from Android parent folder to current item]
-                    using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                    service.Pull(item.FullPath, stream, SyncProgressCallback, useV2, in isCanceled);
-                    
-                    if (item.DateModified is not null)
-                        File.SetLastWriteTime(targetPath, item.DateModified.Value);
+                    try
+                    {
+                        // target = [Windows parent folder]\[relative path from Android parent folder to current item]
+                        using var stream = new FileStream(targetPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                        service.Pull(item.FullPath, stream, SyncProgressCallback, useV2, in isCanceled);
+
+                        if (item.DateModified is not null)
+                            File.SetLastWriteTime(targetPath, item.DateModified.Value);
+                    }
+                    catch (Exception e)
+                    {
+                        AddUpdates([new SyncErrorInfo(item.FullPath, e.Message)]);
+                    }
                 }
             });
 
@@ -171,13 +185,26 @@ public class FileSyncOperation : FileOperation
 
         task.ContinueWith((t) =>
         {
-            Status = OperationStatus.Completed;
-
             var files = Files.Where(f => !f.IsDirectory);
             var completed = files.Count(f => f.CurrentPercentage == 100);
 
-            AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, TotalBytes, TransferEnd.Subtract(TransferStart).TotalSeconds, completed, files.Count() - completed);
-            StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
+            if (Files.Count() == 1 && completed == 0)
+            {
+                string message = FilePath.LastUpdate is SyncErrorInfo errorInfo
+                    ? errorInfo.Message
+                    : progressUpdates.OfType<SyncErrorInfo>().Last().Message;
+
+                Status = OperationStatus.Failed;
+                StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
+            }
+            else
+            {
+                Status = OperationStatus.Completed;
+                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, TotalBytes, TransferEnd.Subtract(TransferStart).TotalSeconds, completed, files.Count() - completed);
+                StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
+            }
+
+            ReleaseTransferResources();
 
         }, TaskContinuationOptions.OnlyOnRanToCompletion);
 
@@ -185,6 +212,8 @@ public class FileSyncOperation : FileOperation
         {
             Status = OperationStatus.Canceled;
             StatusInfo = new CanceledOpProgressViewModel();
+
+            ReleaseTransferResources();
         }, TaskContinuationOptions.OnlyOnCanceled);
 
         task.ContinueWith((t) =>
@@ -195,6 +224,8 @@ public class FileSyncOperation : FileOperation
 
             Status = OperationStatus.Failed;
             StatusInfo = new FailedOpProgressViewModel(FileOpStatusConverter.StatusString(typeof(SyncErrorInfo), message: message, total: true));
+
+            ReleaseTransferResources();
         }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
@@ -251,8 +282,40 @@ public class FileSyncOperation : FileOperation
 
     public override void ClearChildren()
     {
-        FilePath.Children.Clear();
-        progressUpdates.Clear();
+        FilePath.ClearAll();
+        progressUpdates?.Clear();
+    }
+
+    private void ReleaseTransferResources()
+    {
+        if (StatusInfo is CompletedSyncProgressViewModel completed && completed.FilesSkipped > 0)
+        {
+            var faultyFiles = Files.Where(f => !f.IsDirectory && f.LastUpdate is SyncErrorInfo)
+                                   .Take(20)
+                                   .Select(f => (File: f, Update: f.LastUpdate))
+                                   .ToList();
+
+            FilePath.ClearAll();
+
+            foreach (var (file, update) in faultyFiles)
+            {
+                file.ProgressUpdates.Add(update);
+            }
+
+            FilePath.Children.AddRange(faultyFiles.Select(f => f.File));
+        }
+        else
+        {
+            FilePath.ClearAll();
+        }
+
+        progressUpdates?.Clear();
+
+        if (OriginalShellItem is IDisposable disposable)
+        {
+            disposable.Dispose();
+            OriginalShellItem = null;
+        }
     }
 
     public override void AddUpdates(IEnumerable<FileOpProgressInfo> newUpdates)
