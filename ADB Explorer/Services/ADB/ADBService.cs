@@ -450,7 +450,16 @@ public partial class ADBService
             return;
         }
 
-        var adbSHA = Security.CalculateWindowsFileHash(adbPath.Trim('\\', '"'), true);
+        string trimmedPath = adbPath.Trim('"');
+
+        // Forbid UNC paths for security reasons
+        if (trimmedPath.StartsWith(@"\\"))
+        {
+            RuntimeSettings.AdbVersion = null;
+            return;
+        }
+
+        var adbSHA = Security.CalculateWindowsFileHash(trimmedPath, true);
         if (adbSHA is not null)
         {
             bool isValidHash = AdbVersions.HashList.Contains(adbSHA);
