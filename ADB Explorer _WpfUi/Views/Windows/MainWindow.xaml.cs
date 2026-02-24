@@ -14,6 +14,8 @@ namespace ADB_Explorer.Views.Windows
 {
     public partial class MainWindow : INavigationWindow
     {
+        private readonly DragWindow dw = new();
+
         public MainWindowViewModel ViewModel { get; }
 
         public MainWindow(
@@ -51,8 +53,12 @@ namespace ADB_Explorer.Views.Windows
             Data.RuntimeSettings.DefaultBrowserPath = Network.GetDefaultBrowser();
             Data.FileOpQ = new();
             NativeMethods.InterceptClipboard.Init(this, Data.CopyPaste.GetClipboardPasteItems, IpcService.AcceptIpcMessage);
-            
+
             //DeviceHelper.UpdateWsaPkgStatus();
+
+            dw.Show();
+
+            App.Current.MainWindow = this;
         }
 
         private SettingsPageHeader SettingsPageHeader
@@ -115,6 +121,8 @@ namespace ADB_Explorer.Views.Windows
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+
+            dw.Close();
 
             // Make sure that closing this window will begin the process of closing the application.
             Application.Current.Shutdown();

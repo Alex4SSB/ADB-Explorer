@@ -1,0 +1,154 @@
+﻿<Popup
+    x:Class="ADB_Explorer.DragWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    x:Name="dragWin"
+    AllowsTransparency="True"
+    Focusable="False"
+    IsHitTestVisible="False"
+    Opened="Popup_Opened"
+    Placement="AbsolutePoint"
+    PopupAnimation="None"
+    StaysOpen="True"
+    mc:Ignorable="d">
+    <Border
+        x:Name="MainBorder"
+        HorizontalAlignment="Left"
+        VerticalAlignment="Top"
+        Background="Transparent"
+        DataContext="{Binding ElementName=dragWin}"
+        MouseUp="Border_MouseUp"
+        Opacity="1">
+        <Border.Style>
+            <Style TargetType="Border">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}" Value="{x:Null}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragWithinSlave}" Value="True">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Border.Style>
+        <Grid
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            IsHitTestVisible="False">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Grid HorizontalAlignment="Left">
+                <Image
+                    x:Name="DragImage"
+                    Width="128"
+                    Height="128"
+                    IsHitTestVisible="False"
+                    Opacity="0.8"
+                    RenderOptions.BitmapScalingMode="HighQuality"
+                    RenderTransformOrigin="0.5,1"
+                    Source="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DragBitmap}"
+                    Stretch="Fill">
+                    <Image.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DpiScalingFactor}" ScaleY="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=DpiScalingFactor}" />
+                        </TransformGroup>
+                    </Image.RenderTransform>
+                </Image>
+                <TextBlock
+                    x:Name="DebugLabel"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="White"
+                    Foreground="Black"
+                    Text="DEBUG">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsDebug}" Value="False">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+            <Border
+                Grid.Column="1"
+                Padding="4"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Bottom"
+                Background="{DynamicResource SolidBackgroundFillColorQuarternaryBrush}"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                CornerRadius="3">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding ElementName=DragTooltip, Path=Text}" Value="">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="None">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                        <Setter Property="CornerRadius" Value="0" />
+                    </Style>
+                </Border.Style>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <ui:FontIcon
+                        Width="16"
+                        Margin="0,0,2,0"
+                        HorizontalAlignment="Left"
+                        FontSize="12"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        RenderTransformOrigin="0.5,0.5">
+                        <ui:FontIcon.Style>
+                            <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.RuntimeSettings}, Path=IsRTL, Mode=OneTime}" Value="True">
+                                        <Setter Property="RenderTransform">
+                                            <Setter.Value>
+                                                <ScaleTransform ScaleX="-1" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Copy">
+                                        <Setter Property="Glyph" Value="&#xE710;" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Move">
+                                        <Setter Property="Glyph" Value="&#xE72A;" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Source={x:Static Member=models:Data.CopyPaste}, Path=CurrentDropEffect}" Value="Link">
+                                        <Setter Property="Glyph" Value="&#xE8AD;" />
+                                    </DataTrigger>
+                                    <MultiDataTrigger>
+                                        <MultiDataTrigger.Conditions>
+                                            <Condition Binding="{Binding Source={x:Static Member=models:Data.FileActions}, Path=IsAppDrive}" Value="True" />
+                                            <Condition Binding="{Binding MouseWithinApp}" Value="True" />
+                                        </MultiDataTrigger.Conditions>
+                                        <Setter Property="Glyph" Value="&#xE896;" />
+                                    </MultiDataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ui:FontIcon.Style>
+                    </ui:FontIcon>
+                    <TextBlock
+                        x:Name="DragTooltip"
+                        Grid.Column="1"
+                        Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                        TextWrapping="Wrap" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Popup>

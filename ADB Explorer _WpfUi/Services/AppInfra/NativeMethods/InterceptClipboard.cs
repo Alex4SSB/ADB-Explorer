@@ -17,19 +17,24 @@ public static partial class NativeMethods
             _externalClipAction = clipboardAction;
             _externalIpcAction = ipcAction;
             RoutedEventHandler windowLoadedHandler = null;
-            PropertyChangedEventHandler driveViewHandler = null;
 
-            driveViewHandler = (sender, e) =>
+            if (window.IsLoaded)
             {
-                if (e.PropertyName == nameof(Data.RuntimeSettings.DriveViewNav) && Data.RuntimeSettings.DriveViewNav)
+                GetMainWindowHandle(window);
+            }
+            else
+            {
+                windowLoadedHandler = (sender, e) =>
                 {
-                    Data.RuntimeSettings.PropertyChanged -= driveViewHandler;
-                }
-            };
+                    GetMainWindowHandle(window);
 
-            Data.RuntimeSettings.PropertyChanged += driveViewHandler;
+                    window.Loaded -= windowLoadedHandler;
+                };
 
-            windowLoadedHandler = (sender, e) =>
+                window.Loaded += windowLoadedHandler;
+            }
+
+            static void GetMainWindowHandle(Window window)
             {
                 MainWindowHandle = new WindowInteropHelper(window).Handle;
 
@@ -37,11 +42,7 @@ public static partial class NativeMethods
                 _hwndSource.AddHook(WndProc);
 
                 AddClipboardFormatListener(MainWindowHandle);
-
-                window.Loaded -= windowLoadedHandler;
-            };
-
-            window.Loaded += windowLoadedHandler;
+            }
         }
 
         public static void Close()

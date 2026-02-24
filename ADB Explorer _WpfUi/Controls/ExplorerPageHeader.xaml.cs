@@ -31,8 +31,6 @@ public partial class ExplorerPageHeader : UserControl
     private bool WasDragging;
     private Point MouseDownPoint;
     private FileToIconConverter FileToIcon;
-    private DateTime appDataClick;
-    //private readonly DragWindow dw = new();
 
     private static Point NullPoint => new(-1, -1);
     private double? RowHeight { get; set; }
@@ -910,10 +908,47 @@ public partial class ExplorerPageHeader : UserControl
 
     private void DataGridRow_Drop(object sender, DragEventArgs e)
     {
+        CopyPaste.AcceptDataObject(e, (FrameworkElement)sender);
+        e.Handled = true;
     }
 
     private void ExplorerGrid_DragOver(object sender, DragEventArgs e)
     {
+        var allowed = CopyPaste.GetAllowedDragEffects(e.Data, (FrameworkElement)sender);
+
+        if (allowed.HasFlag(DragDropEffects.Move) && CopyPaste.IsSelf && !e.KeyStates.HasFlag(DragDropKeyStates.ControlKey) && !e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
+        {
+            e.Effects = DragDropEffects.Move;
+        }
+        else if (allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
+        {
+            e.Effects = DragDropEffects.Move;
+        }
+        else if (allowed.HasFlag(DragDropEffects.Link) && e.KeyStates.HasFlag(DragDropKeyStates.AltKey))
+        {
+            e.Effects = DragDropEffects.Link;
+        }
+        else if (allowed.HasFlag(DragDropEffects.Copy)) // copy is the default and does not require Ctrl to be activated
+        {
+            e.Effects = DragDropEffects.Copy;
+        }
+        else
+            e.Effects = allowed;
+
+        if ((!allowed.HasFlag(DragDropEffects.Copy) && e.KeyStates.HasFlag(DragDropKeyStates.ControlKey))
+            || (!allowed.HasFlag(DragDropEffects.Move) && e.KeyStates.HasFlag(DragDropKeyStates.ShiftKey))
+            || (!allowed.HasFlag(DragDropEffects.Link) && e.KeyStates.HasFlag(DragDropKeyStates.AltKey)))
+        {
+            e.Effects = DragDropEffects.None;
+        }
+
+        CopyPaste.DropEffect =
+        CopyPaste.CurrentDropEffect = e.Effects;
+
+        if (CopyPaste.CurrentFiles.Any())
+            RuntimeSettings.DragBitmap = FileToIconConverter.GetBitmapSource(CopyPaste.CurrentFiles.First());
+
+        e.Handled = true;
     }
 
     private void ExplorerGrid_ContextMenuClosing(object sender, ContextMenuEventArgs e)

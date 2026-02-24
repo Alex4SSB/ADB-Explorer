@@ -56,6 +56,7 @@
         <ui:FontIcon
             Margin="0,0,0,-2"
             VerticalAlignment="Center"
+            FontSize="18"
             Glyph="{Binding BatteryIcon}">
             <ui:FontIcon.Style>
                 <Style BasedOn="{StaticResource GlyphFont}" TargetType="ui:FontIcon">
