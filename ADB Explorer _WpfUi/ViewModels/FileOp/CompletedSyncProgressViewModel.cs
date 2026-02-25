@@ -32,6 +32,9 @@ public class CompletedSyncProgressViewModel : FileOpProgressViewModel
         {
             if (AverageRateMBps.HasValue)
             {
+                if (AverageRateMBps.Value <= 0)
+                    return string.Empty;
+
                 return string.Format(Strings.Resources.S_SECONDS_SHORT, $"{UnitConverter.BytesToSize((long)(AverageRateMBps.Value * 1024 * 1024))}/");
             }
             else

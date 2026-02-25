@@ -1100,7 +1100,7 @@ internal static class FileActionLogic
             path = ShellItem.Open(dialog.FileName);
         }
 
-        PullFiles(path, pullItems);
+        PullFiles(path, pullItems, true);
     }
 
     public static async void PullFiles(ShellItem path, IEnumerable<FileClass> pullItems, bool notify = false)
@@ -1170,7 +1170,7 @@ internal static class FileActionLogic
 
         var op = sender as FileSyncOperation;
         if (op.Status is FileOperation.OperationStatus.Completed)
-            ExplorerHelper.NotifyFileCreated(op.TargetPath.FullPath);
+            NativeMethods.RefreshExplorerDirectory(op.TargetPath.ParentPath);
     }
 
     public static void ToggleFileOpQ()

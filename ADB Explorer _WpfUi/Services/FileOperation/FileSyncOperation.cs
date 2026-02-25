@@ -186,9 +186,15 @@ public class FileSyncOperation : FileOperation
         task.ContinueWith((t) =>
         {
             var files = Files.Where(f => !f.IsDirectory);
+            int filesCount = files.Count();
             var completed = files.Count(f => f.CurrentPercentage == 100);
+            if (filesCount == 0 && Files.First().IsDirectory)
+            {
+                filesCount = 1;
+                completed = 1;
+            }
 
-            if (Files.Count() == 1 && completed == 0)
+            if (filesCount == 1 && completed == 0)
             {
                 string message = FilePath.LastUpdate is SyncErrorInfo errorInfo
                     ? errorInfo.Message
@@ -200,7 +206,12 @@ public class FileSyncOperation : FileOperation
             else
             {
                 Status = OperationStatus.Completed;
-                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, TotalBytes, TransferEnd.Subtract(TransferStart).TotalSeconds, completed, files.Count() - completed);
+
+                var totalSeconds = TransferEnd.Subtract(TransferStart).TotalSeconds;
+                if (totalSeconds < 0)
+                    totalSeconds = 0;
+
+                AdbSyncStatsInfo adbInfo = new(FilePath.FullPath, TotalBytes, totalSeconds, completed, filesCount - completed);
                 StatusInfo = new CompletedSyncProgressViewModel(adbInfo);
             }
 

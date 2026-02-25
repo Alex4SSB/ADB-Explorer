@@ -3,6 +3,7 @@
 using Helpers;
 using System.Drawing;
 using System.Runtime.InteropServices.ComTypes;
+using static Vanara.PInvoke.Shell32;
 
 #pragma warning disable SYSLIB1054 // Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time
 
@@ -709,6 +710,20 @@ public static partial class NativeMethods
     {
         var result = SendMessage(windowHandle, (uint)messageType, IntPtr.Zero, ref data);
         return result != IntPtr.Zero;
+    }
+
+    public static void RefreshExplorerDirectory(string directoryPath)
+    {
+        var hDir = (nuint)Marshal.StringToHGlobalUni(directoryPath);
+
+        try
+        {
+            SHChangeNotify(SHCNE.SHCNE_UPDATEDIR, SHCNF.SHCNF_PATHW, hDir);
+        }
+        finally
+        {
+            Marshal.FreeHGlobal((nint)hDir);
+        }
     }
 
     /// <summary>
