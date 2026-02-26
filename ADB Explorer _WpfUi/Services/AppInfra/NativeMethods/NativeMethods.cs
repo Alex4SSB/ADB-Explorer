@@ -643,6 +643,29 @@ public static partial class NativeMethods
         return icon;
     }
 
+    [LibraryImport("User32.dll", EntryPoint = "PrivateExtractIconsW", StringMarshalling = StringMarshalling.Utf16)]
+    private static partial uint PrivateExtractIcons(
+        string szFileName,
+        int nIconIndex,
+        int cxIcon,
+        int cyIcon,
+        out HANDLE phicon,
+        out int piconid,
+        uint nIcons,
+        uint flags);
+
+    public static Icon ExtractIconByIndex(string filePath, int index, int size)
+    {
+        uint result = PrivateExtractIcons(filePath, index, size, size, out HANDLE hIcon, out _, 1, 0);
+        if (result == 0 || hIcon == IntPtr.Zero)
+            return null;
+
+        Icon icon = (Icon)Icon.FromHandle(hIcon).Clone();
+        DestroyIcon(hIcon);
+
+        return icon;
+    }
+
     [LibraryImport("Gdi32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool DeleteObject(HANDLE hObject);

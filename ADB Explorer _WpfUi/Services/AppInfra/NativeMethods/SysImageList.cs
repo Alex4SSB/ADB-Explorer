@@ -134,8 +134,14 @@ public static partial class NativeMethods
 
     #region SysImageList
     /// <summary>
-    /// Summary description for SysImageList.
+    /// Provides access to the system image list, allowing retrieval and drawing of icons associated with files and
+    /// system resources.
     /// </summary>
+    /// <remarks>The SysImageList class enables managed code to interact with the Windows Shell system image
+    /// list, supporting operations such as retrieving icon indices for files, obtaining icon handles, and drawing icons
+    /// to device contexts. The image list size can be specified during instantiation. This class implements IDisposable
+    /// to ensure that unmanaged resources are released appropriately. It is typically used to display file or folder
+    /// icons consistent with those shown by Windows Explorer.</remarks>
     public class SysImageList : IDisposable
     {
         #region UnmanagedCode
@@ -568,7 +574,7 @@ public static partial class NativeMethods
                 IMAGELISTDRAWPARAMS pimldp = new()
                 {
                     hdcDst = hdc,
-                    cbSize = Marshal.SizeOf(typeof(IMAGELISTDRAWPARAMS)),
+                    cbSize = Marshal.SizeOf<IMAGELISTDRAWPARAMS>(),
                     i = index,
                     x = x,
                     y = y,
@@ -606,7 +612,7 @@ public static partial class NativeMethods
             IMAGELISTDRAWPARAMS pimldp = new()
             {
                 hdcDst = hdc,
-                cbSize = Marshal.SizeOf(typeof(IMAGELISTDRAWPARAMS)),
+                cbSize = Marshal.SizeOf<IMAGELISTDRAWPARAMS>(),
                 i = index,
                 x = x,
                 y = y,
@@ -663,7 +669,7 @@ public static partial class NativeMethods
             IMAGELISTDRAWPARAMS pimldp = new()
             {
                 hdcDst = hdc,
-                cbSize = Marshal.SizeOf(typeof(IMAGELISTDRAWPARAMS)),
+                cbSize = Marshal.SizeOf<IMAGELISTDRAWPARAMS>(),
                 i = index,
                 x = x,
                 y = y,
@@ -716,7 +722,7 @@ public static partial class NativeMethods
             hIml = IntPtr.Zero;
 
             // Get the System IImageList object from the Shell:
-            Guid iidImageList = new Guid("46EB5926-582E-4017-9FDF-E8998DAA0950");
+            Guid iidImageList = new("46EB5926-582E-4017-9FDF-E8998DAA0950");
             _ = SHGetImageList(
                 (int)size,
                 ref iidImageList,
