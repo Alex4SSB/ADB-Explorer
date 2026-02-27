@@ -6,11 +6,13 @@
     xmlns:local="clr-namespace:ADB_Explorer.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:models="clr-namespace:ADB_Explorer.Models"
+    xmlns:strings="clr-namespace:ADB_Explorer.Strings"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
-    d:DesignHeight="450"
-    d:DesignWidth="800"
+    x:Name="Dialog"
+    d:DesignWidth="500"
+    Focusable="False"
     mc:Ignorable="d">
-    <local:SimpleStackPanel Spacing="12">
+    <local:SimpleStackPanel DataContext="{Binding ElementName=Dialog}" Spacing="12">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
@@ -25,6 +27,8 @@
                 x:Name="DialogContent"
                 Grid.Column="1"
                 VerticalAlignment="Center"
+                d:Foreground="White"
+                d:Text="Baldur’s Gate 3 is a story-rich, party-based RPG set in the universe of Dungeons &amp; Dragons, where your choices shape a tale of fellowship and betrayal, survival and sacrifice, and the lure of absolute power. "
                 TextWrapping="Wrap" />
             <ContentPresenter
                 x:Name="ContentPresenter"
@@ -37,13 +41,40 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <CheckBox x:Name="DialogContentCheckbox" />
-            <local:AdbMenu
+            <CheckBox
+                d:Content="Do Not Show This Again"
+                d:Foreground="White"
+                d:IsChecked="True"
+                Content="{Binding CheckBoxContent}"
+                IsChecked="{Binding IsChecked, Mode=TwoWay}"
+                IsTabStop="False">
+                <CheckBox.Style>
+                    <Style BasedOn="{StaticResource DefaultCheckBoxStyle}" TargetType="CheckBox">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CheckBoxContent}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </CheckBox.Style>
+            </CheckBox>
+            <ui:Button
                 Grid.Column="1"
-                Margin="0,10,-20,-18"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Style="{StaticResource DialogExtraButtonsStyle}" />
+                Margin="0,10,0,0"
+                Command="{Binding CopyCommand.Command}"
+                IsTabStop="False"
+                ToolTip="{Binding Source={x:Static Member=strings:Resources.S_BUTTON_COPY_TO_CLIP}}">
+                <ui:Button.Style>
+                    <Style BasedOn="{StaticResource DefaultButtonStyle}" TargetType="ui:Button">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding MessageToCopy}" Value="">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ui:Button.Style>
+                <ui:FontIcon FontSize="16" Glyph="&#xF0E3;" />
+            </ui:Button>
         </Grid>
     </local:SimpleStackPanel>
 </UserControl>

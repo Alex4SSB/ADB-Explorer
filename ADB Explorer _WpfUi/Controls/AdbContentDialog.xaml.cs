@@ -1,4 +1,5 @@
-﻿using ADB_Explorer.Models;
+﻿using ADB_Explorer.Helpers;
+using ADB_Explorer.Models;
 using static ADB_Explorer.Services.DialogService;
 
 namespace ADB_Explorer.Controls;
@@ -6,8 +7,24 @@ namespace ADB_Explorer.Controls;
 /// <summary>
 /// Interaction logic for AdbContentDialog.xaml
 /// </summary>
+[ObservableObject]
 public partial class AdbContentDialog : UserControl
 {
+    [ObservableProperty]
+    private string messageToCopy = "";
+
+    [ObservableProperty]
+    private string checkBoxContent = "";
+
+    [ObservableProperty]
+    public bool isChecked = false;
+
+    public BaseAction CopyCommand => new(() => true, () =>
+    {
+        Clipboard.SetText(MessageToCopy);
+        MessageToCopy = "";
+    });
+
     private static string GetIcon(DialogIcon icon) => icon switch
     {
         DialogIcon.None => "",
@@ -34,18 +51,13 @@ public partial class AdbContentDialog : UserControl
         }
 
         if (copyToClipboard)
-            Data.FileActions.MessageToCopy = content;
+            dialog.MessageToCopy = content;
 
         dialog.Icon.Glyph = GetIcon(icon);
         dialog.ContentPresenter.Visibility = Visibility.Collapsed;
         dialog.DialogContent.Visibility = Visibility.Visible;
         dialog.DialogContent.Text = content;
-
-        dialog.DialogContentCheckbox.Content = checkBoxContent;
-        if (string.IsNullOrEmpty(checkBoxContent))
-        {
-            dialog.DialogContentCheckbox.Visibility = Visibility.Collapsed;
-        }
+        dialog.CheckBoxContent = checkBoxContent;
 
         return dialog;
     }
@@ -58,10 +70,8 @@ public partial class AdbContentDialog : UserControl
         dialog.ContentPresenter.Visibility = Visibility.Visible;
         dialog.DialogContent.Visibility = Visibility.Collapsed;
         dialog.ContentPresenter.Content = content;
-        dialog.DialogContentCheckbox.Visibility = Visibility.Collapsed;
+        dialog.CheckBoxContent = "";
 
         return dialog;
     }
-
-    public bool IsChecked => DialogContentCheckbox.IsChecked is true;
 }

@@ -402,14 +402,6 @@ public static class AppActions
             Strings.Resources.S_MENU_SEARCH_WEB,
             new(Key.O, ModifierKeys.Control),
             true),
-        new(FileActionType.CopyMessageToClipboard,
-            () => !string.IsNullOrEmpty(Data.FileActions.MessageToCopy),
-            () =>
-            {
-                Clipboard.SetText(Data.FileActions.MessageToCopy);
-                Data.FileActions.MessageToCopy = "";
-            },
-            Strings.Resources.S_BUTTON_COPY_TO_CLIP),
         new(FileActionType.NavHistory,
             () => NavHistory.MenuHistory.Value.Any() && !Data.FileActions.ListingInProgress,
             () => { },
@@ -507,7 +499,6 @@ public class FileAction : ViewModelBase
         FollowLink,
         PasteLink,
         SearchApkOnWeb,
-        CopyMessageToClipboard,
         NavHistory,
         TerminalToggle,
         OpenPackageLocation,

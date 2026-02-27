@@ -17,11 +17,11 @@ public static class DialogService
         Delete,
     }
 
-    public static void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true, bool copyToClipboard = false)
+    public static async void ShowMessage(string content, string title = "", DialogIcon icon = DialogIcon.None, bool censorContent = true, bool copyToClipboard = false)
     {
         var contentDialog = AdbContentDialog.StringDialog(content, icon, censorContent, copyToClipboard);
 
-        _ = ShowDialog(contentDialog, title).Result;
+        await ShowDialog(contentDialog, title);
     }
 
     public static async void ShowContent(UIElement content, string title = "", DialogIcon icon = DialogIcon.None)

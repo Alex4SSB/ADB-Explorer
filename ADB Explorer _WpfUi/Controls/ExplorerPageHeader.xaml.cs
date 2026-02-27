@@ -259,6 +259,26 @@ public partial class ExplorerPageHeader : UserControl
                     InitLister();
                     break;
 
+                case nameof(AppRuntimeSettings.PathBoxNavigation):
+                    if (RuntimeSettings.PathBoxNavigation == "-")
+                    {
+                        bfNavigation = true;
+                        NavigateToLocation(NavHistory.GoBack());
+                    }
+                    else
+                    {
+                        if (FileActions.IsExplorerVisible)
+                            NavigateToLocation(new(RuntimeSettings.PathBoxNavigation));
+                        else
+                        {
+                            if (!InitNavigation(RuntimeSettings.PathBoxNavigation))
+                            {
+                                DriveViewNav();
+                            }
+                        }
+                    }
+                    break;
+
                 case nameof(AppRuntimeSettings.LocationToNavigate):
                     if (RuntimeSettings.LocationToNavigate is null)
                         return;
